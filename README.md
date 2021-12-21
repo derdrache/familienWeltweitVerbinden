@@ -1,6 +1,10 @@
 # familien_suche
 
 to do:
+- Profil in Einstellung bearbeiten
+- Profil mit Datenbank verknüpfen
+- Test Profile zur Datenbank hinzufügen
+
 - MenuLeiste mit folgenden Punkten:
     - Board - Social interaction zwischen Orten oder Personen die gefolgt werden,
       Events für Orte Planen
@@ -11,9 +15,10 @@ to do:
     - Einstellungen:
         - Profil bearbeiten
         - benachrichtigung einstellen
-
+- Profil Einrichten beim ersten Login
 - Account verknüpfen - optional
     - Account löschen
+
 - Server umstellen mLab => vultr/ AWS / Azure / Google cloud?
 
 
