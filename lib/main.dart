@@ -4,7 +4,7 @@ import 'pages/board_page.dart';
 import 'pages/erkunden_page.dart';
 import 'pages/umkreis_page.dart';
 import 'pages/chat_page.dart';
-import 'pages/setting_page.dart';
+import 'pages/setting_page/setting_page.dart';
 
 void main()async {
   runApp(MyApp());

@@ -26,14 +26,14 @@ class SettingPage extends StatelessWidget{
           child:Row(
               children:[
                 SizedBox(width: elementDistance),
-                Icon(icon),
+                Icon(icon, color: Colors.white),
                 SizedBox(width: elementDistance),
                 Text(name),
                 Expanded(
                     child:Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children:[
-                          Icon(Icons.chevron_right),
+                          Icon(Icons.chevron_right, color: Colors.white),
                           SizedBox(width: elementDistance)
                         ]
                     )
