@@ -9,13 +9,14 @@ class ProfilChangePage extends StatefulWidget {
 
 class _ProfilChangePageState extends State<ProfilChangePage>{
   int dropdownValue = 5;
+  var testdropdown;
   int children = 1;
   final nameController = TextEditingController();
   final ortController = TextEditingController();
   final interessenController = TextEditingController();
   List<String> interessenList = ["Freilerner", "Weltreise"];
   List interessenAuswahlList = [];
-  List childAgeAuswahlList = [];
+  List childAgeAuswahlList = [null];
 
   Widget nameContainer(title){
     return Container(
@@ -34,15 +35,19 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
       padding: EdgeInsets.only(left: 10, right:10),
       child: TextField(
         controller: controller,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: hintText,
-          )
+        decoration: InputDecoration(
+          enabledBorder: const OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.black),
+          ),
+          border: OutlineInputBorder(),
+          hintText: hintText,
+          hintStyle: TextStyle(fontSize: 13, color: Colors.grey)
+        )
       ),
     );
   }
 
-  Widget multiDropTest(){
+  Widget interessenDropdown(){
     return Container(
       child: GFMultiSelect(
         items: interessenList,
@@ -50,14 +55,13 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
           interessenAuswahlList = value;
         },
         dropdownTitleTileText: 'Welche Themen interessieren dich?',
-        dropdownTitleTileColor: Colors.grey[200],
-        dropdownTitleTileMargin: EdgeInsets.only(
-            top: 22, left: 18, right: 18, bottom: 5),
+        dropdownTitleTileColor: Colors.purple,
+        dropdownTitleTileMargin: EdgeInsets.only(left: 10, right: 10),
         dropdownTitleTilePadding: EdgeInsets.all(10),
         dropdownUnderlineBorder: const BorderSide(
             color: Colors.transparent, width: 2),
         dropdownTitleTileBorder:
-        Border.all(color: Colors.grey, width: 1),
+        Border.all(color: Colors.black, width: 1),
         dropdownTitleTileBorderRadius: BorderRadius.circular(5),
         expandedIcon: const Icon(
           Icons.keyboard_arrow_down,
@@ -69,7 +73,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
         ),
         submitButton: Text('OK'),
         dropdownTitleTileTextStyle: const TextStyle(
-            fontSize: 14, color: Colors.black54),
+            fontSize: 14, color: Colors.grey),
         padding: const EdgeInsets.all(6),
         margin: const EdgeInsets.all(6),
         type: GFCheckboxType.basic,
@@ -79,76 +83,43 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     );
   }
 
-  Widget interessenDropdown(){
+  Widget ageDropdownButton(id) {
     return Container(
       height: 50,
-      margin: EdgeInsets.only(top: 10, bottom:10),
-      padding: EdgeInsets.only(left: 10, right:10),
-      child: InputDecorator(
-        decoration: const InputDecoration(border: OutlineInputBorder()),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: null,
-            hint: Text("Welche Themen interessieren dich?"),
-            icon: const Icon(Icons.arrow_downward),
-            elevation: 16,
-            style: const TextStyle(color: Colors.black),
-            underline: Container(
-              height: 2,
-              color: Colors.deepPurpleAccent,
-            ),
-            onChanged: (String? newValue) {
-              setState(() {
-                interessenAuswahlList.add(newValue);
-              });
-            },
-            items: interessenList
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
+      margin: EdgeInsets.all(10),
+      child: DropdownButtonHideUnderline(
+        child: GFDropdown(
+          padding: const EdgeInsets.all(15),
+          borderRadius: BorderRadius.circular(5),
+          border: const BorderSide(
+              color: Colors.black, width: 1),
+          dropdownButtonColor: Colors.purple,
+          icon: const Icon(Icons.keyboard_arrow_down),
+          iconEnabledColor: Colors.black54,
+          hint: Text(
+              "Alter der Kinder ?",
+              style: TextStyle(color: Colors.grey)
           ),
-      ),
-    ));
-  }
-
-  Widget ageDropdown(id){
-    return Container(
-      height: 50,
-      margin: EdgeInsets.only(top: 10, bottom:10),
-      padding: EdgeInsets.only(left: 10, right:10),
-      child: InputDecorator(
-        decoration: const InputDecoration(border: OutlineInputBorder()),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<int>(
-            value: childAgeAuswahlList.length == id ? null : childAgeAuswahlList[id],
-            hint: Text("Wie alt ist dein Kind?"),
-            icon: const Icon(Icons.arrow_downward),
-            elevation: 16,
-            style: const TextStyle(color: Colors.black),
-            underline: Container(
-              height: 2,
-              color: Colors.deepPurpleAccent,
-            ),
-            onChanged: (int? newValue) {
-              setState(() {
-                if(childAgeAuswahlList.length == id){
-                  childAgeAuswahlList.add(newValue);
-                } else{
-                  childAgeAuswahlList[id] = newValue;
-                }
-              });
-            },
-            items: <int>[0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17]
-                .map<DropdownMenuItem<int>>((int value) {
-              return DropdownMenuItem<int>(
+          style: const TextStyle(color: Colors.black, fontSize: 14,),
+          value: childAgeAuswahlList.length == id
+              ? null
+              : childAgeAuswahlList[id],
+          onChanged: (newValue) {
+            setState(() {
+              if (childAgeAuswahlList.length == id) {
+                childAgeAuswahlList.add(newValue);
+              } else {
+                childAgeAuswahlList[id] = newValue;
+              }
+            });
+          },
+          items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+              .map((value) =>
+              DropdownMenuItem(
                 value: value,
                 child: Text(value.toString()),
-              );
-            }).toList(),
-          ),
+              ))
+              .toList(),
         ),
       ),
     );
@@ -162,6 +133,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
         child: Icon(Icons.add),
         onPressed: (){
           setState((){
+            childAgeAuswahlList.add(null);
             children += 1;
           });
         },
@@ -190,12 +162,12 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
       nameContainer("Ort"),
       customTextfield('Placeholder - alter Ort', ortController),
       nameContainer("Interessen"),
-      multiDropTest(),
-      nameContainer("Alter der Kinder")
+      interessenDropdown(),
+      nameContainer("Alter der Kinder"),
     ];
 
     for(var i = 0 ; i < children; i++ ) {
-      containerList.add(ageDropdown(i));
+      containerList.add(ageDropdownButton(i));
     }
     containerList.add(newDropdownButton());
     containerList.add(saveButton());

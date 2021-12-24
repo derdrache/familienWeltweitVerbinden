@@ -2,7 +2,6 @@
 
 to do:
 - Profil bearbeiten:
-    - Interessenfeld beschränken? oder mit dropdown + Auswahl mit einem Auswahlmodus
     - Inhalt in die Datenbank einpflegen + fiktive Email Adresse verknüpfen / oder Handy id?
     - preDaten per Datenbank abrufen + in hintText einfügen
 
@@ -25,4 +24,5 @@ to do:
 - menu Leiste abrunden?
 - Farblayout verbessern
 - Einlogen mit Email?
+- Profil ageDropdown entfernen einfügen
 
