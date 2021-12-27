@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'pages/board_page.dart';
 import 'pages/erkunden_page.dart';
@@ -6,9 +8,16 @@ import 'pages/umkreis_page.dart';
 import 'pages/chat_page.dart';
 import 'pages/setting_page/setting_page.dart';
 
+
 void main()async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(MyApp());
 }
+
 
 class MyApp extends StatefulWidget{
   _MyAppState createState() => _MyAppState();

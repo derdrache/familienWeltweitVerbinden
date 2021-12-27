@@ -2,6 +2,7 @@
 
 to do:
 - Profil bearbeiten:
+    - Datenbank eintrag ändern
     - Inhalt in die Datenbank einpflegen + fiktive Email Adresse verknüpfen / oder Handy id?
     - preDaten per Datenbank abrufen + in hintText einfügen
 

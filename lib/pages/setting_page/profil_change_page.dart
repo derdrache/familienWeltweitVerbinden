@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
 import '../../setting_appbar.dart';
+import '../../database.dart';
 
 class ProfilChangePage extends StatefulWidget {
   State<ProfilChangePage> createState() => _ProfilChangePageState();
@@ -13,9 +14,8 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   int children = 1;
   final nameController = TextEditingController();
   final ortController = TextEditingController();
-  final interessenController = TextEditingController();
   List<String> interessenList = ["Freilerner", "Weltreise"];
-  List interessenAuswahlList = [];
+  List interessenDBList = [];
   List childAgeAuswahlList = [null];
 
   Widget nameContainer(title){
@@ -48,11 +48,21 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   }
 
   Widget interessenDropdown(){
+
+    changeSelectToList(select){
+      interessenDBList = [];
+      for(var i = 0; i< select.length; i++){
+        print(select[i]);
+        print(interessenList[1]);
+        interessenDBList.add(interessenList[select[i]]);
+      }
+    }
+
     return Container(
       child: GFMultiSelect(
         items: interessenList,
         onSelect: (value) {
-          interessenAuswahlList = value;
+          changeSelectToList(value);
         },
         dropdownTitleTileText: 'Welche Themen interessieren dich?',
         dropdownTitleTileColor: Colors.purple,
@@ -145,11 +155,27 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     return FloatingActionButton.extended(
       label: Text("speichern"),
       icon: Icon(Icons.save),
-      onPressed: (){
+      onPressed: () async{
+        /*
         print(nameController.text);
         print(ortController.text);
-        print(interessenController.text);
+        print(interessenDBList);
         print(childAgeAuswahlList);
+
+         */
+
+        /*
+        dbAddNewProfil(
+          name: nameController.text,
+          ort: ortController.text,
+          interessen: interessenDBList,
+          kinder: childAgeAuswahlList
+        );
+
+         */
+        var docID = await dbGetProfilDocumentID("2");
+        print(await dbGetProfil(docID));
+        //MongoDatabase
       },
     );
   }
