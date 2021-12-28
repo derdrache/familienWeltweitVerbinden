@@ -10,7 +10,6 @@ class ProfilChangePage extends StatefulWidget {
 
 class _ProfilChangePageState extends State<ProfilChangePage>{
   int dropdownValue = 5;
-  var testdropdown;
   int children = 1;
   final nameController = TextEditingController();
   final ortController = TextEditingController();
@@ -52,8 +51,6 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     changeSelectToList(select){
       interessenDBList = [];
       for(var i = 0; i< select.length; i++){
-        print(select[i]);
-        print(interessenList[1]);
         interessenDBList.add(interessenList[select[i]]);
       }
     }
@@ -156,26 +153,14 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
       label: Text("speichern"),
       icon: Icon(Icons.save),
       onPressed: () async{
-        /*
-        print(nameController.text);
-        print(ortController.text);
-        print(interessenDBList);
-        print(childAgeAuswahlList);
-
-         */
-
-        /*
-        dbAddNewProfil(
-          name: nameController.text,
-          ort: ortController.text,
-          interessen: interessenDBList,
-          kinder: childAgeAuswahlList
-        );
-
-         */
-        var docID = await dbGetProfilDocumentID("2");
-        print(await dbGetProfil(docID));
-        //MongoDatabase
+        var data = {
+          "name": nameController.text,
+          "ort": ortController.text,
+          "interessen": interessenDBList,
+          "kinder": childAgeAuswahlList
+        };
+        var docID = await dbGetProfilDocumentID("dominik.mast.11@gmail.com");
+        dbChangeProfil(docID, data);
       },
     );
   }

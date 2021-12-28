@@ -2,9 +2,10 @@
 
 to do:
 - Profil bearbeiten:
-    - Datenbank eintrag ändern
-    - Inhalt in die Datenbank einpflegen + fiktive Email Adresse verknüpfen / oder Handy id?
-    - preDaten per Datenbank abrufen + in hintText einfügen
+    - Login Page
+        - TextFormField validator funktioniert nicht?
+    - resgister Page
+    - setting Page => Profil => preDaten per Datenbank abrufen + in hintText einfügen
 
 - MenuLeiste mit folgenden Punkten:
     - Board - Social interaction zwischen Orten oder Personen die gefolgt werden,
@@ -26,4 +27,6 @@ to do:
 - Farblayout verbessern
 - Einlogen mit Email?
 - Profil ageDropdown entfernen einfügen
+- Profil ID durch Email oder unique Name?
+- Layout Einheitlich (Button, Label, Textfield etc.)
 

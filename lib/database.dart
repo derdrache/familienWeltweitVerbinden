@@ -40,11 +40,11 @@ dbGetProfil(docID) async{
   return profilData;
 }
 
-dbGetProfilDocumentID(phoneID) async{
+dbGetProfilDocumentID(email) async{
   var docID = "";
 
   await profil
-      .where('phoneID', isEqualTo:phoneID)
+      .where('email', isEqualTo:email)
       .get()
       .then((snapshot) => docID=snapshot.docs[0].reference.id);
 
@@ -63,6 +63,8 @@ dbChangeProfil(docID, data){
       .catchError((error) => print("Failed to update user: $error"));
 }
 
-dbDeleteProfil() async{
-
+dbDeleteProfil(docID) {
+  return profil
+      .doc(docID)
+      .delete();
 }
