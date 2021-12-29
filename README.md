@@ -3,8 +3,8 @@
 to do:
 - Profil bearbeiten:
     - Login Page
-        - TextFormField validator funktioniert nicht?
-    - resgister Page
+        - passwort vergessen Page
+    - register Page
     - setting Page => Profil => preDaten per Datenbank abrufen + in hintText einfügen
 
 - MenuLeiste mit folgenden Punkten:

@@ -27,6 +27,7 @@ Widget customFloatbuttonExtended(text, function){
     margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
     padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
     child: FloatingActionButton.extended(
+      heroTag: text,
         label: Text(text),
         backgroundColor: Colors.purple,
         onPressed: function
