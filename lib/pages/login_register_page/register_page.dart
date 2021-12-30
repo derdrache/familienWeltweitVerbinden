@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../custom_widgets.dart';
@@ -18,12 +19,28 @@ class _RegisterPageState extends State<RegisterPage> {
   final checkPasswordController = TextEditingController();
   final _formKeyT = GlobalKey<FormState>();
 
-  submit(){
+  registration() async{
     if(_formKeyT.currentState!.validate()){
-        print(nameController.text);
-        print(emailController.text);
-        print(passwordController.text);
-        print(checkPasswordController.text);
+      var name = nameController.text;
+      var email = emailController.text;
+      var password = passwordController.text;
+
+      try{
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+        print(userCredential);
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text("Registrierung erfolgreich, bitte Anmelden")
+            )
+        );
+
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => LoginPage() )
+        );
+      }on FirebaseAuthException catch(error){
+        print("error");
+      }
     }
   }
 
@@ -64,7 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   }
               ),
-              customFloatbuttonExtended("Registrieren", () => submit())
+              customFloatbuttonExtended("Registrieren", () => registration())
             ],
           ),
         )

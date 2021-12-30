@@ -2,9 +2,7 @@
 
 to do:
 - Profil bearbeiten:
-    - Login Page
-        - passwort vergessen Page
-    - register Page
+    - passwort Textform passwort verstecken
     - setting Page => Profil => preDaten per Datenbank abrufen + in hintText einfügen
 
 - MenuLeiste mit folgenden Punkten:
