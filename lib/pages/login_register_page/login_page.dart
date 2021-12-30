@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../custom_widgets.dart';
+import '../../global_functions.dart' as globalFunction;
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
@@ -67,51 +68,19 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget emailTextField(){
-      return Container(
-        margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
-        padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
-        child: TextFormField(
-            controller: emailController,
-            decoration: InputDecoration(
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.black),
-                ),
-                border: OutlineInputBorder(),
-                labelText: "Email",
-            ),
-            validator: (value){
-                if(value == null || value.isEmpty){
-                  return "Bitte Email Adresse eingeben";
-                }
-                else if(!value.contains("@")){
-                  return "Bitte gültige Email Adresse eingeben";
-                }
-                return null;
-            },
-        ),
-      );
-    }
-
-    Widget passwortTextField(){
-      return Container(
-        margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
-        padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
-        child: TextFormField(
-          controller: passwortController,
-          decoration: InputDecoration(
-            enabledBorder: const OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black),
-            ),
-            border: OutlineInputBorder(),
-            labelText: "Passwort",
-          ),
-          validator: (value){
-            if(value == null || value.isEmpty){
-              return "Bitte Passwort eingeben";
-            }
-            return null;
-          },
+    Widget forgetPassButton(){
+      return Align(
+        child: Container(
+          width: 150,
+          child: FlatButton(
+            hoverColor: Colors.transparent,
+              child: Text("Passwort vergessen?"),
+              onPressed: (){ Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context)=> ForgetPasswordPage()
+                  )
+              );
+          }),
         ),
       );
     }
@@ -132,13 +101,9 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
               children: [
                 header(),
-                emailTextField(),
-                passwortTextField(),
-                TextButton( child: Text("Passwort vergessen?"), onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context)=> ForgetPasswordPage())
-                  );
-                }),
+                customTextForm("Email", emailController, globalFunction.checkValidatorEmail()),
+                customTextForm("Passwort", passwortController, globalFunction.checkValidatorEmpty()),
+                forgetPassButton(),
                 customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended("Register", (){
                   Navigator.pushAndRemoveUntil(

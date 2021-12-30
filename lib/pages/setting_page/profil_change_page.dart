@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
-import '../../setting_appbar.dart';
+import '../../custom_widgets.dart';
 import '../../database.dart';
+import 'setting_page.dart';
 
 class ProfilChangePage extends StatefulWidget {
   State<ProfilChangePage> createState() => _ProfilChangePageState();
@@ -184,7 +185,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     containerList.add(saveButton());
 
     return Scaffold(
-    appBar: SettingAppBar("Profil bearbeiten"),
+    appBar: CustomAppbar("Profil bearbeiten", SettingPage()),
     body: Container(
           margin: EdgeInsets.all(20),
           decoration: BoxDecoration(

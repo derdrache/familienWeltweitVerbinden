@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../custom_widgets.dart';
+
 class ForgetPasswordPage extends StatefulWidget {
   const ForgetPasswordPage({Key? key}) : super(key: key);
 
@@ -10,6 +12,9 @@ class ForgetPasswordPage extends StatefulWidget {
 class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   @override
   Widget build(BuildContext context) {
-    return Text("Passwort vergessen");
+    return Scaffold(
+      appBar: CustomAppbar("Passwort vergessen", ForgetPasswordPage()),
+      body: Text("Passwort vergessen")
+    );
   }
 }
