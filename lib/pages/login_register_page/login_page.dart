@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../custom_widgets.dart';
-import '../../global_functions.dart' as globalFunction;
+import '../../global_functions.dart' as globalFunctions;
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
@@ -27,7 +27,8 @@ class _LoginPageState extends State<LoginPage> {
           email: email,
           password: passwort
       );
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StartPage()));
+
+      globalFunctions.changePage(context, StartPage(newVisit: true));
 
     }on FirebaseAuthException catch(error){
       if(error.code == "user-not-found"){
@@ -106,9 +107,9 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 header(),
                 customTextForm("Email", emailController,
-                    validator: globalFunction.checkValidatorEmpty()),
+                    validator: globalFunctions.checkValidatorEmpty()),
                 customTextForm("Passwort", passwortController,
-                    validator: globalFunction.checkValidatorEmpty(),
+                    validator: globalFunctions.checkValidatorEmpty(),
                     obsure: true),
                 forgetPassButton(),
                 customFloatbuttonExtended("Login", () => doLogin()),

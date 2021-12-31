@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
 import '../../custom_widgets.dart';
+import '../../global_functions.dart' as globalFunctions;
 import '../../database.dart';
 import '../start_page.dart';
 
@@ -170,8 +171,8 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
       dbChangeProfil(docID, data);
 
     } else {
-      dbAddNewProfil(data);
       FirebaseAuth.instance.currentUser!.updateDisplayName(nameController.text);
+      dbAddNewProfil(data);
     }
   }
 
@@ -182,7 +183,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
       icon: Icon(Icons.save),
       onPressed: () {
         transferDataToDatabase();
-        //change Page
+        globalFunctions.changePage(context, StartPage());
       },
     );
   }

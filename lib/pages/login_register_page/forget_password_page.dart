@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../custom_widgets.dart';
-import '../../global_functions.dart' as globalFunction;
+import '../../global_functions.dart' as globalFunctions;
 import 'login_page.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
@@ -21,10 +21,6 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       try{
         await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
         customSnackbar(context, "Email zum Passwort zurücksetzen wurde versendet");
-
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginPage() )
-        );
       }on FirebaseAuthException catch(error){
         if(error.code == "user-not-found"){
           customSnackbar(context, "kein User zu der Email Adresse gefunden");
@@ -51,8 +47,11 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                 SizedBox(height: 100),
                 Center(child: Text("Reset Link wird an deine Email Adresse gesendet")),
                 customTextForm("Email", emailController,
-                    validator: globalFunction.checkValidatorEmpty()),
-                customFloatbuttonExtended("Send Email", () => resetPassword())
+                    validator: globalFunctions.checkValidatorEmpty()),
+                customFloatbuttonExtended("Send Email", (){
+                  resetPassword();
+                  globalFunctions.changePage(context, LoginPage());
+                })
               ],
             ),
           )

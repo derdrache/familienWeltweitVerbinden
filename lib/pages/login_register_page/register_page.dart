@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../custom_widgets.dart';
-import '../../global_functions.dart' as globalFunction;
+import '../../global_functions.dart' as globalFunctions;
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -26,13 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       try{
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-
         customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden");
-
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginPage() )
-        );
-
       }on FirebaseAuthException catch(error){
         print(error.code);
         if(error.code == "email-already-in-use"){
@@ -68,12 +62,12 @@ class _RegisterPageState extends State<RegisterPage> {
               customTextForm(
                   "Email",
                   emailController,
-                  validator: globalFunction.checkValidatorEmpty()
+                  validator: globalFunctions.checkValidatorEmpty()
               ),
               customTextForm(
                   "Passwort",
                   passwordController,
-                  validator: globalFunction.checkValidatorEmpty(),
+                  validator: globalFunctions.checkValidatorEmpty(),
                   obsure: true
               ),
               customTextForm(
@@ -89,7 +83,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   }
               ),
-              customFloatbuttonExtended("Registrieren", () => registration())
+              customFloatbuttonExtended("Registrieren", (){
+                registration();
+                globalFunctions.changePage(context, LoginPage());
+              })
             ],
           ),
         )

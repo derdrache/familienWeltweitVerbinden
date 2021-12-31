@@ -11,8 +11,9 @@ import 'setting_page/profil_change_page.dart';
 
 class StartPage extends StatefulWidget{
   var selectedIndex;
+  var newVisit;
 
-  StartPage({this.selectedIndex=0});
+  StartPage({this.selectedIndex=0, this.newVisit = false});
 
   _StartPageState createState() => _StartPageState();
 }
@@ -20,12 +21,15 @@ class StartPage extends StatefulWidget{
 class _StartPageState extends State<StartPage>{
   int _selectedIndex = 0;
 
+
   checkIfFirstLogin(){
     var userCreateTime = FirebaseAuth.instance.currentUser!.metadata.creationTime;
     var userLastLoginTime = FirebaseAuth.instance.currentUser!.metadata.lastSignInTime;
-
-    // or FirebaseAuth.instance.currentUser!.displayName == null ?
-    if (userCreateTime == userLastLoginTime){
+    print(widget.newVisit);
+    if(widget.newVisit == false){
+      return false;
+    }else if (userCreateTime == userLastLoginTime ||
+        FirebaseAuth.instance.currentUser!.displayName == null){
       return true;
     } else{
       return false;
@@ -35,7 +39,6 @@ class _StartPageState extends State<StartPage>{
   Widget build(BuildContext context){
     const pageMainColor = Colors.grey;
     const navigationbarButtonColor = Colors.purple;
-    print(FirebaseAuth.instance.currentUser!.displayName);
     List<Widget> tabPages = <Widget>[
       BoardPage(),
       ErkundenPage(),

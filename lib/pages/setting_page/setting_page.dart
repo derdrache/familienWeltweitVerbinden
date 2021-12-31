@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
 
 import 'profil_change_page.dart';
+import '../../global_functions.dart' as globalFunctions;
 
 
 class SettingPage extends StatelessWidget{
@@ -46,15 +47,8 @@ class SettingPage extends StatelessWidget{
     Widget settingElement(icon, text, page){
       return TextButton(
         child: elementButtons(icon, text),
-        onPressed:  () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => page)
-        ),
+        onPressed:  () => globalFunctions.changePage(context, page)
       );
-      return OpenContainer(
-          closedBuilder: (context, _) => elementButtons(icon, text),
-          openBuilder: (context, _) => page
-          );
     }
 
     Widget settingOptions(screenWidth){

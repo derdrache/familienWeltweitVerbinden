@@ -10,7 +10,6 @@ checkValidatorEmpty(){
   };
 }
 
-
 checkValidatorPassword(password){
  return (value){
    if(value == null || value.isEmpty){
@@ -20,4 +19,11 @@ checkValidatorPassword(password){
    }
    return null;
  };
+}
+
+changePage(context, page){
+  Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => page)
+  );
 }
