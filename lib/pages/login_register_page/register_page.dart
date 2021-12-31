@@ -19,6 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final checkPasswordController = TextEditingController();
   final _formKeyT = GlobalKey<FormState>();
 
+
   registration() async{
     if(_formKeyT.currentState!.validate()){
       var name = nameController.text;
@@ -28,20 +29,33 @@ class _RegisterPageState extends State<RegisterPage> {
       try{
         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
         print(userCredential);
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text("Registrierung erfolgreich, bitte Anmelden")
-            )
-        );
+
+        customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden");
 
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => LoginPage() )
         );
       }on FirebaseAuthException catch(error){
-        print("error");
+        print(error.code);
+        if(error.code == "email-already-in-use"){
+          customSnackbar(context, "Email ist schon in Benutzung");
+        } else if(error.code == "invalid-email"){
+          customSnackbar(context, "Email ist nicht gültig");
+        } else if(error.code == "weak-password"){
+          customSnackbar(context, "Passwort ist zu schwach");
+        }
       }
     }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    checkPasswordController.dispose();
+
+    super.dispose();
   }
 
 
@@ -57,22 +71,24 @@ class _RegisterPageState extends State<RegisterPage> {
               customTextForm(
                   "Nickname",
                   nameController,
-                  globalFunction.checkValidatorEmpty()
+                  validator: globalFunction.checkValidatorEmpty()
               ),
               customTextForm(
                   "Email",
                   emailController,
-                  globalFunction.checkValidatorEmail()
+                  validator: globalFunction.checkValidatorEmpty()
               ),
               customTextForm(
                   "Passwort",
                   passwordController,
-                  globalFunction.checkValidatorEmpty()
+                  validator: globalFunction.checkValidatorEmpty(),
+                  obsure: true
               ),
               customTextForm(
                   "Passwort bestätigen",
                   checkPasswordController,
-                  (value){
+                  obsure: true,
+                  validator: (value){
                     if(value == null || value.isEmpty){
                       return "Bitte Passwort eingeben";
                     } else if(value != passwordController.text){

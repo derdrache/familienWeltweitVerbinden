@@ -18,6 +18,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   List interessenDBList = [];
   List childAgeAuswahlList = [null];
 
+
   Widget nameContainer(title){
     return Container(
         margin: EdgeInsets.only(top: 15, bottom: 15),
@@ -167,6 +168,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   }
 
   Widget build(BuildContext context) {
+
     double screenWidth = MediaQuery.of(context).size.width;
     List<Widget> containerList = [
       nameContainer("Benutztername"),

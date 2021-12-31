@@ -2,8 +2,9 @@
 
 to do:
 - Profil bearbeiten:
-    - passwort Textform passwort verstecken
+    - userid abrufen und durch die seiten geben!!
     - setting Page => Profil => preDaten per Datenbank abrufen + in hintText einfügen
+    - prüfen on alle Textformfelder leer sind beim zweiten Besuch
 
 - MenuLeiste mit folgenden Punkten:
     - Board - Social interaction zwischen Orten oder Personen die gefolgt werden,

@@ -28,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
           password: passwort
       );
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StartPage()));
+
     }on FirebaseAuthException catch(error){
       if(error.code == "user-not-found"){
         print("Benutzer nicht gefunden");
@@ -75,11 +76,14 @@ class _LoginPageState extends State<LoginPage> {
           child: FlatButton(
             hoverColor: Colors.transparent,
               child: Text("Passwort vergessen?"),
-              onPressed: (){ Navigator.push(
+              onPressed: (){                   Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context)=> ForgetPasswordPage()
-                  )
-              );
+                  PageRouteBuilder(
+                      pageBuilder: (context,a,b)=> ForgetPasswordPage(),
+                      transitionDuration: Duration(seconds: 0)
+                  ),
+                      (route) => false);
+
           }),
         ),
       );
@@ -101,8 +105,11 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
               children: [
                 header(),
-                customTextForm("Email", emailController, globalFunction.checkValidatorEmail()),
-                customTextForm("Passwort", passwortController, globalFunction.checkValidatorEmpty()),
+                customTextForm("Email", emailController,
+                    validator: globalFunction.checkValidatorEmpty()),
+                customTextForm("Passwort", passwortController,
+                    validator: globalFunction.checkValidatorEmpty(),
+                    obsure: true),
                 forgetPassButton(),
                 customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended("Register", (){

@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 double sideSpace = 20;
 var buttonColor = Colors.purple;
 
-Widget customTextForm(text, controller, [validator = null]){
+Widget customTextForm(text, controller, {validator = null, obsure = false}){
   return Container(
     margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
     padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
     child: TextFormField(
+      obscureText: obsure,
       controller: controller,
       decoration: InputDecoration(
         enabledBorder: const OutlineInputBorder(
@@ -31,6 +32,14 @@ Widget customFloatbuttonExtended(text, function){
         backgroundColor: Colors.purple,
         onPressed: function
     )
+  );
+}
+
+customSnackbar(context, text){
+  return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text(text)
+      )
   );
 }
 
