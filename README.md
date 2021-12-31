@@ -2,7 +2,7 @@
 
 to do:
 - Profil bearbeiten:
-    - userid abrufen und durch die seiten geben!!
+    - Global Pagewechsel funktion einbauen => profil_change_page Seitenwechsel nach save einbauen
     - setting Page => Profil => preDaten per Datenbank abrufen + in hintText einfügen
     - prüfen on alle Textformfelder leer sind beim zweiten Besuch
 
@@ -17,6 +17,7 @@ to do:
         - benachrichtigung einstellen
 
 - Profil Einrichten beim ersten Login
+    - Check ob jemand das erste Profilanlegen übersprungen hat
 
 - Account verknüpfen - optional
     - Account löschen

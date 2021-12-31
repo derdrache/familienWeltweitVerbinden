@@ -3,13 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
 
 
-dbAddNewProfil({name, ort, interessen, kinder}) {
+dbAddNewProfil(data) {
 
   return profil.add({
-    "name" : name,
-    "ort" : ort,
-    "interessen": interessen,
-    "kinder": kinder
+    "name": data["name"],
+    "ort": data["ort"],
+    "interessen": data["interessen"],
+    "kinder": data["kinder"]
   })
       .then((value) => print("User Added"))
       .catchError((error) => print("Failed to add user: $error"));
@@ -41,12 +41,16 @@ dbGetProfil(docID) async{
 }
 
 dbGetProfilDocumentID(email) async{
-  var docID = "";
+  var docID;
 
-  await profil
-      .where('email', isEqualTo:email)
-      .get()
-      .then((snapshot) => docID=snapshot.docs[0].reference.id);
+  try{
+    await profil
+        .where('email', isEqualTo:email)
+        .get()
+        .then((snapshot) => docID=snapshot.docs[0].reference.id);
+  }catch(error){
+    docID = null;
+  }
 
   return docID;
 }

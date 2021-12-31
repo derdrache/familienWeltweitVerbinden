@@ -44,6 +44,13 @@ class SettingPage extends StatelessWidget{
     }
 
     Widget settingElement(icon, text, page){
+      return TextButton(
+        child: elementButtons(icon, text),
+        onPressed:  () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => page)
+        ),
+      );
       return OpenContainer(
           closedBuilder: (context, _) => elementButtons(icon, text),
           openBuilder: (context, _) => page
@@ -60,21 +67,22 @@ class SettingPage extends StatelessWidget{
           ),
           width: screenWidth,
           child:Column(children: [
-            settingElement(Icons.manage_accounts, "Profil bearbeiten", ProfilChangePage()),
+            settingElement(
+                Icons.manage_accounts,
+                "Profil bearbeiten",
+                ProfilChangePage(newProfil: false,)
+            ),
             separationBox(),
             settingElement(Icons.manage_accounts, "Placeholder", null)
           ])
       );
     }
 
-    return Scaffold(
-        body: Center(child:Column(
+    return Center(child:Column(
           children: [
-            Text("Einstellungen"),
-            SizedBox(height: 20),
             settingOptions(screenWidth)
           ],
         )
-    ));
+    );
   }
 }

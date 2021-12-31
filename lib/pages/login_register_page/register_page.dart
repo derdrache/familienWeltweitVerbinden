@@ -13,7 +13,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final checkPasswordController = TextEditingController();
@@ -22,19 +21,18 @@ class _RegisterPageState extends State<RegisterPage> {
 
   registration() async{
     if(_formKeyT.currentState!.validate()){
-      var name = nameController.text;
       var email = emailController.text;
       var password = passwordController.text;
 
       try{
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-        print(userCredential);
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
         customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden");
 
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => LoginPage() )
         );
+
       }on FirebaseAuthException catch(error){
         print(error.code);
         if(error.code == "email-already-in-use"){
@@ -50,7 +48,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     checkPasswordController.dispose();
@@ -68,11 +65,6 @@ class _RegisterPageState extends State<RegisterPage> {
           key: _formKeyT,
           child: ListView(
             children: [
-              customTextForm(
-                  "Nickname",
-                  nameController,
-                  validator: globalFunction.checkValidatorEmpty()
-              ),
               customTextForm(
                   "Email",
                   emailController,

@@ -1,26 +1,41 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
 
 import 'board_page.dart';
 import 'erkunden_page.dart';
 import 'umkreis_page.dart';
 import 'chat_page.dart';
 import 'setting_page/setting_page.dart';
+import 'setting_page/profil_change_page.dart';
 
 
 class StartPage extends StatefulWidget{
+  var selectedIndex;
+
+  StartPage({this.selectedIndex=0});
+
   _StartPageState createState() => _StartPageState();
 }
 
 class _StartPageState extends State<StartPage>{
   int _selectedIndex = 0;
 
+  checkIfFirstLogin(){
+    var userCreateTime = FirebaseAuth.instance.currentUser!.metadata.creationTime;
+    var userLastLoginTime = FirebaseAuth.instance.currentUser!.metadata.lastSignInTime;
+
+    // or FirebaseAuth.instance.currentUser!.displayName == null ?
+    if (userCreateTime == userLastLoginTime){
+      return true;
+    } else{
+      return false;
+    }
+  }
 
   Widget build(BuildContext context){
     const pageMainColor = Colors.grey;
     const navigationbarButtonColor = Colors.purple;
+    print(FirebaseAuth.instance.currentUser!.displayName);
     List<Widget> tabPages = <Widget>[
       BoardPage(),
       ErkundenPage(),
@@ -32,17 +47,17 @@ class _StartPageState extends State<StartPage>{
 
     void _onItemTapped(int index) {
       setState(() {
-        _selectedIndex = index;
+        widget.selectedIndex = index;
       });
     }
 
-    return MaterialApp(
+    return checkIfFirstLogin() ? ProfilChangePage(newProfil: true): MaterialApp(
       theme: ThemeData(
         scaffoldBackgroundColor: pageMainColor,
       ),
       home: Scaffold(
           body: Center(
-            child: tabPages.elementAt(_selectedIndex),
+            child: tabPages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: BottomNavigationBar(
             items: const <BottomNavigationBarItem>[
@@ -72,7 +87,7 @@ class _StartPageState extends State<StartPage>{
                 backgroundColor: navigationbarButtonColor,
               ),
             ],
-            currentIndex: _selectedIndex,
+            currentIndex: widget.selectedIndex,
             selectedItemColor: pageMainColor,
             onTap: _onItemTapped,
           )

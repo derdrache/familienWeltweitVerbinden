@@ -1,11 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
 
 import '../../custom_widgets.dart';
 import '../../database.dart';
-import 'setting_page.dart';
+import '../start_page.dart';
 
 class ProfilChangePage extends StatefulWidget {
+  var newProfil;
+
+  ProfilChangePage({this.newProfil});
+
   State<ProfilChangePage> createState() => _ProfilChangePageState();
 }
 
@@ -17,6 +22,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   List<String> interessenList = ["Freilerner", "Weltreise"];
   List interessenDBList = [];
   List childAgeAuswahlList = [null];
+
 
 
   Widget nameContainer(title){
@@ -138,6 +144,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     return Container(
       margin: EdgeInsets.only(right: 20, bottom: 10),
       child: FloatingActionButton(
+        heroTag: 1,
         mini: true,
         child: Icon(Icons.add),
         onPressed: (){
@@ -150,25 +157,38 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     );
   }
 
+  void transferDataToDatabase() async {
+    var data = {
+    "name": nameController.text,
+    "ort": ortController.text,
+    "interessen": interessenDBList,
+    "kinder": childAgeAuswahlList
+    };
+
+    if(widget.newProfil == false){
+      var docID = await dbGetProfilDocumentID("dominik.mast.11@gmail.com");
+      dbChangeProfil(docID, data);
+
+    } else {
+      dbAddNewProfil(data);
+      FirebaseAuth.instance.currentUser!.updateDisplayName(nameController.text);
+    }
+  }
+
   Widget saveButton(){
     return FloatingActionButton.extended(
+      heroTag: "speichern",
       label: Text("speichern"),
       icon: Icon(Icons.save),
-      onPressed: () async{
-        var data = {
-          "name": nameController.text,
-          "ort": ortController.text,
-          "interessen": interessenDBList,
-          "kinder": childAgeAuswahlList
-        };
-        var docID = await dbGetProfilDocumentID("dominik.mast.11@gmail.com");
-        dbChangeProfil(docID, data);
+      onPressed: () {
+        transferDataToDatabase();
+        //change Page
       },
     );
   }
 
   Widget build(BuildContext context) {
-
+    String pageName = widget.newProfil == false? "Profil bearbeiten" : "Profil Anlegen";
     double screenWidth = MediaQuery.of(context).size.width;
     List<Widget> containerList = [
       nameContainer("Benutztername"),
@@ -187,18 +207,18 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     containerList.add(saveButton());
 
     return Scaffold(
-    appBar: CustomAppbar("Profil bearbeiten", SettingPage()),
-    body: Container(
-          margin: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-              color: Colors.purple,
-              borderRadius: BorderRadius.all(Radius.circular(10))
-          ),
-          width: screenWidth,
-          child: ListView(
-              children: containerList
+        appBar: widget.newProfil == false ? CustomAppbar(pageName, StartPage(selectedIndex: 4)): null,
+        body: Container(
+              margin: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                  color: Colors.purple,
+                  borderRadius: BorderRadius.all(Radius.circular(10))
+              ),
+              width: screenWidth,
+              child: ListView(
+                  children: containerList
+              )
           )
-      )
     );
   }
 }
