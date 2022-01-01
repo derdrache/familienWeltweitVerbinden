@@ -28,7 +28,6 @@ class _RegisterPageState extends State<RegisterPage> {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
         customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden");
       }on FirebaseAuthException catch(error){
-        print(error.code);
         if(error.code == "email-already-in-use"){
           customSnackbar(context, "Email ist schon in Benutzung");
         } else if(error.code == "invalid-email"){
@@ -60,20 +59,15 @@ class _RegisterPageState extends State<RegisterPage> {
           child: ListView(
             children: [
               customTextForm(
-                  "Email",
-                  emailController,
+                  "Email", emailController,
                   validator: globalFunctions.checkValidatorEmpty()
               ),
               customTextForm(
-                  "Passwort",
-                  passwordController,
-                  validator: globalFunctions.checkValidatorEmpty(),
-                  obsure: true
+                  "Passwort", passwordController, obsure: true,
+                  validator: globalFunctions.checkValidatorEmpty()
               ),
               customTextForm(
-                  "Passwort bestätigen",
-                  checkPasswordController,
-                  obsure: true,
+                  "Passwort bestätigen", checkPasswordController, obsure: true,
                   validator: (value){
                     if(value == null || value.isEmpty){
                       return "Bitte Passwort eingeben";

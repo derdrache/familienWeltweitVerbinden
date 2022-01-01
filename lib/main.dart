@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
+// wechsel für live
 import 'pages/login_register_page/login_page.dart';
+import 'pages/start_page.dart';
 
 
 void main()async {
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               scaffoldBackgroundColor: pageMainColor,
             ),
-            home: LoginPage()
+            home: StartPage()//LoginPage()
           );
         }
     );

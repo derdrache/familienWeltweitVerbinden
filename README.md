@@ -3,9 +3,8 @@
 to do:
 - Erkunden - Karte Personen mit bestimmten Kriteren gesucht werden können
     Möglichkeiten:
-        - Mapbox => free?
-        - OpenStreetMap => free?
-        - google Maps => Karten Zugriffe pro Monat begrenzen => Maps API kostet ab 28K zugriffe
+        - OpenStreetMap => benutzt facebook marketplace
+
 
 - MenuLeiste mit folgenden Punkten:
     - Board - Social interaction zwischen Orten oder Personen die gefolgt werden,
@@ -20,6 +19,9 @@ to do:
 - Account verknüpfen - optional
     - Account löschen
 
+- clean Code
+- mehrere Personen als Familie verknüpfen
+- interessen für Kinder optimieren?
 - passwort ändern ermöglichen
 - menu Leiste abrunden?
 - Farblayout verbessern

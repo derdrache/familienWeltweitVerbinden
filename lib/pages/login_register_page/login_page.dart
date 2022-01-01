@@ -25,26 +25,15 @@ class _LoginPageState extends State<LoginPage> {
     try{
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
-          password: passwort
-      );
-
+          password: passwort);
       globalFunctions.changePage(context, StartPage(newVisit: true));
-
     }on FirebaseAuthException catch(error){
       if(error.code == "user-not-found"){
-        print("Benutzer nicht gefunden");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.blue,
-          content: Text("Benutzer nicht gefunden"),
-        ));
+        customSnackbar(context, "Benutzer nicht gefunden");
       } else if(error.code == "wrong-password"){
-        print("Password ist falsch");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          backgroundColor: Colors.blue,
-          content: Text("Password ist falsch"),
-        ));
+        customSnackbar(context, "Password ist falsch");
       }
-    };
+    }
   }
 
   @override
@@ -61,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
     Widget header(){
       return Container(
         margin: EdgeInsets.only(top: sideSpace, bottom: sideSpace),
-        child: Center(
+        child: const Center(
             child:Text(
                 "Login",
               style: TextStyle(fontSize: 24),
