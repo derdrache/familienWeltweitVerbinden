@@ -19,17 +19,14 @@ class StartPage extends StatefulWidget{
 }
 
 class _StartPageState extends State<StartPage>{
-  int _selectedIndex = 0;
-
 
   checkIfFirstLogin(){
     var userCreateTime = FirebaseAuth.instance.currentUser!.metadata.creationTime;
     var userLastLoginTime = FirebaseAuth.instance.currentUser!.metadata.lastSignInTime;
-    print(widget.newVisit);
+
     if(widget.newVisit == false){
       return false;
-    }else if (userCreateTime == userLastLoginTime ||
-        FirebaseAuth.instance.currentUser!.displayName == null){
+    }else if (FirebaseAuth.instance.currentUser!.displayName == null){
       return true;
     } else{
       return false;

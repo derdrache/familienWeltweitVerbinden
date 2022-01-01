@@ -85,6 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               customFloatbuttonExtended("Registrieren", (){
                 registration();
+                dispose();
                 globalFunctions.changePage(context, LoginPage());
               })
             ],

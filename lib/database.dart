@@ -6,6 +6,7 @@ CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
 dbAddNewProfil(data) {
 
   return profil.add({
+    "email": data["email"],
     "name": data["name"],
     "ort": data["ort"],
     "interessen": data["interessen"],

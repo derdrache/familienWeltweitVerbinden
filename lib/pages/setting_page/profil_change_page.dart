@@ -17,14 +17,13 @@ class ProfilChangePage extends StatefulWidget {
 
 class _ProfilChangePageState extends State<ProfilChangePage>{
   int dropdownValue = 5;
-  int children = 1;
+  int childrenCount = 1;
   final nameController = TextEditingController();
   final ortController = TextEditingController();
   List<String> interessenList = ["Freilerner", "Weltreise"];
   List interessenDBList = [];
   List childAgeAuswahlList = [null];
-
-
+  var readDatabase = false;
 
   Widget nameContainer(title){
     return Container(
@@ -56,6 +55,9 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   }
 
   Widget interessenDropdown(){
+    var dropdownText = interessenDBList.isEmpty ?
+                       "Interessen eingeben": interessenDBList.join(" , ");
+    var color = interessenDBList.isEmpty ? Colors.grey : Colors.black;
 
     changeSelectToList(select){
       interessenDBList = [];
@@ -70,7 +72,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
         onSelect: (value) {
           changeSelectToList(value);
         },
-        dropdownTitleTileText: 'Welche Themen interessieren dich?',
+        dropdownTitleTileText: dropdownText,
         dropdownTitleTileColor: Colors.purple,
         dropdownTitleTileMargin: EdgeInsets.only(left: 10, right: 10),
         dropdownTitleTilePadding: EdgeInsets.all(10),
@@ -88,8 +90,8 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
           color: Colors.black54,
         ),
         submitButton: Text('OK'),
-        dropdownTitleTileTextStyle: const TextStyle(
-            fontSize: 14, color: Colors.grey),
+        dropdownTitleTileTextStyle: TextStyle(
+            fontSize: 14, color: color),
         padding: const EdgeInsets.all(6),
         margin: const EdgeInsets.all(6),
         type: GFCheckboxType.basic,
@@ -151,7 +153,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
         onPressed: (){
           setState((){
             childAgeAuswahlList.add(null);
-            children += 1;
+            childrenCount += 1;
           });
         },
       ),
@@ -160,6 +162,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
 
   void transferDataToDatabase() async {
     var data = {
+    "email": FirebaseAuth.instance.currentUser!.email,
     "name": nameController.text,
     "ort": ortController.text,
     "interessen": interessenDBList,
@@ -188,20 +191,50 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     );
   }
 
+  getProfilFromDatabase() async {
+    var userEmail = FirebaseAuth.instance.currentUser!.email;
+    var docID = await dbGetProfilDocumentID(userEmail);
+    var profil = await dbGetProfil(docID);
+
+    return profil;
+  }
+
+  void changeTextFormHintText() async {
+    if(!readDatabase){
+      var userProfil = await getProfilFromDatabase();
+
+      setState(() {
+        readDatabase = true;
+        nameController.text = userProfil["name"];
+        ortController.text = userProfil["ort"];
+        interessenDBList = userProfil["interessen"];
+        childAgeAuswahlList = userProfil["kinder"];
+        childAgeAuswahlList.add(null);
+        childrenCount = userProfil["kinder"].length;
+
+      });
+    }
+
+  }
+
   Widget build(BuildContext context) {
     String pageName = widget.newProfil == false? "Profil bearbeiten" : "Profil Anlegen";
     double screenWidth = MediaQuery.of(context).size.width;
     List<Widget> containerList = [
       nameContainer("Benutztername"),
-      customTextfield('Placeholder - alter Name', nameController),
-      nameContainer("Ort"),
-      customTextfield('Placeholder - alter Ort', ortController),
+      customTextfield("Benutzername eingeben", nameController),
+      nameContainer("Aktueller Ort"),
+      customTextfield("Ort eingeben", ortController),
       nameContainer("Interessen"),
       interessenDropdown(),
       nameContainer("Alter der Kinder"),
     ];
 
-    for(var i = 0 ; i < children; i++ ) {
+    if (!widget.newProfil){
+      changeTextFormHintText();
+    }
+
+    for(var i = 0 ; i < childrenCount; i++ ) {
       containerList.add(ageDropdownButton(i));
     }
     containerList.add(newDropdownButton());
