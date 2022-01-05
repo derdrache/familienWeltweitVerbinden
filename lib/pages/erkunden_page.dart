@@ -2,13 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+
 class ErkundenPage extends StatefulWidget{
   _ErkundenPageState createState() => _ErkundenPageState();
 }
 
 class _ErkundenPageState extends State<ErkundenPage>{
+
+
+
   Widget build(BuildContext context){
 
+
+    Marker ownMarker(text, position,  buttonFunction){
+      return Marker(
+        width: 30.0,
+        height: 30.0,
+        point: position,
+        builder: (ctx) => FloatingActionButton.small(
+          child: Text(text),
+          onPressed: buttonFunction,
+        ),
+      );
+    }
 
     Widget ownFlutterMap(){
       return FlutterMap(
@@ -25,16 +41,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
           MarkerLayerOptions(
             markers: [
               //hier Landen alle Personen und Events
-              Marker(
-                width: 80.0,
-                height: 80.0,
-                point: LatLng(51.5, -0.09),
-                builder: (ctx) => const FloatingActionButton(
-                    mini: true,
-                    child: Text("2"),
-                    onPressed: null,
-                  ),
-                ),
+              ownMarker("1", LatLng(20.86302, -86.89927), null),
             ],
           ),
         ],

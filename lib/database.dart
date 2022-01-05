@@ -10,7 +10,10 @@ dbAddNewProfil(data) {
     "name": data["name"],
     "ort": data["ort"],
     "interessen": data["interessen"],
-    "kinder": data["kinder"]
+    "kinder": data["kinder"],
+    "land": data["land"],
+    "longt": data["longt"],
+    "latt":  data["latt"]
   })
       .then((value) => print("User Added"))
       .catchError((error) => print("Failed to add user: $error"));
@@ -63,7 +66,10 @@ dbChangeProfil(docID, data){
     "name": data["name"],
     "ort": data["ort"],
     "interessen": data["interessen"],
-    "kinder": data["kinder"]
+    "kinder": data["kinder"],
+    "land": data["land"],
+    "longt": data["longt"],
+    "latt":  data["latt"]
       }).then((value) => print("User Updated"))
       .catchError((error) => print("Failed to update user: $error"));
 }

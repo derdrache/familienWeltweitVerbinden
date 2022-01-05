@@ -6,6 +6,8 @@ import '../../custom_widgets.dart';
 import '../../global_functions.dart' as globalFunctions;
 import '../../database.dart';
 import '../start_page.dart';
+import 'locationsService.dart';
+
 
 class ProfilChangePage extends StatefulWidget {
   var newProfil;
@@ -160,15 +162,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     );
   }
 
-  void transferDataToDatabase() async {
-    var data = {
-    "email": FirebaseAuth.instance.currentUser!.email,
-    "name": nameController.text,
-    "ort": ortController.text,
-    "interessen": interessenDBList,
-    "kinder": childAgeAuswahlList
-    };
-
+  void transferDataToDatabase(data) async {
     if(widget.newProfil == false){
       var docID = await dbGetProfilDocumentID("dominik.mast.11@gmail.com");
       dbChangeProfil(docID, data);
@@ -179,14 +173,45 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     }
   }
 
+  checkChangeChildrenList(){
+    var newChildList = [];
+    childAgeAuswahlList.forEach((child) {
+      if(child != null){
+        newChildList.add(child);
+      }
+    });
+
+    setState(() {
+      childAgeAuswahlList =newChildList;
+    });
+  }
+
   Widget saveButton(){
     return FloatingActionButton.extended(
       heroTag: "speichern",
       label: Text("speichern"),
       icon: Icon(Icons.save),
-      onPressed: () {
-        transferDataToDatabase();
-        globalFunctions.changePage(context, StartPage());
+      onPressed: () async{
+        var locationData = await LocationService().getLocationMapData(ortController.text);
+
+        if(locationData != null){
+          checkChangeChildrenList();
+          var data = {
+            "email": FirebaseAuth.instance.currentUser!.email,
+            "name": nameController.text,
+            "ort": locationData["city"],
+            "interessen": interessenDBList,
+            "kinder": childAgeAuswahlList,
+            "land": locationData["countryname"],
+            "longt": locationData["longt"],
+            "latt":  locationData["latt"]
+          };
+          transferDataToDatabase(data);
+          globalFunctions.changePage(context, StartPage());
+        }else{
+          customSnackbar(context, "Stadt nicht gefunden");
+        }
+
       },
     );
   }
@@ -209,7 +234,6 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
         ortController.text = userProfil["ort"];
         interessenDBList = userProfil["interessen"];
         childAgeAuswahlList = userProfil["kinder"];
-        childAgeAuswahlList.add(null);
         childrenCount = userProfil["kinder"].length;
 
       });
@@ -223,8 +247,8 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     List<Widget> containerList = [
       nameContainer("Benutztername"),
       customTextfield("Benutzername eingeben", nameController),
-      nameContainer("Aktueller Ort"),
-      customTextfield("Ort eingeben", ortController),
+      nameContainer("Aktuelle Stadt"),
+      customTextfield("Stadt eingeben", ortController),
       nameContainer("Interessen"),
       interessenDropdown(),
       nameContainer("Alter der Kinder"),

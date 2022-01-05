@@ -2,8 +2,8 @@
 
 to do:
 - Erkunden - Karte Personen mit bestimmten Kriteren gesucht werden können
-    Möglichkeiten:
-        - OpenStreetMap => benutzt facebook marketplace
+    => alle Datenbankeinträge abfragen
+    => für jeden Eintrag einen Marker erstellen
 
 
 - MenuLeiste mit folgenden Punkten:
@@ -19,6 +19,7 @@ to do:
 - Account verknüpfen - optional
     - Account löschen
 
+- Kartensuche => Kanarische Inseln machen Probleme
 - clean Code
 - mehrere Personen als Familie verknüpfen
 - interessen für Kinder optimieren?
