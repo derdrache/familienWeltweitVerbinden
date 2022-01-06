@@ -2,8 +2,6 @@
 
 to do:
 - Erkunden - Karte Personen mit bestimmten Kriteren gesucht werden können
-    => alle Datenbankeinträge abfragen
-    => für jeden Eintrag einen Marker erstellen
 
 
 - MenuLeiste mit folgenden Punkten:
