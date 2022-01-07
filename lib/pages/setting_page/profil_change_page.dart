@@ -192,7 +192,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
       label: Text("speichern"),
       icon: Icon(Icons.save),
       onPressed: () async{
-        var locationData = await LocationService().getLocationMapData(ortController.text);
+        var locationData = await LocationService().getLocationMapDataGoogle(ortController.text);
 
         if(locationData != null){
           checkChangeChildrenList();

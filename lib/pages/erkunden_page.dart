@@ -11,9 +11,9 @@ class ErkundenPage extends StatefulWidget{
 
 class _ErkundenPageState extends State<ErkundenPage>{
   var originalProfils = [];
-  var profilsZoom1 = []; // Landebene?
-  var profilsZoom2 = []; //mehrere Städe verbinden
-  var profilsZoom3 = []; //Stadtebene
+  var profilCountries = []; // Landebene?
+  var profilsBetween = []; //mehrere Städe verbinden
+  var profilsCities = []; //Stadtebene
   var aktiveProfils = [];
 
   void initState () {
@@ -27,21 +27,58 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var getProfils = await dbGetAllProfils();
     setState(() {
       originalProfils = getProfils;
-      aktiveProfils = getProfils;
       createAndSetZoomProfils();
+      aktiveProfils = profilsCities;
+
     });
   }
 
   createAndSetZoomProfils(){
     setState(() {
-      // 1
-      // 2
-      profilsZoom3 = createZoomProfil3();
+      profilsCities = createProfilCities();
+      profilsBetween = createProfilBetween(); // wirft noch zu viele zusammen
+      // Länder
+
     });
 
   }
 
-  createZoomProfil3(){
+  createProfilBetween(){
+    var newProfils = [];
+
+    profilsCities.forEach((originalProfil) {
+      print(originalProfil);
+      var newPoint = false;
+      var abstand = 1.5;
+
+      for(var i = 0; i< newProfils.length; i++){
+        double originalLatt = originalProfil["latt"];
+        double newLatt = newProfils[i]["latt"];
+        double originalLongth = originalProfil["longt"];
+        double newLongth = newProfils[i]["longt"];
+        bool check = (newLatt + abstand >= originalLatt && newLatt - abstand <= originalLatt) &&
+                     (newLongth + abstand >= originalLongth && newLongth - abstand<= originalLongth);
+
+        if(check){
+          newPoint = true;
+          newProfils[i]["name"] = (int.parse(newProfils[i]["name"]) + int.parse(originalProfil["name"])).toString();
+        }
+      };
+
+      if(!newPoint){
+        newProfils.add({
+          "ort": originalProfil["ort"],
+          "name": originalProfil["name"],
+          "latt": originalProfil["latt"],
+          "longt": originalProfil["longt"]
+        });
+      }
+    });
+    print(newProfils);
+    return newProfils;
+  }
+
+  createProfilCities(){
     var newProfils = [];
 
     originalProfils.forEach((originalProfil) {
@@ -50,14 +87,16 @@ class _ErkundenPageState extends State<ErkundenPage>{
       for(var i = 0; i< newProfils.length; i++){
         if(originalProfil["ort"] == newProfils[i]["ort"]){
           newCity = true;
-          newProfils[i]["count"] += 1;
+          newProfils[i]["name"] = (int.parse(newProfils[i]["name"]) + 1).toString();
         }
       };
 
       if(!newCity){
         newProfils.add({
           "ort": originalProfil["ort"],
-          "count": 1
+          "name": "1",
+          "latt": originalProfil["latt"],
+          "longt": originalProfil["longt"]
         });
       }
     });
@@ -68,8 +107,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   Widget build(BuildContext context){
     List<Marker> allMarker = [];
-    double? zoom = 0.0;
-
 
     Marker ownMarker(text, position,  buttonFunction){
       return Marker(
@@ -83,14 +120,14 @@ class _ErkundenPageState extends State<ErkundenPage>{
       );
     }
 
-    changeProfil( zoom){
+    changeProfil(zoom){
       var choosenProfils = [];
-      if(zoom! > 5){
-        choosenProfils = profilsZoom1;
-      } else if(zoom! > 4){
-        choosenProfils = profilsZoom2;
-      } else if(zoom! > 3){
-        choosenProfils = profilsZoom3;
+      if(zoom! > 6.5){
+        choosenProfils = profilsCities;
+      } else if(zoom! > 4.5){
+        choosenProfils = profilsBetween;
+      } else{
+        //choosenProfils = profilsZoom1;
       }
 
       setState(() {
@@ -101,7 +138,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     createMarker() async{
       List<Marker> markerList = [];
       aktiveProfils.forEach((profil){
-        var position = LatLng(double.parse(profil["latt"]), double.parse(profil["longt"]));
+        var position = LatLng(profil["latt"], profil["longt"]);
         markerList.add(ownMarker(profil["name"], position, null));
       });
 
@@ -117,8 +154,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       return FlutterMap(
         options: MapOptions(
-          center: LatLng(51.5, -0.09),
-          zoom: 0.7,
+          center: LatLng(20.96472, -89.62173),
+          zoom: 8.0,
           onPositionChanged: (position, changed){
             if(changed){
               changeProfil(position.zoom);

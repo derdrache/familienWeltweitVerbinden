@@ -14,19 +14,19 @@ class _BoardPageState extends State<BoardPage>{
 
 
   testDatatoDB() async {
-    var stadt = "Puerto Vallarta";
-    var locationData = await LocationService().getLocationMapData(stadt);
-
+    var stadt = "Tulum";
+    var locationData = await LocationService().getLocationMapDataGoogle(stadt);
     var data = {
-      "email": "test45@test.com",
-      "name": "test45",
+      "email": "test010@test.com",
+      "name": "test010",
       "ort": locationData["city"],
-      "interessen": ["Weltreise"],
-      "kinder": [12],
+      "interessen": [ "Freilerner"],
+      "kinder": [7,9, 11, 13],
       "land": locationData["countryname"],
       "longt": locationData["longt"],
       "latt":  locationData["latt"]
     };
+    print(data);
     dbAddNewProfil(data);
 
   }
@@ -37,6 +37,7 @@ class _BoardPageState extends State<BoardPage>{
     return Scaffold(
       body: FloatingActionButton(
       onPressed: ()async {
+        testDatatoDB();
       },
       )
     );
