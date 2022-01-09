@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 import 'setting_page/locationsService.dart';
 import '../database.dart';
 
@@ -14,7 +15,7 @@ class _BoardPageState extends State<BoardPage>{
 
 
   testDatatoDB() async {
-    var stadt = "Tulum";
+    var stadt = "United Arab Emirates";
     var locationData = await LocationService().getLocationMapDataGoogle(stadt);
     var data = {
       "email": "test010@test.com",
@@ -27,9 +28,11 @@ class _BoardPageState extends State<BoardPage>{
       "latt":  locationData["latt"]
     };
     print(data);
-    dbAddNewProfil(data);
+    //dbAddNewProfil(data);
 
   }
+
+
 
   Widget build(BuildContext context){
     var textController = TextEditingController();
@@ -37,7 +40,7 @@ class _BoardPageState extends State<BoardPage>{
     return Scaffold(
       body: FloatingActionButton(
       onPressed: ()async {
-        testDatatoDB();
+        print(await LocationService().getCountryLocation("Mexiko"));
       },
       )
     );

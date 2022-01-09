@@ -22,10 +22,9 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   int childrenCount = 1;
   final nameController = TextEditingController();
   final ortController = TextEditingController();
-  List<String> interessenList = ["Freilerner", "Weltreise"];
-  List interessenDBList = [];
   List childAgeAuswahlList = [null];
   var readDatabase = false;
+  var searchMultiForm = CustomMultiTextForm(auswahlList: []);
 
   Widget nameContainer(title){
     return Container(
@@ -36,70 +35,6 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
                 style: TextStyle(fontSize: 21)
             )
         )
-    );
-  }
-
-  Widget customTextfield(hintText, controller){
-    return Container(
-      padding: EdgeInsets.only(left: 10, right:10),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          enabledBorder: const OutlineInputBorder(
-            borderSide: const BorderSide(color: Colors.black),
-          ),
-          border: OutlineInputBorder(),
-          hintText: hintText,
-          hintStyle: TextStyle(fontSize: 13, color: Colors.grey)
-        )
-      ),
-    );
-  }
-
-  Widget interessenDropdown(){
-    var dropdownText = interessenDBList.isEmpty ?
-                       "Interessen eingeben": interessenDBList.join(" , ");
-    var color = interessenDBList.isEmpty ? Colors.grey : Colors.black;
-
-    changeSelectToList(select){
-      interessenDBList = [];
-      for(var i = 0; i< select.length; i++){
-        interessenDBList.add(interessenList[select[i]]);
-      }
-    }
-
-    return Container(
-      child: GFMultiSelect(
-        items: interessenList,
-        onSelect: (value) {
-          changeSelectToList(value);
-        },
-        dropdownTitleTileText: dropdownText,
-        dropdownTitleTileColor: Colors.purple,
-        dropdownTitleTileMargin: EdgeInsets.only(left: 10, right: 10),
-        dropdownTitleTilePadding: EdgeInsets.all(10),
-        dropdownUnderlineBorder: const BorderSide(
-            color: Colors.transparent, width: 2),
-        dropdownTitleTileBorder:
-        Border.all(color: Colors.black, width: 1),
-        dropdownTitleTileBorderRadius: BorderRadius.circular(5),
-        expandedIcon: const Icon(
-          Icons.keyboard_arrow_down,
-          color: Colors.black54,
-        ),
-        collapsedIcon: const Icon(
-          Icons.keyboard_arrow_up,
-          color: Colors.black54,
-        ),
-        submitButton: Text('OK'),
-        dropdownTitleTileTextStyle: TextStyle(
-            fontSize: 14, color: color),
-        padding: const EdgeInsets.all(6),
-        margin: const EdgeInsets.all(6),
-        type: GFCheckboxType.basic,
-        activeBgColor: Colors.green.withOpacity(0.5),
-        inactiveBorderColor: Colors.grey,
-      ),
     );
   }
 
@@ -200,7 +135,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
             "email": FirebaseAuth.instance.currentUser!.email,
             "name": nameController.text,
             "ort": locationData["city"],
-            "interessen": interessenDBList,
+            "interessen": searchMultiForm.auswahlList,
             "kinder": childAgeAuswahlList,
             "land": locationData["countryname"],
             "longt": locationData["longt"],
@@ -232,7 +167,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
         readDatabase = true;
         nameController.text = userProfil["name"];
         ortController.text = userProfil["ort"];
-        interessenDBList = userProfil["interessen"];
+        searchMultiForm = CustomMultiTextForm(auswahlList: userProfil["interessen"]);
         childAgeAuswahlList = userProfil["kinder"];
         childrenCount = userProfil["kinder"].length;
 
@@ -250,7 +185,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
       nameContainer("Aktuelle Stadt"),
       customTextfield("Stadt eingeben", ortController),
       nameContainer("Interessen"),
-      interessenDropdown(),
+      searchMultiForm,
       nameContainer("Alter der Kinder"),
     ];
 
