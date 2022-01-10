@@ -192,6 +192,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 class CustomDatePicker extends StatefulWidget {
   DateTime? pickedDate;
   String hintText;
+  var deleteFunction;
 
   getPickedDate(){
     return pickedDate;
@@ -200,7 +201,8 @@ class CustomDatePicker extends StatefulWidget {
   CustomDatePicker({
     Key? key,
     required this.hintText,
-    this.pickedDate
+    this.pickedDate,
+    this.deleteFunction
   }) : super(key: key);
 
   @override
@@ -242,12 +244,26 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
               border: Border.all(width: 1),
               borderRadius: BorderRadius.all(Radius.circular(borderRounding))
           ),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              widget.hintText,
-              style: TextStyle(fontSize: 16),
-            ),
+          child: Row(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  widget.hintText,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              Expanded(child: SizedBox()),
+              FloatingActionButton(
+                heroTag: widget.hintText,
+                backgroundColor: Colors.red,
+                mini: true,
+                child: Icon(Icons.remove),
+                onPressed: widget.deleteFunction
+              )
+            ]
+
+
           )
       ),
     );

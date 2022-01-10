@@ -21,12 +21,19 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   int childrenCount = 1;
   final nameController = TextEditingController();
   final ortController = TextEditingController();
-  List ageDatePickerList = [CustomDatePicker(hintText: "Geburtstag vom Kind eingeben")];
+  List ageDatePickerList = [];
   var searchMultiForm = CustomMultiTextForm(auswahlList: []);
   var childrenAgeList = [];
 
   void initState (){
     super.initState();
+
+    ageDatePickerList.add(
+        CustomDatePicker(
+          hintText: "Geburtstag vom Kind eingeben",
+          deleteFunction: ageDatePickerDeleteFunction(0),
+        )
+    );
 
     if (!widget.newProfil){
       getDataFromDB();
@@ -47,8 +54,9 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
 
       for(var i = 0; i < childrenCount; i++){
         ageDatePickerList.add(CustomDatePicker(
-            hintText: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["string"],
-            pickedDate: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["date"]
+          hintText: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["string"],
+          pickedDate: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["date"],
+          deleteFunction: ageDatePickerDeleteFunction(i),
         ));
       }
     });
@@ -107,7 +115,6 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   Widget saveButton(){
 
     saveButtonFunction() async{
-      print(getChildrenAgeData());
       var locationData = await LocationService().getLocationMapDataGoogle(ortController.text);
 
       if(locationData != null){
@@ -164,6 +171,17 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     containerList.add(saveButton());
 
     return containerList;
+  }
+
+  ageDatePickerDeleteFunction(id){
+    return (){
+      setState(() {
+        childrenCount -= 1;
+        ageDatePickerList.removeAt(id);
+      });
+    };
+
+
   }
 
 
