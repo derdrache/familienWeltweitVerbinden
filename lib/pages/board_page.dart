@@ -9,8 +9,6 @@ class BoardPage extends StatefulWidget{
   _BoardPageState createState() => _BoardPageState();
 }
 
-
-
 class _BoardPageState extends State<BoardPage>{
 
 
@@ -39,8 +37,8 @@ class _BoardPageState extends State<BoardPage>{
 
     return Scaffold(
       body: FloatingActionButton(
-      onPressed: ()async {
-        print(await LocationService().getCountryLocation("Mexiko"));
+      onPressed: () {
+
       },
       )
     );

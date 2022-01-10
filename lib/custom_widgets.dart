@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:getwidget/getwidget.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+
+// Container Text verändert sich nicht
 
 double sideSpace = 10;
 double borderRounding = 10;
@@ -63,43 +64,6 @@ customSnackbar(context, text){
   );
 }
 
-Widget customMultiTextForm(dropdownText, interessenList, function){
-  //var color = interessenDBList.isEmpty ? Colors.grey : Colors.black;
-
-
-  return Container(
-    child: GFMultiSelect(
-      items: interessenList,
-      onSelect: function,
-      dropdownTitleTileText: dropdownText,
-      dropdownTitleTileColor: Colors.purple,
-      dropdownTitleTileMargin: EdgeInsets.only(left: 10, right: 10),
-      dropdownTitleTilePadding: EdgeInsets.all(10),
-      dropdownUnderlineBorder: const BorderSide(
-          color: Colors.transparent, width: 2),
-      dropdownTitleTileBorder:
-      Border.all(color: Colors.black, width: 1),
-      dropdownTitleTileBorderRadius: BorderRadius.circular(5),
-      expandedIcon: const Icon(
-        Icons.keyboard_arrow_down,
-        color: Colors.black54,
-      ),
-      collapsedIcon: const Icon(
-        Icons.keyboard_arrow_up,
-        color: Colors.black54,
-      ),
-      submitButton: Text('OK'),
-      dropdownTitleTileTextStyle: TextStyle(
-          fontSize: 14),
-      padding: const EdgeInsets.all(6),
-      margin: const EdgeInsets.all(6),
-      type: GFCheckboxType.basic,
-      activeBgColor: Colors.green.withOpacity(0.5),
-      inactiveBorderColor: Colors.grey,
-    ),
-  );
-}
-
 class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize = Size.fromHeight(50.0);
@@ -144,9 +108,6 @@ class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
     );
   }
 }
-
-
-
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
@@ -228,77 +189,68 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
   }
 }
 
+class CustomDatePicker extends StatefulWidget {
+  DateTime? pickedDate;
+  String hintText;
 
-
-/*
-class CustomMultiTextForm extends StatefulWidget {
-  List auswahlList;
-  bool allSelected;
-  CustomMultiTextForm({required this.auswahlList, this.allSelected = false});
-
-  @override
-  _CustomMultiTextFormState createState() => _CustomMultiTextFormState();
-}
-
-class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
-  List<String> interessenList = ["Freilerner", "Weltreise"];
-
-  @override
-  void initState() {
-    if(widget.allSelected){
-      widget.auswahlList = interessenList;
-    }
-    super.initState();
+  getPickedDate(){
+    return pickedDate;
   }
 
+  CustomDatePicker({
+    Key? key,
+    required this.hintText,
+    this.pickedDate
+  }) : super(key: key);
 
+  @override
+  _CustomDatePickerState createState() => _CustomDatePickerState();
+}
+
+class _CustomDatePickerState extends State<CustomDatePicker> {
+
+  datePicker() async{
+    return await showDatePicker(
+        context: context,
+        initialDate: DateTime.now().subtract(Duration(days: 365*9)),
+        firstDate: DateTime.now().subtract(Duration(days: 365*18)),
+        lastDate: DateTime.now()
+    );
+  }
+
+  showDate(){
+    return () async{
+      widget.pickedDate = await datePicker();
+      String newHintText = widget.pickedDate.toString().split(" ")[0].split("-").reversed.join("-");
+      setState(() {
+        widget.hintText = newHintText;
+      });
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
-    var dropdownText = widget.auswahlList.isEmpty ?
-    "Interessen eingeben": widget.auswahlList.join(" , ");
 
 
-    changeSelectToList(select){
-      widget.auswahlList = [];
-      for(var i = 0; i< select.length; i++){
-        widget.auswahlList.add(interessenList[select[i]]);
-      }
-    }
-
-    return Container(
-      child: GFMultiSelect(
-        items: interessenList,
-        onSelect: changeSelectToList,
-        dropdownTitleTileText: dropdownText,
-        dropdownTitleTileColor: Colors.purple,
-        dropdownTitleTileMargin: EdgeInsets.only(left: 10, right: 10),
-        dropdownTitleTilePadding: EdgeInsets.all(10),
-        dropdownUnderlineBorder: const BorderSide(
-            color: Colors.transparent, width: 2),
-        dropdownTitleTileBorder:
-        Border.all(color: Colors.black, width: 1),
-        dropdownTitleTileBorderRadius: BorderRadius.circular(5),
-        expandedIcon: const Icon(
-          Icons.keyboard_arrow_down,
-          color: Colors.black54,
-        ),
-        collapsedIcon: const Icon(
-          Icons.keyboard_arrow_up,
-          color: Colors.black54,
-        ),
-        submitButton: Text('OK'),
-        dropdownTitleTileTextStyle: TextStyle(
-            fontSize: 14),
-        padding: const EdgeInsets.all(6),
-        margin: const EdgeInsets.all(6),
-        type: GFCheckboxType.basic,
-        activeBgColor: Colors.green.withOpacity(0.5),
-        inactiveBorderColor: Colors.grey,
+    return GestureDetector(
+      onTap: showDate(),
+      child: Container(
+          height: 60,
+          margin: EdgeInsets.all(sideSpace),
+          padding: EdgeInsets.only(left: sideSpace, right: sideSpace),
+          decoration: BoxDecoration(
+              border: Border.all(width: 1),
+              borderRadius: BorderRadius.all(Radius.circular(borderRounding))
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              widget.hintText,
+              style: TextStyle(fontSize: 16),
+            ),
+          )
       ),
     );
   }
 }
 
-
- */

@@ -27,3 +27,17 @@ changePage(context, page){
       MaterialPageRoute(builder: (context) => page)
   );
 }
+
+timeStampToDateTimeDict(timestamp){
+  DateTime dateTime = timestamp.toDate();
+  String dateTimeString = dateTime.toString();
+
+  dateTime = DateTime.parse(dateTimeString.split(" ")[0]);
+  dateTimeString = dateTimeString.split(" ")[0].toString();
+
+  return {
+    "date": dateTime,
+    "string": dateTimeString.split("-").reversed.join("-")
+  };
+
+}

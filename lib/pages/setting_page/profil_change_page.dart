@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:getwidget/getwidget.dart';
 
 import '../../custom_widgets.dart';
 import '../../global_functions.dart' as globalFunctions;
@@ -22,9 +21,38 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   int childrenCount = 1;
   final nameController = TextEditingController();
   final ortController = TextEditingController();
-  List childAgeAuswahlList = [null];
-  var readDatabase = false;
+  List ageDatePickerList = [CustomDatePicker(hintText: "Geburtstag vom Kind eingeben")];
   var searchMultiForm = CustomMultiTextForm(auswahlList: []);
+  var childrenAgeList = [];
+
+  void initState (){
+    super.initState();
+
+    if (!widget.newProfil){
+      getDataFromDB();
+    }
+
+  }
+
+  void getDataFromDB() async {
+    var userProfil = await getProfilFromDatabase();
+
+    setState(() {
+      nameController.text = userProfil["name"];
+      ortController.text = userProfil["ort"];
+      searchMultiForm = CustomMultiTextForm(auswahlList: userProfil["interessen"]);
+      childrenAgeList = userProfil["kinder"];
+      childrenCount = childrenAgeList.length;
+      ageDatePickerList = [];
+
+      for(var i = 0; i < childrenCount; i++){
+        ageDatePickerList.add(CustomDatePicker(
+            hintText: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["string"],
+            pickedDate: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["date"]
+        ));
+      }
+    });
+  }
 
   Widget nameContainer(title){
     return Container(
@@ -38,49 +66,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     );
   }
 
-  Widget ageDropdownButton(id) {
-    return Container(
-      height: 50,
-      margin: EdgeInsets.all(10),
-      child: DropdownButtonHideUnderline(
-        child: GFDropdown(
-          padding: const EdgeInsets.all(15),
-          borderRadius: BorderRadius.circular(5),
-          border: const BorderSide(
-              color: Colors.black, width: 1),
-          dropdownButtonColor: Colors.purple,
-          icon: const Icon(Icons.keyboard_arrow_down),
-          iconEnabledColor: Colors.black54,
-          hint: Text(
-              "Alter der Kinder ?",
-              style: TextStyle(color: Colors.grey)
-          ),
-          style: const TextStyle(color: Colors.black, fontSize: 14,),
-          value: childAgeAuswahlList.length == id
-              ? null
-              : childAgeAuswahlList[id],
-          onChanged: (newValue) {
-            setState(() {
-              if (childAgeAuswahlList.length == id) {
-                childAgeAuswahlList.add(newValue);
-              } else {
-                childAgeAuswahlList[id] = newValue;
-              }
-            });
-          },
-          items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
-              .map((value) =>
-              DropdownMenuItem(
-                value: value,
-                child: Text(value.toString()),
-              ))
-              .toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget newDropdownButton(){
+  Widget addChildrenButton(){
     return Container(
       margin: EdgeInsets.only(right: 20, bottom: 10),
       child: FloatingActionButton(
@@ -89,8 +75,8 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
         child: Icon(Icons.add),
         onPressed: (){
           setState((){
-            childAgeAuswahlList.add(null);
             childrenCount += 1;
+            ageDatePickerList.add(CustomDatePicker(hintText: "Geburtstag vom Kind eingeben"));
           });
         },
       ),
@@ -108,46 +94,46 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     }
   }
 
-  checkChangeChildrenList(){
-    var newChildList = [];
-    childAgeAuswahlList.forEach((child) {
-      if(child != null){
-        newChildList.add(child);
-      }
+  getChildrenAgeData(){
+    List brithDataList = [];
+
+    ageDatePickerList.forEach((datePicker) {
+      brithDataList.add(datePicker.getPickedDate());
     });
 
-    setState(() {
-      childAgeAuswahlList =newChildList;
-    });
+    return brithDataList;
   }
 
   Widget saveButton(){
+
+    saveButtonFunction() async{
+      print(getChildrenAgeData());
+      var locationData = await LocationService().getLocationMapDataGoogle(ortController.text);
+
+      if(locationData != null){
+        var data = {
+          "email": FirebaseAuth.instance.currentUser!.email,
+          "name": nameController.text,
+          "ort": locationData["city"],
+          "interessen": searchMultiForm.auswahlList,
+          "kinder": getChildrenAgeData(),
+          "land": locationData["countryname"],
+          "longt": locationData["longt"],
+          "latt":  locationData["latt"]
+        };
+
+        transferDataToDatabase(data);
+        globalFunctions.changePage(context, StartPage());
+      }else{
+        customSnackbar(context, "Stadt nicht gefunden");
+      }
+    }
+
     return FloatingActionButton.extended(
       heroTag: "speichern",
       label: Text("speichern"),
       icon: Icon(Icons.save),
-      onPressed: () async{
-        var locationData = await LocationService().getLocationMapDataGoogle(ortController.text);
-
-        if(locationData != null){
-          checkChangeChildrenList();
-          var data = {
-            "email": FirebaseAuth.instance.currentUser!.email,
-            "name": nameController.text,
-            "ort": locationData["city"],
-            "interessen": searchMultiForm.auswahlList,
-            "kinder": childAgeAuswahlList,
-            "land": locationData["countryname"],
-            "longt": locationData["longt"],
-            "latt":  locationData["latt"]
-          };
-          transferDataToDatabase(data);
-          globalFunctions.changePage(context, StartPage());
-        }else{
-          customSnackbar(context, "Stadt nicht gefunden");
-        }
-
-      },
+      onPressed: () => saveButtonFunction(),
     );
   }
 
@@ -159,26 +145,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
     return profil;
   }
 
-  void changeTextFormHintText() async {
-    if(!readDatabase){
-      var userProfil = await getProfilFromDatabase();
-
-      setState(() {
-        readDatabase = true;
-        nameController.text = userProfil["name"];
-        ortController.text = userProfil["ort"];
-        searchMultiForm = CustomMultiTextForm(auswahlList: userProfil["interessen"]);
-        childAgeAuswahlList = userProfil["kinder"];
-        childrenCount = userProfil["kinder"].length;
-
-      });
-    }
-
-  }
-
-  Widget build(BuildContext context) {
-    String pageName = widget.newProfil == false? "Profil bearbeiten" : "Profil Anlegen";
-    double screenWidth = MediaQuery.of(context).size.width;
+  List<Widget> createProfilChangeWidgets(){
     List<Widget> containerList = [
       nameContainer("Benutztername"),
       customTextfield("Benutzername eingeben", nameController),
@@ -189,15 +156,20 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
       nameContainer("Alter der Kinder"),
     ];
 
-    if (!widget.newProfil){
-      changeTextFormHintText();
+    for(var i = 0 ; i < childrenCount; i++ ) {
+      containerList.add(ageDatePickerList[i]);
     }
 
-    for(var i = 0 ; i < childrenCount; i++ ) {
-      containerList.add(ageDropdownButton(i));
-    }
-    containerList.add(newDropdownButton());
+    containerList.add(addChildrenButton());
     containerList.add(saveButton());
+
+    return containerList;
+  }
+
+
+  Widget build(BuildContext context) {
+    String pageName = widget.newProfil == false? "Profil bearbeiten" : "Profil Anlegen";
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
         appBar: widget.newProfil == false ? CustomAppbar(pageName, StartPage(selectedIndex: 4)): null,
@@ -209,7 +181,7 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
               ),
               width: screenWidth,
               child: ListView(
-                  children: containerList
+                  children: createProfilChangeWidgets()
               )
           )
     );
