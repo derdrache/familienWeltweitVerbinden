@@ -46,108 +46,108 @@ class _ErkundenPageState extends State<ErkundenPage>{
     createAndSetZoomProfils();
   }
 
-  createProfilBetween(){
-    var newProfils = [];
-
-    filteredProfils.forEach((originalProfil) {
+  createProfilBetween(list, profil){
       var newPoint = false;
       var abstand = 1.5;
 
-      for(var i = 0; i< newProfils.length; i++){
-        double originalLatt = originalProfil["latt"];
-        double newLatt = newProfils[i]["latt"];
-        double originalLongth = originalProfil["longt"];
-        double newLongth = newProfils[i]["longt"];
+      for(var i = 0; i< list.length; i++){
+        double originalLatt = profil["latt"];
+        double newLatt = list[i]["latt"];
+        double originalLongth = profil["longt"];
+        double newLongth = list[i]["longt"];
         bool check = (newLatt + abstand >= originalLatt && newLatt - abstand <= originalLatt) &&
             (newLongth + abstand >= originalLongth && newLongth - abstand<= originalLongth);
 
         if(check){
           newPoint = true;
-          newProfils[i]["name"] = (int.parse(newProfils[i]["name"]) + 1).toString();
-          newProfils[i]["profils"].add(originalProfil);
+          list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
+          list[i]["profils"].add(profil);
         }
       };
 
       if(!newPoint){
-        newProfils.add({
-          "ort": originalProfil["ort"],
+        list.add({
+          "ort": profil["ort"],
           "name": "1",
-          "latt": originalProfil["latt"],
-          "longt": originalProfil["longt"],
-          "profils": [originalProfil]
+          "latt": profil["latt"],
+          "longt": profil["longt"],
+          "profils": [profil]
         });
       }
-    });
-    return newProfils;
+
+    return list;
   }
 
-  createProfilCities(){
-    var newProfils = [];
-
-    filteredProfils.forEach((originalProfil) {
+  createProfilCities(list, profil){
       var newCity = false;
 
-      for(var i = 0; i< newProfils.length; i++){
-        if(originalProfil["ort"] == newProfils[i]["ort"]){
+      for(var i = 0; i< list.length; i++){
+        if(profil["ort"] == list[i]["ort"]){
           newCity = true;
-          newProfils[i]["name"] = (int.parse(newProfils[i]["name"]) + 1).toString();
-          newProfils[i]["profils"].add(originalProfil);
+          list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
+          list[i]["profils"].add(profil);
         }
       };
 
       if(!newCity){
-        newProfils.add({
-          "ort": originalProfil["ort"],
+        list.add({
+          "ort": profil["ort"],
           "name": "1",
-          "latt": originalProfil["latt"],
-          "longt": originalProfil["longt"],
-          "profils": [originalProfil]
+          "latt": profil["latt"],
+          "longt": profil["longt"],
+          "profils": [profil]
         });
       }
 
-    });
-
-    return newProfils;
+    return list;
   }
 
-  createProfilCountries() async {
-    var newProfil = [];
-
-    for (var j= 0; j<filteredProfils.length; j++){
+  createProfilCountries(list, profil) async {
       var checkNewCountry = true;
 
-      for (var i = 0; i<newProfil.length; i++){
-        if(newProfil[i]["countryname"] == filteredProfils[j]["land"]){
+      for (var i = 0; i<list.length; i++){
+        if(list[i]["countryname"] == profil["land"]){
           checkNewCountry = false;
-          newProfil[i]["name"] =(int.parse(newProfil[i]["name"]) + 1).toString();
-          newProfil[i]["profils"].add(filteredProfils[j]);
+          list[i]["name"] =(int.parse(list[i]["name"]) + 1).toString();
+          list[i]["profils"].add(profil);
         }
       }
 
       if(checkNewCountry){
-        var country = filteredProfils[j]["land"];
+        var country = profil["land"];
         var position = await LocationService().getCountryLocation(country);
-        newProfil.add({
+        list.add({
           "name": "1",
           "countryname": country,
           "longt": position["longt"],
           "latt": position["latt"],
-          "profils": [filteredProfils[j]]
+          "profils": [profil]
         });
       }
 
-    }
-
-    return newProfil;
+    return list;
   }
 
   createAndSetZoomProfils() async {
-    var pufferProfil = await createProfilCountries();
+    var pufferProfilCities = [];
+    var pufferProfilBetween = [];
+    var pufferProfilCountries = [];
+
+    for(var i= 0; i<filteredProfils.length; i++){
+      pufferProfilCountries = await createProfilCountries(pufferProfilCountries,
+                                                          filteredProfils[i]);
+      pufferProfilBetween = await createProfilBetween(pufferProfilBetween,
+                                                       filteredProfils[i]);
+
+      pufferProfilCities = await createProfilCities(pufferProfilCities,
+                                                     filteredProfils[i]);
+
+    }
 
     setState(() {
-      profilsCities = createProfilCities();
-      profilsBetween = createProfilBetween();
-      profilCountries = pufferProfil;
+      profilsCities = pufferProfilCities;
+      profilsBetween = pufferProfilBetween;
+      profilCountries = pufferProfilCountries;
       changeProfil(mapZoom);
     });
 
