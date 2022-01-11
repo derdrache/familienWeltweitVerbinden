@@ -72,11 +72,15 @@ class SettingPage extends StatelessWidget{
       );
     }
 
-    return Center(child:Column(
-          children: [
-            settingOptions(screenWidth)
-          ],
-        )
+    return Padding(
+      padding: const EdgeInsets.only(top: 25),
+      child: Center(
+          child:Column(
+            children: [
+              settingOptions(screenWidth)
+            ],
+          )
+      ),
     );
   }
 }

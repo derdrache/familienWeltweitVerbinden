@@ -343,10 +343,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
     return Scaffold(
-        body: Stack(children: [
-          ownFlutterMap(),
-          searchMultiForm
-        ])
+        body: Padding(
+          padding: const EdgeInsets.only(top: 25),
+          child: Stack(children: [
+            ownFlutterMap(),
+            searchMultiForm
+          ]),
+        )
     );
   }
 }

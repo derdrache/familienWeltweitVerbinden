@@ -42,24 +42,29 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
   }
 
   void getDataFromDB() async {
-    var userProfil = await getProfilFromDatabase();
+    try{
+      var userProfil = await getProfilFromDatabase();
 
-    setState(() {
-      nameController.text = userProfil["name"];
-      ortController.text = userProfil["ort"];
-      searchMultiForm = CustomMultiTextForm(auswahlList: userProfil["interessen"]);
-      childrenAgeList = userProfil["kinder"];
-      childrenCount = childrenAgeList.length;
-      ageDatePickerList = [];
+      setState(() {
+        nameController.text = userProfil["name"];
+        ortController.text = userProfil["ort"];
+        searchMultiForm = CustomMultiTextForm(auswahlList: userProfil["interessen"]);
+        childrenAgeList = userProfil["kinder"];
+        childrenCount = childrenAgeList.length;
+        ageDatePickerList = [];
 
-      for(var i = 0; i < childrenCount; i++){
-        ageDatePickerList.add(CustomDatePicker(
-          hintText: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["string"],
-          pickedDate: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["date"],
-          deleteFunction: ageDatePickerDeleteFunction(i),
-        ));
-      }
-    });
+        for(var i = 0; i < childrenCount; i++){
+          ageDatePickerList.add(CustomDatePicker(
+            hintText: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["string"],
+            pickedDate: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["date"],
+            deleteFunction: ageDatePickerDeleteFunction(i),
+          ));
+        }
+      });
+    } catch (error){
+      print("Problem mit dem User finden");
+    }
+
   }
 
   Widget nameContainer(title){

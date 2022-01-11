@@ -40,10 +40,13 @@ class _BoardPageState extends State<BoardPage>{
     var textController = TextEditingController();
 
     return Scaffold(
-      body: FloatingActionButton(
-      onPressed: () {
-        timestampToYear();
-      },
+      body: Padding(
+        padding: const EdgeInsets.only(top:25),
+        child: FloatingActionButton(
+        onPressed: () {
+          timestampToYear();
+        },
+        ),
       )
     );
   }

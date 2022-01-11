@@ -133,6 +133,10 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       widget.auswahlList = interessenList;
     }
     super.initState();
+
+    if (widget.confirmFunction == null){
+      widget.confirmFunction = (list){};
+    }
   }
 
 
