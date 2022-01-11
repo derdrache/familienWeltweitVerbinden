@@ -112,11 +112,12 @@ class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
   bool allSelected;
-  var confirmFunction = (select){};
+  var confirmFunction;
 
   CustomMultiTextForm({
     required this.auswahlList,
     this.allSelected = false,
+    this.confirmFunction
   });
 
   @override
