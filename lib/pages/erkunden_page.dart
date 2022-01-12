@@ -210,7 +210,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     List<Marker> allMarker = [];
 
     markerPopupWindow(profils){
-      List<Widget> popupItems = [];
+
 
       createPopupTitle(){
         return Center(
@@ -241,7 +241,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
               onTap: () => profilPopupWindow(context, profil),
               child: Container(
                 width: 50,
-                margin: EdgeInsets.only(top: 10, bottom: 10),
+                margin: EdgeInsets.all(10),
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   border: Border.all(width: 1),
@@ -259,22 +259,46 @@ class _ErkundenPageState extends State<ErkundenPage>{
         return profilsList;
       }
 
+      createpopupContent(){
+        List<Widget> popupItems = [];
 
-      popupItems.add(createPopupTitle());
-      popupItems.add(SizedBox(height: 20));
-      popupItems = popupItems + createPopupProfils();
+        popupItems.add(Row(
+            children: [
+              TextButton(
+                  style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          )
+                      )
+                  ),
+                  child: Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.of(context, rootNavigator: true).pop()
+              ),
+              SizedBox(width: 50),
+              createPopupTitle()
+            ]
+        ));
+        popupItems.add(SizedBox(height: 20));
+        popupItems = popupItems + createPopupProfils();
+
+        return popupItems;
+      }
+
+      createpopupContent();
 
       return showDialog(
             context: context,
             builder: (BuildContext context){
               return AlertDialog(
+                contentPadding: EdgeInsets.fromLTRB(10, 20, 10, 20),
                 content: Container(
                   height: 400,
                   width: double.maxFinite,
                   child: Scrollbar(
                     isAlwaysShown: true,
                     child: ListView(
-                      children: popupItems
+                      children: createpopupContent()
                     ),
                   ),
                 ),
