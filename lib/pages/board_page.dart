@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'setting_page/locationsService.dart';
 import '../database.dart';
-
+import '../profil_popup_window.dart';
 
 class BoardPage extends StatefulWidget{
   _BoardPageState createState() => _BoardPageState();
@@ -30,23 +30,26 @@ class _BoardPageState extends State<BoardPage>{
 
   }
 
-  timestampToYear(){
-    //var Datetime =
-    print(DateTime.utc(2015-12-26));
-  }
 
 
   Widget build(BuildContext context){
     var textController = TextEditingController();
+    var testProfil = {
+      "interessen": ["Weltreise", "Freilerner"],
+      "ort": "Tizimín",
+      //"kinder": [Timestamp(seconds=1451106000, nanoseconds=0), Timestamp(seconds=1213938000, nanoseconds=0)],
+      "latt": 21.1454686,
+      "name": "test007",
+      "land": "Mexiko",
+      "email": "test007@test.com",
+      "longt": -88.1496087
+    };
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(top:25),
+      body: Container(
         child: FloatingActionButton(
-        onPressed: () {
-          timestampToYear();
-        },
-        ),
+            onPressed: () => profilPopupWindow(context, testProfil)
+        )
       )
     );
   }

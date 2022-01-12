@@ -55,8 +55,8 @@ class _ProfilChangePageState extends State<ProfilChangePage>{
 
         for(var i = 0; i < childrenCount; i++){
           ageDatePickerList.add(CustomDatePicker(
-            hintText: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["string"],
-            pickedDate: globalFunctions.timeStampToDateTimeDict(childrenAgeList[i])["date"],
+            hintText: globalFunctions.timeStampToAllDict(childrenAgeList[i])["string"],
+            pickedDate: globalFunctions.timeStampToAllDict(childrenAgeList[i])["date"],
             deleteFunction: ageDatePickerDeleteFunction(i),
           ));
         }

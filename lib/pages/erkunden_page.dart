@@ -4,6 +4,8 @@ import 'package:latlong2/latlong.dart';
 
 import '../database.dart';
 import '../custom_widgets.dart';
+import '../global_functions.dart' as globalFunctions;
+import '../profil_popup_window.dart';
 import '../pages/setting_page/locationsService.dart';
 
 
@@ -222,17 +224,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
       List<Widget> createPopupProfils(){
 
         childrenAgeStringToStringAge(childrenAgeList){
-          String stringAge = "";
           List yearChildrenAgeList = [];
 
           childrenAgeList.forEach((child){
-            var childTimeStampToDateTime = DateTime.parse(child.toDate().toString());
-            var childYears = DateTime.now().difference(childTimeStampToDateTime).inDays ~/ 365;
-
+            var childYears = globalFunctions.timeStampToAllDict(child)["years"];
             yearChildrenAgeList.add(childYears);
-
           });
-
 
           return yearChildrenAgeList.join(" , ");
         }
@@ -241,7 +238,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
         profils["profils"].forEach((profil){
           profilsList.add(
             GestureDetector(
-              onTap: () => print("Show Profil"),
+              onTap: () => profilPopupWindow(context, profil),
               child: Container(
                 width: 50,
                 margin: EdgeInsets.only(top: 10, bottom: 10),

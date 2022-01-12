@@ -28,16 +28,23 @@ changePage(context, page){
   );
 }
 
-timeStampToDateTimeDict(timestamp){
+timeStampToAllDict(timestamp){
   DateTime dateTime = timestamp.toDate();
   String dateTimeString = dateTime.toString();
 
   dateTime = DateTime.parse(dateTimeString.split(" ")[0]);
   dateTimeString = dateTimeString.split(" ")[0].toString();
 
+  var yearsFromDateTime = DateTime.now().difference(dateTime).inDays ~/ 365;
+
   return {
     "date": dateTime,
-    "string": dateTimeString.split("-").reversed.join("-")
+    "string": dateTimeString.split("-").reversed.join("-"),
+    "years": yearsFromDateTime
   };
+}
+
+getAgeFromDateTime(dateTime){
 
 }
+
