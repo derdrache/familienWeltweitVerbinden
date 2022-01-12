@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'setting_page/locationsService.dart';
 import '../database.dart';
-import '../profil_popup_window.dart';
 
 class BoardPage extends StatefulWidget{
   _BoardPageState createState() => _BoardPageState();
@@ -48,7 +47,7 @@ class _BoardPageState extends State<BoardPage>{
     return Scaffold(
       body: Container(
         child: FloatingActionButton(
-            onPressed: () => profilPopupWindow(context, testProfil)
+            onPressed: () => print("test")
         )
       )
     );
