@@ -21,7 +21,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const pageMainColor = Colors.grey;
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.black,
@@ -38,9 +37,6 @@ class MyApp extends StatelessWidget {
           }
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              scaffoldBackgroundColor: pageMainColor,
-            ),
             home: StartPage()//LoginPage()
           );
         }

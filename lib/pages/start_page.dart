@@ -6,7 +6,6 @@ import 'erkunden_page.dart';
 import 'umkreis_page.dart';
 import 'chat_page.dart';
 import 'setting_page/setting_page.dart';
-import 'setting_page/profil_change_page.dart';
 
 
 class StartPage extends StatefulWidget{
@@ -31,7 +30,7 @@ class _StartPageState extends State<StartPage>{
   }
 
   Widget build(BuildContext context){
-    const pageMainColor = Colors.grey;
+    const pageMainColor = Colors.white;
     const navigationbarButtonColor = Colors.purple;
     List<Widget> tabPages = <Widget>[
       BoardPage(),
@@ -48,7 +47,7 @@ class _StartPageState extends State<StartPage>{
       });
     }
 
-    return checkIfFirstLogin() ? ProfilChangePage(newProfil: true): MaterialApp(
+    return MaterialApp( // checkIfFirstLogin() ? newProfilPage():
       theme: ThemeData(
         scaffoldBackgroundColor: pageMainColor,
       ),

@@ -211,7 +211,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     markerPopupWindow(profils){
 
-
       createPopupTitle(){
         return Center(
             child: Text(
@@ -305,8 +304,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
               );
             }
         );
-        //jede Familie aufgelistet => möglichkeit das Profil zu sehen => pagechange
-
     }
 
     Marker ownMarker(text, position,  buttonFunction){
