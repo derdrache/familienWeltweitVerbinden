@@ -8,9 +8,6 @@ import '../locationsService.dart';
 import '../database.dart';
 import 'start_page.dart';
 
-//1. Page => Ort, Reiseart, über mich
-//2. Page => Geburtsdatum der Kinder , Interessen
-
 class CreateProfilPage extends StatefulWidget {
   const CreateProfilPage({Key? key}) : super(key: key);
 
@@ -177,12 +174,13 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     }
 
     addChildrensBirthDatePickerList(childrenCount){
+
       if(childrenCount <=6){
-        deleteFunction(i){
+        deleteFunction(){
           return (){
             setState(() {
               childrens -= 1;
-              childrensBirthDatePickerList.removeAt(i);
+              childrensBirthDatePickerList.removeLast();
             });
 
           };
@@ -191,7 +189,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         childrensBirthDatePickerList.add(
             CustomDatePicker(
                 hintText: "Kind Geburtsdatum",
-                deleteFunction: deleteFunction(childrenCount-1)
+                deleteFunction: deleteFunction()
             )
         );
       }
