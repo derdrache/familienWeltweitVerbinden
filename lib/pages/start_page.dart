@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'board_page.dart';
+import 'profil_page.dart';
 import 'erkunden_page.dart';
 import 'umkreis_page.dart';
 import 'chat_page.dart';
@@ -33,7 +34,7 @@ class _StartPageState extends State<StartPage>{
     const pageMainColor = Colors.white;
     const navigationbarButtonColor = Colors.purple;
     List<Widget> tabPages = <Widget>[
-      BoardPage(),
+      CreateProfilPage(),//BoardPage(),
       ErkundenPage(),
       UmkreisPage(),
       ChatPage(),

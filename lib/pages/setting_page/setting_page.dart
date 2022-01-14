@@ -34,17 +34,6 @@ class _SettingPageState extends State<SettingPage> {
     return Container(
       child: Row(
         children: [
-          TextButton(
-            style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    )
-                )
-            ),
-            child: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
           Expanded(child: SizedBox()),
           TextButton(
             style: ButtonStyle(
@@ -169,8 +158,6 @@ class _SettingPageState extends State<SettingPage> {
     }
 
   }
-
-
 
   @override
   Widget build(BuildContext context) {

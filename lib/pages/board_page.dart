@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 
-import 'setting_page/locationsService.dart';
+import '../locationsService.dart';
 import '../database.dart';
 
 class BoardPage extends StatefulWidget{

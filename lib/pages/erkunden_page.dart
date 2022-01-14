@@ -5,8 +5,9 @@ import 'package:latlong2/latlong.dart';
 import '../database.dart';
 import '../custom_widgets.dart';
 import '../global_functions.dart' as globalFunctions;
+import '../global/variablen.dart' as globalVar;
 import '../profil_popup_window.dart';
-import '../pages/setting_page/locationsService.dart';
+import '../locationsService.dart';
 
 
 class ErkundenPage extends StatefulWidget{
@@ -31,8 +32,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
     });
 
     searchMultiForm = CustomMultiTextForm(
+      auswahlList: globalVar.reisearten + globalVar.interessenListe,
       allSelected: true,
-      auswahlList: [],
+      choosenList: [],
       confirmFunction: changeMapFilter(),
     );
 

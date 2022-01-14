@@ -3,7 +3,7 @@ import 'dart:convert' as convert;
 import 'package:flutter/services.dart';
 import 'dart:convert';
 
-import '../../auth/secrets.dart';
+import 'auth/secrets.dart';
 
 
 class LocationService {

@@ -5,12 +5,13 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 double sideSpace = 10;
 double borderRounding = 10;
+double boxHeight = 50;
 var buttonColor = Colors.purple;
 
 Widget customTextForm(text, controller, {validator = null, obsure = false}){
   return Container(
-    margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
-    padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
+    height: boxHeight,
+    margin: EdgeInsets.all(sideSpace),
     child: TextFormField(
       obscureText: obsure,
       controller: controller,
@@ -28,7 +29,8 @@ Widget customTextForm(text, controller, {validator = null, obsure = false}){
 
 Widget customTextfield(hintText, controller){
   return Container(
-    padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
+    height: boxHeight,
+    margin: EdgeInsets.all(sideSpace),
     child: TextField(
         controller: controller,
         decoration: InputDecoration(
@@ -111,11 +113,14 @@ class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
+  List choosenList;
   bool allSelected;
   var confirmFunction;
 
+
   CustomMultiTextForm({
     required this.auswahlList,
+    required this.choosenList,
     this.allSelected = false,
     this.confirmFunction
   });
@@ -125,12 +130,11 @@ class CustomMultiTextForm extends StatefulWidget {
 }
 
 class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
-  var interessenList = ["Freilerner", "Weltreise"];
 
   @override
   void initState() {
     if(widget.allSelected){
-      widget.auswahlList = interessenList;
+      widget.choosenList = widget.auswahlList;
     }
     super.initState();
 
@@ -143,29 +147,31 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
   @override
   Widget build(BuildContext context) {
-    List<MultiSelectItem> auswahlListe = interessenList.map((e) => MultiSelectItem(e, e)).toList();
+    List<MultiSelectItem> auswahlListSelectItem = widget.auswahlList.map((e) => MultiSelectItem(e, e)).toList();
+    var textColor = Colors.black;
 
     String createDropdownText(){
       String dropdownText = "";
 
-      if (widget.auswahlList.isEmpty){
+      if (widget.choosenList.isEmpty){
         dropdownText = "Interessen eingeben";
+        textColor = Colors.grey;
       } else if(widget.allSelected){
         dropdownText =  "alles";
       } else{
-        dropdownText = widget.auswahlList.join(" , ");
+        dropdownText = widget.choosenList.join(" , ");
       }
 
       return dropdownText;
     }
 
     changeSelectToList(select){
-      widget.auswahlList = [];
+      widget.choosenList = [];
 
       for(var i = 0; i< select.length; i++){
         setState(() {
-          widget.auswahlList = select;
-          if(interessenList.length == select.length){
+          widget.choosenList = select;
+          if(widget.auswahlList.length == select.length){
             widget.allSelected = true;
           } else{
             widget.allSelected = false;
@@ -175,21 +181,25 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     }
 
 
-    return Padding(
-      padding: EdgeInsets.all(sideSpace),
-      child:MultiSelectBottomSheetField (
-        initialValue: widget.auswahlList,
-        buttonText: Text(createDropdownText()),
-        chipDisplay: MultiSelectChipDisplay.none(),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black),
-          borderRadius: BorderRadius.all(Radius.circular(borderRounding))
-        ),
-        items: auswahlListe,
-        onSelectionChanged: changeSelectToList,
-        onConfirm: widget.confirmFunction,
-      )
+    return Container(
+      height: boxHeight,
+      margin: EdgeInsets.all(sideSpace),
+      child: MultiSelectBottomSheetField (
+          initialValue: widget.choosenList,
+          buttonText: Text(
+            createDropdownText(),
+            style: TextStyle(color: textColor),
+          ),
+          chipDisplay: MultiSelectChipDisplay.none(),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.black),
+            borderRadius: BorderRadius.all(Radius.circular(borderRounding))
+          ),
+          items: auswahlListSelectItem,
+          onSelectionChanged: changeSelectToList,
+          onConfirm: widget.confirmFunction,
+        )
     );
   }
 }
@@ -215,6 +225,7 @@ class CustomDatePicker extends StatefulWidget {
 }
 
 class _CustomDatePickerState extends State<CustomDatePicker> {
+  bool chosseDate = false;
 
   datePicker() async{
     return await showDatePicker(
@@ -230,19 +241,32 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
       widget.pickedDate = await datePicker();
       String newHintText = widget.pickedDate.toString().split(" ")[0].split("-").reversed.join("-");
       setState(() {
-        widget.hintText = newHintText;
+        if(widget.pickedDate != null){
+          widget.hintText = newHintText;
+          chosseDate = true;
+        }
+
       });
     };
   }
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
 
+    differentText(){
+      if (chosseDate){
+        return Text(widget.hintText, style: TextStyle(fontSize: 20, color: Colors.black));
+      } else{
+        return Text(widget.hintText, style: TextStyle(fontSize: 14, color: Colors.grey));
+      }
+    }
 
     return GestureDetector(
       onTap: showDate(),
       child: Container(
-          height: 60,
+          height: boxHeight,
+          width: (screenWidth / 2) - 20,
           margin: EdgeInsets.all(sideSpace),
           padding: EdgeInsets.only(left: sideSpace, right: sideSpace),
           decoration: BoxDecoration(
@@ -253,18 +277,19 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.hintText,
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: differentText(),
               ),
               Expanded(child: SizedBox()),
-              FloatingActionButton(
-                heroTag: widget.hintText,
-                backgroundColor: Colors.red,
-                mini: true,
-                child: Icon(Icons.remove),
-                onPressed: widget.deleteFunction
+              widget.deleteFunction == null? SizedBox():
+              SizedBox(
+                width: 25,
+                child: FloatingActionButton(
+                  heroTag: widget.hintText,
+                  backgroundColor: Colors.red,
+                  mini: true,
+                  child: Icon(Icons.remove),
+                  onPressed: widget.deleteFunction
+                ),
               )
             ]
 
