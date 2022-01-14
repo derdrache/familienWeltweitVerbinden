@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../custom_widgets.dart';
-import '../../global_functions.dart' as globalFunctions;
+import '../../global/custom_widgets.dart';
+import '../../global/global_functions.dart' as globalFunctions;
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {

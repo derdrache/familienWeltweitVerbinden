@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../database.dart';
-import '../custom_widgets.dart';
-import '../global_functions.dart' as globalFunctions;
+import '../services/database.dart';
+import '../global/custom_widgets.dart';
+import '../global/global_functions.dart' as globalFunctions;
 import '../global/variablen.dart' as globalVar;
-import '../profil_popup_window.dart';
-import '../locationsService.dart';
+import '../windows/profil_popup_window.dart';
+import '../services/locationsService.dart';
 
 
 class ErkundenPage extends StatefulWidget{

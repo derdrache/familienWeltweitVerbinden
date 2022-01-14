@@ -15,7 +15,8 @@ dbAddNewProfil(data) {
     "longt": data["longt"],
     "latt":  data["latt"],
     "reiseart": data["reiseart"],
-    "aboutme": data["aboutme"]
+    "aboutme": data["aboutme"],
+    "sprachen": data["sprachen"]
   })
       .then((value) => print("User Added"))
       .catchError((error) => print("Failed to add user: $error"));

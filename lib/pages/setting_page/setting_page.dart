@@ -1,8 +1,10 @@
+import 'package:familien_suche/global/variablen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../database.dart';
-import '../../global_functions.dart' as globalFunctions;
+import '../../services/database.dart';
+import '../../global/global_functions.dart' as globalFunctions;
+import '../../services/database.dart';
 
 
 class SettingPage extends StatefulWidget {
@@ -14,13 +16,17 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   double globalPadding = 30;
-  double fontSize = 18;
+  double fontSize = 16;
   var borderColor = Colors.grey[200]!;
   var profilName = "";
   var profilOrt = "";
   var profilKinder = [];
   var profilInteressen = [];
   var profilBio = "";
+  var profilEmail = "";
+  var profilReiseart = "";
+  var profilSprachen = [];
+
 
   @override
   void initState() {
@@ -29,6 +35,7 @@ class _SettingPageState extends State<SettingPage> {
     getAndSetDataFromDB();
     super.initState();
   }
+
 
   menuBar(){
     return Container(
@@ -45,7 +52,6 @@ class _SettingPageState extends State<SettingPage> {
             ),
             child: Icon(Icons.more_vert),
             onPressed: () => print("open Settings"),
-            // Name ändern, abmelden
           )
         ],
       ),
@@ -59,59 +65,31 @@ class _SettingPageState extends State<SettingPage> {
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(width: 10, color: borderColor))
       ),
-      child: Text(
-        profilName,
-        style: TextStyle(fontSize: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            profilName,
+            style: TextStyle(fontSize: 30),
+          ),
+          Text(profilEmail)
+        ]
       )
-    );
-  }
-
-  profilContainer(){
-    double containerPadding = 5;
-
-    themeContainer(haupttext, beschreibung){
-      return Container(
-        padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(haupttext,
-              style: TextStyle(fontSize: fontSize),
-            ),
-            SizedBox(height: 3),
-            Text(beschreibung,
-              style: TextStyle(color: Colors.grey, fontSize: fontSize-2.0),
-            ),
-          ],
-        )
-      );
-    }
-
-    return Container(
-        width: double.maxFinite,
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 10, color: borderColor))
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Profil",
-                style: TextStyle(color: Colors.blue, fontSize: fontSize)
-            ),
-            SizedBox(height: 5),
-            themeContainer(profilOrt, "Aktueller Ort"),
-            themeContainer(profilKinder.join(" , "), "Alter der Kinder"),
-            themeContainer(profilInteressen.join(" , "), "Interessen"),
-            themeContainer(profilBio, "Über mich")
-          ],
-        )
     );
   }
 
   settingContainer(){
 
-    themeContainer(title){
+    themeContainer(title, icon){
+      return Container(
+        child: Row(
+          children: [
+            Icon(icon),
+            SizedBox(width: 20),
+            Text(title)
+          ],
+        )
+      );
       return Text(title);
     }
 
@@ -122,7 +100,10 @@ class _SettingPageState extends State<SettingPage> {
           children: [
             Text("Einstellungen",
                 style: TextStyle(color: Colors.blue, fontSize: fontSize)),
-            themeContainer("Privatsphäre und Sicherheit") //Email anzeigen, Passwort ändern
+            SizedBox(height: 20),
+            themeContainer("Privatsphäre und Sicherheit", Icons.lock),//Email anzeigen, Passwort ändern
+            SizedBox(height: 20),
+
           ],
         )
     );
@@ -148,9 +129,13 @@ class _SettingPageState extends State<SettingPage> {
 
       setState(() {
         profilName = userProfil["name"];
+        profilEmail = userProfil["email"];
         profilOrt = userProfil["ort"];
         profilInteressen = userProfil["interessen"];
         profilKinder = childrenDataYears;
+        profilBio = userProfil["aboutme"];
+        profilReiseart = userProfil["reiseart"];
+        profilSprachen = userProfil["sprachen"];
       });
 
     } catch (error){
@@ -161,6 +146,60 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
+    profilContainer(){
+      double containerPadding = 5;
+
+      themeContainer(haupttext, beschreibung){
+        return Container(
+          padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
+          width: width /2 -20,
+          child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(haupttext,
+              style: TextStyle(fontSize: fontSize),
+            ),
+            SizedBox(height: 3),
+            Text(beschreibung,
+              style: TextStyle(color: Colors.grey, fontSize: fontSize-2.0),
+            ),
+          ],
+        )
+        );
+      }
+
+      return Container(
+          width: double.maxFinite,
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(width: 10, color: borderColor))
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Profil",
+                  style: TextStyle(color: Colors.blue, fontSize: fontSize)
+              ),
+              SizedBox(height: 5),
+              Wrap(
+                children: [
+                  themeContainer(profilOrt, "Aktueller Ort"),
+                  themeContainer(profilReiseart, "Art der Reise"),
+                  themeContainer(profilKinder.join(" , "), "Alter der Kinder"),
+                  themeContainer(profilInteressen.join(" , "), "Interessen"),
+                  themeContainer(profilSprachen.join(" , "), "Sprachen")
+                ],
+
+              ),
+              themeContainer(profilBio, "Über mich")
+            ],
+          )
+      );
+    }
+
+
     return Padding(
         padding: const EdgeInsets.only(top: 25),
         child: Column(
