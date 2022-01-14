@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../custom_widgets.dart';
-import '../global_functions.dart' as globalFunctions;
+import '../global/custom_widgets.dart';
+import '../global/global_functions.dart' as globalFunctions;
 import '../global/variablen.dart' as globalVariablen;
-import '../locationsService.dart';
-import '../database.dart';
+import '../services/locationsService.dart';
+import '../services/database.dart';
 import 'start_page.dart';
 
 class CreateProfilPage extends StatefulWidget {
@@ -65,8 +65,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "interessen": interessenChoosenListe,
         "kinder": getChildrenData(),
         "land": locationData["countryname"],
-        "longt": locationData["longt"],
-        "latt":  locationData["latt"],
+        "longt": double.parse(locationData["longt"]),
+        "latt":  double.parse(locationData["latt"]),
         "reiseart": reiseartChoosen,
         "aboutme": "",
         "sprachen": ""
@@ -236,20 +236,22 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       );
     }
 
-    return Container(
-      margin: EdgeInsets.only(top: 30),
-        child: ListView(
-            children: [
-              pageTitle(),
-              customTextfield("Benutzername", nameTextcontroller),
-              customTextfield("Aktuelle Stadt eingeben", ortTextcontroller),
-              reiseartInput(),
-              sprachenAuswahlBox,
-              interessenAuswahlBox,
-              birthDateChildrenInput(),
-              childrenAddAndSaveButton()
-            ],
-          ),
+    return Scaffold(
+      body: Container(
+        margin: EdgeInsets.only(top: 30),
+          child: ListView(
+              children: [
+                pageTitle(),
+                customTextfield("Benutzername", nameTextcontroller),
+                customTextfield("Aktuelle Stadt eingeben", ortTextcontroller),
+                reiseartInput(),
+                sprachenAuswahlBox,
+                interessenAuswahlBox,
+                birthDateChildrenInput(),
+                childrenAddAndSaveButton()
+              ],
+            ),
+      ),
     );
   }
 }

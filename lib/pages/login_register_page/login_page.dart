@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../custom_widgets.dart';
-import '../../global_functions.dart' as globalFunctions;
+import '../../global/custom_widgets.dart';
+import '../../global/global_functions.dart' as globalFunctions;
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';

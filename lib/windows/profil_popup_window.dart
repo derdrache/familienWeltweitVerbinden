@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'global_functions.dart' as globalFunctions;
+import '../global/global_functions.dart' as globalFunctions;
 
 
 _menuBarProfil(context){
