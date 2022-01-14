@@ -4,7 +4,7 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 // Container Text verändert sich nicht
 
 double sideSpace = 10;
-double borderRounding = 10;
+double borderRounding = 5;
 double boxHeight = 50;
 var buttonColor = Colors.purple;
 
@@ -116,11 +116,13 @@ class CustomMultiTextForm extends StatefulWidget {
   List choosenList;
   bool allSelected;
   var confirmFunction;
+  String hintText;
 
 
   CustomMultiTextForm({
     required this.auswahlList,
     required this.choosenList,
+    required this.hintText,
     this.allSelected = false,
     this.confirmFunction
   });
@@ -154,7 +156,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       String dropdownText = "";
 
       if (widget.choosenList.isEmpty){
-        dropdownText = "Interessen eingeben";
+        dropdownText = widget.hintText;
         textColor = Colors.grey;
       } else if(widget.allSelected){
         dropdownText =  "alles";
@@ -184,7 +186,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     return Container(
       height: boxHeight,
       margin: EdgeInsets.all(sideSpace),
-      child: MultiSelectBottomSheetField (
+      child: MultiSelectDialogField (
           initialValue: widget.choosenList,
           buttonText: Text(
             createDropdownText(),

@@ -32,6 +32,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     });
 
     searchMultiForm = CustomMultiTextForm(
+      hintText: "Suche",
       auswahlList: globalVar.reisearten + globalVar.interessenListe,
       allSelected: true,
       choosenList: [],
