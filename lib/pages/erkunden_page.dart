@@ -35,8 +35,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       hintText: "Suche",
       auswahlList: globalVar.reisearten + globalVar.interessenListe,
       allSelected: true,
-      choosenList: [],
-      confirmFunction: changeMapFilter(),
+      onConfirm: changeMapFilter(),
     );
 
   }

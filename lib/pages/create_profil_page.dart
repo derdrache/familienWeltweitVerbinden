@@ -18,40 +18,22 @@ class CreateProfilPage extends StatefulWidget {
 class _CreateProfilPageState extends State<CreateProfilPage> {
   var nameTextcontroller = TextEditingController();
   var ortTextcontroller = TextEditingController();
-  var sprachenChoosenList = [];
-  var sprachenAuswahlBox;
-  var reiseartChoosen = "";
-  var interessenChoosenListe = [];
-  var interessenAuswahlBox;
+  var sprachenAuswahlBox = CustomMultiTextForm(
+    hintText: "Sprachen auswählen",
+    auswahlList: globalVariablen.sprachenListe,
+  );
+  var reiseArtenAuswahlBox = CustomDropDownButton(
+      items: globalVariablen.reisearten);
+  var interessenAuswahlBox = CustomMultiTextForm(
+    hintText: "Interessen auswählen",
+    auswahlList: globalVariablen.interessenListe,
+  );
   int childrens = 1;
   List childrensBirthDatePickerList = [CustomDatePicker(
       hintText: "Kind Geburtsdatum",
   )];
 
 
-
-  void initState() {
-    sprachenAuswahlBox = CustomMultiTextForm(
-      hintText: "Sprachen auswählen",
-      auswahlList: globalVariablen.sprachenListe,
-      choosenList: [],
-      confirmFunction: (selected){
-        sprachenChoosenList = selected;
-      },
-    );
-
-
-    interessenAuswahlBox = CustomMultiTextForm(
-      hintText: "Interessen auswählen",
-      auswahlList: globalVariablen.interessenListe,
-      choosenList: [],
-      confirmFunction: (selected){
-        interessenChoosenListe = selected;
-      },
-    );
-
-    super.initState();
-  }
 
   saveFunction()async {
     var locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
@@ -62,14 +44,14 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "email": firebaseUser?.email,
         "name": nameTextcontroller.text,
         "ort": locationData["city"], //groß und kleinschreibung?
-        "interessen": interessenChoosenListe,
+        "interessen": interessenAuswahlBox.getSelected(),
         "kinder": getChildrenData(),
         "land": locationData["countryname"],
         "longt": double.parse(locationData["longt"]),
         "latt":  double.parse(locationData["latt"]),
-        "reiseart": reiseartChoosen,
+        "reiseart": reiseArtenAuswahlBox.getSelected(),
         "aboutme": "",
-        "sprachen": ""
+        "sprachen": sprachenAuswahlBox.getSelected()
       };
 
       dbAddNewProfil(data);
@@ -88,13 +70,13 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     if(locationData == null || locationData["city"] == ""){
       errorString += "- Stadt eingeben \n";
     }
-    if(reiseartChoosen.isEmpty){
+    if(reiseArtenAuswahlBox.getSelected().isEmpty){
       errorString += "- Reiseart auswählen \n";
     }
-    if(sprachenChoosenList.isEmpty){
+    if(sprachenAuswahlBox.getSelected().isEmpty){
       errorString += "- Sprachen auswählen \n";
     }
-    if(interessenChoosenListe.isEmpty){
+    if(interessenAuswahlBox.getSelected().isEmpty){
       errorString += "- Interessen auswählen \n";
     }
     if(getChildrenData().length == 0 ||
@@ -136,38 +118,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             style: TextStyle(
                 fontSize: 30
             ),
-          ),
-        ),
-      );
-    }
-
-    reiseartInput(){
-      return Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.only(left: 10, right: 10),
-        decoration: BoxDecoration(
-            border: Border.all(width: 1),
-            borderRadius: BorderRadius.all(Radius.circular(5))
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: reiseartChoosen == ""? null: reiseartChoosen,
-            hint: Text("Art der Reise auswählen", style: TextStyle(color: Colors.grey)),
-            elevation: 16,
-            style: const TextStyle(color: Colors.black),
-            icon: Icon(Icons.arrow_downward, color: Colors.black,),
-            onChanged: (String? newValue) {
-              setState(() {
-                reiseartChoosen = newValue!;
-              });
-            },
-            items: globalVariablen.reisearten.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
           ),
         ),
       );
@@ -244,7 +194,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                 pageTitle(),
                 customTextfield("Benutzername", nameTextcontroller),
                 customTextfield("Aktuelle Stadt eingeben", ortTextcontroller),
-                reiseartInput(),
+                reiseArtenAuswahlBox,
                 sprachenAuswahlBox,
                 interessenAuswahlBox,
                 birthDateChildrenInput(),
