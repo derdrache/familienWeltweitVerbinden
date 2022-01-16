@@ -27,6 +27,7 @@ Widget customTextForm(text, controller, {validator = null, obsure = false}){
   );
 }
 
+
 Widget customTextfield(hintText, controller){
   return Container(
     height: boxHeight,
@@ -45,6 +46,7 @@ Widget customTextfield(hintText, controller){
   );
 }
 
+
 Widget customFloatbuttonExtended(text, function){
   return Container(
     margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
@@ -58,6 +60,7 @@ Widget customFloatbuttonExtended(text, function){
   );
 }
 
+
 customSnackbar(context, text){
   return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -65,6 +68,7 @@ customSnackbar(context, text){
       )
   );
 }
+
 
 class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
   @override
@@ -110,6 +114,7 @@ class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
     );
   }
 }
+
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
@@ -213,6 +218,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
   }
 }
 
+
 class CustomDatePicker extends StatefulWidget {
   DateTime? pickedDate;
   String hintText;
@@ -309,6 +315,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
   }
 }
 
+
 class CustomDropDownButton extends StatefulWidget {
   List<String> items;
   String selected;
@@ -360,3 +367,96 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
   }
 }
 
+
+class ChildrenBirthdatePickerBox extends StatefulWidget {
+  List childrensBirthDatePickerList = [];
+  var childrens;
+
+  getDates(){
+    List dates = [];
+    childrensBirthDatePickerList.forEach((datePicker) {
+      dates.add(datePicker.getPickedDate());
+    });
+
+    return dates;
+  }
+
+  ChildrenBirthdatePickerBox({Key? key,this.childrens = 1}) : super(key: key);
+
+  @override
+  _ChildrenBirthdatePickerBoxState createState() => _ChildrenBirthdatePickerBoxState();
+}
+
+class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox> {
+
+  deleteFunction(){
+    return (){
+      setState(() {
+        widget.childrens -= 1;
+        widget.childrensBirthDatePickerList.removeLast();
+      });
+
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    agePickerContainer(){
+      return Container(
+          child: Wrap(
+              children: [...widget.childrensBirthDatePickerList]
+          )
+      );
+    }
+
+    addChildrensBirthDatePickerList(childrenCount){
+
+      if(childrenCount <=6){
+
+        widget.childrensBirthDatePickerList.add(
+            CustomDatePicker(
+                hintText: "Kind Geburtsdatum",
+                deleteFunction: deleteFunction()
+            )
+        );
+      }
+
+    }
+
+    childrenAddAndSaveButton(){
+      return Container(
+          margin: EdgeInsets.only(top: 10),
+          child: widget.childrens < 6? Row(
+            children:[
+              SizedBox(width: 10),
+              FloatingActionButton.extended(
+                label: Text("weiteres Kind"),
+                heroTag: "add children",
+                onPressed: (){
+                  setState(() {
+                    widget.childrens += 1;
+                    addChildrensBirthDatePickerList(widget.childrens);
+                  });
+                },
+              ),
+              Expanded(child: SizedBox()),
+              SizedBox(width: 10),
+            ] ,
+          ) :
+          SizedBox()
+      );
+    }
+
+
+
+    return Container(
+      child: Column(
+        children: [
+          agePickerContainer(),
+          childrenAddAndSaveButton()
+        ],
+      )
+    );
+  }
+}
