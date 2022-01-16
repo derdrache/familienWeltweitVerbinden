@@ -24,6 +24,7 @@ class _SettingPageState extends State<SettingPage> {
   var profilName = "";
   var profilOrt = "";
   var profilKinder = [];
+  var kinderAgeBox = ChildrenBirthdatePickerBox();
   var profilInteressen = [];
   var interessenInputBox = CustomMultiTextForm(
       auswahlList: globalVariablen.interessenListe);
@@ -149,6 +150,10 @@ class _SettingPageState extends State<SettingPage> {
           auswahlList: globalVariablen.interessenListe,
           selected: profilInteressen,
         );
+        var kinderAgeBox = ChildrenBirthdatePickerBox(
+          childrens: profilKinder.length,
+
+        );
       });
 
     } catch (error){
@@ -203,8 +208,8 @@ class _SettingPageState extends State<SettingPage> {
                 children: [
                   themeContainer(profilOrt, "Aktuelle Stadt", customTextfield("", ortKontroller)),
                   themeContainer(profilReiseart, "Art der Reise", reiseArtInput),
-                  themeContainer(profilKinder.join(" , "), "Alter der Kinder", Container()),
-                  themeContainer(profilInteressen.join(" , "), "Interessen",Container()),
+                  themeContainer(profilKinder.join(" , "), "Alter der Kinder", kinderAgeBox),
+                  themeContainer(profilInteressen.join(" , "), "Interessen",interessenInputBox),
                   themeContainer(profilSprachen.join(" , "), "Sprachen", sprachenInputBox)
                 ],
 
