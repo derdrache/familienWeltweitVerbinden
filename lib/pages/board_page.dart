@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../services/locationsService.dart';
 import '../services/database.dart';
+import '../windows/change_profil_window.dart';
 
 class BoardPage extends StatefulWidget{
   _BoardPageState createState() => _BoardPageState();
@@ -47,7 +48,9 @@ class _BoardPageState extends State<BoardPage>{
     return Scaffold(
       body: Container(
         child: FloatingActionButton(
-            onPressed: () => print("test")
+            onPressed: (){
+              profilChangeWindow(context, "test", Container());
+            }
         )
       )
     );

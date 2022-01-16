@@ -113,18 +113,23 @@ class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
-  List choosenList;
+  var selected;
   bool allSelected;
-  var confirmFunction;
   String hintText;
+  var onConfirm;
+
+  getSelected(){
+    return selected;
+  }
+
 
 
   CustomMultiTextForm({
     required this.auswahlList,
-    required this.choosenList,
-    required this.hintText,
+    this.selected,
+    this.hintText = "",
     this.allSelected = false,
-    this.confirmFunction
+    this.onConfirm
   });
 
   @override
@@ -133,16 +138,18 @@ class CustomMultiTextForm extends StatefulWidget {
 
 class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
+
   @override
   void initState() {
     if(widget.allSelected){
-      widget.choosenList = widget.auswahlList;
+      widget.selected = widget.auswahlList;
     }
+
+    widget.onConfirm ??= (selected){};
+    widget.selected ??= [];
+
     super.initState();
 
-    if (widget.confirmFunction == null){
-      widget.confirmFunction = (list){};
-    }
   }
 
 
@@ -155,24 +162,24 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     String createDropdownText(){
       String dropdownText = "";
 
-      if (widget.choosenList.isEmpty){
+      if (widget.selected.isEmpty){
         dropdownText = widget.hintText;
         textColor = Colors.grey;
       } else if(widget.allSelected){
         dropdownText =  "alles";
       } else{
-        dropdownText = widget.choosenList.join(" , ");
+        dropdownText = widget.selected.join(" , ");
       }
 
       return dropdownText;
     }
 
     changeSelectToList(select){
-      widget.choosenList = [];
+      widget.selected = [];
 
       for(var i = 0; i< select.length; i++){
         setState(() {
-          widget.choosenList = select;
+          widget.selected = select;
           if(widget.auswahlList.length == select.length){
             widget.allSelected = true;
           } else{
@@ -187,7 +194,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       height: boxHeight,
       margin: EdgeInsets.all(sideSpace),
       child: MultiSelectDialogField (
-          initialValue: widget.choosenList,
+          initialValue: widget.selected,
           buttonText: Text(
             createDropdownText(),
             style: TextStyle(color: textColor),
@@ -200,7 +207,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
           ),
           items: auswahlListSelectItem,
           onSelectionChanged: changeSelectToList,
-          onConfirm: widget.confirmFunction,
+          onConfirm: widget.onConfirm
         )
     );
   }
@@ -297,6 +304,57 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
 
           )
+      ),
+    );
+  }
+}
+
+class CustomDropDownButton extends StatefulWidget {
+  List<String> items;
+  String selected;
+
+  getSelected(){
+    return selected;
+  }
+
+  CustomDropDownButton({Key? key,required this.items,
+    this.selected = ""}) : super(key: key);
+
+  @override
+  _CustomDropDownButtonState createState() => _CustomDropDownButtonState();
+}
+
+class _CustomDropDownButtonState extends State<CustomDropDownButton> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.all(10),
+      padding: EdgeInsets.only(left: 10, right: 10),
+      decoration: BoxDecoration(
+          border: Border.all(width: 1),
+          borderRadius: BorderRadius.all(Radius.circular(5))
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: widget.selected == ""? null: widget.selected,
+          hint: Text("Art der Reise auswählen", style: TextStyle(color: Colors.grey)),
+          elevation: 16,
+          style: const TextStyle(color: Colors.black),
+          icon: Icon(Icons.arrow_downward, color: Colors.black,),
+          onChanged: (newValue){
+            setState(() {
+              widget.selected = newValue!;
+            });
+
+          },
+          items: widget.items.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

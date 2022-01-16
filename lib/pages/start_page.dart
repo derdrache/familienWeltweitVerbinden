@@ -6,7 +6,7 @@ import 'board_page.dart';
 import 'erkunden_page.dart';
 import 'umkreis_page.dart';
 import 'chat_page.dart';
-import 'setting_page/setting_page.dart';
+import 'setting_page.dart';
 
 
 class StartPage extends StatefulWidget{
