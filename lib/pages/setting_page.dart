@@ -122,7 +122,8 @@ class _SettingPageState extends State<SettingPage> {
         emailTextKontroller.text = userProfil["email"];
         ortKontroller.text = userProfil["ort"];
         interessenInputBox.selected = userProfil["interessen"];
-        kinderAgeBox.childrenBirthDates = childrenAgeTimestamp;
+        kinderAgeBox.setSelected(childrenAgeTimestamp);
+        //kinderAgeBox = ChildrenBirthdatePickerBox(childrenBirthDates: childrenAgeTimestamp);
         bioTextKontroller.text = userProfil["aboutme"];
         reiseArtInput.selected = userProfil["reiseart"];
         sprachenInputBox.selected = userProfil["sprachen"];
@@ -151,6 +152,7 @@ class _SettingPageState extends State<SettingPage> {
     }else if(beschreibung == beschreibungReise){
       dbChangeProfil(emailTextKontroller.text, {"reiseart": reiseArtInput.getSelected()});
     }else if(beschreibung == beschreibungKinder){
+      //print(kinderAgeBox.getDates());
       dbChangeProfil(emailTextKontroller.text, {"kinder": kinderAgeBox.getDates()});
     }else if(beschreibung == beschreibungInteressen){
       dbChangeProfil(emailTextKontroller.text, {"interessen": interessenInputBox.getSelected()});
@@ -160,7 +162,9 @@ class _SettingPageState extends State<SettingPage> {
       dbChangeProfil(emailTextKontroller.text, {"aboutme": bioTextKontroller.text});
     }
 
-    setState(() {});
+    setState(() {
+
+    });
 
     Navigator.of(context, rootNavigator: true).pop();
 
