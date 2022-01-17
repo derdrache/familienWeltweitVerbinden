@@ -7,6 +7,7 @@ import '../windows/change_profil_window.dart';
 import '../global/custom_widgets.dart';
 import '../global/variablen.dart' as globalVariablen;
 import '../services/locationsService.dart';
+import '../pages/login_register_page/login_page.dart';
 
 
 class SettingPage extends StatefulWidget {
@@ -26,6 +27,7 @@ class _SettingPageState extends State<SettingPage> {
       auswahlList: globalVariablen.interessenListe);
   var bioTextKontroller = TextEditingController();
   var emailTextKontroller = TextEditingController();
+  var passwortTextKontroller = TextEditingController();
   var reiseArtInput = CustomDropDownButton(items: globalVariablen.reisearten);
   var sprachenInputBox = CustomMultiTextForm(
       auswahlList: globalVariablen.sprachenListe);
@@ -36,6 +38,9 @@ class _SettingPageState extends State<SettingPage> {
   String beschreibungInteressen = "Interessen";
   String beschreibungSprachen = "Sprachen";
   String beschreibungBio = "Über mich";
+  String beschreibungName = "Name ändern";
+  String beschreibungEmail = "Email ändern";
+  String beschreibungPasswort = "Passwort ändern";
 
   @override
   void initState() {
@@ -123,7 +128,6 @@ class _SettingPageState extends State<SettingPage> {
         ortKontroller.text = userProfil["ort"];
         interessenInputBox.selected = userProfil["interessen"];
         kinderAgeBox.setSelected(childrenAgeTimestamp);
-        //kinderAgeBox = ChildrenBirthdatePickerBox(childrenBirthDates: childrenAgeTimestamp);
         bioTextKontroller.text = userProfil["aboutme"];
         reiseArtInput.selected = userProfil["reiseart"];
         sprachenInputBox.selected = userProfil["sprachen"];
@@ -152,7 +156,6 @@ class _SettingPageState extends State<SettingPage> {
     }else if(beschreibung == beschreibungReise){
       dbChangeProfil(emailTextKontroller.text, {"reiseart": reiseArtInput.getSelected()});
     }else if(beschreibung == beschreibungKinder){
-      //print(kinderAgeBox.getDates());
       dbChangeProfil(emailTextKontroller.text, {"kinder": kinderAgeBox.getDates()});
     }else if(beschreibung == beschreibungInteressen){
       dbChangeProfil(emailTextKontroller.text, {"interessen": interessenInputBox.getSelected()});
@@ -160,11 +163,14 @@ class _SettingPageState extends State<SettingPage> {
       dbChangeProfil(emailTextKontroller.text, {"sprachen": sprachenInputBox.getSelected()});
     }else if(beschreibung == beschreibungBio){
       dbChangeProfil(emailTextKontroller.text, {"aboutme": bioTextKontroller.text});
+    }else if(beschreibung == beschreibungName){
+      FirebaseAuth.instance.currentUser?.updateDisplayName(nameTextKontroller.text);
+      dbChangeProfil(emailTextKontroller.text, {"name": nameTextKontroller.text});
+    } else if (beschreibung == beschreibungPasswort){
+      FirebaseAuth.instance.currentUser?.updatePassword(passwortTextKontroller.text);
     }
 
-    setState(() {
-
-    });
+    setState(() {});
 
     Navigator.of(context, rootNavigator: true).pop();
 
@@ -209,9 +215,14 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Profil",
-                  style: TextStyle(color: Colors.blue, fontSize: fontSize)
-              ),
+              Row(children: [
+                Text("Profil",
+                    style: TextStyle(color: Colors.blue, fontSize: fontSize)
+                ),
+                Expanded(child: SizedBox()),
+                Text("Antippen, um Einträge zu ändern",style: TextStyle(color: Colors.grey, fontSize: 14)),
+                Expanded(child: SizedBox()),
+              ]),
               SizedBox(height: 5),
               Wrap(
                 children: [
@@ -253,22 +264,24 @@ class _SettingPageState extends State<SettingPage> {
             items: [
               PopupMenuItem(
                   child: TextButton(
-                    onPressed: null,
-                    child: Text("Name ändern", style: TextStyle(color: textColor)))
+                    onPressed: () => profilChangeWindow(context, beschreibungName,
+                        customTextfield(beschreibungName,nameTextKontroller),
+                        () => saveFunction(beschreibungName)),
+                    child: Text(beschreibungName, style: TextStyle(color: textColor)))
               ),
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: null,
-                      child: Text("Email ändern", style: TextStyle(color: textColor)))
+                      onPressed: () => profilChangeWindow(context, beschreibungPasswort,
+                          customTextfield(beschreibungPasswort, passwortTextKontroller),
+                              () => saveFunction(beschreibungPasswort)),
+                      child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
               ),
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: null,
-                      child: Text("Passwort ändern", style: TextStyle(color: textColor)))
-              ),
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: null,
+                      onPressed: () {
+                        FirebaseAuth.instance.signOut();
+                        globalFunctions.changePage(context, LoginPage());
+                      },
                       child: Text("Abmelden", style: TextStyle(color: textColor)))
               ),
             ]
