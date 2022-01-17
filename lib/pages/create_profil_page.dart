@@ -28,36 +28,47 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     hintText: "Interessen auswählen",
     auswahlList: globalVariablen.interessenListe,
   );
-  int childrens = 1;
-  List childrensBirthDatePickerList = [CustomDatePicker(
-      hintText: "Kind Geburtsdatum",
-  )];
+  var childrenAgePickerBox = ChildrenBirthdatePickerBox();
+
 
 
 
   saveFunction()async {
     var locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
     var firebaseUser = await FirebaseAuth.instance.currentUser;
+    var email = firebaseUser?.email;
 
     if(checkAllValidation(locationData)){
       var data = {
-        "email": firebaseUser?.email,
+        "email": email,
         "name": nameTextcontroller.text,
         "ort": locationData["city"], //groß und kleinschreibung?
         "interessen": interessenAuswahlBox.getSelected(),
-        "kinder": getChildrenData(),
+        "kinder": childrenAgePickerBox.getDates(),
         "land": locationData["countryname"],
         "longt": double.parse(locationData["longt"]),
         "latt":  double.parse(locationData["latt"]),
         "reiseart": reiseArtenAuswahlBox.getSelected(),
         "aboutme": "",
-        "sprachen": sprachenAuswahlBox.getSelected()
+        "sprachen": sprachenAuswahlBox.getSelected(),
       };
 
-      dbAddNewProfil(data);
-      globalFunctions.changePage(context, StartPage());
+      dbAddNewProfil(email, data);
+      FirebaseAuth.instance.currentUser?.updateDisplayName(nameTextcontroller.text);
+      globalFunctions.changePage(context, StartPage(registered: true));
 
     }
+  }
+
+  childrenInputValidation(){
+    bool allFilled = true;
+
+    childrenAgePickerBox.getDates().forEach((date){
+      if(date == null){
+        allFilled = false;
+      }
+    });
+    return allFilled;
   }
 
   checkAllValidation(locationData){
@@ -79,10 +90,10 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     if(interessenAuswahlBox.getSelected().isEmpty){
       errorString += "- Interessen auswählen \n";
     }
-    if(getChildrenData().length == 0 ||
-        childrensBirthDatePickerList.length > getChildrenData().length){
+    if(childrenAgePickerBox.getDates().length == 0 || !childrenInputValidation()){
       errorString += "- Geburtsdatum vom Kind eingeben \n";
     }
+
 
     if(errorString.length > 29){
       allGood = false;
@@ -93,98 +104,32 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     return allGood;
   }
 
-  getChildrenData(){
-    var childrenAgeList = [];
-
-    childrensBirthDatePickerList.forEach((child) {
-      if(child.getPickedDate() != null){
-        childrenAgeList.add(child.getPickedDate());
-      }
-    });
-
-    return childrenAgeList;
-  }
-
   @override
   Widget build(BuildContext context) {
 
 
     pageTitle(){
       return Container(
-        margin: EdgeInsets.all(10),
-        child: Center(
-          child: Text(
-            "Profil erstellen",
-            style: TextStyle(
-                fontSize: 30
+        height: 60,
+        child: Row(
+          children: [
+            Expanded(child: SizedBox()),
+            Text(
+              "Profil erstellen",
+              style: TextStyle(
+                  fontSize: 30
+              ),
             ),
-          ),
-        ),
-      );
-    }
-
-    addChildrensBirthDatePickerList(childrenCount){
-
-      if(childrenCount <=6){
-        deleteFunction(){
-          return (){
-            setState(() {
-              childrens -= 1;
-              childrensBirthDatePickerList.removeLast();
-            });
-
-          };
-        }
-
-        childrensBirthDatePickerList.add(
-            CustomDatePicker(
-                hintText: "Kind Geburtsdatum",
-                deleteFunction: deleteFunction()
+            Expanded(child: SizedBox()),
+            TextButton(
+                onPressed: saveFunction,
+                child: Icon(Icons.done, size: 35),
             )
-        );
-      }
-
-    }
-
-    birthDateChildrenInput(){
-
-      return Container(
-          child: Wrap(
-              children: [...childrensBirthDatePickerList]
-          )
+        ]),
       );
     }
 
-    childrenAddAndSaveButton(){
-      return Container(
-          margin: EdgeInsets.only(top: 10),
-          child: childrens < 6? Row(
-            children:[
-              SizedBox(width: 10),
-              FloatingActionButton.extended(
-                label: Text("weiteres Kind"),
-                heroTag: "add children",
-                onPressed: (){
-                  setState(() {
-                    childrens += 1;
-                    addChildrensBirthDatePickerList(childrens);
-                  });
-                },
-              ),
-              Expanded(child: SizedBox()),
-              SizedBox(width: 10),
-              FloatingActionButton.extended(
-                  label: Text("Profil speichern"),
-                  onPressed: () => saveFunction()
-              ),
-            ] ,
-          ) :
-          FloatingActionButton.extended(
-            label: Text("Profil speichern"),
-            onPressed: () => saveFunction()
-          )
-      );
-    }
+
 
     return Scaffold(
       body: Container(
@@ -197,8 +142,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                 reiseArtenAuswahlBox,
                 sprachenAuswahlBox,
                 interessenAuswahlBox,
-                birthDateChildrenInput(),
-                childrenAddAndSaveButton()
+                childrenAgePickerBox
               ],
             ),
       ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
-// Container Text verändert sich nicht
 
 double sideSpace = 10;
 double borderRounding = 5;
@@ -17,7 +16,7 @@ Widget customTextForm(text, controller, {validator = null, obsure = false}){
       controller: controller,
       decoration: InputDecoration(
         enabledBorder: const OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(color: Colors.black),
         ),
         border: OutlineInputBorder(),
         labelText: text,
@@ -223,16 +222,22 @@ class CustomDatePicker extends StatefulWidget {
   DateTime? pickedDate;
   String hintText;
   var deleteFunction;
+  bool dateIsSelected;
 
   getPickedDate(){
     return pickedDate;
+  }
+
+  setDate(date){
+    pickedDate = date;
   }
 
   CustomDatePicker({
     Key? key,
     required this.hintText,
     this.pickedDate,
-    this.deleteFunction
+    this.deleteFunction,
+    this.dateIsSelected = false
   }) : super(key: key);
 
   @override
@@ -240,7 +245,7 @@ class CustomDatePicker extends StatefulWidget {
 }
 
 class _CustomDatePickerState extends State<CustomDatePicker> {
-  bool chosseDate = false;
+
 
   datePicker() async{
     return await showDatePicker(
@@ -258,7 +263,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
       setState(() {
         if(widget.pickedDate != null){
           widget.hintText = newHintText;
-          chosseDate = true;
+          widget.dateIsSelected = true;
         }
 
       });
@@ -267,49 +272,47 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    var screenWidth = MediaQuery.of(context).size.width;
-
     differentText(){
-      if (chosseDate){
-        return Text(widget.hintText, style: TextStyle(fontSize: 20, color: Colors.black));
+      if (widget.dateIsSelected){
+        return Text(widget.hintText, style: TextStyle(fontSize: 16, color: Colors.black));
       } else{
-        return Text(widget.hintText, style: TextStyle(fontSize: 14, color: Colors.grey));
+        return Text(widget.hintText, style: TextStyle(fontSize: 13, color: Colors.grey));
       }
     }
 
     return GestureDetector(
       onTap: showDate(),
-      child: Container(
-          height: boxHeight,
-          width: (screenWidth / 2) - 20,
-          margin: EdgeInsets.all(sideSpace),
-          padding: EdgeInsets.only(left: sideSpace, right: sideSpace),
-          decoration: BoxDecoration(
-              border: Border.all(width: 1),
-              borderRadius: BorderRadius.all(Radius.circular(borderRounding))
-          ),
-          child: Row(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: differentText(),
+      child: FractionallySizedBox(
+          widthFactor: 0.5,
+          child: Container(
+              height: boxHeight,
+              margin: EdgeInsets.all(sideSpace),
+              padding: EdgeInsets.only(left: sideSpace/2, right: sideSpace/2),
+              decoration: BoxDecoration(
+                  border: Border.all(width: 1),
+                  borderRadius: BorderRadius.all(Radius.circular(borderRounding))
               ),
-              Expanded(child: SizedBox()),
-              widget.deleteFunction == null? SizedBox():
-              SizedBox(
-                width: 25,
-                child: FloatingActionButton(
-                  heroTag: widget.hintText,
-                  backgroundColor: Colors.red,
-                  mini: true,
-                  child: Icon(Icons.remove),
-                  onPressed: widget.deleteFunction
-                ),
+              child: Row(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: differentText(),
+                  ),
+                  Expanded(child: SizedBox()),
+                  widget.deleteFunction == null? SizedBox():
+                  SizedBox(
+                    width: 25,
+                    child: FloatingActionButton(
+                      heroTag: widget.hintText,
+                      backgroundColor: Colors.red,
+                      mini: true,
+                      child: Icon(Icons.remove),
+                      onPressed: widget.deleteFunction
+                    ),
+                  )
+                ]
               )
-            ]
-
-
-          )
+          ),
       ),
     );
   }
@@ -370,45 +373,96 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
 
 class ChildrenBirthdatePickerBox extends StatefulWidget {
   List childrensBirthDatePickerList = [];
-  var childrens;
+  var childrenBirthDates;
 
-  getDates(){
+  getDates({bool years = false}){
+
     List dates = [];
+
+    if (childrensBirthDatePickerList.length == 0 && childrenBirthDates != null){
+      dates = childrenBirthDates;
+    }
+
     childrensBirthDatePickerList.forEach((datePicker) {
       dates.add(datePicker.getPickedDate());
     });
 
+    dates.sort();
+
+    if(years){
+      List converted = [];
+      dates.forEach((element) {
+        String dateTimeString = element.toString();
+
+        var dateTime = DateTime.parse(dateTimeString.split(" ")[0]);
+        dateTimeString = dateTimeString.split(" ")[0].toString();
+
+        var yearsFromDateTime = DateTime.now().difference(dateTime).inDays ~/ 365;
+
+        converted.add(yearsFromDateTime);
+      });
+
+      dates = converted;
+    }
+
     return dates;
   }
 
-  ChildrenBirthdatePickerBox({Key? key,this.childrens = 1}) : super(key: key);
+  ChildrenBirthdatePickerBox({Key? key, this.childrenBirthDates}) : super(key: key);
 
   @override
   _ChildrenBirthdatePickerBoxState createState() => _ChildrenBirthdatePickerBoxState();
 }
 
 class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox> {
+  var childrens = 1;
+
+
+  @override
+  void initState() {
+    widget.childrensBirthDatePickerList = [];
+
+    if(widget.childrenBirthDates != null){
+      childrens = widget.childrenBirthDates.length;
+      setDatesToPicker();
+    } else{
+      widget.childrensBirthDatePickerList.add(CustomDatePicker(
+          hintText: "Datum",
+          deleteFunction: deleteFunction()
+      )
+      );
+    }
+
+    super.initState();
+  }
+
+
+  setDatesToPicker(){
+      for(var i = 0; i<childrens; i++){
+        var datePicker = CustomDatePicker(
+          hintText: widget.childrenBirthDates[i].toString().split(" ")[0].split("-").reversed.join("-"),
+          deleteFunction: deleteFunction(),
+          pickedDate: widget.childrenBirthDates[i],
+          dateIsSelected: true
+        );
+        widget.childrensBirthDatePickerList.add(datePicker);
+      }
+  }
 
   deleteFunction(){
     return (){
       setState(() {
-        widget.childrens -= 1;
+        childrens -= 1;
         widget.childrensBirthDatePickerList.removeLast();
       });
 
     };
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-
-    agePickerContainer(){
-      return Container(
-          child: Wrap(
-              children: [...widget.childrensBirthDatePickerList]
-          )
-      );
-    }
 
     addChildrensBirthDatePickerList(childrenCount){
 
@@ -416,7 +470,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
         widget.childrensBirthDatePickerList.add(
             CustomDatePicker(
-                hintText: "Kind Geburtsdatum",
+                hintText: "Datum",
                 deleteFunction: deleteFunction()
             )
         );
@@ -424,26 +478,21 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
     }
 
-    childrenAddAndSaveButton(){
+    childrenAddButton(){
       return Container(
-          margin: EdgeInsets.only(top: 10),
-          child: widget.childrens < 6? Row(
-            children:[
-              SizedBox(width: 10),
-              FloatingActionButton.extended(
-                label: Text("weiteres Kind"),
+        margin: EdgeInsets.all(sideSpace),
+          child: childrens < 8?
+              FloatingActionButton(
+                mini: true,
                 heroTag: "add children",
+                child: Icon(Icons.add),
                 onPressed: (){
                   setState(() {
-                    widget.childrens += 1;
-                    addChildrensBirthDatePickerList(widget.childrens);
+                    childrens += 1;
+                    addChildrensBirthDatePickerList(childrens);
                   });
                 },
-              ),
-              Expanded(child: SizedBox()),
-              SizedBox(width: 10),
-            ] ,
-          ) :
+              ) :
           SizedBox()
       );
     }
@@ -451,10 +500,10 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
 
     return Container(
-      child: Column(
+      child: Wrap(
         children: [
-          agePickerContainer(),
-          childrenAddAndSaveButton()
+          ...widget.childrensBirthDatePickerList,
+          childrenAddButton()
         ],
       )
     );

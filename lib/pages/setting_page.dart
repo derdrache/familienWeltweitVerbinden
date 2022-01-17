@@ -1,13 +1,12 @@
-import 'package:familien_suche/global/variablen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../services/database.dart';
 import '../global/global_functions.dart' as globalFunctions;
-import '../services/database.dart';
 import '../windows/change_profil_window.dart';
 import '../global/custom_widgets.dart';
 import '../global/variablen.dart' as globalVariablen;
+import '../services/locationsService.dart';
 
 
 class SettingPage extends StatefulWidget {
@@ -21,41 +20,31 @@ class _SettingPageState extends State<SettingPage> {
   double globalPadding = 30;
   double fontSize = 16;
   var borderColor = Colors.grey[200]!;
-  var profilName = "";
-  var profilOrt = "";
-  var profilKinder = [];
+  var nameTextKontroller = TextEditingController();
   var kinderAgeBox = ChildrenBirthdatePickerBox();
-  var profilInteressen = [];
   var interessenInputBox = CustomMultiTextForm(
       auswahlList: globalVariablen.interessenListe);
-  var profilBio = "";
-  var profilEmail = "";
-  var profilReiseart = "";
+  var bioTextKontroller = TextEditingController();
+  var emailTextKontroller = TextEditingController();
   var reiseArtInput = CustomDropDownButton(items: globalVariablen.reisearten);
-  var profilSprachen = [];
   var sprachenInputBox = CustomMultiTextForm(
       auswahlList: globalVariablen.sprachenListe);
   var ortKontroller = TextEditingController();
-
+  String beschreibungStadt = "Aktuelle Stadt";
+  String beschreibungReise  = "Art der Reise";
+  String beschreibungKinder = "Alter der Kinder";
+  String beschreibungInteressen = "Interessen";
+  String beschreibungSprachen = "Sprachen";
+  String beschreibungBio = "Über mich";
 
   @override
   void initState() {
-    // TODO: implement initState
-
-    reiseArtInput = CustomDropDownButton(
-      items: globalVariablen.reisearten,
-      selected: profilReiseart,
-    );
-
-
 
     getAndSetDataFromDB();
 
 
     super.initState();
   }
-
-
 
 
   nameContainer(){
@@ -69,10 +58,10 @@ class _SettingPageState extends State<SettingPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            profilName,
+            nameTextKontroller.text,
             style: TextStyle(fontSize: 30),
           ),
-          Text(profilEmail)
+          Text(emailTextKontroller.text)
         ]
       )
     );
@@ -90,7 +79,6 @@ class _SettingPageState extends State<SettingPage> {
           ],
         )
       );
-      return Text(title);
     }
 
     return Container(
@@ -110,55 +98,71 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   getProfilFromDatabase() async {
-    var userEmail = FirebaseAuth.instance.currentUser!.email;
-    var docID = await dbGetProfilDocumentID(userEmail);
-    var profil = await dbGetProfil(docID);
+    emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
+    var profil = await dbGetProfil(emailTextKontroller.text);
 
     return profil;
   }
 
   void getAndSetDataFromDB() async {
+    var userProfil;
+    List childrenAgeTimestamp = [];
     try{
-      var userProfil = await getProfilFromDatabase();
+      userProfil = await getProfilFromDatabase();
       List childrenDataYears = [];
 
       userProfil["kinder"].forEach((kind){
-        var timestampToYears = globalFunctions.timeStampToAllDict(kind)["years"];
-        childrenDataYears.add(timestampToYears);
+        var changeTimeStamp = globalFunctions.timeStampToAllDict(kind);
+        childrenDataYears.add(changeTimeStamp["years"]);
+        childrenAgeTimestamp.add(changeTimeStamp["date"]);
       });
 
       setState(() {
-        profilName = userProfil["name"];
-        profilEmail = userProfil["email"];
-        profilOrt = userProfil["ort"];
-        profilInteressen = userProfil["interessen"];
-        profilKinder = childrenDataYears;
-        profilBio = userProfil["aboutme"];
-        profilReiseart = userProfil["reiseart"];
-        profilSprachen = userProfil["sprachen"];
-
-        ortKontroller.text = profilOrt;
-        reiseArtInput = CustomDropDownButton(
-          items: globalVariablen.reisearten,
-          selected: profilReiseart,
-        );
-        sprachenInputBox = CustomMultiTextForm(
-          auswahlList: globalVariablen.sprachenListe,
-          selected: profilSprachen,
-        );
-        interessenInputBox = CustomMultiTextForm(
-          auswahlList: globalVariablen.interessenListe,
-          selected: profilInteressen,
-        );
-        var kinderAgeBox = ChildrenBirthdatePickerBox(
-          childrens: profilKinder.length,
-
-        );
+        nameTextKontroller.text = userProfil["name"];
+        emailTextKontroller.text = userProfil["email"];
+        ortKontroller.text = userProfil["ort"];
+        interessenInputBox.selected = userProfil["interessen"];
+        kinderAgeBox.childrenBirthDates = childrenAgeTimestamp;
+        bioTextKontroller.text = userProfil["aboutme"];
+        reiseArtInput.selected = userProfil["reiseart"];
+        sprachenInputBox.selected = userProfil["sprachen"];
       });
-
     } catch (error){
       print("Problem mit dem User finden");
     }
+
+  }
+
+  pushLocationDataToDB() async {
+    var locationData = await LocationService().getLocationMapDataGeocode(ortKontroller.text);
+
+    var locationDict = {
+      "ort": locationData["city"],
+      "longt": double.parse(locationData["longt"]),
+      "latt": double.parse(locationData["latt"]),
+      "land": locationData["countryname"]
+    };
+    dbChangeProfil(emailTextKontroller.text, locationDict);
+  }
+
+  saveFunction(beschreibung) async{
+    if(beschreibung == beschreibungStadt){
+      pushLocationDataToDB();
+    }else if(beschreibung == beschreibungReise){
+      dbChangeProfil(emailTextKontroller.text, {"reiseart": reiseArtInput.getSelected()});
+    }else if(beschreibung == beschreibungKinder){
+      dbChangeProfil(emailTextKontroller.text, {"kinder": kinderAgeBox.getDates()});
+    }else if(beschreibung == beschreibungInteressen){
+      dbChangeProfil(emailTextKontroller.text, {"interessen": interessenInputBox.getSelected()});
+    }else if(beschreibung == beschreibungSprachen){
+      dbChangeProfil(emailTextKontroller.text, {"sprachen": sprachenInputBox.getSelected()});
+    }else if(beschreibung == beschreibungBio){
+      dbChangeProfil(emailTextKontroller.text, {"aboutme": bioTextKontroller.text});
+    }
+
+    setState(() {});
+
+    Navigator.of(context, rootNavigator: true).pop();
 
   }
 
@@ -167,10 +171,11 @@ class _SettingPageState extends State<SettingPage> {
     double width = MediaQuery.of(context).size.width;
     double containerPadding = 5;
 
+
     themeContainer(haupttext, beschreibung, changeWidget){
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onTap: () => profilChangeWindow(context, beschreibung, changeWidget),
+        onTap: () => profilChangeWindow(context, beschreibung, changeWidget, () => saveFunction(beschreibung)),
         child: Container(
             padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
             width: width /2 -20,
@@ -206,15 +211,23 @@ class _SettingPageState extends State<SettingPage> {
               SizedBox(height: 5),
               Wrap(
                 children: [
-                  themeContainer(profilOrt, "Aktuelle Stadt", customTextfield("", ortKontroller)),
-                  themeContainer(profilReiseart, "Art der Reise", reiseArtInput),
-                  themeContainer(profilKinder.join(" , "), "Alter der Kinder", kinderAgeBox),
-                  themeContainer(profilInteressen.join(" , "), "Interessen",interessenInputBox),
-                  themeContainer(profilSprachen.join(" , "), "Sprachen", sprachenInputBox)
+                  themeContainer(ortKontroller.text, beschreibungStadt , customTextfield("", ortKontroller)),
+                  themeContainer(reiseArtInput.getSelected(), beschreibungReise, reiseArtInput),
+                  themeContainer(kinderAgeBox.getDates(years: true)  == null? "":
+                  kinderAgeBox.getDates(years: true).join(" , "),
+                      beschreibungKinder, kinderAgeBox),
+                  themeContainer(
+                      interessenInputBox.getSelected() == null? "" :
+                      interessenInputBox.getSelected().join(" , "),
+                      beschreibungInteressen,interessenInputBox),
+                  themeContainer(
+                      sprachenInputBox.getSelected() == null? "":
+                      sprachenInputBox.getSelected().join(" , "),
+                      beschreibungSprachen, sprachenInputBox)
                 ],
-
               ),
-              themeContainer(profilBio, "Über mich", Container())
+              themeContainer(bioTextKontroller.text, beschreibungBio,
+                  customTextfield("über mich", bioTextKontroller))
             ],
           )
       );
@@ -283,8 +296,8 @@ class _SettingPageState extends State<SettingPage> {
 
     return Padding(
         padding: const EdgeInsets.only(top: 25),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
+            //crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               menuBar(),
               nameContainer(),

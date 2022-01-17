@@ -3,21 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
 
 
-dbAddNewProfil(data) {
+dbAddNewProfil(id, data) {
 
-  return profil.add({
-    "email": data["email"],
-    "name": data["name"],
-    "ort": data["ort"],
-    "interessen": data["interessen"],
-    "kinder": data["kinder"],
-    "land": data["land"],
-    "longt": data["longt"],
-    "latt":  data["latt"],
-    "reiseart": data["reiseart"],
-    "aboutme": data["aboutme"],
-    "sprachen": data["sprachen"]
-  })
+  return profil.doc(id).set(data)
       .then((value) => print("User Added"))
       .catchError((error) => print("Failed to add user: $error"));
 }
@@ -31,10 +19,10 @@ dbGetAllProfils() async {
 
 }
 
-dbGetProfil(docID) async{
+dbGetProfil(email) async{
   var profilData;
 
-  await profil.doc(docID)
+  await profil.doc(email)
       .get()
       .then((DocumentSnapshot documentSnapshot) {
     if (documentSnapshot.exists) {
@@ -47,33 +35,12 @@ dbGetProfil(docID) async{
   return profilData;
 }
 
-dbGetProfilDocumentID(email) async{
-  var docID;
 
-  try{
-    await profil
-        .where('email', isEqualTo:email)
-        .get()
-        .then((snapshot) => docID=snapshot.docs[0].reference.id);
-  }catch(error){
-    docID = null;
-  }
-
-  return docID;
-}
 
 dbChangeProfil(docID, data){
   CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
 
-  return profil.doc(docID).update({
-    "name": data["name"],
-    "ort": data["ort"],
-    "interessen": data["interessen"],
-    "kinder": data["kinder"],
-    "land": data["land"],
-    "longt": data["longt"],
-    "latt":  data["latt"]
-      }).then((value) => print("User Updated"))
+  return profil.doc(docID).update(data).then((value) => print("User Updated"))
       .catchError((error) => print("Failed to update user: $error"));
 }
 
