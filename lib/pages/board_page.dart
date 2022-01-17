@@ -49,7 +49,6 @@ class _BoardPageState extends State<BoardPage>{
       body: Container(
         child: FloatingActionButton(
             onPressed: (){
-              profilChangeWindow(context, "test", Container());
             }
         )
       )

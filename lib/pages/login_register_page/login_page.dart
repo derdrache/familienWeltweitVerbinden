@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: passwort);
-      globalFunctions.changePage(context, StartPage(newVisit: true));
+      globalFunctions.changePage(context, StartPage());
     }on FirebaseAuthException catch(error){
       if(error.code == "user-not-found"){
         customSnackbar(context, "Benutzer nicht gefunden");

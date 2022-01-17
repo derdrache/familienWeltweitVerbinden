@@ -11,24 +11,29 @@ import 'setting_page.dart';
 
 class StartPage extends StatefulWidget{
   var selectedIndex;
-  var newVisit;
+  bool registered;
 
-  StartPage({this.selectedIndex=0, this.newVisit = false});
+  StartPage({this.selectedIndex=0, this.registered = false});
 
   _StartPageState createState() => _StartPageState();
 }
 
 class _StartPageState extends State<StartPage>{
 
+
   checkIfFirstLogin(){
-    if(widget.newVisit == false){
-      return false;
-    }else if (FirebaseAuth.instance.currentUser!.displayName == null){
+
+    if(widget.registered){ return false; }
+
+    if(FirebaseAuth.instance.currentUser!.displayName == null ||
+        FirebaseAuth.instance.currentUser!.displayName == ""){
       return true;
-    } else{
-      return false;
     }
+
+    return false;
+
   }
+
 
   Widget build(BuildContext context){
     const pageMainColor = Colors.white;

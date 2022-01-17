@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../global/custom_widgets.dart';
 
-_topBar(context, titel){
+_topBar(context, titel, Function saveFunction){
   return Row(
     children: [
       TextButton(
@@ -26,13 +25,15 @@ _topBar(context, titel){
               )
           ),
           child: Icon(Icons.done),
-          onPressed: null
+          onPressed: (){
+            saveFunction();
+          }
       ),
     ],
   );
 }
 
-profilChangeWindow(context, String titel, Widget changeWidget){
+profilChangeWindow(context, String titel, Widget changeWidget, saveFunction){
   return showDialog(
       context: context,
       builder: (BuildContext context){
@@ -44,7 +45,7 @@ profilChangeWindow(context, String titel, Widget changeWidget){
             width: double.maxFinite,
             child: Column(
               children: [
-                _topBar(context, titel),
+                _topBar(context, titel, saveFunction),
                 changeWidget
               ],
             ),
