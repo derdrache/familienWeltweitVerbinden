@@ -272,6 +272,8 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
   @override
   Widget build(BuildContext context) {
+    var _deleteFunction = widget.deleteFunction;
+
     differentText(){
       if (widget.dateIsSelected){
         return Text(widget.hintText, style: TextStyle(fontSize: 16, color: Colors.black));
@@ -283,8 +285,11 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
     return GestureDetector(
       onTap: showDate(),
       child: FractionallySizedBox(
-          widthFactor: 0.5,
-          child: Container(
+        widthFactor: 0.5,
+        child: Stack(
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          children: [
+            Container(
               height: boxHeight,
               margin: EdgeInsets.all(sideSpace),
               padding: EdgeInsets.only(left: sideSpace/2, right: sideSpace/2),
@@ -293,28 +298,32 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                   borderRadius: BorderRadius.all(Radius.circular(borderRounding))
               ),
               child: Row(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: differentText(),
-                  ),
-                  Expanded(child: SizedBox()),
-                  widget.deleteFunction == null? SizedBox():
-                  SizedBox(
-                    width: 25,
-                    child: FloatingActionButton(
-                      heroTag: widget.hintText,
-                      backgroundColor: Colors.red,
-                      mini: true,
-                      child: Icon(Icons.remove),
-                      onPressed: widget.deleteFunction
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: differentText(),
                     ),
-                  )
-                ]
+                    Expanded(child: SizedBox()),
+                  ]
               )
           ),
+          _deleteFunction == null? SizedBox():Positioned(
+            width: 20,
+            right: 1.0,
+            top: -5.0,
+            child: InkResponse(
+              onTap: _deleteFunction,
+              child: CircleAvatar(
+                child: Icon(Icons.close, size: 10,),
+                backgroundColor: Colors.red,
+              ),
+            ),
+          ),
+        ]
+        ),
       ),
     );
+
   }
 }
 
@@ -373,23 +382,25 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
 
 class ChildrenBirthdatePickerBox extends StatefulWidget {
   List childrensBirthDatePickerList = [];
-  var childrenBirthDates;
 
   getDates({bool years = false}){
-
     List dates = [];
-
+/*
     if (childrensBirthDatePickerList.length == 0 && childrenBirthDates != null){
       dates = childrenBirthDates;
     }
+
+ */
 
     childrensBirthDatePickerList.forEach((datePicker) {
       dates.add(datePicker.getPickedDate());
     });
 
-    dates.sort();
+
 
     if(years){
+      dates.sort();
+
       List converted = [];
       dates.forEach((element) {
         String dateTimeString = element.toString();
@@ -408,7 +419,20 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
     return dates;
   }
 
-  ChildrenBirthdatePickerBox({Key? key, this.childrenBirthDates}) : super(key: key);
+  setSelected(childrenBirthDates){
+    childrenBirthDates.forEach((date){
+      childrensBirthDatePickerList.add(
+          CustomDatePicker(
+              hintText: date.toString().split(" ")[0].split("-").reversed.join("-"),
+              //deleteFunction: deleteFunction(),
+              pickedDate: date,
+              dateIsSelected: true
+          )
+      );
+    });
+  }
+
+  ChildrenBirthdatePickerBox({Key? key}) : super(key: key);
 
   @override
   _ChildrenBirthdatePickerBoxState createState() => _ChildrenBirthdatePickerBoxState();
@@ -420,16 +444,9 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
   @override
   void initState() {
-    widget.childrensBirthDatePickerList = [];
-
-    if(widget.childrenBirthDates != null){
-      childrens = widget.childrenBirthDates.length;
-      setDatesToPicker();
-    } else{
+    if(widget.childrensBirthDatePickerList.length == 0){
       widget.childrensBirthDatePickerList.add(CustomDatePicker(
-          hintText: "Datum",
-          deleteFunction: deleteFunction()
-      )
+        hintText: "Datum")
       );
     }
 
@@ -437,28 +454,16 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
   }
 
 
-  setDatesToPicker(){
-      for(var i = 0; i<childrens; i++){
-        var datePicker = CustomDatePicker(
-          hintText: widget.childrenBirthDates[i].toString().split(" ")[0].split("-").reversed.join("-"),
-          deleteFunction: deleteFunction(),
-          pickedDate: widget.childrenBirthDates[i],
-          dateIsSelected: true
-        );
-        widget.childrensBirthDatePickerList.add(datePicker);
-      }
-  }
-
   deleteFunction(){
     return (){
       setState(() {
         childrens -= 1;
         widget.childrensBirthDatePickerList.removeLast();
+
       });
 
     };
   }
-
 
 
   @override
@@ -466,8 +471,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
     addChildrensBirthDatePickerList(childrenCount){
 
-      if(childrenCount <=6){
-
+      if(childrenCount <=8){
         widget.childrensBirthDatePickerList.add(
             CustomDatePicker(
                 hintText: "Datum",
@@ -497,7 +501,38 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
       );
     }
 
+    checkAndSetDeleteFunction(){
+      List dates = widget.getDates();
+      List newPicker = [];
 
+      for(var i = 0;i < widget.childrensBirthDatePickerList.length; i++){
+        var hintText = dates[i] == null? "Datum" : dates[i].toString();
+
+        if(i == 0 || i < widget.childrensBirthDatePickerList.length -1 ){
+
+          newPicker.add(
+              CustomDatePicker(
+                  hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
+                  pickedDate: dates[i],
+                  dateIsSelected: dates[i] != null
+              )
+          );
+        } else{
+          newPicker.add(
+              CustomDatePicker(
+                  hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
+                  pickedDate: dates[i],
+                  deleteFunction: deleteFunction(),
+                  dateIsSelected: dates[i] != null
+              )
+          );
+        }
+      }
+
+      widget.childrensBirthDatePickerList = newPicker;
+    }
+
+    checkAndSetDeleteFunction();
 
     return Container(
       child: Wrap(
