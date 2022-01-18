@@ -54,12 +54,6 @@ _menuBarProfil(context){
       )
     ],
   );
-
-
-  ElevatedButton(onPressed: null, child: Icon(Icons.arrow_back));
-  // zurück Button , Navigator.pop()
-  // Freund hinzufügen button
-  // Blockieren Button?
 }
 
 _titelProfil(profil){
@@ -93,9 +87,15 @@ _infoProfil(profil){
           SizedBox(height: columnAbstand),
           Text("Ort: " + profil["ort"]),
           SizedBox(height: columnAbstand),
+          Text("Reiseart: " + profil["reiseart"]),
+          SizedBox(height: columnAbstand),
+          Text("Sprache: " + profil["sprachen"].join(" , ")),
+          SizedBox(height: columnAbstand),
           Text("Kinder: " + childrenAgeList.join(" , ")),
           SizedBox(height: columnAbstand),
-          Text("Interessen: " + profil["interessen"].join(" , "))
+          Text("Interessen: " + profil["interessen"].join(" , ")),
+          SizedBox(height: columnAbstand),
+          Text("Über mich: " + profil["aboutme"]),
         ],
       )
   );
@@ -115,7 +115,6 @@ _kontaktProfil(profil){
 }
 
 profilPopupWindow(context, profil){
-  print(profil);
 
   return showDialog(
       context: context,
@@ -131,7 +130,7 @@ profilPopupWindow(context, profil){
               child: ListView(
                   children: [
                     _menuBarProfil(context),
-                    SizedBox(height: 30),
+                    SizedBox(height: 25),
                     _titelProfil(profil),
                     SizedBox(height: 30),
                     _infoProfil(profil),
