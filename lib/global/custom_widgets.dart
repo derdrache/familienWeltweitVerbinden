@@ -118,7 +118,6 @@ class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
   var selected;
-  bool allSelected;
   String hintText;
   var onConfirm;
 
@@ -132,7 +131,6 @@ class CustomMultiTextForm extends StatefulWidget {
     required this.auswahlList,
     this.selected,
     this.hintText = "",
-    this.allSelected = false,
     this.onConfirm
   });
 
@@ -145,10 +143,6 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
   @override
   void initState() {
-    if(widget.allSelected){
-      widget.selected = widget.auswahlList;
-    }
-
     widget.onConfirm ??= (selected){};
     widget.selected ??= [];
 
@@ -169,10 +163,12 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       if (widget.selected.isEmpty){
         dropdownText = widget.hintText;
         textColor = Colors.grey;
-      } else if(widget.allSelected){
-        dropdownText =  "alles";
       } else{
         dropdownText = widget.selected.join(" , ");
+      }
+
+      if (dropdownText.length > 50){
+        dropdownText = dropdownText.substring(0,47) + "...";
       }
 
       return dropdownText;
@@ -184,11 +180,6 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       for(var i = 0; i< select.length; i++){
         setState(() {
           widget.selected = select;
-          if(widget.auswahlList.length == select.length){
-            widget.allSelected = true;
-          } else{
-            widget.allSelected = false;
-          }
         });
       }
     }
