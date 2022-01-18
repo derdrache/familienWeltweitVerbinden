@@ -33,8 +33,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     searchMultiForm = CustomMultiTextForm(
       hintText: "Suche",
-      auswahlList: globalVar.reisearten + globalVar.interessenListe,
-      allSelected: true,
+      auswahlList: globalVar.reisearten + globalVar.interessenListe +
+                   globalVar.sprachenListe,
       onConfirm: changeMapFilter(),
     );
 
@@ -172,6 +172,33 @@ class _ErkundenPageState extends State<ErkundenPage>{
     });
   }
 
+  checkMatchFilter(List selected, List profil, globalList){
+    bool globalMatch = false;
+    bool match = false;
+
+    for (var select in selected) {
+      if(globalList.contains(select)){
+        globalMatch = true;
+      }
+
+      if(profil.contains(select)){
+        match = true;
+      }
+
+    }
+
+    if(!globalMatch){
+      return true;
+    } else {
+      if(match){
+        return true;
+      } else{
+        return false;
+      }
+    }
+
+  }
+
   changeMapFilter(){
     return (select){
       var newProfil = [];
@@ -179,17 +206,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       originalProfils.forEach((profil) {
         var profilInteressen = profil["interessen"];
-        var interessenMatch = false;
+        var profilReiseart = profil["reiseart"];
+        var profilSprachen = profil["sprachen"];
+        var spracheMatch = checkMatchFilter(select, profilSprachen, globalVar.sprachenListe);
+        var reiseartMatch = checkMatchFilter(select, [profilReiseart], globalVar.reisearten);
+        var interesseMatch = checkMatchFilter(select, profilInteressen, globalVar.interessenListe);
 
-        select.forEach((selectInteresse){
-          profilInteressen.forEach((profilInteresse){
-            if(selectInteresse == profilInteresse){
-              interessenMatch = true;
-            }
-          });
-        });
-
-        if(interessenMatch){
+        if(spracheMatch && reiseartMatch && interesseMatch){
           newProfil.add(profil);
         }
 
@@ -200,10 +223,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
         createAndSetZoomProfils();
       });
     };
-    /*
-
-
-       */
 
   }
 
