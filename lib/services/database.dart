@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
+CollectionReference chats = FirebaseFirestore.instance.collection("chats");
 
 
 dbAddNewProfil(id, data) {
@@ -35,11 +36,7 @@ dbGetProfil(email) async{
   return profilData;
 }
 
-
-
 dbChangeProfil(docID, data){
-  CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
-
   return profil.doc(docID).update(data).then((value) => print("User Updated"))
       .catchError((error) => print("Failed to update user: $error"));
 }
@@ -48,4 +45,21 @@ dbDeleteProfil(docID) {
   return profil
       .doc(docID)
       .delete();
+}
+
+
+dbGetAllUsersChats(user) async{
+  var userChatGroups = [];
+
+  await chats.where("users", arrayContains: user)
+      .get()
+      .then((QuerySnapshot querySnapshot) {
+        if (querySnapshot.docs.isNotEmpty) {
+          for(var chatgroup in querySnapshot.docs){
+            userChatGroups.add(chatgroup.data());
+          }
+        }
+      });
+
+  return userChatGroups;
 }
