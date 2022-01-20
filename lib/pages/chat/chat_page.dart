@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../services/database.dart';
+import '../../../services/database.dart';
+import '../../global/custom_widgets.dart';
+import '../../global/global_functions.dart';
+import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget{
   _ChatPageState createState() => _ChatPageState();
@@ -18,35 +21,12 @@ class _ChatPageState extends State<ChatPage>{
     await dbGetAllUsersChats("dominik.mast.11@gmail.com");
   }
 
-  openThisChat(messages){
-    print(messages);
+  openThisChat(groudChatData){
+    changePage(context, ChatDetailsPage(groudChatData: groudChatData));
   }
 
 
   Widget build(BuildContext context){
-
-
-    topBar(){
-      return Container(
-        margin: EdgeInsets.only(top: 25),
-        decoration: BoxDecoration(
-            border: Border(
-                bottom: BorderSide(
-                    width: 1,
-                    color: Colors.grey
-                )
-            )
-        ),
-        child: Row(
-          children: [
-            Expanded(child: SizedBox()),
-            Text("Chat", style: TextStyle(fontSize: 22),),
-            Expanded(child: SizedBox()),
-            TextButton(onPressed: null, child: Icon(Icons.search, size: 30,))
-          ],
-        ),
-      );
-    }
 
     chatUserList(groupdata){
       List<Widget> groupContainer = [];
@@ -56,7 +36,8 @@ class _ChatPageState extends State<ChatPage>{
 
         groupContainer.add(
           GestureDetector(
-            onTap: openThisChat(group["messages"]),
+            onTap: () => openThisChat(group)
+            ,
             child: Container(
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
@@ -89,9 +70,17 @@ class _ChatPageState extends State<ChatPage>{
     }
 
     return Scaffold(
+      appBar: customAppBar(
+        title: "Chat",
+        button: TextButton(
+          child: Icon(Icons.search),
+          onPressed: null,
+        )
+
+      ),
       body: Column(
         children: [
-          topBar(),
+          //topBar(),
           FutureBuilder(
             future: dbGetAllUsersChats("dominik.mast.11@gmail.com"),
               builder: (

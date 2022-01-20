@@ -264,6 +264,65 @@ class _SettingPageState extends State<SettingPage> {
             items: [
               PopupMenuItem(
                   child: TextButton(
+                      onPressed: () => profilChangeWindow(context, beschreibungName,
+                          customTextfield(beschreibungName,nameTextKontroller),
+                              () => saveFunction(beschreibungName)),
+                      child: Text(beschreibungName, style: TextStyle(color: textColor)))
+              ),
+              PopupMenuItem(
+                  child: TextButton(
+                      onPressed: () => profilChangeWindow(context, beschreibungPasswort,
+                          customTextfield(beschreibungPasswort, passwortTextKontroller),
+                              () => saveFunction(beschreibungPasswort)),
+                      child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
+              ),
+              PopupMenuItem(
+                  child: TextButton(
+                      onPressed: () {
+                        FirebaseAuth.instance.signOut();
+                        globalFunctions.changePage(context, LoginPage());
+                      },
+                      child: Text("Abmelden", style: TextStyle(color: textColor)))
+              ),
+            ]
+        );
+      }
+
+      return  customAppBar(
+        title: "",
+        elevation: 0.0,
+        button: TextButton(
+          style: ButtonStyle(
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  )
+              )
+          ),
+          child: Icon(Icons.more_vert, color: Colors.black),
+          onPressed: () => openSettingWindow(),
+        )
+      );
+    }
+
+
+/*
+    menuBar(){
+
+      openSettingWindow()async {
+        var textColor = Colors.black;
+
+        return showMenu(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
+              ),
+            ),
+            context: context,
+            position: RelativeRect.fromLTRB(100, 0, 0, 100),
+            items: [
+              PopupMenuItem(
+                  child: TextButton(
                     onPressed: () => profilChangeWindow(context, beschreibungName,
                         customTextfield(beschreibungName,nameTextKontroller),
                         () => saveFunction(beschreibungName)),
@@ -307,6 +366,10 @@ class _SettingPageState extends State<SettingPage> {
         ),
       );
     }
+
+
+ */
+
 
 
 

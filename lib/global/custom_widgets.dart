@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
+import 'global_functions.dart';
 
 double sideSpace = 10;
 double borderRounding = 5;
@@ -69,51 +70,19 @@ customSnackbar(context, text){
 }
 
 
-class CustomAppbar extends StatelessWidget with PreferredSizeWidget {
-  @override
-  final Size preferredSize = Size.fromHeight(50.0);
-  final String title;
-  var backPage;
-
-  CustomAppbar(this.title, this.backPage);
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-        title: Row(
-          children: [
-            FloatingActionButton(
-              mini: true,
-              backgroundColor: buttonColor,
-              child: Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => backPage),
-                );
-              }
-            ),
-            Expanded(
-              child: Center(
-                  child: Container(
-                      padding: EdgeInsets.only(right:40),
-                      child: Text(
-                          title,
-                          style: TextStyle(
-                              color: Colors.black
-                          )
-                      )
-                  )
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.grey,
-        elevation: 0.0
-    );
-  }
+customAppBar({title, button, elevation = 4.0}){
+  return AppBar(
+    title: Center(child: Text(title, style: TextStyle(color: Colors.black),)),
+    backgroundColor: Colors.white,
+    elevation: elevation,
+    iconTheme: IconThemeData(
+      color: Colors.black
+    ),
+    actions: [
+      button
+    ],
+  );
 }
-
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;

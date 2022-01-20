@@ -38,7 +38,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar("Reset Passwort", LoginPage()),
+      appBar: customAppBar(title: "Reset Passwort"),
       body: Container(
           child: Form(
             key: _formKey,

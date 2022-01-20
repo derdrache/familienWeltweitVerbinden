@@ -22,7 +22,7 @@ checkValidatorPassword(password){
 }
 
 changePage(context, page){
-  Navigator.pushReplacement(
+  Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => page)
   );
