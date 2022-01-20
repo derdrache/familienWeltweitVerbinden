@@ -66,15 +66,10 @@ class _LoginPageState extends State<LoginPage> {
           child: FlatButton(
             hoverColor: Colors.transparent,
               child: Text("Passwort vergessen?"),
-              onPressed: (){                   Navigator.pushAndRemoveUntil(
-                  context,
-                  PageRouteBuilder(
-                      pageBuilder: (context,a,b)=> ForgetPasswordPage(),
-                      transitionDuration: Duration(seconds: 0)
-                  ),
-                      (route) => false);
-
-          }),
+              onPressed: (){
+                globalFunctions.changePage(context, ForgetPasswordPage());
+              }
+          ),
         ),
       );
     }
@@ -103,6 +98,8 @@ class _LoginPageState extends State<LoginPage> {
                 forgetPassButton(),
                 customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended("Register", (){
+                  globalFunctions.changePage(context, RegisterPage());
+                  /*
                   Navigator.pushAndRemoveUntil(
                       context,
                       PageRouteBuilder(
@@ -110,6 +107,9 @@ class _LoginPageState extends State<LoginPage> {
                           transitionDuration: Duration(seconds: 0)
                       ),
                           (route) => false);
+                  */
+
+
                 }),
               ],
             )

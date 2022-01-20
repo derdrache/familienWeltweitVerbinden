@@ -5,7 +5,7 @@ import 'create_profil_page.dart';
 import 'board_page.dart';
 import 'erkunden_page.dart';
 import 'umkreis_page.dart';
-import 'chat_page.dart';
+import 'chat/chat_page.dart';
 import 'setting_page.dart';
 
 
@@ -22,7 +22,6 @@ class _StartPageState extends State<StartPage>{
 
 
   checkIfFirstLogin(){
-
     if(widget.registered){ return false; }
 
     if(FirebaseAuth.instance.currentUser!.displayName == null ||
@@ -36,7 +35,6 @@ class _StartPageState extends State<StartPage>{
 
 
   Widget build(BuildContext context){
-    const pageMainColor = Colors.white;
     const navigationbarButtonColor = Colors.purple;
     List<Widget> tabPages = <Widget>[
       ChatPage(),
@@ -53,11 +51,7 @@ class _StartPageState extends State<StartPage>{
       });
     }
 
-    return checkIfFirstLogin() ? CreateProfilPage(): MaterialApp(
-      theme: ThemeData(
-        scaffoldBackgroundColor: pageMainColor,
-      ),
-      home: Scaffold(
+    return checkIfFirstLogin() ? CreateProfilPage(): Scaffold(
           body: Center(
             child: tabPages.elementAt(widget.selectedIndex),
           ),
@@ -90,10 +84,9 @@ class _StartPageState extends State<StartPage>{
               ),
             ],
             currentIndex: widget.selectedIndex,
-            selectedItemColor: pageMainColor,
+            selectedItemColor: Colors.white,
             onTap: _onItemTapped,
           )
-      ),
     );
   }
 }

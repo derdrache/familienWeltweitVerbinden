@@ -52,7 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppbar("Register", LoginPage()),
+      appBar: customAppBar(title: "Register"),
       body: Center(
         child: Form(
           key: _formKeyT,

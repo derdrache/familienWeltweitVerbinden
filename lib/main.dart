@@ -18,6 +18,7 @@ void main()async {
 
 class MyApp extends StatelessWidget {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  var pageMainColor = Colors.white;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
             return Center(child: CircularProgressIndicator());
           }
           return MaterialApp(
+              theme: ThemeData(
+                scaffoldBackgroundColor: pageMainColor,
+              ),
             debugShowCheckedModeBanner: false,
             home: StartPage()//LoginPage()
           );
