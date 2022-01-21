@@ -51,7 +51,7 @@ dbDeleteProfil(docID) {
 dbGetAllUsersChats(user) async{
   var userChatGroups = [];
 
-  await chats.where("users", arrayContains: user)
+  await chats
       .get()
       .then((QuerySnapshot querySnapshot) {
         if (querySnapshot.docs.isNotEmpty) {
@@ -62,4 +62,21 @@ dbGetAllUsersChats(user) async{
       });
 
   return userChatGroups;
+}
+
+dbGetMessagesFromChatgroup(chatgroup) async{
+  QuerySnapshot querySnapshots =  await chats.doc(chatgroup["docid"]).collection("messages").get();
+  List allData = querySnapshots.docs.map((doc) => doc.data()).toList();
+
+  return allData;
+}
+
+dbAddMessage(messageData) async {
+  await chats.doc(messageData["docid"]).collection("messages").add({
+    "message" : messageData["message"],
+    "date" : messageData["date"],
+    "from": messageData["from"]
+  });
+
+
 }
