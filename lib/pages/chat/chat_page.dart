@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../services/database.dart';
 import '../../global/custom_widgets.dart';
@@ -10,20 +11,31 @@ class ChatPage extends StatefulWidget{
 }
 
 class _ChatPageState extends State<ChatPage>{
-  
+  var userEmail = FirebaseAuth.instance.currentUser!.email;
 
-  @override
-  void initState(){
-    loadChatdataFromDb();
+
+  getMessagesToChatgroup(chatgroups) async {
+    var newChatgroups = [];
+    for(var group in chatgroups){
+      group["messages"] = await dbGetMessagesFromChatgroup(group);
+      newChatgroups.add(group);
+    }
+    return newChatgroups;
   }
 
-  loadChatdataFromDb() async {
-    await dbGetAllUsersChats("dominik.mast.11@gmail.com");
+  getAllDbData() async {
+    var chatGroups = await dbGetAllUsersChats(userEmail);
+    chatGroups = await getMessagesToChatgroup(chatGroups);
+
+    return chatGroups;
   }
 
-  openThisChat(groudChatData){
-    changePage(context, ChatDetailsPage(groudChatData: groudChatData));
+
+  openThisChat(groupChatData){
+    changePage(context, ChatDetailsPage(groupChatData: groupChatData));
   }
+
+
 
 
   Widget build(BuildContext context){
@@ -32,7 +44,9 @@ class _ChatPageState extends State<ChatPage>{
       List<Widget> groupContainer = [];
 
       for(var group in groupdata){
-        group["users"].remove("dominik.mast.11@gmail.com");
+        var chatpartner = group["users"][0] == "dominik.mast.11@gmail.com" ?
+                          group["users"][1] : group["users"][0];
+        var lastMessage = group["messages"].last["message"];
 
         groupContainer.add(
           GestureDetector(
@@ -41,7 +55,7 @@ class _ChatPageState extends State<ChatPage>{
             child: Container(
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(),
                     )
@@ -49,9 +63,9 @@ class _ChatPageState extends State<ChatPage>{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(group["users"][0],style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(chatpartner,style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(height: 5),
-                  Text("letzte Nachricht")
+                  Text(lastMessage)
                 ],
               )
             ),
@@ -69,6 +83,8 @@ class _ChatPageState extends State<ChatPage>{
       );
     }
 
+
+
     return Scaffold(
       appBar: customAppBar(
         title: "Chat",
@@ -80,9 +96,8 @@ class _ChatPageState extends State<ChatPage>{
       ),
       body: Column(
         children: [
-          //topBar(),
           FutureBuilder(
-            future: dbGetAllUsersChats("dominik.mast.11@gmail.com"),
+            future: getAllDbData(),
               builder: (
                   BuildContext context,
                   AsyncSnapshot snapshot,
