@@ -12,30 +12,74 @@ class ChatPage extends StatefulWidget{
 
 class _ChatPageState extends State<ChatPage>{
   var userEmail = FirebaseAuth.instance.currentUser!.email;
+  var globalChatGroups = [];
 
-
-  getMessagesToChatgroup(chatgroups) async {
-    var newChatgroups = [];
-    for(var group in chatgroups){
-      group["messages"] = await dbGetMessagesFromChatgroup(group);
-      newChatgroups.add(group);
-    }
-    return newChatgroups;
-  }
-
-  getAllDbData() async {
+  getAllDbDataAndSetChatGroups() async {
     var chatGroups = await dbGetAllUsersChats(userEmail);
-    chatGroups = await getMessagesToChatgroup(chatGroups);
+
+    globalChatGroups = chatGroups;
 
     return chatGroups;
   }
-
 
   openThisChat(groupChatData){
     changePage(context, ChatDetailsPage(groupChatData: groupChatData));
   }
 
+  selectChatpartnerWindow(){
+    var personenSucheController = TextEditingController();
 
+    return showDialog(
+        context: context,
+        builder: (BuildContext context){
+          return AlertDialog(
+            content: Container(
+              height: 400,
+              child: Column(
+                children: [
+                  Row(
+                      children: [
+                        Container(width: 200,child: customTextfield("Person suchen", personenSucheController)),
+                        FloatingActionButton(
+                          mini: true,
+                          child: Icon(Icons.search),
+                          onPressed: () => validCheckAndOpenChatgroup(personenSucheController.text),
+                        )
+                      ]),
+                ]
+              )
+            ),
+          );
+   });
+  }
+
+  validCheckAndOpenChatgroup(chatPartner) async {
+    var checkAndIndex = checkNewChatGroup(chatPartner);
+
+    Navigator.pop(context);
+
+    if(checkAndIndex[0]){
+      var chatGroupData = await dbAddNewChatGroup([userEmail, chatPartner]);
+      openThisChat(chatGroupData);
+    } else{
+      openThisChat(globalChatGroups[checkAndIndex[1]]);
+    }
+
+  }
+
+  checkNewChatGroup(chatPartner){
+    var check = [true, -1];
+
+
+    for(var i = 0;i < globalChatGroups.length; i++){
+
+      if(globalChatGroups[i]["users"].contains(chatPartner)){
+        check = [false,i];
+      }
+    }
+
+    return check;
+  }
 
 
   Widget build(BuildContext context){
@@ -46,12 +90,11 @@ class _ChatPageState extends State<ChatPage>{
       for(var group in groupdata){
         var chatpartner = group["users"][0] == "dominik.mast.11@gmail.com" ?
                           group["users"][1] : group["users"][0];
-        var lastMessage = group["messages"].last["message"];
-
+        var lastMessage = group["lastMessage"];
+        print(group);
         groupContainer.add(
           GestureDetector(
-            onTap: () => openThisChat(group)
-            ,
+            onTap: () => openThisChat(group),
             child: Container(
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
@@ -97,7 +140,7 @@ class _ChatPageState extends State<ChatPage>{
       body: Column(
         children: [
           FutureBuilder(
-            future: getAllDbData(),
+            future: getAllDbDataAndSetChatGroups(),
               builder: (
                   BuildContext context,
                   AsyncSnapshot snapshot,
@@ -113,7 +156,7 @@ class _ChatPageState extends State<ChatPage>{
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.create),
-        onPressed: null,
+        onPressed: () => selectChatpartnerWindow(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

@@ -65,18 +65,53 @@ dbGetAllUsersChats(user) async{
 }
 
 dbGetMessagesFromChatgroup(chatgroup) async{
-  QuerySnapshot querySnapshots =  await chats.doc(chatgroup["docid"]).collection("messages").get();
+  QuerySnapshot querySnapshots =  await chats.doc(chatgroup["docid"]).
+                                collection("messages").orderBy("date", descending: true).get();
   List allData = querySnapshots.docs.map((doc) => doc.data()).toList();
 
   return allData;
 }
 
-dbAddMessage(messageData) async {
-  await chats.doc(messageData["docid"]).collection("messages").add({
+dbAddNewChatGroup(users) async {
+  var chatGroupData = {
+    "users" : users,
+    "lastMessage": "",
+    "lastMessageDate": DateTime.now(),
+    "docid" : users[0]+users[1]
+  };
+
+  chats.doc(users[0]+users[1]).set({
+    "users" : users,
+    "lastMessage": "",
+    "lastMessageDate": DateTime.now()
+  }).then((value) {
+    chats.doc(users[0] + users[1]).update({"docid": users[0] + users[1]});
+    chats.doc(users[0] + users[1]).collection("messages").add({
+      "message": "",
+      "date": DateTime.now(),
+      "from": users[0]
+    });
+
+  });
+
+
+  return chatGroupData;
+
+}
+
+dbAddMessage(docid, messageData) async {
+  await chats.doc(docid).update({
+    "lastMessage" : messageData["message"],
+    "lastMessageDate": messageData["from"]
+  });
+
+  await chats.doc(docid).collection("messages").add({
     "message" : messageData["message"],
     "date" : messageData["date"],
     "from": messageData["from"]
   });
+
+
 
 
 }
