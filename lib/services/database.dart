@@ -29,7 +29,7 @@ dbGetProfil(email) async{
     if (documentSnapshot.exists) {
       profilData = documentSnapshot.data();
     } else {
-      print('Document does not exist on the database');
+      profilData = null;
     }
   });
 
@@ -85,7 +85,6 @@ dbAddNewChatGroup(users) async {
     "lastMessage": "",
     "lastMessageDate": DateTime.now()
   }).then((value) {
-    chats.doc(users[0] + users[1]).update({"docid": users[0] + users[1]});
     chats.doc(users[0] + users[1]).collection("messages").add({
       "message": "",
       "date": DateTime.now(),
@@ -94,7 +93,6 @@ dbAddNewChatGroup(users) async {
 
   });
 
-
   return chatGroupData;
 
 }
@@ -102,7 +100,7 @@ dbAddNewChatGroup(users) async {
 dbAddMessage(docid, messageData) async {
   await chats.doc(docid).update({
     "lastMessage" : messageData["message"],
-    "lastMessageDate": messageData["from"]
+    "lastMessageDate": messageData["date"]
   });
 
   await chats.doc(docid).collection("messages").add({

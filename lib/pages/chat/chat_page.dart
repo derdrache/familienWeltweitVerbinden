@@ -26,8 +26,21 @@ class _ChatPageState extends State<ChatPage>{
     changePage(context, ChatDetailsPage(groupChatData: groupChatData));
   }
 
-  selectChatpartnerWindow(){
+  checkUserExist(user) async {
+    var check = false;
+    var userProfil = await dbGetProfil(user);
+
+    if(userProfil != null){
+      check = true;
+    }
+
+    return check;
+  }
+
+  selectChatpartnerWindow() async {
     var personenSucheController = TextEditingController();
+    var userProfil = await dbGetProfil(userEmail);
+    var userFriendlist = userProfil["friendlist"];
 
     return showDialog(
         context: context,
@@ -43,9 +56,23 @@ class _ChatPageState extends State<ChatPage>{
                         FloatingActionButton(
                           mini: true,
                           child: Icon(Icons.search),
-                          onPressed: () => validCheckAndOpenChatgroup(personenSucheController.text),
+                          onPressed: () async {
+                            bool userExist = await checkUserExist(personenSucheController.text);
+
+                            if(userExist){
+                              validCheckAndOpenChatgroup(personenSucheController.text);
+                            } else {
+                              //suche input leer machen
+                              customSnackbar(context, "Benutzer existiert nicht");
+                            }
+
+                          },
                         )
                       ]),
+                  SizedBox(height: 15),
+                  Align(alignment: Alignment.centerLeft, child: Text("Friendlist: ")),
+                  SizedBox(height: 15),
+                  createFriendlistBox(userFriendlist)
                 ]
               )
             ),
@@ -53,8 +80,36 @@ class _ChatPageState extends State<ChatPage>{
    });
   }
 
+  Widget createFriendlistBox(userFriendlist) {
+    List<Widget> friendsBoxen = [];
+
+    for(var friend in userFriendlist){
+      friendsBoxen.add(
+        GestureDetector(
+          onTap: () => validCheckAndOpenChatgroup(friend),
+          child: Container(
+            child: Text(friend)
+          ),
+        )
+      );
+    }
+
+    return Container(
+      width: double.maxFinite,
+      height: 250,
+      padding: EdgeInsets.all(10),
+      child: ListView(
+          children: friendsBoxen
+      ),
+    );
+
+  }
+
   validCheckAndOpenChatgroup(chatPartner) async {
     var checkAndIndex = checkNewChatGroup(chatPartner);
+
+
+    // prüfen ob user existiert
 
     Navigator.pop(context);
 
@@ -69,7 +124,6 @@ class _ChatPageState extends State<ChatPage>{
 
   checkNewChatGroup(chatPartner){
     var check = [true, -1];
-
 
     for(var i = 0;i < globalChatGroups.length; i++){
 
@@ -91,7 +145,7 @@ class _ChatPageState extends State<ChatPage>{
         var chatpartner = group["users"][0] == "dominik.mast.11@gmail.com" ?
                           group["users"][1] : group["users"][0];
         var lastMessage = group["lastMessage"];
-        print(group);
+
         groupContainer.add(
           GestureDetector(
             onTap: () => openThisChat(group),
@@ -131,11 +185,6 @@ class _ChatPageState extends State<ChatPage>{
     return Scaffold(
       appBar: customAppBar(
         title: "Chat",
-        button: TextButton(
-          child: Icon(Icons.search),
-          onPressed: null,
-        )
-
       ),
       body: Column(
         children: [
