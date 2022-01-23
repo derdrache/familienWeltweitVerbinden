@@ -97,19 +97,32 @@ dbAddNewChatGroup(users) async {
 
 }
 
-dbAddMessage(docid, messageData) async {
-  await chats.doc(docid).update({
-    "lastMessage" : messageData["message"],
-    "lastMessageDate": messageData["date"]
-  });
+dbAddMessage(chatgroupData, messageData,{ newChat = false}) async {
+  var groupChatData = {
+    "users" : chatgroupData["users"],
+    "lastMessage": messageData["message"],
+    "lastMessageDate": messageData["date"],
+    "docid" : chatgroupData["docid"]
+  };
 
-  await chats.doc(docid).collection("messages").add({
+  if(newChat){
+    await chats.doc(chatgroupData["docid"]).set(groupChatData);
+  } else{
+    await chats.doc(chatgroupData["docid"]).update({
+      "lastMessage" : messageData["message"],
+      "lastMessageDate": messageData["date"]
+    });
+  }
+
+
+  await chats.doc(chatgroupData["docid"]).collection("messages").add({
     "message" : messageData["message"],
     "date" : messageData["date"],
     "from": messageData["from"]
   });
 
 
+  return groupChatData;
 
 
 }
