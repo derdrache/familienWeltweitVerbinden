@@ -37,10 +37,10 @@ class _StartPageState extends State<StartPage>{
   Widget build(BuildContext context){
     const navigationbarButtonColor = Colors.purple;
     List<Widget> tabPages = <Widget>[
-      ChatPage(),
+      BoardPage(),
       ErkundenPage(),
       UmkreisPage(),
-      BoardPage(),//,
+      ChatPage(),
       SettingPage()
     ];
 
