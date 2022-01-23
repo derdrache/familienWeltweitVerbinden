@@ -26,55 +26,64 @@ class _ChatPageState extends State<ChatPage>{
     changePage(context, ChatDetailsPage(groupChatData: groupChatData));
   }
 
-  checkUserExist(user) async {
-    var check = false;
-    var userProfil = await dbGetProfil(user);
-
-    if(userProfil != null){
-      check = true;
-    }
-
-    return check;
-  }
 
   selectChatpartnerWindow() async {
     var personenSucheController = TextEditingController();
     var userProfil = await dbGetProfil(userEmail);
-    var userFriendlist = userProfil["friendlist"];
+    var userFriendlist = userProfil["friendlist"] ?? [];
+
 
     return showDialog(
         context: context,
-        builder: (BuildContext context){
+        builder: (BuildContext dialogContext){
           return AlertDialog(
-            content: Container(
-              height: 400,
-              child: Column(
-                children: [
-                  Row(
-                      children: [
-                        Container(width: 200,child: customTextfield("Person suchen", personenSucheController)),
-                        FloatingActionButton(
-                          mini: true,
-                          child: Icon(Icons.search),
-                          onPressed: () async {
-                            bool userExist = await checkUserExist(personenSucheController.text);
+            content: Scaffold(
+              body: Container(
+                height: 400,
+                child: Column(
+                  children: [
+                    Row(
+                        children: [
+                          Container(
+                            width: 168,
+                            height: 40,
+                            child: TextFormField(
+                              controller: personenSucheController,
+                                decoration: const InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.black),
+                                    ),
+                                    border: OutlineInputBorder(),
+                                    hintText: "Person suchen",
+                                    hintStyle: TextStyle(fontSize: 12, color: Colors.grey)
+                                )
 
-                            if(userExist){
-                              validCheckAndOpenChatgroup(personenSucheController.text);
-                            } else {
-                              //suche input leer machen
-                              customSnackbar(context, "Benutzer existiert nicht");
-                            }
+                            ),
+                          ),
+                          TextButton(
+                            child: Icon(Icons.search),
+                            onPressed: () async {
+                              var chatPartner = personenSucheController.text;
+                              if(validChatPartnerInput(chatPartner)){
+                                bool userExist = await checkUserExist(personenSucheController.text);
 
-                          },
-                        )
-                      ]),
-                  SizedBox(height: 15),
-                  Align(alignment: Alignment.centerLeft, child: Text("Friendlist: ")),
-                  SizedBox(height: 15),
-                  createFriendlistBox(userFriendlist)
-                ]
-              )
+                                if(userExist){
+                                  validCheckAndOpenChatgroup(personenSucheController.text);
+                                } else {
+                                  personenSucheController.clear();
+                                  customSnackbar(dialogContext, "Benutzer existiert nicht");
+                                }
+                              }
+                            },
+                          )
+                        ]),
+                    SizedBox(height: 20),
+                    Align(alignment: Alignment.centerLeft, child: Text("Friendlist: ")),
+                    SizedBox(height: 20),
+                    createFriendlistBox(userFriendlist)
+                  ]
+                )
+              ),
             ),
           );
    });
@@ -105,19 +114,35 @@ class _ChatPageState extends State<ChatPage>{
 
   }
 
+  validChatPartnerInput(chatPartner){
+    if (chatPartner == ""){
+      return false;
+    }
+
+    return true;
+
+  }
+
+  checkUserExist(user) async {
+    var check = false;
+    var userProfil = await dbGetProfil(user);
+
+    if(userProfil != null){
+      check = true;
+    }
+
+    return check;
+  }
+
   validCheckAndOpenChatgroup(chatPartner) async {
     var checkAndIndex = checkNewChatGroup(chatPartner);
-
-
-    // prüfen ob user existiert
 
     Navigator.pop(context);
 
     if(checkAndIndex[0]){
-      var chatGroupData = await dbAddNewChatGroup([userEmail, chatPartner]);
-      openThisChat(chatGroupData);
+      changePage(context, ChatDetailsPage(groupChatData: chatPartner, newChat: true));
     } else{
-      openThisChat(globalChatGroups[checkAndIndex[1]]);
+      changePage(context, ChatDetailsPage(groupChatData: globalChatGroups[checkAndIndex[1]]));
     }
 
   }
@@ -148,7 +173,7 @@ class _ChatPageState extends State<ChatPage>{
 
         groupContainer.add(
           GestureDetector(
-            onTap: () => openThisChat(group),
+            onTap: () =>changePage(context, ChatDetailsPage(groupChatData: group)),
             child: Container(
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
