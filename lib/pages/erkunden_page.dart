@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -15,6 +16,7 @@ class ErkundenPage extends StatefulWidget{
 }
 
 class _ErkundenPageState extends State<ErkundenPage>{
+  var ownUserProfil;
   var originalProfils = [];
   var filteredProfils = [];
   var profilCountries = [];
@@ -42,12 +44,28 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   _asyncMethod() async{
     var getProfils = await dbGetAllProfils();
+    ownUserProfil = getOwnProfil(getProfils);
+    getProfils.remove(ownUserProfil);
+
     setState(() {
       originalProfils = getProfils;
       filteredProfils = getProfils;
     });
 
     createAndSetZoomProfils();
+  }
+
+  getOwnProfil(profils){
+    var userEmail = FirebaseAuth.instance.currentUser!.email;
+
+    for(var profil in profils){
+      if(profil["email"] == userEmail){
+        return profil;
+      }
+    }
+
+    return null;
+
   }
 
   createProfilBetween(list, profil){
@@ -226,6 +244,35 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   }
 
+  addFriendButton(profil){
+    var onFriendlist = ownUserProfil["friendlist"].contains(profil["email"]);
+
+    return TextButton(
+      style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              )
+          )
+      ),
+      child: onFriendlist?Icon(Icons.person_remove) : Icon(Icons.person_add),
+      onPressed: (){
+        if(onFriendlist){
+          ownUserProfil["friendlist"].remove(profil["email"]);
+          dbChangeProfil(ownUserProfil["email"], {"friendlist": ownUserProfil["friendlist"]});
+        } else {
+          ownUserProfil["friendlist"].add(profil["email"]);
+          dbChangeProfil(ownUserProfil["email"], {"friendlist": ownUserProfil["friendlist"]});
+        }
+
+        Navigator.pop(context);
+        profilPopupWindow(context, profil,
+            addFriendButton: addFriendButton(profil));
+
+      }
+    );
+  }
+
 
   Widget build(BuildContext context){
     List<Marker> allMarker = [];
@@ -258,7 +305,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
         profils["profils"].forEach((profil){
           profilsList.add(
             GestureDetector(
-              onTap: () => profilPopupWindow(context, profil),
+              onTap: () => profilPopupWindow(context, profil,
+                  addFriendButton: addFriendButton(profil)
+                ),
               child: Container(
                 width: 50,
                 margin: EdgeInsets.all(10),

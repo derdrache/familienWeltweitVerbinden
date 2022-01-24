@@ -13,20 +13,24 @@ class _BoardPageState extends State<BoardPage>{
 
 
   testDatatoDB() async {
-    var stadt = "United Arab Emirates";
+    var stadt = "Puerto Morelos";
     var locationData = await LocationService().getLocationMapDataGoogle(stadt);
-    var data = {
-      "email": "test010@test.com",
-      "name": "test010",
+    var testProfil = {
+      "email": "test3@web.de",
+      "name": "test3",
       "ort": locationData["city"],
-      "interessen": [ "Freilerner"],
-      "kinder": [7,9, 11, 13],
+      "interessen": [],
+      "kinder": [],
       "land": locationData["countryname"],
       "longt": locationData["longt"],
-      "latt":  locationData["latt"]
+      "latt":  locationData["latt"],
+      "reiseart": "Weltreise",
+      "aboutme": "",
+      "sprachen": ["Deutsch", "Englisch"],
+      "friendlist": []
     };
-    print(data);
-    //dbAddNewProfil(data);
+
+    dbAddNewProfil(testProfil["email"], testProfil);
 
   }
 
@@ -34,21 +38,13 @@ class _BoardPageState extends State<BoardPage>{
 
   Widget build(BuildContext context){
     var textController = TextEditingController();
-    var testProfil = {
-      "interessen": ["Weltreise", "Freilerner"],
-      "ort": "Tizimín",
-      //"kinder": [Timestamp(seconds=1451106000, nanoseconds=0), Timestamp(seconds=1213938000, nanoseconds=0)],
-      "latt": 21.1454686,
-      "name": "test007",
-      "land": "Mexiko",
-      "email": "test007@test.com",
-      "longt": -88.1496087
-    };
+
 
     return Scaffold(
       body: Container(
         child: FloatingActionButton(
             onPressed: (){
+              testDatatoDB();
             }
         )
       )

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../global/global_functions.dart' as globalFunctions;
 
 
-_menuBarProfil(context){
+_menuBarProfil(context, addFriendButton){
   return Row(
     children: [
       TextButton(
@@ -29,17 +29,7 @@ _menuBarProfil(context){
           child: Icon(Icons.message),
           onPressed: () => print("Zum Chat")
       ),
-      TextButton(
-        style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                )
-            )
-        ),
-        child: Icon(Icons.person_add),
-        onPressed: () => print("add Friendlist"),
-      ),
+      addFriendButton,
       TextButton(
         style: ButtonStyle(
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -114,7 +104,7 @@ _kontaktProfil(profil){
   );
 }
 
-profilPopupWindow(context, profil){
+profilPopupWindow(context, profil, {addFriendButton}){
 
   return showDialog(
       context: context,
@@ -129,7 +119,7 @@ profilPopupWindow(context, profil){
               isAlwaysShown: true,
               child: ListView(
                   children: [
-                    _menuBarProfil(context),
+                    _menuBarProfil(context, addFriendButton),
                     SizedBox(height: 25),
                     _titelProfil(profil),
                     SizedBox(height: 30),
