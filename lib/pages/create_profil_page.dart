@@ -34,14 +34,21 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
 
   saveFunction()async {
-    var locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
+    var locationData;
+    while(locationData == null){
+      locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
+    }
     var firebaseUser = await FirebaseAuth.instance.currentUser;
+    var userExist = await dbGetProfil(nameTextcontroller.text) != null;
     var email = firebaseUser?.email;
+    var userName = nameTextcontroller.text;
 
-    if(checkAllValidation(locationData)){
+    print(locationData);
+
+    if(checkAllValidation(userExist, locationData)){
       var data = {
         "email": email,
-        "name": nameTextcontroller.text,
+        "name": userName,
         "ort": locationData["city"], //groß und kleinschreibung?
         "interessen": interessenAuswahlBox.getSelected(),
         "kinder": childrenAgePickerBox.getDates(),
@@ -54,8 +61,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "friendlist": []
       };
 
-      dbAddNewProfil(email, data);
-      FirebaseAuth.instance.currentUser?.updateDisplayName(nameTextcontroller.text);
+      dbAddNewProfil(data);
+      FirebaseAuth.instance.currentUser?.updateDisplayName(userName);
       globalFunctions.changePage(context, StartPage(registered: true));
 
     }
@@ -72,12 +79,14 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     return allFilled;
   }
 
-  checkAllValidation(locationData){
+  checkAllValidation(userExist, locationData){
     bool allGood = true;
     String errorString = "Bitte Eingaben korrigieren: \n";
 
     if(nameTextcontroller.text.isEmpty){
       errorString += "- Name eingeben \n";
+    } else if (userExist){
+      errorString += "- Username wird schon verwendet \n";
     }
     if(locationData == null || locationData["city"] == ""){
       errorString += "- Stadt eingeben \n";

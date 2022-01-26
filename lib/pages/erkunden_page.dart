@@ -244,8 +244,17 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   }
 
+  checkOnFriendlist(friendlist, email){
+    for(var friend in friendlist){
+      if (friend["email"] == email){
+        return true;
+      }
+    }
+    return false;
+  }
+
   addFriendButton(profil){
-    var onFriendlist = ownUserProfil["friendlist"].contains(profil["email"]);
+    var onFriendlist = ownUserProfil["friendlist"].contains(profil["name"]);
 
     return TextButton(
       style: ButtonStyle(
@@ -258,11 +267,11 @@ class _ErkundenPageState extends State<ErkundenPage>{
       child: onFriendlist?Icon(Icons.person_remove) : Icon(Icons.person_add),
       onPressed: (){
         if(onFriendlist){
-          ownUserProfil["friendlist"].remove(profil["email"]);
-          dbChangeProfil(ownUserProfil["email"], {"friendlist": ownUserProfil["friendlist"]});
+          ownUserProfil["friendlist"].remove(profil["name"]);
+          dbChangeProfil(ownUserProfil["name"], {"friendlist": ownUserProfil["friendlist"]});
         } else {
-          ownUserProfil["friendlist"].add(profil["email"]);
-          dbChangeProfil(ownUserProfil["email"], {"friendlist": ownUserProfil["friendlist"]});
+          ownUserProfil["friendlist"].add(profil["name"]);
+          dbChangeProfil(ownUserProfil["name"], {"friendlist": ownUserProfil["friendlist"]});
         }
 
         Navigator.pop(context);

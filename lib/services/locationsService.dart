@@ -7,7 +7,7 @@ import '../auth/secrets.dart';
 
 
 class LocationService {
-
+/*
   getLocationMapDataGoogle(input) async{
     var sprache = "de";
     try{
@@ -26,8 +26,9 @@ class LocationService {
     }
   }
 
+
+ */
   getLocationMapDataGeocode(input) async{
-    // Probleme mit der Stadt ermittlung
     try{
       var response = await http.get(Uri.parse("https://geocode.xyz/cityname=$input?json=1&nostrict=0"));
       var json = convert.jsonDecode(response.body);
@@ -40,6 +41,7 @@ class LocationService {
       };
       return mapData;
     }catch (error){
+      print("API Problem - erneuter Versuch");
       return null;
     }
   }
@@ -61,5 +63,14 @@ class LocationService {
     }
     return null;
   }
+/*
+  test(input) async{
+    var response = await http.get(Uri.parse("http://www.mapquestapi.com/geocoding/v1/$input"));
+    var json = convert.jsonDecode(response.body);
+
+    print(json);
+  }
+
+ */
 }
 

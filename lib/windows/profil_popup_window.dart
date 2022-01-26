@@ -27,7 +27,7 @@ _menuBarProfil(context, addFriendButton){
               )
           ),
           child: Icon(Icons.message),
-          onPressed: () => print("Zum Chat")
+          onPressed: () => print("open Chat or create a new one")
       ),
       addFriendButton,
       TextButton(

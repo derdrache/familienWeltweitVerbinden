@@ -21,6 +21,7 @@ class _SettingPageState extends State<SettingPage> {
   double globalPadding = 30;
   double fontSize = 16;
   var borderColor = Colors.grey[200]!;
+  var userProfil;
   var nameTextKontroller = TextEditingController();
   var kinderAgeBox = ChildrenBirthdatePickerBox();
   var interessenInputBox = CustomMultiTextForm(
@@ -104,16 +105,14 @@ class _SettingPageState extends State<SettingPage> {
 
   getProfilFromDatabase() async {
     emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
-    var profil = await dbGetProfil(emailTextKontroller.text);
-
-    return profil;
+    nameTextKontroller.text = FirebaseAuth.instance.currentUser!.displayName!;
+    userProfil = await dbGetProfil(nameTextKontroller.text);
   }
 
   void getAndSetDataFromDB() async {
-    var userProfil;
     List childrenAgeTimestamp = [];
     try{
-      userProfil = await getProfilFromDatabase();
+      await getProfilFromDatabase();
       List childrenDataYears = [];
 
       userProfil["kinder"].forEach((kind){
@@ -139,7 +138,10 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   pushLocationDataToDB() async {
-    var locationData = await LocationService().getLocationMapDataGeocode(ortKontroller.text);
+    var locationData;
+    while(locationData == null){
+      locationData = await LocationService().getLocationMapDataGeocode(ortKontroller.text);
+    }
 
     var locationDict = {
       "ort": locationData["city"],
@@ -147,25 +149,24 @@ class _SettingPageState extends State<SettingPage> {
       "latt": double.parse(locationData["latt"]),
       "land": locationData["countryname"]
     };
-    dbChangeProfil(emailTextKontroller.text, locationDict);
+    dbChangeProfil(userProfil["docid"], locationDict);
   }
 
   saveFunction(beschreibung) async{
     if(beschreibung == beschreibungStadt){
       pushLocationDataToDB();
     }else if(beschreibung == beschreibungReise){
-      dbChangeProfil(emailTextKontroller.text, {"reiseart": reiseArtInput.getSelected()});
+      dbChangeProfil(userProfil["docid"], {"reiseart": reiseArtInput.getSelected()});
     }else if(beschreibung == beschreibungKinder){
-      dbChangeProfil(emailTextKontroller.text, {"kinder": kinderAgeBox.getDates()});
+      dbChangeProfil(userProfil["docid"], {"kinder": kinderAgeBox.getDates()});
     }else if(beschreibung == beschreibungInteressen){
-      dbChangeProfil(emailTextKontroller.text, {"interessen": interessenInputBox.getSelected()});
+      dbChangeProfil(userProfil["docid"], {"interessen": interessenInputBox.getSelected()});
     }else if(beschreibung == beschreibungSprachen){
-      dbChangeProfil(emailTextKontroller.text, {"sprachen": sprachenInputBox.getSelected()});
+      dbChangeProfil(userProfil["docid"], {"sprachen": sprachenInputBox.getSelected()});
     }else if(beschreibung == beschreibungBio){
-      dbChangeProfil(emailTextKontroller.text, {"aboutme": bioTextKontroller.text});
+      dbChangeProfil(userProfil["docid"], {"aboutme": bioTextKontroller.text});
     }else if(beschreibung == beschreibungName){
-      FirebaseAuth.instance.currentUser?.updateDisplayName(nameTextKontroller.text);
-      dbChangeProfil(emailTextKontroller.text, {"name": nameTextKontroller.text});
+      dbChangeUserName(userProfil["docid"],userProfil["name"],nameTextKontroller.text);
     } else if (beschreibung == beschreibungPasswort){
       FirebaseAuth.instance.currentUser?.updatePassword(passwortTextKontroller.text);
     }

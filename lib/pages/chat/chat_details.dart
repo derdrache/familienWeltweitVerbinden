@@ -19,17 +19,17 @@ class ChatDetailsPage extends StatefulWidget {
 class _ChatDetailsPageState extends State<ChatDetailsPage> {
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
-  var userEmail = FirebaseAuth.instance.currentUser!.email;
+  var userName = FirebaseAuth.instance.currentUser!.displayName;
 
 
   @override
   void initState() {
     if(widget.newChat){
       widget.groupChatData = {
-        "users" : [userEmail, widget.groupChatData],
+        "users" : [userName, widget.groupChatData],
         "lastMessage": "",
         "lastMessageDate": DateTime.now(),
-        "docid" : userEmail!+widget.groupChatData
+        "docid" : userName!+widget.groupChatData
       };
     }
     super.initState();
@@ -38,7 +38,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   getTitle(){
     var users = widget.groupChatData["users"];
 
-    return users[0] == userEmail? users[1]: users[0];
+    return users[0] == userName? users[1]: users[0];
 
   }
 
@@ -47,7 +47,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     var messageData = {
       "message" :message,
-      "from": userEmail,
+      "from": userName,
       "date": DateTime.now()
     };
 
@@ -67,7 +67,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-
+    print(widget.groupChatData);
     messageList(messages){
       List<Widget> messageBox = [];
 
@@ -77,7 +77,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.grey;
 
-        if(message["from"] == userEmail){
+        if(message["from"] == userName){
           textAlign = Alignment.centerRight;
           boxColor = Colors.blue;
         }

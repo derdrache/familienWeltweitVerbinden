@@ -11,25 +11,20 @@ class ChatPage extends StatefulWidget{
 }
 
 class _ChatPageState extends State<ChatPage>{
-  var userEmail = FirebaseAuth.instance.currentUser!.email;
+  var userName = FirebaseAuth.instance.currentUser!.displayName;
   var globalChatGroups = [];
 
   getAllDbDataAndSetChatGroups() async {
-    var chatGroups = await dbGetAllUsersChats(userEmail);
+    var chatGroups = await dbGetAllUsersChats(userName);
 
     globalChatGroups = chatGroups;
 
     return chatGroups;
   }
 
-  openThisChat(groupChatData){
-    changePage(context, ChatDetailsPage(groupChatData: groupChatData));
-  }
-
-
   selectChatpartnerWindow() async {
     var personenSucheController = TextEditingController();
-    var userProfil = await dbGetProfil(userEmail);
+    var userProfil = await dbGetProfil(userName);
     var userFriendlist = userProfil["friendlist"] ?? [];
 
 
@@ -64,11 +59,11 @@ class _ChatPageState extends State<ChatPage>{
                             child: Icon(Icons.search),
                             onPressed: () async {
                               var chatPartner = personenSucheController.text;
-                              if(validChatPartnerInput(chatPartner)){
-                                bool userExist = await checkUserExist(personenSucheController.text);
+                              if(chatPartner != ""){
+                                var userName = await findUserGetName(personenSucheController.text);
 
-                                if(userExist){
-                                  validCheckAndOpenChatgroup(personenSucheController.text);
+                                if(userName != null){
+                                  validCheckAndOpenChatgroup(userName);
                                 } else {
                                   personenSucheController.clear();
                                   customSnackbar(dialogContext, "Benutzer existiert nicht");
@@ -79,7 +74,7 @@ class _ChatPageState extends State<ChatPage>{
                         ]),
                     SizedBox(height: 20),
                     Align(alignment: Alignment.centerLeft, child: Text("Friendlist: ")),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     createFriendlistBox(userFriendlist)
                   ]
                 )
@@ -97,6 +92,13 @@ class _ChatPageState extends State<ChatPage>{
         GestureDetector(
           onTap: () => validCheckAndOpenChatgroup(friend),
           child: Container(
+            margin: EdgeInsets.all(5),
+            padding: EdgeInsets.all(15),
+            width: 200,
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(15)
+            ),
             child: Text(friend)
           ),
         )
@@ -114,24 +116,19 @@ class _ChatPageState extends State<ChatPage>{
 
   }
 
-  validChatPartnerInput(chatPartner){
-    if (chatPartner == ""){
-      return false;
+  findUserGetName(user) async {
+    var foundOnName = await dbGetProfil(user) ;
+    var foundOnEmail = await dbGetProfilFromEmail(user);
+
+
+    if(foundOnName != null){
+      return foundOnName["name"];
+    } else if(foundOnEmail != null){
+      return foundOnEmail["name"];
+    } else {
+      return null;
     }
 
-    return true;
-
-  }
-
-  checkUserExist(user) async {
-    var check = false;
-    var userProfil = await dbGetProfil(user);
-
-    if(userProfil != null){
-      check = true;
-    }
-
-    return check;
   }
 
   validCheckAndOpenChatgroup(chatPartner) async {
