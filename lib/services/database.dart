@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
 CollectionReference chats = FirebaseFirestore.instance.collection("chats");
 
 
-dbAddNewProfil(id, data) {
-
-  return profil.doc(id).set(data)
-      .then((value) => print("User Added"))
-      .catchError((error) => print("Failed to add user: $error"));
+dbAddNewProfil(data) {
+  return profil.add(data).then((value) {
+    profil.doc(value.id).update({"docid": value.id});
+  });
 }
 
 dbGetAllProfils() async {
@@ -20,18 +20,34 @@ dbGetAllProfils() async {
 
 }
 
-dbGetProfil(email) async{
+dbGetProfil(name) async{
   var profilData;
 
-  await profil.doc(email)
+  await profil.where("name", isEqualTo: name)
+      .limit(1)
       .get()
-      .then((DocumentSnapshot documentSnapshot) {
-    if (documentSnapshot.exists) {
-      profilData = documentSnapshot.data();
+      .then((value) {
+    if (value.docs.isNotEmpty) {
+      profilData = value.docs[0].data();
     } else {
       profilData = null;
     }
   });
+
+  return profilData;
+}
+
+dbGetProfilFromEmail(email) async{
+  var profilData;
+
+  await profil.where("email", isEqualTo: email).limit(1)
+      .get()
+      .then((value) {
+        if(value.docs.isNotEmpty){
+          profilData = value.docs[0].data();
+        }
+
+      });
 
   return profilData;
 }
@@ -72,41 +88,19 @@ dbGetMessagesFromChatgroup(chatgroup) async{
   return allData;
 }
 
-dbAddNewChatGroup(users) async {
-  var chatGroupData = {
-    "users" : users,
-    "lastMessage": "",
-    "lastMessageDate": DateTime.now(),
-    "docid" : users[0]+users[1]
-  };
-
-  chats.doc(users[0]+users[1]).set({
-    "users" : users,
-    "lastMessage": "",
-    "lastMessageDate": DateTime.now()
-  }).then((value) {
-    chats.doc(users[0] + users[1]).collection("messages").add({
-      "message": "",
-      "date": DateTime.now(),
-      "from": users[0]
-    });
-
-  });
-
-  return chatGroupData;
-
-}
-
 dbAddMessage(chatgroupData, messageData,{ newChat = false}) async {
-  var groupChatData = {
-    "users" : chatgroupData["users"],
-    "lastMessage": messageData["message"],
-    "lastMessageDate": messageData["date"],
-    "docid" : chatgroupData["docid"]
-  };
 
   if(newChat){
-    await chats.doc(chatgroupData["docid"]).set(groupChatData);
+    chatgroupData = {
+      "users" : chatgroupData["users"],
+      "lastMessage": messageData["message"],
+      "lastMessageDate": messageData["date"],
+    };
+
+    await chats.add(chatgroupData).then((value) {
+      chatgroupData["docid"] = value.id;
+      chats.doc(value.id).update({"docid": value.id});
+    });
   } else{
     await chats.doc(chatgroupData["docid"]).update({
       "lastMessage" : messageData["message"],
@@ -114,15 +108,43 @@ dbAddMessage(chatgroupData, messageData,{ newChat = false}) async {
     });
   }
 
-
   await chats.doc(chatgroupData["docid"]).collection("messages").add({
     "message" : messageData["message"],
     "date" : messageData["date"],
     "from": messageData["from"]
   });
 
+  return chatgroupData;
+}
 
-  return groupChatData;
+dbChangeUserName(profilDocid, oldName, newName) async {
+  FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
+
+  profil.doc(profilDocid).update({"name": newName});
+
+  profil.where("friendlist", arrayContains: oldName)
+        .get().then((values) {
+          if(values.docs.isNotEmpty){
+            for(var value in values.docs){
+              List friendList = value.get("friendlist");
+              friendList[friendList.indexOf(oldName)] = newName;
+
+              profil.doc(value.id).update({"friendlist": friendList});
+            }
+          }
+  });
+
+  chats.where("users", arrayContains: oldName).get().then((values) {
+    if(values.docs.isNotEmpty){
+      for(var value in values.docs){
+        List users = value.get("users");
+        users.remove(oldName);
+        users.add(newName);
+        chats.doc(value.id).update({"users": users});
+      }
+    }
+  });
+
 
 
 }

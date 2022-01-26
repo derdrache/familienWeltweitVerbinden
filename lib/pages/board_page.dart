@@ -14,10 +14,13 @@ class _BoardPageState extends State<BoardPage>{
 
   testDatatoDB() async {
     var stadt = "Puerto Morelos";
-    var locationData = await LocationService().getLocationMapDataGoogle(stadt);
+    var locationData = await LocationService().getLocationMapDataGeocode(stadt);
+    while(locationData == null){
+      locationData = await LocationService().getLocationMapDataGeocode(stadt);
+    }
     var testProfil = {
-      "email": "test3@web.de",
-      "name": "test3",
+      "email": "test@web.de",
+      "name": "test",
       "ort": locationData["city"],
       "interessen": [],
       "kinder": [],
@@ -26,11 +29,11 @@ class _BoardPageState extends State<BoardPage>{
       "latt":  locationData["latt"],
       "reiseart": "Weltreise",
       "aboutme": "",
-      "sprachen": ["Deutsch", "Englisch"],
+      "sprachen": ["Englisch"],
       "friendlist": []
     };
 
-    dbAddNewProfil(testProfil["email"], testProfil);
+    //dbAddNewProfil(testProfil);
 
   }
 
