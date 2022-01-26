@@ -63,11 +63,14 @@ dbDeleteProfil(docID) {
       .delete();
 }
 
-
+/*
 dbGetAllUsersChats(user) async{
   var userChatGroups = [];
 
-  await chats
+  //return chats.snapshots(includeMetadataChanges: true)
+
+  chats
+      .where("users", arrayContains: user)
       .get()
       .then((QuerySnapshot querySnapshot) {
         if (querySnapshot.docs.isNotEmpty) {
@@ -78,6 +81,27 @@ dbGetAllUsersChats(user) async{
       });
 
   return userChatGroups;
+}
+
+ */
+
+
+dbGetOneUserChat(user1, user2) async{
+  var groupChatData;
+
+  await chats.where("users", arrayContains: user1).get().then((values){
+    if(values.docs.isNotEmpty){
+      for(var value in values.docs){
+
+        var hasUser2 = value.get("users").contains(user2);
+        if(hasUser2){
+          groupChatData =  value.data();
+        }
+      }
+    }
+  });
+
+  return groupChatData;
 }
 
 dbGetMessagesFromChatgroup(chatgroup) async{
@@ -111,7 +135,7 @@ dbAddMessage(chatgroupData, messageData,{ newChat = false}) async {
   await chats.doc(chatgroupData["docid"]).collection("messages").add({
     "message" : messageData["message"],
     "date" : messageData["date"],
-    "from": messageData["from"]
+    "from": chatgroupData["users"].indexOf(messageData["from"])
   });
 
   return chatgroupData;
@@ -138,8 +162,7 @@ dbChangeUserName(profilDocid, oldName, newName) async {
     if(values.docs.isNotEmpty){
       for(var value in values.docs){
         List users = value.get("users");
-        users.remove(oldName);
-        users.add(newName);
+        users[users.indexOf(oldName)] = newName;
         chats.doc(value.id).update({"users": users});
       }
     }

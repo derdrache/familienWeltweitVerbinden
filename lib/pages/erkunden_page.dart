@@ -275,7 +275,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
         }
 
         Navigator.pop(context);
-        profilPopupWindow(context, profil,
+        profilPopupWindow(context,ownUserProfil["name"], profil,
             addFriendButton: addFriendButton(profil));
 
       }
@@ -314,8 +314,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         profils["profils"].forEach((profil){
           profilsList.add(
             GestureDetector(
-              onTap: () => profilPopupWindow(context, profil,
-                  addFriendButton: addFriendButton(profil)
+              onTap: () => profilPopupWindow(context, ownUserProfil["name"],
+                  profil, addFriendButton: addFriendButton(profil)
                 ),
               child: Container(
                 width: 50,
