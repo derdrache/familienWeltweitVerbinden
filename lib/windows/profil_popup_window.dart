@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../global/global_functions.dart' as globalFunctions;
+import '../global/global_functions.dart';
+import '../pages/chat/chat_details.dart';
+import '../services/database.dart';
 
 
-_menuBarProfil(context, addFriendButton){
+_menuBarProfil(context,userName,profilName, addFriendButton){
   return Row(
     children: [
       TextButton(
@@ -27,7 +30,15 @@ _menuBarProfil(context, addFriendButton){
               )
           ),
           child: Icon(Icons.message),
-          onPressed: () => print("open Chat or create a new one")
+          onPressed: () async {
+            var groupChatData = await dbGetOneUserChat(userName, profilName);
+            if(groupChatData != null){
+              changePage(context, ChatDetailsPage(groupChatData: groupChatData));
+            } else {
+              changePage(context, ChatDetailsPage(groupChatData: profilName, newChat: true));
+            }
+
+          }
       ),
       addFriendButton,
       TextButton(
@@ -104,7 +115,7 @@ _kontaktProfil(profil){
   );
 }
 
-profilPopupWindow(context, profil, {addFriendButton}){
+profilPopupWindow(context,userName, profil, {addFriendButton}){
 
   return showDialog(
       context: context,
@@ -119,7 +130,7 @@ profilPopupWindow(context, profil, {addFriendButton}){
               isAlwaysShown: true,
               child: ListView(
                   children: [
-                    _menuBarProfil(context, addFriendButton),
+                    _menuBarProfil(context,userName,profil["name"], addFriendButton),
                     SizedBox(height: 25),
                     _titelProfil(profil),
                     SizedBox(height: 30),

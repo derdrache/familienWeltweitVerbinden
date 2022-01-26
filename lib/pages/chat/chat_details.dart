@@ -67,7 +67,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.groupChatData);
+
     messageList(messages){
       List<Widget> messageBox = [];
 
@@ -77,7 +77,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.grey;
 
-        if(message["from"] == userName){
+        if(widget.groupChatData["users"][message["from"]] == userName){
           textAlign = Alignment.centerRight;
           boxColor = Colors.blue;
         }
@@ -111,16 +111,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     }
 
     showMessages(){
-      return FutureBuilder(
-          future: getAllMessages(),
+      return StreamBuilder(
+          stream: chats.doc(widget.groupChatData["docid"])
+              .collection("messages")
+              .orderBy("date", descending: true).snapshots(),
           builder: (
               BuildContext context,
               AsyncSnapshot snapshot,
               ){
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
-            } else if (snapshot.connectionState == ConnectionState.done) {
-              return messageList(snapshot.data);
+            } else if (snapshot.hasData) {
+              return messageList(snapshot.data.docs);
             }
             return Container();
           });

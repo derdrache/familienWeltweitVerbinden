@@ -46,8 +46,7 @@ class _BoardPageState extends State<BoardPage>{
     return Scaffold(
       body: Container(
         child: FloatingActionButton(
-            onPressed: (){
-              testDatatoDB();
+            onPressed: () async{
             }
         )
       )

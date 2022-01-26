@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -13,14 +14,6 @@ class ChatPage extends StatefulWidget{
 class _ChatPageState extends State<ChatPage>{
   var userName = FirebaseAuth.instance.currentUser!.displayName;
   var globalChatGroups = [];
-
-  getAllDbDataAndSetChatGroups() async {
-    var chatGroups = await dbGetAllUsersChats(userName);
-
-    globalChatGroups = chatGroups;
-
-    return chatGroups;
-  }
 
   selectChatpartnerWindow() async {
     var personenSucheController = TextEditingController();
@@ -210,18 +203,21 @@ class _ChatPageState extends State<ChatPage>{
       ),
       body: Column(
         children: [
-          FutureBuilder(
-            future: getAllDbDataAndSetChatGroups(),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection("chats")
+                .where("users", arrayContains: userName)
+                .snapshots(),
               builder: (
                   BuildContext context,
                   AsyncSnapshot snapshot,
               ){
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
-                } else if (snapshot.connectionState == ConnectionState.done) {
-                  return chatUserList(snapshot.data);
+                } else if (snapshot.hasData) {
+                  globalChatGroups = snapshot.data.docs;
+                  return chatUserList(snapshot.data.docs);
                 }
-                return Container();
+                return Text("error");
               })
         ],
       ),
