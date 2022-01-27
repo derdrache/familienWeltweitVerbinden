@@ -22,6 +22,7 @@ class _BoardPageState extends State<BoardPage>{
       "email": "test@web.de",
       "name": "test",
       "ort": locationData["city"],
+      "emailAnzeigen": false,
       "interessen": [],
       "kinder": [],
       "land": locationData["countryname"],
@@ -40,16 +41,11 @@ class _BoardPageState extends State<BoardPage>{
 
 
   Widget build(BuildContext context){
-    var textController = TextEditingController();
-
-
     return Scaffold(
       body: Container(
-        child: FloatingActionButton(
-            onPressed: () async{
-            }
+        margin: EdgeInsets.all(100),
+        child: Text("In Arbeit", style: TextStyle(fontSize: 40),)
         )
-      )
-    );
+      );
   }
 }

@@ -109,7 +109,7 @@ _kontaktProfil(profil){
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Kontakt",style: TextStyle(color: Colors.blue),),
-          Text("Email: " + profil["email"])
+          profil["emailAnzeigen"]?Text("Email: " + profil["email"]): Container()
         ],
       ),
   );
