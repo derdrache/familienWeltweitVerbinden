@@ -55,25 +55,7 @@ class _SettingPageState extends State<SettingPage> {
   }
 
 
-  nameContainer(){
-    return Container(
-      width: double.maxFinite,
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(width: 10, color: borderColor))
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            nameTextKontroller.text,
-            style: TextStyle(fontSize: 30),
-          ),
-          Text(emailTextKontroller.text)
-        ]
-      )
-    );
-  }
+
 
   getProfilFromDatabase() async {
     emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
@@ -165,7 +147,7 @@ class _SettingPageState extends State<SettingPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(haupttext,
+                haupttext == ""? CircularProgressIndicator() : Text(haupttext,
                   style: TextStyle(fontSize: fontSize),
                 ),
                 SizedBox(height: 3),
@@ -235,6 +217,26 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
+    nameContainer(){
+      return Container(
+          width: double.maxFinite,
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(width: 10, color: borderColor))
+          ),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nameTextKontroller.text,
+                  style: TextStyle(fontSize: 30),
+                ),
+                Text(emailTextKontroller.text)
+              ]
+          )
+      );
+    }
+
     profilContainer(){
       return Container(
           width: double.maxFinite,
@@ -271,8 +273,10 @@ class _SettingPageState extends State<SettingPage> {
                       beschreibungSprachen, sprachenInputBox)
                 ],
               ),
-              themeContainer(bioTextKontroller.text, beschreibungBio,
-                  customTextfield("über mich", bioTextKontroller))
+              themeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
+                  beschreibungBio,
+                  customTextfield("über mich", bioTextKontroller)
+              )
             ],
           )
       );

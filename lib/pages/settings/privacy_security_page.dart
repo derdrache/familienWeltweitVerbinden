@@ -16,7 +16,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.profil);
 
     emailSettingContainer(){
       return Row(
