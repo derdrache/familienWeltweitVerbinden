@@ -7,7 +7,10 @@ class UmkreisPage extends StatefulWidget{
 class _UmkreisPageState extends State<UmkreisPage>{
   Widget build(BuildContext context){
     return Scaffold(
-        body: Text("im Umkreis")
+        body: Container(
+            margin: EdgeInsets.all(100),
+            child: Text("In Arbeit", style: TextStyle(fontSize: 40),)
+        )
     );
   }
 }

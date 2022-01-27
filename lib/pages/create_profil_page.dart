@@ -48,6 +48,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     if(checkAllValidation(userExist, locationData)){
       var data = {
         "email": email,
+        "emailAnzeigen": false,
         "name": userName,
         "ort": locationData["city"], //groß und kleinschreibung?
         "interessen": interessenAuswahlBox.getSelected(),

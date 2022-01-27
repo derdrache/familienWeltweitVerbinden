@@ -53,6 +53,7 @@ dbGetProfilFromEmail(email) async{
 }
 
 dbChangeProfil(docID, data){
+  print(data);
   return profil.doc(docID).update(data).then((value) => print("User Updated"))
       .catchError((error) => print("Failed to update user: $error"));
 }
@@ -62,29 +63,6 @@ dbDeleteProfil(docID) {
       .doc(docID)
       .delete();
 }
-
-/*
-dbGetAllUsersChats(user) async{
-  var userChatGroups = [];
-
-  //return chats.snapshots(includeMetadataChanges: true)
-
-  chats
-      .where("users", arrayContains: user)
-      .get()
-      .then((QuerySnapshot querySnapshot) {
-        if (querySnapshot.docs.isNotEmpty) {
-          for(var chatgroup in querySnapshot.docs){
-            userChatGroups.add(chatgroup.data());
-          }
-        }
-      });
-
-  return userChatGroups;
-}
-
- */
-
 
 dbGetOneUserChat(user1, user2) async{
   var groupChatData;
@@ -104,8 +82,8 @@ dbGetOneUserChat(user1, user2) async{
   return groupChatData;
 }
 
-dbGetMessagesFromChatgroup(chatgroup) async{
-  QuerySnapshot querySnapshots =  await chats.doc(chatgroup["docid"]).
+dbGetMessagesFromChatgroup(chatgroup) async {
+  QuerySnapshot querySnapshots = await chats.doc(chatgroup["docid"]).
                                 collection("messages").orderBy("date", descending: true).get();
   List allData = querySnapshots.docs.map((doc) => doc.data()).toList();
 

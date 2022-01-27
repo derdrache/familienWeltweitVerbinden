@@ -1,13 +1,15 @@
+import 'package:familien_suche/pages/settings/privacy_security_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../services/database.dart';
-import '../global/global_functions.dart' as globalFunctions;
-import '../windows/change_profil_window.dart';
-import '../global/custom_widgets.dart';
-import '../global/variablen.dart' as globalVariablen;
-import '../services/locationsService.dart';
-import '../pages/login_register_page/login_page.dart';
+import '../../global/global_functions.dart';
+import '../../services/database.dart';
+import '../../global/global_functions.dart' as globalFunctions;
+import '../../windows/change_profil_window.dart';
+import '../../global/custom_widgets.dart';
+import '../../global/variablen.dart' as globalVariablen;
+import '../../services/locationsService.dart';
+import '../login_register_page/login_page.dart';
 
 
 class SettingPage extends StatefulWidget {
@@ -70,36 +72,6 @@ class _SettingPageState extends State<SettingPage> {
           Text(emailTextKontroller.text)
         ]
       )
-    );
-  }
-
-  settingContainer(){
-
-    themeContainer(title, icon){
-      return Container(
-        child: Row(
-          children: [
-            Icon(icon),
-            SizedBox(width: 20),
-            Text(title)
-          ],
-        )
-      );
-    }
-
-    return Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Einstellungen",
-                style: TextStyle(color: Colors.blue, fontSize: fontSize)),
-            SizedBox(height: 20),
-            themeContainer("Privatsphäre und Sicherheit", Icons.lock),//Email anzeigen, Passwort ändern
-            SizedBox(height: 20),
-
-          ],
-        )
     );
   }
 
@@ -206,6 +178,63 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
+    menuBar(){
+
+      openSettingWindow()async {
+        var textColor = Colors.black;
+
+        return showMenu(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(5.0),
+              ),
+            ),
+            context: context,
+            position: RelativeRect.fromLTRB(100, 0, 0, 100),
+            items: [
+              PopupMenuItem(
+                  child: TextButton(
+                      onPressed: () => profilChangeWindow(context, beschreibungName,
+                          customTextfield(beschreibungName,nameTextKontroller),
+                              () => saveFunction(beschreibungName)),
+                      child: Text(beschreibungName, style: TextStyle(color: textColor)))
+              ),
+              PopupMenuItem(
+                  child: TextButton(
+                      onPressed: () => profilChangeWindow(context, beschreibungPasswort,
+                          customTextfield(beschreibungPasswort, passwortTextKontroller),
+                              () => saveFunction(beschreibungPasswort)),
+                      child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
+              ),
+              PopupMenuItem(
+                  child: TextButton(
+                      onPressed: () {
+                        FirebaseAuth.instance.signOut();
+                        globalFunctions.changePage(context, LoginPage());
+                      },
+                      child: Text("Abmelden", style: TextStyle(color: textColor)))
+              ),
+            ]
+        );
+      }
+
+      return  customAppBar(
+          title: "",
+          elevation: 0.0,
+          button: TextButton(
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    )
+                )
+            ),
+            child: Icon(Icons.more_vert, color: Colors.black),
+            onPressed: () => openSettingWindow(),
+          )
+      );
+    }
+
     profilContainer(){
       return Container(
           width: double.maxFinite,
@@ -249,130 +278,41 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
-    menuBar(){
+    settingContainer(){
 
-      openSettingWindow()async {
-        var textColor = Colors.black;
-
-        return showMenu(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(5.0),
-              ),
-            ),
-            context: context,
-            position: RelativeRect.fromLTRB(100, 0, 0, 100),
-            items: [
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () => profilChangeWindow(context, beschreibungName,
-                          customTextfield(beschreibungName,nameTextKontroller),
-                              () => saveFunction(beschreibungName)),
-                      child: Text(beschreibungName, style: TextStyle(color: textColor)))
-              ),
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () => profilChangeWindow(context, beschreibungPasswort,
-                          customTextfield(beschreibungPasswort, passwortTextKontroller),
-                              () => saveFunction(beschreibungPasswort)),
-                      child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
-              ),
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () {
-                        FirebaseAuth.instance.signOut();
-                        globalFunctions.changePage(context, LoginPage());
-                      },
-                      child: Text("Abmelden", style: TextStyle(color: textColor)))
-              ),
-            ]
-        );
-      }
-
-      return  customAppBar(
-        title: "",
-        elevation: 0.0,
-        button: TextButton(
-          style: ButtonStyle(
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  )
+      themeContainer(title, icon, function){
+        return GestureDetector(
+          excludeFromSemantics: true,
+          onTap: function,
+          child: Container(
+              child: Row(
+                children: [
+                  Icon(icon),
+                  SizedBox(width: 20),
+                  Text(title)
+                ],
               )
           ),
-          child: Icon(Icons.more_vert, color: Colors.black),
-          onPressed: () => openSettingWindow(),
-        )
-      );
-    }
-
-
-/*
-    menuBar(){
-
-      openSettingWindow()async {
-        var textColor = Colors.black;
-
-        return showMenu(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(5.0),
-              ),
-            ),
-            context: context,
-            position: RelativeRect.fromLTRB(100, 0, 0, 100),
-            items: [
-              PopupMenuItem(
-                  child: TextButton(
-                    onPressed: () => profilChangeWindow(context, beschreibungName,
-                        customTextfield(beschreibungName,nameTextKontroller),
-                        () => saveFunction(beschreibungName)),
-                    child: Text(beschreibungName, style: TextStyle(color: textColor)))
-              ),
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () => profilChangeWindow(context, beschreibungPasswort,
-                          customTextfield(beschreibungPasswort, passwortTextKontroller),
-                              () => saveFunction(beschreibungPasswort)),
-                      child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
-              ),
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () {
-                        FirebaseAuth.instance.signOut();
-                        globalFunctions.changePage(context, LoginPage());
-                      },
-                      child: Text("Abmelden", style: TextStyle(color: textColor)))
-              ),
-            ]
         );
       }
 
       return Container(
-        child: Row(
-          children: [
-            Expanded(child: SizedBox()),
-            TextButton(
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      )
-                  )
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Einstellungen",
+                  style: TextStyle(color: Colors.blue, fontSize: fontSize)),
+              SizedBox(height: 20),
+              themeContainer("Privatsphäre und Sicherheit", Icons.lock,
+                      () => changePage(context, PrivacySecurityPage(profil: userProfil))
               ),
-              child: Icon(Icons.more_vert, color: Colors.black),
-              onPressed: () => openSettingWindow(),
-            )
-          ],
-        ),
+              SizedBox(height: 20),
+
+            ],
+          )
       );
     }
-
-
- */
-
-
-
 
 
     return Padding(
