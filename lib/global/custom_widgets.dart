@@ -28,11 +28,12 @@ Widget customTextForm(text, controller, {validator = null, obsure = false}){
 }
 
 
-Widget customTextfield(hintText, controller){
+Widget customTextfield(hintText, controller, {passwort = false}){
   return Container(
     height: boxHeight,
     margin: EdgeInsets.all(sideSpace),
     child: TextField(
+      obscureText: passwort,
       maxLines: 1,
         controller: controller,
         decoration: InputDecoration(

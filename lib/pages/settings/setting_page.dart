@@ -30,7 +30,9 @@ class _SettingPageState extends State<SettingPage> {
       auswahlList: globalVariablen.interessenListe);
   var bioTextKontroller = TextEditingController();
   var emailTextKontroller = TextEditingController();
-  var passwortTextKontroller = TextEditingController();
+  var passwortTextKontroller1 = TextEditingController();
+  var passwortTextKontroller2 = TextEditingController();
+  var passwortCheckKontroller = TextEditingController();
   var reiseArtInput = CustomDropDownButton(items: globalVariablen.reisearten);
   var sprachenInputBox = CustomMultiTextForm(
       auswahlList: globalVariablen.sprachenListe);
@@ -104,33 +106,110 @@ class _SettingPageState extends State<SettingPage> {
     dbChangeProfil(userProfil["docid"], locationDict);
   }
 
+  userLogin(passwort) async {
+    var loginUser;
+
+    try {
+      loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: userProfil["email"],
+          password: passwort
+      );
+    } on FirebaseAuthException catch  (e) {
+      loginUser = null;
+    }
+
+    return loginUser;
+  }
+
   validAndSave(beschreibung) async{
     String errorMessage = "";
 
     if(beschreibung == beschreibungStadt){
-      pushLocationDataToDB();
+      if(ortKontroller.text != "" && ortKontroller.text != userProfil["ort"]){
+        pushLocationDataToDB();
+      } else{
+        errorMessage += "- neue Stadt eingeben";
+      }
     }else if(beschreibung == beschreibungReise){
-      dbChangeProfil(userProfil["docid"], {"reiseart": reiseArtInput.getSelected()});
+      if(reiseArtInput.getSelected() != userProfil["reiseart"] ){
+        dbChangeProfil(userProfil["docid"], {"reiseart": reiseArtInput.getSelected()});
+      } else {
+        errorMessage += "- neue Reiseart eingeben";
+      }
     }else if(beschreibung == beschreibungKinder){
-      dbChangeProfil(userProfil["docid"], {"kinder": kinderAgeBox.getDates()});
+      if(kinderAgeBox.getDates().length != 0 &&
+          kinderAgeBox.getDates() != userProfil["kinder"]){
+        dbChangeProfil(userProfil["docid"], {"kinder": kinderAgeBox.getDates()});
+      } else{
+        errorMessage += "- Neue Geburtsdaten eingeben";
+      }
     }else if(beschreibung == beschreibungInteressen){
-      dbChangeProfil(userProfil["docid"], {"interessen": interessenInputBox.getSelected()});
+      if(interessenInputBox.getSelected() != userProfil["interessen"] &&
+          interessenInputBox.getSelected().lenth != 0){
+        dbChangeProfil(userProfil["docid"], {"interessen": interessenInputBox.getSelected()});
+      } else{
+        errorMessage += "- neue interessen eingeben";
+      }
     }else if(beschreibung == beschreibungSprachen){
-      dbChangeProfil(userProfil["docid"], {"sprachen": sprachenInputBox.getSelected()});
+      if(sprachenInputBox.getSelected() != userProfil["sprachen"] &&
+          sprachenInputBox.getSelected().length != 0){
+        dbChangeProfil(userProfil["docid"], {"sprachen": sprachenInputBox.getSelected()});
+      }else {
+        errorMessage += "- Sprache eingeben";
+      }
     }else if(beschreibung == beschreibungBio){
-      dbChangeProfil(userProfil["docid"], {"aboutme": bioTextKontroller.text});
+      if(bioTextKontroller.text != userProfil["aboutme"]){
+        dbChangeProfil(userProfil["docid"], {"aboutme": bioTextKontroller.text});
+      }
     }else if(beschreibung == beschreibungName){
-      dbChangeUserName(userProfil["docid"],userProfil["name"],nameTextKontroller.text);
+      if(nameTextKontroller.text != userProfil["name"] && nameTextKontroller.text != ""){
+        var userProfil = await dbGetProfil(nameTextKontroller.text);
+        if(userProfil == null){
+          dbChangeUserName(userProfil["docid"],userProfil["name"],nameTextKontroller.text);
+        } else{
+          errorMessage += "- Name schon vorhanden";
+        }
+      } else{
+        errorMessage += "- Neuen Namen eingeben";
+      }
     } else if (beschreibung == beschreibungEmail){
       errorMessage = await checkPasswortAndNewEmail();
       if(errorMessage == ""){
         FirebaseAuth.instance.currentUser?.updateEmail(emailTextKontroller.text);
         dbChangeProfil(userProfil["docid"], {"email":emailTextKontroller.text });
       }
-
-
     } else if (beschreibung == beschreibungPasswort){
-      FirebaseAuth.instance.currentUser?.updatePassword(passwortTextKontroller.text);
+      var newPasswort = passwortTextKontroller1.text;
+      var newPasswortCheck = passwortTextKontroller2.text;
+      var oldPasswort = passwortCheckKontroller.text;
+
+      if(newPasswort != "" && newPasswortCheck != "" && oldPasswort != "" &&
+          newPasswort != oldPasswort){
+        if (newPasswort == newPasswortCheck ){
+          try{
+            var loginTest = await userLogin(passwortCheckKontroller.text);
+
+            if (loginTest != null){
+              await FirebaseAuth.instance.currentUser?.updatePassword(passwortTextKontroller1.text);
+            } else {
+              errorMessage += "- Altes Passwort ist falsch";
+            }
+
+          } catch (error){
+            errorMessage += "- Neues Passwort ist zu schwach";
+          }
+
+        } else{
+          errorMessage += "- Passwort bestätigung stimmt nicht mit dem neuen Passwort überein";
+        }
+      }else{
+        if (newPasswort == "" || newPasswort == oldPasswort){
+          errorMessage += "- neues Passwort eingeben \n";
+        }
+        if(newPasswortCheck == ""){ errorMessage += "- neues Passwort bestätigen \n"; }
+        if(oldPasswort == ""){errorMessage += "- altes Passwort eingeben"; }
+
+      }
     }
 
     if(errorMessage.isEmpty){
@@ -146,7 +225,7 @@ class _SettingPageState extends State<SettingPage> {
   checkPasswortAndNewEmail() async {
     var errorString = "";
 
-    if(passwortTextKontroller.text != "" && emailTextKontroller.text != ""){
+    if(passwortTextKontroller1.text != "" && emailTextKontroller.text != ""){
       bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(emailTextKontroller.text);
       var emailInUse = await dbGetProfilFromEmail(emailTextKontroller.text);
@@ -154,15 +233,7 @@ class _SettingPageState extends State<SettingPage> {
       if (emailInUse != null){
         errorString += "- Email wird schon verwendet";
       } else if (emailIsValid){
-        var loginUser;
-        try {
-          loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
-              email: userProfil["email"],
-              password: passwortTextKontroller.text
-          );
-        } on FirebaseAuthException catch  (e) {
-          loginUser = null;
-        }
+        var loginUser = await userLogin(passwortTextKontroller1);
 
         if(loginUser != null){
           return "";
@@ -173,7 +244,7 @@ class _SettingPageState extends State<SettingPage> {
         errorString += "- ungültige Email";
       }
     } else{
-      if(passwortTextKontroller.text == ""){
+      if(passwortTextKontroller1.text == ""){
         errorString += "- Passwort eingeben \n";
       }
       if(emailTextKontroller.text == ""){
@@ -216,11 +287,33 @@ class _SettingPageState extends State<SettingPage> {
     }
 
     emailChangeWindow(){
+      emailTextKontroller.text = "";
+      passwortTextKontroller1.text = "";
+
       return Column(
         children: [
           customTextfield(beschreibungEmail,emailTextKontroller),
           SizedBox(height: 15),
-          customTextfield("Passwort bestätigen",passwortTextKontroller)
+          customTextfield("Passwort bestätigen",passwortTextKontroller1, passwort: true)
+        ],
+      );
+    }
+
+    passwortChangeWindow(){
+      passwortTextKontroller1.text = "";
+      passwortTextKontroller2.text = "";
+      passwortCheckKontroller.text = "";
+
+      return Column(
+        children: [
+          customTextfield("Neues Passwort eingeben", passwortTextKontroller1,
+              passwort: true),
+          SizedBox(height: 15),
+          customTextfield("Neues Passwort wiederholen", passwortTextKontroller2,
+              passwort: true),
+          SizedBox(height: 15),
+          customTextfield("Altes Passwort eingeben", passwortCheckKontroller,
+              passwort: true)
         ],
       );
     }
@@ -229,6 +322,7 @@ class _SettingPageState extends State<SettingPage> {
 
       openSettingWindow()async {
         var textColor = Colors.black;
+        nameTextKontroller.text = "";
 
         return showMenu(
             shape: const RoundedRectangleBorder(
@@ -258,7 +352,7 @@ class _SettingPageState extends State<SettingPage> {
               PopupMenuItem(
                   child: TextButton(
                       onPressed: () => profilChangeWindow(context, beschreibungPasswort,
-                          customTextfield(beschreibungPasswort, passwortTextKontroller),
+                          passwortChangeWindow(),
                               () => validAndSave(beschreibungPasswort)),
                       child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
               ),
