@@ -33,13 +33,16 @@ Widget customTextfield(hintText, controller){
     height: boxHeight,
     margin: EdgeInsets.all(sideSpace),
     child: TextField(
+      maxLines: 1,
         controller: controller,
         decoration: InputDecoration(
+            isDense: true,
             enabledBorder: const OutlineInputBorder(
               borderSide: const BorderSide(color: Colors.black),
             ),
             border: OutlineInputBorder(),
             hintText: hintText,
+
             hintStyle: TextStyle(fontSize: 13, color: Colors.grey)
         )
     ),

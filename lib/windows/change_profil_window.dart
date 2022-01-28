@@ -36,21 +36,24 @@ _topBar(context, titel, Function saveFunction){
 profilChangeWindow(context, String titel, Widget changeWidget, saveFunction){
   return showDialog(
       context: context,
-      builder: (BuildContext context){
+      builder: (BuildContext buildContext){
         return AlertDialog(
-          //backgroundColor: Colors.white,
           contentPadding: EdgeInsets.fromLTRB(10, 20, 10, 20),
-          content: Container(
-            height: 400,
-            width: double.maxFinite,
-            child: Column(
-              children: [
-                _topBar(context, titel, saveFunction),
-                changeWidget
-              ],
+          content: Scaffold(
+            body: Container(
+              height: 400,
+              width: double.maxFinite,
+              child: Column(
+                children: [
+                  _topBar(buildContext, titel, saveFunction),
+                  changeWidget
+                ],
+              ),
             ),
           ),
         );
       }
   );
 }
+
+
