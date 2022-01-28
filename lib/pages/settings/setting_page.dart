@@ -55,8 +55,6 @@ class _SettingPageState extends State<SettingPage> {
   }
 
 
-
-
   getProfilFromDatabase() async {
     emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
     nameTextKontroller.text = FirebaseAuth.instance.currentUser!.displayName!;
@@ -106,7 +104,9 @@ class _SettingPageState extends State<SettingPage> {
     dbChangeProfil(userProfil["docid"], locationDict);
   }
 
-  saveFunction(beschreibung) async{
+  validAndSave(beschreibung) async{
+    String errorMessage = "";
+
     if(beschreibung == beschreibungStadt){
       pushLocationDataToDB();
     }else if(beschreibung == beschreibungReise){
@@ -121,15 +121,68 @@ class _SettingPageState extends State<SettingPage> {
       dbChangeProfil(userProfil["docid"], {"aboutme": bioTextKontroller.text});
     }else if(beschreibung == beschreibungName){
       dbChangeUserName(userProfil["docid"],userProfil["name"],nameTextKontroller.text);
+    } else if (beschreibung == beschreibungEmail){
+      errorMessage = await checkPasswortAndNewEmail();
+      if(errorMessage == ""){
+        FirebaseAuth.instance.currentUser?.updateEmail(emailTextKontroller.text);
+        dbChangeProfil(userProfil["docid"], {"email":emailTextKontroller.text });
+      }
+
+
     } else if (beschreibung == beschreibungPasswort){
       FirebaseAuth.instance.currentUser?.updatePassword(passwortTextKontroller.text);
     }
 
-    setState(() {});
+    if(errorMessage.isEmpty){
+      setState(() {});
+      Navigator.of(context, rootNavigator: true).pop();
+    } else{
+      customSnackbar(context, errorMessage);
+    }
 
-    Navigator.of(context, rootNavigator: true).pop();
 
   }
+
+  checkPasswortAndNewEmail() async {
+    var errorString = "";
+
+    if(passwortTextKontroller.text != "" && emailTextKontroller.text != ""){
+      bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          .hasMatch(emailTextKontroller.text);
+      var emailInUse = await dbGetProfilFromEmail(emailTextKontroller.text);
+
+      if (emailInUse != null){
+        errorString += "- Email wird schon verwendet";
+      } else if (emailIsValid){
+        var loginUser;
+        try {
+          loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: userProfil["email"],
+              password: passwortTextKontroller.text
+          );
+        } on FirebaseAuthException catch  (e) {
+          loginUser = null;
+        }
+
+        if(loginUser != null){
+          return "";
+        } else{
+          errorString += "falsches Passwort";
+        }
+      } else {
+        errorString += "- ungültige Email";
+      }
+    } else{
+      if(passwortTextKontroller.text == ""){
+        errorString += "- Passwort eingeben \n";
+      }
+      if(emailTextKontroller.text == ""){
+        errorString += "- Email eingeben \n";
+      }
+    }
+    return errorString;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +193,9 @@ class _SettingPageState extends State<SettingPage> {
     themeContainer(haupttext, beschreibung, changeWidget){
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onTap: () => profilChangeWindow(context, beschreibung, changeWidget, () => saveFunction(beschreibung)),
+        onTap: () => profilChangeWindow(context, beschreibung, changeWidget,
+          () => validAndSave(beschreibung),
+        ),//profilChangeWindow(context, beschreibung, changeWidget, () => validAndSave(beschreibung)),
         child: Container(
             padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
             width: width /2 -20,
@@ -157,6 +212,16 @@ class _SettingPageState extends State<SettingPage> {
               ],
             )
         ),
+      );
+    }
+
+    emailChangeWindow(){
+      return Column(
+        children: [
+          customTextfield(beschreibungEmail,emailTextKontroller),
+          SizedBox(height: 15),
+          customTextfield("Passwort bestätigen",passwortTextKontroller)
+        ],
       );
     }
 
@@ -178,14 +243,23 @@ class _SettingPageState extends State<SettingPage> {
                   child: TextButton(
                       onPressed: () => profilChangeWindow(context, beschreibungName,
                           customTextfield(beschreibungName,nameTextKontroller),
-                              () => saveFunction(beschreibungName)),
+                              () => validAndSave(beschreibungName)),
                       child: Text(beschreibungName, style: TextStyle(color: textColor)))
+              ),
+              PopupMenuItem(
+                  child: TextButton(
+                      onPressed: () => profilChangeWindow(context, beschreibungEmail,
+                          emailChangeWindow(),
+                          () => validAndSave(beschreibungEmail)
+                      ),
+                      child: Text(beschreibungEmail, style: TextStyle(color: textColor))
+                  )
               ),
               PopupMenuItem(
                   child: TextButton(
                       onPressed: () => profilChangeWindow(context, beschreibungPasswort,
                           customTextfield(beschreibungPasswort, passwortTextKontroller),
-                              () => saveFunction(beschreibungPasswort)),
+                              () => validAndSave(beschreibungPasswort)),
                       child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
               ),
               PopupMenuItem(
@@ -322,7 +396,6 @@ class _SettingPageState extends State<SettingPage> {
     return Padding(
         padding: const EdgeInsets.only(top: 25),
         child: ListView(
-            //crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               menuBar(),
               nameContainer(),

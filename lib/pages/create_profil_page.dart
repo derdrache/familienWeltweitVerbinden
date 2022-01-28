@@ -43,8 +43,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     var email = firebaseUser?.email;
     var userName = nameTextcontroller.text;
 
-    print(locationData);
-
     if(checkAllValidation(userExist, locationData)){
       var data = {
         "email": email,
