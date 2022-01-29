@@ -91,7 +91,6 @@ class CustomMultiTextForm extends StatefulWidget {
 
 class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
-
   @override
   void initState() {
     widget.onConfirm ??= (selected){};
@@ -137,7 +136,6 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
 
     return Container(
-      height: boxHeight,
       margin: EdgeInsets.all(sideSpace),
       child: MultiSelectDialogField (
           initialValue: widget.selected,

@@ -29,6 +29,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var interessenAuswahlBox = CustomMultiTextForm(
     hintText: "Interessen auswählen",
     auswahlList: globalVariablen.interessenListe,
+      validator: globalFunctions.checkValidationMultiTextForm()
   );
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
 
