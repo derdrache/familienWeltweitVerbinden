@@ -1,6 +1,8 @@
 import 'package:familien_suche/pages/settings/privacy_security_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/link.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
@@ -385,6 +387,8 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
+
+
     nameContainer(){
       return Container(
           width: double.maxFinite,
@@ -479,8 +483,49 @@ class _SettingPageState extends State<SettingPage> {
               themeContainer("Privatsphäre und Sicherheit", Icons.lock,
                       () => changePage(context, PrivacySecurityPage(profil: userProfil))
               ),
-              SizedBox(height: 20),
+            ],
+          )
+      );
+    }
 
+    aboutAppContainer(){
+
+      themeContainer(title, icon, url){
+        return Link(
+          target: LinkTarget.blank,
+          uri: Uri.parse(url),
+          builder: (context, followLink) => GestureDetector(
+            excludeFromSemantics: true,
+            onTap: followLink,
+            child: Container(
+                child: Row(
+                  children: [
+                    Icon(icon),
+                    SizedBox(width: 20),
+                    Text(title)
+                  ],
+                )
+            ),
+          ),
+        );
+      }
+
+      return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("App Informationen",
+                  style: TextStyle(color: Colors.blue, fontSize: fontSize)),
+              SizedBox(height: 20),
+              themeContainer("Patch Notes", Icons.format_list_bulleted, ""),
+              SizedBox(height: 20),
+              themeContainer("Geplante Erweiterungen", Icons.task, ""),
+              SizedBox(height: 20),
+              themeContainer("Über das Projekt", Icons.description, ""),
+              SizedBox(height: 20),
+              themeContainer("Spenden", Icons.card_giftcard,
+                  "https://www.paypal.com/paypalme/DominikMast"),
             ],
           )
       );
@@ -494,7 +539,8 @@ class _SettingPageState extends State<SettingPage> {
               menuBar(),
               nameContainer(),
               profilContainer(),
-              settingContainer()
+              settingContainer(),
+              aboutAppContainer()
           ]
         )
     );
