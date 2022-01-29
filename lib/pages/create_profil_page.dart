@@ -16,11 +16,13 @@ class CreateProfilPage extends StatefulWidget {
 }
 
 class _CreateProfilPageState extends State<CreateProfilPage> {
+  final _formKey = GlobalKey<FormState>();
   var nameTextcontroller = TextEditingController();
   var ortTextcontroller = TextEditingController();
   var sprachenAuswahlBox = CustomMultiTextForm(
     hintText: "Sprachen auswählen",
     auswahlList: globalVariablen.sprachenListe,
+    validator: globalFunctions.checkValidationMultiTextForm(),
   );
   var reiseArtenAuswahlBox = CustomDropDownButton(
       items: globalVariablen.reisearten);
@@ -34,36 +36,38 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
 
   saveFunction()async {
-    var locationData;
-    while(locationData == null){
-      locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
-    }
-    var firebaseUser = await FirebaseAuth.instance.currentUser;
-    var userExist = await dbGetProfil(nameTextcontroller.text) != null;
-    var email = firebaseUser?.email;
-    var userName = nameTextcontroller.text;
+    if(_formKey.currentState!.validate()){
+      var locationData;
+      while(locationData == null && ortTextcontroller.text != ""){
+        locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
+      }
+      var firebaseUser = await FirebaseAuth.instance.currentUser;
+      var userExist = await dbGetProfil(nameTextcontroller.text) != null;
+      var email = firebaseUser?.email;
+      var userName = nameTextcontroller.text;
 
-    if(checkAllValidation(userExist, locationData)){
-      var data = {
-        "email": email,
-        "emailAnzeigen": false,
-        "name": userName,
-        "ort": locationData["city"], //groß und kleinschreibung?
-        "interessen": interessenAuswahlBox.getSelected(),
-        "kinder": childrenAgePickerBox.getDates(),
-        "land": locationData["countryname"],
-        "longt": locationData["longt"],
-        "latt":  locationData["latt"],
-        "reiseart": reiseArtenAuswahlBox.getSelected(),
-        "aboutme": "",
-        "sprachen": sprachenAuswahlBox.getSelected(),
-        "friendlist": []
-      };
+      if(checkAllValidation(userExist, locationData)){
+        var data = {
+          "email": email,
+          "emailAnzeigen": false,
+          "name": userName,
+          "ort": locationData["city"], //groß und kleinschreibung?
+          "interessen": interessenAuswahlBox.getSelected(),
+          "kinder": childrenAgePickerBox.getDates(),
+          "land": locationData["countryname"],
+          "longt": locationData["longt"],
+          "latt":  locationData["latt"],
+          "reiseart": reiseArtenAuswahlBox.getSelected(),
+          "aboutme": "",
+          "sprachen": sprachenAuswahlBox.getSelected(),
+          "friendlist": []
+        };
 
-      dbAddNewProfil(data);
-      FirebaseAuth.instance.currentUser?.updateDisplayName(userName);
-      globalFunctions.changePage(context, StartPage(registered: true));
+        dbAddNewProfil(data);
+        FirebaseAuth.instance.currentUser?.updateDisplayName(userName);
+        globalFunctions.changePage(context, StartPage(registered: true));
 
+      }
     }
   }
 
@@ -116,7 +120,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   @override
   Widget build(BuildContext context) {
 
-
     pageTitle(){
       return Container(
         height: 60,
@@ -139,21 +142,25 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     }
 
 
-
     return Scaffold(
       body: Container(
         margin: EdgeInsets.only(top: 30),
-          child: ListView(
-              children: [
-                pageTitle(),
-                customTextfield("Benutzername", nameTextcontroller),
-                customTextfield("Aktuelle Stadt eingeben", ortTextcontroller),
-                reiseArtenAuswahlBox,
-                sprachenAuswahlBox,
-                interessenAuswahlBox,
-                childrenAgePickerBox
-              ],
-            ),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+                children: [
+                  pageTitle(),
+                  customTextInput("Benutzername", nameTextcontroller,
+                      validator: globalFunctions.checkValidatorEmpty()),
+                  customTextInput("Aktuelle Stadt eingeben", ortTextcontroller,
+                      validator: globalFunctions.checkValidatorEmpty()),
+                  reiseArtenAuswahlBox,
+                  sprachenAuswahlBox,
+                  interessenAuswahlBox,
+                  childrenAgePickerBox
+                ],
+              ),
+          ),
       ),
     );
   }

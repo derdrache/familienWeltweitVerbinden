@@ -4,22 +4,46 @@ import 'package:flutter/material.dart';
 checkValidatorEmpty(){
   return (value){
     if(value == null || value.isEmpty){
-      return "Bitte Passwort eingeben";
+      return "Dieses Feld bitte ausfüllen";
     }
     return null;
   };
 }
 
-checkValidatorPassword(password){
+checkValidationEmail(){
+  return (value){
+    bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(value);
+
+    if(value == null || value.isEmpty){
+      return "Bitte Email eingeben";
+    } else if(!emailIsValid){
+      return "Bitte gültige Email eingeben";
+    }
+  };
+}
+
+checkValidatorPassword({passwordCheck = ""}){
  return (value){
    if(value == null || value.isEmpty){
      return "Bitte Passwort eingeben";
-   } else if(value != password){
+   } else if(passwordCheck!= "" && value != passwordCheck){
      return "Passwort stimmt nicht überein";
    }
    return null;
  };
 }
+
+checkValidationMultiTextForm(){
+  return (value){
+    if(value == null || value.isEmpty){
+      return "Bitte auswählen";
+    }
+    return null;
+  };
+}
+
+
 
 changePage(context, page){
   Navigator.push(

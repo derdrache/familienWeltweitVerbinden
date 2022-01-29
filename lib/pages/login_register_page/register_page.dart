@@ -27,6 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
       try{
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
         customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden");
+        return true;
       }on FirebaseAuthException catch(error){
         if(error.code == "email-already-in-use"){
           customSnackbar(context, "Email ist schon in Benutzung");
@@ -35,8 +36,11 @@ class _RegisterPageState extends State<RegisterPage> {
         } else if(error.code == "weak-password"){
           customSnackbar(context, "Passwort ist zu schwach");
         }
+
+        return false;
       }
     }
+    return false;
   }
 
   @override
@@ -58,28 +62,24 @@ class _RegisterPageState extends State<RegisterPage> {
           key: _formKeyT,
           child: ListView(
             children: [
-              customTextForm(
+              customTextInput(
                   "Email", emailController,
-                  validator: globalFunctions.checkValidatorEmpty()
+                  validator: globalFunctions.checkValidationEmail()
               ),
-              customTextForm(
-                  "Passwort", passwordController, obsure: true,
-                  validator: globalFunctions.checkValidatorEmpty()
+              customTextInput(
+                  "Passwort", passwordController, passwort: true,
+                  validator: globalFunctions.checkValidatorPassword()
               ),
-              customTextForm(
-                  "Passwort bestätigen", checkPasswordController, obsure: true,
-                  validator: (value){
-                    if(value == null || value.isEmpty){
-                      return "Bitte Passwort eingeben";
-                    } else if(value != passwordController.text){
-                      return "Passwort stimmt nicht überein";
-                    }
-                    return null;
-                  }
+              customTextInput(
+                  "Passwort bestätigen", checkPasswordController, passwort: true,
+                  validator: globalFunctions.checkValidatorPassword(
+                      passwordCheck: passwordController.text)
               ),
-              customFloatbuttonExtended("Registrieren", () {
-                registration();
-                globalFunctions.changePage(context, LoginPage());
+              customFloatbuttonExtended("Registrieren", () async{
+                var registrationComplete = await registration();
+                if(registrationComplete){
+                  globalFunctions.changePage(context, LoginPage());
+                }
               })
             ],
           ),

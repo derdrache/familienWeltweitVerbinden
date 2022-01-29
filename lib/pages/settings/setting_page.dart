@@ -294,9 +294,9 @@ class _SettingPageState extends State<SettingPage> {
 
       return Column(
         children: [
-          customTextfield(beschreibungEmail,emailTextKontroller),
+          customTextInput(beschreibungEmail,emailTextKontroller),
           SizedBox(height: 15),
-          customTextfield("Passwort bestätigen",passwortTextKontroller1, passwort: true)
+          customTextInput("Passwort bestätigen",passwortTextKontroller1, passwort: true)
         ],
       );
     }
@@ -308,13 +308,13 @@ class _SettingPageState extends State<SettingPage> {
 
       return Column(
         children: [
-          customTextfield("Neues Passwort eingeben", passwortTextKontroller1,
+          customTextInput("Neues Passwort eingeben", passwortTextKontroller1,
               passwort: true),
           SizedBox(height: 15),
-          customTextfield("Neues Passwort wiederholen", passwortTextKontroller2,
+          customTextInput("Neues Passwort wiederholen", passwortTextKontroller2,
               passwort: true),
           SizedBox(height: 15),
-          customTextfield("Altes Passwort eingeben", passwortCheckKontroller,
+          customTextInput("Altes Passwort eingeben", passwortCheckKontroller,
               passwort: true)
         ],
       );
@@ -338,7 +338,7 @@ class _SettingPageState extends State<SettingPage> {
               PopupMenuItem(
                   child: TextButton(
                       onPressed: () => profilChangeWindow(context, beschreibungName,
-                          customTextfield(beschreibungName,nameTextKontroller),
+                          customTextInput(beschreibungName,nameTextKontroller),
                               () => validAndSave(beschreibungName)),
                       child: Text(beschreibungName, style: TextStyle(color: textColor)))
               ),
@@ -430,7 +430,8 @@ class _SettingPageState extends State<SettingPage> {
               SizedBox(height: 5),
               Wrap(
                 children: [
-                  themeContainer(ortKontroller.text, beschreibungStadt , customTextfield("", ortKontroller)),
+                  themeContainer(ortKontroller.text, beschreibungStadt ,
+                      customTextInput("", ortKontroller)),
                   themeContainer(reiseArtInput.getSelected(), beschreibungReise, reiseArtInput),
                   themeContainer(kinderAgeBox.getDates(years: true)  == null? "":
                   kinderAgeBox.getDates(years: true).join(" , "),
@@ -447,7 +448,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
               themeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
                   beschreibungBio,
-                  customTextfield("über mich", bioTextKontroller)
+                  customTextInput("über mich", bioTextKontroller)
               )
             ],
           )
