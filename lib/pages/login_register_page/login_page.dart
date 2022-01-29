@@ -47,7 +47,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(userLogedIn);
     double sideSpace = 20;
 
     Widget header(){
@@ -93,11 +92,11 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
               children: [
                 header(),
-                customTextForm("Email", emailController,
-                    validator: globalFunctions.checkValidatorEmpty()),
-                customTextForm("Passwort", passwortController,
-                    validator: globalFunctions.checkValidatorEmpty(),
-                    obsure: true),
+                customTextInput("Email", emailController,
+                    validator: globalFunctions.checkValidationEmail()),
+                customTextInput("Passwort", passwortController,
+                    validator: globalFunctions.checkValidatorPassword(),
+                    passwort: true),
                 forgetPassButton(),
                 customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended("Register", (){

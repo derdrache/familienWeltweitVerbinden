@@ -1,55 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
-import 'global_functions.dart';
-
 double sideSpace = 10;
 double borderRounding = 5;
 double boxHeight = 50;
 var buttonColor = Colors.purple;
 
-Widget customTextForm(text, controller, {validator = null, obsure = false}){
+Widget customTextInput(text, controller, {validator = null, passwort = false}){
   return Container(
     height: boxHeight,
     margin: EdgeInsets.all(sideSpace),
     child: TextFormField(
-      obscureText: obsure,
+      obscureText: passwort,
       controller: controller,
       decoration: InputDecoration(
+        isDense: true,
         enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),
         ),
         border: OutlineInputBorder(),
         labelText: text,
+        labelStyle: TextStyle(fontSize: 13, color: Colors.grey),
+        floatingLabelStyle: TextStyle(fontSize: 15, color: Colors.blue)
       ),
       validator: validator
     ),
   );
 }
-
-
-Widget customTextfield(hintText, controller, {passwort = false}){
-  return Container(
-    height: boxHeight,
-    margin: EdgeInsets.all(sideSpace),
-    child: TextField(
-      obscureText: passwort,
-      maxLines: 1,
-        controller: controller,
-        decoration: InputDecoration(
-            isDense: true,
-            enabledBorder: const OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.black),
-            ),
-            border: OutlineInputBorder(),
-            hintText: hintText,
-
-            hintStyle: TextStyle(fontSize: 13, color: Colors.grey)
-        )
-    ),
-  );
-}
-
 
 Widget customFloatbuttonExtended(text, function){
   return Container(
@@ -64,7 +41,6 @@ Widget customFloatbuttonExtended(text, function){
   );
 }
 
-
 customSnackbar(context, text){
   return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -72,7 +48,6 @@ customSnackbar(context, text){
       )
   );
 }
-
 
 customAppBar({title, button, elevation = 4.0}){
   if(button == null){ button = Container();}
@@ -94,6 +69,7 @@ class CustomMultiTextForm extends StatefulWidget {
   var selected;
   String hintText;
   var onConfirm;
+  var validator;
 
   getSelected(){
     return selected;
@@ -105,7 +81,8 @@ class CustomMultiTextForm extends StatefulWidget {
     required this.auswahlList,
     this.selected,
     this.hintText = "",
-    this.onConfirm
+    this.onConfirm,
+    this.validator = null
   });
 
   @override
@@ -175,6 +152,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
             borderRadius: BorderRadius.all(Radius.circular(borderRounding))
           ),
           items: auswahlListSelectItem,
+          validator: widget.validator,
           onSelectionChanged: changeSelectToList,
           onConfirm: widget.onConfirm
         )

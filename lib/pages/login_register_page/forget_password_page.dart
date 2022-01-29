@@ -16,15 +16,17 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   var emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  void resetPassword() async {
+  resetPassword() async {
     if(_formKey.currentState!.validate()){
       try{
         await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
         customSnackbar(context, "Email zum Passwort zurücksetzen wurde versendet");
+        return true;
       }on FirebaseAuthException catch(error){
         if(error.code == "user-not-found"){
           customSnackbar(context, "kein User zu der Email Adresse gefunden");
         }
+        return false;
       }
     }
   }
@@ -44,13 +46,16 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
             key: _formKey,
             child: ListView(
               children: [
-                SizedBox(height: 100),
+                SizedBox(height: 20),
                 Center(child: Text("Reset Link wird an deine Email Adresse gesendet")),
-                customTextForm("Email", emailController,
-                    validator: globalFunctions.checkValidatorEmpty()),
-                customFloatbuttonExtended("Send Email", (){
-                  resetPassword();
-                  globalFunctions.changePage(context, LoginPage());
+                customTextInput("Email", emailController,
+                    validator: globalFunctions.checkValidationEmail()),
+                customFloatbuttonExtended("Send Email", () async{
+                  var wasReset = await resetPassword();
+                  if (wasReset){
+                    globalFunctions.changePage(context, LoginPage());
+                  }
+
                 })
               ],
             ),
