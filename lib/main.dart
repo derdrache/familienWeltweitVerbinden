@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
                 scaffoldBackgroundColor: pageMainColor,
               ),
             debugShowCheckedModeBanner: false,
-            home: StartPage()//LoginPage()
+            home: LoginPage()
           );
         }
     );

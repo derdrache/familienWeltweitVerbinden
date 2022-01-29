@@ -20,7 +20,6 @@ class StartPage extends StatefulWidget{
 
 class _StartPageState extends State<StartPage>{
 
-
   checkIfFirstLogin(){
     if(widget.registered){ return false; }
 
@@ -32,7 +31,6 @@ class _StartPageState extends State<StartPage>{
     return false;
 
   }
-
 
   Widget build(BuildContext context){
     const navigationbarButtonColor = Colors.purple;
