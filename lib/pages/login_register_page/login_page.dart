@@ -15,11 +15,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  var userLogedIn = FirebaseAuth.instance.currentUser;
   final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwortController = TextEditingController();
   var email = "";
   var passwort = "";
+
 
   userLogin() async{
     try{
@@ -45,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(userLogedIn);
     double sideSpace = 20;
 
     Widget header(){
@@ -84,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
 
-    return Scaffold(
+    return userLogedIn != null ? StartPage() : Scaffold(
         body: Form(
           key: _formKey,
             child: ListView(
@@ -99,17 +102,6 @@ class _LoginPageState extends State<LoginPage> {
                 customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended("Register", (){
                   globalFunctions.changePage(context, RegisterPage());
-                  /*
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      PageRouteBuilder(
-                          pageBuilder: (context,a,b)=> RegisterPage(),
-                          transitionDuration: Duration(seconds: 0)
-                      ),
-                          (route) => false);
-                  */
-
-
                 }),
               ],
             )
