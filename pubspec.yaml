@@ -43,6 +43,7 @@ dependencies:
   flutter_map: ^0.14.0
   http: ^0.13.4
   firebase_messaging: ^11.2.5
+  url_launcher: ^6.0.18
 
 dev_dependencies:
   flutter_test:
