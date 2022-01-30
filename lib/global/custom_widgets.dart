@@ -6,11 +6,11 @@ double borderRounding = 5;
 double boxHeight = 50;
 var buttonColor = Colors.purple;
 
-Widget customTextInput(text, controller, {validator = null, passwort = false}){
+Widget customTextInput(text, controller, {validator = null, passwort = false, moreLines = 1}){
   return Container(
-    height: boxHeight,
     margin: EdgeInsets.all(sideSpace),
     child: TextFormField(
+      maxLines: moreLines,
       obscureText: passwort,
       controller: controller,
       decoration: InputDecoration(
@@ -41,9 +41,10 @@ Widget customFloatbuttonExtended(text, function){
   );
 }
 
-customSnackbar(context, text){
+customSnackbar(context, text, {color = Colors.red}){
   return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        backgroundColor: color,
           content: Text(text)
       )
   );
@@ -52,7 +53,10 @@ customSnackbar(context, text){
 customAppBar({title, button, elevation = 4.0}){
   if(button == null){ button = Container();}
   return AppBar(
-    title: Center(child: Text(title, style: TextStyle(color: Colors.black),)),
+    title: Container(
+      margin: EdgeInsets.only(left: 80),
+      child: Text(title, style: TextStyle(color: Colors.black))
+    ),
     backgroundColor: Colors.white,
     elevation: elevation,
     iconTheme: IconThemeData(
@@ -117,8 +121,8 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
         dropdownText = widget.selected.join(" , ");
       }
 
-      if (dropdownText.length > 50){
-        dropdownText = dropdownText.substring(0,47) + "...";
+      if (dropdownText.length > 32){
+        dropdownText = dropdownText.substring(0,29) + "...";
       }
 
       return dropdownText;
@@ -126,12 +130,11 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
     changeSelectToList(select){
       widget.selected = [];
-
       for(var i = 0; i< select.length; i++){
-        setState(() {
-          widget.selected = select;
-        });
+        widget.selected = select;
       }
+
+      setState(() {});
     }
 
 
@@ -141,6 +144,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
           initialValue: widget.selected,
           buttonText: Text(
             createDropdownText(),
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(color: textColor),
           ),
           chipDisplay: MultiSelectChipDisplay.none(),
