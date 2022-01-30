@@ -1,4 +1,3 @@
-import 'package:familien_suche/pages/settings/privacy_security_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/link.dart';
@@ -6,10 +5,12 @@ import 'package:url_launcher/link.dart';
 import '../../services/database.dart';
 import '../../services/locationsService.dart';
 import '../../global/global_functions.dart' as globalFunctions;
-import '../../global/custom_widgets.dart';
 import '../../global/variablen.dart' as globalVariablen;
+import '../../global/custom_widgets.dart';
 import '../../windows/change_profil_window.dart';
 import '../login_register_page/login_page.dart';
+import 'package:familien_suche/pages/settings/privacy_security_page.dart';
+import 'feedback_page.dart';
 
 
 class SettingPage extends StatefulWidget {
@@ -46,6 +47,7 @@ class _SettingPageState extends State<SettingPage> {
   String beschreibungName = "Name ändern";
   String beschreibungEmail = "Email ändern";
   String beschreibungPasswort = "Passwort ändern";
+  String beschreibungFeedback = "Feedback geben";
 
   @override
   void initState() {
@@ -320,7 +322,7 @@ class _SettingPageState extends State<SettingPage> {
     double containerPadding = 5;
 
 
-    themeContainer(haupttext, beschreibung, changeWidget){
+    profilThemeContainer(haupttext, beschreibung, changeWidget){
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: () => profilChangeWindow(context, beschreibung, changeWidget,
@@ -487,23 +489,23 @@ class _SettingPageState extends State<SettingPage> {
               SizedBox(height: 5),
               Wrap(
                 children: [
-                  themeContainer(ortKontroller.text, beschreibungStadt ,
+                  profilThemeContainer(ortKontroller.text, beschreibungStadt ,
                       customTextInput("", ortKontroller)),
-                  themeContainer(reiseArtInput.getSelected(), beschreibungReise, reiseArtInput),
-                  themeContainer(kinderAgeBox.getDates(years: true)  == null? "":
+                  profilThemeContainer(reiseArtInput.getSelected(), beschreibungReise, reiseArtInput),
+                  profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
                   kinderAgeBox.getDates(years: true).join(" , "),
                       beschreibungKinder, kinderAgeBox),
-                  themeContainer(
+                  profilThemeContainer(
                       interessenInputBox.getSelected() == null? "" :
                       interessenInputBox.getSelected().join(" , "),
                       beschreibungInteressen,interessenInputBox),
-                  themeContainer(
+                  profilThemeContainer(
                       sprachenInputBox.getSelected() == null? "":
                       sprachenInputBox.getSelected().join(" , "),
                       beschreibungSprachen, sprachenInputBox)
                 ],
               ),
-              themeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
+              profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
                   beschreibungBio,
                   customTextInput("über mich", bioTextKontroller, moreLines: 10)
               )
@@ -512,23 +514,23 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
-    settingContainer(){
+    settingThemeContainer(title, icon, function){
+      return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: function,
+        child: Container(
+            child: Row(
+              children: [
+                Icon(icon),
+                SizedBox(width: 20),
+                Text(title)
+              ],
+            )
+        ),
+      );
+    }
 
-      themeContainer(title, icon, function){
-        return GestureDetector(
-          excludeFromSemantics: true,
-          onTap: function,
-          child: Container(
-              child: Row(
-                children: [
-                  Icon(icon),
-                  SizedBox(width: 20),
-                  Text(title)
-                ],
-              )
-          ),
-        );
-      }
+    settingContainer(){
 
       return Container(
           padding: EdgeInsets.all(20),
@@ -538,7 +540,7 @@ class _SettingPageState extends State<SettingPage> {
               Text("Einstellungen",
                   style: TextStyle(color: Colors.blue, fontSize: fontSize)),
               SizedBox(height: 20),
-              themeContainer("Privatsphäre und Sicherheit", Icons.lock,
+              settingThemeContainer("Privatsphäre und Sicherheit", Icons.lock,
                       () => globalFunctions.changePage(
                           context, PrivacySecurityPage(profil: userProfil)
                       )
@@ -555,7 +557,7 @@ class _SettingPageState extends State<SettingPage> {
           target: LinkTarget.blank,
           uri: Uri.parse(url),
           builder: (context, followLink) => GestureDetector(
-            excludeFromSemantics: true,
+            behavior: HitTestBehavior.translucent,
             onTap: followLink,
             child: Container(
                 child: Row(
@@ -578,7 +580,11 @@ class _SettingPageState extends State<SettingPage> {
               Text("App Informationen",
                   style: TextStyle(color: Colors.blue, fontSize: fontSize)),
               SizedBox(height: 20),
-              themeContainer("Feedback", Icons.feedback, ""),
+              settingThemeContainer("Feedback", Icons.feedback,
+                      () => globalFunctions.changePage(
+                      context, FeedbackPage(profil: userProfil)
+                  )
+              ),
               SizedBox(height: 20),
               themeContainer("Patch Notes", Icons.format_list_bulleted,
                   "https://docs.google.com/document/d/1Mjexik9-MqgpKDNkkosBLZ7cQGtvnexcM_MKMi0XGqw/edit?usp=sharing"),

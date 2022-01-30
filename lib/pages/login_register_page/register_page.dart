@@ -16,11 +16,11 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final checkPasswordController = TextEditingController();
-  final _formKeyT = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
 
   registration() async{
-    if(_formKeyT.currentState!.validate()){
+    if(formKey.currentState!.validate()){
       var email = emailController.text;
       var password = passwordController.text;
 
@@ -59,7 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: customAppBar(title: "Register"),
       body: Center(
         child: Form(
-          key: _formKeyT,
+          key: formKey,
           child: ListView(
             children: [
               customTextInput(
