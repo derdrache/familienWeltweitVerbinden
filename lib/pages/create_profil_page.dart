@@ -43,30 +43,32 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       if(checkAllValidation(userExist)){
         var email = await FirebaseAuth.instance.currentUser?.email;
         var userName = nameTextcontroller.text;
-        var locationData;
-        while(locationData == null){
-          locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
+        var locationData = await LocationService()
+            .getLocationData(ortTextcontroller.text);
+        if(locationData != null){
+          var data = {
+            "email": email,
+            "emailAnzeigen": false,
+            "name": userName,
+            "ort": locationData["city"], //groß und kleinschreibung?
+            "interessen": interessenAuswahlBox.getSelected(),
+            "kinder": childrenAgePickerBox.getDates(),
+            "land": locationData["countryname"],
+            "longt": locationData["longt"],
+            "latt":  locationData["latt"],
+            "reiseart": reiseArtenAuswahlBox.getSelected(),
+            "aboutme": "",
+            "sprachen": sprachenAuswahlBox.getSelected(),
+            "friendlist": []
+          };
+
+          dbAddNewProfil(data);
+          FirebaseAuth.instance.currentUser?.updateDisplayName(userName);
+          globalFunctions.changePage(context, StartPage(registered: true));
+        } else{
+          customSnackbar(context, "Stadt nicht gefunden");
         }
 
-        var data = {
-          "email": email,
-          "emailAnzeigen": false,
-          "name": userName,
-          "ort": locationData["city"], //groß und kleinschreibung?
-          "interessen": interessenAuswahlBox.getSelected(),
-          "kinder": childrenAgePickerBox.getDates(),
-          "land": locationData["countryname"],
-          "longt": locationData["longt"],
-          "latt":  locationData["latt"],
-          "reiseart": reiseArtenAuswahlBox.getSelected(),
-          "aboutme": "",
-          "sprachen": sprachenAuswahlBox.getSelected(),
-          "friendlist": []
-        };
-
-        dbAddNewProfil(data);
-        FirebaseAuth.instance.currentUser?.updateDisplayName(userName);
-        globalFunctions.changePage(context, StartPage(registered: true));
 
       }
     }
