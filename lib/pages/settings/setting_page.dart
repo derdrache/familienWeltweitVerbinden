@@ -2,15 +2,13 @@ import 'package:familien_suche/pages/settings/privacy_security_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/link.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import '../../global/global_functions.dart';
 import '../../services/database.dart';
+import '../../services/locationsService.dart';
 import '../../global/global_functions.dart' as globalFunctions;
-import '../../windows/change_profil_window.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/variablen.dart' as globalVariablen;
-import '../../services/locationsService.dart';
+import '../../windows/change_profil_window.dart';
 import '../login_register_page/login_page.dart';
 
 
@@ -127,91 +125,26 @@ class _SettingPageState extends State<SettingPage> {
     String errorMessage = "";
 
     if(beschreibung == beschreibungStadt){
-      if(ortKontroller.text != "" && ortKontroller.text != userProfil["ort"]){
-        pushLocationDataToDB();
-      } else{
-        errorMessage += "- neue Stadt eingeben";
-      }
+      errorMessage = changeStadt();
     }else if(beschreibung == beschreibungReise){
-      if(reiseArtInput.getSelected() != userProfil["reiseart"] ){
-        dbChangeProfil(userProfil["docid"], {"reiseart": reiseArtInput.getSelected()});
-      } else {
-        errorMessage += "- neue Reiseart eingeben";
-      }
+      errorMessage = changeReiseart();
     }else if(beschreibung == beschreibungKinder){
-      if(kinderAgeBox.getDates().length != 0 &&
-          kinderAgeBox.getDates() != userProfil["kinder"]){
-        dbChangeProfil(userProfil["docid"], {"kinder": kinderAgeBox.getDates()});
-      } else{
-        errorMessage += "- Neue Geburtsdaten eingeben";
-      }
+      errorMessage = changeKinderAge();
     }else if(beschreibung == beschreibungInteressen){
-      if(interessenInputBox.getSelected() != userProfil["interessen"] &&
-          interessenInputBox.getSelected().lenth != 0){
-        dbChangeProfil(userProfil["docid"], {"interessen": interessenInputBox.getSelected()});
-      } else{
-        errorMessage += "- neue interessen eingeben";
-      }
+      errorMessage = changeInteressen();
     }else if(beschreibung == beschreibungSprachen){
-      if(sprachenInputBox.getSelected() != userProfil["sprachen"] &&
-          sprachenInputBox.getSelected().length != 0){
-        dbChangeProfil(userProfil["docid"], {"sprachen": sprachenInputBox.getSelected()});
-      }else {
-        errorMessage += "- Sprache eingeben";
-      }
+      errorMessage = changeSprachen();
     }else if(beschreibung == beschreibungBio){
       if(bioTextKontroller.text != userProfil["aboutme"]){
         dbChangeProfil(userProfil["docid"], {"aboutme": bioTextKontroller.text});
       }
     }else if(beschreibung == beschreibungName){
-      if(nameTextKontroller.text != userProfil["name"] && nameTextKontroller.text != ""){
-        var userProfil = await dbGetProfil(nameTextKontroller.text);
-        if(userProfil == null){
-          dbChangeUserName(userProfil["docid"],userProfil["name"],nameTextKontroller.text);
-        } else{
-          errorMessage += "- Name schon vorhanden";
-        }
-      } else{
-        errorMessage += "- Neuen Namen eingeben";
-      }
+
+      errorMessage = await changeName();
     } else if (beschreibung == beschreibungEmail){
-      errorMessage = await checkPasswortAndNewEmail();
-      if(errorMessage == ""){
-        FirebaseAuth.instance.currentUser?.updateEmail(emailTextKontroller.text);
-        dbChangeProfil(userProfil["docid"], {"email":emailTextKontroller.text });
-      }
+      errorMessage = await changeEmail();
     } else if (beschreibung == beschreibungPasswort){
-      var newPasswort = passwortTextKontroller1.text;
-      var newPasswortCheck = passwortTextKontroller2.text;
-      var oldPasswort = passwortCheckKontroller.text;
-
-      if(newPasswort != "" && newPasswortCheck != "" && oldPasswort != "" &&
-          newPasswort != oldPasswort){
-        if (newPasswort == newPasswortCheck ){
-          try{
-            var loginTest = await userLogin(passwortCheckKontroller.text);
-
-            if (loginTest != null){
-              await FirebaseAuth.instance.currentUser?.updatePassword(passwortTextKontroller1.text);
-            } else {
-              errorMessage += "- Altes Passwort ist falsch";
-            }
-
-          } catch (error){
-            errorMessage += "- Neues Passwort ist zu schwach";
-          }
-
-        } else{
-          errorMessage += "- Passwort bestätigung stimmt nicht mit dem neuen Passwort überein";
-        }
-      }else{
-        if (newPasswort == "" || newPasswort == oldPasswort){
-          errorMessage += "- neues Passwort eingeben \n";
-        }
-        if(newPasswortCheck == ""){ errorMessage += "- neues Passwort bestätigen \n"; }
-        if(oldPasswort == ""){errorMessage += "- altes Passwort eingeben"; }
-
-      }
+      errorMessage = await changePasswort();
     }
 
     if(errorMessage.isEmpty){
@@ -224,7 +157,89 @@ class _SettingPageState extends State<SettingPage> {
 
   }
 
-  checkPasswortAndNewEmail() async {
+  changeStadt(){
+    var errorMessage = "";
+
+    if(ortKontroller.text == ""){
+      errorMessage += "Neue Stadt eingeben";
+    } else if (ortKontroller.text != userProfil["ort"]){
+      pushLocationDataToDB();
+    }
+
+    return errorMessage;
+  }
+
+  changeReiseart(){
+    var errorMessage = "";
+
+    if(reiseArtInput.getSelected() == null || reiseArtInput.getSelected().isEmpty){
+      errorMessage = "neue Reiseart eingeben";
+    } else if(reiseArtInput.getSelected() != userProfil["reiseart"] ){
+      dbChangeProfil(userProfil["docid"], {"reiseart": reiseArtInput.getSelected()});
+    }
+
+    return errorMessage;
+  }
+
+  changeKinderAge(){
+    var errorMessage = "";
+    bool allFilled = true;
+
+    for(var kindAge in kinderAgeBox.getDates()){
+      if (kindAge == null){
+        allFilled = false;
+      }
+    }
+
+    if(!allFilled || kinderAgeBox.getDates().isEmpty){
+      errorMessage = "Geburtsdaten eingeben";
+    } else if (kinderAgeBox.getDates() != userProfil["kinder"]){
+      dbChangeProfil(userProfil["docid"], {"kinder": kinderAgeBox.getDates()});
+    }
+
+    return errorMessage;
+  }
+
+  changeInteressen(){
+    var errorMessage = "";
+
+    if(interessenInputBox.getSelected() == null || interessenInputBox.getSelected().isEmpty){
+      errorMessage = "neue interessen eingeben";
+    } else if(interessenInputBox.getSelected() != userProfil["interessen"]){
+      dbChangeProfil(userProfil["docid"], {"interessen": interessenInputBox.getSelected()});
+    }
+    return errorMessage;
+  }
+
+  changeSprachen(){
+    var errorMessage = "";
+
+    if(sprachenInputBox.getSelected() == null || sprachenInputBox.getSelected().isEmpty){
+      errorMessage = "Sprache eingeben";
+    } else if(sprachenInputBox.getSelected() != userProfil["sprachen"]){
+      dbChangeProfil(userProfil["docid"], {"sprachen": sprachenInputBox.getSelected()});
+    }
+    return errorMessage;
+  }
+
+  changeName() async{
+    var errorMessage = "";
+    var userProfil = await dbGetProfil(nameTextKontroller.text);
+
+    if(nameTextKontroller.text == null || nameTextKontroller.text == ""){
+      errorMessage = "Neuen Namen eingeben";
+    } else{
+      if(userProfil == null){
+        dbChangeUserName(userProfil["docid"],userProfil["name"],nameTextKontroller.text);
+      } else {
+        errorMessage += "- Name schon vorhanden";
+      }
+    }
+    return errorMessage;
+
+  }
+
+  changeEmail() async {
     var errorString = "";
 
     if(passwortTextKontroller1.text != "" && emailTextKontroller.text != ""){
@@ -253,7 +268,49 @@ class _SettingPageState extends State<SettingPage> {
         errorString += "- Email eingeben \n";
       }
     }
+
+    if(errorString == ""){
+      FirebaseAuth.instance.currentUser?.updateEmail(emailTextKontroller.text);
+      dbChangeProfil(userProfil["docid"], {"email":emailTextKontroller.text });
+    }
+
     return errorString;
+  }
+
+  changePasswort() async {
+    var errorMessage = "";
+    var newPasswort = passwortTextKontroller1.text;
+    var newPasswortCheck = passwortTextKontroller2.text;
+    var oldPasswort = passwortCheckKontroller.text;
+
+    if(newPasswort != "" && newPasswortCheck != "" && oldPasswort != "" &&
+        newPasswort != oldPasswort){
+      if (newPasswort == newPasswortCheck ){
+        try{
+          var loginTest = await userLogin(passwortCheckKontroller.text);
+
+          if (loginTest != null){
+            await FirebaseAuth.instance.currentUser?.updatePassword(passwortTextKontroller1.text);
+          } else {
+            errorMessage += "- Altes Passwort ist falsch";
+          }
+
+        } catch (error){
+          errorMessage += "- Neues Passwort ist zu schwach";
+        }
+
+      } else{
+        errorMessage += "- Passwort bestätigung stimmt nicht mit dem neuen Passwort überein";
+      }
+    }else{
+      if (newPasswort == "" || newPasswort == oldPasswort){
+        errorMessage += "- neues Passwort eingeben \n";
+      }
+      if(newPasswortCheck == ""){ errorMessage += "- neues Passwort bestätigen \n"; }
+      if(oldPasswort == ""){errorMessage += "- altes Passwort eingeben"; }
+
+    }
+    return errorMessage;
   }
 
 
@@ -268,14 +325,16 @@ class _SettingPageState extends State<SettingPage> {
         behavior: HitTestBehavior.translucent,
         onTap: () => profilChangeWindow(context, beschreibung, changeWidget,
           () => validAndSave(beschreibung),
-        ),//profilChangeWindow(context, beschreibung, changeWidget, () => validAndSave(beschreibung)),
+        ),
         child: Container(
             padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
             width: width /2 -20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                haupttext == ""? CircularProgressIndicator() : Text(haupttext,
+                haupttext == ""? CircularProgressIndicator() : Text(
+                  haupttext,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: fontSize),
                 ),
                 SizedBox(height: 3),
@@ -387,12 +446,10 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
-
-
     nameContainer(){
       return Container(
           width: double.maxFinite,
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
           decoration: BoxDecoration(
               border: Border(bottom: BorderSide(width: 10, color: borderColor))
           ),
@@ -448,7 +505,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
               themeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
                   beschreibungBio,
-                  customTextInput("über mich", bioTextKontroller)
+                  customTextInput("über mich", bioTextKontroller, moreLines: 10)
               )
             ],
           )
@@ -482,7 +539,9 @@ class _SettingPageState extends State<SettingPage> {
                   style: TextStyle(color: Colors.blue, fontSize: fontSize)),
               SizedBox(height: 20),
               themeContainer("Privatsphäre und Sicherheit", Icons.lock,
-                      () => changePage(context, PrivacySecurityPage(profil: userProfil))
+                      () => globalFunctions.changePage(
+                          context, PrivacySecurityPage(profil: userProfil)
+                      )
               ),
             ],
           )
@@ -519,12 +578,16 @@ class _SettingPageState extends State<SettingPage> {
               Text("App Informationen",
                   style: TextStyle(color: Colors.blue, fontSize: fontSize)),
               SizedBox(height: 20),
-              themeContainer("Patch Notes", Icons.format_list_bulleted, ""),
+              themeContainer("Feedback", Icons.feedback, ""),
               SizedBox(height: 20),
-              themeContainer("Geplante Erweiterungen", Icons.task, ""),
+              themeContainer("Patch Notes", Icons.format_list_bulleted,
+                  "https://docs.google.com/document/d/1Mjexik9-MqgpKDNkkosBLZ7cQGtvnexcM_MKMi0XGqw/edit?usp=sharing"),
               SizedBox(height: 20),
-              themeContainer("Über das Projekt", Icons.description, ""),
+              themeContainer("Geplante Erweiterungen", Icons.task,
+                  "https://docs.google.com/spreadsheets/d/1bnxfdw-MsaKHWSxtpxIm7rmbyd3N-dvqmCSNdkixAeU/edit?usp=sharing"),
               SizedBox(height: 20),
+              //themeContainer("Über das Projekt", Icons.description, ""),
+              //SizedBox(height: 20),
               themeContainer("Spenden", Icons.card_giftcard,
                   "https://www.paypal.com/paypalme/DominikMast"),
             ],
@@ -534,7 +597,7 @@ class _SettingPageState extends State<SettingPage> {
 
 
     return Padding(
-        padding: const EdgeInsets.only(top: 25),
+        padding: const EdgeInsets.only(top: 5),
         child: ListView(
             children: [
               menuBar(),

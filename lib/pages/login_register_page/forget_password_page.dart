@@ -20,7 +20,8 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
     if(_formKey.currentState!.validate()){
       try{
         await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
-        customSnackbar(context, "Email zum Passwort zurücksetzen wurde versendet");
+        customSnackbar(context, "Email zum Passwort zurücksetzen wurde versendet",
+            color: Colors.green);
         return true;
       }on FirebaseAuthException catch(error){
         if(error.code == "user-not-found"){

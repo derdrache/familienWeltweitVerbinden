@@ -21,11 +21,10 @@ class StartPage extends StatefulWidget{
 class _StartPageState extends State<StartPage>{
 
   checkIfFirstLogin(){
-    return true;
     if(widget.registered){ return false; }
 
-    if(FirebaseAuth.instance.currentUser!.displayName == null ||
-        FirebaseAuth.instance.currentUser!.displayName == ""){
+    if(FirebaseAuth.instance.currentUser?.displayName == null ||
+        FirebaseAuth.instance.currentUser?.displayName == ""){
       return true;
     }
 

@@ -38,16 +38,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   saveFunction()async {
     if(_formKey.currentState!.validate()){
-      var locationData;
-      while(locationData == null && ortTextcontroller.text != ""){
-        locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
-      }
-      var firebaseUser = await FirebaseAuth.instance.currentUser;
       var userExist = await dbGetProfil(nameTextcontroller.text) != null;
-      var email = firebaseUser?.email;
-      var userName = nameTextcontroller.text;
 
-      if(checkAllValidation(userExist, locationData)){
+      if(checkAllValidation(userExist)){
+        var email = await FirebaseAuth.instance.currentUser?.email;
+        var userName = nameTextcontroller.text;
+        var locationData;
+        while(locationData == null){
+          locationData = await LocationService().getLocationMapDataGeocode(ortTextcontroller.text);
+        }
+
         var data = {
           "email": email,
           "emailAnzeigen": false,
@@ -83,26 +83,15 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     return allFilled;
   }
 
-  checkAllValidation(userExist, locationData){
+  checkAllValidation(userExist){
     bool allGood = true;
     String errorString = "Bitte Eingaben korrigieren: \n";
 
-    if(nameTextcontroller.text.isEmpty){
-      errorString += "- Name eingeben \n";
-    } else if (userExist){
+    if (userExist){
       errorString += "- Username wird schon verwendet \n";
-    }
-    if(locationData == null || locationData["city"] == ""){
-      errorString += "- Stadt eingeben \n";
     }
     if(reiseArtenAuswahlBox.getSelected().isEmpty){
       errorString += "- Reiseart auswählen \n";
-    }
-    if(sprachenAuswahlBox.getSelected().isEmpty){
-      errorString += "- Sprachen auswählen \n";
-    }
-    if(interessenAuswahlBox.getSelected().isEmpty){
-      errorString += "- Interessen auswählen \n";
     }
     if(childrenAgePickerBox.getDates().length == 0 || !childrenInputValidation()){
       errorString += "- Geburtsdatum vom Kind eingeben \n";
@@ -158,7 +147,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                   reiseArtenAuswahlBox,
                   sprachenAuswahlBox,
                   interessenAuswahlBox,
-                  childrenAgePickerBox
+                  childrenAgePickerBox,
                 ],
               ),
           ),

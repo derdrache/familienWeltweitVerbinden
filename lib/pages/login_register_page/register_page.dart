@@ -26,7 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       try{
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-        customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden");
+        customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden", color: Colors.green);
         return true;
       }on FirebaseAuthException catch(error){
         if(error.code == "email-already-in-use"){
