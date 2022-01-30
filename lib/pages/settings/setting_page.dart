@@ -93,11 +93,7 @@ class _SettingPageState extends State<SettingPage> {
 
   }
 
-  pushLocationDataToDB() async {
-    var locationData;
-    while(locationData == null){
-      locationData = await LocationService().getLocationMapDataGeocode(ortKontroller.text);
-    }
+  pushLocationDataToDB(locationData) async {
 
     var locationDict = {
       "ort": locationData["city"],
@@ -159,13 +155,20 @@ class _SettingPageState extends State<SettingPage> {
 
   }
 
-  changeStadt(){
+  changeStadt() async {
     var errorMessage = "";
 
     if(ortKontroller.text == ""){
       errorMessage += "Neue Stadt eingeben";
     } else if (ortKontroller.text != userProfil["ort"]){
-      pushLocationDataToDB();
+      var locationData = await LocationService().getLocationData(ortKontroller.text);
+
+      if (locationData != null){
+        pushLocationDataToDB(locationData);
+      } else {
+        errorMessage += "Stadt nicht gefunden";
+      }
+
     }
 
     return errorMessage;

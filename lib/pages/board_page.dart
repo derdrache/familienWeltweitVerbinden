@@ -42,10 +42,18 @@ class _BoardPageState extends State<BoardPage>{
 
   Widget build(BuildContext context){
     return Scaffold(
-      body: Container(
+      body: FloatingActionButton(
+        onPressed: () async{
+          print(await LocationService().getLocationData("Playa del Carmen"));
+        },
+      )
+      /*
+      Container(
         margin: EdgeInsets.all(100),
         child: Text("In Arbeit", style: TextStyle(fontSize: 40),)
         )
+
+       */
       );
   }
 }
