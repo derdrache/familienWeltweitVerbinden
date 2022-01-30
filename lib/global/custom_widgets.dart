@@ -10,6 +10,7 @@ Widget customTextInput(text, controller, {validator = null, passwort = false, mo
   return Container(
     margin: EdgeInsets.all(sideSpace),
     child: TextFormField(
+      textAlignVertical: TextAlignVertical.top,
       maxLines: moreLines,
       obscureText: passwort,
       controller: controller,
@@ -19,6 +20,7 @@ Widget customTextInput(text, controller, {validator = null, passwort = false, mo
           borderSide: BorderSide(color: Colors.black),
         ),
         border: OutlineInputBorder(),
+        alignLabelWithHint: true,
         labelText: text,
         labelStyle: TextStyle(fontSize: 13, color: Colors.grey),
         floatingLabelStyle: TextStyle(fontSize: 15, color: Colors.blue)
@@ -54,7 +56,6 @@ customAppBar({title, button, elevation = 4.0}){
   if(button == null){ button = Container();}
   return AppBar(
     title: Container(
-      margin: EdgeInsets.only(left: 80),
       child: Text(title, style: TextStyle(color: Colors.black))
     ),
     backgroundColor: Colors.white,
