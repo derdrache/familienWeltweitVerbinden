@@ -48,7 +48,7 @@ class LocationService {
 
     locationData = await getLocationMapDataGeocode(input);
 
-    return locationData; //?? await getLocationMapDataGoogle(input);
+    return locationData ?? await getLocationMapDataGoogle(input);
 
   }
 
