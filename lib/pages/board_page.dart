@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-
-import '../services/locationsService.dart';
 import '../services/database.dart';
+import '../services/locationsService.dart';
 import '../windows/change_profil_window.dart';
 
 class BoardPage extends StatefulWidget{
@@ -38,13 +37,29 @@ class _BoardPageState extends State<BoardPage>{
 
   }
 
+  newDBTest(){
+    var chatgroupData = {
+      "users" : ["Dominik", "Test"],
+      "lastMessage": "",
+      "lastMessageDate": "",
+    };
 
+    var messageData = {
+      "message" : "hi",
+      "date" : DateTime.now().toString(),
+      "from": "Dominik"
+    };
+
+    var dbChat = DBChat();
+    dbChat.addNewChatGroup(chatgroupData, messageData);
+    //dbAddMessageNew();
+  }
 
   Widget build(BuildContext context){
     return Scaffold(
       body: FloatingActionButton(
-        onPressed: () async{
-          print(await LocationService().getLocationData("Playa del Carmen"));
+        onPressed: () async {
+          newDBTest();
         },
       )
       /*

@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
 CollectionReference chats = FirebaseFirestore.instance.collection("chats");
+DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
+    databaseURL: "https://praxis-cab-236720-default-rtdb.europe-west1.firebasedatabase.app",
+    app: Firebase.app()).ref();
 
 
 dbAddNewProfil(data) {
@@ -63,6 +68,10 @@ dbDeleteProfil(docID) {
       .doc(docID)
       .delete();
 }
+
+
+
+
 
 dbGetOneUserChat(user1, user2) async{
   var groupChatData;
@@ -147,5 +156,44 @@ dbChangeUserName(profilDocid, oldName, newName) async {
   });
 
 
+
+}
+
+
+class DBChat{
+
+  addNewChatGroup(chatgroupData,messageData){
+    var chatGroups = realtimeDatabase.child("chats");
+    var chatKey = chatGroups.push().key;
+
+    chatgroupData = {
+      "users" : chatgroupData["users"],
+      "lastMessage": messageData["message"],
+      "lastMessageDate": messageData["date"],
+    };
+
+    chatGroups.push().set(chatgroupData);
+
+    return chatKey;
+  }
+
+  updateChatGroup(){
+
+  }
+
+  addNewMessage(chatID, messageData){
+    var chatGroup = realtimeDatabase.child("chatMessages").child(chatID);
+
+    chatGroup.push().set(messageData);
+  }
+
+  addChatIDToProfils(){
+
+  }
+
+
+}
+
+class DBProfil{
 
 }
