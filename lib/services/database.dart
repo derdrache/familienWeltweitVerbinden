@@ -10,69 +10,6 @@ DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
     app: Firebase.app()).ref();
 
 
-dbAddNewProfil(data) {
-  return profil.add(data).then((value) {
-    profil.doc(value.id).update({"docid": value.id});
-  });
-}
-
-dbGetAllProfils() async {
-  QuerySnapshot querySnapshot = await profil.get();
-
-  final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-
-  return allData;
-
-}
-
-dbGetProfil(name) async{
-  var profilData;
-
-  await profil.where("name", isEqualTo: name)
-      .limit(1)
-      .get()
-      .then((value) {
-    if (value.docs.isNotEmpty) {
-      profilData = value.docs[0].data();
-    } else {
-      profilData = null;
-    }
-  });
-
-  return profilData;
-}
-
-dbGetProfilFromEmail(email) async{
-  var profilData;
-
-  await profil.where("email", isEqualTo: email).limit(1)
-      .get()
-      .then((value) {
-        if(value.docs.isNotEmpty){
-          profilData = value.docs[0].data();
-        }
-
-      });
-
-  return profilData;
-}
-
-dbChangeProfil(docID, data){
-  print(data);
-  return profil.doc(docID).update(data).then((value) => print("User Updated"))
-      .catchError((error) => print("Failed to update user: $error"));
-}
-
-dbDeleteProfil(docID) {
-  return profil
-      .doc(docID)
-      .delete();
-}
-
-
-
-
-
 dbGetOneUserChat(user1, user2) async{
   var groupChatData;
 
@@ -128,6 +65,9 @@ dbAddMessage(chatgroupData, messageData,{ newChat = false}) async {
   return chatgroupData;
 }
 
+
+
+
 dbChangeUserName(profilDocid, oldName, newName) async {
   FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
 
@@ -160,16 +100,19 @@ dbChangeUserName(profilDocid, oldName, newName) async {
 }
 
 
-class DBChat{
+class ChatDatabaseKontroller{
+  var chatGroups = realtimeDatabase.child("chats");
+  var chatMessages = realtimeDatabase.child("chatMessages");
 
-  addNewChatGroup(chatgroupData,messageData){
-    var chatGroups = realtimeDatabase.child("chats");
+  addNewChatGroup(chatgroupData){
+
     var chatKey = chatGroups.push().key;
 
     chatgroupData = {
+      "id" : chatKey,
       "users" : chatgroupData["users"],
-      "lastMessage": messageData["message"],
-      "lastMessageDate": messageData["date"],
+      "lastMessage": "",
+      "lastMessageDate": "",
     };
 
     chatGroups.push().set(chatgroupData);
@@ -177,23 +120,75 @@ class DBChat{
     return chatKey;
   }
 
-  updateChatGroup(){
-
+  updateChatGroup(chatID, chatgroupData){
+    chatGroups.child(chatID).update(chatgroupData);
   }
 
-  addNewMessage(chatID, messageData){
-    var chatGroup = realtimeDatabase.child("chatMessages").child(chatID);
+  addNewMessage(chatgroupData, messageData,{ newChat = false}){
+    var chatGroup = realtimeDatabase.child("chatMessages").child(chatgroupData["id"]);
 
     chatGroup.push().set(messageData);
   }
 
-  addChatIDToProfils(){
+  getChat(user1, user2){
 
   }
 
+  getAllChatgroupsFromUserStream(user) {
+    return chatGroups.orderByChild("users/$user").equalTo(true).onValue;
+  }
+
+  getAllMessagesStream(chatID) {
+    return chatMessages.child(chatID).orderByChild("date").onValue;
+  }
 
 }
 
-class DBProfil{
+class ProfilDatabaseKontroller{
+  var profils = realtimeDatabase.child("profils");
+
+  addNewProfil(profilData){
+    profilData["id"] = profils.push().key;
+
+    profils.push().set(profilData);
+  }
+
+  updateProfil(userID, data){
+    profils.child(userID).update(data);
+  }
+
+  deleteProfil(){
+
+  }
+
+  getProfil(name) async{
+    var event = await profils.orderByChild("name").limitToFirst(1).equalTo(name).once();
+    var data = event.snapshot.children.first.value;
+
+    return data;
+  }
+
+  getProfilFromEmail(email) async{
+    var event = await profils.orderByChild("email").limitToFirst(1).equalTo(email).once();
+    var data = event.snapshot.children.first.value;
+
+    return data;
+  }
+
+  getAllProfils() async {
+    var resultProfils = [];
+
+    var test = await profils.get();
+    var data = test.children;
+
+    data.forEach((element) {
+      resultProfils.add(element.value);
+
+    });
+
+    return resultProfils;
+
+  }
+
 
 }

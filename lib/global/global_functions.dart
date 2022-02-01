@@ -45,7 +45,6 @@ checkValidationMultiTextForm(){
 
 
 
-
 changePage(context, page){
   Navigator.push(
       context,
@@ -53,11 +52,8 @@ changePage(context, page){
   );
 }
 
-timeStampToAllDict(timestamp){
-  DateTime dateTime = timestamp.toDate();
-  String dateTimeString = dateTime.toString();
-
-  dateTime = DateTime.parse(dateTimeString.split(" ")[0]);
+timeStampToAllDict(dateTimeString){
+  DateTime dateTime = DateTime.parse(dateTimeString.split(" ")[0]);
   dateTimeString = dateTimeString.split(" ")[0].toString();
 
   var yearsFromDateTime = DateTime.now().difference(dateTime).inDays ~/ 365;
