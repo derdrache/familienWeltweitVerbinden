@@ -29,7 +29,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 setState(() {
                   widget.profil["emailAnzeigen"] = value;
                 });
-                dbChangeProfil(
+                ProfilDatabaseKontroller().updateProfil(
                     widget.profil["docid"],
                     {"emailAnzeigen": widget.profil["emailAnzeigen"]}
                 );

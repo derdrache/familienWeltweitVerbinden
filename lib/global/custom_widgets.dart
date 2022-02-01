@@ -339,7 +339,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
  */
 
     childrensBirthDatePickerList.forEach((datePicker) {
-      dates.add(datePicker.getPickedDate());
+      dates.add(datePicker.getPickedDate().toString());
     });
 
 
@@ -349,11 +349,8 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 
       List converted = [];
       dates.forEach((element) {
-        String dateTimeString = element.toString();
 
-        var dateTime = DateTime.parse(dateTimeString.split(" ")[0]);
-        dateTimeString = dateTimeString.split(" ")[0].toString();
-
+        var dateTime = DateTime.parse(element.split(" ")[0]);
         var yearsFromDateTime = DateTime.now().difference(dateTime).inDays ~/ 365;
 
         converted.add(yearsFromDateTime);
@@ -459,7 +456,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
           newPicker.add(
               CustomDatePicker(
                   hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
-                  pickedDate: dates[i],
+                  pickedDate: DateTime.parse(dates[i]),
                   dateIsSelected: dates[i] != null
               )
           );
@@ -467,7 +464,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
           newPicker.add(
               CustomDatePicker(
                   hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
-                  pickedDate: dates[i],
+                  pickedDate: DateTime.parse(dates[i]),
                   deleteFunction: deleteFunction(),
                   dateIsSelected: dates[i] != null
               )

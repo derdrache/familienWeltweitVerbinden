@@ -31,12 +31,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         "lastMessageDate": DateTime.now(),
         "docid" : userName!+widget.groupChatData
       };
+
     }
     super.initState();
   }
 
   getTitle(){
-    var users = widget.groupChatData["users"];
+    var users = widget.groupChatData["users"].keys.toList();
 
     return users[0] == userName? users[1]: users[0];
 
@@ -48,26 +49,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     var messageData = {
       "message" :message,
       "from": userName,
-      "date": DateTime.now()
+      "date": DateTime.now().toString()
     };
+    if(widget.newChat){
+      await ChatDatabaseKontroller()
+          .addNewChatGroup(widget.groupChatData);
 
-    var groupChatData = await dbAddMessage(widget.groupChatData, messageData, newChat: widget.newChat);
+    }
+
+    await ChatDatabaseKontroller().addNewMessage(
+        widget.groupChatData,
+        messageData,
+        newChat: widget.newChat
+    );
+
     if (widget.newChat){
       Navigator.pop(context);
-      changePage(context, ChatDetailsPage(groupChatData: groupChatData));
+      changePage(context, ChatDetailsPage(groupChatData: widget.groupChatData));
     }
 
   }
 
-  getAllMessages() async {
-    return dbGetMessagesFromChatgroup(widget.groupChatData);
-  }
-
-
-
   @override
   Widget build(BuildContext context) {
-
     messageList(messages){
       List<Widget> messageBox = [];
 
@@ -101,28 +105,35 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         );
       }
 
-      return Expanded(
-        child: ListView(
+      return ListView(
           reverse: true,
           shrinkWrap: true,
           children: messageBox,
-        ),
       );
     }
 
     showMessages(){
+
       return StreamBuilder(
-          stream: chats.doc(widget.groupChatData["docid"])
-              .collection("messages")
-              .orderBy("date", descending: true).snapshots(),
+          stream: ChatDatabaseKontroller().getAllMessagesStream(widget.groupChatData["id"]),
           builder: (
               BuildContext context,
               AsyncSnapshot snapshot,
               ){
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
-            } else if (snapshot.hasData) {
-              return messageList(snapshot.data.docs);
+            } else if (snapshot.data.snapshot.value != null) {
+              var messages = [];
+
+              if(snapshot.data.snapshot.value != null){
+                var messagesMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
+
+                messagesMap.forEach((key, value) {
+                  messages.add(value);
+                });
+              }
+
+              return messageList(messages);
             }
             return Container();
           });
@@ -155,6 +166,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       ),
       body: Column(
         children: [
+          Expanded(child: Container()),
           showMessages(),
           textEingabe()
         ],

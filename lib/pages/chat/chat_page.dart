@@ -15,9 +15,10 @@ class _ChatPageState extends State<ChatPage>{
   var userName = FirebaseAuth.instance.currentUser!.displayName;
   var globalChatGroups = [];
 
+
   selectChatpartnerWindow() async {
     var personenSucheController = TextEditingController();
-    var userProfil = await dbGetProfil(userName);
+    var userProfil = await ProfilDatabaseKontroller().getProfil(userName);
     var userFriendlist = userProfil["friendlist"] ?? [];
 
 
@@ -110,8 +111,8 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   findUserGetName(user) async {
-    var foundOnName = await dbGetProfil(user) ;
-    var foundOnEmail = await dbGetProfilFromEmail(user);
+    var foundOnName = await ProfilDatabaseKontroller().getProfil(user);
+    var foundOnEmail = await ProfilDatabaseKontroller().getProfilFromEmail(user);
 
 
     if(foundOnName != null){
@@ -151,14 +152,21 @@ class _ChatPageState extends State<ChatPage>{
   }
 
 
+
   Widget build(BuildContext context){
 
     chatUserList(groupdata){
       List<Widget> groupContainer = [];
 
       for(var group in groupdata){
-        var chatpartner = group["users"][0] == "dominik.mast.11@gmail.com" ?
-                          group["users"][1] : group["users"][0];
+        var chatPartner = "";
+
+        group["users"].forEach((key, value){
+          if(key != userName){
+            chatPartner = key;
+          }
+        });
+
         var lastMessage = group["lastMessage"];
 
         groupContainer.add(
@@ -175,7 +183,7 @@ class _ChatPageState extends State<ChatPage>{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(chatpartner,style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(chatPartner,style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(height: 5),
                   Text(lastMessage)
                 ],
@@ -203,10 +211,8 @@ class _ChatPageState extends State<ChatPage>{
       ),
       body: Column(
         children: [
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection("chats")
-                .where("users", arrayContains: userName)
-                .snapshots(),
+          StreamBuilder(
+            stream: ChatDatabaseKontroller().getAllChatgroupsFromUserStream("Dekar"),
               builder: (
                   BuildContext context,
                   AsyncSnapshot snapshot,
@@ -214,11 +220,24 @@ class _ChatPageState extends State<ChatPage>{
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 } else if (snapshot.hasData) {
-                  globalChatGroups = snapshot.data.docs;
-                  return chatUserList(snapshot.data.docs);
+                  var chatGroups = [];
+                  var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
+
+                  chatgroupsMap.forEach((key, value) {
+                    chatGroups.add(value);
+                  });
+
+                  globalChatGroups = chatGroups;
+                  return chatUserList(chatGroups);
                 }
                 return Text("error");
-              })
+
+
+
+
+              }
+          )
+
         ],
       ),
       floatingActionButton: FloatingActionButton(

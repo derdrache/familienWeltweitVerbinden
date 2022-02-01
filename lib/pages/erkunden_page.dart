@@ -43,7 +43,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   _asyncMethod() async{
-    var getProfils = await dbGetAllProfils();
+    var getProfils = await ProfilDatabaseKontroller().getAllProfils();
     ownUserProfil = getOwnProfil(getProfils);
     getProfils.remove(ownUserProfil);
 
@@ -268,11 +268,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
       onPressed: (){
         if(onFriendlist){
           ownUserProfil["friendlist"].remove(profil["name"]);
-          dbChangeProfil(ownUserProfil["name"], {"friendlist": ownUserProfil["friendlist"]});
         } else {
           ownUserProfil["friendlist"].add(profil["name"]);
-          dbChangeProfil(ownUserProfil["name"], {"friendlist": ownUserProfil["friendlist"]});
         }
+
+        ProfilDatabaseKontroller().updateProfil(
+            ownUserProfil["id"], {"friendlist": ownUserProfil["friendlist"]}
+        );
 
         Navigator.pop(context);
         profilPopupWindow(context,ownUserProfil["name"], profil,

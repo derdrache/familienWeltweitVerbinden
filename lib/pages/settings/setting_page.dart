@@ -62,7 +62,7 @@ class _SettingPageState extends State<SettingPage> {
   getProfilFromDatabase() async {
     emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
     nameTextKontroller.text = FirebaseAuth.instance.currentUser!.displayName!;
-    userProfil = await dbGetProfil(nameTextKontroller.text);
+    userProfil = await ProfilDatabaseKontroller().getProfil(nameTextKontroller.text);
   }
 
   void getAndSetDataFromDB() async {
@@ -91,6 +91,7 @@ class _SettingPageState extends State<SettingPage> {
       print("Problem mit dem User finden");
     }
 
+
   }
 
   pushLocationDataToDB(locationData) async {
@@ -101,7 +102,10 @@ class _SettingPageState extends State<SettingPage> {
       "latt": double.parse(locationData["latt"]),
       "land": locationData["countryname"]
     };
-    dbChangeProfil(userProfil["docid"], locationDict);
+
+    ProfilDatabaseKontroller().updateProfil(
+        userProfil["id"], locationDict
+    );
   }
 
   userLogin(passwort) async {
@@ -134,7 +138,8 @@ class _SettingPageState extends State<SettingPage> {
       errorMessage = changeSprachen();
     }else if(beschreibung == beschreibungBio){
       if(bioTextKontroller.text != userProfil["aboutme"]){
-        dbChangeProfil(userProfil["docid"], {"aboutme": bioTextKontroller.text});
+        ProfilDatabaseKontroller().updateProfil(
+            userProfil["docid"], {"aboutme": bioTextKontroller.text});
       }
     }else if(beschreibung == beschreibungName){
 
@@ -180,7 +185,9 @@ class _SettingPageState extends State<SettingPage> {
     if(reiseArtInput.getSelected() == null || reiseArtInput.getSelected().isEmpty){
       errorMessage = "neue Reiseart eingeben";
     } else if(reiseArtInput.getSelected() != userProfil["reiseart"] ){
-      dbChangeProfil(userProfil["docid"], {"reiseart": reiseArtInput.getSelected()});
+      ProfilDatabaseKontroller().updateProfil(
+          userProfil["id"], {"reiseart": reiseArtInput.getSelected()}
+      );
     }
 
     return errorMessage;
@@ -199,7 +206,9 @@ class _SettingPageState extends State<SettingPage> {
     if(!allFilled || kinderAgeBox.getDates().isEmpty){
       errorMessage = "Geburtsdaten eingeben";
     } else if (kinderAgeBox.getDates() != userProfil["kinder"]){
-      dbChangeProfil(userProfil["docid"], {"kinder": kinderAgeBox.getDates()});
+      ProfilDatabaseKontroller().updateProfil(
+          userProfil["id"], {"kinder": kinderAgeBox.getDates()}
+      );
     }
 
     return errorMessage;
@@ -211,7 +220,9 @@ class _SettingPageState extends State<SettingPage> {
     if(interessenInputBox.getSelected() == null || interessenInputBox.getSelected().isEmpty){
       errorMessage = "neue interessen eingeben";
     } else if(interessenInputBox.getSelected() != userProfil["interessen"]){
-      dbChangeProfil(userProfil["docid"], {"interessen": interessenInputBox.getSelected()});
+      ProfilDatabaseKontroller().updateProfil(
+          userProfil["id"], {"interessen": interessenInputBox.getSelected()}
+      );
     }
     return errorMessage;
   }
@@ -222,20 +233,23 @@ class _SettingPageState extends State<SettingPage> {
     if(sprachenInputBox.getSelected() == null || sprachenInputBox.getSelected().isEmpty){
       errorMessage = "Sprache eingeben";
     } else if(sprachenInputBox.getSelected() != userProfil["sprachen"]){
-      dbChangeProfil(userProfil["docid"], {"sprachen": sprachenInputBox.getSelected()});
+      ProfilDatabaseKontroller().updateProfil(
+          userProfil["id"], {"sprachen": sprachenInputBox.getSelected()}
+      );
     }
     return errorMessage;
   }
 
   changeName() async{
     var errorMessage = "";
-    var userProfil = await dbGetProfil(nameTextKontroller.text);
+    var userProfil = await ProfilDatabaseKontroller().getProfil(nameTextKontroller.text);
 
     if(nameTextKontroller.text == null || nameTextKontroller.text == ""){
       errorMessage = "Neuen Namen eingeben";
     } else{
       if(userProfil == null){
         dbChangeUserName(userProfil["docid"],userProfil["name"],nameTextKontroller.text);
+
       } else {
         errorMessage += "- Name schon vorhanden";
       }
@@ -250,7 +264,8 @@ class _SettingPageState extends State<SettingPage> {
     if(passwortTextKontroller1.text != "" && emailTextKontroller.text != ""){
       bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(emailTextKontroller.text);
-      var emailInUse = await dbGetProfilFromEmail(emailTextKontroller.text);
+      var emailInUse = await ProfilDatabaseKontroller()
+          .getProfilFromEmail(emailTextKontroller.text);
 
       if (emailInUse != null){
         errorString += "- Email wird schon verwendet";
@@ -276,7 +291,10 @@ class _SettingPageState extends State<SettingPage> {
 
     if(errorString == ""){
       FirebaseAuth.instance.currentUser?.updateEmail(emailTextKontroller.text);
-      dbChangeProfil(userProfil["docid"], {"email":emailTextKontroller.text });
+      ProfilDatabaseKontroller().updateProfil(
+          userProfil["id"], {"email":emailTextKontroller.text }
+      );
+
     }
 
     return errorString;

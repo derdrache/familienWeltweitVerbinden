@@ -50,8 +50,8 @@ class _BoardPageState extends State<BoardPage>{
       "from": "Dominik"
     };
 
-    var dbChat = DBChat();
-    dbChat.addNewChatGroup(chatgroupData, messageData);
+    var dbChat = ChatDatabaseKontroller();
+    dbChat.addNewChatGroup(chatgroupData);
     //dbAddMessageNew();
   }
 
@@ -59,7 +59,13 @@ class _BoardPageState extends State<BoardPage>{
     return Scaffold(
       body: FloatingActionButton(
         onPressed: () async {
-          newDBTest();
+          var groupChatData = {
+            "users" : {"Test": true, "Test2": true},
+            "lastMessage": "",
+            "lastMessageDate": "",
+          };
+
+          await ChatDatabaseKontroller().addNewChatGroup(groupChatData);
         },
       )
       /*
