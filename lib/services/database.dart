@@ -107,6 +107,16 @@ class ProfilDatabaseKontroller{
     profils.child(userID).update(data);
   }
 
+  updateProfilName(profilDocid, oldName, newName){
+    FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
+
+    //Change Name in Profil
+    //in other Friendlists change Name
+    //chats change Name
+
+
+  }
+
   deleteProfil(){
 
   }
