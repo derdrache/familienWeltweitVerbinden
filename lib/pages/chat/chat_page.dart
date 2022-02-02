@@ -139,9 +139,16 @@ class _ChatPageState extends State<ChatPage>{
     Navigator.pop(context);
 
     if(checkAndIndex[0]){
-      changePage(context, ChatDetailsPage(groupChatData: chatPartner, newChat: true));
+      changePage(context, ChatDetailsPage(
+          groupChatData: {},
+          chatPartner:  chatPartner,
+          newChat: true)
+      );
     } else{
-      changePage(context, ChatDetailsPage(groupChatData: globalChatGroups[checkAndIndex[1]]));
+      changePage(context, ChatDetailsPage(
+        groupChatData: globalChatGroups[checkAndIndex[1]],
+        chatPartner: chatPartner,
+      ));
     }
 
   }
@@ -151,7 +158,7 @@ class _ChatPageState extends State<ChatPage>{
 
     for(var i = 0;i < globalChatGroups.length; i++){
 
-      if(globalChatGroups[i]["users"].contains(chatPartner)){
+      if(globalChatGroups[i]["users"][userId] == userName){
         check = [false,i];
       }
     }
@@ -163,15 +170,15 @@ class _ChatPageState extends State<ChatPage>{
 
   Widget build(BuildContext context){
 
-    chatUserList(groupdata){
+    chatUserList(groupdata) {
       List<Widget> groupContainer = [];
 
       for(var group in groupdata){
         var chatPartner = "";
 
-        group["users"].forEach((key, value){
+        group["users"].forEach((key, value) async {
           if(key != userName){
-            chatPartner = key;
+            chatPartner = value;
           }
         });
 
@@ -179,7 +186,10 @@ class _ChatPageState extends State<ChatPage>{
 
         groupContainer.add(
           GestureDetector(
-            onTap: () =>changePage(context, ChatDetailsPage(groupChatData: group)),
+            onTap: () =>changePage(context, ChatDetailsPage(
+                groupChatData: group,
+              chatPartner: chatPartner,
+            )),
             child: Container(
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
@@ -220,7 +230,8 @@ class _ChatPageState extends State<ChatPage>{
       body: Column(
         children: [
           StreamBuilder(
-            stream: ChatDatabaseKontroller().getAllChatgroupsFromUserStream("Dekar"),
+            stream: ChatDatabaseKontroller()
+                .getAllChatgroupsFromUserStream(userId, userName),
               builder: (
                   BuildContext context,
                   AsyncSnapshot snapshot,

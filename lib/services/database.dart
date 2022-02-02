@@ -9,7 +9,7 @@ DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
     databaseURL: "https://praxis-cab-236720-default-rtdb.europe-west1.firebasedatabase.app",
     app: Firebase.app()).ref();
 
-
+/*
 
 dbChangeUserName(profilDocid, oldName, newName) async {
   FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
@@ -42,6 +42,9 @@ dbChangeUserName(profilDocid, oldName, newName) async {
 
 }
 
+
+
+ */
 
 class ChatDatabaseKontroller{
   var chatGroups = realtimeDatabase.child("chats");
@@ -84,9 +87,8 @@ class ChatDatabaseKontroller{
     return data;
   }
 
-  getAllChatgroupsFromUserStream(name) {
-
-    return chatGroups.orderByChild("users/$name").equalTo(true).onValue;
+  getAllChatgroupsFromUserStream(userID, userName) {
+    return chatGroups.orderByChild("users/$userID").equalTo(userName).onValue;
   }
 
   getAllMessagesStream(chatID) {
@@ -106,37 +108,10 @@ class ProfilDatabaseKontroller{
     profils.child(userID).update(data);
   }
 
-  updateProfilName(profilID, oldName, newName){
+  updateProfilName(profilID, newName){
     FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
 
     updateProfil(profilID, {"name": newName});
-
-    profils.orderByChild("friendlist/$oldName").equalTo(true).once().then((value){
-      value.snapshot.children.forEach((element) {
-        var friendlist = element.child("friendlist").value as Map;
-        friendlist[newName] = true;
-        friendlist.remove(oldName);
-
-        updateProfil(element.key, friendlist);
-
-      });
-    });
-
-    realtimeDatabase.child("chats").orderByChild("users/$oldName").equalTo(true)
-        .once().then((value) {
-          value.snapshot.children.forEach((element) {
-            var users = element.child("users").value as Map;
-            users[newName] = true;
-            users.remove(oldName);
-
-            ChatDatabaseKontroller().updateChatGroup(
-                element.key,
-                {"users": users}
-            );
-          });
-    });
-
-    //in jeder Nachricht updaten
 
   }
 
