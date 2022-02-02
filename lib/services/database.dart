@@ -10,63 +10,6 @@ DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
     app: Firebase.app()).ref();
 
 
-dbGetOneUserChat(user1, user2) async{
-  var groupChatData;
-
-  await chats.where("users", arrayContains: user1).get().then((values){
-    if(values.docs.isNotEmpty){
-      for(var value in values.docs){
-
-        var hasUser2 = value.get("users").contains(user2);
-        if(hasUser2){
-          groupChatData =  value.data();
-        }
-      }
-    }
-  });
-
-  return groupChatData;
-}
-
-dbGetMessagesFromChatgroup(chatgroup) async {
-  QuerySnapshot querySnapshots = await chats.doc(chatgroup["docid"]).
-                                collection("messages").orderBy("date", descending: true).get();
-  List allData = querySnapshots.docs.map((doc) => doc.data()).toList();
-
-  return allData;
-}
-
-dbAddMessage(chatgroupData, messageData,{ newChat = false}) async {
-
-  if(newChat){
-    chatgroupData = {
-      "users" : chatgroupData["users"],
-      "lastMessage": messageData["message"],
-      "lastMessageDate": messageData["date"],
-    };
-
-    await chats.add(chatgroupData).then((value) {
-      chatgroupData["docid"] = value.id;
-      chats.doc(value.id).update({"docid": value.id});
-    });
-  } else{
-    await chats.doc(chatgroupData["docid"]).update({
-      "lastMessage" : messageData["message"],
-      "lastMessageDate": messageData["date"]
-    });
-  }
-
-  await chats.doc(chatgroupData["docid"]).collection("messages").add({
-    "message" : messageData["message"],
-    "date" : messageData["date"],
-    "from": chatgroupData["users"].indexOf(messageData["from"])
-  });
-
-  return chatgroupData;
-}
-
-
-
 
 dbChangeUserName(profilDocid, oldName, newName) async {
   FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
@@ -130,8 +73,15 @@ class ChatDatabaseKontroller{
     chatGroup.push().set(messageData);
   }
 
-  getChat(user1, user2){
+  getChat(user1, user2) async {
+    var query = await chatGroups.orderByChild("users").limitToFirst(1)
+        .equalTo({
+      user1: true,
+      user2: true
+    }).once();
+    var data = query.snapshot.children.first.value;
 
+    return data;
   }
 
   getAllChatgroupsFromUserStream(user) {

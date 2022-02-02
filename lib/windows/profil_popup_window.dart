@@ -31,7 +31,9 @@ _menuBarProfil(context,userName,profilName, addFriendButton){
           ),
           child: Icon(Icons.message),
           onPressed: () async {
-            var groupChatData = await dbGetOneUserChat(userName, profilName);
+            var groupChatData = ChatDatabaseKontroller().getChat(
+                userName, profilName
+            );//await dbGetOneUserChat(userName, profilName);
             if(groupChatData != null){
               changePage(context, ChatDetailsPage(groupChatData: groupChatData));
             } else {
@@ -73,6 +75,9 @@ _infoProfil(profil){
   var childrenList = profil["kinder"];
   var childrenAgeList = [];
   double columnAbstand = 5;
+
+
+
 
   childrenList.forEach((child){
     childrenAgeList.add(globalFunctions.timeStampToAllDict(child)["years"]);

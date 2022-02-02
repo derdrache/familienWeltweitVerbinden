@@ -60,7 +60,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "reiseart": reiseArtenAuswahlBox.getSelected(),
             "aboutme": "",
             "sprachen": sprachenAuswahlBox.getSelected(),
-            "friendlist": []
+            "friendlist": ["empty"]
           };
 
           ProfilDatabaseKontroller().addNewProfil(data);
