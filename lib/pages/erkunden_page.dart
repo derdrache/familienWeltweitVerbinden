@@ -91,8 +91,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         list.add({
           "ort": profil["ort"],
           "name": "1",
-          "latt": profil["latt"],
-          "longt": profil["longt"],
+          "latt": double.parse(profil["latt"]),
+          "longt": double.parse(profil["longt"]),
           "profils": [profil]
         });
       }
@@ -115,8 +115,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         list.add({
           "ort": profil["ort"],
           "name": "1",
-          "latt": profil["latt"],
-          "longt": profil["longt"],
+          "latt": double.parse(profil["latt"]),
+          "longt": double.parse(profil["longt"]),
           "profils": [profil]
         });
       }
@@ -406,6 +406,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
     createAllMarker() async{
+
       List<Marker> markerList = [];
       aktiveProfils.forEach((profil){
         var position = LatLng(profil["latt"], profil["longt"]);
