@@ -254,7 +254,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   addFriendButton(profil){
-    var onFriendlist = ownUserProfil["friendlist"].contains(profil["name"]);
+    var onFriendlist = ownUserProfil["friendlist"]?.contains(profil["name"])?? false;
 
     return TextButton(
       style: ButtonStyle(
@@ -266,17 +266,23 @@ class _ErkundenPageState extends State<ErkundenPage>{
       ),
       child: onFriendlist?Icon(Icons.person_remove) : Icon(Icons.person_add),
       onPressed: (){
+        var friendlist = new List<String>.from(ownUserProfil["friendlist"]);
+
         if(onFriendlist){
-          ownUserProfil["friendlist"].remove(profil["name"]);
+          friendlist.remove(profil["name"]);
+          if(friendlist.isEmpty) friendlist = ["empty"];
         } else {
-          ownUserProfil["friendlist"].add(profil["name"]);
+          if(friendlist[0] == "empty") friendlist = [];
+          friendlist.add(profil["name"]);
         }
 
         ProfilDatabaseKontroller().updateProfil(
-            ownUserProfil["id"], {"friendlist": ownUserProfil["friendlist"]}
+            ownUserProfil["id"], {"friendlist": friendlist}
         );
 
+
         Navigator.pop(context);
+        ownUserProfil["friendlist"] = friendlist;
         profilPopupWindow(context,ownUserProfil["name"], profil,
             addFriendButton: addFriendButton(profil));
 
