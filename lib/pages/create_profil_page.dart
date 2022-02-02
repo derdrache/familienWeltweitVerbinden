@@ -46,7 +46,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         var email = FirebaseAuth.instance.currentUser?.email;
         var userName = nameTextcontroller.text;
         var locationData = await LocationService()
-            .getLocationData(ortTextcontroller.text);
+            .getLocationMapDataGoogle(ortTextcontroller.text);
         if(locationData != null){
           var data = {
             "email": email,

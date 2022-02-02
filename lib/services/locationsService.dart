@@ -34,8 +34,8 @@ class LocationService {
       var mapData = {
         "city": json["standard"]["city"],
         "countryname": json["standard"]["countryname"],
-        "longt": json["longt"],
-        "latt": json["latt"]
+        "longt": double.parse(json["longt"]),
+        "latt": double.parse(json["latt"])
       };
       return mapData;
     }catch (error){

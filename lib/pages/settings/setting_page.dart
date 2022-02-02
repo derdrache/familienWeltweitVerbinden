@@ -167,7 +167,7 @@ class _SettingPageState extends State<SettingPage> {
     if(ortKontroller.text == ""){
       errorMessage += "Neue Stadt eingeben";
     } else if (ortKontroller.text != userProfil["ort"]){
-      var locationData = await LocationService().getLocationData(ortKontroller.text);
+      var locationData = await LocationService().getLocationMapDataGoogle(ortKontroller.text);
 
       if (locationData != null){
         pushLocationDataToDB(locationData);
@@ -250,8 +250,7 @@ class _SettingPageState extends State<SettingPage> {
     } else{
       if(userProfil == null){
         ProfilDatabaseKontroller().updateProfilName(
-            userID, userProfil["name"],
-            nameTextKontroller.text
+            userID, nameTextKontroller.text
         );
       } else {
         errorMessage += "- Name schon vorhanden";

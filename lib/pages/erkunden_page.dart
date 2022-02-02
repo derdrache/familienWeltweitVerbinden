@@ -91,8 +91,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         list.add({
           "ort": profil["ort"],
           "name": "1",
-          "latt": double.parse(profil["latt"]),
-          "longt": double.parse(profil["longt"]),
+          "latt": profil["latt"],
+          "longt": profil["longt"],
           "profils": [profil]
         });
       }
@@ -115,8 +115,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         list.add({
           "ort": profil["ort"],
           "name": "1",
-          "latt": double.parse(profil["latt"]),
-          "longt": double.parse(profil["longt"]),
+          "latt": profil["latt"],
+          "longt": profil["longt"],
           "profils": [profil]
         });
       }

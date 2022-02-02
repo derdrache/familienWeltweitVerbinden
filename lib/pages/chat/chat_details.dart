@@ -9,8 +9,10 @@ import '../../global/global_functions.dart';
 class ChatDetailsPage extends StatefulWidget {
   var groupChatData;
   bool newChat;
+  String chatPartner;
 
-  ChatDetailsPage({Key? key,required this.groupChatData, this.newChat = false}) : super(key: key);
+  ChatDetailsPage({Key? key,required this.groupChatData,
+    required this.chatPartner, this.newChat = false}) : super(key: key);
 
   @override
   _ChatDetailsPageState createState() => _ChatDetailsPageState();
@@ -21,22 +23,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var nachrichtController = TextEditingController();
   var userName = FirebaseAuth.instance.currentUser!.displayName;
 
-
-  getTitle(){
-
-    if(widget.newChat){
-      return widget.groupChatData;
-    } else{
-      var users = [];
-      widget.groupChatData["users"].forEach((k, v) => users.add(k));
-      var chatPartner = users[0] == userName? users[1]: users[0];
-
-      return chatPartner;
-    }
-
-
-
-  }
 
   messageToDbAndClearMessageInput(message)async {
     var userID = FirebaseAuth.instance.currentUser!.uid;
@@ -67,11 +53,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         }
     );
 
-
+/*
     if (widget.newChat){
       Navigator.pop(context);
       changePage(context, ChatDetailsPage(groupChatData: widget.groupChatData));
     }
+
+ */
+
+
 
   }
 
@@ -167,7 +157,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     return Scaffold(
       appBar: customAppBar(
-        title: getTitle(),
+        title: widget.chatPartner,
         button: TextButton(
             onPressed: null,
             child: Icon(Icons.more_vert))

@@ -35,9 +35,16 @@ _menuBarProfil(context,userName,profilName, addFriendButton){
                 userName, profilName
             );//await dbGetOneUserChat(userName, profilName);
             if(groupChatData != null){
-              changePage(context, ChatDetailsPage(groupChatData: groupChatData));
+              changePage(context, ChatDetailsPage(
+                  groupChatData: groupChatData,
+                chatPartner: profilName,
+              ));
             } else {
-              changePage(context, ChatDetailsPage(groupChatData: profilName, newChat: true));
+              changePage(context, ChatDetailsPage(
+                  groupChatData: {},
+                  chatPartner: profilName,
+                  newChat: true
+              ));
             }
 
           }
