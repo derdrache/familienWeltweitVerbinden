@@ -12,13 +12,14 @@ class ChatPage extends StatefulWidget{
 }
 
 class _ChatPageState extends State<ChatPage>{
+  var userId = FirebaseAuth.instance.currentUser!.uid;
   var userName = FirebaseAuth.instance.currentUser!.displayName;
   var globalChatGroups = [];
 
 
   selectChatpartnerWindow() async {
     var personenSucheController = TextEditingController();
-    var userProfil = await ProfilDatabaseKontroller().getProfil(userName);
+    var userProfil = await ProfilDatabaseKontroller().getProfil(userId);
     var userFriendlist = userProfil["friendlist"] ?? [];
 
 
@@ -54,10 +55,10 @@ class _ChatPageState extends State<ChatPage>{
                             onPressed: () async {
                               var chatPartner = personenSucheController.text;
                               if(chatPartner != ""){
-                                var userName = await findUserGetName(personenSucheController.text);
+                                var userID = await findUserGetName(personenSucheController.text);
 
-                                if(userName != null){
-                                  validCheckAndOpenChatgroup(userName);
+                                if(userID != null){
+                                  validCheckAndOpenChatgroup(userID);
                                 } else {
                                   personenSucheController.clear();
                                   customSnackbar(dialogContext, "Benutzer existiert nicht");
@@ -80,6 +81,14 @@ class _ChatPageState extends State<ChatPage>{
 
   Widget createFriendlistBox(userFriendlist) {
     List<Widget> friendsBoxen = [];
+
+    if(userFriendlist["empty"] == true) {
+      userFriendlist= [];
+    } else{
+      userFriendlist = userFriendlist.keys;
+    }
+
+
 
     for(var friend in userFriendlist){
       friendsBoxen.add(
@@ -111,14 +120,13 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   findUserGetName(user) async {
-    var foundOnName = await ProfilDatabaseKontroller().getProfil(user);
-    var foundOnEmail = await ProfilDatabaseKontroller().getProfilFromEmail(user);
-
+    var foundOnName = await ProfilDatabaseKontroller().getProfilIDFromName(user);
+    var foundOnEmail = await ProfilDatabaseKontroller().getProfilIDFromEmail(user);
 
     if(foundOnName != null){
-      return foundOnName["name"];
+      return foundOnName;
     } else if(foundOnEmail != null){
-      return foundOnEmail["name"];
+      return foundOnEmail;
     } else {
       return null;
     }
@@ -219,7 +227,7 @@ class _ChatPageState extends State<ChatPage>{
               ){
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
-                } else if (snapshot.hasData) {
+                } else if (snapshot.data.snapshot.value != null) {
                   var chatGroups = [];
                   var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
@@ -230,7 +238,7 @@ class _ChatPageState extends State<ChatPage>{
                   globalChatGroups = chatGroups;
                   return chatUserList(chatGroups);
                 }
-                return Text("error");
+                return Container();
 
 
 

@@ -47,20 +47,20 @@ class ChatDatabaseKontroller{
   var chatGroups = realtimeDatabase.child("chats");
   var chatMessages = realtimeDatabase.child("chatMessages");
 
-  addNewChatGroup(chatgroupData){
+  addNewChatGroup(users) {
+    var newChatGroup = chatGroups.push();
+    var chatKey = newChatGroup.key;
 
-    var chatKey = chatGroups.push().key;
-
-    chatgroupData = {
+    var chatgroupData = {
       "id" : chatKey,
-      "users" : chatgroupData["users"],
+      "users" : users,
       "lastMessage": "",
       "lastMessageDate": "",
     };
 
-    chatGroups.push().set(chatgroupData);
+    newChatGroup.set(chatgroupData);
 
-    return chatKey;
+    return chatgroupData;
   }
 
   updateChatGroup(chatID, chatgroupData){
@@ -84,8 +84,9 @@ class ChatDatabaseKontroller{
     return data;
   }
 
-  getAllChatgroupsFromUserStream(user) {
-    return chatGroups.orderByChild("users/$user").equalTo(true).onValue;
+  getAllChatgroupsFromUserStream(name) {
+
+    return chatGroups.orderByChild("users/$name").equalTo(true).onValue;
   }
 
   getAllMessagesStream(chatID) {
@@ -97,23 +98,45 @@ class ChatDatabaseKontroller{
 class ProfilDatabaseKontroller{
   var profils = realtimeDatabase.child("profils");
 
-  addNewProfil(profilData){
-    profilData["id"] = profils.push().key;
-
-    profils.push().set(profilData);
+  addNewProfil(id, profilData){
+    profils.child(id).set(profilData);
   }
 
   updateProfil(userID, data){
     profils.child(userID).update(data);
   }
 
-  updateProfilName(profilDocid, oldName, newName){
+  updateProfilName(profilID, oldName, newName){
     FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
 
-    //Change Name in Profil
-    //in other Friendlists change Name
-    //chats change Name
+    updateProfil(profilID, {"name": newName});
 
+    profils.orderByChild("friendlist/$oldName").equalTo(true).once().then((value){
+      value.snapshot.children.forEach((element) {
+        var friendlist = element.child("friendlist").value as Map;
+        friendlist[newName] = true;
+        friendlist.remove(oldName);
+
+        updateProfil(element.key, friendlist);
+
+      });
+    });
+
+    realtimeDatabase.child("chats").orderByChild("users/$oldName").equalTo(true)
+        .once().then((value) {
+          value.snapshot.children.forEach((element) {
+            var users = element.child("users").value as Map;
+            users[newName] = true;
+            users.remove(oldName);
+
+            ChatDatabaseKontroller().updateChatGroup(
+                element.key,
+                {"users": users}
+            );
+          });
+    });
+
+    //in jeder Nachricht updaten
 
   }
 
@@ -121,18 +144,35 @@ class ProfilDatabaseKontroller{
 
   }
 
-  getProfil(name) async{
-    var event = await profils.orderByChild("name").limitToFirst(1).equalTo(name).once();
-    var data = event.snapshot.children.first.value;
+  getProfil(id) async{
+    var query = await profils.child(id).get();
+    var data = query.value;
 
     return data;
   }
 
-  getProfilFromEmail(email) async{
-    var event = await profils.orderByChild("email").limitToFirst(1).equalTo(email).once();
-    var data = event.snapshot.children.first.value;
+  getProfilIDFromName(name) async {
+    var event = await profils.orderByChild("name").limitToFirst(1).equalTo(name).once();
 
-    return data;
+    if(event.snapshot.exists){
+      return event.snapshot.children.first.key;
+    }
+  }
+
+  getProfilIDFromEmail(email) async{
+    var event = await profils.orderByChild("email").limitToFirst(1).equalTo(email).once();
+
+    if(event.snapshot.exists){
+      return event.snapshot.children.first.key;
+    }
+
+  }
+
+  getProfilName(id) async {
+    var query = await profils.child(id).child("name").get();
+
+    return query.value;
+
   }
 
   getAllProfils() async {

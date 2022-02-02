@@ -22,46 +22,51 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var userName = FirebaseAuth.instance.currentUser!.displayName;
 
 
-  @override
-  void initState() {
-    if(widget.newChat){
-      widget.groupChatData = {
-        "users" : [userName, widget.groupChatData],
-        "lastMessage": "",
-        "lastMessageDate": DateTime.now(),
-        "docid" : userName!+widget.groupChatData
-      };
-
-    }
-    super.initState();
-  }
-
   getTitle(){
-    var users = widget.groupChatData["users"].keys.toList();
 
-    return users[0] == userName? users[1]: users[0];
+    if(widget.newChat){
+      return widget.groupChatData;
+    } else{
+      var users = [];
+      widget.groupChatData["users"].forEach((k, v) => users.add(k));
+      var chatPartner = users[0] == userName? users[1]: users[0];
+
+      return chatPartner;
+    }
+
+
 
   }
 
   messageToDbAndClearMessageInput(message)async {
+    var userID = FirebaseAuth.instance.currentUser!.uid;
     nachrichtController.clear();
 
     var messageData = {
       "message" :message,
-      "from": userName,
+      "from": userID,
       "date": DateTime.now().toString()
     };
     if(widget.newChat){
-      await ChatDatabaseKontroller()
-          .addNewChatGroup(widget.groupChatData);
 
+      widget.groupChatData = ChatDatabaseKontroller()
+          .addNewChatGroup({userID: true, widget.groupChatData: true});
     }
 
-    await ChatDatabaseKontroller().addNewMessage(
+    ChatDatabaseKontroller().addNewMessage(
         widget.groupChatData,
         messageData,
         newChat: widget.newChat
     );
+
+    ChatDatabaseKontroller().updateChatGroup(
+        widget.groupChatData["id"],
+        {
+         "lastMessage": messageData["message"],
+         "lastMessageDate": messageData["date"],
+        }
+    );
+
 
     if (widget.newChat){
       Navigator.pop(context);
@@ -72,6 +77,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+
     messageList(messages){
       List<Widget> messageBox = [];
 
@@ -99,7 +105,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   border: Border.all(),
                   borderRadius: BorderRadius.all(Radius.circular(10))
                 ),
-                child: Text(message["message"])
+                child: Text(message["message"] == null ? "": message["message"])
               ),
             ),
         );
@@ -115,7 +121,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     showMessages(){
 
       return StreamBuilder(
-          stream: ChatDatabaseKontroller().getAllMessagesStream(widget.groupChatData["id"]),
+          stream: ChatDatabaseKontroller().getAllMessagesStream(
+              widget.newChat?"": widget.groupChatData["id"]
+          ),
           builder: (
               BuildContext context,
               AsyncSnapshot snapshot,
