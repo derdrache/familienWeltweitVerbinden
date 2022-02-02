@@ -42,7 +42,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           .getProfil(nameTextcontroller.text) != null;
 
       if(checkAllValidation(userExist)){
-        var email = await FirebaseAuth.instance.currentUser?.email;
+        var userID = FirebaseAuth.instance.currentUser?.uid;
+        var email = FirebaseAuth.instance.currentUser?.email;
         var userName = nameTextcontroller.text;
         var locationData = await LocationService()
             .getLocationData(ortTextcontroller.text);
@@ -63,7 +64,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "friendlist": {"empty": true}
           };
 
-          ProfilDatabaseKontroller().addNewProfil(data);
+          ProfilDatabaseKontroller().addNewProfil(userID, data);
           FirebaseAuth.instance.currentUser?.updateDisplayName(userName);
           globalFunctions.changePage(context, StartPage(registered: true));
         } else{

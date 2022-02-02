@@ -24,6 +24,7 @@ class _SettingPageState extends State<SettingPage> {
   double globalPadding = 30;
   double fontSize = 16;
   var borderColor = Colors.grey[200]!;
+  var userID = FirebaseAuth.instance.currentUser!.uid;
   var userProfil;
   var nameTextKontroller = TextEditingController();
   var kinderAgeBox = ChildrenBirthdatePickerBox();
@@ -62,7 +63,7 @@ class _SettingPageState extends State<SettingPage> {
   getProfilFromDatabase() async {
     emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
     nameTextKontroller.text = FirebaseAuth.instance.currentUser!.displayName!;
-    userProfil = await ProfilDatabaseKontroller().getProfil(nameTextKontroller.text);
+    userProfil = await ProfilDatabaseKontroller().getProfil(userID);
   }
 
   void getAndSetDataFromDB() async {
@@ -104,7 +105,7 @@ class _SettingPageState extends State<SettingPage> {
     };
 
     ProfilDatabaseKontroller().updateProfil(
-        userProfil["id"], locationDict
+        userID, locationDict
     );
   }
 
@@ -139,7 +140,7 @@ class _SettingPageState extends State<SettingPage> {
     }else if(beschreibung == beschreibungBio){
       if(bioTextKontroller.text != userProfil["aboutme"]){
         ProfilDatabaseKontroller().updateProfil(
-            userProfil["docid"], {"aboutme": bioTextKontroller.text});
+            userID, {"aboutme": bioTextKontroller.text});
       }
     }else if(beschreibung == beschreibungName){
 
@@ -186,7 +187,7 @@ class _SettingPageState extends State<SettingPage> {
       errorMessage = "neue Reiseart eingeben";
     } else if(reiseArtInput.getSelected() != userProfil["reiseart"] ){
       ProfilDatabaseKontroller().updateProfil(
-          userProfil["id"], {"reiseart": reiseArtInput.getSelected()}
+          userID, {"reiseart": reiseArtInput.getSelected()}
       );
     }
 
@@ -207,7 +208,7 @@ class _SettingPageState extends State<SettingPage> {
       errorMessage = "Geburtsdaten eingeben";
     } else if (kinderAgeBox.getDates() != userProfil["kinder"]){
       ProfilDatabaseKontroller().updateProfil(
-          userProfil["id"], {"kinder": kinderAgeBox.getDates()}
+          userID, {"kinder": kinderAgeBox.getDates()}
       );
     }
 
@@ -221,7 +222,7 @@ class _SettingPageState extends State<SettingPage> {
       errorMessage = "neue interessen eingeben";
     } else if(interessenInputBox.getSelected() != userProfil["interessen"]){
       ProfilDatabaseKontroller().updateProfil(
-          userProfil["id"], {"interessen": interessenInputBox.getSelected()}
+          userID, {"interessen": interessenInputBox.getSelected()}
       );
     }
     return errorMessage;
@@ -234,7 +235,7 @@ class _SettingPageState extends State<SettingPage> {
       errorMessage = "Sprache eingeben";
     } else if(sprachenInputBox.getSelected() != userProfil["sprachen"]){
       ProfilDatabaseKontroller().updateProfil(
-          userProfil["id"], {"sprachen": sprachenInputBox.getSelected()}
+          userID, {"sprachen": sprachenInputBox.getSelected()}
       );
     }
     return errorMessage;
@@ -248,8 +249,10 @@ class _SettingPageState extends State<SettingPage> {
       errorMessage = "Neuen Namen eingeben";
     } else{
       if(userProfil == null){
-        dbChangeUserName(userProfil["docid"],userProfil["name"],nameTextKontroller.text);
-
+        ProfilDatabaseKontroller().updateProfilName(
+            userID, userProfil["name"],
+            nameTextKontroller.text
+        );
       } else {
         errorMessage += "- Name schon vorhanden";
       }
@@ -265,7 +268,7 @@ class _SettingPageState extends State<SettingPage> {
       bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(emailTextKontroller.text);
       var emailInUse = await ProfilDatabaseKontroller()
-          .getProfilFromEmail(emailTextKontroller.text);
+          .getProfilIDFromEmail(emailTextKontroller.text);
 
       if (emailInUse != null){
         errorString += "- Email wird schon verwendet";
@@ -292,7 +295,7 @@ class _SettingPageState extends State<SettingPage> {
     if(errorString == ""){
       FirebaseAuth.instance.currentUser?.updateEmail(emailTextKontroller.text);
       ProfilDatabaseKontroller().updateProfil(
-          userProfil["id"], {"email":emailTextKontroller.text }
+          userID, {"email":emailTextKontroller.text }
       );
 
     }
