@@ -133,21 +133,25 @@ class _ChatPageState extends State<ChatPage>{
 
   }
 
-  validCheckAndOpenChatgroup(chatPartner) async {
-    var checkAndIndex = checkNewChatGroup(chatPartner);
+  validCheckAndOpenChatgroup(chatPartnerID) async {
+    var checkAndIndex = checkNewChatGroup(chatPartnerID);
+    var chatPartnerName = ProfilDatabaseKontroller().getProfilName(chatPartnerID);
 
     Navigator.pop(context);
 
     if(checkAndIndex[0]){
       changePage(context, ChatDetailsPage(
-          groupChatData: {},
-          chatPartner:  chatPartner,
+          groupChatData: {"users": {
+            chatPartnerID: chatPartnerName,
+            userId: userName
+          }},
+          chatPartner: {chatPartnerID: chatPartnerName},
           newChat: true)
       );
     } else{
       changePage(context, ChatDetailsPage(
         groupChatData: globalChatGroups[checkAndIndex[1]],
-        chatPartner: chatPartner,
+        chatPartner: {chatPartnerID: chatPartnerName},
       ));
     }
 
@@ -174,11 +178,13 @@ class _ChatPageState extends State<ChatPage>{
       List<Widget> groupContainer = [];
 
       for(var group in groupdata){
-        var chatPartner = "";
+        var chatPartnerName;
+        var chatPartnerID;
 
         group["users"].forEach((key, value) async {
           if(key != userName){
-            chatPartner = value;
+            chatPartnerName = value;
+            chatPartnerID = key;
           }
         });
 
@@ -188,7 +194,7 @@ class _ChatPageState extends State<ChatPage>{
           GestureDetector(
             onTap: () =>changePage(context, ChatDetailsPage(
                 groupChatData: group,
-              chatPartner: chatPartner,
+              chatPartner: {chatPartnerID:chatPartnerName},
             )),
             child: Container(
                 padding: EdgeInsets.all(10),
@@ -201,7 +207,7 @@ class _ChatPageState extends State<ChatPage>{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(chatPartner,style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(chatPartnerName,style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   SizedBox(height: 5),
                   Text(lastMessage)
                 ],
@@ -239,6 +245,10 @@ class _ChatPageState extends State<ChatPage>{
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 } else if (snapshot.data.snapshot.value != null) {
+
+
+
+
                   var chatGroups = [];
                   var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
