@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -80,11 +81,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         if(message["message"] == ""){continue;}
 
         var textAlign = Alignment.centerLeft;
-        var boxColor = Colors.grey;
+        var boxColor = Colors.white;
 
         if(widget.groupChatData["users"][message["from"]] == userName){
           textAlign = Alignment.centerRight;
-          boxColor = Colors.blue;
+          boxColor = Colors.greenAccent;
         }
 
 
@@ -92,15 +93,55 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           Align(
             alignment: textAlign, //right and left
             child: Container(
-                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.65),
+                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.55),
                 margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: boxColor,
                   border: Border.all(),
                   borderRadius: BorderRadius.all(Radius.circular(10))
                 ),
-                child: Text(message["message"] == null ? "": message["message"])
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.end,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top:5, left: 10, bottom: 7, right: 10),
+                      child: Text(message["message"] == null ? "": message["message"],
+                          style: TextStyle(fontSize: 16 )
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(bottom: 5, right: 10),
+                      child: Text(
+                          dbSecondsToTimeString(message["date"]),
+                          style: TextStyle(color: Colors.grey[600])
+                      ),
+                    )
+
+                  ],
+                )
+
+
+                /*Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(top:5, left: 5, bottom: 20, right: 10),
+                      child: Text(message["message"] == null ? "": message["message"],
+                            style: TextStyle(fontSize: 16 )
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 3,
+                      right: 3,
+                      child: Text(
+                          dbSecondsToTimeString(message["date"]),
+                          style: TextStyle(color: Colors.grey[600])
+                      ),
+                    ),
+                  ]
+                )
+                */
               ),
             ),
         );
@@ -141,9 +182,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     textEingabe(){
       return Container(
+
         padding: EdgeInsets.all(15),
         height: 50,
-        decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey))),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(top: BorderSide(color: Colors.grey))
+        ),
         child: TextField(
           onSubmitted: (eingabe) async { messageToDbAndClearMessageInput(eingabe); },
           controller: nachrichtController,
@@ -162,14 +207,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         title: chatPartnerName,
         button: TextButton(
             onPressed: null,
-            child: Icon(Icons.more_vert))
+            child: Container()
+        )
       ),
-      body: Column(
-        children: [
-          Expanded(child: Container()),
-          showMessages(),
-          textEingabe()
-        ],
+      body: Container(
+        color: Colors.blue,
+        child: Column(
+          children: [
+            Expanded(child: Container()),
+            showMessages(),
+            textEingabe()
+          ],
+        ),
       )
     );
   }
