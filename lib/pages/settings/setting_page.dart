@@ -32,6 +32,7 @@ class _SettingPageState extends State<SettingPage> {
       auswahlList: globalVariablen.interessenListe);
   var bioTextKontroller = TextEditingController();
   var emailTextKontroller = TextEditingController();
+  var emailNewTextKontroller = TextEditingController();
   var passwortTextKontroller1 = TextEditingController();
   var passwortTextKontroller2 = TextEditingController();
   var passwortCheckKontroller = TextEditingController();
@@ -50,11 +51,10 @@ class _SettingPageState extends State<SettingPage> {
   String beschreibungPasswort = "Passwort ändern";
   String beschreibungFeedback = "Feedback geben";
 
+
   @override
   void initState() {
-
     getAndSetDataFromDB();
-
 
     super.initState();
   }
@@ -110,14 +110,15 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   userLogin(passwort) async {
+    var userEmail = FirebaseAuth.instance.currentUser!.email;
     var loginUser;
-
     try {
       loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: userProfil["email"],
+          email: userEmail??"",
           password: passwort
       );
     } on FirebaseAuthException catch  (e) {
+      print(e);
       loginUser = null;
     }
 
@@ -263,11 +264,11 @@ class _SettingPageState extends State<SettingPage> {
   changeEmail() async {
     var errorString = "";
 
-    if(passwortTextKontroller1.text != "" && emailTextKontroller.text != ""){
+    if(passwortTextKontroller1.text != "" && emailNewTextKontroller.text != ""){
       bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-          .hasMatch(emailTextKontroller.text);
+          .hasMatch(emailNewTextKontroller.text);
       var emailInUse = await ProfilDatabaseKontroller()
-          .getProfilIDFromEmail(emailTextKontroller.text);
+          .getProfilIDFromEmail(emailNewTextKontroller.text);
 
       if (emailInUse != null){
         errorString += "- Email wird schon verwendet";
@@ -282,17 +283,19 @@ class _SettingPageState extends State<SettingPage> {
       if(passwortTextKontroller1.text == ""){
         errorString += "- Passwort eingeben \n";
       }
-      if(emailTextKontroller.text == ""){
+      if(emailNewTextKontroller.text == ""){
         errorString += "- Email eingeben \n";
       }
     }
 
     if(errorString == ""){
-      FirebaseAuth.instance.currentUser?.updateEmail(emailTextKontroller.text);
+      FirebaseAuth.instance.currentUser?.updateEmail(emailNewTextKontroller.text);
 
       ProfilDatabaseKontroller().updateProfil(
-          userID, {"email":emailTextKontroller.text }
+          userID, {"email":emailNewTextKontroller.text }
       );
+
+      emailTextKontroller.text = emailNewTextKontroller.text;
 
     }
 
@@ -370,12 +373,12 @@ class _SettingPageState extends State<SettingPage> {
     }
 
     emailChangeWindow(){
-      emailTextKontroller.text = "";
+      emailNewTextKontroller.text = "";
       passwortTextKontroller1.text = "";
 
       return Column(
         children: [
-          customTextInput(beschreibungEmail,emailTextKontroller),
+          customTextInput(beschreibungEmail,emailNewTextKontroller),
           SizedBox(height: 15),
           customTextInput("Passwort bestätigen",passwortTextKontroller1, passwort: true)
         ],
@@ -405,7 +408,6 @@ class _SettingPageState extends State<SettingPage> {
 
       openSettingWindow()async {
         var textColor = Colors.black;
-        nameTextKontroller.text = "";
 
         return showMenu(
             shape: const RoundedRectangleBorder(
