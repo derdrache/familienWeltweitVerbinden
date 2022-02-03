@@ -53,7 +53,9 @@ customSnackbar(context, text, {color = Colors.red}){
 }
 
 customAppBar({title, button, elevation = 4.0}){
-  if(button == null){ button = Container();}
+
+  if(button == null) button = Container();
+
   return AppBar(
     title: Container(
       child: Text(title, style: TextStyle(color: Colors.black))

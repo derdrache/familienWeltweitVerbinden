@@ -225,47 +225,45 @@ class _ChatPageState extends State<ChatPage>{
       );
     }
 
-
-
     return Scaffold(
-      appBar: customAppBar(
-        title: "Chat",
-      ),
-      body: Column(
-        children: [
-          StreamBuilder(
-            stream: ChatDatabaseKontroller()
-                .getAllChatgroupsFromUserStream(userId, userName),
-              builder: (
-                  BuildContext context,
-                  AsyncSnapshot snapshot,
-              ){
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.data.snapshot.value != null) {
+      body: Padding(
+        padding: const EdgeInsets.only(top: 25),
+        child: Column(
+          children: [
+            StreamBuilder(
+              stream: ChatDatabaseKontroller()
+                  .getAllChatgroupsFromUserStream(userId, userName),
+                builder: (
+                    BuildContext context,
+                    AsyncSnapshot snapshot,
+                ){
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.data.snapshot.value != null) {
 
 
 
 
-                  var chatGroups = [];
-                  var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
+                    var chatGroups = [];
+                    var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
-                  chatgroupsMap.forEach((key, value) {
-                    chatGroups.add(value);
-                  });
+                    chatgroupsMap.forEach((key, value) {
+                      chatGroups.add(value);
+                    });
 
-                  globalChatGroups = chatGroups;
-                  return chatUserList(chatGroups);
+                    globalChatGroups = chatGroups;
+                    return chatUserList(chatGroups);
+                  }
+                  return Container();
+
+
+
+
                 }
-                return Container();
+            )
 
-
-
-
-              }
-          )
-
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.create),
