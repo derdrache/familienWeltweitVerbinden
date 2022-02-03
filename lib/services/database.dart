@@ -3,48 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-CollectionReference profil = FirebaseFirestore.instance.collection("Nutzer");
-CollectionReference chats = FirebaseFirestore.instance.collection("chats");
 DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
     databaseURL: "https://praxis-cab-236720-default-rtdb.europe-west1.firebasedatabase.app",
     app: Firebase.app()).ref();
 
-/*
-
-dbChangeUserName(profilDocid, oldName, newName) async {
-  FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
-
-  profil.doc(profilDocid).update({"name": newName});
-
-  profil.where("friendlist", arrayContains: oldName)
-        .get().then((values) {
-          if(values.docs.isNotEmpty){
-            for(var value in values.docs){
-              List friendList = value.get("friendlist");
-              friendList[friendList.indexOf(oldName)] = newName;
-
-              profil.doc(value.id).update({"friendlist": friendList});
-            }
-          }
-  });
-
-  chats.where("users", arrayContains: oldName).get().then((values) {
-    if(values.docs.isNotEmpty){
-      for(var value in values.docs){
-        List users = value.get("users");
-        users[users.indexOf(oldName)] = newName;
-        chats.doc(value.id).update({"users": users});
-      }
-    }
-  });
-
-
-
-}
-
-
-
- */
 
 class ChatDatabaseKontroller{
   var chatGroups = realtimeDatabase.child("chats");
@@ -108,10 +70,25 @@ class ProfilDatabaseKontroller{
     profils.child(userID).update(data);
   }
 
-  updateProfilName(profilID, newName){
+  updateProfilName(profilID,oldName, newName) {
     FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
 
     updateProfil(profilID, {"name": newName});
+
+    realtimeDatabase.child("chats").orderByChild("users/$profilID").equalTo(oldName).once().then((value){
+      value.snapshot.children.forEach((element) {
+        var key = element.key;
+
+        realtimeDatabase.child("chats").child(key!).child("users").update({profilID: newName});
+
+      });
+
+    });
+
+
+
+    //var key = query.snapshot.key;
+    //realtimeDatabase.child("chats").child(key!).child("users").update({profilID: newName})
 
   }
 
@@ -124,6 +101,14 @@ class ProfilDatabaseKontroller{
     var data = query.value;
 
     return data;
+  }
+
+  getProfilFromName(name) async{
+    var event = await profils.orderByChild("name").limitToFirst(1).equalTo(name).once();
+    if(event.snapshot.exists){
+      return event.snapshot.value;
+    }
+
   }
 
   getProfilIDFromName(name) async {

@@ -1,15 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:familien_suche/services/database.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   var groupChatData;
   bool newChat;
-  String chatPartner;
+  var chatPartner;
 
   ChatDetailsPage({Key? key,required this.groupChatData,
     required this.chatPartner, this.newChat = false}) : super(key: key);
@@ -19,24 +21,34 @@ class ChatDetailsPage extends StatefulWidget {
 }
 
 class _ChatDetailsPageState extends State<ChatDetailsPage> {
+  var chatPartnerID;
+  var chatPartnerName;
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
   var userName = FirebaseAuth.instance.currentUser!.displayName;
 
+  @override
+  void initState() {
+    chatPartnerID = widget.chatPartner.keys.toList()[0];
+    chatPartnerName = widget.chatPartner[chatPartnerID];
+
+    super.initState();
+  }
 
   messageToDbAndClearMessageInput(message)async {
     var userID = FirebaseAuth.instance.currentUser!.uid;
+
+
     nachrichtController.clear();
 
     var messageData = {
       "message" :message,
       "from": userID,
-      "date": DateTime.now().toString()
+      "date": Timestamp.now().seconds
     };
     if(widget.newChat){
-
       widget.groupChatData = ChatDatabaseKontroller()
-          .addNewChatGroup({userID: true, widget.groupChatData: true});
+          .addNewChatGroup({userID: userName, chatPartnerID: chatPartnerName});
     }
 
     ChatDatabaseKontroller().addNewMessage(
@@ -52,18 +64,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
          "lastMessageDate": messageData["date"],
         }
     );
-
-/*
-    if (widget.newChat){
-      Navigator.pop(context);
-      changePage(context, ChatDetailsPage(groupChatData: widget.groupChatData));
-    }
-
- */
-
-
-
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +104,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       }
 
       return ListView(
-          reverse: true,
           shrinkWrap: true,
           children: messageBox,
       );
@@ -116,20 +117,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           ),
           builder: (
               BuildContext context,
-              AsyncSnapshot snapshot,
+              AsyncSnapshot snap,
               ){
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snap.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
-            } else if (snapshot.data.snapshot.value != null) {
-              var messages = [];
+            } else if (snap.data.snapshot.value != null) {
+              List<Map> messages = [];
 
-              if(snapshot.data.snapshot.value != null){
-                var messagesMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
+              var messagesMap = snap.data.snapshot.value;
 
-                messagesMap.forEach((key, value) {
-                  messages.add(value);
-                });
-              }
+              messagesMap.forEach((key, value) {
+                messages.add(value);
+              });
+
+              messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
               return messageList(messages);
             }
@@ -157,7 +158,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     return Scaffold(
       appBar: customAppBar(
-        title: widget.chatPartner,
+        title: chatPartnerName,
         button: TextButton(
             onPressed: null,
             child: Icon(Icons.more_vert))

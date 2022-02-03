@@ -143,7 +143,6 @@ class _SettingPageState extends State<SettingPage> {
             userID, {"aboutme": bioTextKontroller.text});
       }
     }else if(beschreibung == beschreibungName){
-
       errorMessage = await changeName();
     } else if (beschreibung == beschreibungEmail){
       errorMessage = await changeEmail();
@@ -243,14 +242,15 @@ class _SettingPageState extends State<SettingPage> {
 
   changeName() async{
     var errorMessage = "";
-    var userProfil = await ProfilDatabaseKontroller().getProfil(nameTextKontroller.text);
+    var userName = FirebaseAuth.instance.currentUser!.displayName;
+    var checkUserProfilExist = await ProfilDatabaseKontroller().getProfilFromName(nameTextKontroller.text);
 
     if(nameTextKontroller.text == null || nameTextKontroller.text == ""){
       errorMessage = "Neuen Namen eingeben";
     } else{
-      if(userProfil == null){
+      if(checkUserProfilExist == null){
         ProfilDatabaseKontroller().updateProfilName(
-            userID, nameTextKontroller.text
+            userID, userName, nameTextKontroller.text
         );
       } else {
         errorMessage += "- Name schon vorhanden";
