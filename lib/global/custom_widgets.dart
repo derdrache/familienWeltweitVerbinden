@@ -165,7 +165,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
 
 class CustomDatePicker extends StatefulWidget {
-  DateTime? pickedDate;
+  var pickedDate;
   String hintText;
   var deleteFunction;
   bool dateIsSelected;
@@ -181,7 +181,7 @@ class CustomDatePicker extends StatefulWidget {
   CustomDatePicker({
     Key? key,
     required this.hintText,
-    this.pickedDate,
+    this.pickedDate = "",
     this.deleteFunction,
     this.dateIsSelected = false
   }) : super(key: key);
@@ -331,12 +331,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 
   getDates({bool years = false}){
     List dates = [];
-/*
-    if (childrensBirthDatePickerList.length == 0 && childrenBirthDates != null){
-      dates = childrenBirthDates;
-    }
 
- */
 
     childrensBirthDatePickerList.forEach((datePicker) {
       dates.add(datePicker.getPickedDate().toString());
@@ -359,6 +354,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
       dates = converted;
     }
 
+
     return dates;
   }
 
@@ -367,7 +363,6 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
       childrensBirthDatePickerList.add(
           CustomDatePicker(
               hintText: date.toString().split(" ")[0].split("-").reversed.join("-"),
-              //deleteFunction: deleteFunction(),
               pickedDate: date,
               dateIsSelected: true
           )
@@ -452,11 +447,10 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
         var hintText = dates[i] == null? "Datum" : dates[i].toString();
 
         if(i == 0 || i < widget.childrensBirthDatePickerList.length -1 ){
-
           newPicker.add(
               CustomDatePicker(
                   hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
-                  pickedDate: DateTime.parse(dates[i]),
+                  pickedDate: dates[i] != "Datum eingeben"? DateTime.parse(dates[i]) : dates[i],
                   dateIsSelected: dates[i] != null
               )
           );

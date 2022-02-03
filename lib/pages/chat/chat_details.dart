@@ -75,7 +75,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     messageList(messages){
       List<Widget> messageBox = [];
-
+      print(messages);
       for(var message in messages){
         if(message["message"] == ""){continue;}
 
@@ -116,7 +116,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
       return StreamBuilder(
           stream: ChatDatabaseKontroller().getAllMessagesStream(
-              widget.newChat?"": widget.groupChatData["id"]
+              widget.newChat? "null": widget.groupChatData["id"]
           ),
           builder: (
               BuildContext context,
