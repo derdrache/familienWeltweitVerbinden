@@ -135,7 +135,7 @@ class _ChatPageState extends State<ChatPage>{
 
   validCheckAndOpenChatgroup(chatPartnerID) async {
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
-    var chatPartnerName = ProfilDatabaseKontroller().getProfilName(chatPartnerID);
+    var chatPartnerName = await ProfilDatabaseKontroller().getProfilName(chatPartnerID);
 
     Navigator.pop(context);
 

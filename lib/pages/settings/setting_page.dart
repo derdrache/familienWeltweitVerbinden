@@ -272,13 +272,9 @@ class _SettingPageState extends State<SettingPage> {
       if (emailInUse != null){
         errorString += "- Email wird schon verwendet";
       } else if (emailIsValid){
-        var loginUser = await userLogin(passwortTextKontroller1);
+        var loginUser = await userLogin(passwortTextKontroller1.text);
 
-        if(loginUser != null){
-          return "";
-        } else{
-          errorString += "falsches Passwort";
-        }
+        if(loginUser == null) errorString += "falsches Passwort";
       } else {
         errorString += "- ungültige Email";
       }
@@ -293,6 +289,7 @@ class _SettingPageState extends State<SettingPage> {
 
     if(errorString == ""){
       FirebaseAuth.instance.currentUser?.updateEmail(emailTextKontroller.text);
+
       ProfilDatabaseKontroller().updateProfil(
           userID, {"email":emailTextKontroller.text }
       );

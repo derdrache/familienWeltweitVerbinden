@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../global/custom_widgets.dart';
@@ -13,6 +14,7 @@ class PrivacySecurityPage extends StatefulWidget {
 }
 
 class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
+  var userID = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                   widget.profil["emailAnzeigen"] = value;
                 });
                 ProfilDatabaseKontroller().updateProfil(
-                    widget.profil["docid"],
+                    userID,
                     {"emailAnzeigen": widget.profil["emailAnzeigen"]}
                 );
               })

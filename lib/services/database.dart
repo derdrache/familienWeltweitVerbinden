@@ -13,17 +13,18 @@ class ChatDatabaseKontroller{
   var chatMessages = realtimeDatabase.child("chatMessages");
 
   addNewChatGroup(users) {
-    var newChatGroup = chatGroups.push();
-    var chatKey = newChatGroup.key;
+    var userIDList = users.keys.toList();
+    userIDList.sort();
+    var id = userIDList.join("_");
 
     var chatgroupData = {
-      "id" : chatKey,
+      "id": id,
       "users" : users,
       "lastMessage": "",
       "lastMessageDate": "",
     };
 
-    newChatGroup.set(chatgroupData);
+    chatGroups.child(id).set(chatgroupData);
 
     return chatgroupData;
   }
@@ -33,18 +34,17 @@ class ChatDatabaseKontroller{
   }
 
   addNewMessage(chatgroupData, messageData,{ newChat = false}){
-    var chatGroup = realtimeDatabase.child("chatMessages").child(chatgroupData["id"]);
+    var users = chatgroupData["users"].keys.toList();
+    users.sort();
+    var id = users.join("_");
+    var chatGroup = realtimeDatabase.child("chatMessages").child(id);
 
     chatGroup.push().set(messageData);
   }
 
-  getChat(user1, user2) async {
-    var query = await chatGroups.orderByChild("users").limitToFirst(1)
-        .equalTo({
-      user1: true,
-      user2: true
-    }).once();
-    var data = query.snapshot.children.first.value;
+  getChat(chatID) async {
+    var query = await chatGroups.child(chatID).get();
+    var data = query.value;
 
     return data;
   }
@@ -84,11 +84,6 @@ class ProfilDatabaseKontroller{
       });
 
     });
-
-
-
-    //var key = query.snapshot.key;
-    //realtimeDatabase.child("chats").child(key!).child("users").update({profilID: newName})
 
   }
 
