@@ -1,3 +1,4 @@
+import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -20,6 +21,23 @@ class StartPage extends StatefulWidget{
 
 class _StartPageState extends State<StartPage>{
 
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
+
+    super.initState();
+  }
+
+  _asyncMethod() async{
+    var userID = FirebaseAuth.instance.currentUser!.uid;
+    var userAuthEmail = FirebaseAuth.instance.currentUser!.email;
+    var userDBEmail = await ProfilDatabaseKontroller().getProfilEmail(userID);
+
+    if(userAuthEmail != userDBEmail ){
+      ProfilDatabaseKontroller().updateProfil(userID, {"email": userAuthEmail});
+    }
+  }
+
   checkIfFirstLogin(){
     if(widget.registered){ return false; }
 
@@ -31,6 +49,8 @@ class _StartPageState extends State<StartPage>{
     return false;
 
   }
+
+
 
   Widget build(BuildContext context){
     const navigationbarButtonColor = Colors.purple;

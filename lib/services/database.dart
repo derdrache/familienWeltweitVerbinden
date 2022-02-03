@@ -98,6 +98,13 @@ class ProfilDatabaseKontroller{
     return data;
   }
 
+  getProfilEmail(id) async{
+    var query = await profils.child(id).child("email").get();
+    var data = query.value;
+
+    return data;
+  }
+
   getProfilFromName(name) async{
     var event = await profils.orderByChild("name").limitToFirst(1).equalTo(name).once();
     if(event.snapshot.exists){
