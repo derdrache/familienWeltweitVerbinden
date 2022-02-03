@@ -32,6 +32,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     chatPartnerID = widget.chatPartner.keys.toList()[0];
     chatPartnerName = widget.chatPartner[chatPartnerID];
 
+
+
+
     super.initState();
   }
 

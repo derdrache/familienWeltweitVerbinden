@@ -267,6 +267,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       child: onFriendlist?Icon(Icons.person_remove) : Icon(Icons.person_add),
       onPressed: (){
         var friendlist = ownUserProfil["friendlist"];
+        var userID = FirebaseAuth.instance.currentUser!.uid;
 
         if(onFriendlist){
           friendlist.remove(profil["name"]);
@@ -276,7 +277,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
         }
 
         ProfilDatabaseKontroller().updateProfil(
-            ownUserProfil["id"], {"friendlist": friendlist}
+            userID, {"friendlist": friendlist}
         );
 
 

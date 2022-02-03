@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../global/global_functions.dart' as globalFunctions;
@@ -31,18 +32,27 @@ _menuBarProfil(context,userName,profilName, addFriendButton){
           ),
           child: Icon(Icons.message),
           onPressed: () async {
-            var groupChatData = ChatDatabaseKontroller().getChat(
-                userName, profilName
-            );//await dbGetOneUserChat(userName, profilName);
+            var userID = FirebaseAuth.instance.currentUser!.uid;
+            var profilID = await ProfilDatabaseKontroller().getProfilIDFromName(profilName);
+            var users = [userID, profilID];
+            users.sort();
+
+            var groupChatData = await ChatDatabaseKontroller().getChat(users.join("_"));
+
+
+
             if(groupChatData != null){
               changePage(context, ChatDetailsPage(
                   groupChatData: groupChatData,
-                chatPartner: profilName,
+                chatPartner: {profilID: profilName}
               ));
             } else {
               changePage(context, ChatDetailsPage(
-                  groupChatData: {},
-                  chatPartner: profilName,
+                  groupChatData: {"users": {
+                    profilID: profilName,
+                    userID: userName
+                  }},
+                  chatPartner: {profilID: profilName},
                   newChat: true
               ));
             }
