@@ -187,6 +187,8 @@ class _ChatPageState extends State<ChatPage>{
         });
 
         var lastMessage = group["lastMessage"];
+        var lastMessageTime = dbSecondsToTimeString(group["lastMessageDate"]);
+
 
         groupContainer.add(
           GestureDetector(
@@ -195,7 +197,7 @@ class _ChatPageState extends State<ChatPage>{
               chatPartner: {chatPartnerID:chatPartnerName},
             )),
             child: Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
                 width: double.infinity,
                 decoration: const BoxDecoration(
                     border: Border(
@@ -205,9 +207,15 @@ class _ChatPageState extends State<ChatPage>{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(chatPartnerName,style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 5),
-                  Text(lastMessage)
+                  Row(
+                    children: [
+                      Text(chatPartnerName,style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Expanded(child: SizedBox()),
+                      Text(lastMessageTime, style: TextStyle(color: Colors.grey[600]),)
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Text(lastMessage, style: TextStyle(fontSize: 16, color: Colors.grey[600]),)
                 ],
               )
             ),
@@ -240,10 +248,6 @@ class _ChatPageState extends State<ChatPage>{
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
                   } else if (snapshot.data.snapshot.value != null) {
-
-
-
-
                     var chatGroups = [];
                     var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
@@ -255,10 +259,6 @@ class _ChatPageState extends State<ChatPage>{
                     return chatUserList(chatGroups);
                   }
                   return Container();
-
-
-
-
                 }
             )
 

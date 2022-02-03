@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 
 checkValidatorEmpty(){
@@ -65,7 +66,10 @@ timeStampToAllDict(dateTimeString){
   };
 }
 
-getAgeFromDateTime(dateTime){
+dbSecondsToTimeString(seconds){
+  DateTime secondsToDateTime = DateTime.fromMillisecondsSinceEpoch(seconds*1000);
+  var dateTimeToTime = DateFormat.Hm().format(secondsToDateTime);
 
+  return dateTimeToTime;
 }
 
