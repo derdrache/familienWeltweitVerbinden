@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -161,7 +160,6 @@ class _ChatPageState extends State<ChatPage>{
     var check = [true, -1];
 
     for(var i = 0;i < globalChatGroups.length; i++){
-
       if(globalChatGroups[i]["users"][userId] == userName){
         check = [false,i];
       }
@@ -182,7 +180,7 @@ class _ChatPageState extends State<ChatPage>{
         var chatPartnerID;
 
         group["users"].forEach((key, value) async {
-          if(key != userName){
+          if(key != userId){
             chatPartnerName = value;
             chatPartnerID = key;
           }
