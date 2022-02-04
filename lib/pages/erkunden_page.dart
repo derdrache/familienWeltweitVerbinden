@@ -25,16 +25,17 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var aktiveProfils = [];
   double mapZoom = 3.0;
   var searchMultiForm;
+  var buildIsLoaded = false;
 
 
   void initState (){
     super.initState();
-    /*
+
     WidgetsBinding.instance?.addPostFrameCallback((_){
-      _asyncMethod();
+      buildIsLoaded = true;
     });
 
-     */
+
 
     searchMultiForm = CustomMultiTextForm(
       hintText: "Suche",
@@ -44,22 +45,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
     );
 
   }
-
-  /*
-  _asyncMethod() async{
-    var getProfils = await ProfilDatabaseKontroller().getAllProfils();
-    ownUserProfil = getOwnProfil(getProfils);
-    getProfils.remove(ownUserProfil);
-
-    setState(() {
-      originalProfils = getProfils;
-      filteredProfils = getProfils;
-    });
-
-    createAndSetZoomProfils();
-  }
-
-   */
 
   getOwnProfil(profils){
     var userEmail = FirebaseAuth.instance.currentUser!.email;
@@ -176,6 +161,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
       profilsBetween = pufferProfilBetween;
       profilCountries = pufferProfilCountries;
       changeProfil(mapZoom);
+
+      if(buildIsLoaded){
+        buildIsLoaded = false;
+        setState(() {});
+      }
+
   }
 
   changeProfil(zoom){
@@ -418,7 +409,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       allMarker = markerList;
 
-
     }
 
     Widget ownFlutterMap(){
@@ -460,7 +450,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
               BuildContext context,
               AsyncSnapshot snapshot,
           ) {
-            if (snapshot.data.snapshot.value != null) {
+            if (snapshot.hasData ) {
               var allProfils = [];
               var allProfilsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
@@ -476,7 +466,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
               createAndSetZoomProfils();
 
-
               return Stack(children: [
                 ownFlutterMap(),
                 searchMultiForm
@@ -488,14 +477,5 @@ class _ErkundenPageState extends State<ErkundenPage>{
       )
     );
 
-    return Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.only(top: 25),
-          child: Stack(children: [
-            ownFlutterMap(),
-            searchMultiForm
-          ]),
-        )
-    );
   }
 }
