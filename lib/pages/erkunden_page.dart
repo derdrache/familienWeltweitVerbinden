@@ -29,9 +29,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   void initState (){
     super.initState();
+    /*
     WidgetsBinding.instance?.addPostFrameCallback((_){
       _asyncMethod();
     });
+
+     */
 
     searchMultiForm = CustomMultiTextForm(
       hintText: "Suche",
@@ -42,6 +45,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   }
 
+  /*
   _asyncMethod() async{
     var getProfils = await ProfilDatabaseKontroller().getAllProfils();
     ownUserProfil = getOwnProfil(getProfils);
@@ -54,6 +58,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     createAndSetZoomProfils();
   }
+
+   */
 
   getOwnProfil(profils){
     var userEmail = FirebaseAuth.instance.currentUser!.email;
@@ -166,13 +172,10 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     }
 
-    setState(() {
       profilsCities = pufferProfilCities;
       profilsBetween = pufferProfilBetween;
       profilCountries = pufferProfilCountries;
       changeProfil(mapZoom);
-    });
-
   }
 
   changeProfil(zoom){
@@ -185,9 +188,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       choosenProfils = profilCountries;
     }
 
-    setState(() {
-      aktiveProfils = choosenProfils;
-    });
+    aktiveProfils = choosenProfils;
   }
 
   checkMatchFilter(List selected, List profil, globalList){
@@ -415,9 +416,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         );
       });
 
-      setState(() {
-        allMarker = markerList;
-      });
+      allMarker = markerList;
+
 
     }
 
@@ -431,8 +431,10 @@ class _ErkundenPageState extends State<ErkundenPage>{
           zoom: 1.0,
           onPositionChanged: (position, changed){
             if(changed){
-              changeProfil(position.zoom);
-              mapZoom = position.zoom!;
+                setState(() {
+                  changeProfil(position.zoom);
+                  mapZoom = position.zoom!;
+                });
             }
           }
         ),
@@ -447,6 +449,44 @@ class _ErkundenPageState extends State<ErkundenPage>{
         ],
       );
     }
+
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.only(top: 25),
+        child:StreamBuilder(
+          stream: ProfilDatabaseKontroller().getAllProfilsStream(),
+          builder: (
+              BuildContext context,
+              AsyncSnapshot snapshot,
+          ) {
+            if (snapshot.data.snapshot.value != null) {
+              var allProfils = [];
+              var allProfilsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
+
+              allProfilsMap.forEach((key, value) {
+                allProfils.add(value);
+              });
+
+              ownUserProfil = getOwnProfil(allProfils);
+              allProfils.remove(ownUserProfil);
+
+              originalProfils = allProfils;
+              filteredProfils = allProfils;
+
+              createAndSetZoomProfils();
+
+
+              return Stack(children: [
+                ownFlutterMap(),
+                searchMultiForm
+              ]);
+            }
+            return Container();
+          }
+        )
+      )
+    );
 
     return Scaffold(
         body: Padding(

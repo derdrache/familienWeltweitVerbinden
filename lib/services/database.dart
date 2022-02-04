@@ -145,11 +145,14 @@ class ProfilDatabaseKontroller{
 
     data.forEach((element) {
       resultProfils.add(element.value);
-
     });
 
     return resultProfils;
 
+  }
+
+  getAllProfilsStream(){
+    return profils.onValue;
   }
 
 
