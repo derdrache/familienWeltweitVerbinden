@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:familien_suche/services/database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:familien_suche/global/custom_widgets.dart';
 import '../../global/global_functions.dart';
@@ -8,23 +10,56 @@ class FeedbackPage extends StatelessWidget {
   var profil;
   var feedbackTextKontroller = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  var adminName = "Dekar";
+  var adminID = "n4PVWLdMWuWfXfIU9Ct2BUYT6413";
+  var userID = FirebaseAuth.instance.currentUser!.uid;
 
   FeedbackPage({Key? key, profil}) : super(key: key);
 
-  feedbackSenden(){
-    if(formKey.currentState!.validate()){
-      final Uri emailLaunchUri = Uri(
-          scheme: 'mailto',
-          path: 'dominik.mast.11@gmail.com',
-          queryParameters: {
-            'subject': 'Feedback für Familien Weltweit App',
-            'body': feedbackTextKontroller.text
-          }
-      );
+  feedbackSendenAndClose(context) async {
+    var chatDatabaseKontroller = ChatDatabaseKontroller();
+    var messageTime = Timestamp.now().seconds;
+    var userName = await ProfilDatabaseKontroller().getProfilName(userID);
+    var users = {
+      adminID:adminName,
+      userID: userName
+    };
+    var userIDList = [adminID, userID];
+    userIDList.sort();
+    var chatID = userIDList.join("_");
 
-    launch(emailLaunchUri.toString());
+    var chatGroup = await chatDatabaseKontroller.getChat(chatID);
 
+    if(chatGroup == null){
+      chatDatabaseKontroller.addNewChatGroup(users);
     }
+
+    chatDatabaseKontroller.addNewMessage(
+        {
+        "id": chatID,
+        "users" : users,
+        "lastMessage": "",
+        "lastMessageDate": "",
+        },
+        {
+          "message": feedbackTextKontroller.text,
+          "from": userID,
+          "date": messageTime
+        },
+    );
+
+    await ChatDatabaseKontroller().updateChatGroup(
+        chatID,
+        {
+          "lastMessage": feedbackTextKontroller.text,
+          "lastMessageDate": messageTime,
+        }
+    );
+
+
+    feedbackTextKontroller.clear();
+    Navigator.pop(context);
+
   }
 
   @override
@@ -51,7 +86,7 @@ class FeedbackPage extends StatelessWidget {
       return Container(
         margin: EdgeInsets.all(10),
         child: FloatingActionButton.extended(
-            onPressed: () => feedbackSenden(),
+            onPressed: () => feedbackSendenAndClose(context),
             label: Text("Senden")
         ),
       );
