@@ -151,6 +151,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                   reiseArtenAuswahlBox,
                   sprachenAuswahlBox,
                   interessenAuswahlBox,
+                  Container(
+                    padding: EdgeInsets.all(10),
+                      child: Text(
+                        "Anzahl und Alter der Kinder:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                        ),
+                      )
+                  ),
                   childrenAgePickerBox,
                 ],
               ),

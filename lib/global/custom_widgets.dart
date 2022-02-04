@@ -182,8 +182,8 @@ class CustomDatePicker extends StatefulWidget {
 
   CustomDatePicker({
     Key? key,
-    required this.hintText,
-    this.pickedDate = "Datum eingeben",
+    this.hintText = "Datum eingeben",
+    this.pickedDate,
     this.deleteFunction,
     this.dateIsSelected = false
   }) : super(key: key);
@@ -336,7 +336,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 
 
     childrensBirthDatePickerList.forEach((datePicker) {
-      dates.add(datePicker.getPickedDate().toString());
+      dates.add(datePicker.getPickedDate());
     });
 
 
@@ -347,7 +347,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
       List converted = [];
       dates.forEach((element) {
 
-        var dateTime = DateTime.parse(element.split(" ")[0]);
+        var dateTime = DateTime.parse(element.toString().split(" ")[0]);
         var yearsFromDateTime = DateTime.now().difference(dateTime).inDays ~/ 365;
 
         converted.add(yearsFromDateTime);
@@ -380,13 +380,14 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 
 class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox> {
   var childrens = 1;
+  var maxChildrens = 6;
 
 
   @override
   void initState() {
     if(widget.childrensBirthDatePickerList.length == 0){
       widget.childrensBirthDatePickerList.add(CustomDatePicker(
-        hintText: "Datum")
+        hintText: "Geburtsdatum")
       );
     }
 
@@ -414,7 +415,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
       if(childrenCount <=8){
         widget.childrensBirthDatePickerList.add(
             CustomDatePicker(
-                hintText: "Datum",
+                hintText: "Geburtsdatum",
                 deleteFunction: deleteFunction()
             )
         );
@@ -425,7 +426,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
     childrenAddButton(){
       return Container(
         margin: EdgeInsets.all(sideSpace),
-          child: childrens < 8?
+          child: childrens < maxChildrens?
               FloatingActionButton(
                 mini: true,
                 heroTag: "add children",
@@ -446,13 +447,13 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
       List newPicker = [];
 
       for(var i = 0;i < widget.childrensBirthDatePickerList.length; i++){
-        var hintText = dates[i] == null? "Datum" : dates[i].toString();
-        print(dates[i]);
+        var hintText = dates[i] == null? "Geburtsdatum" : dates[i].toString();
+
         if(i == 0 || i < widget.childrensBirthDatePickerList.length -1 ){
           newPicker.add(
               CustomDatePicker(
                   hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
-                  pickedDate: dates[i] != "Datum eingeben"? DateTime.parse(dates[i]) : dates[i],
+                  pickedDate: dates[i],
                   dateIsSelected: dates[i] != null
               )
           );
@@ -460,7 +461,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
           newPicker.add(
               CustomDatePicker(
                   hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
-                  pickedDate: dates[i] != "Datum eingeben"? DateTime.parse(dates[i]) : dates[i],
+                  pickedDate: dates[i],
                   deleteFunction: deleteFunction(),
                   dateIsSelected: dates[i] != null
               )
