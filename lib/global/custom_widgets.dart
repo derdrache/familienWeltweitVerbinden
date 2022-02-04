@@ -183,7 +183,7 @@ class CustomDatePicker extends StatefulWidget {
   CustomDatePicker({
     Key? key,
     required this.hintText,
-    this.pickedDate = "",
+    this.pickedDate = "Datum eingeben",
     this.deleteFunction,
     this.dateIsSelected = false
   }) : super(key: key);
@@ -447,7 +447,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
       for(var i = 0;i < widget.childrensBirthDatePickerList.length; i++){
         var hintText = dates[i] == null? "Datum" : dates[i].toString();
-
+        print(dates[i]);
         if(i == 0 || i < widget.childrensBirthDatePickerList.length -1 ){
           newPicker.add(
               CustomDatePicker(
@@ -460,7 +460,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
           newPicker.add(
               CustomDatePicker(
                   hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
-                  pickedDate: DateTime.parse(dates[i]),
+                  pickedDate: dates[i] != "Datum eingeben"? DateTime.parse(dates[i]) : dates[i],
                   deleteFunction: deleteFunction(),
                   dateIsSelected: dates[i] != null
               )
