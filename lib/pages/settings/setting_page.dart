@@ -484,6 +484,7 @@ class _SettingPageState extends State<SettingPage> {
                   nameTextKontroller.text,
                   style: TextStyle(fontSize: 30),
                 ),
+                SizedBox(height: 5),
                 Text(emailTextKontroller.text)
               ]
           )

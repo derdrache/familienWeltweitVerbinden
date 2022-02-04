@@ -261,7 +261,6 @@ class _ChatPageState extends State<ChatPage>{
                   return Container();
                 }
             )
-
           ],
         ),
       ),
