@@ -39,8 +39,6 @@ _menuBarProfil(context,userName,profilName, addFriendButton){
 
             var groupChatData = await ChatDatabaseKontroller().getChat(users.join("_"));
 
-
-
             if(groupChatData != null){
               changePage(context, ChatDetailsPage(
                   groupChatData: groupChatData,
@@ -60,18 +58,6 @@ _menuBarProfil(context,userName,profilName, addFriendButton){
           }
       ),
       addFriendButton,
-      TextButton(
-        style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                )
-            )
-        ),
-        child: Icon(Icons.more_vert),
-        onPressed: () => print("open Settings"),
-
-      )
     ],
   );
 }
