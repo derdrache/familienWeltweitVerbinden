@@ -160,7 +160,7 @@ class _ChatPageState extends State<ChatPage>{
     var check = [true, -1];
 
     for(var i = 0;i < globalChatGroups.length; i++){
-      if(globalChatGroups[i]["users"][userId] == userName){
+      if(globalChatGroups[i]["users"][userId] == chatPartner){
         check = [false,i];
       }
     }
