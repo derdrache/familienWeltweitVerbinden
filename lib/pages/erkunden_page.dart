@@ -17,8 +17,8 @@ class ErkundenPage extends StatefulWidget{
 
 class _ErkundenPageState extends State<ErkundenPage>{
   var ownUserProfil;
-  var originalProfils = [];
-  var filteredProfils = [];
+  var filterList = [];
+  var profils = [];
   var profilCountries = [];
   var profilsBetween = [];
   var profilsCities = [];
@@ -146,14 +146,14 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var pufferProfilBetween = [];
     var pufferProfilCountries = [];
 
-    for(var i= 0; i<filteredProfils.length; i++){
+    for(var i= 0; i<profils.length; i++){
       pufferProfilCountries = await createProfilCountries(pufferProfilCountries,
-                                                          filteredProfils[i]);
+                                                          profils[i]);
       pufferProfilBetween = await createProfilBetween(pufferProfilBetween,
-                                                       filteredProfils[i]);
+                                                       profils[i]);
 
       pufferProfilCities = await createProfilCities(pufferProfilCities,
-                                                     filteredProfils[i]);
+                                                     profils[i]);
 
     }
 
@@ -182,7 +182,22 @@ class _ErkundenPageState extends State<ErkundenPage>{
     aktiveProfils = choosenProfils;
   }
 
-  checkMatchFilter(List selected, List profil, globalList){
+  checkFilter(profil){
+    var profilInteressen = profil["interessen"];
+    var profilReiseart = profil["reiseart"];
+    var profilSprachen = profil["sprachen"];
+    var spracheMatch = checkMatch(filterList, profilSprachen, globalVar.sprachenListe);
+    var reiseartMatch = checkMatch(filterList, [profilReiseart], globalVar.reisearten);
+    var interesseMatch = checkMatch(filterList, profilInteressen, globalVar.interessenListe);
+
+    if(spracheMatch && reiseartMatch && interesseMatch){
+      return true;
+    }
+
+    return false;
+  }
+
+  checkMatch(List selected, List profil, globalList){
     bool globalMatch = false;
     bool match = false;
 
@@ -209,28 +224,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   }
 
+
+
   changeMapFilter(){
     return (select){
-      var newProfil = [];
-
-
-      originalProfils.forEach((profil) {
-        var profilInteressen = profil["interessen"];
-        var profilReiseart = profil["reiseart"];
-        var profilSprachen = profil["sprachen"];
-        var spracheMatch = checkMatchFilter(select, profilSprachen, globalVar.sprachenListe);
-        var reiseartMatch = checkMatchFilter(select, [profilReiseart], globalVar.reisearten);
-        var interesseMatch = checkMatchFilter(select, profilInteressen, globalVar.interessenListe);
-
-        if(spracheMatch && reiseartMatch && interesseMatch){
-          newProfil.add(profil);
-        }
-
-      });
-
       setState(() {
-        filteredProfils = newProfil;
-        createAndSetZoomProfils();
+        filterList = select;
       });
     };
 
@@ -298,18 +297,21 @@ class _ErkundenPageState extends State<ErkundenPage>{
       }
 
       List<Widget> createPopupProfils(){
+        List<Widget> profilsList = [];
 
         childrenAgeStringToStringAge(childrenAgeList){
           List yearChildrenAgeList = [];
 
           childrenAgeList.forEach((child){
             var childYears = globalFunctions.timeStampToAllDict(child)["years"];
-            yearChildrenAgeList.add(childYears);
+            yearChildrenAgeList.add(childYears.toString() + "J");
           });
+
 
           return yearChildrenAgeList.join(" , ");
         }
-        List<Widget> profilsList = [];
+
+
 
         profils["profils"].forEach((profil){
           profilsList.add(
@@ -455,14 +457,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
               var allProfilsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
               allProfilsMap.forEach((key, value) {
-                allProfils.add(value);
+                if(checkFilter(value)){
+                  allProfils.add(value);
+                }
               });
 
               ownUserProfil = getOwnProfil(allProfils);
               allProfils.remove(ownUserProfil);
 
-              originalProfils = allProfils;
-              filteredProfils = allProfils;
+              profils = allProfils;
 
               createAndSetZoomProfils();
 
