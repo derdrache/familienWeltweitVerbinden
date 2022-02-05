@@ -99,8 +99,8 @@ class _SettingPageState extends State<SettingPage> {
 
     var locationDict = {
       "ort": locationData["city"],
-      "longt": double.parse(locationData["longt"]),
-      "latt": double.parse(locationData["latt"]),
+      "longt": locationData["longt"],
+      "latt": locationData["latt"],
       "land": locationData["countryname"]
     };
 
@@ -129,7 +129,7 @@ class _SettingPageState extends State<SettingPage> {
     String errorMessage = "";
 
     if(beschreibung == beschreibungStadt){
-      errorMessage = changeStadt();
+      errorMessage = await changeStadt();
     }else if(beschreibung == beschreibungReise){
       errorMessage = changeReiseart();
     }else if(beschreibung == beschreibungKinder){
