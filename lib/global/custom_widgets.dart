@@ -198,7 +198,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
   datePicker() async{
     return await showDatePicker(
         context: context,
-        initialDate: DateTime.now().subtract(Duration(days: 365*9)),
+        initialDate: DateTime.now(),
         firstDate: DateTime.now().subtract(Duration(days: 365*18)),
         lastDate: DateTime.now()
     );
