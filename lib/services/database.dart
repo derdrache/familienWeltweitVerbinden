@@ -42,6 +42,14 @@ class ChatDatabaseKontroller{
     chatGroup.push().set(messageData);
   }
 
+  addAdminMessage(message, user){
+    realtimeDatabase.child("feedback").push().set({
+      "feedback": message,
+      "user": user,
+      "date": DateTime.now().toString()
+    });
+  }
+
   getChat(chatID) async {
     var query = await chatGroups.child(chatID).get();
     var data = query.value;
