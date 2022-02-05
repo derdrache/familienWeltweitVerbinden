@@ -57,7 +57,7 @@ class _StartPageState extends State<StartPage>{
     List<Widget> tabPages = <Widget>[
       BoardPage(),
       ErkundenPage(),
-      UmkreisPage(),
+      //UmkreisPage(),
       ChatPage(),
       SettingPage()
     ];
@@ -85,11 +85,14 @@ class _StartPageState extends State<StartPage>{
                 label: 'Weltweit suchen',
                 backgroundColor: navigationbarButtonColor,
               ),
+              /*
               BottomNavigationBarItem(
                 icon: Icon(Icons.location_city),
                 label: 'Dein Umkreis',
                 backgroundColor: navigationbarButtonColor,
               ),
+
+               */
               BottomNavigationBarItem(
                 icon: Icon(Icons.chat),
                 label: 'Chat',
