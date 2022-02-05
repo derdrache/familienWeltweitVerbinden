@@ -413,14 +413,14 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     }
 
-    Widget ownFlutterMap(){
+    ownFlutterMap(){
       createAllMarker();
 
 
       return FlutterMap(
         options: MapOptions(
           center: LatLng(0, 0),
-          zoom: 1.0,
+          zoom: 1.5,
           onPositionChanged: (position, changed){
             if(changed){
                 setState(() {
