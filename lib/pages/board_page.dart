@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../services/database.dart';
@@ -12,69 +13,41 @@ class _BoardPageState extends State<BoardPage>{
 
 
   testDatatoDB() async {
-    var stadt = "Puerto Morelos";
-    var locationData = await LocationService().getLocationMapDataGeocode(stadt);
-    while(locationData == null){
-      locationData = await LocationService().getLocationMapDataGeocode(stadt);
-    }
+    var stadt = "Playa del Carmen";
+    var id = "pq2lqWR3XwTrNIDAsKcaPbX3E0q1";
+    var locationData;
+
     var testProfil = {
       "email": "test@web.de",
       "name": "test",
       "ort": locationData["city"],
       "emailAnzeigen": false,
-      "interessen": [],
-      "kinder": [],
+      "interessen": ["Freilerner"],
+      "kinder": [DateTime.now().toString(), DateTime.now().toString()],
       "land": locationData["countryname"],
       "longt": locationData["longt"],
       "latt":  locationData["latt"],
       "reiseart": "Weltreise",
       "aboutme": "",
       "sprachen": ["Englisch"],
-      "friendlist": []
+      "friendlist": {"empty": true}
     };
 
-    //dbAddNewProfil(testProfil);
+    ProfilDatabaseKontroller().addNewProfil(id, testProfil);
 
   }
 
-  newDBTest(){
-    var chatgroupData = {
-      "users" : ["Dominik", "Test"],
-      "lastMessage": "",
-      "lastMessageDate": "",
-    };
-
-    var messageData = {
-      "message" : "hi",
-      "date" : DateTime.now().toString(),
-      "from": "Dominik"
-    };
-
-    var dbChat = ChatDatabaseKontroller();
-    dbChat.addNewChatGroup(chatgroupData);
-    //dbAddMessageNew();
-  }
 
   Widget build(BuildContext context){
     return Scaffold(
-      body: FloatingActionButton(
-        onPressed: () async {
-          var groupChatData = {
-            "users" : {"Test": true, "Test2": true},
-            "lastMessage": "",
-            "lastMessageDate": "",
-          };
+      body:
 
-          await ChatDatabaseKontroller().addNewChatGroup(groupChatData);
-        },
-      )
-      /*
       Container(
         margin: EdgeInsets.all(100),
         child: Text("In Arbeit", style: TextStyle(fontSize: 40),)
         )
 
-       */
+
       );
   }
 }
