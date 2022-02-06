@@ -56,8 +56,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     await ChatDatabaseKontroller().addNewMessage(
         widget.groupChatData,
-        messageData,
-        newChat: widget.newChat
+        messageData
     );
 
     await ChatDatabaseKontroller().updateChatGroup(

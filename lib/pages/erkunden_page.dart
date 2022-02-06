@@ -244,43 +244,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
     return false;
   }
 
-  addFriendButton(profil){
-    var onFriendlist = ownUserProfil["friendlist"].keys?.contains(profil["name"])?? false;
-
-    return TextButton(
-      style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              )
-          )
-      ),
-      child: onFriendlist?Icon(Icons.person_remove) : Icon(Icons.person_add),
-      onPressed: (){
-        var friendlist = ownUserProfil["friendlist"];
-        var userID = FirebaseAuth.instance.currentUser!.uid;
-
-        if(onFriendlist){
-          friendlist.remove(profil["name"]);
-          if(friendlist.keys.isEmpty) friendlist = {"empty": true};
-        } else {
-          if(friendlist["empty"] == true) friendlist = {profil["name"]: true};
-        }
-
-        ProfilDatabaseKontroller().updateProfil(
-            userID, {"friendlist": friendlist}
-        );
-
-
-        Navigator.pop(context);
-        ownUserProfil["friendlist"] = friendlist;
-        profilPopupWindow(context,ownUserProfil["name"], profil,
-            addFriendButton: addFriendButton(profil));
-
-      }
-    );
-  }
-
 
   Widget build(BuildContext context){
     List<Marker> allMarker = [];
@@ -303,7 +266,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
           List yearChildrenAgeList = [];
 
           childrenAgeList.forEach((child){
-            var childYears = globalFunctions.timeStampToAllDict(child)["years"];
+            var childYears = globalFunctions.ChangeTimeStamp(child).intoYears();
             yearChildrenAgeList.add(childYears.toString() + "J");
           });
 
@@ -316,9 +279,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
         profils["profils"].forEach((profil){
           profilsList.add(
             GestureDetector(
-              onTap: () => profilPopupWindow(context, ownUserProfil["name"],
-                  profil, addFriendButton: addFriendButton(profil)
-                ),
+              onTap: () => ProfilPopupWindow(
+                    context: context,
+                    userName: ownUserProfil["name"],
+                    profil: profil,
+                    userFriendlist: ownUserProfil["friendlist"],
+                ).profilPopupWindow(),
               child: Container(
                 width: 50,
                 margin: EdgeInsets.all(10),
@@ -364,8 +330,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
         return popupItems;
       }
-
-      createpopupContent();
 
       return showDialog(
             context: context,

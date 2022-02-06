@@ -73,9 +73,9 @@ class _SettingPageState extends State<SettingPage> {
       List childrenDataYears = [];
 
       userProfil["kinder"].forEach((kind){
-        var changeTimeStamp = globalFunctions.timeStampToAllDict(kind);
-        childrenDataYears.add(changeTimeStamp["years"]);
-        childrenAgeTimestamp.add(changeTimeStamp["date"]);
+        var changeTimeStamp = globalFunctions.ChangeTimeStamp(kind);
+        childrenDataYears.add(changeTimeStamp.intoYears());
+        childrenAgeTimestamp.add(changeTimeStamp.intoDate());
       });
 
       setState(() {
@@ -348,9 +348,12 @@ class _SettingPageState extends State<SettingPage> {
     profilThemeContainer(haupttext, beschreibung, changeWidget){
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onTap: () => profilChangeWindow(context, beschreibung, changeWidget,
-          () => validAndSave(beschreibung),
-        ),
+        onTap: () => ProfilChangeWindow(
+          context: context,
+          titel: beschreibung,
+          changeWidget: changeWidget,
+          saveFunction: () => validAndSave(beschreibung)
+        ).profilChangeWindow(),
         child: Container(
             padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
             width: width /2 -20,
@@ -420,25 +423,33 @@ class _SettingPageState extends State<SettingPage> {
             items: [
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () => profilChangeWindow(context, beschreibungName,
-                          customTextInput(beschreibungName,nameTextKontroller),
-                              () => validAndSave(beschreibungName)),
+                      onPressed: () => ProfilChangeWindow(
+                          context: context,
+                          titel: beschreibungName,
+                          changeWidget: customTextInput(beschreibungName,nameTextKontroller),
+                          saveFunction: () => validAndSave(beschreibungName)
+                      ).profilChangeWindow(),
                       child: Text(beschreibungName, style: TextStyle(color: textColor)))
               ),
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () => profilChangeWindow(context, beschreibungEmail,
-                          emailChangeWindow(),
-                          () => validAndSave(beschreibungEmail)
-                      ),
+                      onPressed: () => ProfilChangeWindow (
+                        context: context,
+                        titel: beschreibungEmail,
+                        changeWidget: emailChangeWindow(),
+                        saveFunction: () => validAndSave(beschreibungEmail)
+                      ).profilChangeWindow(),
                       child: Text(beschreibungEmail, style: TextStyle(color: textColor))
                   )
               ),
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () => profilChangeWindow(context, beschreibungPasswort,
-                          passwortChangeWindow(),
-                              () => validAndSave(beschreibungPasswort)),
+                      onPressed: () => ProfilChangeWindow(
+                        context: context,
+                        titel: beschreibungPasswort,
+                        changeWidget: passwortChangeWindow(),
+                        saveFunction: () => validAndSave(beschreibungPasswort)
+                      ).profilChangeWindow(),
                       child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
               ),
               PopupMenuItem(

@@ -1,49 +1,48 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import '../global/global_functions.dart'as global_functions;
 
 DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
     databaseURL: "https://praxis-cab-236720-default-rtdb.europe-west1.firebasedatabase.app",
     app: Firebase.app()).ref();
-
+var chatGroupsDB = realtimeDatabase.child("chats");
+var chatMessagesDB = realtimeDatabase.child("chatMessages");
+var profilsDB = realtimeDatabase.child("profils");
+var feedbackDB = realtimeDatabase.child("feedback");
 
 class ChatDatabaseKontroller{
-  var chatGroups = realtimeDatabase.child("chats");
-  var chatMessages = realtimeDatabase.child("chatMessages");
 
   addNewChatGroup(users) {
-    var userIDList = users.keys.toList();
-    userIDList.sort();
-    var id = userIDList.join("_");
+    users = users.keys.toList();
+    var chatID = global_functions.getChatID(users);
 
     var chatgroupData = {
-      "id": id,
+      "id": chatID,
       "users" : users,
       "lastMessage": "",
       "lastMessageDate": "",
     };
 
-    chatGroups.child(id).set(chatgroupData);
+    chatGroupsDB.child(chatID).set(chatgroupData);
 
     return chatgroupData;
   }
 
   updateChatGroup(chatID, chatgroupData){
-    chatGroups.child(chatID).update(chatgroupData);
+    chatGroupsDB.child(chatID).update(chatgroupData);
   }
 
-  addNewMessage(chatgroupData, messageData,{ newChat = false}){
+  addNewMessage(chatgroupData, messageData){
     var users = chatgroupData["users"].keys.toList();
-    users.sort();
-    var id = users.join("_");
-    var chatGroup = realtimeDatabase.child("chatMessages").child(id);
+    var chatID = global_functions.getChatID(users);
+    var chatGroup = chatMessagesDB.child(chatID);
 
     chatGroup.push().set(messageData);
   }
 
   addAdminMessage(message, user){
-    realtimeDatabase.child("feedback").push().set({
+    feedbackDB.push().set({
       "feedback": message,
       "user": user,
       "date": DateTime.now().toString()
@@ -51,31 +50,30 @@ class ChatDatabaseKontroller{
   }
 
   getChat(chatID) async {
-    var query = await chatGroups.child(chatID).get();
+    var query = await chatGroupsDB.child(chatID).get();
     var data = query.value;
 
     return data;
   }
 
   getAllChatgroupsFromUserStream(userID, userName) {
-    return chatGroups.orderByChild("users/$userID").equalTo(userName).onValue;
+    return chatGroupsDB.orderByChild("users/$userID").equalTo(userName).onValue;
   }
 
   getAllMessagesStream(chatID) {
-    return chatMessages.child(chatID).orderByChild("date").onValue;
+    return chatMessagesDB.child(chatID).orderByChild("date").onValue;
   }
 
 }
 
 class ProfilDatabaseKontroller{
-  var profils = realtimeDatabase.child("profils");
 
   addNewProfil(id, profilData){
-    profils.child(id).set(profilData);
+    profilsDB.child(id).set(profilData);
   }
 
   updateProfil(userID, data){
-    profils.child(userID).update(data);
+    profilsDB.child(userID).update(data);
   }
 
   updateProfilName(profilID,oldName, newName) {
@@ -83,85 +81,69 @@ class ProfilDatabaseKontroller{
 
     updateProfil(profilID, {"name": newName});
 
-    realtimeDatabase.child("chats").orderByChild("users/$profilID").equalTo(oldName).once().then((value){
-      value.snapshot.children.forEach((element) {
-        var key = element.key;
+    chatGroupsDB.orderByChild("users/$profilID").equalTo(oldName).once().then((query){
+      for (var chatGroup in query.snapshot.children) {
+        var key = chatGroup.key;
 
-        realtimeDatabase.child("chats").child(key!).child("users").update({profilID: newName});
-
-      });
-
+        chatGroupsDB.child(key!).child("users").update({profilID: newName});
+      }
     });
-
-  }
-
-  deleteProfil(){
-
   }
 
   getProfil(id) async{
-    var query = await profils.child(id).get();
+    var query = await profilsDB.child(id).get();
     var data = query.value;
 
     return data;
   }
 
   getProfilEmail(id) async{
-    var query = await profils.child(id).child("email").get();
+    var query = await profilsDB.child(id).child("email").get();
     var data = query.value;
 
     return data;
   }
 
   getProfilFromName(name) async{
-    var event = await profils.orderByChild("name").limitToFirst(1).equalTo(name).once();
-    if(event.snapshot.exists){
-      return event.snapshot.value;
-    }
+    var query = await profilsDB.orderByChild("name").limitToFirst(1).equalTo(name).once();
 
+    if(query.snapshot.exists) return query.snapshot.value;
   }
 
   getProfilIDFromName(name) async {
-    var event = await profils.orderByChild("name").limitToFirst(1).equalTo(name).once();
+    var query = await profilsDB.orderByChild("name").limitToFirst(1).equalTo(name).once();
 
-    if(event.snapshot.exists){
-      return event.snapshot.children.first.key;
-    }
+    if(query.snapshot.exists) return query.snapshot.children.first.key;
   }
 
   getProfilIDFromEmail(email) async{
-    var event = await profils.orderByChild("email").limitToFirst(1).equalTo(email).once();
+    var query = await profilsDB.orderByChild("email").limitToFirst(1).equalTo(email).once();
 
-    if(event.snapshot.exists){
-      return event.snapshot.children.first.key;
-    }
-
+    if(query.snapshot.exists) return query.snapshot.children.first.key;
   }
 
   getProfilName(id) async {
-    var query = await profils.child(id).child("name").get();
+    var query = await profilsDB.child(id).child("name").get();
 
     return query.value;
-
   }
 
   getAllProfils() async {
-    var resultProfils = [];
+    var profils = [];
 
-    var test = await profils.get();
-    var data = test.children;
+    var query = await profilsDB.get();
+    var snapshot = query.children;
 
-    data.forEach((element) {
-      resultProfils.add(element.value);
-    });
+    for (var profil in snapshot) {
+      profils.add(profil.value);
+    }
 
-    return resultProfils;
+    return profils;
 
   }
 
   getAllProfilsStream(){
-    return profils.onValue;
+    return profilsDB.onValue;
   }
-
 
 }

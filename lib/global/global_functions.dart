@@ -44,8 +44,6 @@ checkValidationMultiTextForm(){
   };
 }
 
-
-
 changePage(context, page){
   Navigator.push(
       context,
@@ -53,17 +51,27 @@ changePage(context, page){
   );
 }
 
-timeStampToAllDict(dateTimeString){
-  DateTime dateTime = DateTime.parse(dateTimeString.split(" ")[0]);
-  dateTimeString = dateTimeString.split(" ")[0].toString();
+class ChangeTimeStamp{
+  var timeStamp;
 
-  var yearsFromDateTime = DateTime.now().difference(dateTime).inDays ~/ 365;
+  ChangeTimeStamp(this.timeStamp);
 
-  return {
-    "date": dateTime,
-    "string": dateTimeString.split("-").reversed.join("-"),
-    "years": yearsFromDateTime
-  };
+  late DateTime dateTime = DateTime.parse(timeStamp.split(" ")[0]);
+
+  intoDate(){
+    return dateTime;
+  }
+
+  intoString(){
+    var dateTimeString = timeStamp.split(" ")[0].toString();
+    return dateTimeString.split("-").reversed.join("-");
+  }
+
+  intoYears(){
+    return DateTime.now().difference(dateTime).inDays ~/ 365;
+  }
+
+
 }
 
 dbSecondsToTimeString(seconds){
@@ -71,5 +79,10 @@ dbSecondsToTimeString(seconds){
   var dateTimeToTime = DateFormat.Hm().format(secondsToDateTime);
 
   return dateTimeToTime;
+}
+
+getChatID(usersList){
+  usersList.sort();
+  return usersList.join("_");
 }
 
