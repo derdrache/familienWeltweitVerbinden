@@ -484,3 +484,27 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
     );
   }
 }
+
+class WindowTopbar extends StatelessWidget {
+  var title;
+
+  WindowTopbar({Key? key,required this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Row(
+        children: [
+          Expanded(
+            child: Center(
+                child: Text(
+                  title,
+                  style: TextStyle(fontSize: 20),
+                )
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
