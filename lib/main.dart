@@ -9,23 +9,14 @@ import 'firebase_options.dart';
 import 'pages/login_register_page/login_page.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-
-  print('Handling a background message ${message.messageId}');
+  print(message.notification?.body);
 }
 
 late AndroidNotificationChannel channel;
 
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-
-void main()async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
+notificationSetup() async{
   if (!kIsWeb) {
     channel = const AndroidNotificationChannel(
       'high_importance_channel', // id
@@ -54,14 +45,31 @@ void main()async {
       sound: true,
     );
   }
+}
+
+void main()async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  await notificationSetup();
 
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   var pageMainColor = Colors.white;
+  var appIcon = '@mipmap/ic_launcher';
 
   initialization() async {
+    var initializationSettingsAndroid = AndroidInitializationSettings(appIcon);
+    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
@@ -77,7 +85,7 @@ class MyApp extends StatelessWidget {
               channelDescription: channel.description,
               // TODO add a proper drawable resource to android, for now using
               //      one that already exists in example app.
-              icon: 'launch_background',
+              icon: appIcon,
             ),
           ),
         );
