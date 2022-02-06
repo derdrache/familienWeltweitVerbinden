@@ -1,10 +1,9 @@
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:flutter/material.dart';
 
-class PatchnotesWindow{
+class UpcomingUpdatesWindow{
   var context;
 
-  PatchnotesWindow({this.context});
+  UpcomingUpdatesWindow({this.context});
 
 
   openWindow(){
@@ -19,8 +18,7 @@ class PatchnotesWindow{
                 width: double.maxFinite,
                 child: ListView(
                   children: [
-                    WindowTopbar(title: "Patchnotes"),
-                    Text("1.0.0")
+                    Text("Test")
                   ],
                 ),
               ),
