@@ -51,6 +51,13 @@ changePage(context, page){
   );
 }
 
+changePageForever(context, page){
+  Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => page)
+  );
+}
+
 class ChangeTimeStamp{
   var timeStamp;
 

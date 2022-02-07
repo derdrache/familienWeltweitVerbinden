@@ -17,6 +17,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final checkPasswordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  bool isLoading = false;
 
 
   registration() async{
@@ -43,13 +44,12 @@ class _RegisterPageState extends State<RegisterPage> {
     return false;
   }
 
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    checkPasswordController.dispose();
-
-    super.dispose();
+  loading(){
+    return Container(
+      width: 40,
+      height: 40,
+      child: Center(child: CircularProgressIndicator())
+    );
   }
 
 
@@ -75,10 +75,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   validator: globalFunctions.checkValidatorPassword(
                       passwordCheck: passwordController.text)
               ),
-              customFloatbuttonExtended("Registrieren", () async{
+              isLoading ? loading(): customFloatbuttonExtended("Registrieren", () async{
+                setState(() {
+                  isLoading = true;
+                });
                 var registrationComplete = await registration();
                 if(registrationComplete){
-                  globalFunctions.changePage(context, LoginPage());
+                  globalFunctions.changePageForever(context, LoginPage());
                 }
               })
             ],

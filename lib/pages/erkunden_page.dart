@@ -186,6 +186,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var profilInteressen = profil["interessen"];
     var profilReiseart = profil["reiseart"];
     var profilSprachen = profil["sprachen"];
+
     var spracheMatch = checkMatch(filterList, profilSprachen, globalVar.sprachenListe);
     var reiseartMatch = checkMatch(filterList, [profilReiseart], globalVar.reisearten);
     var interesseMatch = checkMatch(filterList, profilInteressen, globalVar.interessenListe);
@@ -200,6 +201,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   checkMatch(List selected, List profil, globalList){
     bool globalMatch = false;
     bool match = false;
+
 
     for (var select in selected) {
       if(globalList.contains(select)){
