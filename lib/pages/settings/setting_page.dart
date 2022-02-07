@@ -1,3 +1,4 @@
+import 'package:familien_suche/windows/patchnotes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/link.dart';
@@ -8,6 +9,7 @@ import '../../global/global_functions.dart' as globalFunctions;
 import '../../global/variablen.dart' as globalVariablen;
 import '../../global/custom_widgets.dart';
 import '../../windows/change_profil_window.dart';
+import '../../windows/upcoming_updates.dart';
 import '../login_register_page/login_page.dart';
 import 'package:familien_suche/pages/settings/privacy_security_page.dart';
 import 'feedback_page.dart';
@@ -620,11 +622,13 @@ class _SettingPageState extends State<SettingPage> {
                   )
               ),
               SizedBox(height: 20),
-              themeContainer("Patch Notes", Icons.format_list_bulleted,
-                  "https://docs.google.com/document/d/1Mjexik9-MqgpKDNkkosBLZ7cQGtvnexcM_MKMi0XGqw/edit?usp=sharing"),
+              settingThemeContainer("Patch Notes", Icons.format_list_bulleted,
+                  () => PatchnotesWindow(context: context).openWindow()
+               ),
               SizedBox(height: 20),
-              themeContainer("Geplante Erweiterungen", Icons.task,
-                  "https://docs.google.com/spreadsheets/d/1bnxfdw-MsaKHWSxtpxIm7rmbyd3N-dvqmCSNdkixAeU/edit?usp=sharing"),
+              settingThemeContainer("Geplante Erweiterungen", Icons.task,
+                  () => UmcomingUpdatesWindow(context: context).openWindow()
+              ),
               SizedBox(height: 20),
               //themeContainer("Über das Projekt", Icons.description, ""),
               //SizedBox(height: 20),

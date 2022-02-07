@@ -493,13 +493,18 @@ class WindowTopbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.only(top: 10),
       child: Row(
         children: [
           Expanded(
             child: Center(
                 child: Text(
                   title,
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+
+                  ),
                 )
             ),
           )
@@ -508,3 +513,50 @@ class WindowTopbar extends StatelessWidget {
     );
   }
 }
+
+CustomWindow({required context,required title,required List<Widget> children}){
+  children.insert(0,WindowTopbar(title: title));
+  children.insert(1, SizedBox(height: 10));
+
+
+  _closeWindow(){
+    Navigator.pop(context);
+  }
+
+
+  return showDialog(
+      context: context,
+      builder: (BuildContext buildContext){
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: Scaffold(
+            body: SizedBox(
+              height: double.maxFinite,
+              width: double.maxFinite,
+              child: Stack(
+                overflow: Overflow.visible,
+                children: [
+                  ListView(
+                    children: children,
+                  ),
+                  Positioned(
+                    height: 30,
+                    right: -13,
+                    top: -7,
+                    child: InkResponse(
+                        onTap: () => _closeWindow(),
+                        child: const CircleAvatar(
+                          child: Icon(Icons.close, size: 16,),
+                          backgroundColor: Colors.red,
+                        )
+                    ),
+                  ),
+                ] ,
+              ),
+            ),
+          ),
+        );
+      }
+  );
+}
+
