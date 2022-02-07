@@ -8,8 +8,11 @@ import 'firebase_options.dart';
 
 import 'pages/login_register_page/login_page.dart';
 
+var appIcon = '@mipmap/ic_launcher';
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print(message.notification?.body);
+  print(message.notification!.title);
+
 }
 
 late AndroidNotificationChannel channel;
@@ -53,16 +56,17 @@ void main()async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  await notificationSetup();
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  await notificationSetup();
 
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   var pageMainColor = Colors.white;
-  var appIcon = '@mipmap/ic_launcher';
+
 
   initialization() async {
     var initializationSettingsAndroid = AndroidInitializationSettings(appIcon);
@@ -70,10 +74,18 @@ class MyApp extends StatelessWidget {
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
+    ///if the App is closed
+    FirebaseMessaging.instance.getInitialMessage().then((value){
+
+    });
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print(message.notification!.title);
+
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null && !kIsWeb) {
+
         flutterLocalNotificationsPlugin.show(
           notification.hashCode,
           notification.title,
@@ -92,6 +104,10 @@ class MyApp extends StatelessWidget {
       }
     });
 
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message){
+
+    });
+
     getTocken();
 
   }
@@ -99,7 +115,6 @@ class MyApp extends StatelessWidget {
 
   getTocken() async {
     var token = await FirebaseMessaging.instance.getToken();
-    print(token);
   }
 
 
