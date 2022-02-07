@@ -36,6 +36,7 @@ class _StartPageState extends State<StartPage>{
     if(userAuthEmail != userDBEmail ){
       ProfilDatabaseKontroller().updateProfil(userID, {"email": userAuthEmail});
     }
+
   }
 
   checkIfFirstLogin(){
