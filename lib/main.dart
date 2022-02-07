@@ -1,3 +1,5 @@
+import 'package:familien_suche/pages/start_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +68,7 @@ void main()async {
 
 class MyApp extends StatelessWidget {
   var pageMainColor = Colors.white;
-
+  var userLogedIn = FirebaseAuth.instance.currentUser;
 
   initialization() async {
     var initializationSettingsAndroid = AndroidInitializationSettings(appIcon);
@@ -140,7 +142,7 @@ class MyApp extends StatelessWidget {
                 scaffoldBackgroundColor: pageMainColor,
               ),
             debugShowCheckedModeBanner: false,
-            home: LoginPage()
+            home: userLogedIn != null ? StartPage() :LoginPage()
           );
         }
     );

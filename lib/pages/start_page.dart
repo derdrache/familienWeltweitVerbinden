@@ -20,6 +20,10 @@ class StartPage extends StatefulWidget{
 }
 
 class _StartPageState extends State<StartPage>{
+  var userID = FirebaseAuth.instance.currentUser!.uid;
+  var userName = FirebaseAuth.instance.currentUser?.displayName;
+  var userAuthEmail = FirebaseAuth.instance.currentUser!.email;
+
 
   @override
   void initState() {
@@ -29,11 +33,9 @@ class _StartPageState extends State<StartPage>{
   }
 
   _asyncMethod() async{
-    var userID = FirebaseAuth.instance.currentUser!.uid;
-    var userAuthEmail = FirebaseAuth.instance.currentUser!.email;
     var userDBEmail = await ProfilDatabaseKontroller().getProfilEmail(userID);
 
-    if(userAuthEmail != userDBEmail ){
+    if(userAuthEmail != userDBEmail  && userName != null){
       ProfilDatabaseKontroller().updateProfil(userID, {"email": userAuthEmail});
     }
 
@@ -42,8 +44,7 @@ class _StartPageState extends State<StartPage>{
   checkIfFirstLogin(){
     if(widget.registered){ return false; }
 
-    if(FirebaseAuth.instance.currentUser?.displayName == null ||
-        FirebaseAuth.instance.currentUser?.displayName == ""){
+    if(userName == null || userName == ""){
       return true;
     }
 
