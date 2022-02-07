@@ -69,6 +69,7 @@ class ChatDatabaseKontroller{
 class ProfilDatabaseKontroller{
 
   addNewProfil(id, profilData){
+    FirebaseAuth.instance.currentUser?.updateDisplayName(profilData["name"]);
     profilsDB.child(id).set(profilData);
   }
 

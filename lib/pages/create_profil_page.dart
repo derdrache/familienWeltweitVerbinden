@@ -65,8 +65,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           };
 
           ProfilDatabaseKontroller().addNewProfil(userID, data);
-          FirebaseAuth.instance.currentUser?.updateDisplayName(userName);
-          globalFunctions.changePage(context, StartPage(registered: true));
+          globalFunctions.changePageForever(context, StartPage(registered: true));
         } else{
           customSnackbar(context, "Stadt nicht gefunden");
         }
