@@ -15,22 +15,31 @@ class LocalNotificationService{
 
 
 
-  static void display(RemoteMessage message) async {
-    var id = DateTime.now().millisecondsSinceEpoch ~/1000;
+  void display(RemoteMessage message) async {
 
-    NotificationDetails notificationDetails = const NotificationDetails(
-      android: AndroidNotificationDetails(
-        "notification",
-        "notification channel",
-        channelDescription: "this is our channel"
-      )
-    );
+    try {
+      var id = DateTime.now().millisecondsSinceEpoch ~/1000;
 
-    await _notificationsPlugin.show(
-        id,
-        message.notification!.title,
-        message.notification!.body,
-        notificationDetails
-    );
+      NotificationDetails notificationDetails = const NotificationDetails(
+        android: AndroidNotificationDetails(
+          "notification",
+          "notification channel",
+          channelDescription: "this is our channel",
+          importance: Importance.max,
+          priority: Priority.high
+        )
+      );
+      
+      await _notificationsPlugin.show(
+          id,
+          message.notification!.title,
+          message.notification!.body,
+          notificationDetails
+      );
+    } on Exception catch (e) {
+      // TODO
+    }
+    
+    
   }
 }

@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -61,7 +62,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "reiseart": reiseArtenAuswahlBox.getSelected(),
             "aboutme": "",
             "sprachen": sprachenAuswahlBox.getSelected(),
-            "friendlist": {"empty": true}
+            "friendlist": {"empty": true},
+            "token": await FirebaseMessaging.instance.getToken()
           };
 
           ProfilDatabaseKontroller().addNewProfil(userID, data);
@@ -152,7 +154,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                   interessenAuswahlBox,
                   Container(
                     padding: EdgeInsets.all(10),
-                      child: Text(
+                      child: const Text(
                         "Anzahl und Alter der Kinder:",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,

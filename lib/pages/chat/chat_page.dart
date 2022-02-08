@@ -215,7 +215,30 @@ class _ChatPageState extends State<ChatPage>{
                     ],
                   ),
                   SizedBox(height: 10),
-                  Text(lastMessage, style: TextStyle(fontSize: 16, color: Colors.grey[600]),)
+                  Row(
+                    children: [
+                      Text(lastMessage, style: TextStyle(fontSize: 16, color: Colors.grey[600]),),
+                      Expanded(child: SizedBox.shrink()),
+                      group["newMessages"]?[userId] == null? SizedBox.shrink(): Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle
+                          ),
+                          child: Center(
+                            child: FittedBox(
+                              child: Text(
+                                group["newMessages"][userId].toString(),
+                                style: TextStyle(fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          )
+                      )
+                    ],
+                  )
+
                 ],
               )
             ),
