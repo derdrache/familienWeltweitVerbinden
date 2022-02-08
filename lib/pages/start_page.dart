@@ -71,12 +71,57 @@ class _StartPageState extends State<StartPage>{
       });
     }
 
+    chatIcon(){
+      return StreamBuilder(
+          stream: ProfilDatabaseKontroller().getNewMessagesStream(userID),
+          builder: (
+              BuildContext context,
+              AsyncSnapshot snap,
+              ){
+              if(snap.hasData) {
+                if (snap.data.snapshot.value != null) {
+                  var newMessages = snap.data.snapshot.value;
+                  return Stack(
+                    clipBehavior: Clip.none, children: <Widget>[
+                    Icon(Icons.chat),
+                    Positioned(
+                        top: -10,
+                        right: -10,
+                        child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle
+                            ),
+                            child: Center(
+                              child: FittedBox(
+                                child: Text(
+                                  newMessages.toString(),
+                                  style: TextStyle(fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            )
+                        )
+                    )
+                  ],
+                  );
+                }
+              }
+              return Icon(Icons.chat);
+          });
+
+
+
+    }
+
     return checkIfFirstLogin() ? CreateProfilPage(): Scaffold(
           body: Center(
             child: tabPages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
+            items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Board',
@@ -96,7 +141,7 @@ class _StartPageState extends State<StartPage>{
 
                */
               BottomNavigationBarItem(
-                icon: Icon(Icons.chat),
+                icon: chatIcon(),
                 label: 'Chat',
                 backgroundColor: navigationbarButtonColor,
               ),

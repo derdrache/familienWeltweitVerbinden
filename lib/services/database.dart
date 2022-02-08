@@ -13,15 +13,15 @@ var feedbackDB = realtimeDatabase.child("feedback");
 
 class ChatDatabaseKontroller{
 
-  addNewChatGroup(users) {
-    users = users.keys.toList();
-    var chatID = global_functions.getChatID(users);
+  addNewChatGroup(users, messageData) {
+    var usersList = users.keys.toList();
+    var chatID = global_functions.getChatID(usersList);
 
     var chatgroupData = {
       "id": chatID,
       "users" : users,
-      "lastMessage": "",
-      "lastMessageDate": "",
+      "lastMessage": messageData["message"],
+      "lastMessageDate": messageData["date"],
     };
 
     chatGroupsDB.child(chatID).set(chatgroupData);
@@ -129,6 +129,12 @@ class ProfilDatabaseKontroller{
     return query.value;
   }
 
+  getToken(id) async{
+    var query = await profilsDB.child(id).child("token").get();
+
+    return query.value;
+  }
+
   getAllProfils() async {
     var profils = [];
 
@@ -145,6 +151,10 @@ class ProfilDatabaseKontroller{
 
   getAllProfilsStream(){
     return profilsDB.onValue;
+  }
+
+  getNewMessagesStream(userId){
+    return profilsDB.child(userId).child("newMessages").onValue;
   }
 
 }

@@ -37,34 +37,39 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   messageToDbAndClearMessageInput(message)async {
     var userID = FirebaseAuth.instance.currentUser!.uid;
+    var chatPartnerToken = await ProfilDatabaseKontroller().getToken(chatPartnerID);
 
     nachrichtController.clear();
 
     var messageData = {
       "message" :message,
       "from": userID,
-      "date": Timestamp.now().seconds
+      "date": Timestamp.now().seconds,
+      "notificationInfo" : {
+        "from": userName,
+        "token": chatPartnerToken
+      }
     };
     if(widget.newChat){
       widget.groupChatData = await ChatDatabaseKontroller()
-          .addNewChatGroup({userID: userName, chatPartnerID: chatPartnerName});
+          .addNewChatGroup({userID: userName, chatPartnerID: chatPartnerName}, messageData);
 
       setState(() {
         chatID = widget.groupChatData["id"];
       });
+    } else {
+      await ChatDatabaseKontroller().updateChatGroup(
+          widget.groupChatData["id"],
+          {
+            "lastMessage": messageData["message"],
+            "lastMessageDate": messageData["date"],
+          }
+      );
     }
 
-    await ChatDatabaseKontroller().addNewMessage(
+    ChatDatabaseKontroller().addNewMessage(
         widget.groupChatData,
         messageData
-    );
-
-    await ChatDatabaseKontroller().updateChatGroup(
-        widget.groupChatData["id"],
-        {
-         "lastMessage": messageData["message"],
-         "lastMessageDate": messageData["date"],
-        }
     );
 
   }
@@ -211,11 +216,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       ),
       body: Container(
         color: Colors.blue,
-        child: Column(
+        child: ListView(
+          reverse: true,
           children: [
-            Expanded(child: Container()),
+            textEingabe(),
             showMessages(),
-            textEingabe()
           ],
         ),
       )
