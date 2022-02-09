@@ -13,6 +13,7 @@ class ChatPage extends StatefulWidget{
 class _ChatPageState extends State<ChatPage>{
   var userId = FirebaseAuth.instance.currentUser!.uid;
   var userName = FirebaseAuth.instance.currentUser!.displayName;
+  var userEmail = FirebaseAuth.instance.currentUser!.email;
   var globalChatGroups = [];
 
 
@@ -53,7 +54,7 @@ class _ChatPageState extends State<ChatPage>{
                             child: Icon(Icons.search),
                             onPressed: () async {
                               var chatPartner = personenSucheController.text;
-                              if(chatPartner != ""){
+                              if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
                                 var userID = await findUserGetName(personenSucheController.text);
 
                                 if(userID != null){
@@ -62,6 +63,8 @@ class _ChatPageState extends State<ChatPage>{
                                   personenSucheController.clear();
                                   customSnackbar(dialogContext, "Benutzer existiert nicht");
                                 }
+                              } else{
+                                personenSucheController.text = "";
                               }
                             },
                           )
@@ -135,16 +138,18 @@ class _ChatPageState extends State<ChatPage>{
   validCheckAndOpenChatgroup(chatPartnerID) async {
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
     var chatPartnerName = await ProfilDatabaseKontroller().getProfilName(chatPartnerID);
+    var userData = {
+      "users": {
+        chatPartnerID: {"name": chatPartnerName, "newMessages": 0},
+        userId: {"name": userName, "newMessages": 0},
+      }
+    };
 
     Navigator.pop(context);
 
     if(checkAndIndex[0]){
       changePage(context, ChatDetailsPage(
-          groupChatData: {"users": {
-            chatPartnerID: chatPartnerName,
-            userId: userName,
-
-          }},
+          groupChatData: userData,
           newChat: true
       ));
     } else{
@@ -159,7 +164,7 @@ class _ChatPageState extends State<ChatPage>{
     var check = [true, -1];
 
     for(var i = 0;i < globalChatGroups.length; i++){
-      if(globalChatGroups[i]["users"][userId] == chatPartner){
+      if(globalChatGroups[i]["users"][userId] != null){
         check = [false,i];
       }
     }
