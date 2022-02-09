@@ -12,8 +12,10 @@ class ChatDetailsPage extends StatefulWidget {
   bool newChat;
   var chatPartner;
 
-  ChatDetailsPage({Key? key,required this.groupChatData,
-    required this.chatPartner, this.newChat = false}) : super(key: key);
+  ChatDetailsPage({Key? key,
+    required this.groupChatData,
+    required this.chatPartner,
+    this.newChat = false}) : super(key: key);
 
   @override
   _ChatDetailsPageState createState() => _ChatDetailsPageState();
@@ -25,14 +27,44 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var chatPartnerName;
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
+  var userId = FirebaseAuth.instance.currentUser!.uid;
   var userName = FirebaseAuth.instance.currentUser!.displayName;
 
+  @override
+  void dispose() {
+    ProfilDatabaseKontroller().updateProfil(userId, {"activeChat": null});
+    super.dispose();
+  }
   @override
   void initState() {
     chatID = widget.groupChatData["id"]?? "0";
     chatPartnerID = widget.chatPartner.keys.toList()[0];
     chatPartnerName = widget.chatPartner[chatPartnerID];
+
+    writeActiveChat();
+    resetNewMessageCounter();
+
     super.initState();
+  }
+
+  writeActiveChat(){
+    ProfilDatabaseKontroller().updateProfil(userId, {"activeChat": chatID});
+  }
+
+  resetNewMessageCounter() async {
+    var usersChatNewMessages = widget.groupChatData["users"][userId]["newMessages"];
+
+    if(usersChatNewMessages == 0) return;
+
+
+    var usersAllNewMessages = await ProfilDatabaseKontroller().getNewMessages(userId);
+
+    ChatDatabaseKontroller().updateNewMessageCounter(chatID, userId, 0);
+    ProfilDatabaseKontroller().updateProfil(
+        userId,
+        {"newMessages": usersAllNewMessages - usersChatNewMessages}
+    );
+
   }
 
   messageToDbAndClearMessageInput(message)async {
@@ -87,7 +119,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
 
-        if(widget.groupChatData["users"][message["from"]] == userName){
+        if(widget.groupChatData["users"][message["from"]]["name"] == userName){
           textAlign = Alignment.centerRight;
           boxColor = Colors.greenAccent;
         }
@@ -124,28 +156,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
                   ],
                 )
-
-
-                /*Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(top:5, left: 5, bottom: 20, right: 10),
-                      child: Text(message["message"] == null ? "": message["message"],
-                            style: TextStyle(fontSize: 16 )
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 3,
-                      right: 3,
-                      child: Text(
-                          dbSecondsToTimeString(message["date"]),
-                          style: TextStyle(color: Colors.grey[600])
-                      ),
-                    ),
-                  ]
-                )
-                */
               ),
             ),
         );
