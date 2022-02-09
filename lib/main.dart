@@ -60,10 +60,10 @@ class MyApp extends StatelessWidget {
       var chatId = message.data["chatId"];
       var activeChat = await ProfilDatabaseKontroller().getActiveChat(userId);
 
-      //if(activeChat == null || activeChat != message.data["chatId"]){
+      if(activeChat == null || activeChat != message.data["chatId"]){
         notificationToDatabase(chatId);
         LocalNotificationService().display(message);
-      //}
+      }
 
     });
 
