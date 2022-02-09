@@ -64,7 +64,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     if(usersChatNewMessages == 0) return;
 
 
-    var usersAllNewMessages = await ProfilDatabaseKontroller().getNewMessages(userId);
+    var usersAllNewMessages = await ProfilDatabaseKontroller().getOneData(userId, "newMessages");
 
     ChatDatabaseKontroller().updateNewMessageCounter(chatID, userId, 0);
     ProfilDatabaseKontroller().updateProfil(

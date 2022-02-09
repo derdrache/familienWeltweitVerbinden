@@ -270,7 +270,7 @@ class _SettingPageState extends State<SettingPage> {
       bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(emailNewTextKontroller.text);
       var emailInUse = await ProfilDatabaseKontroller()
-          .getProfilIDFromEmail(emailNewTextKontroller.text);
+          .getProfilId("email", emailNewTextKontroller.text);
 
       if (emailInUse != null){
         errorString += "- Email wird schon verwendet";
