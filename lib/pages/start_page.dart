@@ -79,7 +79,7 @@ class _StartPageState extends State<StartPage>{
               AsyncSnapshot snap,
               ){
               if(snap.hasData) {
-                if (snap.data.snapshot.value != null) {
+                if (snap.data.snapshot.value != null && snap.data.snapshot.value != 0) {
                   var newMessages = snap.data.snapshot.value;
                   return Stack(
                     clipBehavior: Clip.none, children: <Widget>[
@@ -108,6 +108,7 @@ class _StartPageState extends State<StartPage>{
                   ],
                   );
                 }
+                return Icon(Icons.chat);
               }
               return Icon(Icons.chat);
           });

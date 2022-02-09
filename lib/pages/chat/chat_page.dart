@@ -142,11 +142,12 @@ class _ChatPageState extends State<ChatPage>{
       changePage(context, ChatDetailsPage(
           groupChatData: {"users": {
             chatPartnerID: chatPartnerName,
-            userId: userName
+            userId: userName,
+
           }},
           chatPartner: {chatPartnerID: chatPartnerName},
-          newChat: true)
-      );
+          newChat: true
+      ));
     } else{
       changePage(context, ChatDetailsPage(
         groupChatData: globalChatGroups[checkAndIndex[1]],
@@ -179,21 +180,22 @@ class _ChatPageState extends State<ChatPage>{
         var chatPartnerName;
         var chatPartnerID;
 
+
         group["users"].forEach((key, value) async {
           if(key != userId){
-            chatPartnerName = value;
+            chatPartnerName = value["name"];
             chatPartnerID = key;
           }
         });
 
         var lastMessage = group["lastMessage"];
+        var ownChatNewMessages = group["users"][userId]["newMessages"];
         var lastMessageTime = dbSecondsToTimeString(group["lastMessageDate"]);
-
 
         groupContainer.add(
           GestureDetector(
             onTap: () =>changePage(context, ChatDetailsPage(
-                groupChatData: group,
+              groupChatData: group,
               chatPartner: {chatPartnerID:chatPartnerName},
             )),
             child: Container(
@@ -219,7 +221,7 @@ class _ChatPageState extends State<ChatPage>{
                     children: [
                       Text(lastMessage, style: TextStyle(fontSize: 16, color: Colors.grey[600]),),
                       Expanded(child: SizedBox.shrink()),
-                      group["newMessages"]?[userId] == null? SizedBox.shrink(): Container(
+                      ownChatNewMessages== 0? SizedBox.shrink(): Container(
                           height: 30,
                           width: 30,
                           decoration: BoxDecoration(
@@ -229,7 +231,7 @@ class _ChatPageState extends State<ChatPage>{
                           child: Center(
                             child: FittedBox(
                               child: Text(
-                                group["newMessages"][userId].toString(),
+                                ownChatNewMessages.toString(),
                                 style: TextStyle(fontWeight: FontWeight.bold,
                                     color: Colors.white),
                               ),

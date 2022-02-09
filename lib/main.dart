@@ -1,4 +1,5 @@
 import 'package:familien_suche/pages/start_page.dart';
+import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/services/local_notification.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'firebase_options.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'pages/login_register_page/login_page.dart';
 
@@ -19,6 +22,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await Hive.initFlutter();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -30,25 +35,35 @@ void main()async {
   runApp(MyApp());
 }
 
+
+
 class MyApp extends StatelessWidget {
   var pageMainColor = Colors.white;
   var userLogedIn = FirebaseAuth.instance.currentUser;
+  var userId = FirebaseAuth.instance.currentUser!.uid;
 
   initialization() async {
     LocalNotificationService.initialize();
+    var notificationBox = await Hive.openBox('notificationBox');
 
     ///if the App is closed
     FirebaseMessaging.instance.getInitialMessage().then((value){
       if(value != null){
 
+
+
       }
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print(message.notification!.title);
-      print(message.data.values);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
+      var chatId = message.data["chatId"];
+      var activeChat = await ProfilDatabaseKontroller().getActiveChat(userId);
 
-      LocalNotificationService().display(message);
+      if(activeChat == null || activeChat != message.data["chatId"]){
+        notificationToDatabase(chatId);
+        LocalNotificationService().display(message);
+      }
+
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message){
@@ -57,7 +72,23 @@ class MyApp extends StatelessWidget {
 
   }
 
+  notificationToDatabase(chatId) async {
+    var newMessages = await ProfilDatabaseKontroller().getNewMessages(userId);
+    if(newMessages == null) newMessages = 0;
 
+    ProfilDatabaseKontroller().updateProfil(
+        userId,
+        {"newMessages": newMessages +1}
+    );
+
+    var newChatMessages = await ChatDatabaseKontroller().getNewMessagesCounter(chatId, userId);
+
+    ChatDatabaseKontroller().updateNewMessageCounter(
+        chatId,
+        userId,
+        newChatMessages + 1
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

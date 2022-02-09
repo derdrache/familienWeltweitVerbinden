@@ -14,12 +14,16 @@ var feedbackDB = realtimeDatabase.child("feedback");
 class ChatDatabaseKontroller{
 
   addNewChatGroup(users, messageData) {
-    var usersList = users.keys.toList();
-    var chatID = global_functions.getChatID(usersList);
+    var userKeysList = users.keys.toList();
+    var usersList = users.values.toList();
+    var chatID = global_functions.getChatID(userKeysList);
 
     var chatgroupData = {
       "id": chatID,
-      "users" : users,
+      "users" : {
+        userKeysList[0] : {"name" : usersList[0], "newMessages": 0},
+        userKeysList[1] : {"name" : usersList[1], "newMessages": 0},
+      },
       "lastMessage": messageData["message"],
       "lastMessageDate": messageData["date"],
     };
@@ -31,6 +35,11 @@ class ChatDatabaseKontroller{
 
   updateChatGroup(chatID, chatgroupData){
     chatGroupsDB.child(chatID).update(chatgroupData);
+  }
+
+  updateNewMessageCounter(chatId, userId, counter){
+    chatGroupsDB.child(chatId).child("users").child(userId).update({
+        "newMessages": counter});
   }
 
   addNewMessage(chatgroupData, messageData){
@@ -56,8 +65,14 @@ class ChatDatabaseKontroller{
     return data;
   }
 
+  getNewMessagesCounter(chatId, userId) async{
+    var query = await chatGroupsDB.child(chatId).child("users").child(userId).child("newMessages").get();
+
+    return query.value;
+  }
+
   getAllChatgroupsFromUserStream(userID, userName) {
-    return chatGroupsDB.orderByChild("users/$userID").equalTo(userName).onValue;
+    return chatGroupsDB.orderByChild("users/$userID/name").equalTo(userName).onValue;
   }
 
   getAllMessagesStream(chatID) {
@@ -129,8 +144,20 @@ class ProfilDatabaseKontroller{
     return query.value;
   }
 
+  getNewMessages(id) async {
+    var query = await profilsDB.child(id).child("newMessages").get();
+
+    return query.value;
+  }
+
   getToken(id) async{
     var query = await profilsDB.child(id).child("token").get();
+
+    return query.value;
+  }
+
+  getActiveChat(id) async {
+    var query = await profilsDB.child(id).child("activeChat").get();
 
     return query.value;
   }
