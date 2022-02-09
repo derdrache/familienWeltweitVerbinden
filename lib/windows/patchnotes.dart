@@ -9,7 +9,7 @@ class PatchnotesWindow{
   PatchnotesWindow({required this.context});
 
 
-  _patch(title, inhalt){
+  _patch(patch){
     return Container(
       margin: EdgeInsets.only(top: 15, left: 10, right: 5),
         child: Row(
@@ -17,7 +17,7 @@ class PatchnotesWindow{
           mainAxisSize: MainAxisSize.max,
           children: [
             Text(
-              title,
+              patch["title"],
               style: TextStyle(
                 fontSize: 15,
                   fontWeight: FontWeight.bold
@@ -27,7 +27,7 @@ class PatchnotesWindow{
             SizedBox(
               width: 200,
               child: Text(
-                inhalt,
+                patch["inhalt"],
                 maxLines: null,
                 style: TextStyle(fontSize: 15),
               ),
@@ -42,13 +42,25 @@ class PatchnotesWindow{
         context: context,
         title: patchnotesTitle,
         children: [
-          _patch(patch1["title"], patch1["inhalt"])
+          _patch(prePatch2),
+          _patch(prePatch1),
+
+          //_patch(patch1)
         ]
     );
   }
 
 }
 
+var prePatch1 = {
+  "title": "0.9.3",
+  "inhalt": "Anzeige von den Patchnotes und geplanten Erweiterungen angepasst"
+};
+
+var prePatch2 = {
+  "title": "0.10.0",
+  "inhalt": "Notification-System wurde eingebaut. Ab jetzt ist es auch möglich zu sehen wie viele ungelesene Chatnachrichten offen sind"
+};
 
 var patch1 = {
   "title" : "1.0.0",
