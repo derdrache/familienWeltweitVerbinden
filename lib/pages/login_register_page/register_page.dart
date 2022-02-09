@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart' as globalFunctions;
-import 'login_page.dart';
+import '../../global/global_functions.dart' as global_functions;
+import '../start_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -30,6 +30,9 @@ class _RegisterPageState extends State<RegisterPage> {
         customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden", color: Colors.green);
         return true;
       }on FirebaseAuthException catch(error){
+        setState(() {
+          isLoading = false;
+        });
         if(error.code == "email-already-in-use"){
           customSnackbar(context, "Email ist schon in Benutzung");
         } else if(error.code == "invalid-email"){
@@ -45,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   loading(){
-    return Container(
+    return const SizedBox(
       width: 40,
       height: 40,
       child: Center(child: CircularProgressIndicator())
@@ -64,15 +67,15 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               customTextInput(
                   "Email", emailController,
-                  validator: globalFunctions.checkValidationEmail()
+                  validator: global_functions.checkValidationEmail()
               ),
               customTextInput(
                   "Passwort", passwordController, passwort: true,
-                  validator: globalFunctions.checkValidatorPassword()
+                  validator: global_functions.checkValidatorPassword()
               ),
               customTextInput(
                   "Passwort bestätigen", checkPasswordController, passwort: true,
-                  validator: globalFunctions.checkValidatorPassword(
+                  validator: global_functions.checkValidatorPassword(
                       passwordCheck: passwordController.text)
               ),
               isLoading ? loading(): customFloatbuttonExtended("Registrieren", () async{
@@ -81,7 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 });
                 var registrationComplete = await registration();
                 if(registrationComplete){
-                  globalFunctions.changePageForever(context, LoginPage());
+                  global_functions.changePageForever(context, StartPage());
                 }
               })
             ],

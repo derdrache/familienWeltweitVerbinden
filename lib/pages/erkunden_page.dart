@@ -386,7 +386,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
       return FlutterMap(
         options: MapOptions(
           center: LatLng(0, 0),
-          zoom: 1.5,
+          zoom: 1.6,
+          minZoom: 1.6,
+          maxZoom: 8,
           onPositionChanged: (position, changed){
             if(changed){
                 setState(() {

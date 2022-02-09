@@ -345,7 +345,12 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
     List dates = [];
 
     for (var datePicker in childrensBirthDatePickerList) {
-      dates.add(datePicker.getPickedDate());
+      var date = datePicker.getPickedDate();
+
+      if(date != null) date = date.toString();
+
+        dates.add(date);
+
     }
 
     if(years){
@@ -362,7 +367,6 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 
       dates = converted;
     }
-
 
     return dates;
   }

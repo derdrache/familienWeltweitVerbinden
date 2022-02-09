@@ -37,6 +37,9 @@ class _LoginPageState extends State<LoginPage> {
           password: passwort);
       global_functions.changePageForever(context, StartPage());
     }on FirebaseAuthException catch(error){
+      setState(() {
+        isLoading = false;
+      });
       if(error.code == "user-not-found"){
         customSnackbar(context, "Benutzer nicht gefunden");
       } else if(error.code == "wrong-password"){
