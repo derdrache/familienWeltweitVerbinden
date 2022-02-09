@@ -35,16 +35,16 @@ class _StartPageState extends State<StartPage>{
 
   _asyncMethod() async{
     if(userName != null){
-      var userDBEmail = await ProfilDatabaseKontroller().getOneData(userID, "email");
-      var userDeviceTokenDb = await ProfilDatabaseKontroller().getOneData(userID, "token");
+      var userDBEmail = await ProfilDatabase().getOneData(userID, "email");
+      var userDeviceTokenDb = await ProfilDatabase().getOneData(userID, "token");
       var userDeviceTokenReal = await FirebaseMessaging.instance.getToken();
 
       if(userAuthEmail != userDBEmail){
-        ProfilDatabaseKontroller().updateProfil(userID, {"email": userAuthEmail});
+        ProfilDatabase().updateProfil(userID, {"email": userAuthEmail});
       }
 
       if(userDeviceTokenDb != userDeviceTokenReal){
-        ProfilDatabaseKontroller().updateProfil(userID, {"token": userDeviceTokenReal});
+        ProfilDatabase().updateProfil(userID, {"token": userDeviceTokenReal});
       }
     }
   }
@@ -81,7 +81,7 @@ class _StartPageState extends State<StartPage>{
 
     chatIcon(){
       return StreamBuilder(
-          stream: ProfilDatabaseKontroller().getNewMessagesStream(userID),
+          stream: ProfilDatabase().getNewMessagesStream(userID),
           builder: (
               BuildContext context,
               AsyncSnapshot snap,

@@ -413,7 +413,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       body: Padding(
         padding: const EdgeInsets.only(top: 25),
         child:StreamBuilder(
-          stream: ProfilDatabaseKontroller().getAllProfilsStream(),
+          stream: ProfilDatabase().getAllProfilsStream(),
           builder: (
               BuildContext context,
               AsyncSnapshot snapshot,

@@ -40,11 +40,11 @@ class ProfilPopupWindow{
         style: global_style.textButtonStyle(),
         child: const Icon(Icons.message),
         onPressed: () async {
-          var profilID = await ProfilDatabaseKontroller().getProfilId("name", profil["name"]);
+          var profilID = await ProfilDatabase().getProfilId("name", profil["name"]);
           var users = [userID, profilID];
           var newChat = false;
 
-          var groupChatData = await ChatDatabaseKontroller()
+          var groupChatData = await ChatDatabase()
               .getChat(global_functions.getChatID(users));
 
           if(groupChatData == null){
@@ -80,7 +80,7 @@ class ProfilPopupWindow{
             if(userFriendlist["empty"] == true) userFriendlist = {profil["name"]: true};
           }
 
-          ProfilDatabaseKontroller().updateProfil(
+          ProfilDatabase().updateProfil(
               userID, {"friendlist": userFriendlist}
           );
 

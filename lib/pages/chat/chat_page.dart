@@ -19,8 +19,7 @@ class _ChatPageState extends State<ChatPage>{
 
   selectChatpartnerWindow() async {
     var personenSucheController = TextEditingController();
-    var userProfil = await ProfilDatabaseKontroller().getProfil(userId);
-    var userFriendlist = userProfil["friendlist"] ?? [];
+    var userFriendlist = await ProfilDatabase().getOneData(userId, "friendlist");
 
 
     return showDialog(
@@ -122,8 +121,8 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   findUserGetName(user) async {
-    var foundOnName = await ProfilDatabaseKontroller().getProfilId("name", user);
-    var foundOnEmail = await ProfilDatabaseKontroller().getProfilId("email", user);
+    var foundOnName = await ProfilDatabase().getProfilId("name", user);
+    var foundOnEmail = await ProfilDatabase().getProfilId("email", user);
 
     if(foundOnName != null){
       return foundOnName;
@@ -137,7 +136,7 @@ class _ChatPageState extends State<ChatPage>{
 
   validCheckAndOpenChatgroup(chatPartnerID) async {
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
-    var chatPartnerName = await ProfilDatabaseKontroller().getOneData(chatPartnerID, "name");
+    var chatPartnerName = await ProfilDatabase().getOneData(chatPartnerID, "name");
 
     var userData = {
       "users": {
@@ -267,7 +266,7 @@ class _ChatPageState extends State<ChatPage>{
         child: Column(
           children: [
             StreamBuilder(
-              stream: ChatDatabaseKontroller()
+              stream: ChatDatabase()
                   .getAllChatgroupsFromUserStream(userId, userName),
                 builder: (
                     BuildContext context,

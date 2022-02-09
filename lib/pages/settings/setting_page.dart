@@ -65,7 +65,7 @@ class _SettingPageState extends State<SettingPage> {
   getProfilFromDatabase() async {
     emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
     nameTextKontroller.text = FirebaseAuth.instance.currentUser!.displayName!;
-    userProfil = await ProfilDatabaseKontroller().getProfil(userID);
+    userProfil = await ProfilDatabase().getProfil(userID);
   }
 
   void getAndSetDataFromDB() async {
@@ -106,7 +106,7 @@ class _SettingPageState extends State<SettingPage> {
       "land": locationData["countryname"]
     };
 
-    ProfilDatabaseKontroller().updateProfil(
+    ProfilDatabase().updateProfil(
         userID, locationDict
     );
   }
@@ -142,7 +142,7 @@ class _SettingPageState extends State<SettingPage> {
       errorMessage = changeSprachen();
     }else if(beschreibung == beschreibungBio){
       if(bioTextKontroller.text != userProfil["aboutme"]){
-        ProfilDatabaseKontroller().updateProfil(
+        ProfilDatabase().updateProfil(
             userID, {"aboutme": bioTextKontroller.text});
       }
     }else if(beschreibung == beschreibungName){
@@ -188,7 +188,7 @@ class _SettingPageState extends State<SettingPage> {
     if(reiseArtInput.getSelected() == null || reiseArtInput.getSelected().isEmpty){
       errorMessage = "neue Reiseart eingeben";
     } else if(reiseArtInput.getSelected() != userProfil["reiseart"] ){
-      ProfilDatabaseKontroller().updateProfil(
+      ProfilDatabase().updateProfil(
           userID, {"reiseart": reiseArtInput.getSelected()}
       );
     }
@@ -209,7 +209,7 @@ class _SettingPageState extends State<SettingPage> {
     if(!allFilled || kinderAgeBox.getDates().isEmpty){
       errorMessage = "Geburtsdaten eingeben";
     } else if (kinderAgeBox.getDates() != userProfil["kinder"]){
-      ProfilDatabaseKontroller().updateProfil(
+      ProfilDatabase().updateProfil(
           userID, {"kinder": kinderAgeBox.getDates()}
       );
     }
@@ -223,7 +223,7 @@ class _SettingPageState extends State<SettingPage> {
     if(interessenInputBox.getSelected() == null || interessenInputBox.getSelected().isEmpty){
       errorMessage = "neue interessen eingeben";
     } else if(interessenInputBox.getSelected() != userProfil["interessen"]){
-      ProfilDatabaseKontroller().updateProfil(
+      ProfilDatabase().updateProfil(
           userID, {"interessen": interessenInputBox.getSelected()}
       );
     }
@@ -236,7 +236,7 @@ class _SettingPageState extends State<SettingPage> {
     if(sprachenInputBox.getSelected() == null || sprachenInputBox.getSelected().isEmpty){
       errorMessage = "Sprache eingeben";
     } else if(sprachenInputBox.getSelected() != userProfil["sprachen"]){
-      ProfilDatabaseKontroller().updateProfil(
+      ProfilDatabase().updateProfil(
           userID, {"sprachen": sprachenInputBox.getSelected()}
       );
     }
@@ -246,13 +246,13 @@ class _SettingPageState extends State<SettingPage> {
   changeName() async{
     var errorMessage = "";
     var userName = FirebaseAuth.instance.currentUser!.displayName;
-    var checkUserProfilExist = await ProfilDatabaseKontroller().getProfilFromName(nameTextKontroller.text);
+    var checkUserProfilExist = await ProfilDatabase().getProfilFromName(nameTextKontroller.text);
 
     if(nameTextKontroller.text == null || nameTextKontroller.text == ""){
       errorMessage = "Neuen Namen eingeben";
     } else{
       if(checkUserProfilExist == null){
-        ProfilDatabaseKontroller().updateProfilName(
+        ProfilDatabase().updateProfilName(
             userID, userName, nameTextKontroller.text
         );
       } else {
@@ -269,7 +269,7 @@ class _SettingPageState extends State<SettingPage> {
     if(passwortTextKontroller1.text != "" && emailNewTextKontroller.text != ""){
       bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(emailNewTextKontroller.text);
-      var emailInUse = await ProfilDatabaseKontroller()
+      var emailInUse = await ProfilDatabase()
           .getProfilId("email", emailNewTextKontroller.text);
 
       if (emailInUse != null){
@@ -293,7 +293,7 @@ class _SettingPageState extends State<SettingPage> {
     if(errorString == ""){
       FirebaseAuth.instance.currentUser?.updateEmail(emailNewTextKontroller.text);
 
-      ProfilDatabaseKontroller().updateProfil(
+      ProfilDatabase().updateProfil(
           userID, {"email":emailNewTextKontroller.text }
       );
 
@@ -618,7 +618,7 @@ class _SettingPageState extends State<SettingPage> {
               SizedBox(height: 20),
               settingThemeContainer("Feedback", Icons.feedback,
                       () => globalFunctions.changePage(
-                      context, FeedbackPage(profil: userProfil)
+                      context, FeedbackPage()
                   )
               ),
               SizedBox(height: 20),
