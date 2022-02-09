@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,15 +6,13 @@ import 'package:familien_suche/global/custom_widgets.dart';
 import '../../global/global_functions.dart';
 
 class FeedbackPage extends StatelessWidget {
-  var profil;
   var feedbackTextKontroller = TextEditingController();
   final formKey = GlobalKey<FormState>();
   var userName = FirebaseAuth.instance.currentUser!.displayName;
 
-  FeedbackPage({Key? key, profil}) : super(key: key);
 
   feedbackSendenAndClose(context) async {
-    var chatDatabaseKontroller = ChatDatabaseKontroller();
+    var chatDatabaseKontroller = ChatDatabase();
 
     chatDatabaseKontroller.addAdminMessage(
         feedbackTextKontroller.text, userName);

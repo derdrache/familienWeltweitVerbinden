@@ -30,7 +30,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   void dispose() {
-    ProfilDatabaseKontroller().updateProfil(userId, {"activeChat": null});
+    ProfilDatabase().updateProfil(userId, {"activeChat": null});
     super.dispose();
   }
   @override
@@ -55,7 +55,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   }
 
   writeActiveChat(){
-    ProfilDatabaseKontroller().updateProfil(userId, {"activeChat": chatID});
+    ProfilDatabase().updateProfil(userId, {"activeChat": chatID});
   }
 
   resetNewMessageCounter() async {
@@ -64,10 +64,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     if(usersChatNewMessages == 0) return;
 
 
-    var usersAllNewMessages = await ProfilDatabaseKontroller().getOneData(userId, "newMessages");
+    var usersAllNewMessages = await ProfilDatabase().getOneData(userId, "newMessages");
 
-    ChatDatabaseKontroller().updateNewMessageCounter(chatID, userId, 0);
-    ProfilDatabaseKontroller().updateProfil(
+    ChatDatabase().updateNewMessageCounter(chatID, userId, 0);
+    ProfilDatabase().updateProfil(
         userId,
         {"newMessages": usersAllNewMessages - usersChatNewMessages}
     );
@@ -86,14 +86,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       "to": chatPartnerID
     };
     if(widget.newChat){
-      widget.groupChatData = await ChatDatabaseKontroller()
+      widget.groupChatData = await ChatDatabase()
           .addNewChatGroup({userID: userName, chatPartnerID: chatPartnerName}, messageData);
 
       setState(() {
         chatID = widget.groupChatData["id"];
       });
     } else {
-      await ChatDatabaseKontroller().updateChatGroup(
+      await ChatDatabase().updateChatGroup(
           widget.groupChatData["id"],
           {
             "lastMessage": messageData["message"],
@@ -102,7 +102,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       );
     }
 
-    ChatDatabaseKontroller().addNewMessage(
+    ChatDatabase().addNewMessage(
         widget.groupChatData,
         messageData
     );
@@ -173,7 +173,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     showMessages(){
 
       return StreamBuilder(
-          stream: ChatDatabaseKontroller().getAllMessagesStream(chatID),
+          stream: ChatDatabase().getAllMessagesStream(chatID),
           builder: (
               BuildContext context,
               AsyncSnapshot snap,

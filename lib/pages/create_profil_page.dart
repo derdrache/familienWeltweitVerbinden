@@ -39,8 +39,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   saveFunction()async {
     if(_formKey.currentState!.validate()){
-      var userExist = await ProfilDatabaseKontroller()
-          .getProfil(nameTextcontroller.text) != null;
+      var userExist = await ProfilDatabase()
+          .getProfilId("name", nameTextcontroller.text) != null;
 
       if(checkAllValidation(userExist)){
         var userID = FirebaseAuth.instance.currentUser?.uid;
@@ -66,13 +66,11 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "token": await FirebaseMessaging.instance.getToken()
           };
 
-          ProfilDatabaseKontroller().addNewProfil(userID, data);
+          ProfilDatabase().addNewProfil(userID, data);
           globalFunctions.changePageForever(context, StartPage(registered: true));
         } else{
           customSnackbar(context, "Stadt nicht gefunden");
         }
-
-
       }
     }
   }

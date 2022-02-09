@@ -11,7 +11,7 @@ var chatMessagesDB = realtimeDatabase.child("chatMessages");
 var profilsDB = realtimeDatabase.child("profils");
 var feedbackDB = realtimeDatabase.child("feedback");
 
-class ChatDatabaseKontroller{
+class ChatDatabase{
 
   addNewChatGroup(users, messageData) {
     var userKeysList = users.keys.toList();
@@ -81,7 +81,7 @@ class ChatDatabaseKontroller{
 
 }
 
-class ProfilDatabaseKontroller{
+class ProfilDatabase{
 
   addNewProfil(id, profilData){
     FirebaseAuth.instance.currentUser?.updateDisplayName(profilData["name"]);
@@ -105,7 +105,6 @@ class ProfilDatabaseKontroller{
       }
     });
   }
-
 
   getProfil(id) async{
     var query = await profilsDB.child(id).get();
@@ -136,20 +135,6 @@ class ProfilDatabaseKontroller{
     var query = await profilsDB.child(id).child("activeChat").get();
 
     return query.value;
-  }
-
-  getAllProfils() async {
-    var profils = [];
-
-    var query = await profilsDB.get();
-    var snapshot = query.children;
-
-    for (var profil in snapshot) {
-      profils.add(profil.value);
-    }
-
-    return profils;
-
   }
 
   getAllProfilsStream(){

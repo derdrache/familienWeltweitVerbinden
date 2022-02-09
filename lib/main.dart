@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
       if(message.data.isNotEmpty){
         var chatId = message.data["chatId"];
-        var activeChat = await ProfilDatabaseKontroller().getActiveChat(userId);
+        var activeChat = await ProfilDatabase().getActiveChat(userId);
 
         if(activeChat == null || activeChat != message.data["chatId"]){
           notificationToDatabase(chatId);
@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
       var chatId = message.data["chatId"];
 
       if(pageContext != null){
-        var groupChatData = await ChatDatabaseKontroller().getChat(chatId);
+        var groupChatData = await ChatDatabase().getChat(chatId);
 
         global_functions.changePageForever(pageContext, ChatDetailsPage(
             groupChatData: groupChatData)
@@ -84,18 +84,18 @@ class MyApp extends StatelessWidget {
   }
 
   notificationToDatabase(chatId) async {
-    var newMessages = await ProfilDatabaseKontroller().getOneData(userId,"newMessages");
+    var newMessages = await ProfilDatabase().getOneData(userId,"newMessages");
 
     if(newMessages == null) newMessages = 0;
 
-    ProfilDatabaseKontroller().updateProfil(
+    ProfilDatabase().updateProfil(
         userId,
         {"newMessages": newMessages +1}
     );
 
-    var newChatMessages = await ChatDatabaseKontroller().getNewMessagesCounter(chatId, userId);
+    var newChatMessages = await ChatDatabase().getNewMessagesCounter(chatId, userId);
 
-    ChatDatabaseKontroller().updateNewMessageCounter(
+    ChatDatabase().updateNewMessageCounter(
         chatId,
         userId,
         newChatMessages + 1
