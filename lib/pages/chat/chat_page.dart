@@ -145,13 +145,11 @@ class _ChatPageState extends State<ChatPage>{
             userId: userName,
 
           }},
-          chatPartner: {chatPartnerID: chatPartnerName},
           newChat: true
       ));
     } else{
       changePage(context, ChatDetailsPage(
         groupChatData: globalChatGroups[checkAndIndex[1]],
-        chatPartner: {chatPartnerID: chatPartnerName},
       ));
     }
 
@@ -196,7 +194,6 @@ class _ChatPageState extends State<ChatPage>{
           GestureDetector(
             onTap: () =>changePage(context, ChatDetailsPage(
               groupChatData: group,
-              chatPartner: {chatPartnerID:chatPartnerName},
             )),
             child: Container(
                 padding: EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),

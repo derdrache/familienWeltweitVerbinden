@@ -10,11 +10,9 @@ import '../../global/custom_widgets.dart';
 class ChatDetailsPage extends StatefulWidget {
   var groupChatData;
   bool newChat;
-  var chatPartner;
 
   ChatDetailsPage({Key? key,
     required this.groupChatData,
-    required this.chatPartner,
     this.newChat = false}) : super(key: key);
 
   @override
@@ -38,13 +36,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   @override
   void initState() {
     chatID = widget.groupChatData["id"]?? "0";
-    chatPartnerID = widget.chatPartner.keys.toList()[0];
-    chatPartnerName = widget.chatPartner[chatPartnerID];
+
+    getAndSetChatPartnerData();
 
     writeActiveChat();
     resetNewMessageCounter();
 
     super.initState();
+  }
+
+  getAndSetChatPartnerData(){
+    widget.groupChatData["users"].forEach((key, value){
+      if(key != userId){
+        chatPartnerID = key;
+        chatPartnerName = value["name"];
+      }
+    });
   }
 
   writeActiveChat(){

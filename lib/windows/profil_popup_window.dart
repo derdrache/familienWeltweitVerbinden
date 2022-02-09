@@ -59,7 +59,6 @@ class ProfilPopupWindow{
 
           global_functions.changePage(context, ChatDetailsPage(
             groupChatData: groupChatData,
-            chatPartner: {profilID: profil["name"]},
             newChat: newChat,
           ));
         }
