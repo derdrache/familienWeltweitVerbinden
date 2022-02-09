@@ -63,9 +63,8 @@ class _StartPageState extends State<StartPage>{
 
 
   Widget build(BuildContext context){
-    const navigationbarButtonColor = Colors.purple;
     List<Widget> tabPages = <Widget>[
-      BoardPage(),
+      //BoardPage(),
       ErkundenPage(),
       //UmkreisPage(),
       ChatPage(),
@@ -130,17 +129,24 @@ class _StartPageState extends State<StartPage>{
             child: tabPages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: BottomNavigationBar(
+            backgroundColor: Colors.blue[800],
+            currentIndex: widget.selectedIndex,
+            selectedItemColor: Colors.black,
+            onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
+/*
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Board',
                 backgroundColor: navigationbarButtonColor,
               ),
+
+ */
               BottomNavigationBarItem(
                 icon: Icon(Icons.travel_explore),
                 label: 'Weltweit suchen',
-                backgroundColor: navigationbarButtonColor,
               ),
+
               /*
               BottomNavigationBarItem(
                 icon: Icon(Icons.location_city),
@@ -152,17 +158,13 @@ class _StartPageState extends State<StartPage>{
               BottomNavigationBarItem(
                 icon: chatIcon(),
                 label: 'Chat',
-                backgroundColor: navigationbarButtonColor,
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),
                 label: 'Settings',
-                backgroundColor: navigationbarButtonColor,
               ),
             ],
-            currentIndex: widget.selectedIndex,
-            selectedItemColor: Colors.white,
-            onTap: _onItemTapped,
+
           )
     );
   }

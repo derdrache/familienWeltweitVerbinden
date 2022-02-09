@@ -42,7 +42,7 @@ void main()async {
 class MyApp extends StatelessWidget {
   var pageMainColor = Colors.white;
   var userLogedIn = FirebaseAuth.instance.currentUser;
-  var userId = FirebaseAuth.instance.currentUser!.uid;
+  var userId = FirebaseAuth.instance.currentUser?.uid;
   var pageContext;
 
   initialization() async {
