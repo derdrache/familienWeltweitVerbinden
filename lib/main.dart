@@ -1,3 +1,4 @@
+import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/services/local_notification.dart';
@@ -11,6 +12,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'pages/login_register_page/login_page.dart';
+import 'global/global_functions.dart' as global_functions;
 
 var appIcon = '@mipmap/ic_launcher';
 
@@ -41,6 +43,7 @@ class MyApp extends StatelessWidget {
   var pageMainColor = Colors.white;
   var userLogedIn = FirebaseAuth.instance.currentUser;
   var userId = FirebaseAuth.instance.currentUser!.uid;
+  var pageContext;
 
   initialization() async {
     LocalNotificationService.initialize();
@@ -50,8 +53,6 @@ class MyApp extends StatelessWidget {
     FirebaseMessaging.instance.getInitialMessage().then((value){
       if(value != null){
 
-
-
       }
     });
 
@@ -59,15 +60,24 @@ class MyApp extends StatelessWidget {
       var chatId = message.data["chatId"];
       var activeChat = await ProfilDatabaseKontroller().getActiveChat(userId);
 
-      if(activeChat == null || activeChat != message.data["chatId"]){
+      //if(activeChat == null || activeChat != message.data["chatId"]){
         notificationToDatabase(chatId);
         LocalNotificationService().display(message);
-      }
+      //}
 
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message){
-      print("test");
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async{
+      var chatId = message.data["chatId"];
+
+      if(pageContext != null){
+        var groupChatData = await ChatDatabaseKontroller().getChat(chatId);
+
+        global_functions.changePageForever(pageContext, ChatDetailsPage(
+            groupChatData: groupChatData)
+        );
+      }
+
     });
 
   }
@@ -92,7 +102,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    pageContext = context;
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.black,
