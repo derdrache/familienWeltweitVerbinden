@@ -40,7 +40,7 @@ class ProfilPopupWindow{
         style: global_style.textButtonStyle(),
         child: const Icon(Icons.message),
         onPressed: () async {
-          var profilID = await ProfilDatabaseKontroller().getProfilIDFromName(profil["name"]);
+          var profilID = await ProfilDatabaseKontroller().getProfilId("name", profil["name"]);
           var users = [userID, profilID];
           var newChat = false;
 

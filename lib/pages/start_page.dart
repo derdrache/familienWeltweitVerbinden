@@ -35,8 +35,8 @@ class _StartPageState extends State<StartPage>{
 
   _asyncMethod() async{
     if(userName != null){
-      var userDBEmail = await ProfilDatabaseKontroller().getProfilEmail(userID);
-      var userDeviceTokenDb = await ProfilDatabaseKontroller().getToken(userID);
+      var userDBEmail = await ProfilDatabaseKontroller().getOneData(userID, "email");
+      var userDeviceTokenDb = await ProfilDatabaseKontroller().getOneData(userID, "token");
       var userDeviceTokenReal = await FirebaseMessaging.instance.getToken();
 
       if(userAuthEmail != userDBEmail){

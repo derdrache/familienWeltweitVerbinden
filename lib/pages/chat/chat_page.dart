@@ -122,8 +122,8 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   findUserGetName(user) async {
-    var foundOnName = await ProfilDatabaseKontroller().getProfilIDFromName(user);
-    var foundOnEmail = await ProfilDatabaseKontroller().getProfilIDFromEmail(user);
+    var foundOnName = await ProfilDatabaseKontroller().getProfilId("name", user);
+    var foundOnEmail = await ProfilDatabaseKontroller().getProfilId("email", user);
 
     if(foundOnName != null){
       return foundOnName;
@@ -137,7 +137,8 @@ class _ChatPageState extends State<ChatPage>{
 
   validCheckAndOpenChatgroup(chatPartnerID) async {
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
-    var chatPartnerName = await ProfilDatabaseKontroller().getProfilName(chatPartnerID);
+    var chatPartnerName = await ProfilDatabaseKontroller().getOneData(chatPartnerID, "name");
+
     var userData = {
       "users": {
         chatPartnerID: {"name": chatPartnerName, "newMessages": 0},

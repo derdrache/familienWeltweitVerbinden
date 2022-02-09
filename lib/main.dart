@@ -84,8 +84,8 @@ class MyApp extends StatelessWidget {
   }
 
   notificationToDatabase(chatId) async {
-    var newMessages = await ProfilDatabaseKontroller().getNewMessages(userId);
-    print(newMessages);
+    var newMessages = await ProfilDatabaseKontroller().getOneData(userId,"newMessages");
+
     if(newMessages == null) newMessages = 0;
 
     ProfilDatabaseKontroller().updateProfil(

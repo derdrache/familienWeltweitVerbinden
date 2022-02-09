@@ -106,6 +106,7 @@ class ProfilDatabaseKontroller{
     });
   }
 
+
   getProfil(id) async{
     var query = await profilsDB.child(id).get();
     var data = query.value;
@@ -113,11 +114,10 @@ class ProfilDatabaseKontroller{
     return data;
   }
 
-  getProfilEmail(id) async{
+  getOneData(id, information) async {
     var query = await profilsDB.child(id).child("email").get();
-    var data = query.value;
 
-    return data;
+    return query.value;
   }
 
   getProfilFromName(name) async{
@@ -126,34 +126,10 @@ class ProfilDatabaseKontroller{
     if(query.snapshot.exists) return query.snapshot.value;
   }
 
-  getProfilIDFromName(name) async {
-    var query = await profilsDB.orderByChild("name").limitToFirst(1).equalTo(name).once();
+  getProfilId(String search, String match) async{
+    var query = await profilsDB.orderByChild(search).limitToFirst(1).equalTo(match).once();
 
     if(query.snapshot.exists) return query.snapshot.children.first.key;
-  }
-
-  getProfilIDFromEmail(email) async{
-    var query = await profilsDB.orderByChild("email").limitToFirst(1).equalTo(email).once();
-
-    if(query.snapshot.exists) return query.snapshot.children.first.key;
-  }
-
-  getProfilName(id) async {
-    var query = await profilsDB.child(id).child("name").get();
-
-    return query.value;
-  }
-
-  getNewMessages(id) async {
-    var query = await profilsDB.child(id).child("newMessages").get();
-
-    return query.value;
-  }
-
-  getToken(id) async{
-    var query = await profilsDB.child(id).child("token").get();
-
-    return query.value;
   }
 
   getActiveChat(id) async {
