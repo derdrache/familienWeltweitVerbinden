@@ -57,14 +57,15 @@ class MyApp extends StatelessWidget {
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
-      var chatId = message.data["chatId"];
-      var activeChat = await ProfilDatabaseKontroller().getActiveChat(userId);
+      if(message.data.isNotEmpty){
+        var chatId = message.data["chatId"];
+        var activeChat = await ProfilDatabaseKontroller().getActiveChat(userId);
 
-      if(activeChat == null || activeChat != message.data["chatId"]){
-        notificationToDatabase(chatId);
-        LocalNotificationService().display(message);
+        if(activeChat == null || activeChat != message.data["chatId"]){
+          notificationToDatabase(chatId);
+          LocalNotificationService().display(message);
+        }
       }
-
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async{
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
 
   notificationToDatabase(chatId) async {
     var newMessages = await ProfilDatabaseKontroller().getNewMessages(userId);
+    print(newMessages);
     if(newMessages == null) newMessages = 0;
 
     ProfilDatabaseKontroller().updateProfil(

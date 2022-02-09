@@ -1,5 +1,6 @@
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'create_profil_page.dart';
@@ -33,12 +34,19 @@ class _StartPageState extends State<StartPage>{
   }
 
   _asyncMethod() async{
-    var userDBEmail = await ProfilDatabaseKontroller().getProfilEmail(userID);
+    if(userName != null){
+      var userDBEmail = await ProfilDatabaseKontroller().getProfilEmail(userID);
+      var userDeviceTokenDb = await ProfilDatabaseKontroller().getToken(userID);
+      var userDeviceTokenReal = await FirebaseMessaging.instance.getToken();
 
-    if(userAuthEmail != userDBEmail  && userName != null){
-      ProfilDatabaseKontroller().updateProfil(userID, {"email": userAuthEmail});
+      if(userAuthEmail != userDBEmail){
+        ProfilDatabaseKontroller().updateProfil(userID, {"email": userAuthEmail});
+      }
+
+      if(userDeviceTokenDb != userDeviceTokenReal){
+        ProfilDatabaseKontroller().updateProfil(userID, {"token": userDeviceTokenReal});
+      }
     }
-
   }
 
   checkIfFirstLogin(){

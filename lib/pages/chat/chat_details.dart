@@ -76,7 +76,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   messageToDbAndClearMessageInput(message)async {
     var userID = FirebaseAuth.instance.currentUser!.uid;
-    //var chatPartnerToken = await ProfilDatabaseKontroller().getToken(chatPartnerID);
 
     nachrichtController.clear();
 
@@ -85,13 +84,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       "from": userID,
       "date": Timestamp.now().seconds,
       "to": chatPartnerID
-      /*
-      "notificationInfo" : {
-        "from": userName,
-        "token": chatPartnerToken
-      }
-
-       */
     };
     if(widget.newChat){
       widget.groupChatData = await ChatDatabaseKontroller()
