@@ -18,6 +18,7 @@ class ChatDatabase{
     var usersList = users.values.toList();
     var chatID = global_functions.getChatID(userKeysList);
 
+
     var chatgroupData = {
       "id": chatID,
       "users" : {
@@ -72,6 +73,8 @@ class ChatDatabase{
   }
 
   getAllChatgroupsFromUserStream(userID, userName) {
+    print(userID);
+    print(userName);
     return chatGroupsDB.orderByChild("users/$userID/name").equalTo(userName).onValue;
   }
 
