@@ -42,6 +42,7 @@ class PatchnotesWindow{
         context: context,
         title: patchnotesTitle,
         children: [
+          _patch(prePatch3),
           _patch(prePatch2),
           _patch(prePatch1),
 
@@ -60,6 +61,11 @@ var prePatch1 = {
 var prePatch2 = {
   "title": "0.10.0",
   "inhalt": "Notification-System wurde eingebaut. Ab jetzt ist es auch möglich zu sehen wie viele ungelesene Chatnachrichten offen sind"
+};
+
+var prePatch3 = {
+  "title": "0.10.1",
+  "inhalt": "- Fehler bei der Freundesliste behoben \n - kritischer Datenbankfehler behoben"
 };
 
 var patch1 = {

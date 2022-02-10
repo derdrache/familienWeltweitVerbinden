@@ -518,6 +518,7 @@ class WindowTopbar extends StatelessWidget {
   }
 }
 
+
 CustomWindow({required context,required title,required List<Widget> children}){
   children.insert(0,WindowTopbar(title: title));
   children.insert(1, SizedBox(height: 10));
@@ -532,9 +533,11 @@ CustomWindow({required context,required title,required List<Widget> children}){
       context: context,
       builder: (BuildContext buildContext){
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))
+          ),
           contentPadding: EdgeInsets.zero,
-          content: Scaffold(
-            body: SizedBox(
+          content: SizedBox(
               height: double.maxFinite,
               width: double.maxFinite,
               child: Stack(
@@ -558,7 +561,7 @@ CustomWindow({required context,required title,required List<Widget> children}){
                 ] ,
               ),
             ),
-          ),
+
         );
       }
   );
