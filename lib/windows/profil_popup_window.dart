@@ -72,12 +72,12 @@ class ProfilPopupWindow{
         style: global_style.textButtonStyle(),
         child: onFriendlist ? const Icon(Icons.person_remove) : const Icon(Icons.person_add),
         onPressed: (){
-
           if(onFriendlist){
             userFriendlist.remove(profil["name"]);
             if(userFriendlist.keys.isEmpty) userFriendlist = {"empty": true};
           } else {
             if(userFriendlist["empty"] == true) userFriendlist = {profil["name"]: true};
+            userFriendlist[profil["name"]] = true;
           }
 
           ProfilDatabase().updateProfil(
