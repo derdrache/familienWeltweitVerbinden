@@ -1,3 +1,4 @@
+import 'package:familien_suche/windows/about_project.dart';
 import 'package:familien_suche/windows/patchnotes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +11,7 @@ import '../../global/variablen.dart' as globalVariablen;
 import '../../global/custom_widgets.dart';
 import '../../windows/change_profil_window.dart';
 import '../../windows/upcoming_updates.dart';
+import '../../windows/about_project.dart';
 import '../login_register_page/login_page.dart';
 import 'package:familien_suche/pages/settings/privacy_security_page.dart';
 import 'feedback_page.dart';
@@ -629,9 +631,14 @@ class _SettingPageState extends State<SettingPage> {
               settingThemeContainer("Geplante Erweiterungen", Icons.task,
                   () => UmcomingUpdatesWindow(context: context).openWindow()
               ),
+              /*
               SizedBox(height: 20),
-              //themeContainer("Über das Projekt", Icons.description, ""),
-              //SizedBox(height: 20),
+              settingThemeContainer("Über das Projekt", Icons.description,
+                  () => AboutProject(context: context).openWindow()
+              ),
+
+               */
+              SizedBox(height: 20),
               themeContainer("Spenden", Icons.card_giftcard,
                   "https://www.paypal.com/paypalme/DominikMast"),
             ],
