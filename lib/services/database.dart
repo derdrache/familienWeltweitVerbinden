@@ -114,7 +114,7 @@ class ProfilDatabase{
   }
 
   getOneData(id, information) async {
-    var query = await profilsDB.child(id).child("email").get();
+    var query = await profilsDB.child(id).child(information).get();
 
     return query.value;
   }
