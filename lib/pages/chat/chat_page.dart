@@ -27,13 +27,13 @@ class _ChatPageState extends State<ChatPage>{
         builder: (BuildContext dialogContext){
           return AlertDialog(
             content: Scaffold(
-              body: Container(
+              body: SizedBox(
                 height: 400,
                 child: Column(
                   children: [
                     Row(
                         children: [
-                          Container(
+                          SizedBox(
                             width: 168,
                             height: 40,
                             child: TextFormField(
@@ -50,14 +50,14 @@ class _ChatPageState extends State<ChatPage>{
                             ),
                           ),
                           TextButton(
-                            child: Icon(Icons.search),
+                            child: const Icon(Icons.search),
                             onPressed: () async {
                               var chatPartner = personenSucheController.text;
                               if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
-                                var userID = await findUserGetName(personenSucheController.text);
+                                var chatPartnerId = await findUserGetName(personenSucheController.text);
 
-                                if(userID != null){
-                                  validCheckAndOpenChatgroup(userID);
+                                if(chatPartnerId != null){
+                                  validCheckAndOpenChatgroup(chatPartnerId);
                                 } else {
                                   personenSucheController.clear();
                                   customSnackbar(dialogContext, "Benutzer existiert nicht");
@@ -68,9 +68,9 @@ class _ChatPageState extends State<ChatPage>{
                             },
                           )
                         ]),
-                    SizedBox(height: 20),
-                    Align(alignment: Alignment.centerLeft, child: Text("Friendlist: ")),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 20),
+                    const Align(alignment: Alignment.centerLeft, child: Text("Friendlist: ")),
+                    const SizedBox(height: 10),
                     createFriendlistBox(userFriendlist)
                   ]
                 )
@@ -82,7 +82,6 @@ class _ChatPageState extends State<ChatPage>{
 
   Widget createFriendlistBox(userFriendlist) {
     List<Widget> friendsBoxen = [];
-
     if(userFriendlist["empty"] == true) {
       userFriendlist= [];
     } else{
@@ -96,8 +95,8 @@ class _ChatPageState extends State<ChatPage>{
         GestureDetector(
           onTap: () => validCheckAndOpenChatgroup(friend),
           child: Container(
-            margin: EdgeInsets.all(5),
-            padding: EdgeInsets.all(15),
+            margin: const EdgeInsets.all(5),
+            padding: const EdgeInsets.all(15),
             width: 200,
             decoration: BoxDecoration(
               border: Border.all(),
@@ -112,7 +111,7 @@ class _ChatPageState extends State<ChatPage>{
     return Container(
       width: double.maxFinite,
       height: 250,
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: ListView(
           children: friendsBoxen
       ),
@@ -124,14 +123,10 @@ class _ChatPageState extends State<ChatPage>{
     var foundOnName = await ProfilDatabase().getProfilId("name", user);
     var foundOnEmail = await ProfilDatabase().getProfilId("email", user);
 
-    if(foundOnName != null){
-      return foundOnName;
-    } else if(foundOnEmail != null){
-      return foundOnEmail;
-    } else {
-      return null;
-    }
+    if(foundOnName != null) return foundOnName;
+    if(foundOnEmail != null) return foundOnEmail;
 
+    return null;
   }
 
   validCheckAndOpenChatgroup(chatPartnerID) async {
@@ -173,7 +168,6 @@ class _ChatPageState extends State<ChatPage>{
   }
 
 
-
   Widget build(BuildContext context){
 
     chatUserList(groupdata) {
@@ -181,13 +175,11 @@ class _ChatPageState extends State<ChatPage>{
 
       for(var group in groupdata){
         var chatPartnerName;
-        var chatPartnerID;
 
 
         group["users"].forEach((key, value) async {
           if(key != userId){
             chatPartnerName = value["name"];
-            chatPartnerID = key;
           }
         });
 
@@ -201,7 +193,7 @@ class _ChatPageState extends State<ChatPage>{
               groupChatData: group,
             )),
             child: Container(
-                padding: EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
+                padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
                 width: double.infinity,
                 decoration: const BoxDecoration(
                     border: Border(
@@ -213,20 +205,20 @@ class _ChatPageState extends State<ChatPage>{
                 children: [
                   Row(
                     children: [
-                      Text(chatPartnerName,style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      Expanded(child: SizedBox()),
+                      Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      const Expanded(child: const SizedBox()),
                       Text(lastMessageTime, style: TextStyle(color: Colors.grey[600]),)
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Text(lastMessage, style: TextStyle(fontSize: 16, color: Colors.grey[600]),),
-                      Expanded(child: SizedBox.shrink()),
-                      ownChatNewMessages== 0? SizedBox.shrink(): Container(
+                      const Expanded(child: SizedBox.shrink()),
+                      ownChatNewMessages== 0? const SizedBox.shrink(): Container(
                           height: 30,
                           width: 30,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               color: Colors.blue,
                               shape: BoxShape.circle
                           ),
@@ -234,7 +226,7 @@ class _ChatPageState extends State<ChatPage>{
                             child: FittedBox(
                               child: Text(
                                 ownChatNewMessages.toString(),
-                                style: TextStyle(fontWeight: FontWeight.bold,
+                                style: const TextStyle(fontWeight: FontWeight.bold,
                                     color: Colors.white),
                               ),
                             ),
@@ -273,7 +265,7 @@ class _ChatPageState extends State<ChatPage>{
                     AsyncSnapshot snapshot,
                 ){
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else if (snapshot.data.snapshot.value != null) {
                     var chatGroups = [];
                     var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
@@ -292,7 +284,7 @@ class _ChatPageState extends State<ChatPage>{
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.create),
+        child: const Icon(Icons.create),
         onPressed: () => selectChatpartnerWindow(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

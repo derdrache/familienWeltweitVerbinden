@@ -18,7 +18,7 @@ class CreateProfilPage extends StatefulWidget {
 
 class _CreateProfilPageState extends State<CreateProfilPage> {
   final _formKey = GlobalKey<FormState>();
-  var nameTextcontroller = TextEditingController();
+  var userNameKontroller = TextEditingController();
   var ortTextcontroller = TextEditingController();
   var sprachenAuswahlBox = CustomMultiTextForm(
     hintText: "Sprachen auswählen",
@@ -35,17 +35,15 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
 
 
-
-
   saveFunction()async {
     if(_formKey.currentState!.validate()){
       var userExist = await ProfilDatabase()
-          .getProfilId("name", nameTextcontroller.text) != null;
+          .getProfilId("name", userNameKontroller.text) != null;
 
       if(checkAllValidation(userExist)){
         var userID = FirebaseAuth.instance.currentUser?.uid;
         var email = FirebaseAuth.instance.currentUser?.email;
-        var userName = nameTextcontroller.text;
+        var userName = userNameKontroller.text;
         var locationData = await LocationService()
             .getLocationMapDataGoogle(ortTextcontroller.text);
         if(locationData != null){
@@ -87,7 +85,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   checkAllValidation(userExist){
-    bool allGood = true;
+    bool noError = true;
     String errorString = "Bitte Eingaben korrigieren: \n";
 
     if (userExist){
@@ -102,30 +100,30 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
 
     if(errorString.length > 29){
-      allGood = false;
+      noError = false;
 
       customSnackbar(context, errorString);
     }
 
-    return allGood;
+    return noError;
   }
 
   @override
   Widget build(BuildContext context) {
 
     pageTitle(){
-      return Container(
+      return SizedBox(
         height: 60,
         child: Row(
           children: [
-            Expanded(child: SizedBox()),
-            Text(
+            const Expanded(child: SizedBox.shrink()),
+            const Text(
               "Profil erstellen",
               style: TextStyle(
                   fontSize: 30
               ),
             ),
-            Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox.shrink()),
             TextButton(
                 onPressed: saveFunction,
                 child: Icon(Icons.done, size: 35),
@@ -143,7 +141,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             child: ListView(
                 children: [
                   pageTitle(),
-                  customTextInput("Benutzername", nameTextcontroller,
+                  customTextInput("Benutzername", userNameKontroller,
                       validator: globalFunctions.checkValidatorEmpty()),
                   customTextInput("Aktuelle Stadt eingeben", ortTextcontroller,
                       validator: globalFunctions.checkValidatorEmpty()),
@@ -151,7 +149,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                   sprachenAuswahlBox,
                   interessenAuswahlBox,
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                       child: const Text(
                         "Anzahl und Alter der Kinder:",
                         style: TextStyle(
