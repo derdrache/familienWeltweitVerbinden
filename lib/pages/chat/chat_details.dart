@@ -45,6 +45,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   }
 
   getAndSetChatPartnerData(){
+
     widget.groupChatData["users"].forEach((key, value){
       if(key != userId){
         chatPartnerID = key;

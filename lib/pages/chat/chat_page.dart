@@ -54,10 +54,10 @@ class _ChatPageState extends State<ChatPage>{
                             onPressed: () async {
                               var chatPartner = personenSucheController.text;
                               if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
-                                var chatPartnerId = await findUserGetName(personenSucheController.text);
+                                var chatPartnerId = await findUserGetId(personenSucheController.text);
 
                                 if(chatPartnerId != null){
-                                  validCheckAndOpenChatgroup(chatPartnerId);
+                                  validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId);
                                 } else {
                                   personenSucheController.clear();
                                   customSnackbar(dialogContext, "Benutzer existiert nicht");
@@ -91,9 +91,10 @@ class _ChatPageState extends State<ChatPage>{
 
 
     for(var friend in userFriendlist){
+
       friendsBoxen.add(
         GestureDetector(
-          onTap: () => validCheckAndOpenChatgroup(friend),
+          onTap: () => validCheckAndOpenChatgroup(name: friend),
           child: Container(
             margin: const EdgeInsets.all(5),
             padding: const EdgeInsets.all(15),
@@ -119,7 +120,7 @@ class _ChatPageState extends State<ChatPage>{
 
   }
 
-  findUserGetName(user) async {
+  findUserGetId(user) async {
     var foundOnName = await ProfilDatabase().getProfilId("name", user);
     var foundOnEmail = await ProfilDatabase().getProfilId("email", user);
 
@@ -129,7 +130,8 @@ class _ChatPageState extends State<ChatPage>{
     return null;
   }
 
-  validCheckAndOpenChatgroup(chatPartnerID) async {
+  validCheckAndOpenChatgroup({chatPartnerID, name}) async {
+    if(name != null) chatPartnerID = await ProfilDatabase().getProfilId("name", name);
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
     var chatPartnerName = await ProfilDatabase().getOneData(chatPartnerID, "name");
 
@@ -155,11 +157,11 @@ class _ChatPageState extends State<ChatPage>{
 
   }
 
-  checkNewChatGroup(chatPartner){
+  checkNewChatGroup(chatPartnerId){
     var check = [true, -1];
 
     for(var i = 0;i < globalChatGroups.length; i++){
-      if(globalChatGroups[i]["users"][userId] != null){
+      if(globalChatGroups[i]["users"][chatPartnerId] != null){
         check = [false,i];
       }
     }

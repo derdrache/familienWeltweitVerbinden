@@ -89,7 +89,7 @@ dbSecondsToTimeString(seconds){
 }
 
 getChatID(usersList){
-  usersList.sort();
-  return usersList.join("_");
+  var sortedList = usersList.toList(growable: false)..sort();
+  return sortedList.join("_");
 }
 

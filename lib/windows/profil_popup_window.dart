@@ -51,8 +51,8 @@ class ProfilPopupWindow{
             newChat = true;
             groupChatData = {
               "users": {
-                profilID: profil["name"],
-                userID: userName
+                profilID: {"name": profil["name"], "newMessages" : 0},
+                userID: {"name": userName, "newMessages" : 0}
               }
             };
           }
