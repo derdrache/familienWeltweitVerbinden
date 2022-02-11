@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../services/database.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
+import '../../services/database.dart';
 import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget{
@@ -169,6 +170,19 @@ class _ChatPageState extends State<ChatPage>{
     return check;
   }
 
+  checkNewMessageCounter() async{
+    var dbNewMessages = ProfilDatabase().getOneData(userId, "newMessages");
+    num realNewMessages = 0;
+    for(var group in globalChatGroups){
+      realNewMessages += group["users"][userId]["newMessages"];
+    }
+
+    if(dbNewMessages != realNewMessages){
+      ProfilDatabase().updateProfil(userId, {"newMessages": realNewMessages});
+    }
+
+  }
+
 
   Widget build(BuildContext context){
 
@@ -276,6 +290,8 @@ class _ChatPageState extends State<ChatPage>{
                       chatGroups.add(value);
                     });
 
+                    checkNewMessageCounter();
+
                     globalChatGroups = chatGroups;
                     return chatUserList(chatGroups);
                   }
@@ -286,6 +302,7 @@ class _ChatPageState extends State<ChatPage>{
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "newChat",
         child: const Icon(Icons.create),
         onPressed: () => selectChatpartnerWindow(),
       ),

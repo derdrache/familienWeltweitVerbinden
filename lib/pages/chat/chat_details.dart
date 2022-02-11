@@ -179,7 +179,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               AsyncSnapshot snap,
               ){
             if (snap.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return SizedBox.shrink();
             } else if (snap.data.snapshot.value != null) {
               List<Map> messages = [];
 
@@ -199,19 +199,38 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     textEingabe(){
       return Container(
-
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),//EdgeInsets.all(10),
         height: 50,
         decoration: BoxDecoration(
             color: Colors.white,
-            border: Border(top: BorderSide(color: Colors.grey))
+            border: Border(top: BorderSide(color: Colors.grey)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ]
         ),
-        child: TextField(
-          onSubmitted: (eingabe) async { messageToDbAndClearMessageInput(eingabe); },
-          controller: nachrichtController,
-          decoration: InputDecoration.collapsed(
-            hintText: "Nachricht"
-          ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: TextField(
+                onSubmitted: (eingabe) async { messageToDbAndClearMessageInput(eingabe); },
+                controller: nachrichtController,
+                decoration: InputDecoration.collapsed(
+                  hintText: "Nachricht"
+                ),
+              ),
+            ),
+            IconButton(
+                padding: EdgeInsets.zero,
+                  onPressed: () => print("test"),
+                  icon: Icon(Icons.send, size: 30)
+              ),
+          ],
         ),
 
       );
@@ -228,7 +247,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         )
       ),
       body: Container(
-        color: Colors.blue,
         child: ListView(
           reverse: true,
           children: [

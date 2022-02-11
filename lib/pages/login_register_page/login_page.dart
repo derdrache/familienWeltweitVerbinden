@@ -100,10 +100,12 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 header(),
                 customTextInput("Email", emailController,
-                    validator: global_functions.checkValidationEmail()),
+                  validator: global_functions.checkValidationEmail(),
+                  textInputAction: TextInputAction.next
+                ),
                 customTextInput("Passwort", passwortController,
                     validator: global_functions.checkValidatorPassword(),
-                    passwort: true),
+                    passwort: true, textInputAction: TextInputAction.done),
                 forgetPassButton(),
                 isLoading ? loading() : customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended("Register", (){
