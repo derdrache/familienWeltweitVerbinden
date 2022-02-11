@@ -129,9 +129,9 @@ class _StartPageState extends State<StartPage>{
             child: tabPages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Colors.blue[800],
+            backgroundColor: Colors.deepOrange,
             currentIndex: widget.selectedIndex,
-            selectedItemColor: Colors.black,
+            selectedItemColor: Colors.white,
             onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
 /*

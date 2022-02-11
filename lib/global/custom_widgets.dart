@@ -6,10 +6,12 @@ double borderRounding = 5;
 double boxHeight = 50;
 var buttonColor = Colors.purple;
 
-Widget customTextInput(text, controller, {validator, passwort = false, moreLines = 1}){
+Widget customTextInput(text, controller, {validator, passwort = false,
+  moreLines = 1,TextInputAction textInputAction = TextInputAction.done}){
   return Container(
     margin: EdgeInsets.all(sideSpace),
     child: TextFormField(
+      textInputAction: textInputAction,
       textAlignVertical: TextAlignVertical.top,
       maxLines: moreLines,
       obscureText: passwort,

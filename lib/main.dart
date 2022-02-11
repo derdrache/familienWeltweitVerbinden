@@ -8,23 +8,28 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'firebase_options.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 import 'pages/login_register_page/login_page.dart';
-import 'global/global_functions.dart' as global_functions;
 
 var appIcon = '@mipmap/ic_launcher';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  var chatId = message.data["chatId"];
+
+  if(chatId != null){
+    notificationToDatabase(chatId);
+  }
+
 
 }
 
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Hive.initFlutter();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -37,22 +42,37 @@ void main()async {
   runApp(MyApp());
 }
 
+notificationToDatabase(chatId) async {
+  var userId = FirebaseAuth.instance.currentUser?.uid;
+  var newMessages = await ProfilDatabase().getOneData(userId,"newMessages") ?? 0;
 
+  ProfilDatabase().updateProfil(
+      userId,
+      {"newMessages": newMessages +1}
+  );
+
+  var newChatMessages = await ChatDatabase().getNewMessagesCounter(chatId, userId);
+
+  ChatDatabase().updateNewMessageCounter(
+      chatId,
+      userId,
+      newChatMessages + 1
+  );
+}
 
 class MyApp extends StatelessWidget {
-  var pageMainColor = Colors.white;
   var userLogedIn = FirebaseAuth.instance.currentUser;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var pageContext;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
     LocalNotificationService.initialize();
-    var notificationBox = await Hive.openBox('notificationBox');
 
-    ///if the App is closed
+
     FirebaseMessaging.instance.getInitialMessage().then((value){
       if(value != null){
-
+        print("Seitenwechsel getInitalMessage");
       }
     });
 
@@ -72,33 +92,20 @@ class MyApp extends StatelessWidget {
       var chatId = message.data["chatId"];
 
       if(pageContext != null){
-        var groupChatData = await ChatDatabase().getChat(chatId);
-
-        global_functions.changePageForever(pageContext, ChatDetailsPage(
-            groupChatData: groupChatData)
-        );
+        changeToChat(chatId);
       }
-
     });
 
   }
 
-  notificationToDatabase(chatId) async {
-    var newMessages = await ProfilDatabase().getOneData(userId,"newMessages");
 
-    if(newMessages == null) newMessages = 0;
 
-    ProfilDatabase().updateProfil(
-        userId,
-        {"newMessages": newMessages +1}
-    );
+  changeToChat(chatId)async {
+    var groupChatData = await ChatDatabase().getChat(chatId);
 
-    var newChatMessages = await ChatDatabase().getNewMessagesCounter(chatId, userId);
-
-    ChatDatabase().updateNewMessageCounter(
-        chatId,
-        userId,
-        newChatMessages + 1
+    navigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (_) => ChatDetailsPage(
+            groupChatData: groupChatData))
     );
   }
 
@@ -106,25 +113,30 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     pageContext = context;
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,
     ));
+
+
 
     return FutureBuilder(
       future: initialization(),
         builder: (context, snapshot){
           if(snapshot.hasError){
-            print("something went wrong");
+            ("something went wrong");
           }
           if(snapshot.connectionState == ConnectionState.waiting){
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           return MaterialApp(
-              theme: ThemeData(
-                scaffoldBackgroundColor: pageMainColor,
-              ),
+            theme: ThemeData(
+              scaffoldBackgroundColor: Colors.white,
+              colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.deepOrange),
+              iconTheme: const IconThemeData(color: Colors.deepOrange)
+            ),
+            navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
-            home: userLogedIn != null ? StartPage() :LoginPage()
+            home: userLogedIn != null ? StartPage() :const LoginPage()
           );
         }
     );

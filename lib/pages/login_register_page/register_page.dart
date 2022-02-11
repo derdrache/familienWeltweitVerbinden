@@ -66,17 +66,20 @@ class _RegisterPageState extends State<RegisterPage> {
           child: ListView(
             children: [
               customTextInput(
-                  "Email", emailController,
-                  validator: global_functions.checkValidationEmail()
+                "Email", emailController,
+                validator: global_functions.checkValidationEmail(),
+                textInputAction: TextInputAction.next
               ),
               customTextInput(
-                  "Passwort", passwordController, passwort: true,
-                  validator: global_functions.checkValidatorPassword()
+                "Passwort", passwordController, passwort: true,
+                validator: global_functions.checkValidatorPassword(),
+                textInputAction: TextInputAction.next
               ),
               customTextInput(
-                  "Passwort bestätigen", checkPasswordController, passwort: true,
-                  validator: global_functions.checkValidatorPassword(
-                      passwordCheck: passwordController.text)
+                "Passwort bestätigen", checkPasswordController, passwort: true,
+                validator: global_functions.checkValidatorPassword(
+                passwordCheck: passwordController.text),
+                textInputAction: TextInputAction.done
               ),
               isLoading ? loading(): customFloatbuttonExtended("Registrieren", () async{
                 setState(() {
