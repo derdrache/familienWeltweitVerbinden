@@ -103,8 +103,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     }
 
     ChatDatabase().addNewMessage(
-        widget.groupChatData,
-        messageData
+      widget.groupChatData,
+      messageData,
+      userID
     );
 
   }

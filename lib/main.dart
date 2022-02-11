@@ -21,7 +21,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   var chatId = message.data["chatId"];
 
   if(chatId != null){
-    notificationToDatabase(chatId);
+    //notificationToDatabase(chatId);
   }
 
 
@@ -82,7 +82,7 @@ class MyApp extends StatelessWidget {
         var activeChat = await ProfilDatabase().getActiveChat(userId);
 
         if(activeChat == null || activeChat != message.data["chatId"]){
-          notificationToDatabase(chatId);
+          //notificationToDatabase(chatId);
           LocalNotificationService().display(message);
         }
       }
