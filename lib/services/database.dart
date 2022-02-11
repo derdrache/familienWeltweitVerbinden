@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import '../global/global_functions.dart'as global_functions;
 
 DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
@@ -43,12 +44,39 @@ class ChatDatabase{
         "newMessages": counter});
   }
 
-  addNewMessage(chatgroupData, messageData){
+  addNewMessage(chatgroupData, messageData, userId){
     var users = chatgroupData["users"].keys.toList();
     var chatID = global_functions.getChatID(users);
     var chatGroup = chatMessagesDB.child(chatID);
 
     chatGroup.push().set(messageData);
+    _changeNewMessageCounter(userId, chatgroupData);
+  }
+
+  _changeNewMessageCounter(userId, chatData) async{
+    var allNewMessages = await ProfilDatabase().getOneData(userId,"newMessages") ?? 0;
+    var usersIds = chatData["users"].keys.toList();
+
+    ProfilDatabase().updateProfil(
+        userId,
+        {"newMessages": allNewMessages +1}
+    );
+
+    for(var userId in usersIds){
+      var oldUserNewMessages = chatData["users"][userId]["newMessages"];
+      var activeChat = await ProfilDatabase().getActiveChat(userId);
+
+      if(chatData["id"] != activeChat){
+        ChatDatabase().updateNewMessageCounter(
+            chatData["id"],
+            userId,
+            oldUserNewMessages + 1
+        );
+      }
+
+    }
+
+
   }
 
   addAdminMessage(message, user){
@@ -100,11 +128,11 @@ class ProfilDatabase{
 
     updateProfil(profilID, {"name": newName});
 
-    chatGroupsDB.orderByChild("users/$profilID").equalTo(oldName).once().then((query){
+    chatGroupsDB.orderByChild("users/$profilID/name").equalTo(oldName).once().then((query){
       for (var chatGroup in query.snapshot.children) {
         var key = chatGroup.key;
 
-        chatGroupsDB.child(key!).child("users").update({profilID: newName});
+        chatGroupsDB.child(key!).child("users").child(profilID).update({"name": newName});
       }
     });
   }
