@@ -234,8 +234,8 @@ class _ChatPageState extends State<ChatPage>{
                       ownChatNewMessages== 0? const SizedBox.shrink(): Container(
                           height: 30,
                           width: 30,
-                          decoration: const BoxDecoration(
-                              color: Colors.blue,
+                          decoration: BoxDecoration(
+                              color:Theme.of(context).colorScheme.tertiary,
                               shape: BoxShape.circle
                           ),
                           child: Center(

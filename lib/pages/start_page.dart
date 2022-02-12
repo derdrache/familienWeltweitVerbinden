@@ -90,7 +90,7 @@ class _StartPageState extends State<StartPage>{
                   var newMessages = snap.data.snapshot.value;
                   return Stack(
                     clipBehavior: Clip.none, children: <Widget>[
-                    Icon(Icons.chat),
+                    const Icon(Icons.chat),
                     Positioned(
                         top: -10,
                         right: -10,
@@ -98,7 +98,7 @@ class _StartPageState extends State<StartPage>{
                             height: 20,
                             width: 20,
                             decoration: BoxDecoration(
-                                color: Colors.red,
+                                color: Theme.of(context).colorScheme.tertiary,
                                 shape: BoxShape.circle
                             ),
                             child: Center(
@@ -129,7 +129,7 @@ class _StartPageState extends State<StartPage>{
             child: tabPages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: Colors.deepOrange,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             currentIndex: widget.selectedIndex,
             selectedItemColor: Colors.white,
             onTap: _onItemTapped,

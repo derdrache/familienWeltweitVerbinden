@@ -66,10 +66,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     var usersAllNewMessages = await ProfilDatabase().getOneData(userId, "newMessages");
 
+
     ChatDatabase().updateNewMessageCounter(chatID, userId, 0);
     ProfilDatabase().updateProfil(
         userId,
-        {"newMessages": usersAllNewMessages - usersChatNewMessages}
+        {"newMessages": usersAllNewMessages - usersChatNewMessages < 0? 0:
+                        usersAllNewMessages - usersChatNewMessages}
     );
 
   }
@@ -102,11 +104,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       );
     }
 
-    ChatDatabase().addNewMessage(
-      widget.groupChatData,
-      messageData,
-      userID
-    );
+    ChatDatabase().addNewMessage(widget.groupChatData, messageData);
 
   }
 
@@ -219,7 +217,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           children: [
             Expanded(
               child: TextField(
-                onSubmitted: (eingabe) async { messageToDbAndClearMessageInput(eingabe); },
+                onSubmitted: (eingabe) => messageToDbAndClearMessageInput(eingabe) ,
                 controller: nachrichtController,
                 decoration: InputDecoration.collapsed(
                   hintText: "Nachricht"
@@ -228,7 +226,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             ),
             IconButton(
                 padding: EdgeInsets.zero,
-                  onPressed: () => print("test"),
+                  onPressed: () => messageToDbAndClearMessageInput(nachrichtController.text),
                   icon: Icon(Icons.send, size: 30)
               ),
           ],
