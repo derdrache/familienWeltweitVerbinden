@@ -18,12 +18,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  var chatId = message.data["chatId"];
-
-  if(chatId != null){
-    //notificationToDatabase(chatId);
-  }
-
 
 }
 
@@ -40,24 +34,6 @@ void main()async {
 
 
   runApp(MyApp());
-}
-
-notificationToDatabase(chatId) async {
-  var userId = FirebaseAuth.instance.currentUser?.uid;
-  var newMessages = await ProfilDatabase().getOneData(userId,"newMessages") ?? 0;
-
-  ProfilDatabase().updateProfil(
-      userId,
-      {"newMessages": newMessages +1}
-  );
-
-  var newChatMessages = await ChatDatabase().getNewMessagesCounter(chatId, userId);
-
-  ChatDatabase().updateNewMessageCounter(
-      chatId,
-      userId,
-      newChatMessages + 1
-  );
 }
 
 class MyApp extends StatelessWidget {
@@ -78,11 +54,9 @@ class MyApp extends StatelessWidget {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
       if(message.data.isNotEmpty){
-        var chatId = message.data["chatId"];
         var activeChat = await ProfilDatabase().getActiveChat(userId);
 
         if(activeChat == null || activeChat != message.data["chatId"]){
-          //notificationToDatabase(chatId);
           LocalNotificationService().display(message);
         }
       }

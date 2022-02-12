@@ -1,4 +1,3 @@
-import 'package:familien_suche/windows/about_project.dart';
 import 'package:familien_suche/windows/patchnotes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -149,10 +148,13 @@ class _SettingPageState extends State<SettingPage> {
       }
     }else if(beschreibung == beschreibungName){
       errorMessage = await changeName();
+      if(errorMessage == "") customSnackbar(context, "Name erfolgreich geändert", color: Colors.green);
     } else if (beschreibung == beschreibungEmail){
       errorMessage = await changeEmail();
+      if(errorMessage == "") customSnackbar(context, "Email erfolgreich geändert", color: Colors.green);
     } else if (beschreibung == beschreibungPasswort){
       errorMessage = await changePasswort();
+      if(errorMessage == "") customSnackbar(context, "Passwort erfolgreich geändert", color: Colors.green);
     }
 
     if(errorMessage.isEmpty){
@@ -257,6 +259,7 @@ class _SettingPageState extends State<SettingPage> {
         ProfilDatabase().updateProfilName(
             userID, userName, nameTextKontroller.text
         );
+
       } else {
         errorMessage += "- Name schon vorhanden";
       }

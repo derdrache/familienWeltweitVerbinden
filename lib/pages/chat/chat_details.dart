@@ -227,7 +227,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             IconButton(
                 padding: EdgeInsets.zero,
                   onPressed: () => messageToDbAndClearMessageInput(nachrichtController.text),
-                  icon: Icon(Icons.send, size: 30)
+                  icon: Icon(Icons.send, size: 30, color: Theme.of(context).colorScheme.tertiary)
               ),
           ],
         ),
