@@ -44,38 +44,34 @@ class ChatDatabase{
         "newMessages": counter});
   }
 
-  addNewMessage(chatgroupData, messageData, userId){
+  addNewMessage(chatgroupData, messageData){
     var users = chatgroupData["users"].keys.toList();
     var chatID = global_functions.getChatID(users);
     var chatGroup = chatMessagesDB.child(chatID);
 
     chatGroup.push().set(messageData);
-    _changeNewMessageCounter(userId, chatgroupData);
+    _changeNewMessageCounter(messageData["to"], chatgroupData);
   }
 
-  _changeNewMessageCounter(userId, chatData) async{
-    var allNewMessages = await ProfilDatabase().getOneData(userId,"newMessages") ?? 0;
-    var usersIds = chatData["users"].keys.toList();
+  _changeNewMessageCounter(chatPartnerId, chatData) async{
+    var allNewMessages = await ProfilDatabase().getOneData(chatPartnerId,"newMessages") ?? 0;
 
     ProfilDatabase().updateProfil(
-        userId,
+        chatPartnerId,
         {"newMessages": allNewMessages +1}
     );
 
-    for(var userId in usersIds){
-      var oldUserNewMessages = chatData["users"][userId]["newMessages"];
-      var activeChat = await ProfilDatabase().getActiveChat(userId);
 
-      if(chatData["id"] != activeChat){
-        ChatDatabase().updateNewMessageCounter(
-            chatData["id"],
-            userId,
-            oldUserNewMessages + 1
-        );
-      }
+    var oldUserNewMessages = chatData["users"][chatPartnerId]["newMessages"];
+    var activeChat = await ProfilDatabase().getActiveChat(chatPartnerId);
 
+    if(chatData["id"] != activeChat){
+      ChatDatabase().updateNewMessageCounter(
+          chatData["id"],
+          chatPartnerId,
+          oldUserNewMessages + 1
+      );
     }
-
 
   }
 
@@ -101,8 +97,6 @@ class ChatDatabase{
   }
 
   getAllChatgroupsFromUserStream(userID, userName) {
-    print(userID);
-    print(userName);
     return chatGroupsDB.orderByChild("users/$userID/name").equalTo(userName).onValue;
   }
 
@@ -123,7 +117,7 @@ class ProfilDatabase{
     profilsDB.child(userID).update(data);
   }
 
-  updateProfilName(profilID,oldName, newName) {
+  updateProfilName(profilID,oldName, newName) async {
     FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
 
     updateProfil(profilID, {"name": newName});
@@ -135,6 +129,15 @@ class ProfilDatabase{
         chatGroupsDB.child(key!).child("users").child(profilID).update({"name": newName});
       }
     });
+
+    var query = await profilsDB.orderByChild("friendlist/$oldName").equalTo(true).once();
+
+    query.snapshot.children.forEach((element) {
+
+      profilsDB.child(element.key!).child("friendlist").child(oldName).remove();
+      profilsDB.child(element.key!).child("friendlist").update({newName: true});
+    });
+
   }
 
   getProfil(id) async{

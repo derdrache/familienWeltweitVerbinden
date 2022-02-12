@@ -131,8 +131,13 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             theme: ThemeData(
               scaffoldBackgroundColor: Colors.white,
-              colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.deepOrange),
-              iconTheme: const IconThemeData(color: Colors.deepOrange)
+              colorScheme: ColorScheme.fromSwatch().copyWith(
+                primary: Color(0xFFBF1D53),
+                secondary: Color(0xFFF49619),
+                tertiary: Color(0xFF3CB28F)
+
+            ),
+              iconTheme: IconThemeData(color: Theme.of(context).colorScheme.tertiary)
             ),
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,

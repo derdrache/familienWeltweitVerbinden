@@ -26,7 +26,7 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   double globalPadding = 30;
-  double fontSize = 16;
+  double fontSize = 20;
   var borderColor = Colors.grey[200]!;
   var userID = FirebaseAuth.instance.currentUser!.uid;
   var userProfil;
@@ -347,6 +347,7 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double containerPadding = 5;
+    var headLineColor = Theme.of(context).colorScheme.secondary;
 
 
     profilThemeContainer(haupttext, beschreibung, changeWidget){
@@ -367,11 +368,11 @@ class _SettingPageState extends State<SettingPage> {
                 haupttext == ""? CircularProgressIndicator() : Text(
                   haupttext,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: fontSize),
+                  style: TextStyle(fontSize: fontSize-4),
                 ),
                 SizedBox(height: 3),
                 Text(beschreibung,
-                  style: TextStyle(color: Colors.grey, fontSize: fontSize-2.0),
+                  style: TextStyle(color: Colors.grey, fontSize: fontSize-6.0),
                 ),
               ],
             )
@@ -518,7 +519,11 @@ class _SettingPageState extends State<SettingPage> {
             children: [
               Row(children: [
                 Text("Profil",
-                    style: TextStyle(color: Colors.blue, fontSize: fontSize)
+                    style: TextStyle(
+                        color: headLineColor,
+                        fontSize: fontSize,
+                      fontWeight: FontWeight.bold
+                    )
                 ),
                 Expanded(child: SizedBox()),
                 Text("Antippen, um Einträge zu ändern",style: TextStyle(color: Colors.grey, fontSize: 14)),
@@ -561,7 +566,7 @@ class _SettingPageState extends State<SettingPage> {
               children: [
                 Icon(icon),
                 SizedBox(width: 20),
-                Text(title)
+                Text(title, style: TextStyle(fontSize: fontSize-4),)
               ],
             )
         ),
@@ -576,7 +581,12 @@ class _SettingPageState extends State<SettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Einstellungen",
-                  style: TextStyle(color: Colors.blue, fontSize: fontSize)),
+                  style: TextStyle(
+                      color: headLineColor,
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.bold
+                  )
+              ),
               SizedBox(height: 20),
               settingThemeContainer("Privatsphäre und Sicherheit", Icons.lock,
                       () => globalFunctions.changePage(
@@ -616,7 +626,12 @@ class _SettingPageState extends State<SettingPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("App Informationen",
-                  style: TextStyle(color: Colors.blue, fontSize: fontSize)),
+                  style: TextStyle(
+                      color: headLineColor,
+                      fontSize: fontSize,
+                    fontWeight: FontWeight.bold
+                  )
+              ),
               SizedBox(height: 20),
               settingThemeContainer("Feedback", Icons.feedback,
                       () => globalFunctions.changePage(
