@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../start_page.dart';
+import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -18,6 +19,22 @@ class _RegisterPageState extends State<RegisterPage> {
   final checkPasswordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  var actionCodeSettings = {
+    // URL you want to redirect back to. The domain (www.example.com) for this
+    // URL must be in the authorized domains list in the Firebase Console.
+    "url": 'https://www.example.com/finishSignUp?cartId=1234',
+    // This must be true.
+    "handleCodeInApp": true,
+    "iOS": {
+      "bundleId": 'com.example.ios'
+    },
+    "android": {
+      "packageName": 'com.example.android',
+      "installApp": true,
+      "minimumVersion": '12'
+    },
+    "dynamicLinkDomain": 'example.page.link'
+  };
 
 
   registration() async{
@@ -27,7 +44,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
       try{
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-        customSnackbar(context, "Registrierung erfolgreich, bitte Anmelden", color: Colors.green);
+        await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+        FirebaseAuth.instance.currentUser?.sendEmailVerification();
+
         return true;
       }on FirebaseAuthException catch(error){
         setState(() {
@@ -46,6 +65,8 @@ class _RegisterPageState extends State<RegisterPage> {
     }
     return false;
   }
+
+
 
   loading(){
     return const SizedBox(
@@ -87,7 +108,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 });
                 var registrationComplete = await registration();
                 if(registrationComplete){
-                  global_functions.changePageForever(context, StartPage());
+                  customSnackbar(context, "Registrierung erfolgreich, bitte Email bestätigen", color: Colors.green);
+                  global_functions.changePageForever(context, LoginPage());
                 }
               })
             ],

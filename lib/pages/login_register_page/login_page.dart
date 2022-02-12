@@ -35,7 +35,18 @@ class _LoginPageState extends State<LoginPage> {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: passwort);
-      global_functions.changePageForever(context, StartPage());
+
+      bool emailVerified = FirebaseAuth.instance.currentUser?.emailVerified?? false;
+
+      if(emailVerified){
+        global_functions.changePageForever(context, StartPage());
+      } else{
+        setState(() {
+          isLoading = false;
+        });
+        customSnackbar(context, "Email ist noch nicht bestätigt worden");
+      }
+
     }on FirebaseAuthException catch(error){
       setState(() {
         isLoading = false;
