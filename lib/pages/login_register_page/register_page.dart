@@ -36,6 +36,16 @@ class _RegisterPageState extends State<RegisterPage> {
     "dynamicLinkDomain": 'example.page.link'
   };
 
+  registrationButton()async{
+    setState(() {
+      isLoading = true;
+    });
+    var registrationComplete = await registration();
+    if(registrationComplete){
+      customSnackbar(context, "Registrierung erfolgreich, bitte Email bestätigen", color: Colors.green);
+      global_functions.changePageForever(context, LoginPage());
+    }
+  }
 
   registration() async{
     if(formKey.currentState!.validate()){
@@ -63,6 +73,11 @@ class _RegisterPageState extends State<RegisterPage> {
         return false;
       }
     }
+
+    setState(() {
+      isLoading = false;
+    });
+
     return false;
   }
 
@@ -100,18 +115,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 "Passwort bestätigen", checkPasswordController, passwort: true,
                 validator: global_functions.checkValidatorPassword(
                 passwordCheck: passwordController.text),
-                textInputAction: TextInputAction.done
+                textInputAction: TextInputAction.done,
+                onSubmit: () => registrationButton()
               ),
-              isLoading ? loading(): customFloatbuttonExtended("Registrieren", () async{
-                setState(() {
-                  isLoading = true;
-                });
-                var registrationComplete = await registration();
-                if(registrationComplete){
-                  customSnackbar(context, "Registrierung erfolgreich, bitte Email bestätigen", color: Colors.green);
-                  global_functions.changePageForever(context, LoginPage());
-                }
-              })
+              isLoading ? loading():
+              customFloatbuttonExtended("Registrieren", () => registrationButton())
             ],
           ),
         )

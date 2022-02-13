@@ -4,13 +4,16 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 double sideSpace = 10;
 double borderRounding = 5;
 double boxHeight = 50;
-var buttonColor = Colors.purple;
 
 Widget customTextInput(text, controller, {validator, passwort = false,
-  moreLines = 1,TextInputAction textInputAction = TextInputAction.done}){
+  moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
+  onSubmit}){
   return Container(
     margin: EdgeInsets.all(sideSpace),
     child: TextFormField(
+      onFieldSubmitted: (string) {
+        if(onSubmit != null)onSubmit();
+      },
       textInputAction: textInputAction,
       textAlignVertical: TextAlignVertical.top,
       maxLines: moreLines,
@@ -39,7 +42,6 @@ Widget customFloatbuttonExtended(text, function){
     child: FloatingActionButton.extended(
       heroTag: text,
         label: Text(text),
-        backgroundColor: Colors.purple,
         onPressed: function
     )
   );

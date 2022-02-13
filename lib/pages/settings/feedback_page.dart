@@ -8,14 +8,14 @@ import '../../global/global_functions.dart';
 class FeedbackPage extends StatelessWidget {
   var feedbackTextKontroller = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  var userName = FirebaseAuth.instance.currentUser!.displayName;
+  var userEmail = FirebaseAuth.instance.currentUser!.email;
 
 
   feedbackSendenAndClose(context) async {
     var chatDatabaseKontroller = ChatDatabase();
 
     chatDatabaseKontroller.addAdminMessage(
-        feedbackTextKontroller.text, userName);
+        feedbackTextKontroller.text, userEmail);
 
     feedbackTextKontroller.clear();
     Navigator.pop(context);

@@ -6,6 +6,7 @@ import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import 'chat_details.dart';
+import '../../services/locationsService.dart';
 
 class ChatPage extends StatefulWidget{
   _ChatPageState createState() => _ChatPageState();
@@ -171,7 +172,7 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   checkNewMessageCounter() async{
-    var dbNewMessages = ProfilDatabase().getOneData(userId, "newMessages");
+    var dbNewMessages = await ProfilDatabase().getOneData(userId, "newMessages");
     num realNewMessages = 0;
     for(var group in globalChatGroups){
       realNewMessages += group["users"][userId]["newMessages"];

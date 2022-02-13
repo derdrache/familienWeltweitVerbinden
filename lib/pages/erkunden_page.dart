@@ -363,7 +363,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
               createAndSetZoomProfils();
 
-
               return Stack(children: [
                 ownFlutterMap(),
                 searchMultiForm
