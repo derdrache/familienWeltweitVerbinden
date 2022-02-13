@@ -6,7 +6,6 @@ import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import 'chat_details.dart';
-import '../../services/locationsService.dart';
 
 class ChatPage extends StatefulWidget{
   _ChatPageState createState() => _ChatPageState();
@@ -185,6 +184,7 @@ class _ChatPageState extends State<ChatPage>{
   }
 
 
+  @override
   Widget build(BuildContext context){
 
     chatUserList(groupdata) {
@@ -223,7 +223,7 @@ class _ChatPageState extends State<ChatPage>{
                   Row(
                     children: [
                       Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      const Expanded(child: const SizedBox()),
+                      const Expanded(child: SizedBox.shrink()),
                       Text(lastMessageTime, style: TextStyle(color: Colors.grey[600]),)
                     ],
                   ),

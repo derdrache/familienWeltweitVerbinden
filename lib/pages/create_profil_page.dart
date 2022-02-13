@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../global/custom_widgets.dart';
-import '../global/global_functions.dart' as globalFunctions;
-import '../global/variablen.dart' as globalVariablen;
+import '../global/global_functions.dart' as global_functions;
+import '../global/variablen.dart' as global_variablen;
 import '../services/locationsService.dart';
 import '../services/database.dart';
 import 'start_page.dart';
@@ -22,15 +22,15 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var ortTextcontroller = TextEditingController();
   var sprachenAuswahlBox = CustomMultiTextForm(
     hintText: "Sprachen auswählen",
-    auswahlList: globalVariablen.sprachenListe,
-    validator: globalFunctions.checkValidationMultiTextForm(),
+    auswahlList: global_variablen.sprachenListe,
+    validator: global_functions.checkValidationMultiTextForm(),
   );
   var reiseArtenAuswahlBox = CustomDropDownButton(
-      items: globalVariablen.reisearten);
+      items: global_variablen.reisearten);
   var interessenAuswahlBox = CustomMultiTextForm(
     hintText: "Interessen auswählen",
-    auswahlList: globalVariablen.interessenListe,
-      validator: globalFunctions.checkValidationMultiTextForm()
+    auswahlList: global_variablen.interessenListe,
+      validator: global_functions.checkValidationMultiTextForm()
   );
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
 
@@ -65,7 +65,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           };
 
           ProfilDatabase().addNewProfil(userID, data);
-          globalFunctions.changePageForever(context, StartPage(registered: true));
+          global_functions.changePageForever(context, StartPage(registered: true));
         } else{
           customSnackbar(context, "Stadt nicht gefunden");
         }
@@ -126,7 +126,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             const Expanded(child: SizedBox.shrink()),
             TextButton(
                 onPressed: saveFunction,
-                child: Icon(Icons.done, size: 35),
+                child: const Icon(Icons.done, size: 35),
             )
         ]),
       );
@@ -135,16 +135,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
     return Scaffold(
       body: Container(
-        margin: EdgeInsets.only(top: 30),
+        margin: const EdgeInsets.only(top: 30),
           child: Form(
             key: _formKey,
             child: ListView(
                 children: [
                   pageTitle(),
                   customTextInput("Benutzername", userNameKontroller,
-                      validator: globalFunctions.checkValidatorEmpty()),
+                      validator: global_functions.checkValidatorEmpty()),
                   customTextInput("Aktuelle Stadt eingeben", ortTextcontroller,
-                      validator: globalFunctions.checkValidatorEmpty()),
+                      validator: global_functions.checkValidatorEmpty()),
                   reiseArtenAuswahlBox,
                   sprachenAuswahlBox,
                   interessenAuswahlBox,

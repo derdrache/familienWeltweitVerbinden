@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
-import '../start_page.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -43,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
     var registrationComplete = await registration();
     if(registrationComplete){
       customSnackbar(context, "Registrierung erfolgreich, bitte Email bestätigen", color: Colors.green);
-      global_functions.changePageForever(context, LoginPage());
+      global_functions.changePageForever(context, const LoginPage());
     }
   }
 

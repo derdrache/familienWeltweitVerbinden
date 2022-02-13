@@ -4,9 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'create_profil_page.dart';
-import 'board_page.dart';
 import 'erkunden_page.dart';
-import 'umkreis_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
 
@@ -68,7 +66,7 @@ class _StartPageState extends State<StartPage>{
       ErkundenPage(),
       //UmkreisPage(),
       ChatPage(),
-      SettingPage()
+      const SettingPage()
     ];
 
 
@@ -105,7 +103,7 @@ class _StartPageState extends State<StartPage>{
                               child: FittedBox(
                                 child: Text(
                                   newMessages.toString(),
-                                  style: TextStyle(fontWeight: FontWeight.bold,
+                                  style: const TextStyle(fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 ),
                               ),
@@ -115,16 +113,16 @@ class _StartPageState extends State<StartPage>{
                   ],
                   );
                 }
-                return Icon(Icons.chat);
+                return const Icon(Icons.chat);
               }
-              return Icon(Icons.chat);
+              return const Icon(Icons.chat);
           });
 
 
 
     }
 
-    return checkIfFirstLogin() ? CreateProfilPage(): Scaffold(
+    return checkIfFirstLogin() ? const CreateProfilPage(): Scaffold(
           body: Center(
             child: tabPages.elementAt(widget.selectedIndex),
           ),
@@ -142,7 +140,7 @@ class _StartPageState extends State<StartPage>{
               ),
 
  */
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.travel_explore),
                 label: 'Weltweit suchen',
               ),
@@ -159,7 +157,7 @@ class _StartPageState extends State<StartPage>{
                 icon: chatIcon(),
                 label: 'Chat',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.settings),
                 label: 'Settings',
               ),
