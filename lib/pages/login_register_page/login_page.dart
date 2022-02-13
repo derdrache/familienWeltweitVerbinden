@@ -116,7 +116,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 customTextInput("Passwort", passwortController,
                     validator: global_functions.checkValidatorPassword(),
-                    passwort: true, textInputAction: TextInputAction.done),
+                    passwort: true,
+                    textInputAction: TextInputAction.done,
+                    onSubmit: () => doLogin()),
                 forgetPassButton(),
                 isLoading ? loading() : customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended("Register", (){

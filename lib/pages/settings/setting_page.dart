@@ -350,7 +350,7 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double containerPadding = 5;
-    var headLineColor = Theme.of(context).colorScheme.secondary;
+    var headLineColor = Theme.of(context).colorScheme.primary;
 
 
     profilThemeContainer(haupttext, beschreibung, changeWidget){
@@ -462,8 +462,8 @@ class _SettingPageState extends State<SettingPage> {
               ),
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () {
-                        FirebaseAuth.instance.signOut();
+                      onPressed: () async {
+                        await FirebaseAuth.instance.signOut();
                         globalFunctions.changePage(context, LoginPage());
                       },
                       child: Text("Abmelden", style: TextStyle(color: textColor)))

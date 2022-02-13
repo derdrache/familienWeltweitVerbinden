@@ -79,6 +79,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   messageToDbAndClearMessageInput(message)async {
     var userID = FirebaseAuth.instance.currentUser!.uid;
 
+    if(nachrichtController.text == "") return;
     nachrichtController.clear();
 
     var messageData = {
@@ -111,7 +112,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     messageList(messages){
       List<Widget> messageBox = [];
 

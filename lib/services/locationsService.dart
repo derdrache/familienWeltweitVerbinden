@@ -20,7 +20,7 @@ class LocationService {
       var json = convert.jsonDecode(response.body);
 
       var mapData = {
-        "city": json["candidates"][0]["formatted_address"].split(", ").first,
+        "city": json["candidates"][0]["name"],
         "countryname": json["candidates"][0]["formatted_address"].split(", ").last,
         "longt": json["candidates"][0]["geometry"]["location"]["lng"],
         "latt": json["candidates"][0]["geometry"]["location"]["lat"]

@@ -62,7 +62,7 @@ class ChatDatabase{
     );
 
 
-    var oldUserNewMessages = chatData["users"][chatPartnerId]["newMessages"];
+    var oldUserNewMessages = await ChatDatabase().getNewMessages(chatData["id"], chatPartnerId);
     var activeChat = await ProfilDatabase().getActiveChat(chatPartnerId);
 
     if(chatData["id"] != activeChat){
@@ -81,6 +81,13 @@ class ChatDatabase{
       "user": user,
       "date": DateTime.now().toString()
     });
+  }
+
+  getNewMessages(chatId, userId) async {
+    var query = await chatGroupsDB.child(chatId).child("users").child(userId).child("newMessages").get();
+
+    return query.value;
+
   }
 
   getChat(chatID) async {
