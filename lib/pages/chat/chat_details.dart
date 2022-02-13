@@ -132,24 +132,24 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             alignment: textAlign, //right and left
             child: Container(
                 constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.55),
-                margin: EdgeInsets.all(10),
+                margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: boxColor,
                   border: Border.all(),
-                  borderRadius: BorderRadius.all(Radius.circular(10))
+                  borderRadius: const BorderRadius.all(Radius.circular(10))
                 ),
                 child: Wrap(
                   crossAxisAlignment: WrapCrossAlignment.end,
                   alignment: WrapAlignment.end,
                   children: [
                     Container(
-                      padding: EdgeInsets.only(top:5, left: 10, bottom: 7, right: 10),
-                      child: Text(message["message"] == null ? "": message["message"],
-                          style: TextStyle(fontSize: 16 )
+                      padding: const EdgeInsets.only(top:5, left: 10, bottom: 7, right: 10),
+                      child: Text(message["message"] ?? "",
+                          style: const TextStyle(fontSize: 16 )
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.only(bottom: 5, right: 10),
+                      padding: const EdgeInsets.only(bottom: 5, right: 10),
                       child: Text(
                           dbSecondsToTimeString(message["date"]),
                           style: TextStyle(color: Colors.grey[600])
@@ -178,7 +178,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               AsyncSnapshot snap,
               ){
             if (snap.connectionState == ConnectionState.waiting) {
-              return SizedBox.shrink();
+              return const SizedBox.shrink();
             } else if (snap.data.snapshot.value != null) {
               List<Map> messages = [];
 
@@ -198,17 +198,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     textEingabe(){
       return Container(
-        padding: EdgeInsets.only(left: 10, bottom: 10, top: 10),//EdgeInsets.all(10),
+        padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),//EdgeInsets.all(10),
         height: 50,
         decoration: BoxDecoration(
             color: Colors.white,
-            border: Border(top: BorderSide(color: Colors.grey)),
+            border: const Border(top: BorderSide(color: Colors.grey)),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 5,
                 blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
+                offset: const Offset(0, 3), // changes position of shadow
               ),
             ]
         ),
@@ -219,7 +219,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               child: TextField(
                 onSubmitted: (eingabe) => messageToDbAndClearMessageInput(eingabe) ,
                 controller: nachrichtController,
-                decoration: InputDecoration.collapsed(
+                decoration: const InputDecoration.collapsed(
                   hintText: "Nachricht"
                 ),
               ),
@@ -245,14 +245,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             child: Container()
         )
       ),
-      body: Container(
-        child: ListView(
-          reverse: true,
-          children: [
-            textEingabe(),
-            showMessages(),
-          ],
-        ),
+      body: ListView(
+        reverse: true,
+        children: [
+          textEingabe(),
+          showMessages(),
+        ],
       )
     );
   }

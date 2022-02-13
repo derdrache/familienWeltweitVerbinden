@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart' as globalFunctions;
+import '../../global/global_functions.dart' as globa_functions;
 import 'login_page.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
@@ -36,25 +36,23 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar(title: "Reset Passwort"),
-      body: Container(
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                SizedBox(height: 20),
-                Center(child: Text("Reset Link wird an deine Email Adresse gesendet")),
-                customTextInput("Email", emailController,
-                    validator: globalFunctions.checkValidationEmail()),
-                customFloatbuttonExtended("Send Email", () async{
-                  var wasReset = await resetPassword();
-                  if (wasReset){
-                    globalFunctions.changePageForever(context, LoginPage());
-                  }
-                })
-              ],
-            ),
-          )
-        )
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          children: [
+            const SizedBox(height: 20),
+            const Center(child: Text("Reset Link wird an deine Email Adresse gesendet")),
+            customTextInput("Email", emailController,
+                validator: globa_functions.checkValidationEmail()),
+            customFloatbuttonExtended("Send Email", () async{
+              var wasReset = await resetPassword();
+              if (wasReset){
+                globa_functions.changePageForever(context, const LoginPage());
+              }
+            })
+          ],
+        ),
+      )
     );
   }
 }

@@ -5,12 +5,11 @@ import 'package:url_launcher/link.dart';
 
 import '../../services/database.dart';
 import '../../services/locationsService.dart';
-import '../../global/global_functions.dart' as globalFunctions;
-import '../../global/variablen.dart' as globalVariablen;
+import '../../global/global_functions.dart' as global_functions;
+import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
 import '../../windows/change_profil_window.dart';
 import '../../windows/upcoming_updates.dart';
-import '../../windows/about_project.dart';
 import '../login_register_page/login_page.dart';
 import 'package:familien_suche/pages/settings/privacy_security_page.dart';
 import 'feedback_page.dart';
@@ -32,16 +31,16 @@ class _SettingPageState extends State<SettingPage> {
   var nameTextKontroller = TextEditingController();
   var kinderAgeBox = ChildrenBirthdatePickerBox();
   var interessenInputBox = CustomMultiTextForm(
-      auswahlList: globalVariablen.interessenListe);
+      auswahlList: global_variablen.interessenListe);
   var bioTextKontroller = TextEditingController();
   var emailTextKontroller = TextEditingController();
   var emailNewTextKontroller = TextEditingController();
   var passwortTextKontroller1 = TextEditingController();
   var passwortTextKontroller2 = TextEditingController();
   var passwortCheckKontroller = TextEditingController();
-  var reiseArtInput = CustomDropDownButton(items: globalVariablen.reisearten);
+  var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
   var sprachenInputBox = CustomMultiTextForm(
-      auswahlList: globalVariablen.sprachenListe);
+      auswahlList: global_variablen.sprachenListe);
   var ortKontroller = TextEditingController();
   String beschreibungStadt = "Aktuelle Stadt";
   String beschreibungReise  = "Art der Reise";
@@ -76,7 +75,7 @@ class _SettingPageState extends State<SettingPage> {
       List childrenDataYears = [];
 
       userProfil["kinder"].forEach((kind){
-        var changeTimeStamp = globalFunctions.ChangeTimeStamp(kind);
+        var changeTimeStamp = global_functions.ChangeTimeStamp(kind);
         childrenDataYears.add(changeTimeStamp.intoYears());
         childrenAgeTimestamp.add(changeTimeStamp.intoDate());
       });
@@ -252,7 +251,7 @@ class _SettingPageState extends State<SettingPage> {
     var userName = FirebaseAuth.instance.currentUser!.displayName;
     var checkUserProfilExist = await ProfilDatabase().getProfilFromName(nameTextKontroller.text);
 
-    if(nameTextKontroller.text == null || nameTextKontroller.text == ""){
+    if(nameTextKontroller.text == ""){
       errorMessage = "Neuen Namen eingeben";
     } else{
       if(checkUserProfilExist == null){
@@ -368,12 +367,12 @@ class _SettingPageState extends State<SettingPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                haupttext == ""? CircularProgressIndicator() : Text(
+                haupttext == ""? const CircularProgressIndicator() : Text(
                   haupttext,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: fontSize-4),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(beschreibung,
                   style: TextStyle(color: Colors.grey, fontSize: fontSize-6.0),
                 ),
@@ -390,7 +389,7 @@ class _SettingPageState extends State<SettingPage> {
       return Column(
         children: [
           customTextInput(beschreibungEmail,emailNewTextKontroller),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           customTextInput("Passwort bestätigen",passwortTextKontroller1, passwort: true)
         ],
       );
@@ -405,10 +404,10 @@ class _SettingPageState extends State<SettingPage> {
         children: [
           customTextInput("Neues Passwort eingeben", passwortTextKontroller1,
               passwort: true),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           customTextInput("Neues Passwort wiederholen", passwortTextKontroller2,
               passwort: true),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           customTextInput("Altes Passwort eingeben", passwortCheckKontroller,
               passwort: true)
         ],
@@ -427,7 +426,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ),
             context: context,
-            position: RelativeRect.fromLTRB(100, 0, 0, 100),
+            position: const RelativeRect.fromLTRB(100, 0, 0, 100),
             items: [
               PopupMenuItem(
                   child: TextButton(
@@ -464,7 +463,7 @@ class _SettingPageState extends State<SettingPage> {
                   child: TextButton(
                       onPressed: () async {
                         await FirebaseAuth.instance.signOut();
-                        globalFunctions.changePage(context, LoginPage());
+                        global_functions.changePage(context, const LoginPage());
                       },
                       child: Text("Abmelden", style: TextStyle(color: textColor)))
               ),
@@ -483,7 +482,7 @@ class _SettingPageState extends State<SettingPage> {
                     )
                 )
             ),
-            child: Icon(Icons.more_vert, color: Colors.black),
+            child: const Icon(Icons.more_vert, color: Colors.black),
             onPressed: () => openSettingWindow(),
           )
       );
@@ -492,7 +491,7 @@ class _SettingPageState extends State<SettingPage> {
     nameContainer(){
       return Container(
           width: double.maxFinite,
-          padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
           decoration: BoxDecoration(
               border: Border(bottom: BorderSide(width: 10, color: borderColor))
           ),
@@ -501,9 +500,9 @@ class _SettingPageState extends State<SettingPage> {
               children: [
                 Text(
                   nameTextKontroller.text,
-                  style: TextStyle(fontSize: 30),
+                  style: const TextStyle(fontSize: 30),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(emailTextKontroller.text)
               ]
           )
@@ -513,7 +512,7 @@ class _SettingPageState extends State<SettingPage> {
     profilContainer(){
       return Container(
           width: double.maxFinite,
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
               border: Border(bottom: BorderSide(width: 10, color: borderColor))
           ),
@@ -528,11 +527,13 @@ class _SettingPageState extends State<SettingPage> {
                       fontWeight: FontWeight.bold
                     )
                 ),
-                Expanded(child: SizedBox()),
-                Text("Antippen, um Einträge zu ändern",style: TextStyle(color: Colors.grey, fontSize: 14)),
-                Expanded(child: SizedBox()),
+                const Expanded(child: SizedBox.shrink()),
+                const Text("Antippen, um Einträge zu ändern",
+                    style: TextStyle(color: Colors.grey, fontSize: 14)
+                ),
+                const Expanded(child: SizedBox()),
               ]),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Wrap(
                 children: [
                   profilThemeContainer(ortKontroller.text, beschreibungStadt ,
@@ -564,14 +565,12 @@ class _SettingPageState extends State<SettingPage> {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
-        child: Container(
-            child: Row(
-              children: [
-                Icon(icon),
-                SizedBox(width: 20),
-                Text(title, style: TextStyle(fontSize: fontSize-4),)
-              ],
-            )
+        child: Row(
+          children: [
+            Icon(icon),
+            const SizedBox(width: 20),
+            Text(title, style: TextStyle(fontSize: fontSize-4),)
+          ],
         ),
       );
     }
@@ -579,7 +578,7 @@ class _SettingPageState extends State<SettingPage> {
     settingContainer(){
 
       return Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -590,9 +589,9 @@ class _SettingPageState extends State<SettingPage> {
                       fontWeight: FontWeight.bold
                   )
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               settingThemeContainer("Privatsphäre und Sicherheit", Icons.lock,
-                      () => globalFunctions.changePage(
+                      () => global_functions.changePage(
                           context, PrivacySecurityPage(profil: userProfil)
                       )
               ),
@@ -610,21 +609,19 @@ class _SettingPageState extends State<SettingPage> {
           builder: (context, followLink) => GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: followLink,
-            child: Container(
-                child: Row(
-                  children: [
-                    Icon(icon),
-                    SizedBox(width: 20),
-                    Text(title)
-                  ],
-                )
+            child: Row(
+              children: [
+                Icon(icon),
+                const SizedBox(width: 20),
+                Text(title)
+              ],
             ),
           ),
         );
       }
 
       return Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -635,17 +632,17 @@ class _SettingPageState extends State<SettingPage> {
                     fontWeight: FontWeight.bold
                   )
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               settingThemeContainer("Feedback", Icons.feedback,
-                      () => globalFunctions.changePage(
+                      () => global_functions.changePage(
                       context, FeedbackPage()
                   )
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               settingThemeContainer("Patch Notes", Icons.format_list_bulleted,
                   () => PatchnotesWindow(context: context).openWindow()
                ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               settingThemeContainer("Geplante Erweiterungen", Icons.task,
                   () => UmcomingUpdatesWindow(context: context).openWindow()
               ),
@@ -656,7 +653,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
 
                */
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               themeContainer("Spenden", Icons.card_giftcard,
                   "https://www.paypal.com/paypalme/DominikMast"),
             ],

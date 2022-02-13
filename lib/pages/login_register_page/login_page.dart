@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
 
   loading(){
-    return Container(
+    return const SizedBox(
         width: 40,
         height: 40,
         child: Center(child: CircularProgressIndicator())

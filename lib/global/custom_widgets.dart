@@ -501,14 +501,14 @@ class WindowTopbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 10),
+      margin: const EdgeInsets.only(top: 10),
       child: Row(
         children: [
           Expanded(
             child: Center(
                 child: Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold
 
@@ -525,7 +525,7 @@ class WindowTopbar extends StatelessWidget {
 
 CustomWindow({required context,required title,required List<Widget> children}){
   children.insert(0,WindowTopbar(title: title));
-  children.insert(1, SizedBox(height: 10));
+  children.insert(1, const SizedBox(height: 10));
 
 
   _closeWindow(){
@@ -537,7 +537,7 @@ CustomWindow({required context,required title,required List<Widget> children}){
       context: context,
       builder: (BuildContext buildContext){
         return AlertDialog(
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20.0))
           ),
           contentPadding: EdgeInsets.zero,
