@@ -5,7 +5,7 @@ import '../global/style.dart' as global_style;
 class ProfilChangeWindow{
   BuildContext context;
   String titel;
-  Widget changeWidget;
+  var changeWidget;
   Function saveFunction;
 
   ProfilChangeWindow({required this.context, required this.titel,

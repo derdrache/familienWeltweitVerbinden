@@ -18,8 +18,10 @@ class CreateProfilPage extends StatefulWidget {
 
 class _CreateProfilPageState extends State<CreateProfilPage> {
   final _formKey = GlobalKey<FormState>();
+  bool selectedCity = false;
   var userNameKontroller = TextEditingController();
   var ortTextcontroller = TextEditingController();
+  var ortMapData = {};
   var sprachenAuswahlBox = CustomMultiTextForm(
     hintText: "Sprachen auswählen",
     auswahlList: global_variablen.sprachenListe,
@@ -33,6 +35,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       validator: global_functions.checkValidationMultiTextForm()
   );
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
+  var windowSetState;
 
 
   saveFunction()async {
@@ -44,19 +47,17 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         var userID = FirebaseAuth.instance.currentUser?.uid;
         var email = FirebaseAuth.instance.currentUser?.email;
         var userName = userNameKontroller.text;
-        var locationData = await LocationService()
-            .getLocationMapDataGoogle(ortTextcontroller.text);
-        if(locationData != null){
+        if(selectedCity){
           var data = {
             "email": email,
             "emailAnzeigen": false,
             "name": userName,
-            "ort": locationData["city"], //groß und kleinschreibung?
+            "ort": ortMapData["city"], //groß und kleinschreibung?
             "interessen": interessenAuswahlBox.getSelected(),
             "kinder": childrenAgePickerBox.getDates(),
-            "land": locationData["countryname"],
-            "longt": locationData["longt"],
-            "latt":  locationData["latt"],
+            "land": ortMapData["countryname"],
+            "longt": ortMapData["longt"],
+            "latt":  ortMapData["latt"],
             "reiseart": reiseArtenAuswahlBox.getSelected(),
             "aboutme": "",
             "sprachen": sprachenAuswahlBox.getSelected(),
@@ -67,7 +68,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           ProfilDatabase().addNewProfil(userID, data);
           global_functions.changePageForever(context, StartPage(registered: true));
         } else{
-          customSnackbar(context, "Stadt nicht gefunden");
+          customSnackbar(context, "Stadt nicht bestätigt");
         }
       }
     }
@@ -132,6 +133,57 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       );
     }
 
+    openSelectCityWindow() async{
+
+      List<Widget> suggestedCitiesList = [];
+      var suggestedCities = await LocationService()
+          .getLocationMapDataGoogle2(ortTextcontroller.text);
+
+      for(var i = 0; i<suggestedCities.length; i++){
+        suggestedCitiesList.add(
+            GestureDetector(
+              onTap: () {
+                ortMapData = {
+                  "city" :suggestedCities[i]["city"],
+                  "countryname" : suggestedCities[i]["countryname"],
+                  "longt": suggestedCities[i]["longt"],
+                  "latt": suggestedCities[i]["latt"]
+                };
+                ortTextcontroller.text = suggestedCities[i]["adress"];
+                selectedCity = true;
+                Navigator.pop(context);
+              },
+              child: Container(
+                  margin: EdgeInsets.only(top:20, left: 10),
+                  child: Text(
+                    suggestedCities[i]["adress"],
+                    style: TextStyle(
+                        fontSize: 16
+                    )
+                    ,)
+              ),
+            )
+        );
+      }
+
+      return showDialog(
+          context: context,
+          builder: (BuildContext buildContext){
+                return AlertDialog(
+                  content: Column(
+                    children: [
+                      Text("Bitte den genauen Standort wählen:",
+                        style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
+                      ),
+                      SizedBox(height: 15,),
+                      ...suggestedCitiesList
+                    ],
+                  ),
+                );
+              }
+            );
+    }
+
 
     return Scaffold(
       body: Container(
@@ -144,7 +196,10 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                   customTextInput("Benutzername", userNameKontroller,
                       validator: global_functions.checkValidatorEmpty()),
                   customTextInput("Aktuelle Stadt eingeben", ortTextcontroller,
-                      validator: global_functions.checkValidatorEmpty()),
+                      validator: global_functions.checkValidatorEmpty(),
+                    onSubmit: () => openSelectCityWindow()
+
+                  ),
                   reiseArtenAuswahlBox,
                   sprachenAuswahlBox,
                   interessenAuswahlBox,

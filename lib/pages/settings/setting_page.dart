@@ -42,6 +42,8 @@ class _SettingPageState extends State<SettingPage> {
   var sprachenInputBox = CustomMultiTextForm(
       auswahlList: global_variablen.sprachenListe);
   var ortKontroller = TextEditingController();
+  var ortChangeWidget = StadtChange();
+  bool ortChoosen = false;
   String beschreibungStadt = "Aktuelle Stadt";
   String beschreibungReise  = "Art der Reise";
   String beschreibungKinder = "Alter der Kinder";
@@ -169,18 +171,16 @@ class _SettingPageState extends State<SettingPage> {
   changeStadt() async {
     var errorMessage = "";
 
-    if(ortKontroller.text == ""){
-      errorMessage += "Neue Stadt eingeben";
-    } else if (ortKontroller.text != userProfil["ort"]){
-      var locationData = await LocationService().getLocationMapDataGoogle(ortKontroller.text);
+    if(ortChangeWidget.ortChangeKontroller.text == "") return "Neue Stadt eingeben";
+    if(ortChangeWidget.stadt == "") return "Eingabe bestätigen";
 
-      if (locationData != null){
-        pushLocationDataToDB(locationData);
-      } else {
-        errorMessage += "Stadt nicht gefunden";
-      }
 
-    }
+    pushLocationDataToDB(ortChangeWidget.getLocationData());
+
+    setState(() {
+      ortKontroller.text = ortChangeWidget.ortChangeKontroller.text;
+      ortChangeWidget = StadtChange();
+    });
 
     return errorMessage;
   }
@@ -509,6 +509,11 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
+    stadtChangeWidget(){
+
+      return customTextInput("", ortKontroller);
+    }
+
     profilContainer(){
       return Container(
           width: double.maxFinite,
@@ -522,8 +527,8 @@ class _SettingPageState extends State<SettingPage> {
               Row(children: [
                 Text("Profil",
                     style: TextStyle(
-                        color: headLineColor,
-                        fontSize: fontSize,
+                      color: headLineColor,
+                      fontSize: fontSize,
                       fontWeight: FontWeight.bold
                     )
                 ),
@@ -537,7 +542,7 @@ class _SettingPageState extends State<SettingPage> {
               Wrap(
                 children: [
                   profilThemeContainer(ortKontroller.text, beschreibungStadt ,
-                      customTextInput("", ortKontroller)),
+                      ortChangeWidget),
                   profilThemeContainer(reiseArtInput.getSelected(), beschreibungReise, reiseArtInput),
                   profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
                   kinderAgeBox.getDates(years: true).join(" , "),
@@ -560,6 +565,7 @@ class _SettingPageState extends State<SettingPage> {
           )
       );
     }
+
 
     settingThemeContainer(title, icon, function){
       return GestureDetector(
@@ -676,3 +682,100 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 }
+
+
+class StadtChange extends StatefulWidget {
+  var ortChangeKontroller;
+    String stadt = "";
+    String land = "";
+    double latt = 0.0;
+    double longt = 0.0;
+    var suggestedCities;
+
+  StadtChange({Key? key, this.suggestedCities, this.ortChangeKontroller}) : super(key: key);
+
+  getLocationData(){
+    return {
+      "city": stadt,
+      "countryname": land,
+      "longt": longt,
+      "latt": latt
+    };
+  }
+
+
+
+
+  @override
+  _StadtChangeState createState() => _StadtChangeState();
+}
+
+class _StadtChangeState extends State<StadtChange> {
+  List<Widget> suggestedCitiesList = [];
+  int selectedIndex = -1;
+
+@override
+  void initState() {
+   widget.suggestedCities = widget.suggestedCities?? [];
+   widget.ortChangeKontroller = widget.ortChangeKontroller?? TextEditingController();
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
+
+    createSuggestedList(List suggestedCities){
+      List<Widget> newSuggestList = [];
+
+      for(var i = 0; i<suggestedCities.length; i++){
+        newSuggestList.add(
+            GestureDetector(
+              onTap: () {
+                selectedIndex = i;
+                widget.ortChangeKontroller.text = suggestedCities[i]["city"];
+                widget.stadt = suggestedCities[i]["city"];
+                widget.land = suggestedCities[i]["countryname"];
+                widget.latt = suggestedCities[i]["latt"];
+                widget.longt = suggestedCities[i]["longt"];
+                setState(() { });
+              },
+              child: Container(
+                  margin: EdgeInsets.only(top:20, left: 10),
+                  child: Text(
+                    suggestedCities[i]["adress"],
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: selectedIndex == i ? Colors.green : Colors.black)
+                    ,)
+              ),
+            )
+        );
+      }
+
+      suggestedCitiesList = newSuggestList;
+
+    }
+
+    createSuggestedList(widget.suggestedCities);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          customTextInput("", widget.ortChangeKontroller, onSubmit: () async{
+            widget.suggestedCities = await LocationService()
+                .getLocationMapDataGoogle2(widget.ortChangeKontroller.text);
+
+            setState(() {});
+
+          }),
+          SizedBox(height: 15),
+          suggestedCitiesList.isNotEmpty ? Text(
+              "Bitte den gewünschten Ort auswählen:",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ): SizedBox.shrink(),
+          ...suggestedCitiesList //== null ? SizedBox.shrink() : Column(children:suggestedCitiesList),
+
+        ],
+    );
+  }
+}
+

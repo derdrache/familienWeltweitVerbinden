@@ -31,6 +31,50 @@ class LocationService {
     }
   }
 
+  getLocationMapDataGoogle2(input) async{
+    var sprache = "de";
+    var allSuggests = [];
+
+    try{
+      var url = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/'
+          'json?input=$input&inputtype=textquery&'
+          'fields=formatted_address%2Cgeometry&'
+          'language=$sprache&key=$google_key';
+
+      var response = await http.get(Uri.parse(url));
+      var json = convert.jsonDecode(response.body);
+      var results = json["candidates"];
+
+      for(var result in results){
+        var formattedAddressList = result["formatted_address"].split(", ");
+        var formattedCity = formattedAddressList.first.split(" ");
+
+        var city = _isNumeric(formattedCity.first) ?
+        formattedCity.last : formattedCity.join(" ");
+
+        var mapData = {
+          "city": city,
+          "countryname": formattedAddressList.last,
+          "longt": result["geometry"]["location"]["lng"],
+          "latt": result["geometry"]["location"]["lat"],
+          "adress": result["formatted_address"]
+        };
+        allSuggests.add(mapData);
+      }
+
+      return allSuggests;
+    }catch (error){
+      return null;
+    }
+  }
+
+  bool _isNumeric(String str) {
+    if(str == null) {
+      return false;
+    }
+    return double.tryParse(str) != null;
+  }
+
   getCountryLocation(input) async{
     var jsonText = await rootBundle.loadString('assets/countryGeodata.json');
     var data = json.decode(jsonText)["data"];
