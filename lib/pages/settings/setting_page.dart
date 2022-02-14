@@ -1,18 +1,25 @@
-import 'package:familien_suche/windows/patchnotes.dart';
+import 'package:familien_suche/pages/settings/changePasswort.dart';
+import 'package:familien_suche/pages/settings/change_aboutme.dart';
+import 'package:familien_suche/pages/settings/change_interessen.dart';
+import 'package:familien_suche/pages/settings/change_sprachen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/link.dart';
 
 import '../../services/database.dart';
-import '../../services/locationsService.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
-import '../../windows/change_profil_window.dart';
 import '../../windows/upcoming_updates.dart';
+import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
-import 'package:familien_suche/pages/settings/privacy_security_page.dart';
+import 'change_children.dart';
+import 'privacy_security_page.dart';
 import 'feedback_page.dart';
+import 'change_city.dart';
+import 'change_reiseart.dart';
+import 'change_name.dart';
+import 'change_email.dart';
 
 
 class SettingPage extends StatefulWidget {
@@ -42,18 +49,6 @@ class _SettingPageState extends State<SettingPage> {
   var sprachenInputBox = CustomMultiTextForm(
       auswahlList: global_variablen.sprachenListe);
   var ortKontroller = TextEditingController();
-  var ortChangeWidget = StadtChange();
-  bool ortChoosen = false;
-  String beschreibungStadt = "Aktuelle Stadt";
-  String beschreibungReise  = "Art der Reise";
-  String beschreibungKinder = "Alter der Kinder";
-  String beschreibungInteressen = "Interessen";
-  String beschreibungSprachen = "Sprachen";
-  String beschreibungBio = "Über mich";
-  String beschreibungName = "Name ändern";
-  String beschreibungEmail = "Email ändern";
-  String beschreibungPasswort = "Passwort ändern";
-  String beschreibungFeedback = "Feedback geben";
 
 
   @override
@@ -62,7 +57,6 @@ class _SettingPageState extends State<SettingPage> {
 
     super.initState();
   }
-
 
   getProfilFromDatabase() async {
     emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
@@ -99,251 +93,6 @@ class _SettingPageState extends State<SettingPage> {
 
   }
 
-  pushLocationDataToDB(locationData) async {
-
-    var locationDict = {
-      "ort": locationData["city"],
-      "longt": locationData["longt"],
-      "latt": locationData["latt"],
-      "land": locationData["countryname"]
-    };
-
-    ProfilDatabase().updateProfil(
-        userID, locationDict
-    );
-  }
-
-  userLogin(passwort) async {
-    var userEmail = FirebaseAuth.instance.currentUser!.email;
-    var loginUser;
-    try {
-      loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: userEmail??"",
-          password: passwort
-      );
-    } on FirebaseAuthException catch  (e) {
-      print(e);
-      loginUser = null;
-    }
-
-    return loginUser;
-  }
-
-  validAndSave(beschreibung) async{
-    String errorMessage = "";
-
-    if(beschreibung == beschreibungStadt){
-      errorMessage = await changeStadt();
-    }else if(beschreibung == beschreibungReise){
-      errorMessage = changeReiseart();
-    }else if(beschreibung == beschreibungKinder){
-      errorMessage = changeKinderAge();
-    }else if(beschreibung == beschreibungInteressen){
-      errorMessage = changeInteressen();
-    }else if(beschreibung == beschreibungSprachen){
-      errorMessage = changeSprachen();
-    }else if(beschreibung == beschreibungBio){
-      if(bioTextKontroller.text != userProfil["aboutme"]){
-        ProfilDatabase().updateProfil(
-            userID, {"aboutme": bioTextKontroller.text});
-      }
-    }else if(beschreibung == beschreibungName){
-      errorMessage = await changeName();
-      if(errorMessage == "") customSnackbar(context, "Name erfolgreich geändert", color: Colors.green);
-    } else if (beschreibung == beschreibungEmail){
-      errorMessage = await changeEmail();
-      if(errorMessage == "") customSnackbar(context, "Email erfolgreich geändert", color: Colors.green);
-    } else if (beschreibung == beschreibungPasswort){
-      errorMessage = await changePasswort();
-      if(errorMessage == "") customSnackbar(context, "Passwort erfolgreich geändert", color: Colors.green);
-    }
-
-    if(errorMessage.isEmpty){
-      setState(() {});
-      Navigator.of(context, rootNavigator: true).pop();
-    } else{
-      customSnackbar(context, errorMessage);
-    }
-
-
-  }
-
-  changeStadt() async {
-    var errorMessage = "";
-
-    if(ortChangeWidget.ortChangeKontroller.text == "") return "Neue Stadt eingeben";
-    if(ortChangeWidget.stadt == "") return "Eingabe bestätigen";
-
-
-    pushLocationDataToDB(ortChangeWidget.getLocationData());
-
-    setState(() {
-      ortKontroller.text = ortChangeWidget.ortChangeKontroller.text;
-      ortChangeWidget = StadtChange();
-    });
-
-    return errorMessage;
-  }
-
-  changeReiseart(){
-    var errorMessage = "";
-
-    if(reiseArtInput.getSelected() == null || reiseArtInput.getSelected().isEmpty){
-      errorMessage = "neue Reiseart eingeben";
-    } else if(reiseArtInput.getSelected() != userProfil["reiseart"] ){
-      ProfilDatabase().updateProfil(
-          userID, {"reiseart": reiseArtInput.getSelected()}
-      );
-    }
-
-    return errorMessage;
-  }
-
-  changeKinderAge(){
-    var errorMessage = "";
-    bool allFilled = true;
-
-    for(var kindAge in kinderAgeBox.getDates()){
-      if (kindAge == null){
-        allFilled = false;
-      }
-    }
-
-    if(!allFilled || kinderAgeBox.getDates().isEmpty){
-      errorMessage = "Geburtsdaten eingeben";
-    } else if (kinderAgeBox.getDates() != userProfil["kinder"]){
-      ProfilDatabase().updateProfil(
-          userID, {"kinder": kinderAgeBox.getDates()}
-      );
-    }
-
-    return errorMessage;
-  }
-
-  changeInteressen(){
-    var errorMessage = "";
-
-    if(interessenInputBox.getSelected() == null || interessenInputBox.getSelected().isEmpty){
-      errorMessage = "neue interessen eingeben";
-    } else if(interessenInputBox.getSelected() != userProfil["interessen"]){
-      ProfilDatabase().updateProfil(
-          userID, {"interessen": interessenInputBox.getSelected()}
-      );
-    }
-    return errorMessage;
-  }
-
-  changeSprachen(){
-    var errorMessage = "";
-
-    if(sprachenInputBox.getSelected() == null || sprachenInputBox.getSelected().isEmpty){
-      errorMessage = "Sprache eingeben";
-    } else if(sprachenInputBox.getSelected() != userProfil["sprachen"]){
-      ProfilDatabase().updateProfil(
-          userID, {"sprachen": sprachenInputBox.getSelected()}
-      );
-    }
-    return errorMessage;
-  }
-
-  changeName() async{
-    var errorMessage = "";
-    var userName = FirebaseAuth.instance.currentUser!.displayName;
-    var checkUserProfilExist = await ProfilDatabase().getProfilFromName(nameTextKontroller.text);
-
-    if(nameTextKontroller.text == ""){
-      errorMessage = "Neuen Namen eingeben";
-    } else{
-      if(checkUserProfilExist == null){
-        ProfilDatabase().updateProfilName(
-            userID, userName, nameTextKontroller.text
-        );
-
-      } else {
-        errorMessage += "- Name schon vorhanden";
-      }
-    }
-    return errorMessage;
-
-  }
-
-  changeEmail() async {
-    var errorString = "";
-
-    if(passwortTextKontroller1.text != "" && emailNewTextKontroller.text != ""){
-      bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-          .hasMatch(emailNewTextKontroller.text);
-      var emailInUse = await ProfilDatabase()
-          .getProfilId("email", emailNewTextKontroller.text);
-
-      if (emailInUse != null){
-        errorString += "- Email wird schon verwendet";
-      } else if (emailIsValid){
-        var loginUser = await userLogin(passwortTextKontroller1.text);
-
-        if(loginUser == null) errorString += "falsches Passwort";
-      } else {
-        errorString += "- ungültige Email";
-      }
-    } else{
-      if(passwortTextKontroller1.text == ""){
-        errorString += "- Passwort eingeben \n";
-      }
-      if(emailNewTextKontroller.text == ""){
-        errorString += "- Email eingeben \n";
-      }
-    }
-
-    if(errorString == ""){
-      FirebaseAuth.instance.currentUser?.updateEmail(emailNewTextKontroller.text);
-
-      ProfilDatabase().updateProfil(
-          userID, {"email":emailNewTextKontroller.text }
-      );
-
-      emailTextKontroller.text = emailNewTextKontroller.text;
-
-    }
-
-    return errorString;
-  }
-
-  changePasswort() async {
-    var errorMessage = "";
-    var newPasswort = passwortTextKontroller1.text;
-    var newPasswortCheck = passwortTextKontroller2.text;
-    var oldPasswort = passwortCheckKontroller.text;
-
-    if(newPasswort != "" && newPasswortCheck != "" && oldPasswort != "" &&
-        newPasswort != oldPasswort){
-      if (newPasswort == newPasswortCheck ){
-        try{
-          var loginTest = await userLogin(passwortCheckKontroller.text);
-
-          if (loginTest != null){
-            await FirebaseAuth.instance.currentUser?.updatePassword(passwortTextKontroller1.text);
-          } else {
-            errorMessage += "- Altes Passwort ist falsch";
-          }
-
-        } catch (error){
-          errorMessage += "- Neues Passwort ist zu schwach";
-        }
-
-      } else{
-        errorMessage += "- Passwort bestätigung stimmt nicht mit dem neuen Passwort überein";
-      }
-    }else{
-      if (newPasswort == "" || newPasswort == oldPasswort){
-        errorMessage += "- neues Passwort eingeben \n";
-      }
-      if(newPasswortCheck == ""){ errorMessage += "- neues Passwort bestätigen \n"; }
-      if(oldPasswort == ""){errorMessage += "- altes Passwort eingeben"; }
-
-    }
-    return errorMessage;
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -352,15 +101,10 @@ class _SettingPageState extends State<SettingPage> {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
 
-    profilThemeContainer(haupttext, beschreibung, changeWidget){
+    profilThemeContainer(haupttext, beschreibung, page){
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
-        onTap: () => ProfilChangeWindow(
-          context: context,
-          titel: beschreibung,
-          changeWidget: changeWidget,
-          saveFunction: () => validAndSave(beschreibung)
-        ).profilChangeWindow(),
+        onTap: () => global_functions.changePage(context, page),
         child: Container(
             padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
             width: width /2 -20,
@@ -382,38 +126,6 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
-    emailChangeWindow(){
-      emailNewTextKontroller.text = "";
-      passwortTextKontroller1.text = "";
-
-      return Column(
-        children: [
-          customTextInput(beschreibungEmail,emailNewTextKontroller),
-          const SizedBox(height: 15),
-          customTextInput("Passwort bestätigen",passwortTextKontroller1, passwort: true)
-        ],
-      );
-    }
-
-    passwortChangeWindow(){
-      passwortTextKontroller1.text = "";
-      passwortTextKontroller2.text = "";
-      passwortCheckKontroller.text = "";
-
-      return Column(
-        children: [
-          customTextInput("Neues Passwort eingeben", passwortTextKontroller1,
-              passwort: true),
-          const SizedBox(height: 15),
-          customTextInput("Neues Passwort wiederholen", passwortTextKontroller2,
-              passwort: true),
-          const SizedBox(height: 15),
-          customTextInput("Altes Passwort eingeben", passwortCheckKontroller,
-              passwort: true)
-        ],
-      );
-    }
-
     menuBar(){
 
       openSettingWindow()async {
@@ -430,34 +142,28 @@ class _SettingPageState extends State<SettingPage> {
             items: [
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () => ProfilChangeWindow(
-                          context: context,
-                          titel: beschreibungName,
-                          changeWidget: customTextInput(beschreibungName,nameTextKontroller),
-                          saveFunction: () => validAndSave(beschreibungName)
-                      ).profilChangeWindow(),
-                      child: Text(beschreibungName, style: TextStyle(color: textColor)))
+                      onPressed: () {
+                        global_functions.changePage(context, ChangeNamePage(
+                            userId: userID,
+                            nameKontroller: nameTextKontroller)
+                        );
+                      },
+                      child: Text("Name ändern", style: TextStyle(color: textColor)))
               ),
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () => ProfilChangeWindow (
-                        context: context,
-                        titel: beschreibungEmail,
-                        changeWidget: emailChangeWindow(),
-                        saveFunction: () => validAndSave(beschreibungEmail)
-                      ).profilChangeWindow(),
-                      child: Text(beschreibungEmail, style: TextStyle(color: textColor))
+                      onPressed: () {
+                        global_functions.changePage(context, ChangeEmailPage());
+                      },
+                      child: Text("Email ändern", style: TextStyle(color: textColor))
                   )
               ),
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () => ProfilChangeWindow(
-                        context: context,
-                        titel: beschreibungPasswort,
-                        changeWidget: passwortChangeWindow(),
-                        saveFunction: () => validAndSave(beschreibungPasswort)
-                      ).profilChangeWindow(),
-                      child: Text(beschreibungPasswort, style: TextStyle(color: textColor)))
+                      onPressed: () {
+                        global_functions.changePage(context, ChangePasswortPage());
+                      },
+                      child: Text("Passwort ändern", style: TextStyle(color: textColor)))
               ),
               PopupMenuItem(
                   child: TextButton(
@@ -470,6 +176,7 @@ class _SettingPageState extends State<SettingPage> {
             ]
         );
       }
+
 
       return  customAppBar(
           title: "",
@@ -509,11 +216,6 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
-    stadtChangeWidget(){
-
-      return customTextInput("", ortKontroller);
-    }
-
     profilContainer(){
       return Container(
           width: double.maxFinite,
@@ -541,31 +243,34 @@ class _SettingPageState extends State<SettingPage> {
               const SizedBox(height: 5),
               Wrap(
                 children: [
-                  profilThemeContainer(ortKontroller.text, beschreibungStadt ,
-                      ortChangeWidget),
-                  profilThemeContainer(reiseArtInput.getSelected(), beschreibungReise, reiseArtInput),
+                  profilThemeContainer(ortKontroller.text, "Aktuelle Stadt",
+                      ChangeCityPage(userId: userID)),
+                  profilThemeContainer(reiseArtInput.getSelected(), "Art der Reise",
+                      ChangeReiseartPage(userId: userID, oldInput: reiseArtInput.getSelected())
+                  ),
                   profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
                   kinderAgeBox.getDates(years: true).join(" , "),
-                      beschreibungKinder, kinderAgeBox),
+                      "Alter der Kinder", ChangeChildrenPage(
+                        userId: userID, childrenBirthdatePickerBox: kinderAgeBox,
+                      )),
                   profilThemeContainer(
                       interessenInputBox.getSelected() == null? "" :
                       interessenInputBox.getSelected().join(" , "),
-                      beschreibungInteressen,interessenInputBox),
+                      "Interessen", ChangeInteressenPage(userId: userID,)),
                   profilThemeContainer(
                       sprachenInputBox.getSelected() == null? "":
                       sprachenInputBox.getSelected().join(" , "),
-                      beschreibungSprachen, sprachenInputBox)
+                      "Sprachen", ChangeSprachenPage(userId: userID))
                 ],
               ),
               profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
-                  beschreibungBio,
-                  customTextInput("über mich", bioTextKontroller, moreLines: 10)
+                  "Über mich",
+                  ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller)
               )
             ],
           )
       );
     }
-
 
     settingThemeContainer(title, icon, function){
       return GestureDetector(
@@ -679,102 +384,6 @@ class _SettingPageState extends State<SettingPage> {
               aboutAppContainer()
           ]
         )
-    );
-  }
-}
-
-
-class StadtChange extends StatefulWidget {
-  var ortChangeKontroller;
-    String stadt = "";
-    String land = "";
-    double latt = 0.0;
-    double longt = 0.0;
-    var suggestedCities;
-
-  StadtChange({Key? key, this.suggestedCities, this.ortChangeKontroller}) : super(key: key);
-
-  getLocationData(){
-    return {
-      "city": stadt,
-      "countryname": land,
-      "longt": longt,
-      "latt": latt
-    };
-  }
-
-
-
-
-  @override
-  _StadtChangeState createState() => _StadtChangeState();
-}
-
-class _StadtChangeState extends State<StadtChange> {
-  List<Widget> suggestedCitiesList = [];
-  int selectedIndex = -1;
-
-@override
-  void initState() {
-   widget.suggestedCities = widget.suggestedCities?? [];
-   widget.ortChangeKontroller = widget.ortChangeKontroller?? TextEditingController();
-    super.initState();
-  }
-  @override
-  Widget build(BuildContext context) {
-
-    createSuggestedList(List suggestedCities){
-      List<Widget> newSuggestList = [];
-
-      for(var i = 0; i<suggestedCities.length; i++){
-        newSuggestList.add(
-            GestureDetector(
-              onTap: () {
-                selectedIndex = i;
-                widget.ortChangeKontroller.text = suggestedCities[i]["city"];
-                widget.stadt = suggestedCities[i]["city"];
-                widget.land = suggestedCities[i]["countryname"];
-                widget.latt = suggestedCities[i]["latt"];
-                widget.longt = suggestedCities[i]["longt"];
-                setState(() { });
-              },
-              child: Container(
-                  margin: EdgeInsets.only(top:20, left: 10),
-                  child: Text(
-                    suggestedCities[i]["adress"],
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: selectedIndex == i ? Colors.green : Colors.black)
-                    ,)
-              ),
-            )
-        );
-      }
-
-      suggestedCitiesList = newSuggestList;
-
-    }
-
-    createSuggestedList(widget.suggestedCities);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          customTextInput("", widget.ortChangeKontroller, onSubmit: () async{
-            widget.suggestedCities = await LocationService()
-                .getLocationMapDataGoogle2(widget.ortChangeKontroller.text);
-
-            setState(() {});
-
-          }),
-          SizedBox(height: 15),
-          suggestedCitiesList.isNotEmpty ? Text(
-              "Bitte den gewünschten Ort auswählen:",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ): SizedBox.shrink(),
-          ...suggestedCitiesList //== null ? SizedBox.shrink() : Column(children:suggestedCitiesList),
-
-        ],
     );
   }
 }
