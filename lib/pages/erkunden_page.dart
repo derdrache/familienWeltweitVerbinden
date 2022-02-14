@@ -93,7 +93,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
       var newCity = false;
 
       for(var i = 0; i< list.length; i++){
-        if(profil["ort"] == list[i]["ort"]){
+        if(profil["ort"] == list[i]["ort"] &&
+            profil["longt"] == list[i]["longt"] &&
+            profil["latt"] == list[i]["latt"]){
           newCity = true;
           list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
           list[i]["profils"].add(profil);
