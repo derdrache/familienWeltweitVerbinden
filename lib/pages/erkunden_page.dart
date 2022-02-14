@@ -316,7 +316,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
           center: LatLng(0, 0),
           zoom: 1.6,
           minZoom: 1.6,
-          maxZoom: 8,
+          maxZoom: 9,
           onPositionChanged: (position, changed){
             if(changed){
                 setState(() {
