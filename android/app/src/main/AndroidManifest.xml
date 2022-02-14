@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.familien_suche">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="familien_suche"
+        android:label="Connect Families"
         android:icon="@mipmap/ic_launcher">
 
         <activity

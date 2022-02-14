@@ -28,7 +28,6 @@ class UmcomingUpdatesWindow{
         children: [
           _update("Englische Version"),
           _update("IOS Version"),
-          _update("Account löschen"),
           _update("Mehrere Accounts verbinden"),
           _update("Automatischer Standort"),
           _update("Events planen"),
@@ -39,6 +38,7 @@ class UmcomingUpdatesWindow{
           _update("Eventboard"),
           _update("Anonyme Anmelden"),
           _update("Chat erweiterungen"),
+          _update("Account löschen"),
           _update("Layout verbessern"),
         ]
     );
