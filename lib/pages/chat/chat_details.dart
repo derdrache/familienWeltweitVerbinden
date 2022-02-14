@@ -197,6 +197,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     }
 
     textEingabe(){
+      var myFocusNode = FocusNode();
+
       return Container(
         padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),//EdgeInsets.all(10),
         height: 50,
@@ -217,7 +219,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           children: [
             Expanded(
               child: TextField(
-                onSubmitted: (eingabe) => messageToDbAndClearMessageInput(eingabe) ,
+                focusNode: myFocusNode,
+                onSubmitted: (eingabe) {
+                  messageToDbAndClearMessageInput(eingabe);
+                  myFocusNode.requestFocus();
+                  },
                 controller: nachrichtController,
                 decoration: const InputDecoration.collapsed(
                   hintText: "Nachricht"
