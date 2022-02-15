@@ -2,6 +2,7 @@ import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
 import 'package:familien_suche/pages/settings/change_interessen.dart';
 import 'package:familien_suche/pages/settings/change_sprachen.dart';
+import 'package:familien_suche/pages/settings/notifications_option.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/link.dart';
@@ -116,6 +117,7 @@ class _SettingPageState extends State<SettingPage> {
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
                     global_functions.changePage(context, const LoginPage());
+                    setState(() {});
                   },
                   child: Text("Abmelden", style: TextStyle(color: textColor)))
           ),
@@ -286,6 +288,12 @@ class _SettingPageState extends State<SettingPage> {
                       () => global_functions.changePage(
                           context, PrivacySecurityPage(profil: userProfil)
                       )
+              ),
+              const SizedBox(height: 20),
+              settingThemeContainer("Benachrichtigungen", Icons.notifications,
+                      () => global_functions.changePage(
+                      context, NotificationsOptionsPage(profil: userProfil)
+                  )
               ),
             ],
           )
