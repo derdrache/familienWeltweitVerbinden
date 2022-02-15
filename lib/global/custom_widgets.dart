@@ -50,6 +50,7 @@ Widget customFloatbuttonExtended(text, function){
 customSnackbar(context, text, {color = Colors.red}){
   return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        duration: Duration(seconds: 5),
           backgroundColor: color,
           content: Text(text)
       )
