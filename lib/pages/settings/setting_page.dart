@@ -51,48 +51,77 @@ class _SettingPageState extends State<SettingPage> {
   var ortKontroller = TextEditingController();
 
 
-  @override
-  void initState() {
-    getAndSetDataFromDB();
-
-    super.initState();
-  }
-
-  getProfilFromDatabase() async {
-    emailTextKontroller.text = FirebaseAuth.instance.currentUser!.email!;
-    nameTextKontroller.text = FirebaseAuth.instance.currentUser!.displayName!;
-    userProfil = await ProfilDatabase().getProfil(userID);
-  }
 
   void getAndSetDataFromDB() async {
     List childrenAgeTimestamp = [];
-    try{
-      await getProfilFromDatabase();
-      List childrenDataYears = [];
 
-      userProfil["kinder"].forEach((kind){
-        var changeTimeStamp = global_functions.ChangeTimeStamp(kind);
-        childrenDataYears.add(changeTimeStamp.intoYears());
-        childrenAgeTimestamp.add(changeTimeStamp.intoDate());
-      });
+    List childrenDataYears = [];
 
-      setState(() {
-        nameTextKontroller.text = userProfil["name"];
-        emailTextKontroller.text = userProfil["email"];
-        ortKontroller.text = userProfil["ort"];
-        interessenInputBox.selected = userProfil["interessen"];
-        kinderAgeBox.setSelected(childrenAgeTimestamp);
-        bioTextKontroller.text = userProfil["aboutme"];
-        reiseArtInput.selected = userProfil["reiseart"];
-        sprachenInputBox.selected = userProfil["sprachen"];
-      });
-    } catch (error){
-      print("Problem mit dem User finden");
+    userProfil["kinder"].forEach((kind){
+      var changeTimeStamp = global_functions.ChangeTimeStamp(kind);
+      childrenDataYears.add(changeTimeStamp.intoYears());
+      childrenAgeTimestamp.add(changeTimeStamp.intoDate());
+    });
+
+    nameTextKontroller.text = userProfil["name"];
+    emailTextKontroller.text = userProfil["email"];
+    ortKontroller.text = userProfil["ort"];
+    interessenInputBox.selected = userProfil["interessen"];
+    kinderAgeBox.setSelected(childrenAgeTimestamp);
+    bioTextKontroller.text = userProfil["aboutme"];
+    reiseArtInput.selected = userProfil["reiseart"];
+    sprachenInputBox.selected = userProfil["sprachen"];
+
     }
 
+  openSettingWindow()async {
+    var textColor = Colors.black;
 
+    return showMenu(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(5.0),
+          ),
+        ),
+        context: context,
+        position: const RelativeRect.fromLTRB(100, 0, 0, 100),
+        items: [
+          PopupMenuItem(
+              child: TextButton(
+                  onPressed: () {
+                    global_functions.changePage(context, ChangeNamePage(
+                        userId: userID,
+                        nameKontroller: nameTextKontroller)
+                    );
+                  },
+                  child: Text("Name ändern", style: TextStyle(color: textColor)))
+          ),
+          PopupMenuItem(
+              child: TextButton(
+                  onPressed: () {
+                    global_functions.changePage(context, ChangeEmailPage());
+                  },
+                  child: Text("Email ändern", style: TextStyle(color: textColor))
+              )
+          ),
+          PopupMenuItem(
+              child: TextButton(
+                  onPressed: () {
+                    global_functions.changePage(context, ChangePasswortPage());
+                  },
+                  child: Text("Passwort ändern", style: TextStyle(color: textColor)))
+          ),
+          PopupMenuItem(
+              child: TextButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                    global_functions.changePage(context, const LoginPage());
+                  },
+                  child: Text("Abmelden", style: TextStyle(color: textColor)))
+          ),
+        ]
+    );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -127,57 +156,6 @@ class _SettingPageState extends State<SettingPage> {
     }
 
     menuBar(){
-
-      openSettingWindow()async {
-        var textColor = Colors.black;
-
-        return showMenu(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(5.0),
-              ),
-            ),
-            context: context,
-            position: const RelativeRect.fromLTRB(100, 0, 0, 100),
-            items: [
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () {
-                        global_functions.changePage(context, ChangeNamePage(
-                            userId: userID,
-                            nameKontroller: nameTextKontroller)
-                        );
-                      },
-                      child: Text("Name ändern", style: TextStyle(color: textColor)))
-              ),
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () {
-                        global_functions.changePage(context, ChangeEmailPage());
-                      },
-                      child: Text("Email ändern", style: TextStyle(color: textColor))
-                  )
-              ),
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () {
-                        global_functions.changePage(context, ChangePasswortPage());
-                      },
-                      child: Text("Passwort ändern", style: TextStyle(color: textColor)))
-              ),
-              PopupMenuItem(
-                  child: TextButton(
-                      onPressed: () async {
-                        await FirebaseAuth.instance.signOut();
-                        global_functions.changePage(context, const LoginPage());
-                      },
-                      child: Text("Abmelden", style: TextStyle(color: textColor)))
-              ),
-            ]
-        );
-      }
-
-
       return  customAppBar(
           title: "",
           elevation: 0.0,
@@ -287,7 +265,6 @@ class _SettingPageState extends State<SettingPage> {
     }
 
     settingContainer(){
-
       return Container(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -312,25 +289,6 @@ class _SettingPageState extends State<SettingPage> {
     }
 
     aboutAppContainer(){
-
-      themeContainer(title, icon, url){
-        return Link(
-          target: LinkTarget.blank,
-          uri: Uri.parse(url),
-          builder: (context, followLink) => GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: followLink,
-            child: Row(
-              children: [
-                Icon(icon),
-                const SizedBox(width: 20),
-                Text(title)
-              ],
-            ),
-          ),
-        );
-      }
-
       return Container(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -365,8 +323,21 @@ class _SettingPageState extends State<SettingPage> {
 
                */
               const SizedBox(height: 20),
-              themeContainer("Spenden", Icons.card_giftcard,
-                  "https://www.paypal.com/paypalme/DominikMast"),
+              Link(
+                target: LinkTarget.blank,
+                uri: Uri.parse("https://www.paypal.com/paypalme/DominikMast"),
+                builder: (context, followLink) => GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: followLink,
+                  child: Row(
+                    children: const [
+                      Icon(Icons.card_giftcard),
+                      SizedBox(width: 20),
+                      Text("Spenden")
+                    ],
+                  ),
+                ),
+              )
             ],
           )
       );
@@ -375,15 +346,30 @@ class _SettingPageState extends State<SettingPage> {
 
     return Padding(
         padding: const EdgeInsets.only(top: 5),
-        child: ListView(
-            children: [
-              menuBar(),
-              nameContainer(),
-              profilContainer(),
-              settingContainer(),
-              aboutAppContainer()
-          ]
-        )
+        child: StreamBuilder(
+          stream: ProfilDatabase().getProfilStream(userID),
+          builder: (
+          BuildContext context,
+          AsyncSnapshot snapshot,
+          ){
+            if(snapshot.hasData){
+              userProfil = snapshot.data.snapshot.value;
+
+              getAndSetDataFromDB();
+
+              return ListView(
+                  children: [
+                    menuBar(),
+                    nameContainer(),
+                    profilContainer(),
+                    settingContainer(),
+                    aboutAppContainer()
+                  ]
+              );
+            }
+            return const SizedBox.shrink();
+          })
+
     );
   }
 }
