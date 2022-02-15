@@ -125,35 +125,12 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery.of(context).size.width;
     double containerPadding = 5;
     var headLineColor = Theme.of(context).colorScheme.primary;
 
 
-    profilThemeContainer(haupttext, beschreibung, page){
-      return GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => global_functions.changePage(context, page),
-        child: Container(
-            padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
-            width: width /2 -20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                haupttext == ""? const CircularProgressIndicator() : Text(
-                  haupttext,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: fontSize-4),
-                ),
-                const SizedBox(height: 3),
-                Text(beschreibung,
-                  style: TextStyle(color: Colors.grey, fontSize: fontSize-6.0),
-                ),
-              ],
-            )
-        ),
-      );
-    }
+
 
     menuBar(){
       return  customAppBar(
@@ -194,6 +171,31 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
+    profilThemeContainer(haupttext, beschreibung, page,[fullWidth = false]){
+      return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => global_functions.changePage(context, page),
+        child: Container(
+            padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
+            width: fullWidth ? screenWidth :screenWidth /2 -20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                haupttext == ""? const CircularProgressIndicator() : Text(
+                  haupttext,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: fontSize-4),
+                ),
+                const SizedBox(height: 3),
+                Text(beschreibung,
+                  style: TextStyle(color: Colors.grey, fontSize: fontSize-6.0),
+                ),
+              ],
+            )
+        ),
+      );
+    }
+
     profilContainer(){
       return Container(
           width: double.maxFinite,
@@ -221,7 +223,8 @@ class _SettingPageState extends State<SettingPage> {
               const SizedBox(height: 5),
               Wrap(
                 children: [
-                  profilThemeContainer(ortKontroller.text, "Aktuelle Stadt",
+                  profilThemeContainer(
+                      ortKontroller.text, "Aktuelle Stadt",
                       ChangeCityPage(userId: userID)),
                   profilThemeContainer(reiseArtInput.getSelected(), "Art der Reise",
                       ChangeReiseartPage(userId: userID, oldInput: reiseArtInput.getSelected())
@@ -242,8 +245,9 @@ class _SettingPageState extends State<SettingPage> {
                 ],
               ),
               profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
-                  "Über mich",
-                  ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller)
+                "Über mich",
+                ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller),
+                true
               )
             ],
           )

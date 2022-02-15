@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
+import 'board_page.dart';
 import 'create_profil_page.dart';
 import 'erkunden_page.dart';
 import 'chat/chat_page.dart';
@@ -132,14 +133,13 @@ class _StartPageState extends State<StartPage>{
             selectedItemColor: Colors.white,
             onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
-/*
+              /*
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Board',
-                backgroundColor: navigationbarButtonColor,
               ),
 
- */
+               */
               const BottomNavigationBarItem(
                 icon: Icon(Icons.travel_explore),
                 label: 'Weltweit suchen',
@@ -149,7 +149,6 @@ class _StartPageState extends State<StartPage>{
               BottomNavigationBarItem(
                 icon: Icon(Icons.location_city),
                 label: 'Dein Umkreis',
-                backgroundColor: navigationbarButtonColor,
               ),
 
                */
