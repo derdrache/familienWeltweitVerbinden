@@ -45,8 +45,7 @@ class PatchnotesWindow{
           _patch(prePatch3),
           _patch(prePatch2),
           _patch(prePatch1),
-
-          //_patch(patch1)
+          _patch(patch1)
         ]
     );
   }
@@ -71,5 +70,10 @@ var prePatch3 = {
 var patch1 = {
   "title" : "1.0.0",
   "inhalt": "App veröffentlicht"
+};
+
+var patch101 = {
+  "title" : "1.0.1",
+  "inhalt" : ""
 };
 

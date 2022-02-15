@@ -21,6 +21,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   bool selectedCity = false;
   var userNameKontroller = TextEditingController();
   var ortTextcontroller = TextEditingController();
+  bool lookInMaps = false;
   var ortMapData = {};
   var sprachenAuswahlBox = CustomMultiTextForm(
     hintText: "Sprachen auswählen",
@@ -42,6 +43,11 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     if(_formKey.currentState!.validate()){
       var userExist = await ProfilDatabase()
           .getProfilId("name", userNameKontroller.text) != null;
+
+      if(!lookInMaps){
+        openSelectCityWindow();
+        return;
+      }
 
       if(checkAllValidation(userExist)){
         var userID = FirebaseAuth.instance.currentUser?.uid;
@@ -109,6 +115,67 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     return noError;
   }
 
+  addCityData(suggestedCities){
+    ortMapData = {
+      "city" :suggestedCities["city"],
+      "countryname" : suggestedCities["countryname"],
+      "longt": suggestedCities["longt"],
+      "latt": suggestedCities["latt"]
+    };
+    ortTextcontroller.text = suggestedCities["adress"];
+    selectedCity = true;
+
+  }
+
+  openSelectCityWindow() async{
+    List<Widget> suggestedCitiesList = [];
+    var suggestedCities = await LocationService()
+        .getLocationMapDataGoogle2(ortTextcontroller.text);
+    lookInMaps = true;
+
+    if(suggestedCities.length == 1){
+      addCityData(suggestedCities[0]);
+      return;
+    }
+
+    for(var i = 0; i<suggestedCities.length; i++){
+      suggestedCitiesList.add(
+          GestureDetector(
+            onTap: () {
+              addCityData(suggestedCities[i]);
+              Navigator.pop(context);
+            },
+            child: Container(
+                margin: EdgeInsets.only(top:20, left: 10),
+                child: Text(
+                  suggestedCities[i]["adress"],
+                  style: TextStyle(
+                      fontSize: 16
+                  )
+                  ,)
+            ),
+          )
+      );
+    }
+
+    return showDialog(
+        context: context,
+        builder: (BuildContext buildContext){
+          return AlertDialog(
+            content: Column(
+              children: [
+                Text("Bitte den genauen Standort wählen:",
+                  style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
+                ),
+                SizedBox(height: 15,),
+                ...suggestedCitiesList
+              ],
+            ),
+          );
+        }
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -132,58 +199,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         ]),
       );
     }
-
-    openSelectCityWindow() async{
-
-      List<Widget> suggestedCitiesList = [];
-      var suggestedCities = await LocationService()
-          .getLocationMapDataGoogle2(ortTextcontroller.text);
-
-      for(var i = 0; i<suggestedCities.length; i++){
-        suggestedCitiesList.add(
-            GestureDetector(
-              onTap: () {
-                ortMapData = {
-                  "city" :suggestedCities[i]["city"],
-                  "countryname" : suggestedCities[i]["countryname"],
-                  "longt": suggestedCities[i]["longt"],
-                  "latt": suggestedCities[i]["latt"]
-                };
-                ortTextcontroller.text = suggestedCities[i]["adress"];
-                selectedCity = true;
-                Navigator.pop(context);
-              },
-              child: Container(
-                  margin: EdgeInsets.only(top:20, left: 10),
-                  child: Text(
-                    suggestedCities[i]["adress"],
-                    style: TextStyle(
-                        fontSize: 16
-                    )
-                    ,)
-              ),
-            )
-        );
-      }
-
-      return showDialog(
-          context: context,
-          builder: (BuildContext buildContext){
-                return AlertDialog(
-                  content: Column(
-                    children: [
-                      Text("Bitte den genauen Standort wählen:",
-                        style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
-                      ),
-                      SizedBox(height: 15,),
-                      ...suggestedCitiesList
-                    ],
-                  ),
-                );
-              }
-            );
-    }
-
 
     return Scaffold(
       body: Container(
@@ -221,4 +236,5 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     );
   }
 }
+
 
