@@ -126,7 +126,6 @@ class ProfilDatabase{
 
   updateProfilName(profilID,oldName, newName) async {
     FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
-
     updateProfil(profilID, {"name": newName});
 
     chatGroupsDB.orderByChild("users/$profilID/name").equalTo(oldName).once().then((query){
@@ -138,12 +137,11 @@ class ProfilDatabase{
     });
 
     var query = await profilsDB.orderByChild("friendlist/$oldName").equalTo(true).once();
-
     query.snapshot.children.forEach((element) {
-
       profilsDB.child(element.key!).child("friendlist").child(oldName).remove();
       profilsDB.child(element.key!).child("friendlist").update({newName: true});
     });
+
 
   }
 
@@ -176,6 +174,10 @@ class ProfilDatabase{
     var query = await profilsDB.child(id).child("activeChat").get();
 
     return query.value;
+  }
+
+  getProfilStream(id){
+    return profilsDB.child(id).onValue;
   }
 
   getAllProfilsStream(){
