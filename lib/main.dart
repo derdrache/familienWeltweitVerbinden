@@ -14,9 +14,11 @@ import 'pages/login_register_page/login_page.dart';
 var appIcon = '@mipmap/ic_launcher';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
 
 
 }
@@ -28,7 +30,6 @@ void main()async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
