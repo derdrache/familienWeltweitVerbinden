@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'firebase_options.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'pages/login_register_page/login_page.dart';
 
@@ -113,6 +114,8 @@ class MyApp extends StatelessWidget {
             ),
               iconTheme: IconThemeData(color: Color(0xFF3CB28F))
             ),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
             home: userLogedIn != null ? StartPage() :const LoginPage()
