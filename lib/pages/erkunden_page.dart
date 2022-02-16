@@ -129,11 +129,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
       if(checkNewCountry){
         var country = profil["land"];
         var position = await LocationService().getCountryLocation(country);
+
         list.add({
           "name": "1",
           "countryname": country,
-          "longt": position["longt"],
-          "latt": position["latt"],
+          "longt": position["longt"]?? 0,
+          "latt": position["latt"] ?? 0,
           "profils": [profil]
         });
       }
@@ -230,7 +231,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     markerPopupWindow(profils){
 
       List<Widget> createPopupProfils(){
-        List<Widget> profilsList = [];
+        List<Widget> profilsList = [SizedBox(height: 10)];
 
         childrenAgeStringToStringAge(childrenAgeList){
           List yearChildrenAgeList = [];
@@ -254,17 +255,16 @@ class _ErkundenPageState extends State<ErkundenPage>{
                     userFriendlist: userProfil["friendlist"],
                 ).profilPopupWindow(),
               child: Container(
-                width: 50,
-                margin: const EdgeInsets.only(top: 10, bottom: 10, right: 25, left: 25),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  border: Border.all(width: 1),
-                    borderRadius: const BorderRadius.all(Radius.circular(20))
+                  border: Border.all(width: 1, color: Color(0xFFDFDDDD)),
                 ),
-                child: Text(
-                    profil["name"] + " - Kinder: " +
-                        childrenAgeStringToStringAge(profil["kinder"]),
-                    style: const TextStyle(fontSize: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(profil["name"], style: TextStyle(fontWeight: FontWeight.bold),),
+                    Text("Kinder :" + childrenAgeStringToStringAge(profil["kinder"]))
+                  ]
                 )
               ),
             )
