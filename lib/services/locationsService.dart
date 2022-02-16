@@ -18,10 +18,12 @@ class LocationService {
 
       var response = await http.get(Uri.parse(url));
       var json = convert.jsonDecode(response.body);
+      var country = json["candidates"][0]["formatted_address"].split(", ").last;
+      if(country.contains(" - ")) country = country.split(" - ")[1];
 
       var mapData = {
         "city": json["candidates"][0]["name"],
-        "countryname": json["candidates"][0]["formatted_address"].split(", ").last,
+        "countryname": country,
         "longt": json["candidates"][0]["geometry"]["location"]["lng"],
         "latt": json["candidates"][0]["geometry"]["location"]["lat"]
       };
@@ -51,6 +53,10 @@ class LocationService {
 
         var city = _isNumeric(formattedCity.first) ?
         formattedCity.last : formattedCity.join(" ");
+
+        var country = formattedAddressList.last;
+        if(country.contains(" - ")) country = country.split(" - ")[1];
+        if(_isNumeric(country)) formattedAddressList[formattedAddressList.length -2];
 
         var mapData = {
           "city": city,
