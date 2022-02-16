@@ -186,7 +186,6 @@ class _ChatPageState extends State<ChatPage>{
 
   @override
   Widget build(BuildContext context){
-
     chatUserList(groupdata) {
       List<Widget> groupContainer = [];
 

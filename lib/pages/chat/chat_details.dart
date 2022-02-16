@@ -219,11 +219,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           children: [
             Expanded(
               child: TextField(
+                maxLines: null,
                 focusNode: myFocusNode,
-                onSubmitted: (eingabe) {
-                  messageToDbAndClearMessageInput(eingabe);
-                  myFocusNode.requestFocus();
-                  },
+                textInputAction: TextInputAction.newline,
                 controller: nachrichtController,
                 decoration: const InputDecoration.collapsed(
                   hintText: "Nachricht"
