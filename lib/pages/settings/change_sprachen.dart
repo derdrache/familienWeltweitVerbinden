@@ -3,12 +3,14 @@ import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_variablen;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 
 class ChangeSprachenPage extends StatelessWidget {
   var userId;
   var sprachenInputBox = CustomMultiTextForm(
-      auswahlList: global_variablen.sprachenListe);
+      auswahlList: Platform.localeName == "de_DE" ?
+      global_variablen.sprachenListe : global_variablen.sprachenListeEnglisch);
 
   ChangeSprachenPage({Key? key,required this.userId}) : super(key: key);
 

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_variablen;
+import 'dart:io';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeReiseartPage extends StatelessWidget {
   var userId;
   var oldInput;
-  var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
+  var reiseArtInput = CustomDropDownButton(items: Platform.localeName == "de_DE" ?
+  global_variablen.reisearten : global_variablen.reiseartenEnglisch);
 
   ChangeReiseartPage({Key? key,required this.userId,required this.oldInput}) : super(key: key);
 
