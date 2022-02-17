@@ -241,17 +241,17 @@ class _SettingPageState extends State<SettingPage> {
                       ChangeReiseartPage(userId: userID, oldInput: reiseArtInput.getSelected())
                   ),
                   profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
-                  kinderAgeBox.getDates(years: true).join(" , "),
+                  kinderAgeBox.getDates(years: true).join(", "),
                       AppLocalizations.of(context)!.alterDerKinder, ChangeChildrenPage(
                         userId: userID, childrenBirthdatePickerBox: kinderAgeBox,
                       )),
                   profilThemeContainer(
                       interessenInputBox.getSelected() == null? "" :
-                      interessenInputBox.getSelected().join(" , "),
+                      interessenInputBox.getSelected().join(", "),
                       AppLocalizations.of(context)!.interessen, ChangeInteressenPage(userId: userID,)),
                   profilThemeContainer(
                       sprachenInputBox.getSelected() == null? "":
-                      sprachenInputBox.getSelected().join(" , "),
+                      sprachenInputBox.getSelected().join(", "),
                       AppLocalizations.of(context)!.sprachen, ChangeSprachenPage(userId: userID))
                 ],
               ),
