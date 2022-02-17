@@ -59,11 +59,18 @@ class PatchnotesWindow{
 
 }
 
+var patch110 = {
+  "title": "1.1.0",
+  "inhalt": [
+    "Englische Version hinzugefügt - Die Sprache wird von der Handysprache übernommen",
+  ]
+};
+
 var patch101 = {
   "title" : "1.0.1",
   "inhalt" : [
     "Notifications können unter Settings deaktiviert werden",
-    "Die Familienanzeige bei klicken auf einen Kartenpunkt wurde verändert",
+    "Die Familienübersicht bei klick auf einen Kartenpunkt wurde verändert",
     "Profil Änderungen unter Setting wurde angepasst",
     "Setting/Profil über mich hat mehr Platz bekommen",
     "Fehler bei Abmelden behoben",

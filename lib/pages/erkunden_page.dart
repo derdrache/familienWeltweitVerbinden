@@ -8,6 +8,7 @@ import '../services/database.dart';
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_var;
+import '../services/locationsService.dart';
 import '../windows/profil_popup_window.dart';
 import '../services/locationsService.dart';
 
@@ -93,9 +94,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       var newCity = false;
 
       for(var i = 0; i< list.length; i++){
-        if(profil["ort"] == list[i]["ort"] &&
-            profil["longt"] == list[i]["longt"] &&
-            profil["latt"] == list[i]["latt"]){
+        if(profil["longt"] == list[i]["longt"] && profil["latt"] == list[i]["latt"]){
           newCity = true;
           list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
           list[i]["profils"].add(profil);
@@ -119,7 +118,11 @@ class _ErkundenPageState extends State<ErkundenPage>{
       var checkNewCountry = true;
 
       for (var i = 0; i<list.length; i++){
-        if(list[i]["countryname"] == profil["land"]){
+        var listCountryLocation = await LocationService().getCountryLocation(list[i]["countryname"]);
+        var profilCountryLocation = await LocationService().getCountryLocation(profil["land"]);
+
+        if(listCountryLocation["latt"] == profilCountryLocation["latt"] &&
+            listCountryLocation["longt"] == profilCountryLocation["longt"] ){
           checkNewCountry = false;
           list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
           list[i]["profils"].add(profil);
@@ -274,11 +277,22 @@ class _ErkundenPageState extends State<ErkundenPage>{
         return profilsList;
       }
 
+      createWindowTitle(list, filter){
+        var titleList = [];
+
+        for(var item in list){
+          if(!titleList.contains(item[filter])) titleList.add(item[filter]);
+        }
+
+        return titleList.join(" / ");
+
+      }
+
 
       return CustomWindow(
           context: context,
-          title: mapZoom > cityZoom ? profils["profils"][0]["ort"] :
-                 profils["profils"][0]["land"],
+          title: mapZoom > cityZoom ? createWindowTitle(profils["profils"], "ort") :
+              createWindowTitle(profils["profils"], "land"),
           children: createPopupProfils());
 
     }

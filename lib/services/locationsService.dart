@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter/services.dart';
@@ -9,11 +10,12 @@ import '../auth/secrets.dart';
 class LocationService {
 
   getLocationMapDataGoogle(input) async{
-    var sprache = "de";
+    var deviceLanguage = Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
     try{
       var url = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/'
           'json?input=$input&inputtype=textquery&'
-          'fields=formatted_address%2Cname%2Crating%2Copening_hours%2Cgeometry&'
+          'fields=formatted_address%2Cgeometry&'
           'language=$sprache&key=$google_key';
 
       var response = await http.get(Uri.parse(url));
@@ -34,7 +36,8 @@ class LocationService {
   }
 
   getLocationMapDataGoogle2(input) async{
-    var sprache = "de";
+    var deviceLanguage = Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
     var allSuggests = [];
 
     try{
