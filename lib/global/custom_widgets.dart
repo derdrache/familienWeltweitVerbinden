@@ -529,20 +529,88 @@ class WindowTopbar extends StatelessWidget {
   }
 }
 
+/*
+class CustomWindowTest{
+  var context;
+  var title;
+  var children;
+  var globalContext;
+
+  CustomWindowTest({required this.context,required this.title,required List<Widget> this.children});
+
+  _closeWindow(){
+    Navigator.pop(context);
+  }
+
+  test(text){
+    customSnackbar(globalContext, text);
+  }
+
+
+  openWindow(){
+    children.insert(0,WindowTopbar(title: title));
+    children.insert(1, const SizedBox(height: 10));
+
+    return AlertDialog(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20.0))
+      ),
+      contentPadding: EdgeInsets.zero,
+      content: SizedBox(
+        height: double.maxFinite,
+        width: double.maxFinite,
+        child: Stack(
+          overflow: Overflow.visible,
+          children: [
+            ListView(
+              children: children,
+            ),
+            Positioned(
+              height: 30,
+              right: -13,
+              top: -7,
+              child: InkResponse(
+                  onTap: () => _closeWindow(),
+                  child: const CircleAvatar(
+                    child: Icon(Icons.close, size: 16,),
+                    backgroundColor: Colors.red,
+                  )
+              ),
+            ),
+          ] ,
+        ),
+      ),
+
+    );
+}
+
+
+
+
+}
+
+
+ */
 
 CustomWindow({required context,required title,required List<Widget> children}){
-  children.insert(0,WindowTopbar(title: title));
-  children.insert(1, const SizedBox(height: 10));
+  var globalContext;
 
 
   _closeWindow(){
     Navigator.pop(context);
   }
 
+  test(text){
+    print(globalContext);
+    customSnackbar(globalContext, text);
+  }
+
 
   return showDialog(
       context: context,
       builder: (BuildContext buildContext){
+        globalContext = buildContext;
+
         return AlertDialog(
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20.0))
@@ -555,7 +623,11 @@ CustomWindow({required context,required title,required List<Widget> children}){
                 overflow: Overflow.visible,
                 children: [
                   ListView(
-                    children: children,
+                    children: [
+                      WindowTopbar(title: title),
+                      const SizedBox(height: 10),
+                      ...children
+                    ],
                   ),
                   Positioned(
                     height: 30,
