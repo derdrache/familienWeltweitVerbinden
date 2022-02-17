@@ -17,72 +17,105 @@ class _ChatPageState extends State<ChatPage>{
   var userName = FirebaseAuth.instance.currentUser!.displayName;
   var userEmail = FirebaseAuth.instance.currentUser!.email;
   var globalChatGroups = [];
+  var testWindow;
 
 
   selectChatpartnerWindow() async {
-    var personenSucheController = TextEditingController();
-    var userFriendlist = await ProfilDatabase().getOneData(userId, "friendlist");
-
+    var userFriendlist = await ProfilDatabase().getOneData(userId, "friendlist");;
 
     return showDialog(
         context: context,
-        builder: (BuildContext dialogContext){
+        builder: (BuildContext buildContext){
+
           return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))
+            ),
+            contentPadding: EdgeInsets.zero,
             content: Scaffold(
               body: SizedBox(
-                height: 400,
-                child: Column(
+                height: double.maxFinite,
+                width: double.maxFinite,
+                child: Stack(
+                  overflow: Overflow.visible,
                   children: [
-                    Row(
-                        children: [
-                          SizedBox(
-                            width: 168,
-                            height: 40,
-                            child: TextFormField(
-                              controller: personenSucheController,
-                                decoration: InputDecoration(
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide(color: Colors.black),
-                                    ),
-                                    border: const OutlineInputBorder(),
-                                    hintText: AppLocalizations.of(context)!.personSuchen,
-                                    hintStyle: const TextStyle(fontSize: 12, color: Colors.grey)
-                                )
-
-                            ),
-                          ),
-                          TextButton(
-                            child: const Icon(Icons.search),
-                            onPressed: () async {
-                              var chatPartner = personenSucheController.text;
-                              if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
-                                var chatPartnerId = await findUserGetId(personenSucheController.text);
-
-                                if(chatPartnerId != null){
-                                  validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId);
-                                } else {
-                                  personenSucheController.clear();
-                                  customSnackbar(dialogContext, AppLocalizations.of(context)!.benutzerNichtGefunden);
-                                }
-                              } else{
-                                personenSucheController.text = "";
-                              }
-                            },
+                    ListView(
+                      children: [
+                        WindowTopbar(title: AppLocalizations.of(context)!.neuenChatEroeffnen),
+                        const SizedBox(height: 10),
+                        personenSuchBox(buildContext),
+                        ...createFriendlistBox(userFriendlist)
+                      ]
+                    ),
+                    Positioned(
+                      height: 30,
+                      right: -13,
+                      top: -7,
+                      child: InkResponse(
+                          onTap: () => Navigator.pop(context),
+                          child: const CircleAvatar(
+                            child: Icon(Icons.close, size: 16,),
+                            backgroundColor: Colors.red,
                           )
-                        ]),
-                    const SizedBox(height: 20),
-                    const Align(alignment: Alignment.centerLeft, child: Text("Friendlist: ")),
-                    const SizedBox(height: 10),
-                    createFriendlistBox(userFriendlist)
-                  ]
-                )
+                      ),
+                    ),
+                  ] ,
+                ),
               ),
             ),
+
           );
-   });
+        }
+    );
   }
 
-  Widget createFriendlistBox(userFriendlist) {
+  Widget personenSuchBox(buildContext){
+    var personenSucheController = TextEditingController();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, bottom: 10, left: 20),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 190,
+              height: 40,
+              child: TextFormField(
+                  controller: personenSucheController,
+                  decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      border: const OutlineInputBorder(),
+                      hintText: AppLocalizations.of(context)!.personSuchen,
+                      hintStyle: const TextStyle(fontSize: 12, color: Colors.grey)
+                  )
+
+              ),
+            ),
+            TextButton(
+              child: const Icon(Icons.search),
+              onPressed: () async {
+                var chatPartner = personenSucheController.text;
+                if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
+                  var chatPartnerId = await findUserGetId(personenSucheController.text);
+
+                  if(chatPartnerId != null){
+                    validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId);
+                  } else {
+                    personenSucheController.clear();
+                    customSnackbar(buildContext, AppLocalizations.of(context)!.benutzerNichtGefunden);
+                  }
+                } else{
+                  personenSucheController.text = "";
+                }
+              },
+            )
+          ]),
+    );
+  }
+
+  List<Widget> createFriendlistBox(userFriendlist){
     List<Widget> friendsBoxen = [];
     if(userFriendlist["empty"] == true) {
       userFriendlist= [];
@@ -90,37 +123,25 @@ class _ChatPageState extends State<ChatPage>{
       userFriendlist = userFriendlist.keys;
     }
 
-
-
     for(var friend in userFriendlist){
 
       friendsBoxen.add(
-        GestureDetector(
-          onTap: () => validCheckAndOpenChatgroup(name: friend),
-          child: Container(
-            margin: const EdgeInsets.all(5),
-            padding: const EdgeInsets.all(15),
-            width: 200,
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(15)
+          GestureDetector(
+            onTap: () => validCheckAndOpenChatgroup(name: friend),
+            child: Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                    border: Border(top: BorderSide(width: 1, color: Color(0xFFDFDDDD)))
+                ),
+                child: Text(friend)
             ),
-            child: Text(friend)
-          ),
-        )
+          )
       );
     }
 
-    return Container(
-      width: double.maxFinite,
-      height: 250,
-      padding: const EdgeInsets.all(10),
-      child: ListView(
-          children: friendsBoxen
-      ),
-    );
-
+    return friendsBoxen;
   }
+
 
   findUserGetId(user) async {
     var foundOnName = await ProfilDatabase().getProfilId("name", user);
