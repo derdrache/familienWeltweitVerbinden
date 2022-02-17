@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -44,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           isLoading = false;
         });
-        customSnackbar(context, "Email ist noch nicht bestätigt worden");
+        customSnackbar(context, AppLocalizations.of(context)!.emailNichtBestaetigt);
       }
 
     }on FirebaseAuthException catch(error){
@@ -52,9 +53,9 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = false;
       });
       if(error.code == "user-not-found"){
-        customSnackbar(context, "Benutzer nicht gefunden");
+        customSnackbar(context, AppLocalizations.of(context)!.benutzerNichtGefunden);
       } else if(error.code == "wrong-password"){
-        customSnackbar(context, "Password ist falsch");
+        customSnackbar(context, AppLocalizations.of(context)!.passwortFalsch);
       }
     }
   }
@@ -83,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
               style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all(Colors.black)
               ),
-              child: const Text("Passwort vergessen?"),
+              child: Text(AppLocalizations.of(context)!.passwortVergessen),
               onPressed: (){
                 passwortController.text = "";
                 global_functions.changePage(context, const ForgetPasswordPage());
@@ -111,17 +112,17 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 header(),
                 customTextInput("Email", emailController,
-                  validator: global_functions.checkValidationEmail(),
+                  validator: global_functions.checkValidationEmail(context),
                   textInputAction: TextInputAction.next
                 ),
-                customTextInput("Passwort", passwortController,
-                    validator: global_functions.checkValidatorPassword(),
+                customTextInput(AppLocalizations.of(context)!.passwort, passwortController,
+                    validator: global_functions.checkValidatorPassword(context),
                     passwort: true,
                     textInputAction: TextInputAction.done,
                     onSubmit: () => doLogin()),
                 forgetPassButton(),
                 isLoading ? loading() : customFloatbuttonExtended("Login", () => doLogin()),
-                customFloatbuttonExtended("Register", (){
+                customFloatbuttonExtended(AppLocalizations.of(context)!.registrieren, (){
                   global_functions.changePage(context, const RegisterPage());
                 }),
               ],

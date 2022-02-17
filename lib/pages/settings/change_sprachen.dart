@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_variablen;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class ChangeSprachenPage extends StatelessWidget {
@@ -19,7 +20,7 @@ class ChangeSprachenPage extends StatelessWidget {
         child: Icon(Icons.done),
         onPressed: (){
           if(sprachenInputBox.getSelected() == null || sprachenInputBox.getSelected().isEmpty){
-            customSnackbar(context, "Sprache eingeben");
+            customSnackbar(context, AppLocalizations.of(context)!.spracheAuswaehlen);
           } else {
             ProfilDatabase().updateProfil(
                 userId, {"sprachen": sprachenInputBox.getSelected()}
@@ -31,7 +32,7 @@ class ChangeSprachenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "Sprachen verändern", button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.spracheVeraendern, button: saveButton()),
       body: sprachenInputBox,
     );
   }

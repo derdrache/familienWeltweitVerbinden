@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
-import '../../services/database.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangePasswortPage extends StatelessWidget {
   var passwortOldKontroller = TextEditingController();
@@ -38,19 +38,19 @@ class ChangePasswortPage extends StatelessWidget {
           var oldPasswort = passwortOldKontroller.text;
 
           if (newPasswort == "" || newPasswort == oldPasswort){
-            customSnackbar(context, "neues Passwort eingeben");
+            customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortEingeben);
             return;
           }
           if(newPasswortCheck == ""){
-            customSnackbar(context, "neues Passwort bestätigen");
+            customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortWiederholen);
             return;
           }
           if(oldPasswort == ""){
-            customSnackbar(context, "altes Passwort eingeben");
+            customSnackbar(context, AppLocalizations.of(context)!.altesPasswortEingeben);
             return;
           }
           if (newPasswort != newPasswortCheck){
-            customSnackbar(context, "Passwort bestätigung stimmt nicht mit dem neuen Passwort überein");
+            customSnackbar(context, AppLocalizations.of(context)!.passwortStimmtNichtMitNeuem);
             return;
           }
 
@@ -58,7 +58,7 @@ class ChangePasswortPage extends StatelessWidget {
             var loginTest = await userLogin(oldPasswort);
 
             if(loginTest == null){
-              customSnackbar(context, "Altes Passwort ist falsch");
+              customSnackbar(context, AppLocalizations.of(context)!.altesPasswortFalsch);
               return;
             }
 
@@ -66,23 +66,23 @@ class ChangePasswortPage extends StatelessWidget {
             Navigator.pop(context);
 
           } catch (error){
-            customSnackbar(context, "Neues Passwort ist zu schwach");
+            customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortSchwach);
           }
         }
       );
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "Passwort ändern", button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.passwortVeraendern, button: saveButton()),
       body: Column(
         children: [
-          customTextInput("Neues Passwort eingeben", passwortNewKontroller,
+          customTextInput(AppLocalizations.of(context)!.neuesPasswortEingeben, passwortNewKontroller,
               passwort: true),
           const SizedBox(height: 15),
-          customTextInput("Neues Passwort wiederholen", passwortNewCheckKontroller,
+          customTextInput(AppLocalizations.of(context)!.neuesPasswortWiederholen, passwortNewCheckKontroller,
               passwort: true),
           const SizedBox(height: 15),
-          customTextInput("Altes Passwort eingeben", passwortOldKontroller,
+          customTextInput(AppLocalizations.of(context)!.altesPasswortEingeben, passwortOldKontroller,
               passwort: true)
         ],
       )

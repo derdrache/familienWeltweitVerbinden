@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class ChangeEmailPage extends StatelessWidget {
@@ -36,31 +37,31 @@ class ChangeEmailPage extends StatelessWidget {
           child: Icon(Icons.done),
           onPressed: () async {
             if(emailKontroller.text == ""){
-              customSnackbar(context, "email eingeben");
+              customSnackbar(context, AppLocalizations.of(context)!.emailEingeben);
               return;
             }
             if(passwortKontroller.text == ""){
-              customSnackbar(context, "passwort eingeben");
+              customSnackbar(context, AppLocalizations.of(context)!.passwortEingeben);
               return;
             }
 
             bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                 .hasMatch(emailKontroller.text);
             if(!emailIsValid){
-              customSnackbar(context, "ungültige Email");
+              customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
               return;
             }
 
             var emailInUse = await ProfilDatabase()
                 .getProfilId("email", emailKontroller.text);
             if (emailInUse != null){
-              customSnackbar(context, "Email wird schon verwendet");
+              customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
               return;
             }
 
             var loginUser = await userLogin(passwortKontroller.text);
             if(loginUser == null){
-              customSnackbar(context, "Email oder Passwort falsch");
+              customSnackbar(context, AppLocalizations.of(context)!.emailOderPasswortFalsch);
               return;
             }
 
@@ -74,12 +75,12 @@ class ChangeEmailPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "Email ändern",button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.emailAendern,button: saveButton()),
       body: Column(
         children: [
-          customTextInput("neue Email",emailKontroller),
+          customTextInput(AppLocalizations.of(context)!.neueEmail,emailKontroller),
           const SizedBox(height: 15),
-          customTextInput("Passwort bestätigen",passwortKontroller, passwort: true)
+          customTextInput(AppLocalizations.of(context)!.passwortBestaetigen,passwortKontroller, passwort: true)
         ],
       )
     );

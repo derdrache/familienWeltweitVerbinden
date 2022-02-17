@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../services/database.dart';
 import '../global/custom_widgets.dart';
@@ -40,7 +41,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
 
     searchMultiForm = CustomMultiTextForm(
-      hintText: "Suche",
       auswahlList: global_var.reisearten + global_var.interessenListe +
           global_var.sprachenListe,
       onConfirm: changeMapFilter(),
@@ -226,6 +226,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   @override
   Widget build(BuildContext context){
+    searchMultiForm.hintText = AppLocalizations.of(context)!.suche;
     List<Marker> allMarker = [];
 
     markerPopupWindow(profils){
@@ -263,7 +264,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(profil["name"], style: TextStyle(fontWeight: FontWeight.bold),),
-                    Text("Kinder :" + childrenAgeStringToStringAge(profil["kinder"]))
+                    Text(AppLocalizations.of(context)!.kinder +" :" + childrenAgeStringToStringAge(profil["kinder"]))
                   ]
                 )
               ),

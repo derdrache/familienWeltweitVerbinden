@@ -3,6 +3,7 @@ import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 
@@ -223,8 +224,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                 focusNode: myFocusNode,
                 textInputAction: TextInputAction.newline,
                 controller: nachrichtController,
-                decoration: const InputDecoration.collapsed(
-                  hintText: "Nachricht"
+                decoration: InputDecoration.collapsed(
+                  hintText: AppLocalizations.of(context)!.nachricht
                 ),
               ),
             ),

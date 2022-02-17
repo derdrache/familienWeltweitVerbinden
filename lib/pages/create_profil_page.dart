@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
@@ -24,17 +25,11 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   bool lookInMaps = false;
   var ortMapData = {};
   var sprachenAuswahlBox = CustomMultiTextForm(
-    hintText: "Sprachen auswählen",
-    auswahlList: global_variablen.sprachenListe,
-    validator: global_functions.checkValidationMultiTextForm(),
-  );
+    auswahlList: global_variablen.sprachenListe);
   var reiseArtenAuswahlBox = CustomDropDownButton(
       items: global_variablen.reisearten);
   var interessenAuswahlBox = CustomMultiTextForm(
-    hintText: "Interessen auswählen",
-    auswahlList: global_variablen.interessenListe,
-      validator: global_functions.checkValidationMultiTextForm()
-  );
+    auswahlList: global_variablen.interessenListe);
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
   var windowSetState;
 
@@ -74,7 +69,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           ProfilDatabase().addNewProfil(userID, data);
           global_functions.changePageForever(context, StartPage(registered: true));
         } else{
-          customSnackbar(context, "Stadt nicht bestätigt");
+          customSnackbar(context, AppLocalizations.of(context)!.stadtNichtBestaetigt);
         }
       }
     }
@@ -93,16 +88,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   checkAllValidation(userExist){
     bool noError = true;
-    String errorString = "Bitte Eingaben korrigieren: \n";
+    String errorString = AppLocalizations.of(context)!.bitteEingabeKorrigieren +  "\n";
 
     if (userExist){
-      errorString += "- Username wird schon verwendet \n";
+      errorString += "- "+ AppLocalizations.of(context)!.usernameInVerwendung +"\n";
     }
     if(reiseArtenAuswahlBox.getSelected().isEmpty){
-      errorString += "- Reiseart auswählen \n";
+      errorString += "- "+ AppLocalizations.of(context)!.reiseartAuswaehlen +"\n";
     }
     if(childrenAgePickerBox.getDates().length == 0 || !childrenInputValidation()){
-      errorString += "- Geburtsdatum vom Kind eingeben \n";
+      errorString += "- " + AppLocalizations.of(context)!.geburtsdatumEingeben + "\n";
     }
 
 
@@ -164,7 +159,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           return AlertDialog(
             content: Column(
               children: [
-                Text("Bitte den genauen Standort wählen:",
+                Text(AppLocalizations.of(context)!.genauenStandortWaehlen + ": ",
                   style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
                 ),
                 SizedBox(height: 15,),
@@ -178,6 +173,12 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   @override
   Widget build(BuildContext context) {
+    sprachenAuswahlBox.validator = global_functions.checkValidationMultiTextForm(context);
+    sprachenAuswahlBox.hintText = AppLocalizations.of(context)!.spracheAuswaehlen;
+    interessenAuswahlBox.validator = global_functions.checkValidationMultiTextForm(context);
+    interessenAuswahlBox.hintText = AppLocalizations.of(context)!.interessenAuswaehlen;
+    reiseArtenAuswahlBox.hintText = AppLocalizations.of(context)!.artDerReiseAuswaehlen;
+    childrenAgePickerBox.hintText = AppLocalizations.of(context)!.geburtsdatum;
 
     pageTitle(){
       return SizedBox(
@@ -185,9 +186,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         child: Row(
           children: [
             const Expanded(child: SizedBox.shrink()),
-            const Text(
-              "Profil erstellen",
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.profilErstellen,
+              style: const TextStyle(
                   fontSize: 30
               ),
             ),
@@ -208,10 +209,10 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             child: ListView(
                 children: [
                   pageTitle(),
-                  customTextInput("Benutzername", userNameKontroller,
-                      validator: global_functions.checkValidatorEmpty()),
-                  customTextInput("Aktuelle Stadt eingeben", ortTextcontroller,
-                      validator: global_functions.checkValidatorEmpty(),
+                  customTextInput(AppLocalizations.of(context)!.benutzername, userNameKontroller,
+                      validator: global_functions.checkValidatorEmpty(context)),
+                  customTextInput(AppLocalizations.of(context)!.stadtEingeben, ortTextcontroller,
+                      validator: global_functions.checkValidatorEmpty(context),
                     onSubmit: () => openSelectCityWindow()
 
                   ),
@@ -220,9 +221,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                   interessenAuswahlBox,
                   Container(
                     padding: const EdgeInsets.all(10),
-                      child: const Text(
-                        "Anzahl und Alter der Kinder:",
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.anzahlUndAlterKinder,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16
                         ),

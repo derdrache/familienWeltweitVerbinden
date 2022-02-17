@@ -1,44 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
-checkValidatorEmpty(){
+checkValidatorEmpty(context) {
   return (value){
     if(value == null || value.isEmpty){
-      return "Dieses Feld bitte ausfüllen";
+      return AppLocalizations.of(context)!.diesesFeldAusfuellen;
     }
     return null;
   };
 }
 
-checkValidationEmail(){
+checkValidationEmail(context){
   return (value){
     bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(value);
 
     if(value == null || value.isEmpty){
-      return "Bitte Email eingeben";
+      return AppLocalizations.of(context)!.emailEingeben;
     } else if(!emailIsValid){
-      return "Bitte gültige Email eingeben";
+      return AppLocalizations.of(context)!.gueltigeEmailEingeben;
     }
   };
 }
 
-checkValidatorPassword({passwordCheck = ""}){
+checkValidatorPassword(context, {passwordCheck = ""}){
  return (value){
    if(value == null || value.isEmpty){
-     return "Bitte Passwort eingeben";
+     return AppLocalizations.of(context)!.passwortEingeben;
    } else if(passwordCheck!= "" && value != passwordCheck){
-     return "Passwort stimmt nicht überein";
+     return AppLocalizations.of(context)!.passwortStimmtNichtUeberein;
    }
    return null;
  };
 }
 
-checkValidationMultiTextForm(){
+checkValidationMultiTextForm(context){
   return (value){
     if(value == null || value.isEmpty){
-      return "Bitte auswählen";
+      return AppLocalizations.of(context)!.ausfuellen;
     }
     return null;
   };

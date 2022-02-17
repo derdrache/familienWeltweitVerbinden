@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -25,7 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
     });
     var registrationComplete = await registration();
     if(registrationComplete){
-      customSnackbar(context, "Registrierung erfolgreich, bitte Email bestätigen", color: Colors.green);
+      customSnackbar(context, AppLocalizations.of(context)!.registerAndEmailBestaetigen, color: Colors.green);
       global_functions.changePageForever(context, const LoginPage());
     }
   }
@@ -46,11 +47,11 @@ class _RegisterPageState extends State<RegisterPage> {
           isLoading = false;
         });
         if(error.code == "email-already-in-use"){
-          customSnackbar(context, "Email ist schon in Benutzung");
+          customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
         } else if(error.code == "invalid-email"){
-          customSnackbar(context, "Email ist nicht gültig");
+          customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
         } else if(error.code == "weak-password"){
-          customSnackbar(context, "Passwort ist zu schwach");
+          customSnackbar(context, AppLocalizations.of(context)!.passwortSchwach);
         }
 
         return false;
@@ -78,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(title: "Register"),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.registrieren),
       body: Center(
         child: Form(
           key: formKey,
@@ -86,23 +87,24 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               customTextInput(
                 "Email", emailController,
-                validator: global_functions.checkValidationEmail(),
+                validator: global_functions.checkValidationEmail(context),
                 textInputAction: TextInputAction.next
               ),
               customTextInput(
-                "Passwort", passwordController, passwort: true,
-                validator: global_functions.checkValidatorPassword(),
+                AppLocalizations.of(context)!.passwort, passwordController, passwort: true,
+                validator: global_functions.checkValidatorPassword(context),
                 textInputAction: TextInputAction.next
               ),
               customTextInput(
-                "Passwort bestätigen", checkPasswordController, passwort: true,
+                AppLocalizations.of(context)!.passwortBestaetigen, checkPasswordController, passwort: true,
                 validator: global_functions.checkValidatorPassword(
-                passwordCheck: passwordController.text),
-                textInputAction: TextInputAction.done,
-                onSubmit: () => registrationButton()
-              ),
+                  context,
+                  passwordCheck: passwordController.text),
+                  textInputAction: TextInputAction.done,
+                  onSubmit: () => registrationButton()
+                ),
               isLoading ? loading():
-              customFloatbuttonExtended("Registrieren", () => registrationButton())
+              customFloatbuttonExtended(AppLocalizations.of(context)!.registrieren, () => registrationButton())
             ],
           ),
         )

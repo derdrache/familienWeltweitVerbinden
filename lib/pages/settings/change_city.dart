@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/locationsService.dart';
 import '../../services/database.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeCityPage extends StatefulWidget {
   var userId;
@@ -51,7 +52,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
             if(suggestedCities.length > 1){
               setState(() {});
-              customSnackbar(context, "genauen Ort auswählen");
+              customSnackbar(context, AppLocalizations.of(context)!.genauenStandortWaehlen);
             } else{
               pushLocationDataToDB(suggestedCities[0]);
               Navigator.pop(context);
@@ -97,22 +98,22 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
 
     return Scaffold(
-      appBar: customAppBar(title: "Aktuelle Stadt ändern", button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.stadtAendern, button: saveButton()),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          customTextInput("Stadt eingeben", ortChangeKontroller, onSubmit: () async{
+          customTextInput(AppLocalizations.of(context)!.stadtEingeben, ortChangeKontroller, onSubmit: () async{
             suggestedCities = await LocationService()
                 .getLocationMapDataGoogle2(ortChangeKontroller.text);
 
             setState(() {});
 
           }),
-          suggestedCitiesList.isNotEmpty ? const Padding(
-            padding: EdgeInsets.all(12.0),
+          suggestedCitiesList.isNotEmpty ? Padding(
+            padding: const EdgeInsets.all(12.0),
             child: Text(
-              "Bitte den gewünschten Ort auswählen:",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.bitteGenaueStadtAuswaehlen + ":",
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ): const SizedBox.shrink(),
           ...suggestedCitiesList

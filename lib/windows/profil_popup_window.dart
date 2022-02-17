@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 import '../global/global_functions.dart' as global_functions;
+import '../global/variablen.dart' as global_variablen;
 import '../global/style.dart' as global_style;
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
@@ -14,6 +17,7 @@ class ProfilPopupWindow{
   var userID = FirebaseAuth.instance.currentUser!.uid;
   Map profil;
   Map userFriendlist;
+  var spracheIstDeutsch = Platform.localeName == "de_DE";
 
 
   ProfilPopupWindow({required this.context, required this.userName,
@@ -106,6 +110,13 @@ class ProfilPopupWindow{
     var childrenProfilList = profil["kinder"];
     var childrenList = [];
     double columnAbstand = 5;
+    var interessenTextGerman = AppLocalizations.of(context)!.interessen+": " + global_variablen.changeEnglishToGerman(profil["interessen"]).join(", ");
+    var interessenTextEnglish = AppLocalizations.of(context)!.interessen+": " + global_variablen.changeGermanToEnglish(profil["interessen"]).join(", ");
+    var reiseArtGerman = AppLocalizations.of(context)!.artDerReise+": " + global_variablen.changeEnglishToGerman(profil["reiseart"]);
+    var reiseArtEnglish = AppLocalizations.of(context)!.artDerReise+": " + global_variablen.changeGermanToEnglish(profil["reiseart"]);
+    var spracheGerman = AppLocalizations.of(context)!.sprachen+": " + global_variablen.changeEnglishToGerman(profil["sprachen"]).join(", ");
+    var spracheEnglish = AppLocalizations.of(context)!.sprachen+": " + global_variablen.changeGermanToEnglish(profil["sprachen"]).join(", ");
+
 
     childrenProfilList.forEach((child){
       childrenList.add(global_functions.ChangeTimeStamp(child).intoYears()
@@ -120,17 +131,23 @@ class ProfilPopupWindow{
           children: [ const
             Text("Info", style: TextStyle(color: Colors.blue)),
             SizedBox(height: columnAbstand),
-            Text("Ort: " + profil["ort"]),
+            Text(AppLocalizations.of(context)!.aktuelleStadt +": " + profil["ort"]),
             SizedBox(height: columnAbstand),
-            Text("Reiseart: " + profil["reiseart"]),
+            spracheIstDeutsch ?
+                Text(reiseArtGerman):
+                Text(reiseArtEnglish),
             SizedBox(height: columnAbstand),
-            Text("Sprache: " + profil["sprachen"].join(" , ")),
+            spracheIstDeutsch ?
+                Text(spracheGerman):
+                Text(spracheEnglish),
             SizedBox(height: columnAbstand),
-            Text("Kinder: " + childrenList.join(" , ")),
+            Text(AppLocalizations.of(context)!.kinder +": " + childrenList.join(" , ")),
             SizedBox(height: columnAbstand),
-            Text("Interessen: " + profil["interessen"].join(" , ")),
+            spracheIstDeutsch ? 
+                Text(interessenTextGerman):
+                Text(interessenTextEnglish),
             SizedBox(height: columnAbstand),
-            Text("Über mich: " + profil["aboutme"]),
+            Text(AppLocalizations.of(context)!.ueberMich + ": " + profil["aboutme"]),
           ],
         )
     );
@@ -141,8 +158,8 @@ class ProfilPopupWindow{
       padding: const EdgeInsets.only(left: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [ const
-          Text("Kontakt",style: TextStyle(color: Colors.blue),),
+        children: [
+          Text(AppLocalizations.of(context)!.kontakt,style: const TextStyle(color: Colors.blue),),
           profil["emailAnzeigen"] ?
             Text("Email: " + profil["email"]) : const SizedBox.shrink()
         ],

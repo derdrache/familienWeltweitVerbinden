@@ -115,7 +115,10 @@ class MyApp extends StatelessWidget {
               iconTheme: IconThemeData(color: Color(0xFF3CB28F))
             ),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
+            supportedLocales: const [
+              Locale('en', ''),
+              Locale('de', ''),
+            ],
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
             home: userLogedIn != null ? StartPage() :const LoginPage()

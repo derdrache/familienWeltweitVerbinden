@@ -30,6 +30,7 @@ class UmcomingUpdatesWindow{
           _update("IOS Version"),
           _update("Mehrere Accounts verbinden"),
           _update("Automatischer Standort"),
+          _update("Nutzer blockieren"),
           _update("Events planen"),
           _update("Reiseplanung"),
           _update("Gemeinschaften Eintragen"),
