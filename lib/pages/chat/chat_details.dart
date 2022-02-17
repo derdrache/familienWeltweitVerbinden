@@ -201,8 +201,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       var myFocusNode = FocusNode();
 
       return Container(
+        constraints: BoxConstraints(maxHeight: 100),
         padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),//EdgeInsets.all(10),
-        height: 50,
         decoration: BoxDecoration(
             color: Colors.white,
             border: const Border(top: BorderSide(color: Colors.grey)),
@@ -225,7 +225,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                 textInputAction: TextInputAction.newline,
                 controller: nachrichtController,
                 decoration: InputDecoration.collapsed(
-                  hintText: AppLocalizations.of(context)!.nachricht
+                  hintText: AppLocalizations.of(context)!.nachricht,
                 ),
               ),
             ),
