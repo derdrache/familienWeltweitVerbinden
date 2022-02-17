@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeChildrenPage extends StatelessWidget {
   var userId;
@@ -25,7 +26,7 @@ class ChangeChildrenPage extends StatelessWidget {
           }
 
           if(!allFilled || childrenBirthdatePickerBox.getDates().isEmpty){
-            customSnackbar(context, "Geburtsdaten eingeben");
+            customSnackbar(context, AppLocalizations.of(context)!.geburtsdatumEingeben);
           } else{
             ProfilDatabase().updateProfil(
                 userId, {"kinder": childrenBirthdatePickerBox.getDates()}
@@ -38,7 +39,7 @@ class ChangeChildrenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "Kinder ändern", button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.kinderAendern, button: saveButton()),
       body: childrenBirthdatePickerBox,
     );
   }

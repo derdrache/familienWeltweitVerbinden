@@ -194,7 +194,7 @@ class CustomDatePicker extends StatefulWidget {
 
   CustomDatePicker({
     Key? key,
-    this.hintText = "Datum eingeben",
+    required this.hintText,
     this.pickedDate,
     this.deleteFunction,
     this.dateIsSelected = false
@@ -288,10 +288,14 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
 class CustomDropDownButton extends StatefulWidget {
   List<String> items;
+  String hintText;
   String selected;
 
-  CustomDropDownButton({Key? key,required this.items,
-    this.selected = ""}) : super(key: key);
+  CustomDropDownButton({Key? key,
+    required this.items,
+    this.hintText = "",
+    this.selected = ""
+  }) : super(key: key);
 
 
   getSelected(){
@@ -326,7 +330,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
         child: DropdownButton<String>(
           isExpanded: true,
           value: widget.selected == "" ? null : widget.selected,
-          hint: const Text("Art der Reise auswählen", style: TextStyle(color: Colors.grey)),
+          hint: Text(widget.hintText, style: TextStyle(color: Colors.grey)),
           elevation: 16,
           style: const TextStyle(color: Colors.black),
           icon: const Icon(Icons.arrow_downward, color: Colors.black,),
@@ -345,6 +349,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
 
 class ChildrenBirthdatePickerBox extends StatefulWidget {
   List childrensBirthDatePickerList = [];
+  String hintText = "";
 
   getDates({bool years = false}){
     List dates = [];
@@ -388,7 +393,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
     });
   }
 
-  ChildrenBirthdatePickerBox({Key? key}) : super(key: key);
+  ChildrenBirthdatePickerBox({Key? key, hintText}) : super(key: key);
 
   @override
   _ChildrenBirthdatePickerBoxState createState() => _ChildrenBirthdatePickerBoxState();
@@ -399,11 +404,12 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
   var maxChildrens = 6;
 
 
+
   @override
   void initState() {
     if(widget.childrensBirthDatePickerList.isEmpty){
       widget.childrensBirthDatePickerList.add(
-        CustomDatePicker(hintText: "Geburtsdatum")
+        CustomDatePicker(hintText: widget.hintText)
       );
     }
 
@@ -424,7 +430,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
     if(childrenCount <=8){
       widget.childrensBirthDatePickerList.add(
           CustomDatePicker(
-              hintText: "Geburtsdatum",
+              hintText: widget.hintText,
               deleteFunction: deleteFunction()
           )
       );
@@ -455,7 +461,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
     List newPicker = [];
 
     for(var i = 0;i < widget.childrensBirthDatePickerList.length; i++){
-      var hintText = dates[i] == null? "Geburtsdatum" : dates[i].toString();
+      var hintText = dates[i] == null? widget.hintText : dates[i].toString();
 
       if(i == 0 || i < widget.childrensBirthDatePickerList.length -1 ){
         newPicker.add(

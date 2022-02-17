@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -23,7 +24,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       return Row(
         children: [
           SizedBox(width: 20),
-          Text("Email für alle Sichtbar", style: TextStyle(fontSize: 20),),
+          Text(AppLocalizations.of(context)!.emailAlleSichtbar, style: TextStyle(fontSize: 20),),
           Expanded(child: SizedBox(width: 20)),
           Switch(
               value: widget.profil["emailAnzeigen"],
@@ -41,7 +42,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "Privatsphäre und Sicherheit"),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.privatsphaereSicherheit),
       body: Column(
         children: [
           SizedBox(height: 20,),

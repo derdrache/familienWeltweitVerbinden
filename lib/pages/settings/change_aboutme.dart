@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class ChangeAboutmePage extends StatelessWidget {
@@ -26,8 +27,8 @@ class ChangeAboutmePage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "Über mich verändern", button: saveButton()),
-      body:customTextInput("über mich", bioTextKontroller, moreLines: 10)
+      appBar: customAppBar(title: AppLocalizations.of(context)!.ueberMichVeraendern, button: saveButton()),
+      body:customTextInput(AppLocalizations.of(context)!.ueberMich, bioTextKontroller, moreLines: 10)
 
     );
   }

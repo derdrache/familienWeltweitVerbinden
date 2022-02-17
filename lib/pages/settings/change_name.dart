@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeNamePage extends StatelessWidget {
   var userId;
@@ -17,7 +18,7 @@ class ChangeNamePage extends StatelessWidget {
         child: Icon(Icons.done),
         onPressed: () async{
           if(nameKontroller.text == ""){
-            customSnackbar(context, "Neuen Namen eingeben");
+            customSnackbar(context, AppLocalizations.of(context)!.neuenNamenEingeben);
           } else{
             var userName = FirebaseAuth.instance.currentUser!.displayName;
             var checkUserProfilExist = await ProfilDatabase().getProfilFromName(nameKontroller.text);
@@ -28,7 +29,7 @@ class ChangeNamePage extends StatelessWidget {
               );
               Navigator.pop(context);
             } else {
-              customSnackbar(context, "Name schon vorhanden");
+              customSnackbar(context, AppLocalizations.of(context)!.usernameInVerwendung);
             }
           }
         },
@@ -36,7 +37,7 @@ class ChangeNamePage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "Name ändern", button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.nameAendern, button: saveButton()),
       body: customTextInput("Name", nameKontroller),
     );
   }

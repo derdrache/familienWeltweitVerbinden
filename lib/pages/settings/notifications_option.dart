@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -21,7 +22,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
     return Row(
       children: [
         SizedBox(width: 20),
-        Text("Benachrichtigungen erhalten", style: TextStyle(fontSize: 20),),
+        Text(AppLocalizations.of(context)!.benachrichtigungenErhalten, style: TextStyle(fontSize: 20),),
         Expanded(child: SizedBox(width: 20)),
         Switch(
             value: widget.profil["notificationstatus"] ?? true,
@@ -43,7 +44,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(title: "Benachrichtigungen"),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.benachrichtigungen),
       body: Column(
         children: [
           SizedBox(height: 20,),

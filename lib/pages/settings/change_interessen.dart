@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
+
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_variablen;
@@ -7,6 +10,7 @@ import '../../global/variablen.dart' as global_variablen;
 
 class ChangeInteressenPage extends StatelessWidget {
   var userId;
+  var sprache = Platform.localeName;
   var interessenInputBox = CustomMultiTextForm(
       auswahlList: global_variablen.interessenListe);
 
@@ -18,14 +22,14 @@ class ChangeInteressenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    print(Platform.localeName == "de_DE");
     saveButton(){
       return TextButton(
         child: Icon(Icons.done),
         onPressed: (){
 
           if(interessenInputBox.getSelected() == null || interessenInputBox.getSelected().isEmpty){
-            customSnackbar(context, "neue interessen eingeben");
+            customSnackbar(context, AppLocalizations.of(context)!.interessenAuswaehlen);
           } else {
             ProfilDatabase().updateProfil(
                 userId, {"interessen": interessenInputBox.getSelected()}
@@ -39,7 +43,7 @@ class ChangeInteressenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "Interessen verändern", button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.interessenVeraendern, button: saveButton()),
       body: interessenInputBox,
     );
   }

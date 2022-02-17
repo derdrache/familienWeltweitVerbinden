@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_variablen;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeReiseartPage extends StatelessWidget {
   var userId;
@@ -20,7 +21,7 @@ class ChangeReiseartPage extends StatelessWidget {
         child: Icon(Icons.done),
         onPressed: () {
           if(reiseArtInput.getSelected() == null || reiseArtInput.getSelected().isEmpty){
-            customSnackbar(context, "neue Reiseart eingeben");
+            customSnackbar(context, AppLocalizations.of(context)!.reiseartAuswaehlen);
           } else if(reiseArtInput.getSelected() != oldInput ){
             ProfilDatabase().updateProfil(
                 userId, {"reiseart": reiseArtInput.getSelected()}
@@ -34,7 +35,7 @@ class ChangeReiseartPage extends StatelessWidget {
 
 
     return Scaffold(
-      appBar: customAppBar(title: "Art der Reise ändern", button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.reiseartAendern, button: saveButton()),
       body: reiseArtInput,
     );
   }

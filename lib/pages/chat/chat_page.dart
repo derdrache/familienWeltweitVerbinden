@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../services/database.dart';
 import '../../global/custom_widgets.dart';
@@ -39,13 +40,13 @@ class _ChatPageState extends State<ChatPage>{
                             height: 40,
                             child: TextFormField(
                               controller: personenSucheController,
-                                decoration: const InputDecoration(
-                                    enabledBorder: OutlineInputBorder(
+                                decoration: InputDecoration(
+                                    enabledBorder: const OutlineInputBorder(
                                       borderSide: BorderSide(color: Colors.black),
                                     ),
-                                    border: OutlineInputBorder(),
-                                    hintText: "Person suchen",
-                                    hintStyle: TextStyle(fontSize: 12, color: Colors.grey)
+                                    border: const OutlineInputBorder(),
+                                    hintText: AppLocalizations.of(context)!.personSuchen,
+                                    hintStyle: const TextStyle(fontSize: 12, color: Colors.grey)
                                 )
 
                             ),
@@ -61,7 +62,7 @@ class _ChatPageState extends State<ChatPage>{
                                   validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId);
                                 } else {
                                   personenSucheController.clear();
-                                  customSnackbar(dialogContext, "Benutzer existiert nicht");
+                                  customSnackbar(dialogContext, AppLocalizations.of(context)!.benutzerNichtGefunden);
                                 }
                               } else{
                                 personenSucheController.text = "";

@@ -6,6 +6,8 @@ import 'package:familien_suche/pages/settings/notifications_option.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/link.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -33,6 +35,7 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   double globalPadding = 30;
   double fontSize = 20;
+  var spracheIstDeutsch = Platform.localeName == "de_DE";
   var borderColor = Colors.grey[200]!;
   var userID = FirebaseAuth.instance.currentUser!.uid;
   var userProfil;
@@ -67,11 +70,17 @@ class _SettingPageState extends State<SettingPage> {
     nameTextKontroller.text = userProfil["name"];
     emailTextKontroller.text = userProfil["email"];
     ortKontroller.text = userProfil["ort"];
-    interessenInputBox.selected = userProfil["interessen"];
+    interessenInputBox.selected = spracheIstDeutsch ?
+        global_variablen.changeEnglishToGerman(userProfil["interessen"]):
+        global_variablen.changeGermanToEnglish(userProfil["interessen"]);
     kinderAgeBox.setSelected(childrenAgeTimestamp);
     bioTextKontroller.text = userProfil["aboutme"];
-    reiseArtInput.selected = userProfil["reiseart"];
-    sprachenInputBox.selected = userProfil["sprachen"];
+    reiseArtInput.selected = spracheIstDeutsch ?
+        global_variablen.changeEnglishToGerman(userProfil["reiseart"]):
+        global_variablen.changeGermanToEnglish(userProfil["reiseart"]);;
+    sprachenInputBox.selected = spracheIstDeutsch ?
+        global_variablen.changeEnglishToGerman(userProfil["sprachen"]):
+        global_variablen.changeGermanToEnglish(userProfil["sprachen"]);;
 
     }
 
@@ -95,14 +104,14 @@ class _SettingPageState extends State<SettingPage> {
                         nameKontroller: nameTextKontroller)
                     );
                   },
-                  child: Text("Name ändern", style: TextStyle(color: textColor)))
+                  child: Text(AppLocalizations.of(context)!.nameAendern, style: TextStyle(color: textColor)))
           ),
           PopupMenuItem(
               child: TextButton(
                   onPressed: () {
                     global_functions.changePage(context, ChangeEmailPage());
                   },
-                  child: Text("Email ändern", style: TextStyle(color: textColor))
+                  child: Text(AppLocalizations.of(context)!.emailAendern, style: TextStyle(color: textColor))
               )
           ),
           PopupMenuItem(
@@ -110,7 +119,7 @@ class _SettingPageState extends State<SettingPage> {
                   onPressed: () {
                     global_functions.changePage(context, ChangePasswortPage());
                   },
-                  child: Text("Passwort ändern", style: TextStyle(color: textColor)))
+                  child: Text(AppLocalizations.of(context)!.passwortVeraendern, style: TextStyle(color: textColor)))
           ),
           PopupMenuItem(
               child: TextButton(
@@ -119,7 +128,7 @@ class _SettingPageState extends State<SettingPage> {
                     global_functions.changePage(context, const LoginPage());
                     setState(() {});
                   },
-                  child: Text("Abmelden", style: TextStyle(color: textColor)))
+                  child: Text(AppLocalizations.of(context)!.abmelden, style: TextStyle(color: textColor)))
           ),
         ]
     );
@@ -217,8 +226,8 @@ class _SettingPageState extends State<SettingPage> {
                     )
                 ),
                 const Expanded(child: SizedBox.shrink()),
-                const Text("Antippen, um Einträge zu ändern",
-                    style: TextStyle(color: Colors.grey, fontSize: 14)
+                Text(AppLocalizations.of(context)!.antippenZumAendern,
+                    style: const TextStyle(color: Colors.grey, fontSize: 14)
                 ),
                 const Expanded(child: SizedBox()),
               ]),
@@ -226,28 +235,28 @@ class _SettingPageState extends State<SettingPage> {
               Wrap(
                 children: [
                   profilThemeContainer(
-                      ortKontroller.text, "Aktuelle Stadt",
+                      ortKontroller.text, AppLocalizations.of(context)!.aktuelleStadt,
                       ChangeCityPage(userId: userID)),
-                  profilThemeContainer(reiseArtInput.getSelected(), "Art der Reise",
+                  profilThemeContainer(reiseArtInput.getSelected(), AppLocalizations.of(context)!.artDerReise,
                       ChangeReiseartPage(userId: userID, oldInput: reiseArtInput.getSelected())
                   ),
                   profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
                   kinderAgeBox.getDates(years: true).join(" , "),
-                      "Alter der Kinder", ChangeChildrenPage(
+                      AppLocalizations.of(context)!.alterDerKinder, ChangeChildrenPage(
                         userId: userID, childrenBirthdatePickerBox: kinderAgeBox,
                       )),
                   profilThemeContainer(
                       interessenInputBox.getSelected() == null? "" :
                       interessenInputBox.getSelected().join(" , "),
-                      "Interessen", ChangeInteressenPage(userId: userID,)),
+                      AppLocalizations.of(context)!.interessen, ChangeInteressenPage(userId: userID,)),
                   profilThemeContainer(
                       sprachenInputBox.getSelected() == null? "":
                       sprachenInputBox.getSelected().join(" , "),
-                      "Sprachen", ChangeSprachenPage(userId: userID))
+                      AppLocalizations.of(context)!.sprachen, ChangeSprachenPage(userId: userID))
                 ],
               ),
               profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
-                "Über mich",
+                  AppLocalizations.of(context)!.ueberMich,
                 ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller),
                 true
               )
@@ -276,7 +285,7 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Einstellungen",
+              Text(AppLocalizations.of(context)!.einstellungen,
                   style: TextStyle(
                       color: headLineColor,
                       fontSize: fontSize,
@@ -284,13 +293,13 @@ class _SettingPageState extends State<SettingPage> {
                   )
               ),
               const SizedBox(height: 20),
-              settingThemeContainer("Privatsphäre und Sicherheit", Icons.lock,
+              settingThemeContainer(AppLocalizations.of(context)!.privatsphaereSicherheit, Icons.lock,
                       () => global_functions.changePage(
                           context, PrivacySecurityPage(profil: userProfil)
                       )
               ),
               const SizedBox(height: 20),
-              settingThemeContainer("Benachrichtigungen", Icons.notifications,
+              settingThemeContainer(AppLocalizations.of(context)!.benachrichtigungen, Icons.notifications,
                       () => global_functions.changePage(
                       context, NotificationsOptionsPage(profil: userProfil)
                   )
@@ -306,7 +315,7 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("App Informationen",
+              Text(AppLocalizations.of(context)!.appInformation,
                   style: TextStyle(
                       color: headLineColor,
                       fontSize: fontSize,
@@ -324,7 +333,7 @@ class _SettingPageState extends State<SettingPage> {
                   () => PatchnotesWindow(context: context).openWindow()
                ),
               const SizedBox(height: 20),
-              settingThemeContainer("Geplante Erweiterungen", Icons.task,
+              settingThemeContainer(AppLocalizations.of(context)!.geplanteErweiterungen, Icons.task,
                   () => UmcomingUpdatesWindow(context: context).openWindow()
               ),
               /*
@@ -342,10 +351,10 @@ class _SettingPageState extends State<SettingPage> {
                   behavior: HitTestBehavior.translucent,
                   onTap: followLink,
                   child: Row(
-                    children: const [
-                      Icon(Icons.card_giftcard),
-                      SizedBox(width: 20),
-                      Text("Spenden")
+                    children: [
+                      const Icon(Icons.card_giftcard),
+                      const SizedBox(width: 20),
+                      Text(AppLocalizations.of(context)!.spenden)
                     ],
                   ),
                 ),
