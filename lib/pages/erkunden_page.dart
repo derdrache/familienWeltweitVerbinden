@@ -261,7 +261,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Color(0xFFDFDDDD)),
+                  border: Border(top: BorderSide(width: 1, color: Color(0xFFDFDDDD)))
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
