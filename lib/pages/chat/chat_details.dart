@@ -165,8 +165,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       }
 
       return ListView(
-          shrinkWrap: true,
-          children: messageBox,
+          reverse: true,
+          children: messageBox.reversed.toList(),
       );
     }
 
@@ -250,11 +250,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             child: Container()
         )
       ),
-      body: ListView(
-        reverse: true,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          Expanded(child:showMessages()),
           textEingabe(),
-          showMessages(),
+
         ],
       )
     );
