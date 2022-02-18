@@ -45,6 +45,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       auswahlList: global_var.reisearten + global_var.interessenListe +
           global_var.sprachenListe,
       onConfirm: changeMapFilter(),
+      icon: Icon(Icons.search),
     );
 
   }
@@ -332,6 +333,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
           zoom: 1.6,
           minZoom: 1.6,
           maxZoom: 9,
+          interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed){
             if(changed){
                 setState(() {

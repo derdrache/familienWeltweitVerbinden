@@ -81,6 +81,7 @@ class CustomMultiTextForm extends StatefulWidget {
   String hintText;
   var onConfirm;
   var validator;
+  Icon? icon;
 
   getSelected(){
     return selected;
@@ -93,7 +94,8 @@ class CustomMultiTextForm extends StatefulWidget {
     this.selected,
     this.hintText = "",
     this.onConfirm,
-    this.validator
+    this.validator,
+    this.icon
   }) : super(key: key);
 
   @override
@@ -118,8 +120,6 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
           MultiSelectItem(auswahl, auswahl)
       );
     }
-    //widget.auswahlList.map((e) => MultiSelectItem(e, e)).toList()
-
 
     return multiSelectItems;
   }
@@ -157,6 +157,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     return Container(
       margin: EdgeInsets.all(sideSpace),
       child: MultiSelectDialogField (
+        buttonIcon: widget.icon,
           initialValue: widget.selected,
           buttonText: Text(
             createDropdownText(),
