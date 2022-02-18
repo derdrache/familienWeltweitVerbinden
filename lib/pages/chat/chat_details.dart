@@ -27,6 +27,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var nachrichtController = TextEditingController();
   var userId = FirebaseAuth.instance.currentUser!.uid;
   var userName = FirebaseAuth.instance.currentUser!.displayName;
+  var messageInputHeight = 50.0;
+  var messageRows = 0;
 
   @override
   void dispose() {
@@ -110,6 +112,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   }
 
+  countItemsInList(list, search){
+    var count = 0;
+
+    for(var i =0; i<list.length-search.length ;i++){
+      if((list[i] + list[i+1] + list[i+1] ).contains(search) ){
+        count += 1;
+        i += 1;
+      }
+    }
+
+    return count;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +147,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           Align(
             alignment: textAlign, //right and left
             child: Container(
-                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.55),
+                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: boxColor,
@@ -199,10 +214,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     textEingabe(){
       var myFocusNode = FocusNode();
-
       return Container(
-        constraints: BoxConstraints(maxHeight: 100),
-        padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),//EdgeInsets.all(10),
+        height: messageInputHeight,
+        padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
         decoration: BoxDecoration(
             color: Colors.white,
             border: const Border(top: BorderSide(color: Colors.grey)),
@@ -227,6 +241,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                 decoration: InputDecoration.collapsed(
                   hintText: AppLocalizations.of(context)!.nachricht,
                 ),
+                onChanged: (value) {
+                    var newLineCounts = countItemsInList(value, "\n");
+
+                    if(countItemsInList(value, "\n") != messageRows){
+                      setState(() {
+                        messageInputHeight = 50.0 + newLineCounts * 15.0;
+                        messageRows = newLineCounts;
+                      });
+                    }
+                },
               ),
             ),
             IconButton(
