@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'month_picker.dart';
 
 double sideSpace = 10;
 double borderRounding = 5;
@@ -207,18 +208,23 @@ class CustomDatePicker extends StatefulWidget {
 class _CustomDatePickerState extends State<CustomDatePicker> {
 
   datePicker() async{
-    return await showDatePicker(
+    return showMonthPicker(
         context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime.now().subtract(const Duration(days: 365*18)),
-        lastDate: DateTime.now()
+        firstDate: DateTime(DateTime.now().year - 1, 5),
+        lastDate: DateTime(DateTime.now().year + 1, 9),
+        initialDate: DateTime.now()
     );
   }
 
   showDate(){
     return () async{
       widget.pickedDate = await datePicker();
-      String newHintText = widget.pickedDate.toString().split(" ")[0].split("-").reversed.join("-");
+      var dateList = widget.pickedDate.toString().split(" ")[0].split("-");
+      dateList.removeLast();
+      String newHintText = dateList.reversed.join("-");
+
+
+
       setState(() {
         if(widget.pickedDate != null){
           widget.hintText = newHintText;
@@ -349,7 +355,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
 
 class ChildrenBirthdatePickerBox extends StatefulWidget {
   List childrensBirthDatePickerList = [];
-  String hintText = "";
+  String hintText = "Month/Year";
 
   getDates({bool years = false}){
     List dates = [];
@@ -593,24 +599,14 @@ class CustomWindowTest{
  */
 
 CustomWindow({required context,required title,required List<Widget> children}){
-  var globalContext;
-
 
   _closeWindow(){
     Navigator.pop(context);
   }
 
-  test(text){
-    print(globalContext);
-    customSnackbar(globalContext, text);
-  }
-
-
   return showDialog(
       context: context,
       builder: (BuildContext buildContext){
-        globalContext = buildContext;
-
         return AlertDialog(
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20.0))
