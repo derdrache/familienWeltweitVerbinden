@@ -56,6 +56,8 @@ class _LoginPageState extends State<LoginPage> {
         customSnackbar(context, AppLocalizations.of(context)!.benutzerNichtGefunden);
       } else if(error.code == "wrong-password"){
         customSnackbar(context, AppLocalizations.of(context)!.passwortFalsch);
+      } else if(error.code == "network-request-failed"){
+        customSnackbar(context, AppLocalizations.of(context)!.keineVerbindungInternet);
       }
     }
   }

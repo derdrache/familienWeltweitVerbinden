@@ -81,6 +81,7 @@
     "spenden": "Spenden",
     "suche": "Suche",
     "kontakt": "Kontakt",
-    "neuenChatEroeffnen": "Neuen Chat eröffnen"
+    "neuenChatEroeffnen": "Neuen Chat eröffnen",
+    "keineVerbindungInternet" : "Keine Verbindung zum Internet"
 
 }

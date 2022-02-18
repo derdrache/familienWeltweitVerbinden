@@ -52,6 +52,8 @@ class _RegisterPageState extends State<RegisterPage> {
           customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
         } else if(error.code == "weak-password"){
           customSnackbar(context, AppLocalizations.of(context)!.passwortSchwach);
+        } else if(error.code == "network-request-failed"){
+          customSnackbar(context, AppLocalizations.of(context)!.keineVerbindungInternet);
         }
 
         return false;
