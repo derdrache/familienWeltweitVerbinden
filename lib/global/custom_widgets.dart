@@ -384,10 +384,13 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
       dates = converted;
     }
 
+    print(dates);
     return dates;
   }
 
   setSelected(childrenBirthDates){
+    childrensBirthDatePickerList = [];
+
     childrenBirthDates.forEach((date){
       childrensBirthDatePickerList.add(
           CustomDatePicker(
