@@ -80,7 +80,8 @@
     "spenden": "Donate",
     "suche": "Search",
     "kontakt": "Contact",
-    "neuenChatEroeffnen": "Open a new chat"
+    "neuenChatEroeffnen": "Open a new chat",
+    "keineVerbindungInternet" : "Keine Verbindung zum Internet"
 
 }
 
