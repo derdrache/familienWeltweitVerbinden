@@ -9,8 +9,7 @@ import '../services/database.dart';
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_var;
-import '../services/locationsService.dart';
-import '../windows/profil_popup_window.dart';
+import '../global/search_autocomplete.dart';
 import '../services/locationsService.dart';
 
 
@@ -29,7 +28,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var aktiveProfils = [];
   double mapZoom = 3.0;
   double cityZoom = 6.5;
-  var searchMultiForm;
+  var searchAutocomplete;
   var buildIsLoaded = false;
 
   @override
@@ -42,11 +41,11 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
 
 
-    searchMultiForm = CustomMultiTextForm(
-      auswahlList: global_var.reisearten + global_var.interessenListe +
+    searchAutocomplete =  SearchAutocomplete(
+      searchableItems: global_var.reisearten + global_var.interessenListe +
           global_var.sprachenListe,
-      onConfirm: changeMapFilter(),
-      icon: Icon(Icons.search),
+      onConfirm: () => changeMapFilter(),
+      onDelete:() => changeMapFilter() ,
     );
 
   }
@@ -221,17 +220,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   changeMapFilter(){
-    return (select){
-      setState(() {
-        filterList = select;
-      });
-    };
-
+    setState(() {
+      filterList = searchAutocomplete.getSelected();
+    });
   }
 
   @override
   Widget build(BuildContext context){
-    searchMultiForm.hintText = AppLocalizations.of(context)!.suche;
     List<Marker> allMarker = [];
 
     markerPopupWindow(profils){
@@ -384,7 +379,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
               return Stack(children: [
                 ownFlutterMap(),
-                searchMultiForm
+                searchAutocomplete
               ]);
             }
             return Container();
