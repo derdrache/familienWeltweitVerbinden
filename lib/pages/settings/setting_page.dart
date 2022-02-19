@@ -14,7 +14,6 @@ import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
-import '../../windows/profil_popup_window.dart';
 import '../../windows/upcoming_updates.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';

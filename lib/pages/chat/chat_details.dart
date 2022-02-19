@@ -7,7 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../windows/profil_popup_window.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   var groupChatData;
