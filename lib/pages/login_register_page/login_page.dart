@@ -69,12 +69,18 @@ class _LoginPageState extends State<LoginPage> {
     Widget header(){
       return Container(
         margin: EdgeInsets.only(top: sideSpace, bottom: sideSpace),
-        child: const Center(
-            child:Text(
-                "Login",
-              style: TextStyle(fontSize: 24),
-            )
-        ),
+        child: Column(
+          children: [
+            Center(
+                child: Image.asset('assets/WeltFlugzeug.png')
+            ),
+            SizedBox(height: 15),
+            Text(AppLocalizations.of(context)!.willkommenBeiAppName, style: TextStyle(fontSize: 20),)
+          ],
+        )
+
+
+
       );
     }
 

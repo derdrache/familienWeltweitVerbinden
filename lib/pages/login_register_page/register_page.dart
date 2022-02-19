@@ -67,8 +67,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return false;
   }
 
-
-
   loading(){
     return const SizedBox(
       width: 40,
@@ -82,34 +80,37 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar(title: AppLocalizations.of(context)!.registrieren),
-      body: Center(
-        child: Form(
-          key: formKey,
-          child: ListView(
-            children: [
-              customTextInput(
-                "Email", emailController,
-                validator: global_functions.checkValidationEmail(context),
-                textInputAction: TextInputAction.next
-              ),
-              customTextInput(
-                AppLocalizations.of(context)!.passwort, passwordController, passwort: true,
-                validator: global_functions.checkValidatorPassword(context),
-                textInputAction: TextInputAction.next
-              ),
-              customTextInput(
-                AppLocalizations.of(context)!.passwortBestaetigen, checkPasswordController, passwort: true,
-                validator: global_functions.checkValidatorPassword(
-                  context,
-                  passwordCheck: passwordController.text),
-                  textInputAction: TextInputAction.done,
-                  onSubmit: () => registrationButton()
+      body: Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Center(
+          child: Form(
+            key: formKey,
+            child: ListView(
+              children: [
+                customTextInput(
+                  "Email", emailController,
+                  validator: global_functions.checkValidationEmail(context),
+                  textInputAction: TextInputAction.next
                 ),
-              isLoading ? loading():
-              customFloatbuttonExtended(AppLocalizations.of(context)!.registrieren, () => registrationButton())
-            ],
-          ),
-        )
+                customTextInput(
+                  AppLocalizations.of(context)!.passwort, passwordController, passwort: true,
+                  validator: global_functions.checkValidatorPassword(context),
+                  textInputAction: TextInputAction.next
+                ),
+                customTextInput(
+                  AppLocalizations.of(context)!.passwortBestaetigen, checkPasswordController, passwort: true,
+                  validator: global_functions.checkValidatorPassword(
+                    context,
+                    passwordCheck: passwordController.text),
+                    textInputAction: TextInputAction.done,
+                    onSubmit: () => registrationButton()
+                  ),
+                isLoading ? loading():
+                customFloatbuttonExtended(AppLocalizations.of(context)!.registrieren, () => registrationButton())
+              ],
+            ),
+          )
+        ),
       ),
     );
   }

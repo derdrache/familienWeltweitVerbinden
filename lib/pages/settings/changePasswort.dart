@@ -73,7 +73,7 @@ class ChangePasswortPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.passwortVeraendern, button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.passwortVeraendern, buttons: [saveButton()]),
       body: Column(
         children: [
           customTextInput(AppLocalizations.of(context)!.neuesPasswortEingeben, passwortNewKontroller,

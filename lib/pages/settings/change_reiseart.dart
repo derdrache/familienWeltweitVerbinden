@@ -37,7 +37,7 @@ class ChangeReiseartPage extends StatelessWidget {
 
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.reiseartAendern, button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.reiseartAendern, buttons: [saveButton()]),
       body: reiseArtInput,
     );
   }

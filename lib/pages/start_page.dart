@@ -46,6 +46,8 @@ class _StartPageState extends State<StartPage>{
         ProfilDatabase().updateProfil(userID, {"token": userDeviceTokenReal});
       }
     }
+
+
   }
 
   checkIfFirstLogin(){
@@ -142,7 +144,7 @@ class _StartPageState extends State<StartPage>{
                */
               const BottomNavigationBarItem(
                 icon: Icon(Icons.travel_explore),
-                label: 'Weltweit suchen',
+                label: 'World',
               ),
 
               /*

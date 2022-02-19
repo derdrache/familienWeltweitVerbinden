@@ -58,20 +58,28 @@ customSnackbar(context, text, {color = Colors.red}){
   );
 }
 
-customAppBar({title, button, elevation = 4.0}){
+customAppBar({required title, buttons, elevation = 4.0, var onTap}){
 
-  button ??= const SizedBox.shrink();
+  buttons ??= <Widget>[];
 
   return AppBar(
-    title: Text(title, style: const TextStyle(color: Colors.black)),
+    title: InkWell(
+        onTap: onTap,
+        child: Row(
+            children: [
+              Container(
+                height: 50,
+                  child: Center(child: Text(title, style: const TextStyle(color: Colors.black)))
+              )
+            ]
+        )
+    ),
     backgroundColor: Colors.white,
     elevation: elevation,
     iconTheme: const IconThemeData(
       color: Colors.black
     ),
-    actions: [
-      button
-    ],
+    actions: buttons,
   );
 }
 
@@ -385,7 +393,6 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
       dates = converted;
     }
 
-    print(dates);
     return dates;
   }
 

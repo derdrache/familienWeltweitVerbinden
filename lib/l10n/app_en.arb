@@ -6,7 +6,7 @@
     "diesesFeldAusfuellen": "fill in this field",
     "emailEingeben" : "Please enter email",
     "gueltigeEmailEingeben": "enter valid email",
-    "passwortEingeben": "please enter password",
+    "passwortEingeben": "Please enter password",
     "passwortStimmtNichtUeberein" : "Password does not match",
     "ausfuellen": "Please select",
     "registerAndEmailBestaetigen": "Registration successful, please confirm email",
@@ -81,7 +81,8 @@
     "suche": "Search",
     "kontakt": "Contact",
     "neuenChatEroeffnen": "Open a new chat",
-    "keineVerbindungInternet" : "Keine Verbindung zum Internet"
+    "keineVerbindungInternet" : "Keine Verbindung zum Internet",
+    "willkommenBeiAppName" : "Welcome to Connect Families"
 
 }
 

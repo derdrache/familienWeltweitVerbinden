@@ -98,7 +98,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.stadtAendern, button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.stadtAendern, buttons: [saveButton()]),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

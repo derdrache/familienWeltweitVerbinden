@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../services/database.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
+import '../../global/variablen.dart' as global_var;
 import '../../services/database.dart';
 import 'chat_details.dart';
 
@@ -131,7 +132,7 @@ class _ChatPageState extends State<ChatPage>{
             child: Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                    border: Border(top: BorderSide(width: 1, color: Color(0xFFDFDDDD)))
+                    border: Border(top: BorderSide(width: 1, color: global_var.borderColorGrey))
                 ),
                 child: Text(friend)
             ),
@@ -208,6 +209,7 @@ class _ChatPageState extends State<ChatPage>{
 
   @override
   Widget build(BuildContext context){
+
     chatUserList(groupdata) {
       List<Widget> groupContainer = [];
 
@@ -233,9 +235,9 @@ class _ChatPageState extends State<ChatPage>{
             child: Container(
                 padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(),
+                      bottom: BorderSide(color: global_var.borderColorGrey),
                     )
                 ),
               child: Column(
