@@ -34,7 +34,7 @@ class ChangeSprachenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.spracheVeraendern, button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.spracheVeraendern, buttons: [saveButton()]),
       body: sprachenInputBox,
     );
   }

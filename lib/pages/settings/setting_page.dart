@@ -3,6 +3,7 @@ import 'package:familien_suche/pages/settings/change_aboutme.dart';
 import 'package:familien_suche/pages/settings/change_interessen.dart';
 import 'package:familien_suche/pages/settings/change_sprachen.dart';
 import 'package:familien_suche/pages/settings/notifications_option.dart';
+import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/link.dart';
@@ -13,6 +14,7 @@ import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
+import '../../windows/profil_popup_window.dart';
 import '../../windows/upcoming_updates.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
@@ -141,13 +143,11 @@ class _SettingPageState extends State<SettingPage> {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
 
-
-
     menuBar(){
-      return  customAppBar(
+      return customAppBar(
           title: "",
           elevation: 0.0,
-          button: TextButton(
+          buttons: [TextButton(
             style: ButtonStyle(
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
@@ -157,7 +157,7 @@ class _SettingPageState extends State<SettingPage> {
             ),
             child: const Icon(Icons.more_vert, color: Colors.black),
             onPressed: () => openSettingWindow(),
-          )
+          )]
       );
     }
 
@@ -210,7 +210,7 @@ class _SettingPageState extends State<SettingPage> {
     profilContainer(){
       return Container(
           width: double.maxFinite,
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.only(top:10, bottom: 15, left:15, right: 15),
           decoration: BoxDecoration(
               border: Border(bottom: BorderSide(width: 10, color: borderColor))
           ),
@@ -230,6 +230,15 @@ class _SettingPageState extends State<SettingPage> {
                     style: const TextStyle(color: Colors.grey, fontSize: 14)
                 ),
                 const Expanded(child: SizedBox()),
+                GestureDetector(
+                  onTap: () {
+                    global_functions.changePage(
+                        context,
+                        ShowProfilPage(profil: userProfil, ownProfil: true)
+                    );
+                  },
+                  child: Icon(Icons.preview, size: 35,)
+                )
               ]),
               const SizedBox(height: 5),
               Wrap(

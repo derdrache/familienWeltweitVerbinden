@@ -82,6 +82,7 @@
     "suche": "Suche",
     "kontakt": "Kontakt",
     "neuenChatEroeffnen": "Neuen Chat eröffnen",
-    "keineVerbindungInternet" : "Keine Verbindung zum Internet"
+    "keineVerbindungInternet" : "Keine Verbindung zum Internet",
+    "willkommenBeiAppName" : "Willkommen bei Connect Families"
 
 }

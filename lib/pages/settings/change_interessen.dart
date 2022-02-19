@@ -40,7 +40,7 @@ class ChangeInteressenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.interessenVeraendern, button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.interessenVeraendern, buttons: [saveButton()]),
       body: interessenInputBox,
     );
   }

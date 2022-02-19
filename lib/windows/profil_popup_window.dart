@@ -9,19 +9,22 @@ import '../global/style.dart' as global_style;
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
 
-
+/*
 class ProfilPopupWindow{
   dynamic globalSetState;
   dynamic context;
-  String userName;
-  var userID = FirebaseAuth.instance.currentUser!.uid;
+  String? userName;
   Map profil;
-  Map userFriendlist;
+  Map? userFriendlist;
+  bool ownProfil;
+
+  var userID = FirebaseAuth.instance.currentUser!.uid;
   var spracheIstDeutsch = Platform.localeName == "de_DE";
 
 
-  ProfilPopupWindow({required this.context, required this.userName,
-    required this.profil,required this.userFriendlist});
+
+  ProfilPopupWindow({required this.context, this.userName,
+    required this.profil, this.userFriendlist, this.ownProfil = false});
 
   _menuBarProfil(){
     return Row(
@@ -32,8 +35,8 @@ class ProfilPopupWindow{
           onPressed: () => Navigator.pop(context),
         ),
         const Expanded(child: SizedBox()),
-        _messageButton(),
-        _friendButton()
+        ownProfil ? SizedBox.shrink() : _messageButton(),
+        ownProfil ? SizedBox.shrink() : _friendButton()
         //addFriendButton,
       ],
     );
@@ -70,25 +73,25 @@ class ProfilPopupWindow{
   }
 
   _friendButton(){
-    var onFriendlist = userFriendlist.keys.contains(profil["name"]);
+    var onFriendlist = userFriendlist!.keys.contains(profil["name"]);
 
     return TextButton(
         style: global_style.textButtonStyle(),
         child: onFriendlist ? const Icon(Icons.person_remove) : const Icon(Icons.person_add),
         onPressed: (){
           if(onFriendlist){
-            userFriendlist.remove(profil["name"]);
-            if(userFriendlist.keys.isEmpty) userFriendlist = {"empty": true};
+            userFriendlist!.remove(profil["name"]);
+            if(userFriendlist!.keys.isEmpty) userFriendlist = {"empty": true};
           } else {
-            if(userFriendlist["empty"] == true) userFriendlist = {profil["name"]: true};
-            userFriendlist[profil["name"]] = true;
+            if(userFriendlist!["empty"] == true) userFriendlist = {profil["name"]: true};
+            userFriendlist![profil["name"]] = true;
           }
 
           ProfilDatabase().updateProfil(
               userID, {"friendlist": userFriendlist}
           );
 
-          globalSetState(() => userFriendlist.keys.contains(profil["name"]));
+          globalSetState(() => userFriendlist!.keys.contains(profil["name"]));
 
         }
     );
@@ -159,7 +162,7 @@ class ProfilPopupWindow{
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppLocalizations.of(context)!.kontakt,style: const TextStyle(color: Colors.blue),),
+          Text(AppLocalizations.of(context)!.kontakt,style: TextStyle(color: Theme.of(context).colorScheme.tertiary),),
           profil["emailAnzeigen"] ?
             Text("Email: " + profil["email"]) : const SizedBox.shrink()
         ],
@@ -168,6 +171,7 @@ class ProfilPopupWindow{
   }
 
   profilPopupWindow(){
+    userFriendlist ??= {"empty": true};
 
     return showDialog(
         context: context,
@@ -186,11 +190,11 @@ class ProfilPopupWindow{
                       child: ListView(
                           children: [
                             _menuBarProfil(),
-                            const SizedBox(height: 25),
+                            const SizedBox(height: 15),
                             _titelProfil(),
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 25),
                             _infoProfil(),
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 25),
                             _kontaktProfil(),
                           ]
                       ),
@@ -204,4 +208,6 @@ class ProfilPopupWindow{
 
 }
 
+
+ */
 

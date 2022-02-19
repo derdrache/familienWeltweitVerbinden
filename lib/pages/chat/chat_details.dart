@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:familien_suche/global/global_functions.dart';
+import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../windows/profil_popup_window.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   var groupChatData;
@@ -123,6 +125,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     }
 
     return count;
+  }
+
+  openProfil() async{
+    var chatPartnerProfil = await ProfilDatabase().getProfil(chatPartnerID);
+    var userFriendlist = await ProfilDatabase().getOneData(userId, "friendlist");
+
+    changePage(context, ShowProfilPage(
+      userName: userName,
+      profil: chatPartnerProfil,
+      userFriendlist: userFriendlist,
+    ));
+
   }
 
 
@@ -269,10 +283,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     return Scaffold(
       appBar: customAppBar(
         title: chatPartnerName,
-        button: TextButton(
-            onPressed: null,
-            child: Container()
-        )
+        onTap: () => openProfil(),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,

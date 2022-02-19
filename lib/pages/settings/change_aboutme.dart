@@ -27,7 +27,7 @@ class ChangeAboutmePage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.ueberMichVeraendern, button: saveButton()),
+      appBar: customAppBar(title: AppLocalizations.of(context)!.ueberMichVeraendern, buttons: [saveButton()]),
       body:customTextInput(AppLocalizations.of(context)!.ueberMich, bioTextKontroller, moreLines: 10)
 
     );

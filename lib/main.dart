@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'firebase_options.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'pages/login_register_page/login_page.dart';
 
@@ -20,7 +21,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-
+  print(message);
 
 }
 
@@ -45,7 +46,16 @@ class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
-    LocalNotificationService.initialize();
+    //LocalNotificationService.initialize();
+    final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+    var initializationSettings = InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher')
+    );
+
+    _notificationsPlugin.initialize(
+        initializationSettings,
+        onSelectNotification: (payload) async => changeToChat(payload)
+    );
 
 
     FirebaseMessaging.instance.getInitialMessage().then((value){

@@ -1,3 +1,4 @@
+import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -253,16 +254,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
         profils["profils"].forEach((profil){
           profilsList.add(
             GestureDetector(
-              onTap: () => ProfilPopupWindow(
-                    context: context,
-                    userName: userProfil["name"],
-                    profil: profil,
-                    userFriendlist: userProfil["friendlist"],
-                ).profilPopupWindow(),
+              onTap: () =>global_functions.changePage(context, ShowProfilPage(
+                userName: userProfil["name"],
+                profil: profil,
+                userFriendlist: userProfil["friendlist"],
+              )),
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  border: Border(top: BorderSide(width: 1, color: Color(0xFFDFDDDD)))
+                  border: Border(top: BorderSide(width: 1, color: global_var.borderColorGrey))
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
