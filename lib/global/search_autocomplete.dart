@@ -29,12 +29,7 @@ class SearchAutocomplete extends StatefulWidget {
 }
 
 class _SearchAutocompleteState extends State<SearchAutocomplete> {
-
-
-
   double dropdownExtraBoxHeight = 55;
-
-
 
 
   showAutoComplete(text){
@@ -53,7 +48,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     if(text.isEmpty) return widget.autoCompleteItems;
 
     for(var item in widget.searchableItems){
-      if(item.toLowerCase().contains(text)) widget.autoCompleteItems.add(item);
+      if(item.toLowerCase().contains(text.toLowerCase())) widget.autoCompleteItems.add(item);
     }
 
     setState(() {});
@@ -82,8 +77,8 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
   @override
   Widget build(BuildContext context) {
-    double dropdownItemSumHeight = widget.autoCompleteItems.length *40 ;
-    if(widget.autoCompleteItems.length *40 > 160) dropdownItemSumHeight = 160;
+    double dropdownItemSumHeight = widget.autoCompleteItems.length *39;
+    if(widget.autoCompleteItems.length *39 > 160) dropdownItemSumHeight = 160;
 
     dropDownItem(item){
       return GestureDetector(
@@ -109,8 +104,9 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
       return Container(
           height: dropdownItemSumHeight,
+          margin: EdgeInsets.only(top: widget.isDense? 25 : 0),
           child: ListView(
-          padding: EdgeInsets.only(top: widget.isDense? 25 : 0),
+          padding: EdgeInsets.only(top: 0),
           children: autoCompleteList,
       ),
       );
@@ -158,22 +154,25 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
         children: [
           Column(
             children: [
-              TextField(
-                textAlignVertical: TextAlignVertical.top,
-                controller: widget.searchKontroller,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.only(top:5),
-                  isDense: widget.isDense,
-                  border: InputBorder.none,
-                  hintText: 'Search',
-                ),
-                style: TextStyle(
-                ),
-                onChanged: (value) {
-                  showAutoComplete(value);
-                  addAutoCompleteItems(value);
-                },
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: TextField(
+                  textAlignVertical: TextAlignVertical.top,
+                  controller: widget.searchKontroller,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(top:5),
+                    isDense: widget.isDense,
+                    border: InputBorder.none,
+                    hintText: 'Search',
+                  ),
+                  style: TextStyle(
+                  ),
+                  onChanged: (value) {
+                    showAutoComplete(value);
+                    addAutoCompleteItems(value);
+                  },
             ),
+              ),
               if(widget.isSearching) autoCompleteDropdownBox()
 
             ],

@@ -12,6 +12,8 @@ import '../global/variablen.dart' as global_var;
 import '../global/search_autocomplete.dart';
 import '../services/locationsService.dart';
 
+/// searchAutocomplete land + city
+
 
 class ErkundenPage extends StatefulWidget{
   @override
@@ -19,7 +21,8 @@ class ErkundenPage extends StatefulWidget{
 }
 
 class _ErkundenPageState extends State<ErkundenPage>{
-  var userProfil;
+  var ownProfil;
+  List<String> allUserName = [];
   var filterList = [];
   var profils = [];
   var profilCountries = [];
@@ -28,7 +31,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var aktiveProfils = [];
   double mapZoom = 3.0;
   double cityZoom = 6.5;
-  var searchAutocomplete;
+  dynamic searchAutocomplete = SizedBox.shrink();
   var buildIsLoaded = false;
 
   @override
@@ -37,24 +40,17 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     WidgetsBinding.instance?.addPostFrameCallback((_){
       buildIsLoaded = true;
+
+
     });
-
-
-
-    searchAutocomplete =  SearchAutocomplete(
-      searchableItems: global_var.reisearten + global_var.interessenListe +
-          global_var.sprachenListe,
-      onConfirm: () => changeMapFilter(),
-      onDelete:() => changeMapFilter() ,
-    );
 
   }
 
-  getOwnProfil(profils){
+  getOwnProfil(profil){
     var userEmail = FirebaseAuth.instance.currentUser!.email;
 
-    for(var profil in profils){
-      if(profil["email"] == userEmail) return profil;
+    if(profil["email"] == userEmail) {
+      return profil;
     }
 
   }
@@ -167,11 +163,22 @@ class _ErkundenPageState extends State<ErkundenPage>{
       profilCountries = pufferProfilCountries;
       changeProfil(mapZoom);
 
+    buildAfterLoaded();
+  }
+
+  buildAfterLoaded() async{
     if(buildIsLoaded){
       buildIsLoaded = false;
+
+      searchAutocomplete =  SearchAutocomplete(
+        searchableItems: global_var.reisearten + global_var.interessenListe +
+            global_var.sprachenListe + allUserName,
+        onConfirm: () => changeMapFilter(),
+        onDelete:() => changeMapFilter() ,
+      );
+
       setState(() {});
     }
-
   }
 
   changeProfil(zoom){
@@ -192,12 +199,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var profilInteressen = profil["interessen"];
     var profilReiseart = profil["reiseart"];
     var profilSprachen = profil["sprachen"];
+    var profilName = profil["name"];
+
+    if(filterList.isEmpty) return true;
 
     var spracheMatch = checkMatch(filterList, profilSprachen, global_var.sprachenListe);
     var reiseartMatch = checkMatch(filterList, [profilReiseart], global_var.reisearten);
     var interesseMatch = checkMatch(filterList, profilInteressen, global_var.interessenListe);
-
-    if(spracheMatch && reiseartMatch && interesseMatch) return true;
+    var userMatch = checkMatch(filterList, [profilName], allUserName);
+    if(spracheMatch && reiseartMatch && interesseMatch && userMatch) return true;
 
     return false;
   }
@@ -249,11 +259,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
         profils["profils"].forEach((profil){
           profilsList.add(
             GestureDetector(
-              onTap: () =>global_functions.changePage(context, ShowProfilPage(
-                userName: userProfil["name"],
-                profil: profil,
-                userFriendlist: userProfil["friendlist"],
-              )),
+              onTap: () {
+                global_functions.changePage(context, ShowProfilPage(
+                  userName: ownProfil["name"],
+                  profil: profil,
+                  userFriendlist: ownProfil["friendlist"],
+                ));
+              },
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -362,16 +374,24 @@ class _ErkundenPageState extends State<ErkundenPage>{
           ) {
             if (snapshot.hasData ) {
               var allProfils = [];
+              allUserName = [];
               var allProfilsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
               allProfilsMap.forEach((key, value) {
-                if(checkFilter(value)){
+                if(getOwnProfil(value) != null) {
+                  ownProfil = getOwnProfil(value);
+                  allProfils.remove(ownProfil);
+                } else{
+                  allUserName.add(value["name"]);
+                }
+              });
+
+              allProfilsMap.forEach((key, value) {
+                if(checkFilter(value) && ownProfil != value){
                   allProfils.add(value);
                 }
               });
 
-              userProfil = getOwnProfil(allProfils);
-              allProfils.remove(userProfil);
 
               profils = allProfils;
 
