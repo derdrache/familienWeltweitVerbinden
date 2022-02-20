@@ -10,16 +10,24 @@ import '../../global/variablen.dart' as global_variablen;
 
 class ChangeInteressenPage extends StatelessWidget {
   var userId;
-  var interessenInputBox = CustomMultiTextForm(
-      auswahlList: Platform.localeName == "de_DE" ?
-          global_variablen.interessenListe : global_variablen.interessenListeEnglisch);
+  var selected;
+  var interessenInputBox;
 
-  ChangeInteressenPage({Key? key, this.userId}) : super(key: key);
+  ChangeInteressenPage({
+    Key? key,
+    required this.userId,
+    required this.selected
+  }) :
+        interessenInputBox = CustomMultiTextForm(
+            auswahlList: Platform.localeName == "de_DE" ?
+            global_variablen.interessenListe : global_variablen.interessenListeEnglisch,
+            selected: selected,
+        );
 
 
   @override
   Widget build(BuildContext context) {
-    print(Platform.localeName == "de_DE");
+
     saveButton(){
       return TextButton(
         child: Icon(Icons.done),

@@ -246,7 +246,10 @@ class _SettingPageState extends State<SettingPage> {
                       ortKontroller.text, AppLocalizations.of(context)!.aktuelleStadt,
                       ChangeCityPage(userId: userID)),
                   profilThemeContainer(reiseArtInput.getSelected(), AppLocalizations.of(context)!.artDerReise,
-                      ChangeReiseartPage(userId: userID, oldInput: reiseArtInput.getSelected())
+                      ChangeReiseartPage(
+                        userId: userID,
+                        oldInput: reiseArtInput.getSelected(),
+                      )
                   ),
                   profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
                   kinderAgeBox.getDates(years: true).join(", "),
@@ -256,11 +259,19 @@ class _SettingPageState extends State<SettingPage> {
                   profilThemeContainer(
                       interessenInputBox.getSelected() == null? "" :
                       interessenInputBox.getSelected().join(", "),
-                      AppLocalizations.of(context)!.interessen, ChangeInteressenPage(userId: userID,)),
+                      AppLocalizations.of(context)!.interessen,
+                      ChangeInteressenPage(
+                          userId: userID,
+                          selected: interessenInputBox.getSelected()
+                      )
+                  ),
                   profilThemeContainer(
                       sprachenInputBox.getSelected() == null? "":
                       sprachenInputBox.getSelected().join(", "),
-                      AppLocalizations.of(context)!.sprachen, ChangeSprachenPage(userId: userID))
+                      AppLocalizations.of(context)!.sprachen,
+                      ChangeSprachenPage(userId: userID, selected: sprachenInputBox.getSelected())
+
+                  )
                 ],
               ),
               profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,

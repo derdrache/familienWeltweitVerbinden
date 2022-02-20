@@ -8,11 +8,23 @@ import 'dart:io';
 
 class ChangeSprachenPage extends StatelessWidget {
   var userId;
-  var sprachenInputBox = CustomMultiTextForm(
-      auswahlList: Platform.localeName == "de_DE" ?
-      global_variablen.sprachenListe : global_variablen.sprachenListeEnglisch);
+  var selected;
 
-  ChangeSprachenPage({Key? key,required this.userId}) : super(key: key);
+  ChangeSprachenPage({
+    Key? key,
+    required this.userId,
+    required this.selected
+  }) :
+    sprachenInputBox = CustomMultiTextForm(
+        selected: selected,
+        auswahlList: Platform.localeName == "de_DE" ?
+        global_variablen.sprachenListe : global_variablen.sprachenListeEnglisch);
+
+
+  var sprachenInputBox;
+
+
+
 
   @override
   Widget build(BuildContext context) {
