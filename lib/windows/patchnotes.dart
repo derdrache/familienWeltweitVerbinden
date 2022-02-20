@@ -1,10 +1,12 @@
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 
 class PatchnotesWindow{
   var context;
   var patchnotesTitle = "Patchnotes";
+  var isGerman = Platform.localeName == "de_DE";
 
   PatchnotesWindow({required this.context});
 
@@ -13,8 +15,6 @@ class PatchnotesWindow{
     List<Widget> patchList = [];
 
     for(var inhalt in patch["inhalt"]){
-      print(inhalt);
-
       patchList.add(SizedBox(height: 10));
       patchList.add(Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,24 +49,74 @@ class PatchnotesWindow{
     return CustomWindow(
         context: context,
         title: patchnotesTitle,
-        children: [
+        children:
 
-          _patch(patch101),
-          _patch(patch1),
+        isGerman ? [
+          _patch(patch110D),
+          _patch(patch101D),
+          _patch(patch1D),
+        ] :
+        [
+          _patch(patch110E),
+          _patch(patch101E),
+          _patch(patch1E),
         ]
     );
   }
 
 }
 
-var patch110 = {
+var patch110E = {
+  "title": "1.1.0",
+  "inhalt": [
+    "Added English version - The language will be taken from the mobile language",
+    "Age of children is only queried with month/year",
+    "The map's search bar has been revised, users can now also be searched for",
+    "When tapping on the chat notification, the chat now opens",
+    "When chatting with a person, the profile of the respective person can now be opened by tapping on the name",
+    "Message input field now enlarges automatically",
+    "Map rotation is no longer possible",
+    "Add/remove friend now has a confirmation message",
+    "Under Settings there is now a button for the profile preview",
+    "When opening a new chat group, the display of the friends list has been revised",
+    "New layout: Login",
+    "Bug fixed: In the chat you can scroll again",
+    "Various small bugs and adjustments"
+  ]
+};
+var patch110D = {
   "title": "1.1.0",
   "inhalt": [
     "Englische Version hinzugefügt - Die Sprache wird von der Handysprache übernommen",
+    "Alter der Kinder wird nur noch mit Monat/Jahr abgefragt",
+    "Suchleiste der Karte wurde überarbeitet, es können jetzt auch User gesucht werden",
+    "Beim Antippen der Chatnotification, öffnet sich nun der Chat",
+    "Beim Chat mit einer Person kann nun das Profil der jeweiligen Person durch ein antippen auf den Namen geöffnet werden",
+    "Nachricht Eingabefeld vergrößert sich nun automatisch",
+    "Drehung der Karte ist nicht mehr möglich",
+    "Bei Freund hinzufügen/entfernen gibt es jetzt eine Bestätigungsmeldung",
+    "Unter Settings gibt es nun ein Button für die Profil Vorschau",
+    "Bei neuer Chatgruppe eröffnen wurde die Anzeige der Freundesliste überarbeitet",
+    "Neues Layout: Login",
+    "Fehler behoben: Im Chat kann wieder gescrollt werden",
+    "Verschiedene kleine Fehler und Anpassungen"
   ]
 };
 
-var patch101 = {
+var patch101E = {
+  "title" : "1.0.1",
+  "inhalt" : [
+    "Notifications can be disabled under Settings",
+    "The family overview when clicking on a map point has been changed",
+    "Profile changes under Setting has been adjusted",
+    "Setting/profile about me got more space",
+    "Fixed logout bug",
+    "Fixed map bug: some countries were throwing an error",
+    "General code improvements"
+  ]
+
+};
+var patch101D = {
   "title" : "1.0.1",
   "inhalt" : [
     "Notifications können unter Settings deaktiviert werden",
@@ -80,7 +130,11 @@ var patch101 = {
 
 };
 
-var patch1 = {
+var patch1E = {
+  "title" : "1.0.0",
+  "inhalt": ["App released"]
+};
+var patch1D = {
   "title" : "1.0.0",
   "inhalt": ["App veröffentlicht"]
 };
