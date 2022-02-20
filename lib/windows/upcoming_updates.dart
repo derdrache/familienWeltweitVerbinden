@@ -26,7 +26,7 @@ class UmcomingUpdatesWindow{
         context: context,
         title: patchnotesTitle,
         children: [
-          _update("IOS Version"),
+          _update("IOS Version / Web Version"),
           _update("Mehrere Accounts verbinden"),
           _update("Automatischer Standort"),
           _update("Nutzer blockieren"),

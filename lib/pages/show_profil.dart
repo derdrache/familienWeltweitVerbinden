@@ -285,7 +285,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                     widget.ownProfil ? SizedBox.shrink() : friendButton()]
       ),
       body: SizedBox(
-        height: 400,
         width: double.maxFinite,
         child: Scrollbar(
           thumbVisibility: true,

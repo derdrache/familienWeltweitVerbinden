@@ -140,7 +140,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
     String createDropdownText(){
       String dropdownText = "";
-      var textMaxLength = 30;
+      var textMaxLength = 55;
 
       if (widget.selected.isEmpty){
         dropdownText = widget.hintText;
