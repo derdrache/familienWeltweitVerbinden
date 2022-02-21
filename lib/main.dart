@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
@@ -21,8 +23,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  print(message);
-
 }
 
 
@@ -33,7 +33,8 @@ void main()async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  if(!kIsWeb) FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
 
   runApp(MyApp());
@@ -46,7 +47,8 @@ class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
-    //LocalNotificationService.initialize();
+    if(kIsWeb) return ;
+      print("wrong");
     final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettings = InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher')
@@ -81,6 +83,7 @@ class MyApp extends StatelessWidget {
         changeToChat(chatId);
       }
     });
+
 
   }
 

@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
 import 'package:familien_suche/pages/settings/change_interessen.dart';
@@ -6,9 +9,9 @@ import 'package:familien_suche/pages/settings/notifications_option.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:url_launcher/link.dart';
+//import 'package:url_launcher/link.dart' as url_luncher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'dart:io';
+
 
 import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -36,7 +39,7 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   double globalPadding = 30;
   double fontSize = 20;
-  var spracheIstDeutsch = Platform.localeName == "de_DE";
+  var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
   var borderColor = Colors.grey[200]!;
   var userID = FirebaseAuth.instance.currentUser!.uid;
   var userProfil;
@@ -249,6 +252,7 @@ class _SettingPageState extends State<SettingPage> {
                       ChangeReiseartPage(
                         userId: userID,
                         oldInput: reiseArtInput.getSelected(),
+                        isGerman: spracheIstDeutsch,
                       )
                   ),
                   profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
@@ -261,17 +265,23 @@ class _SettingPageState extends State<SettingPage> {
                       interessenInputBox.getSelected().join(", "),
                       AppLocalizations.of(context)!.interessen,
                       ChangeInteressenPage(
-                          userId: userID,
-                          selected: interessenInputBox.getSelected()
+                        userId: userID,
+                        selected: interessenInputBox.getSelected(),
+                        isGerman: spracheIstDeutsch,
                       )
                   ),
                   profilThemeContainer(
                       sprachenInputBox.getSelected() == null? "":
                       sprachenInputBox.getSelected().join(", "),
                       AppLocalizations.of(context)!.sprachen,
-                      ChangeSprachenPage(userId: userID, selected: sprachenInputBox.getSelected())
+                      ChangeSprachenPage(
+                        userId: userID,
+                        selected: sprachenInputBox.getSelected(),
+                        isGerman: spracheIstDeutsch,
+                      )
 
                   )
+
                 ],
               ),
               profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
@@ -362,9 +372,11 @@ class _SettingPageState extends State<SettingPage> {
               ),
 
                */
+
               const SizedBox(height: 20),
-              Link(
-                target: LinkTarget.blank,
+              /*
+              url_luncher.Link(
+                target: url_luncher.LinkTarget.blank,
                 uri: Uri.parse("https://www.paypal.com/paypalme/DominikMast"),
                 builder: (context, followLink) => GestureDetector(
                   behavior: HitTestBehavior.translucent,
@@ -378,6 +390,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
               )
+              */
             ],
           )
       );
@@ -397,14 +410,22 @@ class _SettingPageState extends State<SettingPage> {
 
               getAndSetDataFromDB();
 
-              return ListView(
-                  children: [
-                    menuBar(),
-                    nameContainer(),
-                    profilContainer(),
-                    settingContainer(),
-                    aboutAppContainer()
-                  ]
+              return ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                },),
+                child: ListView(
+                    children: [
+                      menuBar(),
+                      nameContainer(),
+                      profilContainer(),
+                      settingContainer(),
+                      aboutAppContainer()
+
+
+                    ]
+                ),
               );
             }
             return const SizedBox.shrink();

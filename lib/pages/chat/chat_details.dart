@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/show_profil.dart';
@@ -192,9 +194,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         );
       }
 
-      return ListView(
-          reverse: true,
-          children: messageBox.reversed.toList(),
+      return ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      },),
+        child: ListView(
+            reverse: true,
+            children: messageBox.reversed.toList(),
+        ),
       );
     }
 

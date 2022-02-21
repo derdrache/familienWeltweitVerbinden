@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'month_picker.dart';
@@ -629,12 +631,18 @@ CustomWindow({required context,required title,required List<Widget> children}){
               child: Stack(
                 overflow: Overflow.visible,
                 children: [
-                  ListView(
-                    children: [
-                      WindowTopbar(title: title),
-                      const SizedBox(height: 10),
-                      ...children
-                    ],
+                  ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    },),
+                    child: ListView(
+                      children: [
+                        WindowTopbar(title: title),
+                        const SizedBox(height: 10),
+                        ...children
+                      ],
+                    ),
                   ),
                   Positioned(
                     height: 30,
