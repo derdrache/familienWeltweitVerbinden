@@ -1,12 +1,15 @@
+import 'dart:io';
+import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
+
 
 
 class PatchnotesWindow{
   var context;
   var patchnotesTitle = "Patchnotes";
-  var isGerman = Platform.localeName == "de_DE";
+  var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
   PatchnotesWindow({required this.context});
 

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -33,9 +35,10 @@ class ShowProfilPage extends StatefulWidget {
 
 class _ShowProfilPageState extends State<ShowProfilPage> {
   var userID = FirebaseAuth.instance.currentUser!.uid;
-  var spracheIstDeutsch = Platform.localeName == "de_DE";
+  var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
   double textSize = 16;
   double healineTextSize = 18;
+
 
   @override
   Widget build(BuildContext context) {
@@ -278,28 +281,37 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       );
     }
 
+
     return Scaffold(
       appBar: customAppBar(
           title: "",
           buttons: [widget.ownProfil ? SizedBox.shrink() : messageButton(),
                     widget.ownProfil ? SizedBox.shrink() : friendButton()]
       ),
-      body: SizedBox(
+      body:
+      SizedBox(
         width: double.maxFinite,
         child: Scrollbar(
           thumbVisibility: true,
-          child: ListView(
-              children: [
-                titelBox(),
-                const SizedBox(height: 15),
-                infoProfil(),
-                const SizedBox(height: 15),
-                kontaktProfil(),
-              ]
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+            },),
+            child: ListView(
+                children: [
+                  titelBox(),
+                  const SizedBox(height: 15),
+                  infoProfil(),
+                  const SizedBox(height: 15),
+                  kontaktProfil(),
+                ]
+            ),
           ),
         ),
       ),
     );
-  }
+
+    }
 }
 

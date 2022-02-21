@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'dart:io';
 
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -12,14 +11,16 @@ class ChangeInteressenPage extends StatelessWidget {
   var userId;
   var selected;
   var interessenInputBox;
+  var isGerman;
 
   ChangeInteressenPage({
     Key? key,
     required this.userId,
-    required this.selected
+    required this.selected,
+    required this.isGerman
   }) :
         interessenInputBox = CustomMultiTextForm(
-            auswahlList: Platform.localeName == "de_DE" ?
+            auswahlList: isGerman ?
             global_variablen.interessenListe : global_variablen.interessenListeEnglisch,
             selected: selected,
         );

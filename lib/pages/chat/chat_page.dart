@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -285,18 +287,23 @@ class _ChatPageState extends State<ChatPage>{
       return MediaQuery.removePadding(
         removeTop: true,
         context: context,
-        child: ListView(
-          shrinkWrap: true,
-          children: groupContainer,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          },),
+          child: ListView(
+            shrinkWrap: true,
+            children: groupContainer,
+          ),
         ),
       );
     }
 
     return Scaffold(
-      body: Padding(
+      body: Container(
         padding: const EdgeInsets.only(top: 25),
-        child: Column(
-          children: [
+        child:
             StreamBuilder(
               stream: ChatDatabase()
                   .getAllChatgroupsFromUserStream(userId, userName),
@@ -322,8 +329,6 @@ class _ChatPageState extends State<ChatPage>{
                   return Container();
                 }
             )
-          ],
-        ),
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",

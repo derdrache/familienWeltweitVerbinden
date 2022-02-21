@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -206,32 +208,38 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         margin: const EdgeInsets.only(top: 30),
           child: Form(
             key: _formKey,
-            child: ListView(
-                children: [
-                  pageTitle(),
-                  customTextInput(AppLocalizations.of(context)!.benutzername, userNameKontroller,
-                      validator: global_functions.checkValidatorEmpty(context)),
-                  customTextInput(AppLocalizations.of(context)!.stadtEingeben, ortTextcontroller,
-                      validator: global_functions.checkValidatorEmpty(context),
-                    onSubmit: () => openSelectCityWindow()
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              },),
+              child: ListView(
+                  children: [
+                    pageTitle(),
+                    customTextInput(AppLocalizations.of(context)!.benutzername, userNameKontroller,
+                        validator: global_functions.checkValidatorEmpty(context)),
+                    customTextInput(AppLocalizations.of(context)!.stadtEingeben, ortTextcontroller,
+                        validator: global_functions.checkValidatorEmpty(context),
+                      onSubmit: () => openSelectCityWindow()
 
-                  ),
-                  reiseArtenAuswahlBox,
-                  sprachenAuswahlBox,
-                  interessenAuswahlBox,
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                      child: Text(
-                        AppLocalizations.of(context)!.anzahlUndAlterKinder,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16
-                        ),
-                      )
-                  ),
-                  childrenAgePickerBox,
-                ],
-              ),
+                    ),
+                    reiseArtenAuswahlBox,
+                    sprachenAuswahlBox,
+                    interessenAuswahlBox,
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                        child: Text(
+                          AppLocalizations.of(context)!.anzahlUndAlterKinder,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16
+                          ),
+                        )
+                    ),
+                    childrenAgePickerBox,
+                  ],
+                ),
+            ),
           ),
       ),
     );
