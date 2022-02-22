@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'month_picker.dart';
@@ -7,46 +8,53 @@ import 'month_picker.dart';
 double sideSpace = 10;
 double borderRounding = 5;
 double boxHeight = 50;
+double webWidth = 600;
 
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
   onSubmit}){
-  return Container(
-    margin: EdgeInsets.all(sideSpace),
-    child: TextFormField(
-      onFieldSubmitted: (string) {
-        if(onSubmit != null)onSubmit();
-      },
-      textInputAction: textInputAction,
-      textAlignVertical: TextAlignVertical.top,
-      maxLines: moreLines,
-      obscureText: passwort,
-      controller: controller,
-      decoration: InputDecoration(
-        isDense: true,
-        enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black),
+  return Align(
+    child: Container(
+      width: webWidth,
+      margin: EdgeInsets.all(sideSpace),
+      child: TextFormField(
+        onFieldSubmitted: (string) {
+          if(onSubmit != null)onSubmit();
+        },
+        textInputAction: textInputAction,
+        textAlignVertical: TextAlignVertical.top,
+        maxLines: moreLines,
+        obscureText: passwort,
+        controller: controller,
+        decoration: InputDecoration(
+          isDense: true,
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
+          ),
+          border: const OutlineInputBorder(),
+          alignLabelWithHint: true,
+          labelText: text,
+          labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+          floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
         ),
-        border: const OutlineInputBorder(),
-        alignLabelWithHint: true,
-        labelText: text,
-        labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-        floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
+        validator: validator
       ),
-      validator: validator
     ),
   );
 }
 
 Widget customFloatbuttonExtended(text, function){
-  return Container(
-    margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
-    padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
-    child: FloatingActionButton.extended(
-      heroTag: text,
-        label: Text(text),
-        onPressed: function
-    )
+  return Align(
+    child: Container(
+      width: webWidth,
+      margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
+      padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
+      child: FloatingActionButton.extended(
+        heroTag: text,
+          label: Text(text),
+          onPressed: function
+      )
+    ),
   );
 }
 
@@ -219,10 +227,12 @@ class CustomDatePicker extends StatefulWidget {
 class _CustomDatePickerState extends State<CustomDatePicker> {
 
   datePicker() async{
+
+
     return showMonthPicker(
         context: context,
-        firstDate: DateTime(DateTime.now().year - 1, 5),
-        lastDate: DateTime(DateTime.now().year + 1, 9),
+        firstDate: DateTime(DateTime.now().year - 18, DateTime.now().month),
+        lastDate: DateTime(DateTime.now().year, DateTime.now().month),
         initialDate: DateTime.now()
     );
   }
@@ -627,7 +637,7 @@ CustomWindow({required context,required title,required List<Widget> children}){
           contentPadding: EdgeInsets.zero,
           content: SizedBox(
               height: double.maxFinite,
-              width: double.maxFinite,
+              width: 600,
               child: Stack(
                 overflow: Overflow.visible,
                 children: [

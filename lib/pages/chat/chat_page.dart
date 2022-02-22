@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -24,47 +25,43 @@ class _ChatPageState extends State<ChatPage>{
 
 
   selectChatpartnerWindow() async {
-    var userFriendlist = await ProfilDatabase().getOneData(userId, "friendlist");;
+    var userFriendlist = await ProfilDatabase().getOneData(userId, "friendlist");
 
     return showDialog(
         context: context,
         builder: (BuildContext buildContext){
-
           return AlertDialog(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20.0))
-            ),
             contentPadding: EdgeInsets.zero,
             content: Scaffold(
-              body: SizedBox(
-                height: double.maxFinite,
-                width: double.maxFinite,
-                child: Stack(
-                  overflow: Overflow.visible,
-                  children: [
-                    ListView(
+              body: Container(
+                    height: double.maxFinite,
+                    width: double.maxFinite,
+                    child: Stack(
+                      overflow: Overflow.visible,
                       children: [
-                        WindowTopbar(title: AppLocalizations.of(context)!.neuenChatEroeffnen),
-                        const SizedBox(height: 10),
-                        personenSuchBox(buildContext),
-                        ...createFriendlistBox(userFriendlist)
-                      ]
+                        ListView(
+                          children: [
+                            WindowTopbar(title: AppLocalizations.of(context)!.neuenChatEroeffnen),
+                            const SizedBox(height: 10),
+                            personenSuchBox(buildContext),
+                            ...createFriendlistBox(userFriendlist)
+                          ]
+                        ),
+                        Positioned(
+                          height: 30,
+                          right: -13,
+                          top: -7,
+                          child: InkResponse(
+                              onTap: () => Navigator.pop(context),
+                              child: const CircleAvatar(
+                                child: Icon(Icons.close, size: 16,),
+                                backgroundColor: Colors.red,
+                              )
+                          ),
+                        ),
+                      ] ,
                     ),
-                    Positioned(
-                      height: 30,
-                      right: -13,
-                      top: -7,
-                      child: InkResponse(
-                          onTap: () => Navigator.pop(context),
-                          child: const CircleAvatar(
-                            child: Icon(Icons.close, size: 16,),
-                            backgroundColor: Colors.red,
-                          )
-                      ),
-                    ),
-                  ] ,
-                ),
-              ),
+                  ),
             ),
 
           );
@@ -226,6 +223,7 @@ class _ChatPageState extends State<ChatPage>{
         });
 
         var lastMessage = group["lastMessage"];
+        if(lastMessage.length > 80) lastMessage = lastMessage.substring(0,80) +"...";
         var ownChatNewMessages = group["users"][userId]["newMessages"];
         var lastMessageTime = dbSecondsToTimeString(group["lastMessageDate"]);
 
@@ -239,7 +237,7 @@ class _ChatPageState extends State<ChatPage>{
                 width: double.infinity,
                 decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: global_var.borderColorGrey),
+                      top: BorderSide(width: 1, color: global_var.borderColorGrey),
                     )
                 ),
               child: Column(
@@ -249,13 +247,18 @@ class _ChatPageState extends State<ChatPage>{
                     children: [
                       Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       const Expanded(child: SizedBox.shrink()),
-                      Text(lastMessageTime, style: TextStyle(color: Colors.grey[600]),)
+                      Text(lastMessageTime, style: TextStyle(color: Colors.grey[600]))
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Text(lastMessage, style: TextStyle(fontSize: 16, color: Colors.grey[600]),),
+                      Flexible(
+                        flex: 3,
+                        child: Text(lastMessage,
+                            style: TextStyle(fontSize: 16, color: Colors.grey[600])
+                        )
+                      ),
                       const Expanded(child: SizedBox.shrink()),
                       ownChatNewMessages== 0? const SizedBox.shrink(): Container(
                           height: 30,
@@ -302,7 +305,7 @@ class _ChatPageState extends State<ChatPage>{
 
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.only(top: 25),
+        padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
         child:
             StreamBuilder(
               stream: ChatDatabase()
@@ -312,7 +315,7 @@ class _ChatPageState extends State<ChatPage>{
                     AsyncSnapshot snapshot,
                 ){
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const SizedBox.shrink(); //const CircularProgressIndicator();
                   } else if (snapshot.data.snapshot.value != null) {
                     var chatGroups = [];
                     var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
