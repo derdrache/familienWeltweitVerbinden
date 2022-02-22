@@ -35,7 +35,7 @@ Widget customTextInput(text, controller, {validator, passwort = false,
           alignLabelWithHint: true,
           labelText: text,
           labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-          floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
+          //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
         ),
         validator: validator
       ),
@@ -59,16 +59,17 @@ Widget customFloatbuttonExtended(text, function){
 }
 
 customSnackbar(context, text, {color = Colors.red}){
-  return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+  var snackbar = SnackBar(
         duration: Duration(seconds: 5),
           backgroundColor: color,
           content: Text(text)
-      )
-  );
+      );
+
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  return ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
 
-customAppBar({required title, buttons, elevation = 4.0, var onTap}){
+customAppBar({title, buttons, elevation = 4.0, var onTap}){
 
   buttons ??= <Widget>[];
 
@@ -99,7 +100,7 @@ class CustomMultiTextForm extends StatefulWidget {
   String hintText;
   var onConfirm;
   var validator;
-  Icon? icon;
+  Icon icon;
 
   getSelected(){
     return selected;
@@ -107,8 +108,8 @@ class CustomMultiTextForm extends StatefulWidget {
 
 
 
-  CustomMultiTextForm({Key? key,
-    required this.auswahlList,
+  CustomMultiTextForm({Key key,
+    this.auswahlList,
     this.selected,
     this.hintText = "",
     this.onConfirm,
@@ -213,8 +214,8 @@ class CustomDatePicker extends StatefulWidget {
   }
 
   CustomDatePicker({
-    Key? key,
-    required this.hintText,
+    Key key,
+    this.hintText,
     this.pickedDate,
     this.deleteFunction,
     this.dateIsSelected = false
@@ -318,8 +319,8 @@ class CustomDropDownButton extends StatefulWidget {
   String hintText;
   String selected;
 
-  CustomDropDownButton({Key? key,
-    required this.items,
+  CustomDropDownButton({Key key,
+    this.items,
     this.hintText = "",
     this.selected = ""
   }) : super(key: key);
@@ -363,7 +364,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
           icon: const Icon(Icons.arrow_downward, color: Colors.black,),
           onChanged: (newValue){
             setState(() {
-              widget.selected = newValue!;
+              widget.selected = newValue;
             });
           },
           items: createDropdownItems(),
@@ -422,7 +423,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
     });
   }
 
-  ChildrenBirthdatePickerBox({Key? key, hintText}) : super(key: key);
+  ChildrenBirthdatePickerBox({Key key, hintText}) : super(key: key);
 
   @override
   _ChildrenBirthdatePickerBoxState createState() => _ChildrenBirthdatePickerBoxState();
@@ -532,7 +533,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 class WindowTopbar extends StatelessWidget {
   var title;
 
-  WindowTopbar({Key? key,required this.title}) : super(key: key);
+  WindowTopbar({Key key,this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -558,70 +559,7 @@ class WindowTopbar extends StatelessWidget {
   }
 }
 
-/*
-class CustomWindowTest{
-  var context;
-  var title;
-  var children;
-  var globalContext;
-
-  CustomWindowTest({required this.context,required this.title,required List<Widget> this.children});
-
-  _closeWindow(){
-    Navigator.pop(context);
-  }
-
-  test(text){
-    customSnackbar(globalContext, text);
-  }
-
-
-  openWindow(){
-    children.insert(0,WindowTopbar(title: title));
-    children.insert(1, const SizedBox(height: 10));
-
-    return AlertDialog(
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20.0))
-      ),
-      contentPadding: EdgeInsets.zero,
-      content: SizedBox(
-        height: double.maxFinite,
-        width: double.maxFinite,
-        child: Stack(
-          overflow: Overflow.visible,
-          children: [
-            ListView(
-              children: children,
-            ),
-            Positioned(
-              height: 30,
-              right: -13,
-              top: -7,
-              child: InkResponse(
-                  onTap: () => _closeWindow(),
-                  child: const CircleAvatar(
-                    child: Icon(Icons.close, size: 16,),
-                    backgroundColor: Colors.red,
-                  )
-              ),
-            ),
-          ] ,
-        ),
-      ),
-
-    );
-}
-
-
-
-
-}
-
-
- */
-
-CustomWindow({required context,required title,required List<Widget> children}){
+CustomWindow({context, title,List<Widget> children}){
 
   _closeWindow(){
     Navigator.pop(context);
@@ -641,18 +579,12 @@ CustomWindow({required context,required title,required List<Widget> children}){
               child: Stack(
                 overflow: Overflow.visible,
                 children: [
-                  ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    },),
-                    child: ListView(
+                  ListView(
                       children: [
                         WindowTopbar(title: title),
                         const SizedBox(height: 10),
                         ...children
                       ],
-                    ),
                   ),
                   Positioned(
                     height: 30,

@@ -9,7 +9,7 @@ class ChangeAboutmePage extends StatelessWidget {
   var bioTextKontroller;
 
 
-  ChangeAboutmePage({Key? key,required this.userId,required this.bioTextKontroller}) : super(key: key);
+  ChangeAboutmePage({Key key,this.userId,this.bioTextKontroller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +27,8 @@ class ChangeAboutmePage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.ueberMichVeraendern, buttons: [saveButton()]),
-      body:customTextInput(AppLocalizations.of(context)!.ueberMich, bioTextKontroller, moreLines: 10)
+      appBar: customAppBar(title: AppLocalizations.of(context).ueberMichVeraendern, buttons: [saveButton()]),
+      body:customTextInput(AppLocalizations.of(context).ueberMich, bioTextKontroller, moreLines: 10)
 
     );
   }

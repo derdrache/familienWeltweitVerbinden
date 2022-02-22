@@ -14,10 +14,10 @@ class ChangeInteressenPage extends StatelessWidget {
   var isGerman;
 
   ChangeInteressenPage({
-    Key? key,
-    required this.userId,
-    required this.selected,
-    required this.isGerman
+    Key key,
+    this.userId,
+    this.selected,
+    this.isGerman
   }) :
         interessenInputBox = CustomMultiTextForm(
             auswahlList: isGerman ?
@@ -35,7 +35,7 @@ class ChangeInteressenPage extends StatelessWidget {
         onPressed: (){
 
           if(interessenInputBox.getSelected() == null || interessenInputBox.getSelected().isEmpty){
-            customSnackbar(context, AppLocalizations.of(context)!.interessenAuswaehlen);
+            customSnackbar(context, AppLocalizations.of(context).interessenAuswaehlen);
           } else {
             ProfilDatabase().updateProfil(
                 userId, {"interessen": interessenInputBox.getSelected()}
@@ -49,7 +49,7 @@ class ChangeInteressenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.interessenVeraendern, buttons: [saveButton()]),
+      appBar: customAppBar(title: AppLocalizations.of(context).interessenVeraendern, buttons: [saveButton()]),
       body: interessenInputBox,
     );
   }

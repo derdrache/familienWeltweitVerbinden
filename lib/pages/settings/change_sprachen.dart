@@ -11,10 +11,10 @@ class ChangeSprachenPage extends StatelessWidget {
   var isGerman;
 
   ChangeSprachenPage({
-    Key? key,
-    required this.userId,
-    required this.selected,
-    required this.isGerman
+    Key key,
+    this.userId,
+    this.selected,
+    this.isGerman
   }) :
     sprachenInputBox = CustomMultiTextForm(
         selected: selected,
@@ -35,7 +35,7 @@ class ChangeSprachenPage extends StatelessWidget {
         child: Icon(Icons.done),
         onPressed: (){
           if(sprachenInputBox.getSelected() == null || sprachenInputBox.getSelected().isEmpty){
-            customSnackbar(context, AppLocalizations.of(context)!.spracheAuswaehlen);
+            customSnackbar(context, AppLocalizations.of(context).spracheAuswaehlen);
           } else {
             ProfilDatabase().updateProfil(
                 userId, {"sprachen": sprachenInputBox.getSelected()}
@@ -47,7 +47,7 @@ class ChangeSprachenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.spracheVeraendern, buttons: [saveButton()]),
+      appBar: customAppBar(title: AppLocalizations.of(context).spracheVeraendern, buttons: [saveButton()]),
       body: sprachenInputBox,
     );
   }

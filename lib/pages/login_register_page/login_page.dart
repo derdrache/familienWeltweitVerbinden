@@ -9,7 +9,7 @@ import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({Key key}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           isLoading = false;
         });
-        customSnackbar(context, AppLocalizations.of(context)!.emailNichtBestaetigt);
+        customSnackbar(context, AppLocalizations.of(context).emailNichtBestaetigt);
       }
 
     }on FirebaseAuthException catch(error){
@@ -53,11 +53,11 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = false;
       });
       if(error.code == "user-not-found"){
-        customSnackbar(context, AppLocalizations.of(context)!.benutzerNichtGefunden);
+        customSnackbar(context, AppLocalizations.of(context).benutzerNichtGefunden);
       } else if(error.code == "wrong-password"){
-        customSnackbar(context, AppLocalizations.of(context)!.passwortFalsch);
+        customSnackbar(context, AppLocalizations.of(context).passwortFalsch);
       } else if(error.code == "network-request-failed"){
-        customSnackbar(context, AppLocalizations.of(context)!.keineVerbindungInternet);
+        customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
       }
     }
   }
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Image.asset('assets/WeltFlugzeug.png')
             ),
             SizedBox(height: 15),
-            Text(AppLocalizations.of(context)!.willkommenBeiAppName, style: TextStyle(fontSize: 20),)
+            Text(AppLocalizations.of(context).willkommenBeiAppName, style: TextStyle(fontSize: 20),)
           ],
         )
 
@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
               style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all(Colors.black)
               ),
-              child: Text(AppLocalizations.of(context)!.passwortVergessen),
+              child: Text(AppLocalizations.of(context).passwortVergessen),
               onPressed: (){
                 passwortController.text = "";
                 global_functions.changePage(context, const ForgetPasswordPage());
@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     doLogin(){
-      if(_formKey.currentState!.validate()){
+      if(_formKey.currentState.validate()){
         setState(() {
           isLoading = true;
           email = emailController.text;
@@ -123,14 +123,14 @@ class _LoginPageState extends State<LoginPage> {
                     validator: global_functions.checkValidationEmail(context),
                     textInputAction: TextInputAction.next
                 ),
-                customTextInput(AppLocalizations.of(context)!.passwort, passwortController,
+                customTextInput(AppLocalizations.of(context).passwort, passwortController,
                     validator: global_functions.checkValidatorPassword(context),
                     passwort: true,
                     textInputAction: TextInputAction.done,
                     onSubmit: () => doLogin()),
                 forgetPassButton(),
                 isLoading ? loading() : customFloatbuttonExtended("Login", () => doLogin()),
-                customFloatbuttonExtended(AppLocalizations.of(context)!.registrieren, (){
+                customFloatbuttonExtended(AppLocalizations.of(context).registrieren, (){
                   global_functions.changePage(context, const RegisterPage());
                 })
               ],

@@ -7,7 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 class ChangeCityPage extends StatefulWidget {
   var userId;
 
-  ChangeCityPage({Key? key, this.userId}) : super(key: key);
+  ChangeCityPage({Key key, this.userId}) : super(key: key);
 
 
 
@@ -52,7 +52,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
             if(suggestedCities.length > 1){
               setState(() {});
-              customSnackbar(context, AppLocalizations.of(context)!.genauenStandortWaehlen);
+              customSnackbar(context, AppLocalizations.of(context).genauenStandortWaehlen);
             } else{
               pushLocationDataToDB(suggestedCities[0]);
               Navigator.pop(context);
@@ -98,11 +98,11 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.stadtAendern, buttons: <Widget>[saveButton()]),
+      appBar: customAppBar(title: AppLocalizations.of(context).stadtAendern, buttons: <Widget>[saveButton()]),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          customTextInput(AppLocalizations.of(context)!.stadtEingeben, ortChangeKontroller, onSubmit: () async{
+          customTextInput(AppLocalizations.of(context).stadtEingeben, ortChangeKontroller, onSubmit: () async{
             suggestedCities = await LocationService()
                 .getLocationMapDataGoogle2(ortChangeKontroller.text);
 
@@ -112,7 +112,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
           suggestedCitiesList.isNotEmpty ? Padding(
             padding: const EdgeInsets.all(12.0),
             child: Text(
-              AppLocalizations.of(context)!.bitteGenaueStadtAuswaehlen + ":",
+              AppLocalizations.of(context).bitteGenaueStadtAuswaehlen + ":",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ): const SizedBox.shrink(),

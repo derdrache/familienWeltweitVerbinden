@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../../services/database.dart';
+import '../../services/database.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
+import '../../global/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
-import '../../services/database.dart';
 import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget{
@@ -17,9 +17,9 @@ class ChatPage extends StatefulWidget{
 }
 
 class _ChatPageState extends State<ChatPage>{
-  var userId = FirebaseAuth.instance.currentUser!.uid;
-  var userName = FirebaseAuth.instance.currentUser!.displayName;
-  var userEmail = FirebaseAuth.instance.currentUser!.email;
+  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userName = FirebaseAuth.instance.currentUser.displayName;
+  var userEmail = FirebaseAuth.instance.currentUser.email;
   var globalChatGroups = [];
   var testWindow;
 
@@ -41,7 +41,7 @@ class _ChatPageState extends State<ChatPage>{
                       children: [
                         ListView(
                           children: [
-                            WindowTopbar(title: AppLocalizations.of(context)!.neuenChatEroeffnen),
+                            WindowTopbar(title: AppLocalizations.of(context).neuenChatEroeffnen),
                             const SizedBox(height: 10),
                             personenSuchBox(buildContext),
                             ...createFriendlistBox(userFriendlist)
@@ -73,14 +73,22 @@ class _ChatPageState extends State<ChatPage>{
     var personenSucheController = TextEditingController();
 
     return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 10, left: 20),
-      child: Row(
+      padding: const EdgeInsets.only(top: 10, bottom: 10),
+      child: SearchAutocomplete(
+        searchableItems: [],
+        onConfirm: (){
+
+        },
+      )
+
+
+      /*Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 190,
-              height: 40,
-              child: TextFormField(
+              child:
+
+              TextFormField(
                   controller: personenSucheController,
                   decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
@@ -92,6 +100,7 @@ class _ChatPageState extends State<ChatPage>{
                   )
 
               ),
+
             ),
             TextButton(
               child: const Icon(Icons.search),
@@ -111,7 +120,11 @@ class _ChatPageState extends State<ChatPage>{
                 }
               },
             )
+
+
           ]),
+
+               */
     );
   }
 
@@ -264,7 +277,7 @@ class _ChatPageState extends State<ChatPage>{
                           height: 30,
                           width: 30,
                           decoration: BoxDecoration(
-                              color:Theme.of(context).colorScheme.tertiary,
+                              color:Theme.of(context).colorScheme.secondary,
                               shape: BoxShape.circle
                           ),
                           child: Center(
@@ -290,16 +303,10 @@ class _ChatPageState extends State<ChatPage>{
       return MediaQuery.removePadding(
         removeTop: true,
         context: context,
-        child: ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-          },),
-          child: ListView(
+        child: ListView(
             shrinkWrap: true,
             children: groupContainer,
           ),
-        ),
       );
     }
 

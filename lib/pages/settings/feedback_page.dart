@@ -9,7 +9,7 @@ import '../../global/global_functions.dart';
 class FeedbackPage extends StatelessWidget {
   var feedbackTextKontroller = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  var userEmail = FirebaseAuth.instance.currentUser!.email;
+  var userEmail = FirebaseAuth.instance.currentUser.email;
 
 
   feedbackSendenAndClose(context) async {
@@ -29,13 +29,13 @@ class FeedbackPage extends StatelessWidget {
     beschreibungsText(){
       return Container(
         margin: EdgeInsets.all(30),
-        child: Text(AppLocalizations.of(context)!.feedbackText)
+        child: Text(AppLocalizations.of(context).feedbackText)
       );
     }
 
     feedbackEingabe(){
       return customTextInput(
-          AppLocalizations.of(context)!.feedbackEingeben,
+          AppLocalizations.of(context).feedbackEingeben,
           feedbackTextKontroller,
           moreLines: 10,
           validator: checkValidatorEmpty(context)
@@ -47,7 +47,7 @@ class FeedbackPage extends StatelessWidget {
         margin: EdgeInsets.all(10),
         child: FloatingActionButton.extended(
             onPressed: () => feedbackSendenAndClose(context),
-            label: Text(AppLocalizations.of(context)!.senden)
+            label: Text(AppLocalizations.of(context).senden)
         ),
       );
     }

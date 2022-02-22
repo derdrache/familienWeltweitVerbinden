@@ -11,6 +11,7 @@ class SearchAutocomplete extends StatefulWidget {
   var isDense = false;
   var searchKontroller = TextEditingController();
   bool isSearching = false;
+  bool withFilter;
 
   getSelected(){
     return filterList;
@@ -18,10 +19,11 @@ class SearchAutocomplete extends StatefulWidget {
 
 
 
-  SearchAutocomplete({Key? key,
-    required this.searchableItems,
+  SearchAutocomplete({Key key,
+    this.searchableItems,
     this.onConfirm,
-    this.onDelete
+    this.onDelete,
+    this.withFilter = true
   }) : super(key: key);
 
   @override
@@ -63,8 +65,18 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
   }
 
   addFilterItem(item){
-    widget.filterList.add(item);
-    widget.isDense = true;
+
+    if (!widget.filterList.contains(item)){
+      widget.filterList.add(item);
+      if(widget.withFilter) widget.isDense = true;
+    }
+
+
+
+
+  }
+
+  resetSearchBar(){
     widget.searchKontroller.text = "";
     widget.isSearching = false;
     widget.autoCompleteItems = [];
@@ -72,18 +84,20 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     setState(() {
 
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
-    double dropdownItemSumHeight = widget.autoCompleteItems.length *39;
+    double dropdownItemSumHeight = widget.autoCompleteItems.length *39.0;
     if(widget.autoCompleteItems.length *39 > 160) dropdownItemSumHeight = 160;
 
     dropDownItem(item){
       return GestureDetector(
         onTap: widget.onConfirm,
-        onTapUp: (details) => addFilterItem(item) ,
+        onTapUp: (details) {
+          addFilterItem(item);
+          resetSearchBar();
+        },
         child: Container(
           padding: EdgeInsets.all(10),
           height: 40,
@@ -123,7 +137,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
             padding: EdgeInsets.all(2),
             margin: EdgeInsets.only(right: 4),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.tertiary,
+              color: Theme.of(context).colorScheme.secondary,
               border: Border.all(),
               borderRadius: BorderRadius.circular(10)
             ),

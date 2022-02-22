@@ -6,7 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 checkValidatorEmpty(context) {
   return (value){
     if(value == null || value.isEmpty){
-      return AppLocalizations.of(context)!.diesesFeldAusfuellen;
+      return AppLocalizations.of(context).diesesFeldAusfuellen;
     }
     return null;
   };
@@ -18,9 +18,9 @@ checkValidationEmail(context){
         .hasMatch(value);
 
     if(value == null || value.isEmpty){
-      return AppLocalizations.of(context)!.emailEingeben;
+      return AppLocalizations.of(context).emailEingeben;
     } else if(!emailIsValid){
-      return AppLocalizations.of(context)!.gueltigeEmailEingeben;
+      return AppLocalizations.of(context).gueltigeEmailEingeben;
     }
   };
 }
@@ -28,9 +28,9 @@ checkValidationEmail(context){
 checkValidatorPassword(context, {passwordCheck = ""}){
  return (value){
    if(value == null || value.isEmpty){
-     return AppLocalizations.of(context)!.passwortEingeben;
+     return AppLocalizations.of(context).passwortEingeben;
    } else if(passwordCheck!= "" && value != passwordCheck){
-     return AppLocalizations.of(context)!.passwortStimmtNichtUeberein;
+     return AppLocalizations.of(context).passwortStimmtNichtUeberein;
    }
    return null;
  };
@@ -39,7 +39,7 @@ checkValidatorPassword(context, {passwordCheck = ""}){
 checkValidationMultiTextForm(context){
   return (value){
     if(value == null || value.isEmpty){
-      return AppLocalizations.of(context)!.ausfuellen;
+      return AppLocalizations.of(context).ausfuellen;
     }
     return null;
   };
@@ -64,9 +64,10 @@ class ChangeTimeStamp{
 
   ChangeTimeStamp(this.timeStamp);
 
-  late DateTime dateTime = DateTime.parse(timeStamp.split(" ")[0]);
+
 
   intoDate(){
+    DateTime dateTime = DateTime.parse(timeStamp.split(" ")[0]);
     return dateTime;
   }
 
@@ -76,6 +77,7 @@ class ChangeTimeStamp{
   }
 
   intoYears(){
+    DateTime dateTime = DateTime.parse(timeStamp.split(" ")[0]);
     return DateTime.now().difference(dateTime).inDays ~/ 365;
   }
 

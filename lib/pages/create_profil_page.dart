@@ -13,7 +13,7 @@ import '../services/database.dart';
 import 'start_page.dart';
 
 class CreateProfilPage extends StatefulWidget {
-  const CreateProfilPage({Key? key}) : super(key: key);
+  const CreateProfilPage({Key key}) : super(key: key);
 
   @override
   _CreateProfilPageState createState() => _CreateProfilPageState();
@@ -37,13 +37,14 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
 
   saveFunction()async {
-    if(_formKey.currentState!.validate()){
+    if(_formKey.currentState.validate()){
       var userExist = await ProfilDatabase()
           .getProfilId("name", userNameKontroller.text) != null;
 
       if(!lookInMaps){
-        openSelectCityWindow();
-        return;
+        bool exactCitiy = await openSelectCityWindow();
+        if(!exactCitiy) return;
+
       }
 
       if(checkAllValidation(userExist)){
@@ -71,7 +72,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           ProfilDatabase().addNewProfil(userID, data);
           global_functions.changePageForever(context, StartPage(registered: true));
         } else{
-          customSnackbar(context, AppLocalizations.of(context)!.stadtNichtBestaetigt);
+          customSnackbar(context, AppLocalizations.of(context).stadtNichtBestaetigt);
         }
       }
     }
@@ -90,16 +91,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   checkAllValidation(userExist){
     bool noError = true;
-    String errorString = AppLocalizations.of(context)!.bitteEingabeKorrigieren +  "\n";
+    String errorString = AppLocalizations.of(context).bitteEingabeKorrigieren +  "\n";
 
     if (userExist){
-      errorString += "- "+ AppLocalizations.of(context)!.usernameInVerwendung +"\n";
+      errorString += "- "+ AppLocalizations.of(context).usernameInVerwendung +"\n";
     }
     if(reiseArtenAuswahlBox.getSelected().isEmpty){
-      errorString += "- "+ AppLocalizations.of(context)!.reiseartAuswaehlen +"\n";
+      errorString += "- "+ AppLocalizations.of(context).reiseartAuswaehlen +"\n";
     }
     if(childrenAgePickerBox.getDates().length == 0 || !childrenInputValidation()){
-      errorString += "- " + AppLocalizations.of(context)!.geburtsdatumEingeben + "\n";
+      errorString += "- " + AppLocalizations.of(context).geburtsdatumEingeben + "\n";
     }
 
 
@@ -132,7 +133,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
     if(suggestedCities.length == 1){
       addCityData(suggestedCities[0]);
-      return;
+      return true;
     }
 
     for(var i = 0; i<suggestedCities.length; i++){
@@ -161,7 +162,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           return AlertDialog(
             content: Column(
               children: [
-                Text(AppLocalizations.of(context)!.genauenStandortWaehlen + ": ",
+                Text(AppLocalizations.of(context).genauenStandortWaehlen + ": ",
                   style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.primary),
                 ),
                 SizedBox(height: 15,),
@@ -176,11 +177,11 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   @override
   Widget build(BuildContext context) {
     sprachenAuswahlBox.validator = global_functions.checkValidationMultiTextForm(context);
-    sprachenAuswahlBox.hintText = AppLocalizations.of(context)!.spracheAuswaehlen;
+    sprachenAuswahlBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
     interessenAuswahlBox.validator = global_functions.checkValidationMultiTextForm(context);
-    interessenAuswahlBox.hintText = AppLocalizations.of(context)!.interessenAuswaehlen;
-    reiseArtenAuswahlBox.hintText = AppLocalizations.of(context)!.artDerReiseAuswaehlen;
-    childrenAgePickerBox.hintText = AppLocalizations.of(context)!.geburtsdatum;
+    interessenAuswahlBox.hintText = AppLocalizations.of(context).interessenAuswaehlen;
+    reiseArtenAuswahlBox.hintText = AppLocalizations.of(context).artDerReiseAuswaehlen;
+    childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
 
     pageTitle(){
       return SizedBox(
@@ -189,7 +190,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           children: [
             const Expanded(child: SizedBox.shrink()),
             Text(
-              AppLocalizations.of(context)!.profilErstellen,
+              AppLocalizations.of(context).profilErstellen,
               style: const TextStyle(
                   fontSize: 30
               ),
@@ -208,17 +209,12 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         margin: const EdgeInsets.only(top: 30),
           child: Form(
             key: _formKey,
-            child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                PointerDeviceKind.touch,
-                PointerDeviceKind.mouse,
-              },),
-              child: ListView(
+            child: ListView(
                   children: [
                     pageTitle(),
-                    customTextInput(AppLocalizations.of(context)!.benutzername, userNameKontroller,
+                    customTextInput(AppLocalizations.of(context).benutzername, userNameKontroller,
                         validator: global_functions.checkValidatorEmpty(context)),
-                    customTextInput(AppLocalizations.of(context)!.stadtEingeben, ortTextcontroller,
+                    customTextInput(AppLocalizations.of(context).stadtEingeben, ortTextcontroller,
                         validator: global_functions.checkValidatorEmpty(context),
                       onSubmit: () => openSelectCityWindow()
 
@@ -229,7 +225,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                     Container(
                       padding: const EdgeInsets.all(10),
                         child: Text(
-                          AppLocalizations.of(context)!.anzahlUndAlterKinder,
+                          AppLocalizations.of(context).anzahlUndAlterKinder,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16
@@ -241,7 +237,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                 ),
             ),
           ),
-      ),
     );
   }
 }

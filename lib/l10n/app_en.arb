@@ -82,7 +82,9 @@
     "kontakt": "Contact",
     "neuenChatEroeffnen": "Open a new chat",
     "keineVerbindungInternet" : "Keine Verbindung zum Internet",
-    "willkommenBeiAppName" : "Welcome to Connect Families"
+    "willkommenBeiAppName" : "Welcome to Connect Families",
+    "friendlistEntfernt" : " removed from friends list",
+    "friendlistHinzugefuegt": " added to friends list"
 
 }
 

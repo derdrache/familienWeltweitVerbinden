@@ -12,10 +12,10 @@ class ChangeReiseartPage extends StatelessWidget {
   var isGerman;
 
   ChangeReiseartPage({
-    Key? key,
-    required this.userId,
-    required this.oldInput,
-    required this.isGerman
+    Key key,
+    this.userId,
+    this.oldInput,
+    this.isGerman
   }) :
         reiseArtInput = CustomDropDownButton(
           items: isGerman ?
@@ -33,7 +33,7 @@ class ChangeReiseartPage extends StatelessWidget {
         child: Icon(Icons.done),
         onPressed: () {
           if(reiseArtInput.getSelected() == null || reiseArtInput.getSelected().isEmpty){
-            customSnackbar(context, AppLocalizations.of(context)!.reiseartAuswaehlen);
+            customSnackbar(context, AppLocalizations.of(context).reiseartAuswaehlen);
           } else if(reiseArtInput.getSelected() != oldInput ){
             ProfilDatabase().updateProfil(
                 userId, {"reiseart": reiseArtInput.getSelected()}
@@ -47,7 +47,7 @@ class ChangeReiseartPage extends StatelessWidget {
 
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.reiseartAendern, buttons: [saveButton()]),
+      appBar: customAppBar(title: AppLocalizations.of(context).reiseartAendern, buttons: [saveButton()]),
       body: reiseArtInput,
     );
   }
