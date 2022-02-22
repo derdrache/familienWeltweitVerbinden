@@ -5,7 +5,7 @@ class AboutProject{
   var context;
   var title = "Über das Projekt";
 
-  AboutProject({required this.context});
+  AboutProject({this.context});
 
 
   openWindow(){

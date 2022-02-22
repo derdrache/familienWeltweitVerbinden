@@ -11,10 +11,10 @@ class ChangeEmailPage extends StatelessWidget {
   var emailKontroller = TextEditingController();
   var passwortKontroller = TextEditingController();
 
-  ChangeEmailPage({Key? key}) : super(key: key);
+  ChangeEmailPage({Key key}) : super(key: key);
 
   userLogin(passwort) async {
-    var userEmail = FirebaseAuth.instance.currentUser!.email;
+    var userEmail = FirebaseAuth.instance.currentUser.email;
     var loginUser;
     try {
       loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -37,31 +37,31 @@ class ChangeEmailPage extends StatelessWidget {
           child: Icon(Icons.done),
           onPressed: () async {
             if(emailKontroller.text == ""){
-              customSnackbar(context, AppLocalizations.of(context)!.emailEingeben);
+              customSnackbar(context, AppLocalizations.of(context).emailEingeben);
               return;
             }
             if(passwortKontroller.text == ""){
-              customSnackbar(context, AppLocalizations.of(context)!.passwortEingeben);
+              customSnackbar(context, AppLocalizations.of(context).passwortEingeben);
               return;
             }
 
             bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                 .hasMatch(emailKontroller.text);
             if(!emailIsValid){
-              customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
+              customSnackbar(context, AppLocalizations.of(context).emailUngueltig);
               return;
             }
 
             var emailInUse = await ProfilDatabase()
                 .getProfilId("email", emailKontroller.text);
             if (emailInUse != null){
-              customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
+              customSnackbar(context, AppLocalizations.of(context).emailInBenutzung);
               return;
             }
 
             var loginUser = await userLogin(passwortKontroller.text);
             if(loginUser == null){
-              customSnackbar(context, AppLocalizations.of(context)!.emailOderPasswortFalsch);
+              customSnackbar(context, AppLocalizations.of(context).emailOderPasswortFalsch);
               return;
             }
 
@@ -75,12 +75,12 @@ class ChangeEmailPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.emailAendern,buttons: [saveButton()]),
+      appBar: customAppBar(title: AppLocalizations.of(context).emailAendern,buttons: [saveButton()]),
       body: Column(
         children: [
-          customTextInput(AppLocalizations.of(context)!.neueEmail,emailKontroller),
+          customTextInput(AppLocalizations.of(context).neueEmail,emailKontroller),
           const SizedBox(height: 15),
-          customTextInput(AppLocalizations.of(context)!.passwortBestaetigen,passwortKontroller, passwort: true)
+          customTextInput(AppLocalizations.of(context).passwortBestaetigen,passwortKontroller, passwort: true)
         ],
       )
     );

@@ -8,10 +8,10 @@ class ChangePasswortPage extends StatelessWidget {
   var passwortNewKontroller = TextEditingController();
   var passwortNewCheckKontroller = TextEditingController();
 
-  ChangePasswortPage({Key? key}) : super(key: key);
+  ChangePasswortPage({Key key}) : super(key: key);
 
   userLogin(passwort) async {
-    var userEmail = FirebaseAuth.instance.currentUser!.email;
+    var userEmail = FirebaseAuth.instance.currentUser.email;
     var loginUser;
     try {
       loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -38,19 +38,19 @@ class ChangePasswortPage extends StatelessWidget {
           var oldPasswort = passwortOldKontroller.text;
 
           if (newPasswort == "" || newPasswort == oldPasswort){
-            customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortEingeben);
+            customSnackbar(context, AppLocalizations.of(context).neuesPasswortEingeben);
             return;
           }
           if(newPasswortCheck == ""){
-            customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortWiederholen);
+            customSnackbar(context, AppLocalizations.of(context).neuesPasswortWiederholen);
             return;
           }
           if(oldPasswort == ""){
-            customSnackbar(context, AppLocalizations.of(context)!.altesPasswortEingeben);
+            customSnackbar(context, AppLocalizations.of(context).altesPasswortEingeben);
             return;
           }
           if (newPasswort != newPasswortCheck){
-            customSnackbar(context, AppLocalizations.of(context)!.passwortStimmtNichtMitNeuem);
+            customSnackbar(context, AppLocalizations.of(context).passwortStimmtNichtMitNeuem);
             return;
           }
 
@@ -58,7 +58,7 @@ class ChangePasswortPage extends StatelessWidget {
             var loginTest = await userLogin(oldPasswort);
 
             if(loginTest == null){
-              customSnackbar(context, AppLocalizations.of(context)!.altesPasswortFalsch);
+              customSnackbar(context, AppLocalizations.of(context).altesPasswortFalsch);
               return;
             }
 
@@ -66,23 +66,23 @@ class ChangePasswortPage extends StatelessWidget {
             Navigator.pop(context);
 
           } catch (error){
-            customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortSchwach);
+            customSnackbar(context, AppLocalizations.of(context).neuesPasswortSchwach);
           }
         }
       );
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.passwortVeraendern, buttons: [saveButton()]),
+      appBar: customAppBar(title: AppLocalizations.of(context).passwortVeraendern, buttons: [saveButton()]),
       body: Column(
         children: [
-          customTextInput(AppLocalizations.of(context)!.neuesPasswortEingeben, passwortNewKontroller,
+          customTextInput(AppLocalizations.of(context).neuesPasswortEingeben, passwortNewKontroller,
               passwort: true),
           const SizedBox(height: 15),
-          customTextInput(AppLocalizations.of(context)!.neuesPasswortWiederholen, passwortNewCheckKontroller,
+          customTextInput(AppLocalizations.of(context).neuesPasswortWiederholen, passwortNewCheckKontroller,
               passwort: true),
           const SizedBox(height: 15),
-          customTextInput(AppLocalizations.of(context)!.altesPasswortEingeben, passwortOldKontroller,
+          customTextInput(AppLocalizations.of(context).altesPasswortEingeben, passwortOldKontroller,
               passwort: true)
         ],
       )

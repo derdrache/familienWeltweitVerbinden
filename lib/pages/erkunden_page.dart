@@ -1,5 +1,6 @@
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -21,6 +22,7 @@ class ErkundenPage extends StatefulWidget{
 }
 
 class _ErkundenPageState extends State<ErkundenPage>{
+  MapController mapController = MapController();
   var ownProfil;
   List<String> allUserName = [];
   var filterList = [];
@@ -29,7 +31,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var profilsBetween = [];
   var profilsCities = [];
   var aktiveProfils = [];
-  double mapZoom = 3.0;
+  double minMapZoom = 1.6;
+  double mapZoom = 1.6;
   double cityZoom = 6.5;
   dynamic searchAutocomplete = SizedBox.shrink();
   var buildIsLoaded = false;
@@ -47,7 +50,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getOwnProfil(profil){
-    var userEmail = FirebaseAuth.instance.currentUser!.email;
+    var userEmail = FirebaseAuth.instance.currentUser.email;
 
     if(profil["email"] == userEmail) {
       return profil;
@@ -184,9 +187,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
   changeProfil(zoom){
     var choosenProfils = [];
 
-    if(zoom! > cityZoom){
+    if(zoom > cityZoom){
       choosenProfils = profilsCities;
-    } else if(zoom! > 4.0){
+    } else if(zoom > 4.0){
       choosenProfils = profilsBetween;
     } else{
       choosenProfils = profilCountries;
@@ -235,6 +238,19 @@ class _ErkundenPageState extends State<ErkundenPage>{
     });
   }
 
+  zoomAtPoint(position){
+    if(mapZoom< 4){
+      mapZoom = 4.1;
+    } else if (mapZoom < 6.5){
+      mapZoom = 6.6;
+    }
+
+    mapController.move(position, mapZoom);
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context){
     List<Marker> allMarker = [];
@@ -243,6 +259,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       List<Widget> createPopupProfils(){
         List<Widget> profilsList = [SizedBox(height: 10)];
+        var friendlist = Map<String, bool>.from(ownProfil["friendlist"]);
 
         childrenAgeStringToStringAge(childrenAgeList){
           List yearChildrenAgeList = [];
@@ -263,7 +280,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 global_functions.changePage(context, ShowProfilPage(
                   userName: ownProfil["name"],
                   profil: profil,
-                  userFriendlist: ownProfil["friendlist"],
+                  userFriendlist: friendlist,
                 ));
               },
               child: Container(
@@ -275,7 +292,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(profil["name"], style: TextStyle(fontWeight: FontWeight.bold),),
-                    Text(AppLocalizations.of(context)!.kinder +" :" + childrenAgeStringToStringAge(profil["kinder"]))
+                    Text(AppLocalizations.of(context).kinder +" :" + childrenAgeStringToStringAge(profil["kinder"]))
                   ]
                 )
               ),
@@ -310,7 +327,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
         width: 30.0,
         height: 30.0,
         point: position,
-        builder: (ctx) => FloatingActionButton.small(
+        builder: (ctx) => FloatingActionButton(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          mini: true,
           child: Text(text),
           onPressed: buttonFunction,
         ),
@@ -323,7 +342,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
       for (var profil in aktiveProfils) {
         var position = LatLng(profil["latt"], profil["longt"]);
         markerList.add(
-            ownMarker(profil["name"], position, () => markerPopupWindow(profil))
+            ownMarker(
+                profil["name"],
+                position,
+                () {
+                  markerPopupWindow(profil);
+                  zoomAtPoint(position);
+                }
+            )
+
         );
       }
 
@@ -335,17 +362,18 @@ class _ErkundenPageState extends State<ErkundenPage>{
       createAllMarker();
 
       return FlutterMap(
+        mapController: mapController,
         options: MapOptions(
           center: LatLng(0, 0),
-          zoom: 1.6,
-          minZoom: 1.6,
+          zoom: minMapZoom,
+          minZoom: minMapZoom,
           maxZoom: 9,
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed){
             if(changed){
                 setState(() {
                   changeProfil(position.zoom);
-                  mapZoom = position.zoom!;
+                  mapZoom = position.zoom;
                 });
             }
           }
@@ -365,7 +393,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(top: 25),
+        padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
         child:StreamBuilder(
           stream: ProfilDatabase().getAllProfilsStream(),
           builder: (
@@ -399,7 +427,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
               return Stack(children: [
                 ownFlutterMap(),
-                searchAutocomplete
+                searchAutocomplete,
+                if(mapZoom > minMapZoom) Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: FloatingActionButton(
+                    child: Icon(Icons.zoom_out_map),
+                    onPressed: () => mapController.move(LatLng(0, 0), minMapZoom),
+                  ),
+                )
               ]);
             }
             return Container();

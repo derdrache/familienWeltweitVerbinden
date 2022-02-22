@@ -20,9 +20,9 @@ class StartPage extends StatefulWidget{
 }
 
 class _StartPageState extends State<StartPage>{
-  var userID = FirebaseAuth.instance.currentUser!.uid;
+  var userID = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser?.displayName;
-  var userAuthEmail = FirebaseAuth.instance.currentUser!.email;
+  var userAuthEmail = FirebaseAuth.instance.currentUser.email;
 
 
   @override
@@ -99,7 +99,7 @@ class _StartPageState extends State<StartPage>{
                             height: 20,
                             width: 20,
                             decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.tertiary,
+                                color: Theme.of(context).colorScheme.secondary,
                                 shape: BoxShape.circle
                             ),
                             child: Center(
@@ -143,7 +143,7 @@ class _StartPageState extends State<StartPage>{
 
                */
               const BottomNavigationBarItem(
-                icon: Icon(Icons.travel_explore),
+                icon: Icon(Icons.map),
                 label: 'World',
               ),
 

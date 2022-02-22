@@ -16,14 +16,14 @@ import '../services/database.dart';
 class ShowProfilPage extends StatefulWidget {
   var userName;
   var profil;
-  Map? userFriendlist = {"empty": true};
+  Map<String, bool> userFriendlist = {"empty": true};
   var ownProfil;
 
 
   ShowProfilPage({
-    Key? key,
+    Key key,
     this.userName,
-    required this.profil,
+    this.profil,
     this.userFriendlist,
     this.ownProfil = false
 
@@ -34,7 +34,7 @@ class ShowProfilPage extends StatefulWidget {
 }
 
 class _ShowProfilPageState extends State<ShowProfilPage> {
-  var userID = FirebaseAuth.instance.currentUser!.uid;
+  var userID = FirebaseAuth.instance.currentUser.uid;
   var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
   double textSize = 16;
   double healineTextSize = 18;
@@ -75,7 +75,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     friendButton(){
-      var onFriendlist = widget.userFriendlist!.keys.contains(widget.profil["name"]);
+      var onFriendlist = widget.userFriendlist.keys.contains(widget.profil["name"]);
 
       return TextButton(
           style: global_style.textButtonStyle(),
@@ -84,13 +84,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             var snackbarText = "";
 
             if(onFriendlist){
-              widget.userFriendlist!.remove(widget.profil["name"]);
-              snackbarText = "Benutzer von der Freundesliste entfernt";
-              if(widget.userFriendlist!.keys.isEmpty) widget.userFriendlist = {"empty": true};
+              widget.userFriendlist.remove(widget.profil["name"]);
+              snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistEntfernt;
+              if(widget.userFriendlist.keys.isEmpty) widget.userFriendlist = {"empty": true};
             } else {
-              if(widget.userFriendlist!["empty"] == true) widget.userFriendlist = {widget.profil["name"]: true};
-              widget.userFriendlist![widget.profil["name"]] = true;
-              snackbarText = "Benutzer der Freundesliste hinzugefügt";
+              if(widget.userFriendlist["empty"] == true) widget.userFriendlist = {widget.profil["name"]: true};
+              widget.userFriendlist[widget.profil["name"]] = true;
+              snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistHinzugefuegt;
             }
 
             customSnackbar(context, snackbarText, color: Colors.green);
@@ -100,7 +100,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             );
 
             setState(() {
-              widget.userFriendlist!.keys.contains(widget.profil["name"]);
+              widget.userFriendlist.keys.contains(widget.profil["name"]);
             });
 
           }
@@ -110,12 +110,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     titelBox(){
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.only(top: 20,bottom: 20),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(
-            color: global_variablen.borderColorGrey
-          ))
-        ),
+        padding: EdgeInsets.only(top: 20,bottom: 10),
         child: SizedBox(
             child:
             Text(
@@ -132,7 +127,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return Row(
         children: [
           Text(
-            AppLocalizations.of(context)!.aktuelleStadt +": ",
+            AppLocalizations.of(context).aktuelleStadt +": ",
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
           ),
           Text(
@@ -142,7 +137,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     travelBox(){
-      var themaText = AppLocalizations.of(context)!.artDerReise+": ";
+      var themaText = AppLocalizations.of(context).artDerReise+": ";
       var inhaltText = global_variablen.changeGermanToEnglish(widget.profil["reiseart"]);
 
       if(spracheIstDeutsch) inhaltText = global_variablen.changeEnglishToGerman(widget.profil["reiseart"]);
@@ -157,7 +152,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     sprachenBox(){
-      var themenText = AppLocalizations.of(context)!.sprachen+": ";
+      var themenText = AppLocalizations.of(context).sprachen+": ";
       var inhaltText = global_variablen.changeGermanToEnglish(widget.profil["sprachen"]).join(", ");
 
       if(spracheIstDeutsch) inhaltText =global_variablen.changeEnglishToGerman(widget.profil["sprachen"]).join(", ");
@@ -182,7 +177,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return Row(
         children: [
           Text(
-              AppLocalizations.of(context)!.kinder +": ",
+              AppLocalizations.of(context).kinder +": ",
               style: TextStyle(
                   fontSize: textSize,
                   fontWeight: FontWeight.bold
@@ -194,7 +189,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     interessenBox(){
-      var themenText = AppLocalizations.of(context)!.interessen+": ";
+      var themenText = AppLocalizations.of(context).interessen+": ";
       var inhaltText = global_variablen.changeGermanToEnglish(widget.profil["interessen"]).join(", ");
 
       if(spracheIstDeutsch) inhaltText = global_variablen.changeEnglishToGerman(widget.profil["interessen"]).join(", ");
@@ -213,7 +208,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppLocalizations.of(context)!.ueberMich + ": ",
+            AppLocalizations.of(context).ueberMich + ": ",
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
           ),
           Flexible(
@@ -230,16 +225,16 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       double columnAbstand = 15;
 
       return Container(
-          padding: const EdgeInsets.only(left: 10, bottom: 20),
+          padding: const EdgeInsets.only(left: 10, top: 20),
           decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: global_variablen.borderColorGrey))
+            border: Border(top: BorderSide(color: global_variablen.borderColorGrey))
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
             Text("Info", style: TextStyle(
                 fontSize: healineTextSize,
-                color: Theme.of(context).colorScheme.tertiary,
+                color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.bold
               ),
             ),
@@ -267,10 +262,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context)!.kontakt,
+              AppLocalizations.of(context).kontakt,
               style: TextStyle(
                   fontSize: healineTextSize,
-                  color: Theme.of(context).colorScheme.tertiary,
+                  color: Theme.of(context).colorScheme.secondary,
                   fontWeight: FontWeight.bold
               ),
             ),
@@ -292,24 +287,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       SizedBox(
         width: double.maxFinite,
         child: Scrollbar(
-          thumbVisibility: true,
-          child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            },),
-            child: ListView(
+          child: ListView(
                 children: [
                   titelBox(),
                   const SizedBox(height: 15),
                   infoProfil(),
                   const SizedBox(height: 15),
-                  kontaktProfil(),
+                  if(widget.profil["emailAnzeigen"]) kontaktProfil(),
                 ]
             ),
           ),
         ),
-      ),
     );
 
     }

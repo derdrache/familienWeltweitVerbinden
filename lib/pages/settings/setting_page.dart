@@ -30,7 +30,7 @@ import 'change_email.dart';
 
 
 class SettingPage extends StatefulWidget {
-  const SettingPage({Key? key}) : super(key: key);
+  const SettingPage({Key key}) : super(key: key);
 
   @override
   _SettingPageState createState() => _SettingPageState();
@@ -40,8 +40,8 @@ class _SettingPageState extends State<SettingPage> {
   double globalPadding = 30;
   double fontSize = 20;
   var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
-  var borderColor = Colors.grey[200]!;
-  var userID = FirebaseAuth.instance.currentUser!.uid;
+  var borderColor = Colors.grey[200];
+  var userID = FirebaseAuth.instance.currentUser.uid;
   var userProfil;
   var nameTextKontroller = TextEditingController();
   var kinderAgeBox = ChildrenBirthdatePickerBox();
@@ -108,14 +108,14 @@ class _SettingPageState extends State<SettingPage> {
                         nameKontroller: nameTextKontroller)
                     );
                   },
-                  child: Text(AppLocalizations.of(context)!.nameAendern, style: TextStyle(color: textColor)))
+                  child: Text(AppLocalizations.of(context).nameAendern, style: TextStyle(color: textColor)))
           ),
           PopupMenuItem(
               child: TextButton(
                   onPressed: () {
                     global_functions.changePage(context, ChangeEmailPage());
                   },
-                  child: Text(AppLocalizations.of(context)!.emailAendern, style: TextStyle(color: textColor))
+                  child: Text(AppLocalizations.of(context).emailAendern, style: TextStyle(color: textColor))
               )
           ),
           PopupMenuItem(
@@ -123,7 +123,7 @@ class _SettingPageState extends State<SettingPage> {
                   onPressed: () {
                     global_functions.changePage(context, ChangePasswortPage());
                   },
-                  child: Text(AppLocalizations.of(context)!.passwortVeraendern, style: TextStyle(color: textColor)))
+                  child: Text(AppLocalizations.of(context).passwortVeraendern, style: TextStyle(color: textColor)))
           ),
           PopupMenuItem(
               child: TextButton(
@@ -132,7 +132,7 @@ class _SettingPageState extends State<SettingPage> {
                     global_functions.changePage(context, const LoginPage());
                     setState(() {});
                   },
-                  child: Text(AppLocalizations.of(context)!.abmelden, style: TextStyle(color: textColor)))
+                  child: Text(AppLocalizations.of(context).abmelden, style: TextStyle(color: textColor)))
           ),
         ]
     );
@@ -228,7 +228,7 @@ class _SettingPageState extends State<SettingPage> {
                     )
                 ),
                 const Expanded(child: SizedBox.shrink()),
-                Text(AppLocalizations.of(context)!.antippenZumAendern,
+                Text(AppLocalizations.of(context).antippenZumAendern,
                     style: const TextStyle(color: Colors.grey, fontSize: 14)
                 ),
                 const Expanded(child: SizedBox()),
@@ -246,9 +246,9 @@ class _SettingPageState extends State<SettingPage> {
               Wrap(
                 children: [
                   profilThemeContainer(
-                      ortKontroller.text, AppLocalizations.of(context)!.aktuelleStadt,
+                      ortKontroller.text, AppLocalizations.of(context).aktuelleStadt,
                       ChangeCityPage(userId: userID)),
-                  profilThemeContainer(reiseArtInput.getSelected(), AppLocalizations.of(context)!.artDerReise,
+                  profilThemeContainer(reiseArtInput.getSelected(), AppLocalizations.of(context).artDerReise,
                       ChangeReiseartPage(
                         userId: userID,
                         oldInput: reiseArtInput.getSelected(),
@@ -257,13 +257,13 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                   profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
                   kinderAgeBox.getDates(years: true).join(", "),
-                      AppLocalizations.of(context)!.alterDerKinder, ChangeChildrenPage(
+                      AppLocalizations.of(context).alterDerKinder, ChangeChildrenPage(
                         userId: userID, childrenBirthdatePickerBox: kinderAgeBox,
                       )),
                   profilThemeContainer(
                       interessenInputBox.getSelected() == null? "" :
                       interessenInputBox.getSelected().join(", "),
-                      AppLocalizations.of(context)!.interessen,
+                      AppLocalizations.of(context).interessen,
                       ChangeInteressenPage(
                         userId: userID,
                         selected: interessenInputBox.getSelected(),
@@ -273,7 +273,7 @@ class _SettingPageState extends State<SettingPage> {
                   profilThemeContainer(
                       sprachenInputBox.getSelected() == null? "":
                       sprachenInputBox.getSelected().join(", "),
-                      AppLocalizations.of(context)!.sprachen,
+                      AppLocalizations.of(context).sprachen,
                       ChangeSprachenPage(
                         userId: userID,
                         selected: sprachenInputBox.getSelected(),
@@ -285,7 +285,7 @@ class _SettingPageState extends State<SettingPage> {
                 ],
               ),
               profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
-                  AppLocalizations.of(context)!.ueberMich,
+                  AppLocalizations.of(context).ueberMich,
                 ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller),
                 true
               )
@@ -314,7 +314,7 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppLocalizations.of(context)!.einstellungen,
+              Text(AppLocalizations.of(context).einstellungen,
                   style: TextStyle(
                       color: headLineColor,
                       fontSize: fontSize,
@@ -322,13 +322,13 @@ class _SettingPageState extends State<SettingPage> {
                   )
               ),
               const SizedBox(height: 20),
-              settingThemeContainer(AppLocalizations.of(context)!.privatsphaereSicherheit, Icons.lock,
+              settingThemeContainer(AppLocalizations.of(context).privatsphaereSicherheit, Icons.lock,
                       () => global_functions.changePage(
                           context, PrivacySecurityPage(profil: userProfil)
                       )
               ),
               const SizedBox(height: 20),
-              settingThemeContainer(AppLocalizations.of(context)!.benachrichtigungen, Icons.notifications,
+              settingThemeContainer(AppLocalizations.of(context).benachrichtigungen, Icons.notifications,
                       () => global_functions.changePage(
                       context, NotificationsOptionsPage(profil: userProfil)
                   )
@@ -344,7 +344,7 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppLocalizations.of(context)!.appInformation,
+              Text(AppLocalizations.of(context).appInformation,
                   style: TextStyle(
                       color: headLineColor,
                       fontSize: fontSize,
@@ -362,7 +362,7 @@ class _SettingPageState extends State<SettingPage> {
                   () => PatchnotesWindow(context: context).openWindow()
                ),
               const SizedBox(height: 20),
-              settingThemeContainer(AppLocalizations.of(context)!.geplanteErweiterungen, Icons.task,
+              settingThemeContainer(AppLocalizations.of(context).geplanteErweiterungen, Icons.update,
                   () => UmcomingUpdatesWindow(context: context).openWindow()
               ),
               /*
@@ -408,12 +408,7 @@ class _SettingPageState extends State<SettingPage> {
 
               getAndSetDataFromDB();
 
-              return ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                },),
-                child: ListView(
+              return ListView(
                     children: [
                       menuBar(),
                       nameContainer(),
@@ -423,7 +418,6 @@ class _SettingPageState extends State<SettingPage> {
 
 
                     ]
-                ),
               );
             }
             return const SizedBox.shrink();

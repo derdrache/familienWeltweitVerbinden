@@ -63,7 +63,7 @@ class ChatDatabase{
 
 
     var oldUserNewMessages = await ChatDatabase().getNewMessages(chatData["id"], chatPartnerId);
-    var activeChat = await ProfilDatabase().getActiveChat(chatPartnerId);
+    var activeChat = await ProfilDatabase().getOneData(chatPartnerId, "activeChat");
 
     if(chatData["id"] != activeChat){
       ChatDatabase().updateNewMessageCounter(
@@ -132,14 +132,14 @@ class ProfilDatabase{
       for (var chatGroup in query.snapshot.children) {
         var key = chatGroup.key;
 
-        chatGroupsDB.child(key!).child("users").child(profilID).update({"name": newName});
+        chatGroupsDB.child(key).child("users").child(profilID).update({"name": newName});
       }
     });
 
     var query = await profilsDB.orderByChild("friendlist/$oldName").equalTo(true).once();
     query.snapshot.children.forEach((element) {
-      profilsDB.child(element.key!).child("friendlist").child(oldName).remove();
-      profilsDB.child(element.key!).child("friendlist").update({newName: true});
+      profilsDB.child(element.key).child("friendlist").child(oldName).remove();
+      profilsDB.child(element.key).child("friendlist").update({newName: true});
     });
 
 
@@ -168,12 +168,6 @@ class ProfilDatabase{
     var query = await profilsDB.orderByChild(search).limitToFirst(1).equalTo(match).once();
 
     if(query.snapshot.exists) return query.snapshot.children.first.key;
-  }
-
-  getActiveChat(id) async {
-    var query = await profilsDB.child(id).child("activeChat").get();
-
-    return query.value;
   }
 
   getProfilStream(id){

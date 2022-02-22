@@ -9,20 +9,20 @@ import '../../services/database.dart';
 class NotificationsOptionsPage extends StatefulWidget {
   var profil;
 
-  NotificationsOptionsPage({Key? key, this.profil}) : super(key: key);
+  NotificationsOptionsPage({Key key, this.profil}) : super(key: key);
 
   @override
   _NotificationsOptionsPageState createState() => _NotificationsOptionsPageState();
 }
 
 class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
-  var userId = FirebaseAuth.instance.currentUser!.uid;
+  var userId = FirebaseAuth.instance.currentUser.uid;
 
   mitteilungEinstellung(){
     return Row(
       children: [
         SizedBox(width: 20),
-        Text(AppLocalizations.of(context)!.benachrichtigungenErhalten, style: TextStyle(fontSize: 20),),
+        Text(AppLocalizations.of(context).benachrichtigungenErhalten, style: TextStyle(fontSize: 20),),
         Expanded(child: SizedBox(width: 20)),
         Switch(
             value: widget.profil["notificationstatus"] ?? true,
@@ -44,7 +44,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.benachrichtigungen),
+      appBar: customAppBar(title: AppLocalizations.of(context).benachrichtigungen),
       body: Column(
         children: [
           SizedBox(height: 20,),

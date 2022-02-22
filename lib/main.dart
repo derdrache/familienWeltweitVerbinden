@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
       if(message.data.isNotEmpty){
-        var activeChat = await ProfilDatabase().getActiveChat(userId);
+        var activeChat = await ProfilDatabase().getOneData(userId, "activeChat");
 
         if(activeChat == null || activeChat != message.data["chatId"]){
           LocalNotificationService().display(message);
@@ -121,8 +121,7 @@ class MyApp extends StatelessWidget {
               scaffoldBackgroundColor: Colors.white,
               colorScheme: ColorScheme.fromSwatch().copyWith(
                 primary: Color(0xFFBF1D53),
-                secondary: Color(0xFFBF1D53), //buttonColor?
-                tertiary: Color(0xFF3CB28F)
+                secondary: Color(0xFF3CB28F), //buttonColor?
             ),
               iconTheme: IconThemeData(color: Color(0xFF3CB28F))
             ),

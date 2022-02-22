@@ -14,8 +14,8 @@ class ChatDetailsPage extends StatefulWidget {
   var groupChatData;
   bool newChat;
 
-  ChatDetailsPage({Key? key,
-    required this.groupChatData,
+  ChatDetailsPage({Key key,
+    this.groupChatData,
     this.newChat = false}) : super(key: key);
 
   @override
@@ -28,8 +28,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var chatPartnerName;
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
-  var userId = FirebaseAuth.instance.currentUser!.uid;
-  var userName = FirebaseAuth.instance.currentUser!.displayName;
+  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userName = FirebaseAuth.instance.currentUser.displayName;
   var messageInputHeight = 50.0;
   var messageRows = 0;
 
@@ -83,9 +83,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   }
 
   messageToDbAndClearMessageInput(message)async {
-    var userID = FirebaseAuth.instance.currentUser!.uid;
+    var userID = FirebaseAuth.instance.currentUser.uid;
 
     if(nachrichtController.text == "") return;
+
     nachrichtController.clear();
 
     var messageData = {
@@ -194,15 +195,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         );
       }
 
-      return ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      },),
-        child: ListView(
+      return ListView(
             reverse: true,
             children: messageBox.reversed.toList(),
-        ),
       );
     }
 
@@ -260,7 +255,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                 textInputAction: TextInputAction.newline,
                 controller: nachrichtController,
                 decoration: InputDecoration.collapsed(
-                  hintText: AppLocalizations.of(context)!.nachricht,
+                  hintText: AppLocalizations.of(context).nachricht,
                 ),
                 onChanged: (value) {
                     var newLineCounts = countItemsInList(value, "\n");
@@ -276,8 +271,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             ),
             IconButton(
                 padding: EdgeInsets.zero,
-                  onPressed: () => messageToDbAndClearMessageInput(nachrichtController.text),
-                  icon: Icon(Icons.send, size: 30, color: Theme.of(context).colorScheme.tertiary)
+                  onPressed: () {
+                    messageToDbAndClearMessageInput(nachrichtController.text);
+
+                    setState(() {
+                      messageInputHeight = 50;
+                    });
+                  },
+                  icon: Icon(Icons.send, size: 30, color: Theme.of(context).colorScheme.secondary)
               ),
           ],
         ),

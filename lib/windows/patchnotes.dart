@@ -11,7 +11,7 @@ class PatchnotesWindow{
   var patchnotesTitle = "Patchnotes";
   var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
-  PatchnotesWindow({required this.context});
+  PatchnotesWindow({this.context});
 
 
   _patch(patch){

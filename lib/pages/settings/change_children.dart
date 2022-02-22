@@ -7,7 +7,7 @@ class ChangeChildrenPage extends StatelessWidget {
   var userId;
   var childrenBirthdatePickerBox;
 
-  ChangeChildrenPage({Key? key,required this.userId,required this.childrenBirthdatePickerBox}) : super(key: key);
+  ChangeChildrenPage({Key key,this.userId,this.childrenBirthdatePickerBox}) : super(key: key);
 
 
   @override
@@ -26,7 +26,7 @@ class ChangeChildrenPage extends StatelessWidget {
           }
 
           if(!allFilled || childrenBirthdatePickerBox.getDates().isEmpty){
-            customSnackbar(context, AppLocalizations.of(context)!.geburtsdatumEingeben);
+            customSnackbar(context, AppLocalizations.of(context).geburtsdatumEingeben);
           } else{
             ProfilDatabase().updateProfil(
                 userId, {"kinder": childrenBirthdatePickerBox.getDates()}
@@ -39,7 +39,7 @@ class ChangeChildrenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.kinderAendern, buttons: [saveButton()]),
+      appBar: customAppBar(title: AppLocalizations.of(context).kinderAendern, buttons: [saveButton()]),
       body: childrenBirthdatePickerBox,
     );
   }

@@ -7,7 +7,7 @@ import '../../global/global_functions.dart' as global_functions;
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({Key key}) : super(key: key);
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -26,13 +26,13 @@ class _RegisterPageState extends State<RegisterPage> {
     });
     var registrationComplete = await registration();
     if(registrationComplete){
-      customSnackbar(context, AppLocalizations.of(context)!.registerAndEmailBestaetigen, color: Colors.green);
+      customSnackbar(context, AppLocalizations.of(context).registerAndEmailBestaetigen, color: Colors.green);
       global_functions.changePageForever(context, const LoginPage());
     }
   }
 
   registration() async{
-    if(formKey.currentState!.validate()){
+    if(formKey.currentState.validate()){
       var email = emailController.text;
       var password = passwordController.text;
 
@@ -47,13 +47,13 @@ class _RegisterPageState extends State<RegisterPage> {
           isLoading = false;
         });
         if(error.code == "email-already-in-use"){
-          customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
+          customSnackbar(context, AppLocalizations.of(context).emailInBenutzung);
         } else if(error.code == "invalid-email"){
-          customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
+          customSnackbar(context, AppLocalizations.of(context).emailUngueltig);
         } else if(error.code == "weak-password"){
-          customSnackbar(context, AppLocalizations.of(context)!.passwortSchwach);
+          customSnackbar(context, AppLocalizations.of(context).passwortSchwach);
         } else if(error.code == "network-request-failed"){
-          customSnackbar(context, AppLocalizations.of(context)!.keineVerbindungInternet);
+          customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
         }
 
         return false;
@@ -79,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context)!.registrieren),
+      appBar: customAppBar(title: AppLocalizations.of(context).registrieren),
       body: Padding(
         padding: const EdgeInsets.only(top: 15.0),
         child: Center(
@@ -93,12 +93,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   textInputAction: TextInputAction.next
                 ),
                 customTextInput(
-                  AppLocalizations.of(context)!.passwort, passwordController, passwort: true,
+                  AppLocalizations.of(context).passwort, passwordController, passwort: true,
                   validator: global_functions.checkValidatorPassword(context),
                   textInputAction: TextInputAction.next
                 ),
                 customTextInput(
-                  AppLocalizations.of(context)!.passwortBestaetigen, checkPasswordController, passwort: true,
+                  AppLocalizations.of(context).passwortBestaetigen, checkPasswordController, passwort: true,
                   validator: global_functions.checkValidatorPassword(
                     context,
                     passwordCheck: passwordController.text),
@@ -106,7 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     onSubmit: () => registrationButton()
                   ),
                 isLoading ? loading():
-                customFloatbuttonExtended(AppLocalizations.of(context)!.registrieren, () => registrationButton())
+                customFloatbuttonExtended(AppLocalizations.of(context).registrieren, () => registrationButton())
               ],
             ),
           )
