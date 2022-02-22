@@ -397,9 +397,7 @@ class _SettingPageState extends State<SettingPage> {
     }
 
 
-    return Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: StreamBuilder(
+    return StreamBuilder(
           stream: ProfilDatabase().getProfilStream(userID),
           builder: (
           BuildContext context,
@@ -429,9 +427,7 @@ class _SettingPageState extends State<SettingPage> {
               );
             }
             return const SizedBox.shrink();
-          })
-
-    );
+          });
   }
 }
 

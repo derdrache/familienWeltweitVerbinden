@@ -48,7 +48,6 @@ class MyApp extends StatelessWidget {
 
   initialization() async {
     if(kIsWeb) return ;
-      print("wrong");
     final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettings = InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher')

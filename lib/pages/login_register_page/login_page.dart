@@ -120,8 +120,8 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 header(),
                 customTextInput("Email", emailController,
-                  validator: global_functions.checkValidationEmail(context),
-                  textInputAction: TextInputAction.next
+                    validator: global_functions.checkValidationEmail(context),
+                    textInputAction: TextInputAction.next
                 ),
                 customTextInput(AppLocalizations.of(context)!.passwort, passwortController,
                     validator: global_functions.checkValidatorPassword(context),
@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                 isLoading ? loading() : customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended(AppLocalizations.of(context)!.registrieren, (){
                   global_functions.changePage(context, const RegisterPage());
-                }),
+                })
               ],
             )
         )
