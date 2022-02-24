@@ -13,8 +13,6 @@ import '../global/variablen.dart' as global_var;
 import '../global/search_autocomplete.dart';
 import '../services/locationsService.dart';
 
-/// searchAutocomplete land + city
-
 
 class ErkundenPage extends StatefulWidget{
   @override
@@ -391,31 +389,29 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
-        child:StreamBuilder(
+    return StreamBuilder(
           stream: ProfilDatabase().getAllProfilsStream(),
           builder: (
               BuildContext context,
               AsyncSnapshot snapshot,
           ) {
             if (snapshot.hasData ) {
+              print("new Load");
               var allProfils = [];
               allUserName = [];
               var allProfilsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
               allProfilsMap.forEach((key, value) {
+
                 if(getOwnProfil(value) != null) {
                   ownProfil = getOwnProfil(value);
-                  allProfils.remove(ownProfil);
                 } else{
                   allUserName.add(value["name"]);
                 }
               });
 
               allProfilsMap.forEach((key, value) {
-                if(checkFilter(value) && ownProfil != value){
+                if(checkFilter(value) && ownProfil != value && value["error"] != true){
                   allProfils.add(value);
                 }
               });
@@ -425,24 +421,25 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
               createAndSetZoomProfils();
 
-              return Stack(children: [
-                ownFlutterMap(),
-                searchAutocomplete,
-                if(mapZoom > minMapZoom) Positioned(
-                  bottom: 10,
-                  right: 10,
-                  child: FloatingActionButton(
-                    child: Icon(Icons.zoom_out_map),
-                    onPressed: () => mapController.move(LatLng(0, 0), minMapZoom),
-                  ),
-                )
-              ]);
+              return Padding(
+                padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
+                child: Stack(children: [
+                  ownFlutterMap(),
+                  searchAutocomplete,
+                  if(mapZoom > minMapZoom) Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: FloatingActionButton(
+                      child: Icon(Icons.zoom_out_map),
+                      onPressed: () => mapController.move(LatLng(0, 0), minMapZoom),
+                    ),
+                  )
+                ]),
+              );
             }
             return Container();
           }
-        )
-      )
-    );
+        );
 
   }
 }

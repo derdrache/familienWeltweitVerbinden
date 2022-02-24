@@ -29,12 +29,12 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   }
 
   pushLocationDataToDB(locationData) async {
-
     var locationDict = {
       "ort": locationData["city"],
       "longt": locationData["longt"],
       "latt": locationData["latt"],
-      "land": locationData["countryname"]
+      "land": locationData["countryname"],
+      "error": locationData["error"] // web workaround
     };
 
     ProfilDatabase().updateProfil(
@@ -42,23 +42,25 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     );
   }
 
+  saveLocation() async {
+    if(suggestedCities.isEmpty) {
+      suggestedCities = await LocationService()
+          .getLocationMapDataGoogle2(ortChangeKontroller.text);
+
+      if(suggestedCities.length > 1){
+        setState(() {});
+        customSnackbar(context, AppLocalizations.of(context).genauenStandortWaehlen);
+      } else{
+        pushLocationDataToDB(suggestedCities[0]);
+        Navigator.pop(context);
+      }
+    }
+  }
+
   saveButton(){
     return TextButton(
         child: Icon(Icons.done),
-        onPressed: () async {
-          if(suggestedCities.isEmpty) {
-            suggestedCities = await LocationService()
-                .getLocationMapDataGoogle2(ortChangeKontroller.text);
-
-            if(suggestedCities.length > 1){
-              setState(() {});
-              customSnackbar(context, AppLocalizations.of(context).genauenStandortWaehlen);
-            } else{
-              pushLocationDataToDB(suggestedCities[0]);
-              Navigator.pop(context);
-            }
-          }
-        },
+        onPressed: () => saveLocation()
 
     );
   }
@@ -98,17 +100,18 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context).stadtAendern, buttons: <Widget>[saveButton()]),
+      appBar: customAppBar(
+          title: AppLocalizations.of(context).stadtAendern,
+          buttons: <Widget>[saveButton()]
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          customTextInput(AppLocalizations.of(context).stadtEingeben, ortChangeKontroller, onSubmit: () async{
-            suggestedCities = await LocationService()
-                .getLocationMapDataGoogle2(ortChangeKontroller.text);
+          customTextInput(AppLocalizations.of(context).stadtEingeben,
+              ortChangeKontroller,
+              onSubmit: () => saveLocation()
 
-            setState(() {});
-
-          }),
+          ),
           suggestedCitiesList.isNotEmpty ? Padding(
             padding: const EdgeInsets.all(12.0),
             child: Text(
