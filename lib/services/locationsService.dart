@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'dart:ui';
 
 import '../auth/secrets.dart';
 
@@ -10,8 +12,10 @@ import '../auth/secrets.dart';
 class LocationService {
 
   getLocationMapDataGoogle(input) async{
-    var deviceLanguage = Platform.localeName.split("_")[0];
+    var deviceLanguage = kIsWeb? window.locale.languageCode :  Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
+
+
     try{
       var url = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/'
           'json?input=$input&inputtype=textquery&'
@@ -20,8 +24,11 @@ class LocationService {
 
       var response = await http.get(Uri.parse(url));
       var json = convert.jsonDecode(response.body);
+
       var country = json["candidates"][0]["formatted_address"].split(", ").last;
       if(country.contains(" - ")) country = country.split(" - ")[1];
+
+
 
       var mapData = {
         "city": json["candidates"][0]["name"],
@@ -36,17 +43,21 @@ class LocationService {
   }
 
   getLocationMapDataGoogle2(input) async{
-    var deviceLanguage = Platform.localeName.split("_")[0];
+    var deviceLanguage = kIsWeb? window.locale.languageCode :  Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
     var allSuggests = [];
 
     try{
+
       var url = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/'
           'json?input=$input&inputtype=textquery&'
           'fields=formatted_address%2Cgeometry&'
           'language=$sprache&key=$google_key';
 
-      var response = await http.get(Uri.parse(url));
+      var response = await http.get(Uri.parse(url), headers: {
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+      });
+
       var json = convert.jsonDecode(response.body);
       var results = json["candidates"];
 
@@ -58,6 +69,7 @@ class LocationService {
         formattedCity.last : formattedCity.join(" ");
 
         var country = formattedAddressList.last;
+
         if(country.contains(" - ")) country = country.split(" - ")[1];
         if(_isNumeric(country)) formattedAddressList[formattedAddressList.length -2];
 
@@ -72,8 +84,13 @@ class LocationService {
       }
 
       return allSuggests;
+
     }catch (error){
-      return null;
+      //Web Workaround
+      return [{
+        "city": input,
+        "error": true
+      }];
     }
   }
 
@@ -103,4 +120,5 @@ class LocationService {
   }
 
 }
+
 

@@ -11,6 +11,7 @@ var chatGroupsDB = realtimeDatabase.child("chats");
 var chatMessagesDB = realtimeDatabase.child("chatMessages");
 var profilsDB = realtimeDatabase.child("profils");
 var feedbackDB = realtimeDatabase.child("feedback");
+var testDB = realtimeDatabase.child("test");
 
 class ChatDatabase{
 
@@ -180,6 +181,16 @@ class ProfilDatabase{
 
   getNewMessagesStream(userId){
     return profilsDB.child(userId).child("newMessages").onValue;
+  }
+
+  workAroundGetAllErrors() async {
+    var query = await profilsDB.orderByChild("error").equalTo(true).once();
+
+    return query.snapshot.value;
+  }
+
+  removeData(userId, data){
+    profilsDB.child(userId).child(data).remove();
   }
 
 }
