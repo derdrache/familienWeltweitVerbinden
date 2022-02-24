@@ -66,7 +66,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "aboutme": "",
             "sprachen": sprachenAuswahlBox.getSelected(),
             "friendlist": {"empty": true},
-            "token": await FirebaseMessaging.instance.getToken()
+            "token": await FirebaseMessaging.instance.getToken(),
+            "error": ortMapData["error"] // web workaround
           };
 
           ProfilDatabase().addNewProfil(userID, data);
@@ -114,11 +115,13 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   addCityData(suggestedCities){
+    print(suggestedCities);
     ortMapData = {
       "city" :suggestedCities["city"],
       "countryname" : suggestedCities["countryname"],
       "longt": suggestedCities["longt"],
-      "latt": suggestedCities["latt"]
+      "latt": suggestedCities["latt"],
+      "error": suggestedCities["error"] // web workaround
     };
     ortTextcontroller.text = suggestedCities["adress"];
     selectedCity = true;
@@ -184,23 +187,26 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
 
     pageTitle(){
-      return SizedBox(
-        height: 60,
-        child: Row(
-          children: [
-            const Expanded(child: SizedBox.shrink()),
-            Text(
-              AppLocalizations.of(context).profilErstellen,
-              style: const TextStyle(
-                  fontSize: 30
+      return Align(
+        child: SizedBox(
+          height: 60,
+          width: 600,
+          child: Row(
+            children: [
+              const Expanded(child: SizedBox.shrink()),
+              Text(
+                AppLocalizations.of(context).profilErstellen,
+                style: const TextStyle(
+                    fontSize: 30
+                ),
               ),
-            ),
-            const Expanded(child: SizedBox.shrink()),
-            TextButton(
-                onPressed: saveFunction,
-                child: const Icon(Icons.done, size: 35),
-            )
-        ]),
+              const Expanded(child: SizedBox.shrink()),
+              TextButton(
+                  onPressed: saveFunction,
+                  child: const Icon(Icons.done, size: 35),
+              )
+          ]),
+        ),
       );
     }
 
@@ -217,20 +223,22 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                     customTextInput(AppLocalizations.of(context).stadtEingeben, ortTextcontroller,
                         validator: global_functions.checkValidatorEmpty(context),
                       onSubmit: () => openSelectCityWindow()
-
                     ),
                     reiseArtenAuswahlBox,
                     sprachenAuswahlBox,
                     interessenAuswahlBox,
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                        child: Text(
-                          AppLocalizations.of(context).anzahlUndAlterKinder,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16
-                          ),
-                        )
+                    Align(
+                      child: Container(
+                        width: 600,
+                        padding: const EdgeInsets.all(10),
+                          child: Text(
+                            AppLocalizations.of(context).anzahlUndAlterKinder,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16
+                            ),
+                          )
+                      ),
                     ),
                     childrenAgePickerBox,
                   ],

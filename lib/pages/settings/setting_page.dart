@@ -17,6 +17,7 @@ import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
+import '../../services/locationsService.dart';
 import '../../windows/upcoming_updates.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
@@ -396,6 +397,42 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
+    errorContainer(){
+      return settingThemeContainer(
+        "Error Workaround",
+        Icons.error,
+          () async {
+            var errorList = await ProfilDatabase().workAroundGetAllErrors();
+
+            if(errorList == null) {
+              print("all done");
+              return;
+            }
+
+            var errorListMap = Map<String, dynamic>.from(errorList);
+
+            errorListMap.forEach((key, value)  async{
+              var userId = key;
+              var locationData = await LocationService().getLocationMapDataGoogle2(value["ort"]);
+              locationData = locationData[0];
+
+              var locationDict = {
+                "ort": locationData["city"],
+                "longt": locationData["longt"],
+                "latt": locationData["latt"],
+                "land": locationData["countryname"],
+              };
+
+              ProfilDatabase().removeData(userId, "error");
+
+              ProfilDatabase().updateProfil(userId, locationDict);
+            });
+
+          }
+      );
+
+    }
+
 
     return StreamBuilder(
           stream: ProfilDatabase().getProfilStream(userID),
@@ -414,8 +451,8 @@ class _SettingPageState extends State<SettingPage> {
                       nameContainer(),
                       profilContainer(),
                       settingContainer(),
-                      aboutAppContainer()
-
+                      aboutAppContainer(),
+                      if(userID == "lZWwNSIXwGacA0ZQZMvCiYfgPeA2") errorContainer() // web work around
 
                     ]
               );

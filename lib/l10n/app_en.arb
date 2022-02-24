@@ -84,7 +84,20 @@
     "keineVerbindungInternet" : "Keine Verbindung zum Internet",
     "willkommenBeiAppName" : "Welcome to Connect Families",
     "friendlistEntfernt" : " removed from friends list",
-    "friendlistHinzugefuegt": " added to friends list"
+    "friendlistHinzugefuegt": " added to friends list",
+    "familienAnzeige" : "Family display - Connect multiple Accounts",
+    "automatischerStandort": "Automatic location option",
+    "nutzerBlockieren" : "Block users",
+    "eventsPlanen" : "Plan events",
+    "reisePlanung": "travel planning / travel route",
+    "gemeinschaftenUpdate": "Register/Show communities",
+    "freundeMarkieren": "Color tag friends on map and follow",
+    "chatgruppen": "Chat groups",
+    "eventboard": "Event board",
+    "anonymeAnmelden": "Anonymous Login",
+    "chatErweiterung": "Chat extensions",
+    "accountLoeschen": "Delete account",
+    "layoutVerbessern": "improve layout"
 
 }
 

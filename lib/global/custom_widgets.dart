@@ -173,27 +173,30 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       });
     }
 
-    return Container(
-      margin: EdgeInsets.all(sideSpace),
-      child: MultiSelectDialogField (
-        buttonIcon: widget.icon,
-          initialValue: widget.selected,
-          buttonText: Text(
-            createDropdownText(),
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: textColor),
-          ),
-          chipDisplay: MultiSelectChipDisplay.none(),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.all(Radius.circular(borderRounding))
-          ),
-          items: auswahlListSelectItem,
-          validator: widget.validator,
-          onSelectionChanged: changeSelectToList,
-          onConfirm: widget.onConfirm
-        )
+    return Align(
+      child: Container(
+        width: webWidth,
+        margin: EdgeInsets.all(sideSpace),
+        child: MultiSelectDialogField (
+          buttonIcon: widget.icon,
+            initialValue: widget.selected,
+            buttonText: Text(
+              createDropdownText(),
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: textColor),
+            ),
+            chipDisplay: MultiSelectChipDisplay.none(),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black),
+              borderRadius: BorderRadius.all(Radius.circular(borderRounding))
+            ),
+            items: auswahlListSelectItem,
+            validator: widget.validator,
+            onSelectionChanged: changeSelectToList,
+            onConfirm: widget.onConfirm
+          )
+      ),
     );
   }
 }
@@ -347,27 +350,31 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.only(left: 10, right: 10),
-      decoration: BoxDecoration(
-          border: Border.all(width: 1),
-          borderRadius: const BorderRadius.all(Radius.circular(5))
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: widget.selected == "" ? null : widget.selected,
-          hint: Text(widget.hintText, style: TextStyle(color: Colors.grey)),
-          elevation: 16,
-          style: const TextStyle(color: Colors.black),
-          icon: const Icon(Icons.arrow_downward, color: Colors.black,),
-          onChanged: (newValue){
-            setState(() {
-              widget.selected = newValue;
-            });
-          },
-          items: createDropdownItems(),
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Container(
+        width: webWidth,
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        decoration: BoxDecoration(
+            border: Border.all(width: 1),
+            borderRadius: const BorderRadius.all(Radius.circular(5))
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: true,
+            value: widget.selected == "" ? null : widget.selected,
+            hint: Text(widget.hintText, style: TextStyle(color: Colors.grey)),
+            elevation: 16,
+            style: const TextStyle(color: Colors.black),
+            icon: const Icon(Icons.arrow_downward, color: Colors.black,),
+            onChanged: (newValue){
+              setState(() {
+                widget.selected = newValue;
+              });
+            },
+            items: createDropdownItems(),
+          ),
         ),
       ),
     );
@@ -521,11 +528,17 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
     checkAndSetDeleteFunction();
 
-    return Wrap(
-      children: [
-        ...widget.childrensBirthDatePickerList,
-        childrenAddButton()
-      ],
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Container(
+        width: webWidth,
+        child: Wrap(
+          children: [
+            ...widget.childrensBirthDatePickerList,
+            childrenAddButton()
+          ],
+        ),
+      ),
     );
   }
 }
