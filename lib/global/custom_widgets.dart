@@ -592,12 +592,18 @@ CustomWindow({context, title,List<Widget> children}){
               child: Stack(
                 overflow: Overflow.visible,
                 children: [
-                  ListView(
-                      children: [
-                        WindowTopbar(title: title),
-                        const SizedBox(height: 10),
-                        ...children
-                      ],
+                  ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    }),
+                    child: ListView(
+                        children: [
+                          WindowTopbar(title: title),
+                          const SizedBox(height: 10),
+                          ...children
+                        ],
+                    ),
                   ),
                   Positioned(
                     height: 30,

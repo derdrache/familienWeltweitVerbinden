@@ -294,15 +294,21 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       SizedBox(
         width: double.maxFinite,
         child: Scrollbar(
-          child: ListView(
-                children: [
-                  titelBox(),
-                  const SizedBox(height: 15),
-                  infoProfil(),
-                  const SizedBox(height: 15),
-                  if(widget.profil["emailAnzeigen"]) kontaktProfil(),
-                ]
-            ),
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+            }),
+            child: ListView(
+                  children: [
+                    titelBox(),
+                    const SizedBox(height: 15),
+                    infoProfil(),
+                    const SizedBox(height: 15),
+                    if(widget.profil["emailAnzeigen"]) kontaktProfil(),
+                  ]
+              ),
+          ),
           ),
         ),
     );

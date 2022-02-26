@@ -295,10 +295,16 @@ class _ChatPageState extends State<ChatPage>{
       return MediaQuery.removePadding(
         removeTop: true,
         context: context,
-        child: ListView(
-            shrinkWrap: true,
-            children: groupContainer,
-          ),
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          }),
+          child: ListView(
+              shrinkWrap: true,
+              children: groupContainer,
+            ),
+        ),
       );
     }
 

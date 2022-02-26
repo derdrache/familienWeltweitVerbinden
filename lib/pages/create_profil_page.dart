@@ -222,34 +222,40 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         margin: const EdgeInsets.only(top: 30),
           child: Form(
             key: _formKey,
-            child: ListView(
-                  children: [
-                    pageTitle(),
-                    customTextInput(AppLocalizations.of(context).benutzername, userNameKontroller,
-                        validator: global_functions.checkValidatorEmpty(context)),
-                    customTextInput(AppLocalizations.of(context).stadtEingeben, ortTextcontroller,
-                        validator: global_functions.checkValidatorEmpty(context),
-                      onSubmit: () => openSelectCityWindow()
-                    ),
-                    reiseArtenAuswahlBox,
-                    sprachenAuswahlBox,
-                    interessenAuswahlBox,
-                    Align(
-                      child: Container(
-                        width: 600,
-                        padding: const EdgeInsets.all(10),
-                          child: Text(
-                            AppLocalizations.of(context).anzahlUndAlterKinder,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16
-                            ),
-                          )
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              }),
+              child: ListView(
+                    children: [
+                      pageTitle(),
+                      customTextInput(AppLocalizations.of(context).benutzername, userNameKontroller,
+                          validator: global_functions.checkValidatorEmpty(context)),
+                      customTextInput(AppLocalizations.of(context).stadtEingeben, ortTextcontroller,
+                          validator: global_functions.checkValidatorEmpty(context),
+                        onSubmit: () => openSelectCityWindow()
                       ),
-                    ),
-                    childrenAgePickerBox,
-                  ],
-                ),
+                      reiseArtenAuswahlBox,
+                      sprachenAuswahlBox,
+                      interessenAuswahlBox,
+                      Align(
+                        child: Container(
+                          width: 600,
+                          padding: const EdgeInsets.all(10),
+                            child: Text(
+                              AppLocalizations.of(context).anzahlUndAlterKinder,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16
+                              ),
+                            )
+                        ),
+                      ),
+                      childrenAgePickerBox,
+                    ],
+                  ),
+            ),
             ),
           ),
     );
