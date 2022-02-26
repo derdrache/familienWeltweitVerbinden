@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
@@ -34,10 +35,11 @@ void main()async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  FirebaseDatabase.instance.setPersistenceEnabled(true);
 
-
-  if(!kIsWeb) FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  if(!kIsWeb){
+    FirebaseDatabase.instance.setPersistenceEnabled(true);
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
 
 
   runApp(MyApp());
@@ -47,10 +49,13 @@ class MyApp extends StatelessWidget {
   var userLogedIn = FirebaseAuth.instance.currentUser;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var pageContext;
+
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
     if(kIsWeb) return ;
+
+
     final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettings = InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher')
@@ -102,7 +107,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     pageContext = context;
+
 
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,

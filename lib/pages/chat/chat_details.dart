@@ -195,9 +195,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         );
       }
 
-      return ListView(
+      return ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+        }),
+        child: ListView(
             reverse: true,
             children: messageBox.reversed.toList(),
+        ),
       );
     }
 

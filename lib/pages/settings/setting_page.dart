@@ -9,7 +9,7 @@ import 'package:familien_suche/pages/settings/notifications_option.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:url_launcher/link.dart' as url_luncher;
+import 'package:url_launcher/link.dart' as url_luncher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
@@ -375,7 +375,6 @@ class _SettingPageState extends State<SettingPage> {
                */
 
               const SizedBox(height: 20),
-              /*
               url_luncher.Link(
                 target: url_luncher.LinkTarget.blank,
                 uri: Uri.parse("https://www.paypal.com/paypalme/DominikMast"),
@@ -386,12 +385,11 @@ class _SettingPageState extends State<SettingPage> {
                     children: [
                       const Icon(Icons.card_giftcard),
                       const SizedBox(width: 20),
-                      Text(AppLocalizations.of(context)!.spenden)
+                      Text(AppLocalizations.of(context).spenden)
                     ],
                   ),
                 ),
               )
-              */
             ],
           )
       );
@@ -445,16 +443,22 @@ class _SettingPageState extends State<SettingPage> {
 
               getAndSetDataFromDB();
 
-              return ListView(
-                    children: [
-                      menuBar(),
-                      nameContainer(),
-                      profilContainer(),
-                      settingContainer(),
-                      aboutAppContainer(),
-                      if(userID == "URgeN7F502RzUeVGboUVuQwS9yu2") errorContainer() // web work around
+              return ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                }),
+                child: ListView(
+                      children: [
+                        menuBar(),
+                        nameContainer(),
+                        profilContainer(),
+                        settingContainer(),
+                        aboutAppContainer(),
+                        if(userID == "URgeN7F502RzUeVGboUVuQwS9yu2") errorContainer() // web work around
 
-                    ]
+                      ]
+                ),
               );
             }
             return const SizedBox.shrink();
