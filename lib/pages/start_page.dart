@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 import 'board_page.dart';
 import 'create_profil_page.dart';
@@ -25,6 +27,7 @@ class _StartPageState extends State<StartPage>{
   var userID = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser?.displayName;
   var userAuthEmail = FirebaseAuth.instance.currentUser.email;
+  PackageInfo packageInfo;
 
 
   @override
@@ -35,6 +38,25 @@ class _StartPageState extends State<StartPage>{
   }
 
   _asyncMethod() async{
+    var updateInformation = await InAppUpdate.checkForUpdate();
+
+    if(updateInformation.updateAvailability ==
+        UpdateAvailability.updateAvailable && !kIsWeb){
+      InAppUpdate.performImmediateUpdate();
+    }
+    /*
+    packageInfo = await PackageInfo.fromPlatform();
+    String buildNummer = packageInfo.buildNumber;
+
+    if(int.parse(buildNummer) < 6){
+      print("go");
+      InAppUpdate.performImmediateUpdate()
+    }
+
+     */
+
+
+
     if(userName != null){
       var userDBEmail = await ProfilDatabase().getOneData(userID, "email");
       var userDeviceTokenDb = await ProfilDatabase().getOneData(userID, "token");
@@ -73,6 +95,7 @@ class _StartPageState extends State<StartPage>{
       ChatPage(),
       const SettingPage()
     ];
+
 
 
     void _onItemTapped(int index) {
