@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import '../global/global_functions.dart'as global_functions;
 
 DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
@@ -129,16 +129,16 @@ class ProfilDatabase{
     FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
     updateProfil(profilID, {"name": newName});
 
-    chatGroupsDB.orderByChild("users/$profilID/name").equalTo(oldName).once().then((query){
-      for (var chatGroup in query.snapshot.children) {
+    chatGroupsDB.orderByChild("users/$profilID/name").equalTo(oldName).get().then((query){
+      for (var chatGroup in query.children) {
         var key = chatGroup.key;
 
         chatGroupsDB.child(key).child("users").child(profilID).update({"name": newName});
       }
     });
 
-    var query = await profilsDB.orderByChild("friendlist/$oldName").equalTo(true).once();
-    query.snapshot.children.forEach((element) {
+    var query = await profilsDB.orderByChild("friendlist/$oldName").equalTo(true).get();
+    query.children.forEach((element) {
       profilsDB.child(element.key).child("friendlist").child(oldName).remove();
       profilsDB.child(element.key).child("friendlist").update({newName: true});
     });
@@ -159,16 +159,17 @@ class ProfilDatabase{
     return query.value;
   }
 
-  getProfilFromName(name) async{
-    var query = await profilsDB.orderByChild("name").limitToFirst(1).equalTo(name).once();
 
-    if(query.snapshot.exists) return query.snapshot.value;
+  getProfilFromName(name) async{
+    var query = await profilsDB.orderByChild("name").limitToFirst(1).equalTo(name).get();
+
+    if(query.exists) return query.value;
   }
 
   getProfilId(String search, String match) async{
-    var query = await profilsDB.orderByChild(search).limitToFirst(1).equalTo(match).once();
+    var query = await profilsDB.orderByChild(search).limitToFirst(1).equalTo(match).get();
 
-    if(query.snapshot.exists) return query.snapshot.children.first.key;
+    if(query.exists) return query.children.first.key;
   }
 
   getProfilStream(id){
@@ -184,9 +185,9 @@ class ProfilDatabase{
   }
 
   workAroundGetAllErrors() async {
-    var query = await profilsDB.orderByChild("error").equalTo(true).once();
+    var query = await profilsDB.orderByChild("error").equalTo(true).get();
 
-    return query.snapshot.value;
+    return query.value;
   }
 
   removeData(userId, data){

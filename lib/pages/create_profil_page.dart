@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -41,10 +42,17 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var userExist = await ProfilDatabase()
           .getProfilId("name", userNameKontroller.text) != null;
 
-      if(!lookInMaps){
+      if(!lookInMaps && !kIsWeb){
+
         bool exactCitiy = await openSelectCityWindow();
         if(!exactCitiy) return;
-
+      }
+      //web work Around
+      if(kIsWeb){
+        var googleMapsAPi =  await LocationService()
+            .getLocationMapDataGoogle2(ortTextcontroller.text);
+        ortMapData = googleMapsAPi[0];
+        selectedCity = true;
       }
 
       if(checkAllValidation(userExist)){
@@ -66,7 +74,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "aboutme": "",
             "sprachen": sprachenAuswahlBox.getSelected(),
             "friendlist": {"empty": true},
-            "token": await FirebaseMessaging.instance.getToken(),
+            "token": !kIsWeb? await  FirebaseMessaging.instance.getToken(): null,
             "error": ortMapData["error"] // web workaround
           };
 
@@ -115,7 +123,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   addCityData(suggestedCities){
-    print(suggestedCities);
     ortMapData = {
       "city" :suggestedCities["city"],
       "countryname" : suggestedCities["countryname"],

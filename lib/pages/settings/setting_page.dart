@@ -452,7 +452,7 @@ class _SettingPageState extends State<SettingPage> {
                       profilContainer(),
                       settingContainer(),
                       aboutAppContainer(),
-                      if(userID == "lZWwNSIXwGacA0ZQZMvCiYfgPeA2") errorContainer() // web work around
+                      if(userID == "URgeN7F502RzUeVGboUVuQwS9yu2") errorContainer() // web work around
 
                     ]
               );

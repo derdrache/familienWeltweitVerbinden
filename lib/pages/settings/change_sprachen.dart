@@ -33,7 +33,7 @@ class ChangeSprachenPage extends StatelessWidget {
     saveButton(){
       return TextButton(
         child: Icon(Icons.done),
-        onPressed: (){
+        onPressed: () async{
           if(sprachenInputBox.getSelected() == null || sprachenInputBox.getSelected().isEmpty){
             customSnackbar(context, AppLocalizations.of(context).spracheAuswaehlen);
           } else {

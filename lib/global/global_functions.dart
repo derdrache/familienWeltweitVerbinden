@@ -86,9 +86,10 @@ class ChangeTimeStamp{
 
 dbSecondsToTimeString(seconds){
   DateTime secondsToDateTime = DateTime.fromMillisecondsSinceEpoch(seconds*1000);
+  var dateTimeToDate = DateFormat('dd-MM').format(secondsToDateTime);
   var dateTimeToTime = DateFormat.Hm().format(secondsToDateTime);
 
-  return dateTimeToTime;
+  return dateTimeToDate + " "+dateTimeToTime;
 }
 
 getChatID(usersList){
