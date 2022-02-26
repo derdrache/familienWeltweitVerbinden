@@ -55,11 +55,13 @@ class PatchnotesWindow{
         children:
 
         isGerman ? [
+          _patch(patch111D),
           _patch(patch110D),
           _patch(patch101D),
           _patch(patch1D),
         ] :
         [
+          _patch(patch111E),
           _patch(patch110E),
           _patch(patch101E),
           _patch(patch1E),
@@ -72,7 +74,14 @@ class PatchnotesWindow{
 var patch111E={
   "title": "1.1.1",
   "inhalt": [
-
+    "Adjustments for the web version",
+    "Added travel type 'Car/Accommodations'",
+    "Added interest 'Worldschooling'",
+    "The map now has a full zoom out button",
+    "Clicking on a map marker automatically zooms in to the next level",
+    "Contact opportunity is only displayed if the user has shared an opportunity",
+    "various translation errors have been fixed",
+    "various small bugs have been fixed"
   ]
 };
 var patch111D = {
