@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
   "Auto/Unterkünfte", "Wohnmobile/Camping", "Boot"];
-List<String> interessenListe = ["Homeschooling", "Freilerner",
+List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling"
   "Gemeinsame Aktivitäten", "Weltreise", "Langsam reisen", "Gemeinsam reisen"];
 List<String> sprachenListe = ["Deutsch", "Englisch"];
 
 List<String> reiseartenEnglisch = ["fixed location", "airplane/housing", "mobile home/camping", "boat"];
-List<String> interessenListeEnglisch = ["homeschooling", "unschooling",
+List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldschooling"
   "joint activities", "world Travel", "travel slowly", "travel together"];
 List<String> sprachenListeEnglisch = ["german", "english"];
 

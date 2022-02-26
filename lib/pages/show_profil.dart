@@ -48,9 +48,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           style: global_style.textButtonStyle(),
           child: const Icon(Icons.message),
           onPressed: () async {
-            //Vereinfachen, das meiste müsste Chat Details machen
             var profilID = await ProfilDatabase().getProfilId("name", widget.profil["name"]);
+            print(profilID);
             var users = [userID, profilID];
+
             var newChat = false;
 
             var groupChatData = await ChatDatabase()
@@ -257,6 +258,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     kontaktProfil(){
       return Container(
+        margin: EdgeInsets.only(top: 10),
         padding: const EdgeInsets.only(left: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,8 +271,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                   fontWeight: FontWeight.bold
               ),
             ),
+            const SizedBox(height: 10),
             widget.profil["emailAnzeigen"] ?
-            Text("Email: " + widget.profil["email"]) : const SizedBox.shrink()
+                Row(children: [
+                  Text("Email: " ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: textSize),),
+                  Text(widget.profil["email"],style: TextStyle(fontSize: textSize))
+                ]) : const SizedBox.shrink()
+
           ],
         ),
       );

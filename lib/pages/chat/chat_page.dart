@@ -69,36 +69,41 @@ class _ChatPageState extends State<ChatPage>{
     );
   }
 
+  searchUser(eingabe, buildContext) async {
+    var chatPartner = eingabe;
+    if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
+      var chatPartnerId = await findUserGetId(eingabe);
+
+      if(chatPartnerId != null){
+        validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId);
+      } else {
+        customSnackbar(buildContext, AppLocalizations.of(context).benutzerNichtGefunden);
+      }
+    }
+  }
+
   Widget personenSuchBox(buildContext){
     var personenSucheController = TextEditingController();
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: SearchAutocomplete(
-        searchableItems: [],
-        onConfirm: (){
-
-        },
-      )
-
-
-      /*Row(
+    return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              child:
-
-              TextFormField(
+              height: 50,
+              width: 200,
+              child: TextField(
                   controller: personenSucheController,
                   decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black),
                       ),
                       border: const OutlineInputBorder(),
-                      hintText: AppLocalizations.of(context)!.personSuchen,
+                      hintText: AppLocalizations.of(context).personSuchen,
                       hintStyle: const TextStyle(fontSize: 12, color: Colors.grey)
-                  )
-
+                  ),
+                  onSubmitted: (eingabe){
+                    searchUser(eingabe, buildContext);
+                  },
               ),
 
             ),
@@ -106,26 +111,13 @@ class _ChatPageState extends State<ChatPage>{
               child: const Icon(Icons.search),
               onPressed: () async {
                 var chatPartner = personenSucheController.text;
-                if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
-                  var chatPartnerId = await findUserGetId(personenSucheController.text);
-
-                  if(chatPartnerId != null){
-                    validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId);
-                  } else {
-                    personenSucheController.clear();
-                    customSnackbar(buildContext, AppLocalizations.of(context)!.benutzerNichtGefunden);
-                  }
-                } else{
-                  personenSucheController.text = "";
-                }
+                searchUser(chatPartner, buildContext);
+                personenSucheController.text = "";
               },
             )
 
 
-          ]),
-
-               */
-    );
+          ]);
   }
 
   List<Widget> createFriendlistBox(userFriendlist){
@@ -144,7 +136,7 @@ class _ChatPageState extends State<ChatPage>{
             child: Container(
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                    border: Border(top: BorderSide(width: 1, color: global_var.borderColorGrey))
+                    border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
                 ),
                 child: Text(friend)
             ),

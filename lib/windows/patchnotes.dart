@@ -69,6 +69,26 @@ class PatchnotesWindow{
 
 }
 
+var patch111E={
+  "title": "1.1.1",
+  "inhalt": [
+
+  ]
+};
+var patch111D = {
+  "title": "1.1.1",
+  "inhalt": [
+    "Anpassungen für die Web Version",
+    "Reiseart 'Auto/Unterkünfte' hinzugefügt",
+    "Interesse 'Worldschooling' hinzugefügt",
+    "Die Karte hat jetzt einen komplett Raus-Zoom-Button",
+    "Beim Klick auf eine Karten Markierung wird in automatisch in die nächste Ebene reingezoomt",
+    "Kontakt-Möglichkeit wird nur angezeigt, wenn der Benutzer eine Möglichkeit freigegeben hat",
+    "verschiedene Übersetzungsfehler wurden behoben",
+    "verschiedene kleine Fehler wurden behoben",
+  ]
+};
+
 var patch110E = {
   "title": "1.1.0",
   "inhalt": [

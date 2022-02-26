@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
@@ -32,6 +33,8 @@ void main()async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseDatabase.instance.setPersistenceEnabled(true);
 
 
   if(!kIsWeb) FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

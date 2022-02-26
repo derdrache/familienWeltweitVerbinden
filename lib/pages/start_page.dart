@@ -1,6 +1,8 @@
+import 'package:familien_suche/pages/umkreis_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'board_page.dart';
@@ -36,7 +38,7 @@ class _StartPageState extends State<StartPage>{
     if(userName != null){
       var userDBEmail = await ProfilDatabase().getOneData(userID, "email");
       var userDeviceTokenDb = await ProfilDatabase().getOneData(userID, "token");
-      var userDeviceTokenReal = await FirebaseMessaging.instance.getToken();
+      var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
 
       if(userAuthEmail != userDBEmail){
         ProfilDatabase().updateProfil(userID, {"email": userAuthEmail});
@@ -135,25 +137,28 @@ class _StartPageState extends State<StartPage>{
             selectedItemColor: Colors.white,
             onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
-              /*
+/*
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Board',
               ),
 
-               */
+
+ */
               const BottomNavigationBarItem(
                 icon: Icon(Icons.map),
                 label: 'World',
               ),
 
-              /*
+/*
               BottomNavigationBarItem(
                 icon: Icon(Icons.location_city),
                 label: 'Dein Umkreis',
               ),
 
-               */
+
+
+ */
               BottomNavigationBarItem(
                 icon: chatIcon(),
                 label: 'Chat',

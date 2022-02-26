@@ -372,6 +372,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 setState(() {
                   changeProfil(position.zoom);
                   mapZoom = position.zoom;
+                  FocusScope.of(context).unfocus();
                 });
             }
           }
@@ -396,7 +397,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
               AsyncSnapshot snapshot,
           ) {
             if (snapshot.hasData ) {
-              print("new Load");
               var allProfils = [];
               allUserName = [];
               var allProfilsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
@@ -431,7 +431,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
                     right: 10,
                     child: FloatingActionButton(
                       child: Icon(Icons.zoom_out_map),
-                      onPressed: () => mapController.move(LatLng(0, 0), minMapZoom),
+                      onPressed: () {
+                        mapController.move(LatLng(0, 0), minMapZoom);
+                        setState(() {
+                          changeProfil(minMapZoom);
+                          mapZoom = minMapZoom;
+                          FocusScope.of(context).unfocus();
+                        });
+
+                      }
                     ),
                   )
                 ]),

@@ -52,19 +52,15 @@ class _BoardPageState extends State<BoardPage>{
 
   }
 
-  checkCountries() async{
-      var city = "Playa del Carmen";
-      var google = await LocationService().getLocationMapDataGoogle2(city);
-      //var position = await LocationService().getCountryLocation(google["countryname"]);
-      print(google);
-     // print(position);
-
-  }
 
   Widget build(BuildContext context){
     return Scaffold(
       body: FloatingActionButton(
-          onPressed: () => checkCountries(),
+          onPressed: () async{
+            var userId = FirebaseAuth.instance.currentUser.uid;
+            var profil = await ProfilDatabase().getProfilId("name", "Dominik");
+            print(profil);
+          },
         ),
       );
   }
