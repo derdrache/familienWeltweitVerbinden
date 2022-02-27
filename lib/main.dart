@@ -69,7 +69,9 @@ class MyApp extends StatelessWidget {
 
     FirebaseMessaging.instance.getInitialMessage().then((value){
       if(value != null){
-        print("Seitenwechsel getInitalMessage");
+        var chatId = value.data["chatId"];
+
+        changeToChat(chatId);
       }
     });
 

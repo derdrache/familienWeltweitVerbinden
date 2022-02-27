@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
   "Auto/Unterkünfte", "Wohnmobile/Camping", "Boot"];
-List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling"
+List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
   "Gemeinsame Aktivitäten", "Weltreise", "Langsam reisen", "Gemeinsam reisen"];
 List<String> sprachenListe = ["Deutsch", "Englisch"];
 
-List<String> reiseartenEnglisch = ["fixed location", "airplane/housing", "mobile home/camping", "boat"];
-List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldschooling"
+List<String> reiseartenEnglisch = ["fixed location", "airplane/housing",
+  "car/housing","mobile home/camping", "boat"];
+List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldschooling",
   "joint activities", "world Travel", "travel slowly", "travel together"];
 List<String> sprachenListeEnglisch = ["german", "english"];
 
@@ -34,9 +35,7 @@ changeGermanToEnglish(list){
   if(checkList.isEmpty) return list;
 
   for(var i = 0; i < list.length; i++){
-
     var index = checkList.indexOf(list[i]);
-
     englishOutputList.add(englishList[index]);
   }
 

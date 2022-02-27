@@ -38,23 +38,15 @@ class _StartPageState extends State<StartPage>{
   }
 
   _asyncMethod() async{
-    var updateInformation = await InAppUpdate.checkForUpdate();
-
-    if(updateInformation.updateAvailability ==
-        UpdateAvailability.updateAvailable && !kIsWeb){
-      InAppUpdate.performImmediateUpdate();
+    try{
+      var updateInformation = await InAppUpdate.checkForUpdate();
+      if(updateInformation.updateAvailability ==
+          UpdateAvailability.updateAvailable && !kIsWeb){
+        InAppUpdate.performImmediateUpdate();
+      }
+    } catch (error){
+      print("kein Playstore");
     }
-    /*
-    packageInfo = await PackageInfo.fromPlatform();
-    String buildNummer = packageInfo.buildNumber;
-
-    if(int.parse(buildNummer) < 6){
-      print("go");
-      InAppUpdate.performImmediateUpdate()
-    }
-
-     */
-
 
 
     if(userName != null){
@@ -67,6 +59,7 @@ class _StartPageState extends State<StartPage>{
       }
 
       if(userDeviceTokenDb != userDeviceTokenReal){
+
         ProfilDatabase().updateProfil(userID, {"token": userDeviceTokenReal});
       }
     }

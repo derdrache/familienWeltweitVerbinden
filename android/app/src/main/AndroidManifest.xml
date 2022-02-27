@@ -2,7 +2,7 @@
     package="com.example.familien_suche">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="Connect Families"
+        android:label="Families worldwide"
         android:icon="@mipmap/ic_launcher">
 
         <activity

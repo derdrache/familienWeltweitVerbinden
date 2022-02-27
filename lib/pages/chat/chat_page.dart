@@ -242,7 +242,7 @@ class _ChatPageState extends State<ChatPage>{
                 width: double.infinity,
                 decoration: BoxDecoration(
                     border: Border(
-                      top: BorderSide(width: 1, color: global_var.borderColorGrey),
+                      bottom: BorderSide(width: 1, color: global_var.borderColorGrey),
                     )
                 ),
               child: Column(
