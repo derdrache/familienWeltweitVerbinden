@@ -239,7 +239,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       var myFocusNode = FocusNode();
       return Container(
         height: messageInputHeight,
-        padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
+        padding: const EdgeInsets.only(left: 10),
         decoration: BoxDecoration(
             color: Colors.white,
             border: const Border(top: BorderSide(color: Colors.grey)),
@@ -256,24 +256,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              child: TextField(
-                maxLines: null,
-                focusNode: myFocusNode,
-                textInputAction: TextInputAction.newline,
-                controller: nachrichtController,
-                decoration: InputDecoration.collapsed(
-                  hintText: AppLocalizations.of(context).nachricht,
-                ),
-                onChanged: (value) {
-                    var newLineCounts = countItemsInList(value, "\n");
+              child: Container(
+                child: TextField(
+                  maxLines: null,
+                  focusNode: myFocusNode,
+                  textInputAction: TextInputAction.newline,
+                  controller: nachrichtController,
+                  decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context).nachricht,
+                  ),
+                  onChanged: (value) {
+                      var newLineCounts = countItemsInList(value, "\n");
 
-                    if(countItemsInList(value, "\n") != messageRows){
-                      setState(() {
-                        messageInputHeight = 50.0 + newLineCounts * 15.0;
-                        messageRows = newLineCounts;
-                      });
-                    }
-                },
+                      if(countItemsInList(value, "\n") != messageRows){
+                        setState(() {
+                          messageInputHeight = 50.0 + newLineCounts * 15.0;
+                          messageRows = newLineCounts;
+                        });
+                      }
+                  },
+                ),
               ),
             ),
             IconButton(
