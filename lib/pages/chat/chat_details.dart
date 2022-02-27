@@ -131,7 +131,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   openProfil() async{
     var chatPartnerProfil = await ProfilDatabase().getProfil(chatPartnerID);
-    var userFriendlist = await ProfilDatabase().getOneData(userId, "friendlist");
+    var userFriendlistData = await ProfilDatabase().getOneData(userId, "friendlist");
+    var userFriendlist = Map<String, bool>.from(userFriendlistData);
 
     changePage(context, ShowProfilPage(
       userName: userName,

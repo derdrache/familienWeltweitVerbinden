@@ -130,8 +130,8 @@ class _SettingPageState extends State<SettingPage> {
               child: TextButton(
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
-                    global_functions.changePage(context, const LoginPage());
                     setState(() {});
+                    global_functions.changePageForever(context, const LoginPage());
                   },
                   child: Text(AppLocalizations.of(context).abmelden, style: TextStyle(color: textColor)))
           ),
@@ -328,8 +328,8 @@ class _SettingPageState extends State<SettingPage> {
                           context, PrivacySecurityPage(profil: userProfil)
                       )
               ),
-              const SizedBox(height: 20),
-              settingThemeContainer(AppLocalizations.of(context).benachrichtigungen, Icons.notifications,
+              if(!kIsWeb) const SizedBox(height: 20),
+              if(!kIsWeb) settingThemeContainer(AppLocalizations.of(context).benachrichtigungen, Icons.notifications,
                       () => global_functions.changePage(
                       context, NotificationsOptionsPage(profil: userProfil)
                   )
@@ -385,7 +385,7 @@ class _SettingPageState extends State<SettingPage> {
                     children: [
                       const Icon(Icons.card_giftcard),
                       const SizedBox(width: 20),
-                      Text(AppLocalizations.of(context).spenden)
+                      Text(AppLocalizations.of(context).spenden, style: TextStyle(fontSize: fontSize-4))
                     ],
                   ),
                 ),

@@ -27,9 +27,11 @@ class FeedbackPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     beschreibungsText(){
-      return Container(
-        margin: EdgeInsets.all(30),
-        child: Text(AppLocalizations.of(context).feedbackText)
+      return Center(
+        child: Container(
+          margin: EdgeInsets.all(30),
+          child: Text(AppLocalizations.of(context).feedbackText)
+        ),
       );
     }
 
@@ -43,11 +45,14 @@ class FeedbackPage extends StatelessWidget {
     }
 
     feedbackSendenButton(){
-      return Container(
-        margin: EdgeInsets.all(10),
-        child: FloatingActionButton.extended(
-            onPressed: () => feedbackSendenAndClose(context),
-            label: Text(AppLocalizations.of(context).senden)
+      return Align(
+        child: Container(
+          width: 200,
+          margin: EdgeInsets.all(10),
+          child: FloatingActionButton.extended(
+              onPressed: () => feedbackSendenAndClose(context),
+              label: Text(AppLocalizations.of(context).senden)
+          ),
         ),
       );
     }

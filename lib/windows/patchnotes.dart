@@ -55,12 +55,14 @@ class PatchnotesWindow{
         children:
 
         isGerman ? [
+          _patch(patch112D),
           _patch(patch111D),
           _patch(patch110D),
           _patch(patch101D),
           _patch(patch1D),
         ] :
         [
+          _patch(patch112E),
           _patch(patch111E),
           _patch(patch110E),
           _patch(patch101E),
@@ -70,6 +72,20 @@ class PatchnotesWindow{
   }
 
 }
+
+var patch112E= {
+  "title": "1.1.2",
+  "inhalt": {[
+    "- final preparations for release"
+]}
+};
+var patch112D= {
+  "title": "1.1.2",
+  "inhalt": {[
+    "- letzte Vorbereitungen für die Veröffentlichung"
+  ]}
+};
+
 
 var patch111E={
   "title": "1.1.1",
