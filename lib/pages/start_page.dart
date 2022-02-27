@@ -43,10 +43,12 @@ class _StartPageState extends State<StartPage>{
       if(updateInformation.updateAvailability ==
           UpdateAvailability.updateAvailable && !kIsWeb){
         InAppUpdate.performImmediateUpdate();
+
       }
     } catch (error){
       print("kein Playstore");
     }
+
 
 
     if(userName != null){
