@@ -397,7 +397,7 @@ class _SettingPageState extends State<SettingPage> {
 
 
     return StreamBuilder(
-          stream: ProfilDatabase().getProfilStream(userID),
+          stream: ProfilDatabase().getProfil("id", userID),
           builder: (
           BuildContext context,
           AsyncSnapshot snapshot,

@@ -33,19 +33,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   double mapZoom = 1.6;
   double cityZoom = 6.5;
   dynamic searchAutocomplete = SizedBox.shrink();
-  var buildIsLoaded = false;
 
-  @override
-  void initState (){
-    super.initState();
-
-    WidgetsBinding.instance?.addPostFrameCallback((_){
-      buildIsLoaded = true;
-
-
-    });
-
-  }
 
   getOwnProfil(profil){
     var userEmail = FirebaseAuth.instance.currentUser.email;
@@ -162,25 +150,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
       profilsCities = pufferProfilCities;
       profilsBetween = pufferProfilBetween;
       profilCountries = pufferProfilCountries;
+
       changeProfil(mapZoom);
 
-    buildAfterLoaded();
+
   }
 
-  buildAfterLoaded() async{
-    if(buildIsLoaded){
-      buildIsLoaded = false;
-
-      searchAutocomplete =  SearchAutocomplete(
-        searchableItems: global_var.reisearten + global_var.interessenListe +
-            global_var.sprachenListe + allUserName,
-        onConfirm: () => changeMapFilter(),
-        onDelete:() => changeMapFilter() ,
-      );
-
-      setState(() {});
-    }
-  }
 
   changeProfil(zoom){
     var choosenProfils = [];
@@ -193,7 +168,10 @@ class _ErkundenPageState extends State<ErkundenPage>{
       choosenProfils = profilCountries;
     }
 
-    aktiveProfils = choosenProfils;
+
+    setState(() {
+      aktiveProfils = choosenProfils;
+    });
   }
 
   checkFilter(profil){
@@ -390,31 +368,40 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
 
-    return StreamBuilder(
-          stream: ProfilDatabase().getAllProfilsStream(),
+    return FutureBuilder(
+          future: ProfilDatabase().getAllProfils(),
           builder: (
               BuildContext context,
               AsyncSnapshot snapshot,
           ) {
             if (snapshot.hasData ) {
+              profils = snapshot.data;
               var allProfils = [];
               allUserName = [];
-              var allProfilsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
 
-              allProfilsMap.forEach((key, value) {
+              //userProfil
+              //allUserName
+              //filter
 
-                if(getOwnProfil(value) != null) {
-                  ownProfil = getOwnProfil(value);
-                } else{
-                  allUserName.add(value["name"]);
+              for(var profil in profils){
+                if(getOwnProfil(profil) != null){
+                  ownProfil = getOwnProfil(profil);
+                  //allUserName.remove(ownProfil);
+                } else {
+                  allUserName.add(profil["name"]);
                 }
-              });
+              }
 
-              allProfilsMap.forEach((key, value) {
-                if(checkFilter(value) && ownProfil != value && value["error"] != true){
-                  allProfils.add(value);
-                }
-              });
+              searchAutocomplete =  SearchAutocomplete(
+                searchableItems: global_var.reisearten + global_var.interessenListe +
+                    global_var.sprachenListe + allUserName,
+                onConfirm: () => changeMapFilter(),
+                onDelete:() => changeMapFilter() ,
+              );
+
+              for(var profil in profils){
+                if(checkFilter(profil)) allProfils.add(profil);
+              }
 
 
               profils = allProfils;

@@ -208,8 +208,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     showMessages(){
 
-      return StreamBuilder(
-          stream: ChatDatabase().getAllMessagesStream(chatID),
+      return FutureBuilder(
+          future: ChatDatabase().getAllMessages(chatID),
           builder: (
               BuildContext context,
               AsyncSnapshot snap,

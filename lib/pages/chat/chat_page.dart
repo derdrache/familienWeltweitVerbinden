@@ -312,9 +312,8 @@ class _ChatPageState extends State<ChatPage>{
       body: Container(
         padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
         child:
-            StreamBuilder(
-              stream: ChatDatabase()
-                  .getAllChatgroupsFromUserStream(userId, userName),
+            FutureBuilder(
+              future: ChatDatabase().getAllChatgroupsFromUser(userId),
                 builder: (
                     BuildContext context,
                     AsyncSnapshot snapshot,

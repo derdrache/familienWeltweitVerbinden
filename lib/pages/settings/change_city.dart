@@ -34,10 +34,8 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       "longt": locationData["longt"],
       "latt": locationData["latt"],
       "land": locationData["countryname"],
-      "error": locationData["error"] // web workaround
     };
-
-    ProfilDatabase().updateProfil(widget.userId, locationDict);
+    ProfilDatabase().updateProfilLocation(widget.userId, locationDict);
   }
 
   saveLocation() async {
