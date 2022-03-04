@@ -86,11 +86,6 @@ class LocationService {
       return allSuggests;
 
     }catch (error){
-      //Web Workaround
-      return [{
-        "city": input,
-        "error": true
-      }];
     }
   }
 

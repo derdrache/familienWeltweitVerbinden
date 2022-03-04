@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +15,8 @@ import '../services/database.dart';
 import 'start_page.dart';
 
 class CreateProfilPage extends StatefulWidget {
+
+
   const CreateProfilPage({Key key}) : super(key: key);
 
   @override
@@ -27,20 +30,35 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var ortTextcontroller = TextEditingController();
   bool lookInMaps = false;
   var ortMapData = {};
-  var sprachenAuswahlBox = CustomMultiTextForm(
-    auswahlList: global_variablen.sprachenListe);
-  var reiseArtenAuswahlBox = CustomDropDownButton(
-      items: global_variablen.reisearten);
-  var interessenAuswahlBox = CustomMultiTextForm(
-    auswahlList: global_variablen.interessenListe);
+  var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+  var sprachenAuswahlBox = CustomMultiTextForm();
+  var reiseArtenAuswahlBox = CustomDropDownButton();
+  var interessenAuswahlBox = CustomMultiTextForm();
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
   var windowSetState;
 
 
+  @override
+  void initState() {
+    sprachenAuswahlBox = CustomMultiTextForm(
+        auswahlList: isGerman ?
+        global_variablen.sprachenListe : global_variablen.sprachenListeEnglisch
+    );
+    reiseArtenAuswahlBox = CustomDropDownButton(
+      items: isGerman ?
+      global_variablen.reisearten : global_variablen.reiseartenEnglisch,
+    );
+    interessenAuswahlBox = CustomMultiTextForm(
+        auswahlList: isGerman ?
+        global_variablen.interessenListe : global_variablen.interessenListeEnglisch
+    );
+    super.initState();
+  }
+
   saveFunction()async {
     if(_formKey.currentState.validate()){
-      var userExist = await ProfilDatabase()
-          .getProfilId("name", userNameKontroller.text) != null;
+      var userExist = await ProfilDatabase().getOneData("id", "name", userNameKontroller.text) != null;
+      // bzw. false?
 
       if(!lookInMaps && !kIsWeb){
 
@@ -61,8 +79,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         var userName = userNameKontroller.text;
         if(selectedCity){
           var data = {
+            "id": userID,
             "email": email,
-            "emailAnzeigen": false,
             "name": userName,
             "ort": ortMapData["city"], //groß und kleinschreibung?
             "interessen": interessenAuswahlBox.getSelected(),
@@ -71,14 +89,11 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "longt": ortMapData["longt"],
             "latt":  ortMapData["latt"],
             "reiseart": reiseArtenAuswahlBox.getSelected(),
-            "aboutme": "",
             "sprachen": sprachenAuswahlBox.getSelected(),
-            "friendlist": {"empty": true},
             "token": !kIsWeb? await  FirebaseMessaging.instance.getToken(): null,
-            "error": ortMapData["error"] // web workaround
           };
 
-          ProfilDatabase().addNewProfil(userID, data);
+          ProfilDatabase().addNewProfil(data);
           global_functions.changePageForever(context, StartPage(registered: true));
         } else{
           customSnackbar(context, AppLocalizations.of(context).stadtNichtBestaetigt);
@@ -183,6 +198,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         }
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

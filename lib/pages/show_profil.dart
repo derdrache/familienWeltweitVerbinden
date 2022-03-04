@@ -48,8 +48,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           style: global_style.textButtonStyle(),
           child: const Icon(Icons.message),
           onPressed: () async {
-            var profilID = await ProfilDatabase().getProfilId("name", widget.profil["name"]);
-            print(profilID);
+            var profilID = await ProfilDatabase().getOneData("id", "name", widget.profil["name"]);
+
             var users = [userID, profilID];
 
             var newChat = false;
@@ -96,9 +96,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
             customSnackbar(context, snackbarText, color: Colors.green);
 
-            ProfilDatabase().updateProfil(
-                userID, {"friendlist": widget.userFriendlist}
-            );
+            ProfilDatabase().updateProfil(userID, "friendlist", widget.userFriendlist);
+
 
             setState(() {
               widget.userFriendlist.keys.contains(widget.profil["name"]);

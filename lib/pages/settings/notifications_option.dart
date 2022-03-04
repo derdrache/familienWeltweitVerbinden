@@ -31,10 +31,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
                 widget.profil["notificationstatus"] = value;
               });
 
-              ProfilDatabase().updateProfil(
-                  userId,
-                  {"notificationstatus": value}
-              );
+              ProfilDatabase().updateProfil(userId, "notificationstatus", value);
 
             })
       ],

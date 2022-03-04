@@ -29,8 +29,7 @@ class ChangeChildrenPage extends StatelessWidget {
             customSnackbar(context, AppLocalizations.of(context).geburtsdatumEingeben);
           } else{
             ProfilDatabase().updateProfil(
-                userId, {"kinder": childrenBirthdatePickerBox.getDates()}
-            );
+                userId, "kinder", childrenBirthdatePickerBox.getDates());
             Navigator.pop(context);
           }
         },

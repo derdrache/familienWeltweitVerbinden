@@ -25,7 +25,7 @@ class _ChatPageState extends State<ChatPage>{
 
 
   selectChatpartnerWindow() async {
-    var userFriendlist = await ProfilDatabase().getOneData(userId, "friendlist");
+    var userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
 
     return showDialog(
         context: context,
@@ -149,8 +149,8 @@ class _ChatPageState extends State<ChatPage>{
 
 
   findUserGetId(user) async {
-    var foundOnName = await ProfilDatabase().getProfilId("name", user);
-    var foundOnEmail = await ProfilDatabase().getProfilId("email", user);
+    var foundOnName = await ProfilDatabase().getOneData("id", "name", user);
+    var foundOnEmail = await ProfilDatabase().getOneData("id", "email", user);
 
     if(foundOnName != null) return foundOnName;
     if(foundOnEmail != null) return foundOnEmail;
@@ -159,9 +159,9 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   validCheckAndOpenChatgroup({chatPartnerID, name}) async {
-    if(name != null) chatPartnerID = await ProfilDatabase().getProfilId("name", name);
+    if(name != null) chatPartnerID = await ProfilDatabase().getOneData("id", "name", name);
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
-    var chatPartnerName = await ProfilDatabase().getOneData(chatPartnerID, "name");
+    var chatPartnerName = await ProfilDatabase().getOneData("name", "id", chatPartnerID);
 
     var userData = {
       "users": {
@@ -198,14 +198,14 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   checkNewMessageCounter() async{
-    var dbNewMessages = await ProfilDatabase().getOneData(userId, "newMessages");
+    var dbNewMessages = await ProfilDatabase().getOneData("newMessages", "id", userId);
     num realNewMessages = 0;
     for(var group in globalChatGroups){
       realNewMessages += group["users"][userId]["newMessages"];
     }
 
     if(dbNewMessages != realNewMessages){
-      ProfilDatabase().updateProfil(userId, {"newMessages": realNewMessages});
+      ProfilDatabase().updateProfil(userId, "newMessages", realNewMessages);
     }
 
   }

@@ -37,9 +37,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       "error": locationData["error"] // web workaround
     };
 
-    ProfilDatabase().updateProfil(
-        widget.userId, locationDict
-    );
+    ProfilDatabase().updateProfil(widget.userId, locationDict);
   }
 
   saveLocation() async {

@@ -35,7 +35,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   void dispose() {
-    ProfilDatabase().updateProfil(userId, {"activeChat": null});
+    ProfilDatabase().updateProfil(userId, "activeChat", "");
     super.dispose();
   }
   @override
@@ -61,7 +61,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   }
 
   writeActiveChat(){
-    ProfilDatabase().updateProfil(userId, {"activeChat": chatID});
+    ProfilDatabase().updateProfil(userId, "activeChat", chatID);
   }
 
   resetNewMessageCounter() async {
@@ -70,14 +70,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     if(usersChatNewMessages == 0) return;
 
 
-    var usersAllNewMessages = await ProfilDatabase().getOneData(userId, "newMessages");
+    var usersAllNewMessages = await ProfilDatabase().getOneData("newMessages","id",userId);
 
-
-    ChatDatabase().updateNewMessageCounter(chatID, userId, 0);
     ProfilDatabase().updateProfil(
-        userId,
-        {"newMessages": usersAllNewMessages - usersChatNewMessages < 0? 0:
-                        usersAllNewMessages - usersChatNewMessages}
+        userId, "newMessages", usersAllNewMessages - usersChatNewMessages < 0? 0:
+        usersAllNewMessages - usersChatNewMessages
+    );
+
+    widget.groupChatData["users"][userId]["newMessages"] = 0;
+    ChatDatabase().updateChatGroup(
+        widget.groupChatData["id"], "users",
+        widget.groupChatData
     );
 
   }
@@ -103,13 +106,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         chatID = widget.groupChatData["id"];
       });
     } else {
-      await ChatDatabase().updateChatGroup(
-          widget.groupChatData["id"],
-          {
-            "lastMessage": messageData["message"],
-            "lastMessageDate": messageData["date"],
-          }
-      );
+      ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessage", messageData["message"]);
+      ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessageDate", messageData["date"]);
     }
 
     ChatDatabase().addNewMessage(widget.groupChatData, messageData);
@@ -130,8 +128,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   }
 
   openProfil() async{
-    var chatPartnerProfil = await ProfilDatabase().getProfil(chatPartnerID);
-    var userFriendlistData = await ProfilDatabase().getOneData(userId, "friendlist");
+    var chatPartnerProfil = await ProfilDatabase().getProfil("id", chatPartnerID);
+    var userFriendlistData = await ProfilDatabase().getOneData("friendlist","id",userId);
     var userFriendlist = Map<String, bool>.from(userFriendlistData);
 
     changePage(context, ShowProfilPage(

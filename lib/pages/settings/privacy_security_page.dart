@@ -33,9 +33,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                   widget.profil["emailAnzeigen"] = value;
                 });
                 ProfilDatabase().updateProfil(
-                    userID,
-                    {"emailAnzeigen": widget.profil["emailAnzeigen"]}
-                );
+                    userID, "emailAnzeigen", widget.profil["emailAnzeigen"]);
               })
         ],
       );

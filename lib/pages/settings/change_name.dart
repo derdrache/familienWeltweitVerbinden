@@ -21,7 +21,7 @@ class ChangeNamePage extends StatelessWidget {
             customSnackbar(context, AppLocalizations.of(context).neuenNamenEingeben);
           } else{
             var userName = FirebaseAuth.instance.currentUser.displayName;
-            var checkUserProfilExist = await ProfilDatabase().getProfilFromName(nameKontroller.text);
+            var checkUserProfilExist = await ProfilDatabase().getProfil("name", nameKontroller.text);
 
             if(checkUserProfilExist == null){
               ProfilDatabase().updateProfilName(
