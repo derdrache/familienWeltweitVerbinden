@@ -16,7 +16,7 @@ import '../services/database.dart';
 class ShowProfilPage extends StatefulWidget {
   var userName;
   var profil;
-  Map<String, bool> userFriendlist = {"empty": true};
+  var userFriendlist = [];
   var ownProfil;
 
 
@@ -57,7 +57,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             var groupChatData = await ChatDatabase()
                 .getChat(global_functions.getChatID(users));
 
-            if(groupChatData == null){
+            if(groupChatData == false){
               newChat = true;
               groupChatData = {
                 "users": {
@@ -76,7 +76,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     friendButton(){
-      var onFriendlist = widget.userFriendlist.keys.contains(widget.profil["name"]);
+      var onFriendlist = widget.userFriendlist != null?
+        widget.userFriendlist.contains(widget.profil["name"]) : false;
 
       return TextButton(
           style: global_style.textButtonStyle(),
@@ -87,10 +88,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             if(onFriendlist){
               widget.userFriendlist.remove(widget.profil["name"]);
               snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistEntfernt;
-              if(widget.userFriendlist.keys.isEmpty) widget.userFriendlist = {"empty": true};
+              if(widget.userFriendlist.isEmpty) widget.userFriendlist = [];
             } else {
-              if(widget.userFriendlist["empty"] == true) widget.userFriendlist = {widget.profil["name"]: true};
-              widget.userFriendlist[widget.profil["name"]] = true;
+              widget.userFriendlist.add(widget.profil["name"]);
               snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistHinzugefuegt;
             }
 
@@ -99,9 +99,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             ProfilDatabase().updateProfil(userID, "friendlist", widget.userFriendlist);
 
 
-            setState(() {
-              widget.userFriendlist.keys.contains(widget.profil["name"]);
-            });
+            setState(() {});
 
           }
       );

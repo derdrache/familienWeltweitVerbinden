@@ -71,8 +71,6 @@ class _BoardPageState extends State<BoardPage>{
       body: FloatingActionButton(
         onPressed: () async {
 
-          ProfilDatabase().updateProfilName("userID1", "dominik", "dekar");
-
         },
       )
     );

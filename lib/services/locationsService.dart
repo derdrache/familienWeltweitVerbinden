@@ -46,20 +46,16 @@ class LocationService {
     var deviceLanguage = kIsWeb? window.locale.languageCode :  Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
     var allSuggests = [];
+    var inputList = input.split(" ");
+    input = inputList.join("_");
 
     try{
+      var url = "https://families-worldwide.com/database/googleAPI.php";
+      var zusatz = "?param1=$google_key&param2=$input&param3=$sprache";
 
-      var url = 'https://maps.googleapis.com/maps/api/place/findplacefromtext/'
-          'json?input=$input&inputtype=textquery&'
-          'fields=formatted_address%2Cgeometry&'
-          'language=$sprache&key=$google_key';
-
-      var response = await http.get(Uri.parse(url), headers: {
-        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-      });
-
-      var json = convert.jsonDecode(response.body);
-      var results = json["candidates"];
+      var response = await http.get(Uri.parse(url + zusatz), headers: {"Accept": "application/json"});
+      var data = json.decode(response.body);
+      var results = data["candidates"];
 
       for(var result in results){
         var formattedAddressList = result["formatted_address"].split(", ");
@@ -86,6 +82,7 @@ class LocationService {
       return allSuggests;
 
     }catch (error){
+
     }
   }
 

@@ -60,17 +60,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var userExist = await ProfilDatabase().getOneData("id", "name", userNameKontroller.text) != "";
 
 
-      if(!lookInMaps && !kIsWeb){
-
+      if(!lookInMaps){
         bool exactCitiy = await openSelectCityWindow();
         if(!exactCitiy) return;
-      }
-      //web work Around
-      if(kIsWeb){
-        var googleMapsAPi =  await LocationService()
-            .getLocationMapDataGoogle2(ortTextcontroller.text);
-        ortMapData = googleMapsAPi[0];
-        selectedCity = true;
       }
 
       if(checkAllValidation(userExist)){

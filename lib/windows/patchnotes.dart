@@ -76,13 +76,13 @@ class PatchnotesWindow{
 var patch112E= {
   "title": "1.1.2",
   "inhalt": [
-    "- final preparations for release"
+    "final preparations for release"
 ]
 };
 var patch112D= {
   "title": "1.1.2",
   "inhalt": [
-    "- letzte Vorbereitungen für die Veröffentlichung"
+    "letzte Vorbereitungen für die Veröffentlichung"
   ]
 };
 
