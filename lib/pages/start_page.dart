@@ -52,17 +52,17 @@ class _StartPageState extends State<StartPage>{
 
 
     if(userName != null){
-      var userDBEmail = await ProfilDatabase().getOneData(userID, "email");
-      var userDeviceTokenDb = await ProfilDatabase().getOneData(userID, "token");
+      var userDBEmail = await ProfilDatabase().getOneData("email","id",userID);
+      var userDeviceTokenDb = await ProfilDatabase().getOneData("token","id",userID);
       var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
 
       if(userAuthEmail != userDBEmail){
-        ProfilDatabase().updateProfil(userID, {"email": userAuthEmail});
+        ProfilDatabase().updateProfil(userID, "email",userAuthEmail);
       }
 
       if(userDeviceTokenDb != userDeviceTokenReal){
 
-        ProfilDatabase().updateProfil(userID, {"token": userDeviceTokenReal});
+        ProfilDatabase().updateProfil(userID, "token", userDeviceTokenReal);
       }
     }
 
@@ -84,7 +84,7 @@ class _StartPageState extends State<StartPage>{
 
   Widget build(BuildContext context){
     List<Widget> tabPages = <Widget>[
-      //BoardPage(),
+      BoardPage(),
       ErkundenPage(),
       //UmkreisPage(),
       ChatPage(),
@@ -150,19 +150,19 @@ class _StartPageState extends State<StartPage>{
             child: tabPages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
             backgroundColor: Theme.of(context).colorScheme.primary,
             currentIndex: widget.selectedIndex,
             selectedItemColor: Colors.white,
             onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
-/*
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Board',
               ),
 
 
- */
+
               const BottomNavigationBarItem(
                 icon: Icon(Icons.map),
                 label: 'World',

@@ -19,8 +19,7 @@ class ChangeAboutmePage extends StatelessWidget {
       return TextButton(
         child: Icon(Icons.done),
         onPressed: (){
-          ProfilDatabase().updateProfil(
-              userId, {"aboutme": bioTextKontroller.text});
+          ProfilDatabase().updateProfil(userId, "aboutme", bioTextKontroller.text);
           Navigator.pop(context);
         }
       );

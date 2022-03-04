@@ -36,7 +36,7 @@ class ChangeReiseartPage extends StatelessWidget {
             customSnackbar(context, AppLocalizations.of(context).reiseartAuswaehlen);
           } else if(reiseArtInput.getSelected() != oldInput ){
             ProfilDatabase().updateProfil(
-                userId, {"reiseart": reiseArtInput.getSelected()}
+                userId, "reiseart", reiseArtInput.getSelected()
             );
             Navigator.pop(context);
           }

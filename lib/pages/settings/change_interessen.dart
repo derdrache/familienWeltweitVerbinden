@@ -38,8 +38,7 @@ class ChangeInteressenPage extends StatelessWidget {
             customSnackbar(context, AppLocalizations.of(context).interessenAuswaehlen);
           } else {
             ProfilDatabase().updateProfil(
-                userId, {"interessen": interessenInputBox.getSelected()}
-            );
+                userId, "interessen", interessenInputBox.getSelected());
             Navigator.pop(context);
           }
 

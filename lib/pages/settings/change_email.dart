@@ -52,8 +52,7 @@ class ChangeEmailPage extends StatelessWidget {
               return;
             }
 
-            var emailInUse = await ProfilDatabase()
-                .getProfilId("email", emailKontroller.text);
+            var emailInUse = await ProfilDatabase().getOneData("id", "email", emailKontroller.text);
             if (emailInUse != null){
               customSnackbar(context, AppLocalizations.of(context).emailInBenutzung);
               return;
@@ -67,9 +66,7 @@ class ChangeEmailPage extends StatelessWidget {
 
             FirebaseAuth.instance.currentUser?.updateEmail(emailKontroller.text);
 
-            ProfilDatabase().updateProfil(
-                userId, {"email":emailKontroller.text }
-            );
+            ProfilDatabase().updateProfil(userId,"email",emailKontroller.text);
             Navigator.pop(context);
       });
     }
