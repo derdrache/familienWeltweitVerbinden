@@ -214,6 +214,8 @@ class ProfilDatabase{
       "sprachen": json.encode(profilData["sprachen"]),
       "token": profilData["token"],
     }));
+
+    FirebaseAuth.instance.currentUser.updateDisplayName(profilData["name"]);
   }
 
   updateProfil(userId, change,  data) async {
@@ -275,7 +277,7 @@ class ProfilDatabase{
     return responseBody;
   }
   
-  updateProfilName(userId, oldName, newName) async {
+  updateProfilName(userId, oldName, newName) async{
     FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
     updateProfil(userId, "name", newName);
 
@@ -299,6 +301,18 @@ class ProfilDatabase{
 
       updateProfil(profil["id"], "friendlist", friendlist);
     }
+  }
+
+  updateProfilLocation(userId, locationDict){
+    var url = Uri.parse(databaseUrl + "database/profils/updateProfilLocation.php");
+
+    http.post(url, body: json.encode({
+      "id": userId,
+      "land": locationDict["countryname"],
+      "city": locationDict["ort"],
+      "longt":locationDict["longt"],
+      "latt": locationDict["latt"]
+    }));
   }
 
 }

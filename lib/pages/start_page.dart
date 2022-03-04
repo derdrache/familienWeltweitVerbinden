@@ -100,15 +100,14 @@ class _StartPageState extends State<StartPage>{
     }
 
     chatIcon(){
-      return StreamBuilder(
-          stream: ProfilDatabase().getNewMessagesStream(userID),
+      return FutureBuilder(
+          future: ProfilDatabase().getOneData("newMessages", "id", userID),
           builder: (
               BuildContext context,
               AsyncSnapshot snap,
               ){
               if(snap.hasData) {
-                if (snap.data.snapshot.value != null && snap.data.snapshot.value != 0) {
-                  var newMessages = snap.data.snapshot.value;
+                  var newMessages = snap.data;
                   return Stack(
                     clipBehavior: Clip.none, children: <Widget>[
                     const Icon(Icons.chat),
@@ -135,7 +134,6 @@ class _StartPageState extends State<StartPage>{
                     )
                   ],
                   );
-                }
                 return const Icon(Icons.chat);
               }
               return const Icon(Icons.chat);
