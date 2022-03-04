@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -35,6 +37,39 @@ class _ErkundenPageState extends State<ErkundenPage>{
   dynamic searchAutocomplete = SizedBox.shrink();
 
 
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
+
+    super.initState();
+  }
+
+  _asyncMethod() async{
+    profils = await ProfilDatabase().getAllProfils();
+
+    allUserName = [];
+
+    for(var profil in profils){
+
+      if(getOwnProfil(profil) != null){
+        ownProfil = getOwnProfil(profil);
+        //allUserName.remove(ownProfil);
+      } else {
+        allUserName.add(profil["name"]);
+      }
+    }
+
+    searchAutocomplete =  SearchAutocomplete(
+      searchableItems: global_var.reisearten + global_var.interessenListe +
+          global_var.sprachenListe + allUserName,
+      onConfirm: () => changeMapFilter(),
+      onDelete:() => changeMapFilter() ,
+    );
+
+    createAndSetZoomProfils();
+  }
+
+
   getOwnProfil(profil){
     var userEmail = FirebaseAuth.instance.currentUser.email;
 
@@ -49,7 +84,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       var abstand = 1.5;
 
       for(var i = 0; i< list.length; i++){
-        double originalLatt = profil["latt"];
+        double originalLatt =  profil["latt"];
         double newLatt = list[i]["latt"];
         double originalLongth = profil["longt"];
         double newLongth = list[i]["longt"];
@@ -67,8 +102,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         list.add({
           "ort": profil["ort"],
           "name": "1",
-          "latt": profil["latt"],
-          "longt": profil["longt"],
+          "latt": double.parse(profil["latt"]),
+          "longt": double.parse(profil["longt"]),
           "profils": [profil]
         });
       }
@@ -91,8 +126,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         list.add({
           "ort": profil["ort"],
           "name": "1",
-          "latt": profil["latt"],
-          "longt": profil["longt"],
+          "latt": double.parse(profil["latt"]),
+          "longt": double.parse(profil["longt"]),
           "profils": [profil]
         });
       }
@@ -156,7 +191,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   }
 
-
   changeProfil(zoom){
     var choosenProfils = [];
 
@@ -209,8 +243,14 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   changeMapFilter(){
+    var filterProfils = [];
+    for(var profil in profils){
+      if(checkFilter(profil)) filterProfils.add(profil);
+    }
+
     setState(() {
       filterList = searchAutocomplete.getSelected();
+      profils = filterProfils;
     });
   }
 
@@ -235,11 +275,10 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       List<Widget> createPopupProfils(){
         List<Widget> profilsList = [SizedBox(height: 10)];
-        var friendlist = Map<String, bool>.from(ownProfil["friendlist"]);
+        var friendlist = ownProfil["friendlist"] ?? [];
 
         childrenAgeStringToStringAge(childrenAgeList){
           List yearChildrenAgeList = [];
-
           childrenAgeList.forEach((child){
             var childYears = global_functions.ChangeTimeStamp(child).intoYears();
             yearChildrenAgeList.add(childYears.toString() + "J");
@@ -316,6 +355,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       List<Marker> markerList = [];
       for (var profil in aktiveProfils) {
+
         var position = LatLng(profil["latt"], profil["longt"]);
         markerList.add(
             ownMarker(
@@ -368,47 +408,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
 
-    return FutureBuilder(
-          future: ProfilDatabase().getAllProfils(),
-          builder: (
-              BuildContext context,
-              AsyncSnapshot snapshot,
-          ) {
-            if (snapshot.hasData ) {
-              profils = snapshot.data;
-              var allProfils = [];
-              allUserName = [];
-
-              //userProfil
-              //allUserName
-              //filter
-
-              for(var profil in profils){
-                if(getOwnProfil(profil) != null){
-                  ownProfil = getOwnProfil(profil);
-                  //allUserName.remove(ownProfil);
-                } else {
-                  allUserName.add(profil["name"]);
-                }
-              }
-
-              searchAutocomplete =  SearchAutocomplete(
-                searchableItems: global_var.reisearten + global_var.interessenListe +
-                    global_var.sprachenListe + allUserName,
-                onConfirm: () => changeMapFilter(),
-                onDelete:() => changeMapFilter() ,
-              );
-
-              for(var profil in profils){
-                if(checkFilter(profil)) allProfils.add(profil);
-              }
-
-
-              profils = allProfils;
-
-              createAndSetZoomProfils();
-
-              return Padding(
+    return Padding(
                 padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
                 child: Stack(children: [
                   ownFlutterMap(),
@@ -431,10 +431,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
                   )
                 ]),
               );
-            }
-            return Container();
-          }
-        );
 
   }
 }

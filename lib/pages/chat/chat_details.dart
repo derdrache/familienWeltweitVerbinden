@@ -130,7 +130,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   openProfil() async{
     var chatPartnerProfil = await ProfilDatabase().getProfil("id", chatPartnerID);
     var userFriendlistData = await ProfilDatabase().getOneData("friendlist","id",userId);
-    var userFriendlist = Map<String, bool>.from(userFriendlistData);
+    var userFriendlist = userFriendlistData;
 
     changePage(context, ShowProfilPage(
       userName: userName,
@@ -216,14 +216,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               ){
             if (snap.connectionState == ConnectionState.waiting) {
               return const SizedBox.shrink();
-            } else if (snap.data.snapshot.value != null) {
-              List<Map> messages = [];
-
-              var messagesMap = snap.data.snapshot.value;
-
-              messagesMap.forEach((key, value) {
-                messages.add(value);
-              });
+            } else if (snap.data != null) {
+              List<Map> messages = snap.data;
 
               messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 

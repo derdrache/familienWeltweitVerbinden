@@ -396,14 +396,14 @@ class _SettingPageState extends State<SettingPage> {
     }
 
 
-    return StreamBuilder(
-          stream: ProfilDatabase().getProfil("id", userID),
+    return FutureBuilder(
+          future: ProfilDatabase().getProfil("id", userID),
           builder: (
           BuildContext context,
           AsyncSnapshot snapshot,
           ){
             if(snapshot.hasData){
-              userProfil = snapshot.data.snapshot.value;
+              userProfil = snapshot.data;
 
               getAndSetDataFromDB();
 

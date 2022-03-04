@@ -44,6 +44,7 @@ class _ChatPageState extends State<ChatPage>{
                             WindowTopbar(title: AppLocalizations.of(context).neuenChatEroeffnen),
                             const SizedBox(height: 10),
                             personenSuchBox(buildContext),
+                            const SizedBox(height: 10),
                             ...createFriendlistBox(userFriendlist)
                           ]
                         ),
@@ -122,12 +123,6 @@ class _ChatPageState extends State<ChatPage>{
 
   List<Widget> createFriendlistBox(userFriendlist){
     List<Widget> friendsBoxen = [];
-    if(userFriendlist["empty"] == true) {
-      userFriendlist= [];
-    } else{
-      userFriendlist = userFriendlist.keys;
-    }
-
     for(var friend in userFriendlist){
 
       friendsBoxen.add(
@@ -320,13 +315,8 @@ class _ChatPageState extends State<ChatPage>{
                 ){
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const SizedBox.shrink(); //const CircularProgressIndicator();
-                  } else if (snapshot.data.snapshot.value != null) {
-                    var chatGroups = [];
-                    var chatgroupsMap = Map<String, dynamic>.from(snapshot.data.snapshot.value);
-
-                    chatgroupsMap.forEach((key, value) {
-                      chatGroups.add(value);
-                    });
+                  } else if (snapshot.data != null) {
+                    var chatGroups = snapshot.data;
 
                     checkNewMessageCounter();
 
