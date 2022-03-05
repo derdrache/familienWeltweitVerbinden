@@ -202,8 +202,10 @@ class _ChatPageState extends State<ChatPage>{
   checkNewMessageCounter() async{
     var dbNewMessages = await ProfilDatabase().getOneData("newMessages", "id", userId);
     num realNewMessages = 0;
+
     for(var group in globalChatGroups){
-      realNewMessages += group["users"][userId]["newMessages"];
+      var users = json.decode(group["users"]);
+      realNewMessages += users[userId]["newMessages"];
     }
 
     if(dbNewMessages != realNewMessages){
@@ -219,11 +221,11 @@ class _ChatPageState extends State<ChatPage>{
     chatUserList(groupdata) {
       List<Widget> groupContainer = [];
 
-      for(var group in groupdata){
+      for(dynamic group in groupdata){
         var chatPartnerName;
+        var users = json.decode(group["users"]);
 
-
-        group["users"].forEach((key, value) async {
+        users.forEach((key, value) async {
           if(key != userId){
             chatPartnerName = value["name"];
           }
@@ -231,8 +233,9 @@ class _ChatPageState extends State<ChatPage>{
 
         var lastMessage = group["lastMessage"];
         if(lastMessage.length > 80) lastMessage = lastMessage.substring(0,80) +"...";
-        var ownChatNewMessages = group["users"][userId]["newMessages"];
-        var lastMessageTime = dbSecondsToTimeString(group["lastMessageDate"]);
+
+        var ownChatNewMessages = users[userId]["newMessages"];
+        var lastMessageTime = dbSecondsToTimeString(json.decode(group["lastMessageDate"]));
 
         groupContainer.add(
           GestureDetector(

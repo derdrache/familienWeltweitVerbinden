@@ -166,8 +166,7 @@ class ChatDatabase{
     var chatID = global_functions.getChatID(userKeysList);
     var date = (DateTime.now().millisecondsSinceEpoch / 1000).round();
 
-    var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
-    await http.post(url, body: json.encode({
+    var newChatGroup = {
       "id": chatID,
       "date": date,
       "users": json.encode({
@@ -175,16 +174,22 @@ class ChatDatabase{
         userKeysList[1] : {"name": usersList[1], "newMessages": 0},
       }),
       "lastMessage": messageData["message"],
-    }));
+    };
+
+    var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
+    await http.post(url, body: json.encode(newChatGroup));
 
     var url2 = Uri.parse(databaseUrl + "database/chats/newMessageTable.php");
     await http.post(url2, body: json.encode({
       "id": chatID,
       "date": date,
       "message": messageData["message"],
-      "von": messageData["to"],
-      "zu": messageData["from"]
+      "von": messageData["from"],
+      "zu": messageData["to"]
     }));
+
+
+    return newChatGroup;
   }
 
   getChat(chatId) async {
@@ -217,26 +222,27 @@ class ChatDatabase{
     var users = jsonDecode(chatgroupData["users"]).keys.toList();
     var chatID = global_functions.getChatID(users);
     var date = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-
+    print("test");
     var url = Uri.parse(databaseUrl + "database/chats/newMessage.php");
-    var test = await http.post(url, body: json.encode({
+    http.post(url, body: json.encode({
       "id": chatID,
       "date": date,
       "message": messageData["message"],
-      "von": messageData["to"],
-      "zu": messageData["from"]
+      "von": messageData["from"],
+      "zu": messageData["zu"]
     }));
 
     _changeNewMessageCounter(messageData["to"], chatgroupData);
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
+
     var activeChat = await ProfilDatabase().getOneData("activeChat", "id", chatPartnerId);
 
     if(chatData["id"] != activeChat){
       var allNewMessages = await ProfilDatabase().getOneData("newMessages", "id", chatPartnerId);
 
-      ProfilDatabase().updateProfil(chatPartnerId, "newMessages", int.parse(allNewMessages)+1);
+      ProfilDatabase().updateProfil(chatPartnerId, "newMessages", int.parse(allNewMessages["newMessages"]) +1);
 
 
       var oldChatNewMessages = await ChatDatabase().getNewMessages(chatData["id"], chatPartnerId);
