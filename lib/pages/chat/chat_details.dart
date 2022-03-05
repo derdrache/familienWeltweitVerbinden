@@ -35,6 +35,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var messageInputHeight = 50.0;
   var messageRows = 0;
   Timer timer;
+  var pufferList;
 
   @override
   void dispose() {
@@ -233,14 +234,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
               AsyncSnapshot snap,
               ){
             if (snap.connectionState == ConnectionState.waiting) {
-              return const SizedBox.shrink();
+              return pufferList ?? const SizedBox.shrink();
             } else if (snap.data != null) {
-
               List<dynamic> messages = snap.data;
 
               messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
-
-              return messageList(messages);
+              pufferList = messageList(messages);
+              return pufferList;
             }
             return Container();
           });
