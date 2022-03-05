@@ -80,6 +80,7 @@ class _ChatPageState extends State<ChatPage>{
     var chatPartner = eingabe;
     if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
       var chatPartnerId = await findUserGetId(eingabe);
+      chatPartnerId = chatPartnerId["id"];
 
       if(chatPartnerId != null){
         validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId);
@@ -161,13 +162,15 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   validCheckAndOpenChatgroup({chatPartnerID, name}) async {
-    if(name != null) chatPartnerID = await ProfilDatabase().getOneData("id", "name", name);
+    if(name != null){
+      chatPartnerID = await ProfilDatabase().getOneData("id", "name", name);
+      chatPartnerID = chatPartnerID["id"];
+    }
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
     var chatPartnerName = await ProfilDatabase().getOneData("name", "id", chatPartnerID);
-
     var userData = {
       "users": {
-        chatPartnerID: {"name": chatPartnerName, "newMessages": 0},
+        chatPartnerID: {"name": chatPartnerName["name"], "newMessages": 0},
         userId: {"name": userName, "newMessages": 0},
       }
     };
@@ -191,7 +194,8 @@ class _ChatPageState extends State<ChatPage>{
     var check = [true, -1];
 
     for(var i = 0;i < globalChatGroups.length; i++){
-      if(globalChatGroups[i]["users"][chatPartnerId] != null){
+      var users = json.decode(globalChatGroups[i]["users"]);
+      if(users[chatPartnerId] != null){
         check = [false,i];
       }
     }
@@ -239,9 +243,12 @@ class _ChatPageState extends State<ChatPage>{
 
         groupContainer.add(
           GestureDetector(
-            onTap: () =>changePage(context, ChatDetailsPage(
-              groupChatData: group,
-            )),
+            onTap: () =>Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ChatDetailsPage(
+                  groupChatData: group,
+                ))
+            ).then((value) => setState((){})),
             child: Container(
                 padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
                 width: double.infinity,
@@ -262,6 +269,7 @@ class _ChatPageState extends State<ChatPage>{
                   ),
                   const SizedBox(height: 10),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Flexible(
                         flex: 3,
@@ -269,7 +277,6 @@ class _ChatPageState extends State<ChatPage>{
                             style: TextStyle(fontSize: 16, color: Colors.grey[600])
                         )
                       ),
-                      const Expanded(child: SizedBox.shrink()),
                       ownChatNewMessages== 0? const SizedBox.shrink(): Container(
                           height: 30,
                           width: 30,
