@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -32,12 +33,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var userName = FirebaseAuth.instance.currentUser.displayName;
   var messageInputHeight = 50.0;
   var messageRows = 0;
+  Timer timer;
 
   @override
   void dispose() {
     ProfilDatabase().updateProfil(userId, "activeChat", "");
+    timer.cancel();
     super.dispose();
   }
+
   @override
   void initState() {
     chatID = widget.groupChatData["id"]?? "0";
@@ -47,7 +51,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     writeActiveChat();
     resetNewMessageCounter();
 
+    timer = Timer.periodic(Duration(seconds: 10), (Timer t) => checkNewMessages());
+
     super.initState();
+  }
+
+  checkNewMessages(){
+    setState(() {});
   }
 
   getAndSetChatPartnerData(){

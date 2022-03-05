@@ -84,7 +84,7 @@ class _StartPageState extends State<StartPage>{
 
   Widget build(BuildContext context){
     List<Widget> tabPages = <Widget>[
-      BoardPage(),
+      //BoardPage(),
       ErkundenPage(),
       //UmkreisPage(),
       ChatPage(),
@@ -124,7 +124,7 @@ class _StartPageState extends State<StartPage>{
                             child: Center(
                               child: FittedBox(
                                 child: Text(
-                                  newMessages.toString(),
+                                  newMessages["newMessages"].toString(),
                                   style: const TextStyle(fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 ),
@@ -154,12 +154,13 @@ class _StartPageState extends State<StartPage>{
             selectedItemColor: Colors.white,
             onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
+              /*
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: 'Board',
               ),
 
-
+               */
 
               const BottomNavigationBarItem(
                 icon: Icon(Icons.map),

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -25,7 +26,12 @@ class _ChatPageState extends State<ChatPage>{
 
 
   selectChatpartnerWindow() async {
-    var userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
+    dynamic userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
+
+    userFriendlist = userFriendlist["friendlist"];
+    if(userFriendlist is String) userFriendlist = jsonDecode(userFriendlist);
+
+    userFriendlist??= [];
 
     return showDialog(
         context: context,
@@ -123,6 +129,7 @@ class _ChatPageState extends State<ChatPage>{
 
   List<Widget> createFriendlistBox(userFriendlist){
     List<Widget> friendsBoxen = [];
+
     for(var friend in userFriendlist){
 
       friendsBoxen.add(

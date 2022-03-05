@@ -32,12 +32,12 @@ class ChangeInteressenPage extends StatelessWidget {
     saveButton(){
       return TextButton(
         child: Icon(Icons.done),
-        onPressed: (){
+        onPressed: ()async {
 
           if(interessenInputBox.getSelected() == null || interessenInputBox.getSelected().isEmpty){
             customSnackbar(context, AppLocalizations.of(context).interessenAuswaehlen);
           } else {
-            ProfilDatabase().updateProfil(
+            await ProfilDatabase().updateProfil(
                 userId, "interessen", interessenInputBox.getSelected());
             Navigator.pop(context);
           }

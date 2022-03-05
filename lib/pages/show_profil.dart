@@ -49,8 +49,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           child: const Icon(Icons.message),
           onPressed: () async {
             var profilID = await ProfilDatabase().getOneData("id", "name", widget.profil["name"]);
-
-            var users = [userID, profilID];
+            var users = [userID, profilID["id"]];
 
             var newChat = false;
 
