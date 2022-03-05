@@ -10,35 +10,41 @@ class ChangeNamePage extends StatelessWidget {
 
   ChangeNamePage({Key key,this.userId,this.nameKontroller}) : super(key: key);
 
+
+
   @override
   Widget build(BuildContext context) {
+
+    saveFunction() async{
+      if(nameKontroller.text == ""){
+        customSnackbar(context, AppLocalizations.of(context).neuenNamenEingeben);
+      } else{
+
+        var userName = FirebaseAuth.instance.currentUser.displayName;
+        var checkUserProfilExist = await ProfilDatabase().getOneData("id", "name", nameKontroller.text);
+        print(checkUserProfilExist);
+        if(checkUserProfilExist == false){
+
+          await ProfilDatabase().updateProfilName(
+              userId, userName, nameKontroller.text
+          );
+          Navigator.pop(context);
+        } else {
+          customSnackbar(context, AppLocalizations.of(context).usernameInVerwendung);
+        }
+      }
+    }
 
     saveButton(){
       return TextButton(
         child: Icon(Icons.done),
-        onPressed: () async{
-          if(nameKontroller.text == ""){
-            customSnackbar(context, AppLocalizations.of(context).neuenNamenEingeben);
-          } else{
-            var userName = FirebaseAuth.instance.currentUser.displayName;
-            var checkUserProfilExist = await ProfilDatabase().getProfil("name", nameKontroller.text);
-
-            if(checkUserProfilExist == null){
-              ProfilDatabase().updateProfilName(
-                  userId, userName, nameKontroller.text
-              );
-              Navigator.pop(context);
-            } else {
-              customSnackbar(context, AppLocalizations.of(context).usernameInVerwendung);
-            }
-          }
-        },
+        onPressed: () => saveFunction()
       );
     }
 
     return Scaffold(
       appBar: customAppBar(title: AppLocalizations.of(context).nameAendern, buttons: [saveButton()]),
-      body: customTextInput("Name", nameKontroller),
+      body: customTextInput("Name", nameKontroller, onSubmit: () =>saveFunction()),
     );
   }
 }

@@ -57,7 +57,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   saveFunction()async {
     if(_formKey.currentState.validate()){
-      var userExist = await ProfilDatabase().getOneData("id", "name", userNameKontroller.text) != "";
+      var userExist = await ProfilDatabase().getOneData("id", "name", userNameKontroller.text) != false;
 
 
       if(!lookInMaps){

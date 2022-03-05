@@ -26,6 +26,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var ownProfil;
   List<String> allUserName = [];
   var filterList = [];
+  var databaseProfils = [];
   var profils = [];
   var profilCountries = [];
   var profilsBetween = [];
@@ -50,14 +51,14 @@ class _ErkundenPageState extends State<ErkundenPage>{
     allUserName = [];
 
     for(var profil in profils){
-
       if(getOwnProfil(profil) != null){
         ownProfil = getOwnProfil(profil);
-        //allUserName.remove(ownProfil);
       } else {
         allUserName.add(profil["name"]);
       }
     }
+
+    profils.remove(ownProfil);
 
     searchAutocomplete =  SearchAutocomplete(
       searchableItems: global_var.reisearten + global_var.interessenListe +
@@ -66,6 +67,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       onDelete:() => changeMapFilter() ,
     );
 
+    databaseProfils = profils;
     createAndSetZoomProfils();
   }
 
@@ -84,9 +86,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
       var abstand = 1.5;
 
       for(var i = 0; i< list.length; i++){
-        double originalLatt =  profil["latt"];
+        double originalLatt = double.parse(profil["latt"]);
         double newLatt = list[i]["latt"];
-        double originalLongth = profil["longt"];
+        double originalLongth = double.parse(profil["longt"]);
         double newLongth = list[i]["longt"];
         bool check = (newLatt + abstand >= originalLatt && newLatt - abstand <= originalLatt) &&
             (newLongth + abstand >= originalLongth && newLongth - abstand<= originalLongth);
@@ -216,10 +218,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     if(filterList.isEmpty) return true;
 
-    var spracheMatch = checkMatch(filterList, profilSprachen, global_var.sprachenListe);
-    var reiseartMatch = checkMatch(filterList, [profilReiseart], global_var.reisearten);
-    var interesseMatch = checkMatch(filterList, profilInteressen, global_var.interessenListe);
+    var spracheMatch = checkMatch(filterList, profilSprachen,
+        global_var.sprachenListe + global_var.sprachenListeEnglisch);
+
+    var reiseartMatch = checkMatch(filterList, [profilReiseart],
+        global_var.reisearten + global_var.reiseartenEnglisch);
+    var interesseMatch = checkMatch(filterList, profilInteressen,
+        global_var.interessenListe +global_var.interessenListeEnglisch);
     var userMatch = checkMatch(filterList, [profilName], allUserName);
+
     if(spracheMatch && reiseartMatch && interesseMatch && userMatch) return true;
 
     return false;
@@ -233,6 +240,16 @@ class _ErkundenPageState extends State<ErkundenPage>{
       if(globalList.contains(select)) globalMatch = true;
 
       if(checkList.contains(select)) match = true;
+
+      if(globalMatch && !match){
+        int halfListNumber = (globalList.length /2).toInt();
+        var positionGlobal = globalList.indexOf(select);
+        var calculatePosition = positionGlobal < halfListNumber ?
+          positionGlobal + halfListNumber : positionGlobal - halfListNumber;
+        var otherLanguage = globalList[calculatePosition];
+
+        if(checkList.contains(otherLanguage)) match = true;
+      }
     }
 
 
@@ -244,13 +261,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   changeMapFilter(){
     var filterProfils = [];
-    for(var profil in profils){
+    filterList = searchAutocomplete.getSelected();
+
+    for(var profil in databaseProfils){
       if(checkFilter(profil)) filterProfils.add(profil);
     }
 
     setState(() {
-      filterList = searchAutocomplete.getSelected();
       profils = filterProfils;
+      createAndSetZoomProfils();
     });
   }
 

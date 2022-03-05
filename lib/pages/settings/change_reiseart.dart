@@ -31,11 +31,11 @@ class ChangeReiseartPage extends StatelessWidget {
     saveButton(){
       return TextButton(
         child: Icon(Icons.done),
-        onPressed: () {
+        onPressed: () async {
           if(reiseArtInput.getSelected() == null || reiseArtInput.getSelected().isEmpty){
             customSnackbar(context, AppLocalizations.of(context).reiseartAuswaehlen);
           } else if(reiseArtInput.getSelected() != oldInput ){
-            ProfilDatabase().updateProfil(
+            await ProfilDatabase().updateProfil(
                 userId, "reiseart", reiseArtInput.getSelected()
             );
             Navigator.pop(context);

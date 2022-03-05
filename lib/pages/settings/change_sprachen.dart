@@ -37,7 +37,7 @@ class ChangeSprachenPage extends StatelessWidget {
           if(sprachenInputBox.getSelected() == null || sprachenInputBox.getSelected().isEmpty){
             customSnackbar(context, AppLocalizations.of(context).spracheAuswaehlen);
           } else {
-            ProfilDatabase().updateProfil(
+            await ProfilDatabase().updateProfil(
                 userId, "sprachen", sprachenInputBox.getSelected());
             Navigator.pop(context);
           }

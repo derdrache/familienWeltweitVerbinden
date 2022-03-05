@@ -64,7 +64,7 @@ class ProfilDatabase{
       body["kinder"] = json.decode(body["kinder"]);
       body["sprachen"] = json.decode(body["sprachen"]);
       body["interessen"] = json.decode(body["interessen"]);
-      body["friendlist"] = json.decode(body["friendlist"]);
+      body["friendlist"] = body["friendlist"] == null? []: json.decode(body["friendlist"]);
       body["emailAnzeigen"] = body["emailAnzeigen"] == "0"? false : true;
       body["notificationstatus"] = body["notificationstatus"] == "0"? false : true;
     }
@@ -96,12 +96,12 @@ class ProfilDatabase{
     var uri = Uri.parse(url+data);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     dynamic responseBody = res.body;
-
     try{
-      responseBody = json.decode(responseBody);
+      responseBody = jsonDecode(responseBody);
     }catch(error){
 
     }
+
 
     return responseBody;
 
@@ -143,12 +143,12 @@ class ProfilDatabase{
     }
   }
 
-  updateProfilLocation(userId, locationDict){
+  updateProfilLocation(userId, locationDict) {
     var url = Uri.parse(databaseUrl + "database/profils/updateProfilLocation.php");
 
     http.post(url, body: json.encode({
       "id": userId,
-      "land": locationDict["countryname"],
+      "land": locationDict["land"],
       "city": locationDict["ort"],
       "longt":locationDict["longt"],
       "latt": locationDict["latt"]

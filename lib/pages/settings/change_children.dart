@@ -16,7 +16,7 @@ class ChangeChildrenPage extends StatelessWidget {
     saveButton(){
       return TextButton(
         child: Icon(Icons.done),
-        onPressed: (){
+        onPressed: () async{
           bool allFilled = true;
 
           for(var kindAge in childrenBirthdatePickerBox.getDates()){
@@ -28,7 +28,7 @@ class ChangeChildrenPage extends StatelessWidget {
           if(!allFilled || childrenBirthdatePickerBox.getDates().isEmpty){
             customSnackbar(context, AppLocalizations.of(context).geburtsdatumEingeben);
           } else{
-            ProfilDatabase().updateProfil(
+            await ProfilDatabase().updateProfil(
                 userId, "kinder", childrenBirthdatePickerBox.getDates());
             Navigator.pop(context);
           }

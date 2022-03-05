@@ -35,7 +35,8 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       "latt": locationData["latt"],
       "land": locationData["countryname"],
     };
-    ProfilDatabase().updateProfilLocation(widget.userId, locationDict);
+
+    await ProfilDatabase().updateProfilLocation(widget.userId, locationDict);
   }
 
   saveLocation() async {

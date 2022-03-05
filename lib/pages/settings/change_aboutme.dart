@@ -18,8 +18,8 @@ class ChangeAboutmePage extends StatelessWidget {
     saveButton(){
       return TextButton(
         child: Icon(Icons.done),
-        onPressed: (){
-          ProfilDatabase().updateProfil(userId, "aboutme", bioTextKontroller.text);
+        onPressed: () async {
+          await ProfilDatabase().updateProfil(userId, "aboutme", bioTextKontroller.text);
           Navigator.pop(context);
         }
       );
