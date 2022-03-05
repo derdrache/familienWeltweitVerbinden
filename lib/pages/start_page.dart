@@ -79,8 +79,7 @@ class _StartPageState extends State<StartPage>{
     return false;
 
   }
-
-
+  
 
   Widget build(BuildContext context){
     List<Widget> tabPages = <Widget>[
@@ -111,7 +110,7 @@ class _StartPageState extends State<StartPage>{
                   return Stack(
                     clipBehavior: Clip.none, children: <Widget>[
                     const Icon(Icons.chat),
-                    Positioned(
+                    int.parse(newMessages["newMessages"]) > 0 ? Positioned(
                         top: -10,
                         right: -10,
                         child: Container(
@@ -131,7 +130,7 @@ class _StartPageState extends State<StartPage>{
                               ),
                             )
                         )
-                    )
+                    ) : SizedBox.shrink()
                   ],
                   );
                 return const Icon(Icons.chat);

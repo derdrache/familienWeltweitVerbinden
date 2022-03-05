@@ -72,7 +72,6 @@ customSnackbar(context, text, {color = Colors.red}){
 customAppBar({title, buttons, elevation = 4.0, var onTap}){
 
   buttons ??= <Widget>[];
-
   return AppBar(
     title: InkWell(
         onTap: onTap,

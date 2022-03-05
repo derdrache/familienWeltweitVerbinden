@@ -88,17 +88,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
 
     var usersAllNewMessages = await ProfilDatabase().getOneData("newMessages","id",userId);
+    usersAllNewMessages = int.parse(usersAllNewMessages["newMessages"]);
 
     ProfilDatabase().updateProfil(
         userId, "newMessages", usersAllNewMessages - usersChatNewMessages < 0? 0:
         usersAllNewMessages - usersChatNewMessages
     );
-
+    widget.groupChatData["users"] = json.decode(widget.groupChatData["users"]);
     widget.groupChatData["users"][userId]["newMessages"] = 0;
+
+
     ChatDatabase().updateChatGroup(
         widget.groupChatData["id"], "users",
-        widget.groupChatData
+        widget.groupChatData["users"]
     );
+
+
 
   }
 
@@ -123,6 +128,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         chatID = global_functions.getChatID([userID, chatPartnerID]);
       });
     } else {
+
       ChatDatabase().addNewMessage(widget.groupChatData, messageData);
       ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessage", messageData["message"]);
       ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessageDate", messageData["date"]);
@@ -149,7 +155,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   openProfil() async{
     var chatPartnerProfil = await ProfilDatabase().getProfil("id", chatPartnerID);
     var userFriendlistData = await ProfilDatabase().getOneData("friendlist","id",userId);
-    var userFriendlist = userFriendlistData;
+    var userFriendlist = json.decode(userFriendlistData["friendlist"]);
 
     global_functions.changePage(context, ShowProfilPage(
       userName: userName,
@@ -305,8 +311,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
       );
     }
-
-
 
     return Scaffold(
       appBar: customAppBar(

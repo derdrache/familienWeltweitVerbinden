@@ -222,14 +222,14 @@ class ChatDatabase{
     var users = jsonDecode(chatgroupData["users"]).keys.toList();
     var chatID = global_functions.getChatID(users);
     var date = (DateTime.now().millisecondsSinceEpoch / 1000).round();
-    print("test");
+
     var url = Uri.parse(databaseUrl + "database/chats/newMessage.php");
     http.post(url, body: json.encode({
       "id": chatID,
       "date": date,
       "message": messageData["message"],
       "von": messageData["from"],
-      "zu": messageData["zu"]
+      "zu": messageData["to"]
     }));
 
     _changeNewMessageCounter(messageData["to"], chatgroupData);
