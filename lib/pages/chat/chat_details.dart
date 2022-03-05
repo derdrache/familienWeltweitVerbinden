@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:familien_suche/global/global_functions.dart';
+import 'package:familien_suche/global/global_functions.dart' as global_functions;
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
@@ -61,8 +62,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   }
 
   getAndSetChatPartnerData(){
+    var users = widget.groupChatData["users"];
+    if(users is String ) users = json.decode(users);
 
-    widget.groupChatData["users"].forEach((key, value){
+    users.forEach((key, value){
       if(key != userId){
         chatPartnerID = key;
         chatPartnerName = value["name"];
@@ -75,7 +78,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   }
 
   resetNewMessageCounter() async {
-    var usersChatNewMessages = widget.groupChatData["users"][userId]["newMessages"];
+    var users = widget.groupChatData["users"];
+    if(users is String ) users = json.decode(users);
+
+    var usersChatNewMessages = users[userId]["newMessages"];
 
     if(usersChatNewMessages == 0) return;
 
@@ -113,14 +119,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           .addNewChatGroup({userID: userName, chatPartnerID: chatPartnerName}, messageData);
 
       setState(() {
-        chatID = widget.groupChatData["id"];
+        chatID = global_functions.getChatID([userID, chatPartnerID]);
       });
     } else {
+      ChatDatabase().addNewMessage(widget.groupChatData, messageData);
       ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessage", messageData["message"]);
       ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessageDate", messageData["date"]);
+
     }
 
-    ChatDatabase().addNewMessage(widget.groupChatData, messageData);
+
 
   }
 
@@ -142,7 +150,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     var userFriendlistData = await ProfilDatabase().getOneData("friendlist","id",userId);
     var userFriendlist = userFriendlistData;
 
-    changePage(context, ShowProfilPage(
+    global_functions.changePage(context, ShowProfilPage(
       userName: userName,
       profil: chatPartnerProfil,
       userFriendlist: userFriendlist,
@@ -162,7 +170,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
 
-        if(widget.groupChatData["users"][message["from"]]["name"] == userName){
+        if(message["von"] == userId){
           textAlign = Alignment.centerRight;
           boxColor = Colors.greenAccent;
         }
@@ -192,7 +200,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                     Container(
                       padding: const EdgeInsets.only(bottom: 5, right: 10),
                       child: Text(
-                          dbSecondsToTimeString(message["date"]),
+                          global_functions.dbSecondsToTimeString(json.decode(message["date"])),
                           style: TextStyle(color: Colors.grey[600])
                       ),
                     )
@@ -227,7 +235,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             if (snap.connectionState == ConnectionState.waiting) {
               return const SizedBox.shrink();
             } else if (snap.data != null) {
-              List<Map> messages = snap.data;
+
+              List<dynamic> messages = snap.data;
 
               messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
