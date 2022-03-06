@@ -1,5 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
@@ -37,7 +39,6 @@ void main()async {
 
 
   if(!kIsWeb){
-    FirebaseDatabase.instance.setPersistenceEnabled(true);
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
@@ -49,12 +50,18 @@ class MyApp extends StatelessWidget {
   var userLogedIn = FirebaseAuth.instance.currentUser;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var pageContext;
+  dynamic importantUpdateNumber = 0;
+  dynamic buildNumber = 0;
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
     if(kIsWeb) return ;
 
+    importantUpdateNumber = await AllgemeinDatabase().getOneData("importantUpdate");
+    importantUpdateNumber = int.parse(importantUpdateNumber["importantUpdate"]);
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    buildNumber = int.parse(packageInfo.buildNumber);
 
     final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettings = InitializationSettings(
@@ -126,6 +133,11 @@ class MyApp extends StatelessWidget {
             ("something went wrong");
           }
           if(snapshot.connectionState == ConnectionState.waiting){
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if(buildNumber < importantUpdateNumber){
+            InAppUpdate.performImmediateUpdate();
             return const Center(child: CircularProgressIndicator());
           }
           return MaterialApp(

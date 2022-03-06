@@ -108,8 +108,9 @@ class _SettingPageState extends State<SettingPage> {
                         context,
                         MaterialPageRoute(builder: (_) => ChangeNamePage(
                             userId: userID,
-                            nameKontroller: nameTextKontroller)
-                    )).then((value) => setState((){}));
+                            oldName: nameTextKontroller.text,
+                            )
+                    )).whenComplete(() => setState(() {}));
                   },
                   child: Text(AppLocalizations.of(context).nameAendern, style: TextStyle(color: textColor)))
           ),
@@ -119,7 +120,7 @@ class _SettingPageState extends State<SettingPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => ChangeEmailPage()
-                        )).then((value) => setState((){}));
+                        )).whenComplete(() => setState(() {}));
                   },
                   child: Text(AppLocalizations.of(context).emailAendern, style: TextStyle(color: textColor))
               )
@@ -195,7 +196,7 @@ class _SettingPageState extends State<SettingPage> {
         onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => page)
-        ).then((value) => setState((){})),
+        ).whenComplete(() => setState(() {})),
         child: Container(
             padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
             width: fullWidth ? screenWidth :screenWidth /2 -20,

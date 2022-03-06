@@ -184,7 +184,7 @@ class _ChatPageState extends State<ChatPage>{
               groupChatData: userData,
               newChat: true
           )))
-      ).then((value) => setState((){}));
+      ).whenComplete(() => setState(() {}));
 
 
 
@@ -195,7 +195,7 @@ class _ChatPageState extends State<ChatPage>{
           MaterialPageRoute(builder: (_) => changePage(context, changePage(context, ChatDetailsPage(
             groupChatData: globalChatGroups[checkAndIndex[1]],
           ))))
-      ).then((value) => setState((){}));
+      ).whenComplete(() => setState(() {}));
 
     }
 
@@ -259,7 +259,7 @@ class _ChatPageState extends State<ChatPage>{
                 MaterialPageRoute(builder: (_) => ChatDetailsPage(
                   groupChatData: group,
                 ))
-            ).then((value) => setState((){})),
+            ).whenComplete(() => setState(() {})),
             child: Container(
                 padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
                 width: double.infinity,

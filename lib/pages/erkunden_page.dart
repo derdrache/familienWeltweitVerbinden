@@ -142,6 +142,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       for (var i = 0; i<list.length; i++){
         var listCountryLocation = await LocationService().getCountryLocation(list[i]["countryname"]);
+
         var profilCountryLocation = await LocationService().getCountryLocation(profil["land"]);
 
         if(listCountryLocation["latt"] == profilCountryLocation["latt"] &&

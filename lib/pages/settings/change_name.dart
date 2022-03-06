@@ -6,15 +6,16 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeNamePage extends StatelessWidget {
   var userId;
-  var nameKontroller;
+  var oldName;
 
-  ChangeNamePage({Key key,this.userId,this.nameKontroller}) : super(key: key);
+  ChangeNamePage({Key key,this.userId,this.oldName}) : nameKontroller = TextEditingController(text:oldName);
+  var nameKontroller;
 
 
 
   @override
   Widget build(BuildContext context) {
-
+    nameKontroller.text = oldName;
     saveFunction() async{
       if(nameKontroller.text == ""){
         customSnackbar(context, AppLocalizations.of(context).neuenNamenEingeben);
@@ -28,6 +29,7 @@ class ChangeNamePage extends StatelessWidget {
           await ProfilDatabase().updateProfilName(
               userId, userName, nameKontroller.text
           );
+
           Navigator.pop(context);
         } else {
           customSnackbar(context, AppLocalizations.of(context).usernameInVerwendung);
