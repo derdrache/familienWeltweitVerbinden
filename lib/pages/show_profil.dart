@@ -75,7 +75,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     friendButton(){
-      var onFriendlist = widget.userFriendlist != null?
+      var onFriendlist = widget.userFriendlist != ""?
         widget.userFriendlist.contains(widget.profil["name"]) : false;
 
       return TextButton(

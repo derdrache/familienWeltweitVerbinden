@@ -116,9 +116,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     var messageData = {
       "message" :message,
-      "from": userID,
+      "von": userID,
       "date": Timestamp.now().seconds,
-      "to": chatPartnerID
+      "zu": chatPartnerID
     };
     if(widget.newChat){
       widget.groupChatData = await ChatDatabase()
@@ -129,13 +129,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       });
     } else {
 
-      ChatDatabase().addNewMessage(widget.groupChatData, messageData);
+      await ChatDatabase().addNewMessage(widget.groupChatData, messageData);
       ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessage", messageData["message"]);
       ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessageDate", messageData["date"]);
 
+      setState(() {
+
+      });
     }
-
-
 
   }
 

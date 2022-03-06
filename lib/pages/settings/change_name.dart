@@ -22,7 +22,7 @@ class ChangeNamePage extends StatelessWidget {
 
         var userName = FirebaseAuth.instance.currentUser.displayName;
         var checkUserProfilExist = await ProfilDatabase().getOneData("id", "name", nameKontroller.text);
-        print(checkUserProfilExist);
+
         if(checkUserProfilExist == false){
 
           await ProfilDatabase().updateProfilName(
