@@ -98,7 +98,8 @@
     "chatErweiterung": "Chat extensions",
     "accountLoeschen": "Delete account",
     "layoutVerbessern": "improve layout",
-    "neueEmailVerifizieren": "New email is valid after verification"
+    "neueEmailVerifizieren": "New email is valid after verification",
+    "geburtsdatumHint": "Month/Year"
 
 }
 

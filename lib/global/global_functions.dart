@@ -14,12 +14,14 @@ checkValidatorEmpty(context) {
 
 checkValidationEmail(context){
   return (value){
-    bool emailIsValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(value);
+
+    bool emailHasAT = value.contains("@");
+    bool emailHasEnd = false;
+    if(emailHasAT) emailHasEnd = value.split("@")[1].contains(".");
 
     if(value == null || value.isEmpty){
       return AppLocalizations.of(context).emailEingeben;
-    } else if(!emailIsValid){
+    } else if(!emailHasAT || !emailHasEnd){
       return AppLocalizations.of(context).gueltigeEmailEingeben;
     }
   };

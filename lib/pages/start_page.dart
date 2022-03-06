@@ -107,6 +107,7 @@ class _StartPageState extends State<StartPage>{
               ){
               if(snap.hasData) {
                   var newMessages = snap.data;
+
                   return Stack(
                     clipBehavior: Clip.none, children: <Widget>[
                     const Icon(Icons.chat),
@@ -123,7 +124,7 @@ class _StartPageState extends State<StartPage>{
                             child: Center(
                               child: FittedBox(
                                 child: Text(
-                                  newMessages["newMessages"].toString(),
+                                  newMessages["newMessages"],
                                   style: const TextStyle(fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 ),
