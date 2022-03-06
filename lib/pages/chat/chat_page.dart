@@ -178,14 +178,25 @@ class _ChatPageState extends State<ChatPage>{
     Navigator.pop(context);
 
     if(checkAndIndex[0]){
-      changePage(context, ChatDetailsPage(
-          groupChatData: userData,
-          newChat: true
-      ));
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => changePage(context, ChatDetailsPage(
+              groupChatData: userData,
+              newChat: true
+          )))
+      ).then((value) => setState((){}));
+
+
+
+
     } else{
-      changePage(context, ChatDetailsPage(
-        groupChatData: globalChatGroups[checkAndIndex[1]],
-      ));
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => changePage(context, changePage(context, ChatDetailsPage(
+            groupChatData: globalChatGroups[checkAndIndex[1]],
+          ))))
+      ).then((value) => setState((){}));
+
     }
 
   }

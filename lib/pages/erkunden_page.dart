@@ -32,7 +32,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var profilsBetween = [];
   var profilsCities = [];
   var aktiveProfils = [];
-  double minMapZoom = 1.6;
+  double minMapZoom = kIsWeb ? 2.0:  1.6;
   double mapZoom = 1.6;
   double cityZoom = 6.5;
   dynamic searchAutocomplete = SizedBox.shrink();
@@ -282,7 +282,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     mapController.move(position, mapZoom);
     setState(() {
-
+      changeProfil(mapZoom);
     });
   }
 
@@ -399,7 +399,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       return FlutterMap(
         mapController: mapController,
         options: MapOptions(
-          center: LatLng(0, 0),
+          center: LatLng(25, 0),
           zoom: minMapZoom,
           minZoom: minMapZoom,
           maxZoom: 9,

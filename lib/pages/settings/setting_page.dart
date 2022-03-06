@@ -150,7 +150,6 @@ class _SettingPageState extends State<SettingPage> {
     double containerPadding = 5;
     var headLineColor = Theme.of(context).colorScheme.primary;
 
-
     menuBar(){
       return customAppBar(
           title: "",
@@ -336,12 +335,15 @@ class _SettingPageState extends State<SettingPage> {
                           context, PrivacySecurityPage(profil: userProfil)
                       )
               ),
+              /*
               if(!kIsWeb) const SizedBox(height: 20),
               if(!kIsWeb) settingThemeContainer(AppLocalizations.of(context).benachrichtigungen, Icons.notifications,
                       () => global_functions.changePage(
                       context, NotificationsOptionsPage(profil: userProfil)
                   )
               ),
+
+               */
             ],
           )
       );

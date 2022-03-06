@@ -64,7 +64,7 @@ class ProfilDatabase{
       body["kinder"] = json.decode(body["kinder"]);
       body["sprachen"] = json.decode(body["sprachen"]);
       body["interessen"] = json.decode(body["interessen"]);
-      body["friendlist"] = body["friendlist"] == null? []: json.decode(body["friendlist"]);
+      body["friendlist"] = body["friendlist"] == ""? []: json.decode(body["friendlist"]);
       body["emailAnzeigen"] = body["emailAnzeigen"] == "0"? false : true;
       body["notificationstatus"] = body["notificationstatus"] == "0"? false : true;
     }
@@ -82,7 +82,7 @@ class ProfilDatabase{
     responseBody["kinder"] = json.decode(responseBody["kinder"]);
     responseBody["sprachen"] = json.decode(responseBody["sprachen"]);
     responseBody["interessen"] = json.decode(responseBody["interessen"]);
-    responseBody["friendlist"] = json.decode(responseBody["friendlist"]);
+    if(responseBody["friendlist"] != "") responseBody["friendlist"] = json.decode(responseBody["friendlist"]);
     responseBody["emailAnzeigen"] = responseBody["emailAnzeigen"] == "0"? false : true;
     responseBody["notificationstatus"] = responseBody["notificationstatus"] == "0"? false : true;
 
@@ -108,7 +108,7 @@ class ProfilDatabase{
   }
 
   getAllFriendlists() async {
-    var url = "databaseUrl + database/profils/getAllFriendlists.php";
+    var url = databaseUrl + "database/profils/getAllFriendlists.php";
     var uri = Uri.parse(url);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
 
@@ -118,7 +118,7 @@ class ProfilDatabase{
   }
   
   updateProfilName(userId, oldName, newName) async{
-    FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
+    FirebaseAuth.instance.currentUser.updateDisplayName(newName);
     updateProfil(userId, "name", newName);
 
     var chats = await ChatDatabase().getAllChatgroupsFromUser(userId);
@@ -131,7 +131,9 @@ class ProfilDatabase{
 
 
     var allProfilFriendlists = await getAllFriendlists();
+
     for(var profil in allProfilFriendlists){
+
       var friendlist = jsonDecode(profil["friendlist"]);
 
       if(profil["friendlist"].contains(oldName)){
@@ -184,10 +186,11 @@ class ChatDatabase{
       "id": chatID,
       "date": date,
       "message": messageData["message"],
-      "von": messageData["from"],
-      "zu": messageData["to"]
+      "von": messageData["von"],
+      "zu": messageData["zu"]
     }));
 
+    _changeNewMessageCounter(messageData["zu"], newChatGroup);
 
     return newChatGroup;
   }
@@ -224,28 +227,27 @@ class ChatDatabase{
     var date = (DateTime.now().millisecondsSinceEpoch / 1000).round();
 
     var url = Uri.parse(databaseUrl + "database/chats/newMessage.php");
-    http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "id": chatID,
       "date": date,
       "message": messageData["message"],
-      "von": messageData["from"],
-      "zu": messageData["to"]
+      "von": messageData["von"],
+      "zu": messageData["zu"]
     }));
 
-    _changeNewMessageCounter(messageData["to"], chatgroupData);
+    _changeNewMessageCounter(messageData["zu"], chatgroupData);
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
-
     var activeChat = await ProfilDatabase().getOneData("activeChat", "id", chatPartnerId);
 
-    if(chatData["id"] != activeChat){
+    if(chatData["id"] != activeChat["activeChat"]){
       var allNewMessages = await ProfilDatabase().getOneData("newMessages", "id", chatPartnerId);
 
       ProfilDatabase().updateProfil(chatPartnerId, "newMessages", int.parse(allNewMessages["newMessages"]) +1);
 
-
       var oldChatNewMessages = await ChatDatabase().getNewMessages(chatData["id"], chatPartnerId);
+
       oldChatNewMessages = oldChatNewMessages["users"];
       var oldChatNewMessagesMap= Map<String, dynamic>.from(jsonDecode(oldChatNewMessages));
       oldChatNewMessagesMap[chatPartnerId]["newMessages"] = oldChatNewMessagesMap[chatPartnerId]["newMessages"] +1;

@@ -231,7 +231,6 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
   datePicker() async{
 
-
     return showMonthPicker(
         context: context,
         firstDate: DateTime(DateTime.now().year - 18, DateTime.now().month),
@@ -419,9 +418,12 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
     childrensBirthDatePickerList = [];
 
     childrenBirthDates.forEach((date){
+      var birthDate = date.toString().split(" ")[0].split("-");
+      birthDate.removeLast();
+
       childrensBirthDatePickerList.add(
           CustomDatePicker(
-              hintText: date.toString().split(" ")[0].split("-").reversed.join("-"),
+              hintText: birthDate.reversed.join("-"),
               pickedDate: date,
               dateIsSelected: true
           )
@@ -438,8 +440,6 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox> {
   var childrens = 1;
   var maxChildrens = 6;
-
-
 
   @override
   void initState() {
@@ -500,6 +500,10 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
       var hintText = dates[i] == null? widget.hintText : dates[i].toString();
 
       if(i == 0 || i < widget.childrensBirthDatePickerList.length -1 ){
+        var date = hintText.split(" ")[0].split("-");
+        date.removeLast();
+        hintText = date.join("-");
+
         newPicker.add(
             CustomDatePicker(
                 hintText: hintText.split(" ")[0].split("-").reversed.join("-"),

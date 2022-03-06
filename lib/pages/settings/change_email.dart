@@ -2,7 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
+import '../../global/global_functions.dart' as global_functions;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../login_register_page/login_page.dart';
 
 
 class ChangeEmailPage extends StatelessWidget {
@@ -61,9 +64,10 @@ class ChangeEmailPage extends StatelessWidget {
         return;
       }
 
-      FirebaseAuth.instance.currentUser?.updateEmail(emailKontroller.text);
 
+      FirebaseAuth.instance.currentUser.verifyBeforeUpdateEmail(emailKontroller.text);
       await ProfilDatabase().updateProfil(userId,"email",emailKontroller.text);
+      customSnackbar(context, AppLocalizations.of(context).neueEmailVerifizieren, color: Colors.green);
       Navigator.pop(context);
     }
 
