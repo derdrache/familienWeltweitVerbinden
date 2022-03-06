@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'month_picker.dart';
+import 'global_functions.dart' as global_functions;
 
 double sideSpace = 10;
 double borderRounding = 5;
@@ -70,27 +71,29 @@ customSnackbar(context, text, {color = Colors.red}){
 }
 
 customAppBar({title, buttons, elevation = 4.0, var onTap}){
-
   buttons ??= <Widget>[];
-  return AppBar(
-    title: InkWell(
-        onTap: onTap,
-        child: Row(
-            children: [
-              Container(
-                height: 50,
-                  child: Center(child: Text(title, style: const TextStyle(color: Colors.black)))
-              )
-            ]
-        )
-    ),
-    backgroundColor: Colors.white,
-    elevation: elevation,
-    iconTheme: const IconThemeData(
-      color: Colors.black
-    ),
-    actions: buttons,
-  );
+
+    return AppBar(
+      title: InkWell(
+          onTap: onTap,
+          child: Row(
+              children: [
+                Container(
+                    height: 50,
+                    child: Center(child: Text(title, style: const TextStyle(color: Colors.black)))
+                )
+              ]
+          )
+      ),
+      backgroundColor: Colors.white,
+      elevation: elevation,
+      iconTheme: const IconThemeData(
+          color: Colors.black
+      ),
+      actions: buttons,
+    );
+
+
 }
 
 class CustomMultiTextForm extends StatefulWidget {

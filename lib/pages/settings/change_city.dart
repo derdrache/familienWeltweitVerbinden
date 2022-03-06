@@ -48,7 +48,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
         setState(() {});
         customSnackbar(context, AppLocalizations.of(context).genauenStandortWaehlen);
       } else{
-        pushLocationDataToDB(suggestedCities[0]);
+        await pushLocationDataToDB(suggestedCities[0]);
         Navigator.pop(context);
       }
     }

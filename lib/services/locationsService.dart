@@ -66,12 +66,15 @@ class LocationService {
 
         var country = formattedAddressList.last;
 
-        if(country.contains(" - ")) country = country.split(" - ")[1];
-        if(_isNumeric(country)) formattedAddressList[formattedAddressList.length -2];
+        if(country.contains(" - ")){
+          city = city.split(" - ")[0];
+          country = country.split(" - ")[1];
+        }
+        if(_isNumeric(country)) country = formattedAddressList[formattedAddressList.length -2];
 
         var mapData = {
           "city": city,
-          "countryname": formattedAddressList.last,
+          "countryname": country,
           "longt": result["geometry"]["location"]["lng"],
           "latt": result["geometry"]["location"]["lat"],
           "adress": result["formatted_address"]

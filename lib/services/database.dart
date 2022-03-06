@@ -18,6 +18,27 @@ var testDB = realtimeDatabase.child("test");
 
 var databaseUrl = "https://families-worldwide.com/";
 
+class AllgemeinDatabase{
+
+  getOneData(what) async{
+    var url = databaseUrl + "database/allgemein/getOneData.php";
+    var data = "?param1=$what";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    dynamic responseBody = res.body;
+
+    try{
+      responseBody = jsonDecode(responseBody);
+    }catch(error){
+
+    }
+
+
+    return responseBody;
+  }
+
+}
+
 class ProfilDatabase{
 
   addNewProfil(profilData) async{
@@ -159,7 +180,6 @@ class ProfilDatabase{
 
 }
 
-
 class ChatDatabase{
 
   addNewChatGroup(users, messageData)async {
@@ -222,9 +242,13 @@ class ChatDatabase{
   }
 
   addNewMessage(chatgroupData, messageData)async {
-    var users = jsonDecode(chatgroupData["users"]).keys.toList();
+    var users = chatgroupData["users"];
+    if(users is String) users = jsonDecode(chatgroupData["users"]);
+    users = users.keys.toList();
     var chatID = global_functions.getChatID(users);
     var date = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+
+    messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
 
     var url = Uri.parse(databaseUrl + "database/chats/newMessage.php");
     await http.post(url, body: json.encode({
@@ -299,3 +323,5 @@ class ChatDatabase{
     return responseBody;
   }
 }
+
+

@@ -42,7 +42,7 @@ class _StartPageState extends State<StartPage>{
       var updateInformation = await InAppUpdate.checkForUpdate();
       if(updateInformation.updateAvailability ==
           UpdateAvailability.updateAvailable && !kIsWeb){
-        InAppUpdate.performImmediateUpdate();
+        InAppUpdate.startFlexibleUpdate();
 
       }
     } catch (error){
