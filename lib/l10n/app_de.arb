@@ -100,4 +100,5 @@
     "accountLoeschen": "Account löschen",
     "layoutVerbessern": "Layout verbessern",
     "neueEmailVerifizieren": "Neue Email ist nach dem Verifizieren gültig"
+    "geburtsdatumHint": "Monat/Jahr"
 }

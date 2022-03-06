@@ -203,7 +203,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
 class CustomDatePicker extends StatefulWidget {
   var pickedDate;
-  String hintText;
+  var hintText;
   var deleteFunction;
   bool dateIsSelected;
 
@@ -246,8 +246,6 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
       dateList.removeLast();
       String newHintText = dateList.reversed.join("-");
 
-
-
       setState(() {
         if(widget.pickedDate != null){
           widget.hintText = newHintText;
@@ -260,12 +258,12 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-
     differentText(){
+
       if (widget.dateIsSelected){
         return Text(widget.hintText, style: const TextStyle(fontSize: 16, color: Colors.black));
       } else{
-        return Text(widget.hintText, style: const TextStyle(fontSize: 13, color: Colors.grey));
+        return Text("Month/Year", style: const TextStyle(fontSize: 13, color: Colors.grey));
       }
     }
 
@@ -392,7 +390,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 
       if(date != null) date = date.toString();
 
-        dates.add(date);
+      dates.add(date);
 
     }
 
@@ -462,7 +460,6 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
   }
 
   addChildrensBirthDatePickerList(childrenCount){
-
     if(childrenCount <=8){
       widget.childrensBirthDatePickerList.add(
           CustomDatePicker(
@@ -528,7 +525,6 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
   @override
   Widget build(BuildContext context) {
-
     checkAndSetDeleteFunction();
 
     return Align(
