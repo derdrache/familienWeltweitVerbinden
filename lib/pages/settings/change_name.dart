@@ -31,6 +31,8 @@ class ChangeNamePage extends StatelessWidget {
           );
 
           Navigator.pop(context);
+        } else if(nameKontroller.text.length > 40){
+          customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
         } else {
           customSnackbar(context, AppLocalizations.of(context).usernameInVerwendung);
         }

@@ -58,7 +58,12 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   saveFunction()async {
     if(_formKey.currentState.validate()){
       var userExist = await ProfilDatabase().getOneData("id", "name", userNameKontroller.text) != false;
+      var userName = userNameKontroller.text;
 
+      if(userName.length > 40){
+        customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
+        return;
+      }
 
       if(!lookInMaps){
         bool exactCitiy = await openSelectCityWindow();
@@ -68,7 +73,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       if(checkAllValidation(userExist)){
         var userID = FirebaseAuth.instance.currentUser?.uid;
         var email = FirebaseAuth.instance.currentUser?.email;
-        var userName = userNameKontroller.text;
+
         if(selectedCity){
           var data = {
             "id": userID,

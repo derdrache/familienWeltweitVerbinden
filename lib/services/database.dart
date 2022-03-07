@@ -154,15 +154,18 @@ class ProfilDatabase{
     var allProfilFriendlists = await getAllFriendlists();
 
     for(var profil in allProfilFriendlists){
+      if(profil["friendlist"] == "" || profil["friendlist"] == []){
+        if(profil["friendlist"].isEmpty) continue;
 
-      var friendlist = jsonDecode(profil["friendlist"]);
+        var friendlist = jsonDecode(profil["friendlist"]);
 
-      if(profil["friendlist"].contains(oldName)){
-        friendlist.add(newName);
-        friendlist.remove(oldName);
+        if(profil["friendlist"].contains(oldName)){
+          friendlist.add(newName);
+          friendlist.remove(oldName);
+        }
+
+        updateProfil(profil["id"], "friendlist", friendlist);
       }
-
-      updateProfil(profil["id"], "friendlist", friendlist);
     }
   }
 
@@ -201,16 +204,16 @@ class ChatDatabase{
     var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
     await http.post(url, body: json.encode(newChatGroup));
 
-    var url2 = Uri.parse(databaseUrl + "database/chats/newMessageTable.php");
-    await http.post(url2, body: json.encode({
+
+    messageData = {
       "id": chatID,
       "date": date,
       "message": messageData["message"],
       "von": messageData["von"],
       "zu": messageData["zu"]
-    }));
+    };
 
-    _changeNewMessageCounter(messageData["zu"], newChatGroup);
+    await addNewMessage(newChatGroup, messageData);
 
     return newChatGroup;
   }
@@ -233,7 +236,7 @@ class ChatDatabase{
       data = json.encode(data);
     }
 
-    var test = await http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "id": chatId,
       "change": change,
       "data": data

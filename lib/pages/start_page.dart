@@ -107,11 +107,13 @@ class _StartPageState extends State<StartPage>{
               ){
               if(snap.hasData) {
                   var newMessages = snap.data;
+                  newMessages = newMessages == false ? 0 : int.parse(newMessages["newMessages"]);
+
 
                   return Stack(
                     clipBehavior: Clip.none, children: <Widget>[
                     const Icon(Icons.chat),
-                    int.parse(newMessages["newMessages"]) > 0 ? Positioned(
+                    newMessages > 0 ? Positioned(
                         top: -10,
                         right: -10,
                         child: Container(
