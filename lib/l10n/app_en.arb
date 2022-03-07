@@ -99,7 +99,8 @@
     "accountLoeschen": "Delete account",
     "layoutVerbessern": "improve layout",
     "neueEmailVerifizieren": "New email is valid after verification",
-    "geburtsdatumHint": "Month/Year"
+    "geburtsdatumHint": "Month/Year",
+    "usernameZuLang": "Username is too long, maximum 40 characters"
 
 }
 
