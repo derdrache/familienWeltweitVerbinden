@@ -56,6 +56,11 @@ class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
+    if(userLogedIn == null){
+      await FirebaseAuth.instance.authStateChanges().first;
+      userLogedIn = FirebaseAuth.instance.currentUser;
+    }
+
     if(kIsWeb) return ;
 
     importantUpdateNumber = await AllgemeinDatabase().getOneData("importantUpdate");
@@ -117,7 +122,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     pageContext = context;
-
 
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,

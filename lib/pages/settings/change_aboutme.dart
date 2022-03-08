@@ -20,6 +20,9 @@ class ChangeAboutmePage extends StatelessWidget {
         child: Icon(Icons.done),
         onPressed: () async {
           await ProfilDatabase().updateProfil(userId, "aboutme", bioTextKontroller.text);
+          customSnackbar(context,
+              AppLocalizations.of(context).ueberMich + " "+
+                  AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
           Navigator.pop(context);
         }
       );
@@ -27,10 +30,16 @@ class ChangeAboutmePage extends StatelessWidget {
 
     return Scaffold(
       appBar: customAppBar(title: AppLocalizations.of(context).ueberMichVeraendern, buttons: [saveButton()]),
-      body: customTextInput(
+      body: Column(
+        children: [
+          customTextInput(
               AppLocalizations.of(context).ueberMich,
               bioTextKontroller,
-              moreLines: 10)
+              moreLines: 10
+          )
+        ],
+      )
+
 
     );
   }

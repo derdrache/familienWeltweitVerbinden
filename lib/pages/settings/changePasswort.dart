@@ -65,6 +65,11 @@ class ChangePasswortPage extends StatelessWidget {
             }
 
             await FirebaseAuth.instance.currentUser?.updatePassword(newPasswort);
+
+            customSnackbar(context,
+                AppLocalizations.of(context).passwort +" "+
+                    AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+
             Navigator.pop(context);
 
           } catch (error){

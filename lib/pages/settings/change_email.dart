@@ -68,6 +68,10 @@ class ChangeEmailPage extends StatelessWidget {
       FirebaseAuth.instance.currentUser.verifyBeforeUpdateEmail(emailKontroller.text);
       await ProfilDatabase().updateProfil(userId,"email",emailKontroller.text);
       customSnackbar(context, AppLocalizations.of(context).neueEmailVerifizieren, color: Colors.green);
+
+      customSnackbar(context,
+          "Email " + AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+
       Navigator.pop(context);
     }
 

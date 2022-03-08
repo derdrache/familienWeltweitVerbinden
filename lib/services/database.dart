@@ -128,6 +128,24 @@ class ProfilDatabase{
 
   }
 
+  getOneDataFromAll(what) async{
+    var url = databaseUrl + "database/profils/getOneDataFromAll.php";
+    var data = "?param1=$what";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    dynamic responseBody = res.body;
+
+    try{
+      responseBody = jsonDecode(responseBody);
+    }catch(error){
+
+    }
+
+
+    return responseBody;
+
+  }
+
   getAllFriendlists() async {
     var url = databaseUrl + "database/profils/getAllFriendlists.php";
     var uri = Uri.parse(url);

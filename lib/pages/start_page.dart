@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:familien_suche/pages/umkreis_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -49,24 +51,28 @@ class _StartPageState extends State<StartPage>{
       print("kein Playstore");
     }
 
+    profilCheck();
 
 
-    if(userName != null){
-      var userDBEmail = await ProfilDatabase().getOneData("email","id",userID);
-      var userDeviceTokenDb = await ProfilDatabase().getOneData("token","id",userID);
-      var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
 
-      if(userAuthEmail != userDBEmail){
-        ProfilDatabase().updateProfil(userID, "email",userAuthEmail);
-      }
+  }
 
-      if(userDeviceTokenDb != userDeviceTokenReal){
+  profilCheck() async{
+    if(userName == null) return;
 
-        ProfilDatabase().updateProfil(userID, "token", userDeviceTokenReal);
-      }
+    var userDBEmail = await ProfilDatabase().getOneData("email","id",userID);
+    var userDeviceTokenDb = await ProfilDatabase().getOneData("token","id",userID);
+    var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
+
+    if(userAuthEmail != userDBEmail){
+      ProfilDatabase().updateProfil(userID, "email",userAuthEmail);
     }
 
+    if(userDeviceTokenDb != userDeviceTokenReal){
+      ProfilDatabase().updateProfil(userID, "token", userDeviceTokenReal);
+    }
 
+    ProfilDatabase().updateProfil(userID, "lastLogin", DateTime.now().toString());
   }
 
   checkIfFirstLogin(){
@@ -107,8 +113,8 @@ class _StartPageState extends State<StartPage>{
               ){
               if(snap.hasData) {
                   var newMessages = snap.data;
-                  newMessages = newMessages == false ? 0 : int.parse(newMessages["newMessages"]);
 
+                  newMessages = newMessages == false ? 0 : int.parse(newMessages["newMessages"]);
 
                   return Stack(
                     clipBehavior: Clip.none, children: <Widget>[
@@ -126,7 +132,7 @@ class _StartPageState extends State<StartPage>{
                             child: Center(
                               child: FittedBox(
                                 child: Text(
-                                  newMessages["newMessages"],
+                                newMessages.toString(),
                                   style: const TextStyle(fontWeight: FontWeight.bold,
                                       color: Colors.white),
                                 ),

@@ -39,6 +39,11 @@ class ChangeInteressenPage extends StatelessWidget {
           } else {
             await ProfilDatabase().updateProfil(
                 userId, "interessen", interessenInputBox.getSelected());
+
+            customSnackbar(context,
+                AppLocalizations.of(context).interessen +" "+
+                    AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+
             Navigator.pop(context);
           }
 

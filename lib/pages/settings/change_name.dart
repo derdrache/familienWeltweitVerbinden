@@ -48,7 +48,12 @@ class ChangeNamePage extends StatelessWidget {
 
     return Scaffold(
       appBar: customAppBar(title: AppLocalizations.of(context).nameAendern, buttons: [saveButton()]),
-      body: customTextInput("Name", nameKontroller, onSubmit: () =>saveFunction()),
+      body: Column(
+          children: [
+          customTextInput(
+          "Name", nameKontroller,
+          onSubmit: () =>saveFunction())
+          ]) ,
     );
   }
 }

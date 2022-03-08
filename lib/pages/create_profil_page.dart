@@ -35,7 +35,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var reiseArtenAuswahlBox = CustomDropDownButton();
   var interessenAuswahlBox = CustomMultiTextForm();
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
-  var windowSetState;
 
 
   @override
@@ -57,8 +56,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   saveFunction()async {
     if(_formKey.currentState.validate()){
-      var userExist = await ProfilDatabase().getOneData("id", "name", userNameKontroller.text) != false;
       var userName = userNameKontroller.text;
+      var userExist = await ProfilDatabase().getOneData("id", "name", userName) != false;
 
       if(userName.length > 40){
         customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
@@ -69,6 +68,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         bool exactCitiy = await openSelectCityWindow();
         if(!exactCitiy) return;
       }
+
 
       if(checkAllValidation(userExist)){
         var userID = FirebaseAuth.instance.currentUser?.uid;
@@ -255,7 +255,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                       Align(
                         child: Container(
                           width: 600,
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.only(top: 10, bottom: 10),
                             child: Text(
                               AppLocalizations.of(context).anzahlUndAlterKinder,
                               style: const TextStyle(

@@ -221,19 +221,18 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     var spracheMatch = checkMatch(filterList, profilSprachen,
         global_var.sprachenListe + global_var.sprachenListeEnglisch);
-
     var reiseartMatch = checkMatch(filterList, [profilReiseart],
         global_var.reisearten + global_var.reiseartenEnglisch);
     var interesseMatch = checkMatch(filterList, profilInteressen,
         global_var.interessenListe +global_var.interessenListeEnglisch);
-    var userMatch = checkMatch(filterList, [profilName], allUserName);
+    var userMatch = checkMatch(filterList, [profilName], allUserName, userSearch: true);
 
     if(spracheMatch && reiseartMatch && interesseMatch && userMatch) return true;
 
     return false;
   }
 
-  checkMatch(List selected, List checkList, globalList){
+  checkMatch(List selected, List checkList, globalList, {userSearch = false}){
     bool globalMatch = false;
     bool match = false;
 
@@ -241,6 +240,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
       if(globalList.contains(select)) globalMatch = true;
 
       if(checkList.contains(select)) match = true;
+
+      if(userSearch) continue;
 
       if(globalMatch && !match){
         int halfListNumber = (globalList.length /2).toInt();
@@ -407,11 +408,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed){
             if(changed){
-                setState(() {
-                  changeProfil(position.zoom);
-                  mapZoom = position.zoom;
-                  FocusScope.of(context).unfocus();
-                });
+              mapZoom = position.zoom;
+              FocusScope.of(context).unfocus();
+              changeProfil(mapZoom);
             }
           }
         ),
@@ -440,12 +439,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
                       child: Icon(Icons.zoom_out_map),
                       onPressed: () {
                         mapController.move(LatLng(0, 0), minMapZoom);
-                        setState(() {
-                          changeProfil(minMapZoom);
-                          mapZoom = minMapZoom;
-                          FocusScope.of(context).unfocus();
-                        });
-
+                        mapZoom = minMapZoom;
+                        FocusScope.of(context).unfocus();
+                        changeProfil(mapZoom);
                       }
                     ),
                   )
