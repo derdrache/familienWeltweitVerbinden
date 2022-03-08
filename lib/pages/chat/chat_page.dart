@@ -23,10 +23,12 @@ class _ChatPageState extends State<ChatPage>{
   var userEmail = FirebaseAuth.instance.currentUser.email;
   var globalChatGroups = [];
   var testWindow;
+  var searchAutocomplete;
 
 
   selectChatpartnerWindow() async {
     dynamic userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
+    var allName = await ProfilDatabase().getOneDataFromAll("name");
 
     userFriendlist = userFriendlist["friendlist"];
     if(userFriendlist is String) userFriendlist = jsonDecode(userFriendlist);
@@ -49,7 +51,7 @@ class _ChatPageState extends State<ChatPage>{
                           children: [
                             WindowTopbar(title: AppLocalizations.of(context).neuenChatEroeffnen),
                             const SizedBox(height: 10),
-                            personenSuchBox(buildContext),
+                            personenSuchBox(buildContext, allName),
                             const SizedBox(height: 10),
                             ...createFriendlistBox(userFriendlist)
                           ]
@@ -76,30 +78,31 @@ class _ChatPageState extends State<ChatPage>{
     );
   }
 
-  searchUser(eingabe, buildContext) async {
-    var chatPartner = eingabe;
-    if(chatPartner != "" && chatPartner != userName && chatPartner != userEmail){
-      var chatPartnerId = await findUserGetId(eingabe);
-      chatPartnerId = chatPartnerId["id"];
+  searchUser() async {
+    var chatPartner = searchAutocomplete.getSelected()[0];
+    var chatPartnerId = await ProfilDatabase().getOneData("id", "name", chatPartner);
 
-      if(chatPartnerId != null){
-        validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId);
-      } else {
-        customSnackbar(buildContext, AppLocalizations.of(context).benutzerNichtGefunden);
-      }
-    }
+    chatPartnerId = chatPartnerId["id"];
+
+    validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
   }
 
-  Widget personenSuchBox(buildContext){
+  Widget personenSuchBox(buildContext, allName){
     var personenSucheController = TextEditingController();
+    searchAutocomplete = SearchAutocomplete(
+      searchableItems: allName,
+      withFilter: false,
+      onConfirm: (){
+        searchUser();
+      },
+    );
 
-    return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 50,
-              width: 200,
-              child: TextField(
+    return Center(
+            child: SizedBox(
+              width: 300,
+              child: searchAutocomplete
+              /*
+              TextField(
                   controller: personenSucheController,
                   decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
@@ -114,6 +117,8 @@ class _ChatPageState extends State<ChatPage>{
                   },
               ),
 
+
+
             ),
             TextButton(
               child: const Icon(Icons.search),
@@ -124,8 +129,9 @@ class _ChatPageState extends State<ChatPage>{
               },
             )
 
-
-          ]);
+ */
+            )
+          );
   }
 
   List<Widget> createFriendlistBox(userFriendlist){
@@ -162,15 +168,18 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   validCheckAndOpenChatgroup({chatPartnerID, name}) async {
-    if(name != null){
+    //alles in chatDetails klären
+
+    if(chatPartnerID == null){
       chatPartnerID = await ProfilDatabase().getOneData("id", "name", name);
       chatPartnerID = chatPartnerID["id"];
     }
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
-    var chatPartnerName = await ProfilDatabase().getOneData("name", "id", chatPartnerID);
+
+    //dieser Prozess muss in chatDetails
     var userData = {
       "users": {
-        chatPartnerID: {"name": chatPartnerName["name"], "newMessages": 0},
+        chatPartnerID: {"name": name, "newMessages": 0},
         userId: {"name": userName, "newMessages": 0},
       }
     };
@@ -180,21 +189,19 @@ class _ChatPageState extends State<ChatPage>{
     if(checkAndIndex[0]){
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => changePage(context, ChatDetailsPage(
+          MaterialPageRoute(builder: (_) => ChatDetailsPage(
               groupChatData: userData,
               newChat: true
-          )))
+          ))
       ).whenComplete(() => setState(() {}));
-
-
 
 
     } else{
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => changePage(context, changePage(context, ChatDetailsPage(
+          MaterialPageRoute(builder: (_) => ChatDetailsPage(
             groupChatData: globalChatGroups[checkAndIndex[1]],
-          ))))
+          ))
       ).whenComplete(() => setState(() {}));
 
     }
@@ -229,6 +236,15 @@ class _ChatPageState extends State<ChatPage>{
 
   }
 
+  cutMessage(message){
+    if(message.length > 80) message = message.substring(0,80) +"...";
+    var messageList = message.split("\n") ?? [];
+
+    if(messageList.length > 2) message = [messageList[0] ?? " " + messageList[1] ?? " "].join("\n") + " ...";
+
+    return message;
+  }
+
 
   @override
   Widget build(BuildContext context){
@@ -246,8 +262,7 @@ class _ChatPageState extends State<ChatPage>{
           }
         });
 
-        var lastMessage = group["lastMessage"];
-        if(lastMessage.length > 80) lastMessage = lastMessage.substring(0,80) +"...";
+        var lastMessage = cutMessage(group["lastMessage"]);
 
         var ownChatNewMessages = users[userId]["newMessages"];
         var lastMessageTime = dbSecondsToTimeString(json.decode(group["lastMessageDate"]));

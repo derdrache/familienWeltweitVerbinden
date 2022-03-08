@@ -110,9 +110,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   messageToDbAndClearMessageInput(message)async {
     var userID = FirebaseAuth.instance.currentUser.uid;
 
-    if(nachrichtController.text == "") return;
+    var messageList = nachrichtController.text.split("\n");
+    var checkMessage = messageList.join();
 
-    nachrichtController.clear();
+    if(checkMessage == "") return;
 
     var messageData = {
       "message" :message,
@@ -169,6 +170,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+
     messageList(messages){
       List<Widget> messageBox = [];
 
@@ -188,7 +190,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           Align(
             alignment: textAlign, //right and left
             child: Container(
-                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.85),
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: boxColor,
@@ -302,6 +304,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                     messageToDbAndClearMessageInput(nachrichtController.text);
 
                     setState(() {
+                      nachrichtController.clear();
                       messageInputHeight = 50;
                     });
                   },

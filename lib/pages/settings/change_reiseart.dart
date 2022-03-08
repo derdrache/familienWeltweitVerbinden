@@ -38,6 +38,9 @@ class ChangeReiseartPage extends StatelessWidget {
             await ProfilDatabase().updateProfil(
                 userId, "reiseart", reiseArtInput.getSelected()
             );
+            customSnackbar(context,
+                AppLocalizations.of(context).artDerReise +" "+
+                    AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
             Navigator.pop(context);
           }
         },

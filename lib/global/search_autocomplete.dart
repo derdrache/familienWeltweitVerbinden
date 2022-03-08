@@ -24,7 +24,7 @@ class SearchAutocomplete extends StatefulWidget {
     this.onConfirm,
     this.onDelete,
     this.withFilter = true
-  }) : super(key: key);
+  }) : isDense = !withFilter;
 
   @override
   _SearchAutocompleteState createState() => _SearchAutocompleteState();
@@ -88,8 +88,8 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
   @override
   Widget build(BuildContext context) {
-    double dropdownItemSumHeight = widget.autoCompleteItems.length *39.0;
-    if(widget.autoCompleteItems.length *39 > 160) dropdownItemSumHeight = 160;
+    double dropdownItemSumHeight = widget.autoCompleteItems.length *38.0;
+    if(widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = 152;
 
     dropDownItem(item){
       return GestureDetector(
@@ -118,11 +118,11 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
       return Container(
           height: dropdownItemSumHeight,
-          margin: EdgeInsets.only(top: widget.isDense? 25 : 0),
+          margin: EdgeInsets.only(top: (widget.isDense && widget.withFilter)? 29: 0),
           child: ListView(
-          padding: EdgeInsets.only(top: 0),
-          children: autoCompleteList,
-      ),
+            padding: EdgeInsets.only(top: widget.withFilter? 0: 5),
+            children: autoCompleteList,
+          ),
       );
     }
 
@@ -174,7 +174,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                   textAlignVertical: TextAlignVertical.top,
                   controller: widget.searchKontroller,
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.only(top:5),
+                    contentPadding: EdgeInsets.only(top: widget.withFilter? 5: 15),
                     isDense: widget.isDense,
                     border: InputBorder.none,
                     hintText: 'Search',
@@ -191,7 +191,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
             ],
           ),
-          if(widget.isDense) Positioned(
+          if(widget.isDense && widget.withFilter) Positioned(
             top: 30,
             child: createFilterBox()
           ),

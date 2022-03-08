@@ -39,6 +39,9 @@ class ChangeSprachenPage extends StatelessWidget {
           } else {
             await ProfilDatabase().updateProfil(
                 userId, "sprachen", sprachenInputBox.getSelected());
+            customSnackbar(context,
+                AppLocalizations.of(context).sprachen +" "+
+                    AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
             Navigator.pop(context);
           }
         },

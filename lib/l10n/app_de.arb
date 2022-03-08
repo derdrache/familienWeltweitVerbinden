@@ -101,5 +101,7 @@
     "layoutVerbessern": "Layout verbessern",
     "neueEmailVerifizieren": "Neue Email ist nach dem Verifizieren gültig",
     "geburtsdatumHint": "Monat/Jahr",
-    "usernameZuLang": "Benutzername ist zu lang, maximal 40 Zeichen"
+    "usernameZuLang": "Benutzername ist zu lang, maximal 40 Zeichen",
+    "feedbackDanke": "Vielen Dank für dein Feedback",
+    "erfolgreichGeaender": "erfolgreich geändert"
 }

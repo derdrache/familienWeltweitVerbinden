@@ -28,7 +28,6 @@ class UmcomingUpdatesWindow{
         context: context,
         title: patchnotesTitle,
         children: [
-          _update("Web Version"),
           _update(AppLocalizations.of(context).familienAnzeige),
           _update(AppLocalizations.of(context).automatischerStandort),
           _update(AppLocalizations.of(context).nutzerBlockieren),

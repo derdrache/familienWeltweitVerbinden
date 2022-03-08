@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -32,6 +33,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   userLogin() async{
+    if(kIsWeb) FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+
     try{
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
@@ -79,15 +82,13 @@ class _LoginPageState extends State<LoginPage> {
           ],
         )
 
-
-
       );
     }
 
     Widget forgetPassButton(){
       return Align(
         child: SizedBox(
-          width: 150,
+          width: 200,
           child: TextButton(
               style: ButtonStyle(
                   foregroundColor: MaterialStateProperty.all(Colors.black)
