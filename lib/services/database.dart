@@ -158,6 +158,7 @@ class ProfilDatabase{
   
   updateProfilName(userId, oldName, newName) async{
     FirebaseAuth.instance.currentUser.updateDisplayName(newName);
+
     updateProfil(userId, "name", newName);
 
     var chats = await ChatDatabase().getAllChatgroupsFromUser(userId);

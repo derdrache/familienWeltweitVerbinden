@@ -65,15 +65,12 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
   }
 
   addFilterItem(item){
+    if(widget.filterList.length == 3) return ;
 
     if (!widget.filterList.contains(item)){
       widget.filterList.add(item);
       if(widget.withFilter) widget.isDense = true;
     }
-
-
-
-
   }
 
   resetSearchBar(){
@@ -174,7 +171,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                   textAlignVertical: TextAlignVertical.top,
                   controller: widget.searchKontroller,
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.only(top: widget.withFilter? 5: 15),
+                    contentPadding: EdgeInsets.only(top: widget.withFilter? widget.isDense? 9 : 5 : 15),
                     isDense: widget.isDense,
                     border: InputBorder.none,
                     hintText: 'Search',

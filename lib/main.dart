@@ -144,6 +144,7 @@ class MyApp extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           return MaterialApp(
+            title: "families worldwide",
             theme: ThemeData(
               scaffoldBackgroundColor: Colors.white,
               colorScheme: ColorScheme.fromSwatch().copyWith(
