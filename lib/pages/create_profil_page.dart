@@ -54,10 +54,64 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     super.initState();
   }
 
+  _showDialog() async {
+    return await showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: new Text(AppLocalizations.of(context).alterSicherheitsabfrageTitle),
+          content: new Text(AppLocalizations.of(context).alterSicherheitsabfrageBody),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            TextButton(
+              child: new Text("Nein"),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: new Text("Ja"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  lookForNewBorn(childrenAgeList){
+    var monthNow = DateTime.now().month;
+    var yearNow = DateTime.now().year;
+
+    for(var childrenAge in childrenAgeList){
+      var ageDate = DateTime.parse(childrenAge);
+      var childrenMonth = ageDate.month;
+      var childrenYear = ageDate.year;
+
+      if(monthNow == childrenMonth && yearNow == childrenYear){
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   saveFunction()async {
+    var children = childrenAgePickerBox.getDates();
+    var newBorn = lookForNewBorn(children);
+
+    if(newBorn) {
+      var sicherheitsAbfrage = await _showDialog();
+      if(!sicherheitsAbfrage) return;
+    }
+
     if(_formKey.currentState.validate()){
       var userName = userNameKontroller.text;
       var userExist = await ProfilDatabase().getOneData("id", "name", userName) != false;
+
+
 
       if(userName.length > 40){
         customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
@@ -81,7 +135,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "name": userName,
             "ort": ortMapData["city"], //groß und kleinschreibung?
             "interessen": interessenAuswahlBox.getSelected(),
-            "kinder": childrenAgePickerBox.getDates(),
+            "kinder": children,
             "land": ortMapData["countryname"],
             "longt": ortMapData["longt"],
             "latt":  ortMapData["latt"],
@@ -255,7 +309,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                       Align(
                         child: Container(
                           width: 600,
-                          padding: const EdgeInsets.only(top: 10, bottom: 10),
+                          padding: const EdgeInsets.all(10),
                             child: Text(
                               AppLocalizations.of(context).anzahlUndAlterKinder,
                               style: const TextStyle(
