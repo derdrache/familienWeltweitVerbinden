@@ -16,22 +16,25 @@ class ChangeNamePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     nameKontroller.text = oldName;
+
     saveFunction() async{
       if(nameKontroller.text == ""){
         customSnackbar(context, AppLocalizations.of(context).neuenNamenEingeben);
       } else{
 
         var userName = FirebaseAuth.instance.currentUser.displayName;
-        var checkUserProfilExist = await ProfilDatabase().getOneData("id", "name", nameKontroller.text);
+        var newUserName = nameKontroller.text;
+        newUserName = newUserName.replaceAll("'" , "\\'");
 
+        var checkUserProfilExist = await ProfilDatabase().getOneData("id", "name", newUserName);
         if(checkUserProfilExist == false){
 
           await ProfilDatabase().updateProfilName(
-              userId, userName, nameKontroller.text
+              userId, userName, newUserName
           );
 
           Navigator.pop(context);
-        } else if(nameKontroller.text.length > 40){
+        } else if(newUserName.length > 40){
           customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
         } else {
           customSnackbar(context, AppLocalizations.of(context).usernameInVerwendung);

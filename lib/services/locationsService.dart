@@ -63,9 +63,14 @@ class LocationService {
 
         var city = _isNumeric(formattedCity.first) ?
         formattedCity.last : formattedCity.join(" ");
+        var cityList = [];
+        for(var item in city.split(" ")){
+          if(!_isNumeric(item)) cityList.add(item);
+        }
+        city = cityList.join(" ");
+
 
         var country = formattedAddressList.last;
-
         if(country.contains(" - ")){
           city = city.split(" - ")[0];
           country = country.split(" - ")[1];

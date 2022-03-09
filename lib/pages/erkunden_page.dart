@@ -33,9 +33,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var profilsCities = [];
   var aktiveProfils = [];
   double minMapZoom = kIsWeb ? 2.0:  1.6;
+  double maxZoom = 9;
   double mapZoom = 1.6;
   double cityZoom = 6.5;
   dynamic searchAutocomplete = SizedBox.shrink();
+  var mapPosition;
+  bool buildLoaded = false;
 
 
   @override
@@ -69,6 +72,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     databaseProfils = profils;
     createAndSetZoomProfils();
+
+    buildLoaded = true;
   }
 
 
@@ -117,7 +122,10 @@ class _ErkundenPageState extends State<ErkundenPage>{
       var newCity = false;
 
       for(var i = 0; i< list.length; i++){
-        if(profil["longt"] == list[i]["longt"] && profil["latt"] == list[i]["latt"]){
+        double profilLongt = double.parse(profil["longt"]);
+        double profilLatt = double.parse(profil["latt"]);
+
+        if(profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"]){
           newCity = true;
           list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
           list[i]["profils"].add(profil);
@@ -282,10 +290,28 @@ class _ErkundenPageState extends State<ErkundenPage>{
       mapZoom = 6.6;
     }
 
+    mapPosition = position;
     mapController.move(position, mapZoom);
     setState(() {
       changeProfil(mapZoom);
     });
+  }
+
+  zoomOut(){
+    var newZoom;
+    if(mapZoom > 6.6){
+      newZoom = 6.6;
+    } else if (mapZoom > 4.1){
+      newZoom = 4.1;
+    } else{
+      newZoom = minMapZoom;
+    }
+
+
+    mapController.move(mapPosition, newZoom);
+    mapZoom = newZoom;
+    FocusScope.of(context).unfocus();
+    changeProfil(mapZoom);
   }
 
   @override
@@ -404,15 +430,18 @@ class _ErkundenPageState extends State<ErkundenPage>{
           center: LatLng(25, 0),
           zoom: minMapZoom,
           minZoom: minMapZoom,
-          maxZoom: 9,
+          maxZoom: maxZoom,
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed){
-            if(changed){
+            if(buildLoaded){
+              print(position.center);
+              mapPosition = position.center;
               mapZoom = position.zoom;
               FocusScope.of(context).unfocus();
               changeProfil(mapZoom);
             }
-          }
+
+          },
         ),
         layers: [
           TileLayerOptions(
@@ -428,25 +457,20 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
 
     return Padding(
-                padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
-                child: Stack(children: [
-                  ownFlutterMap(),
-                  searchAutocomplete,
-                  if(mapZoom > minMapZoom) Positioned(
-                    bottom: 10,
-                    right: 10,
-                    child: FloatingActionButton(
-                      child: Icon(Icons.zoom_out_map),
-                      onPressed: () {
-                        mapController.move(LatLng(0, 0), minMapZoom);
-                        mapZoom = minMapZoom;
-                        FocusScope.of(context).unfocus();
-                        changeProfil(mapZoom);
-                      }
-                    ),
-                  )
-                ]),
-              );
+      padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
+      child: Stack(children: [
+        ownFlutterMap(),
+        searchAutocomplete,
+        if(mapZoom > minMapZoom) Positioned(
+          bottom: 10,
+          right: 10,
+          child: FloatingActionButton(
+              child: Icon(Icons.zoom_out_map),
+              onPressed: () => zoomOut()
+          ),
+        )
+      ]),
+    );
 
   }
 }

@@ -109,6 +109,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
     if(_formKey.currentState.validate()){
       var userName = userNameKontroller.text;
+      userName = userName.replaceAll("'" , "\\'");
       var userExist = await ProfilDatabase().getOneData("id", "name", userName) != false;
 
 
