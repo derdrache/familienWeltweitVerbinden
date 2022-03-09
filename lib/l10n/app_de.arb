@@ -103,5 +103,8 @@
     "geburtsdatumHint": "Monat/Jahr",
     "usernameZuLang": "Benutzername ist zu lang, maximal 40 Zeichen",
     "feedbackDanke": "Vielen Dank für dein Feedback",
-    "erfolgreichGeaender": "erfolgreich geändert"
+    "erfolgreichGeaender": "erfolgreich geändert",
+    "alterSicherheitsabfrageTitle": "Kind mit 0-1 Monaten hinzugefügt",
+    "alterSicherheitsabfrageBody" : "Bist du sicher, dass du ein Neugeborenes hinzufügen möchtest?"
+
 }
