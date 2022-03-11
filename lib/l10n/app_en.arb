@@ -21,7 +21,7 @@
     "userEmailNichtGefunden": "No user found for the email address",
     "spracheAuswaehlen": "Select languages",
     "interessenAuswaehlen" : "Select interests",
-    "stadtNichtBestaetigt": "City not confirmed",
+    "ortNichtBestaetigt": "Location not confirmed",
     "bitteEingabeKorrigieren": "Please correct entries: ",
     "usernameInVerwendung": "Name is already in use",
     "reiseartAuswaehlen": "Select travel type",
@@ -29,7 +29,7 @@
     "genauenStandortWaehlen": "Please select the exact location",
     "profilErstellen": "Create profile",
     "benutzername" : "User name",
-    "stadtEingeben": "Enter current city",
+    "ortEingeben": "Enter current location",
     "anzahlUndAlterKinder": "number and ages of children:",
     "emailNichtBestaetigt": "Email has not yet been confirmed",
     "benutzerNichtGefunden" : "user not found",
@@ -43,8 +43,8 @@
     "ueberMichVeraendern": "change about me",
     "ueberMich": "About me",
     "kinderAendern": "change children",
-    "stadtAendern": "Change current city",
-    "bitteGenaueStadtAuswaehlen": "Please select the desired city",
+    "ortAendern": "Change current location",
+    "bitteGenaueOrtAuswaehlen": "Please select the desired location",
     "emailOderPasswortFalsch": "Wrong email or password",
     "emailAendern": "Change E-Mail",
     "neueEmail": "new email",
@@ -69,7 +69,7 @@
     "privatsphaereSicherheit":"Privacy and security",
     "abmelden": "Log off",
     "antippenZumAendern": "Tap to change entries",
-    "aktuelleStadt": "Current City",
+    "aktuelleOrt": "Current location",
     "artDerReise": "Type of travel",
     "alterDerKinder": "Age of the children",
     "interessen": "Interests",
@@ -103,7 +103,7 @@
     "usernameZuLang": "Username is too long, maximum 40 characters",
     "feedbackDanke": "Thanks for your feedback",
     "erfolgreichGeaender": "successfully changed",
-    "alterSicherheitsabfrageTitle": "Added child with 0-1 months",
-    "alterSicherheitsabfrageBody" : "Are you sure you want to add a newborn?"
+    "ortEingabeInformation": "For the location, you can decide how precise your input should be. \n The more precise your input is, the more likely it is that you will be contacted by others.  \n\n Examples for the input: City / Country / Region"
+
 }
 

@@ -130,7 +130,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       });
     } else {
 
-      await ChatDatabase().addNewMessage(widget.groupChatData, messageData);
+      await ChatDatabase().addNewMessageAndSendNotification(widget.groupChatData, messageData);
       ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessage", messageData["message"]);
       ChatDatabase().updateChatGroup(widget.groupChatData["id"], "lastMessageDate", messageData["date"]);
 

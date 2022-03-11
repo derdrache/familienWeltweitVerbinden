@@ -1,12 +1,15 @@
 import 'dart:ui';
 import 'dart:io';
 
+import 'package:familien_suche/global/search_autocomplete.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 
+import '../auth/secrets.dart';
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_variablen;
@@ -28,6 +31,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   bool selectedCity = false;
   var userNameKontroller = TextEditingController();
   var ortTextcontroller = TextEditingController();
+  var ortSuche = "";
   bool lookInMaps = false;
   var ortMapData = {};
   var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
@@ -54,58 +58,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     super.initState();
   }
 
-  _showDialog() async {
-    return await showDialog(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: new Text(AppLocalizations.of(context).alterSicherheitsabfrageTitle),
-          content: new Text(AppLocalizations.of(context).alterSicherheitsabfrageBody),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            TextButton(
-              child: new Text("Nein"),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            ),
-            TextButton(
-              child: new Text("Ja"),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  lookForNewBorn(childrenAgeList){
-    var monthNow = DateTime.now().month;
-    var yearNow = DateTime.now().year;
-
-    for(var childrenAge in childrenAgeList){
-      var ageDate = DateTime.parse(childrenAge);
-      var childrenMonth = ageDate.month;
-      var childrenYear = ageDate.year;
-
-      if(monthNow == childrenMonth && yearNow == childrenYear){
-        return true;
-      }
-    }
-
-    return false;
-  }
 
   saveFunction()async {
     var children = childrenAgePickerBox.getDates();
-    var newBorn = lookForNewBorn(children);
-
-    if(newBorn) {
-      var sicherheitsAbfrage = await _showDialog();
-      if(!sicherheitsAbfrage) return;
-    }
 
     if(_formKey.currentState.validate()){
       var userName = userNameKontroller.text;
@@ -148,7 +103,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           ProfilDatabase().addNewProfil(data);
           global_functions.changePageForever(context, StartPage(registered: true));
         } else{
-          customSnackbar(context, AppLocalizations.of(context).stadtNichtBestaetigt);
+          customSnackbar(context, AppLocalizations.of(context).ortNichtBestaetigt);
         }
       }
     }
@@ -285,6 +240,27 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       );
     }
 
+    openInfoWindow(text){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Information"),
+            content: Text(text),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
     return Scaffold(
       body: Container(
         margin: const EdgeInsets.only(top: 30),
@@ -300,10 +276,17 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                       pageTitle(),
                       customTextInput(AppLocalizations.of(context).benutzername, userNameKontroller,
                           validator: global_functions.checkValidatorEmpty(context)),
-                      customTextInput(AppLocalizations.of(context).stadtEingeben, ortTextcontroller,
+                      SearchAutocomplete(),
+
+
+                      /*
+                      customTextInput(AppLocalizations.of(context).ortEingeben, ortTextcontroller,
                           validator: global_functions.checkValidatorEmpty(context),
-                        onSubmit: () => openSelectCityWindow()
+                        onSubmit: () => openSelectCityWindow(),
+                        informationWindow: () => openInfoWindow(AppLocalizations.of(context).ortEingabeInformation)
                       ),
+
+                       */
                       reiseArtenAuswahlBox,
                       sprachenAuswahlBox,
                       interessenAuswahlBox,

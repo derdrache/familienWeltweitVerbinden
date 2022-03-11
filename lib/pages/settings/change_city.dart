@@ -9,9 +9,6 @@ class ChangeCityPage extends StatefulWidget {
 
   ChangeCityPage({Key key, this.userId}) : super(key: key);
 
-
-
-
   @override
   _ChangeCityPageState createState() => _ChangeCityPageState();
 }
@@ -50,7 +47,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       } else{
         await pushLocationDataToDB(suggestedCities[0]);
         customSnackbar(context,
-            AppLocalizations.of(context).aktuelleStadt +" "+
+            AppLocalizations.of(context).aktuelleOrt +" "+
                 AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
         Navigator.pop(context);
       }
@@ -67,6 +64,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
   @override
   Widget build(BuildContext context) {
+
     createSuggestedList(List suggestedCities){
       List<Widget> newSuggestList = [];
 
@@ -98,24 +96,45 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
     createSuggestedList(suggestedCities);
 
+    openInfoWindow(text){
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Information"),
+            content: Text(text),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("OK"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
 
     return Scaffold(
       appBar: customAppBar(
-          title: AppLocalizations.of(context).stadtAendern,
+          title: AppLocalizations.of(context).ortAendern,
           buttons: <Widget>[saveButton()]
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          customTextInput(AppLocalizations.of(context).stadtEingeben,
+          customTextInput(AppLocalizations.of(context).ortEingeben,
               ortChangeKontroller,
-              onSubmit: () => saveLocation()
+              onSubmit: () => saveLocation(),
+            informationWindow: () => openInfoWindow(AppLocalizations.of(context).ortEingabeInformation)
 
           ),
           suggestedCitiesList.isNotEmpty ? Padding(
             padding: const EdgeInsets.all(12.0),
             child: Text(
-              AppLocalizations.of(context).bitteGenaueStadtAuswaehlen + ":",
+              AppLocalizations.of(context).bitteGenaueOrtAuswaehlen + ":",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ): const SizedBox.shrink(),

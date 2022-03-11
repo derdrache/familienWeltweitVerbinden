@@ -86,7 +86,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
   @override
   Widget build(BuildContext context) {
     double dropdownItemSumHeight = widget.autoCompleteItems.length *38.0;
-    if(widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = 152;
+    if(widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = widget.withFilter? 160 : 152;
 
     dropDownItem(item){
       return GestureDetector(
@@ -115,7 +115,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
       return Container(
           height: dropdownItemSumHeight,
-          margin: EdgeInsets.only(top: (widget.isDense && widget.withFilter)? 29: 0),
+          margin: EdgeInsets.only(top: (widget.isDense && widget.withFilter)? 25: 0),
           child: ListView(
             padding: EdgeInsets.only(top: widget.withFilter? 0: 5),
             children: autoCompleteList,

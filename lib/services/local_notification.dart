@@ -1,22 +1,11 @@
 
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotificationService{
   static final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
-
-/*
-  static void initialize(){
-    var initializationSettings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher')
-    );
-
-    _notificationsPlugin.initialize(initializationSettings, onSelectNotification: (payload) async {print("test");});
-  }
-
- */
-
-
 
   void display(RemoteMessage message) async {
 
@@ -38,7 +27,7 @@ class LocalNotificationService{
           message.notification.title,
           message.notification.body,
           notificationDetails,
-        payload: message.data["chatId"]
+          payload: json.decode(message.data.values.last)["link"]
       );
     } on Exception catch (e) {
       // TODO

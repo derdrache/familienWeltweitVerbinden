@@ -36,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     if(kIsWeb) FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
 
     try{
+      email = email.replaceAll(' ', '');
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email,
           password: passwort);
