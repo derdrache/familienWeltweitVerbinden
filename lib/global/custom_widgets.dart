@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:familien_suche/global/year_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,33 +15,54 @@ double webWidth = 600;
 
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
-  onSubmit}){
+  onSubmit, informationWindow}){
   return Align(
-    child: Container(
-      width: webWidth,
-      margin: EdgeInsets.all(sideSpace),
-      child: TextFormField(
-        onFieldSubmitted: (string) {
-          if(onSubmit != null)onSubmit();
-        },
-        textInputAction: textInputAction,
-        textAlignVertical: TextAlignVertical.top,
-        maxLines: moreLines,
-        obscureText: passwort,
-        controller: controller,
-        decoration: InputDecoration(
-          isDense: true,
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
-          ),
-          border: const OutlineInputBorder(),
-          alignLabelWithHint: true,
-          labelText: text,
-          labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
-          //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
+    child: Stack(
+      children: [
+        Container(
+            width: webWidth,
+            margin: EdgeInsets.all(sideSpace),
+            child: TextFormField(
+                onFieldSubmitted: (string) {
+                  if(onSubmit != null)onSubmit();
+                },
+                textInputAction: textInputAction,
+                textAlignVertical: TextAlignVertical.top,
+                maxLines: moreLines,
+                obscureText: passwort,
+                controller: controller,
+                decoration: InputDecoration(
+                  isDense: true,
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black),
+                  ),
+                  border: const OutlineInputBorder(),
+                  alignLabelWithHint: true,
+                  labelText: text,
+                  labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+                  //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
+                ),
+                validator: validator
+            ),
         ),
-        validator: validator
-      ),
+        if (informationWindow != null) Positioned(
+            left:5,
+            top: 2,
+            child: Container(
+              alignment: Alignment.topCenter,
+              margin: EdgeInsets.only(bottom: 10),
+              width: 20,
+              height: 20,
+              child: IconButton(
+                  padding: EdgeInsets.all(0),
+                  alignment: Alignment.topCenter,
+                  iconSize: 20,
+                  icon: Icon(Icons.info),
+                  onPressed: () => informationWindow()
+              ),
+            )
+        )
+      ]
     ),
   );
 }
@@ -234,8 +256,7 @@ class CustomDatePicker extends StatefulWidget {
 class _CustomDatePickerState extends State<CustomDatePicker> {
 
   datePicker() async{
-
-    return showMonthPicker(
+    return showYearPicker(
         context: context,
         firstDate: DateTime(DateTime.now().year - 18, DateTime.now().month),
         lastDate: DateTime(DateTime.now().year, DateTime.now().month),
@@ -247,8 +268,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
     return () async{
       widget.pickedDate = await datePicker();
       var dateList = widget.pickedDate.toString().split(" ")[0].split("-");
-      dateList.removeLast();
-      String newHintText = dateList.reversed.join("-");
+      String newHintText = dateList[0];
 
       setState(() {
         if(widget.pickedDate != null){
@@ -262,36 +282,33 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
 
   @override
   Widget build(BuildContext context) {
+    
     differentText(){
-
       if (widget.dateIsSelected){
         return Text(widget.hintText, style: const TextStyle(fontSize: 16, color: Colors.black));
       } else{
-        return Text("Month/Year", style: const TextStyle(fontSize: 13, color: Colors.grey));
+        return Text("Year", style: const TextStyle(fontSize: 13, color: Colors.grey));
       }
     }
 
     return GestureDetector(
       onTap: showDate(),
       child: FractionallySizedBox(
-        widthFactor: 0.5,
+        widthFactor: 0.25,
         child: Stack(
           clipBehavior: Clip.antiAliasWithSaveLayer,
           children: [
             Container(
               height: boxHeight,
               margin: EdgeInsets.all(sideSpace),
-              padding: EdgeInsets.only(left: sideSpace/2, right: sideSpace/2),
+              padding: EdgeInsets.only(left: sideSpace, right: sideSpace/2),
               decoration: BoxDecoration(
                   border: Border.all(width: 1),
                   borderRadius: BorderRadius.all(Radius.circular(borderRounding))
               ),
               child: Row(
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: differentText(),
-                    ),
+                    differentText(),
                     const Expanded(child: SizedBox.shrink()),
                   ]
               )
@@ -384,7 +401,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
 
 class ChildrenBirthdatePickerBox extends StatefulWidget {
   List childrensBirthDatePickerList = [];
-  String hintText = "Month/Year";
+  String hintText = "Year";
 
   getDates({bool years = false}){
     List dates = [];
@@ -441,7 +458,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 
 class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox> {
   var childrens = 1;
-  var maxChildrens = 6;
+  var maxChildrens = 8;
 
   @override
   void initState() {
@@ -507,7 +524,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
         newPicker.add(
             CustomDatePicker(
-                hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
+                hintText: hintText.split(" ")[0].split("-")[0],
                 pickedDate: dates[i],
                 dateIsSelected: dates[i] != null
             )
@@ -515,7 +532,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
       } else{
         newPicker.add(
             CustomDatePicker(
-                hintText: hintText.split(" ")[0].split("-").reversed.join("-"),
+                hintText: hintText.split(" ")[0].split("-")[0],
                 pickedDate: dates[i],
                 deleteFunction: deleteFunction(),
                 dateIsSelected: dates[i] != null

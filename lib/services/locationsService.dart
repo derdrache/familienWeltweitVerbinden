@@ -119,6 +119,23 @@ class LocationService {
     return null;
   }
 
+  getAllCountries() async {
+    var jsonText = await rootBundle.loadString('assets/countryGeodata.json');
+    var data = json.decode(jsonText)["data"];
+    List<String> countriesListGer = [];
+    List<String> countriesListEng = [];
+
+    for(var country in data){
+      countriesListGer.add(country["nameGer"]);
+      countriesListEng.add(country["nameEng"]);
+    }
+
+    return {
+      "ger" : countriesListGer,
+      "eng" : countriesListEng
+    };
+  }
+
 }
 
 

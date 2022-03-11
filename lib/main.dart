@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -72,40 +74,45 @@ class MyApp extends StatelessWidget {
     var initializationSettings = InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher')
     );
-
     _notificationsPlugin.initialize(
         initializationSettings,
-        onSelectNotification: (payload) async => changeToChat(payload)
+        onSelectNotification: (payload) async {
+          changeToChat(payload);
+        }
     );
 
 
     FirebaseMessaging.instance.getInitialMessage().then((value){
       if(value != null){
-        var chatId = value.data["chatId"];
+        var messageChatId = json.decode(value.data.values.last)["link"];
 
-        changeToChat(chatId);
+        changeToChat(messageChatId);
       }
+
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
+      var messageChatId = json.decode(message.data.values.last)["link"];
+
       if(message.data.isNotEmpty){
         var activeChat = await ProfilDatabase().getOneData("activeChat","id",userId);
 
-        if(activeChat == null || activeChat != message.data["chatId"]){
+        if(activeChat == null || activeChat != messageChatId){
           LocalNotificationService().display(message);
         }
       }
+
+
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async{
-      var chatId = message.data["chatId"];
+      var messageChatId = json.decode(message.data.values.last)["link"];
 
       if(pageContext != null){
-        changeToChat(chatId);
+        changeToChat(messageChatId);
       }
+
     });
-
-
   }
 
 

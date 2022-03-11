@@ -124,7 +124,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return Row(
         children: [
           Text(
-            AppLocalizations.of(context).aktuelleStadt +": ",
+            AppLocalizations.of(context).aktuelleOrt +": ",
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
           ),
           Text(

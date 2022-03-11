@@ -34,6 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
   registration() async{
     if(formKey.currentState.validate()){
       var email = emailController.text;
+      email = email.replaceAll(' ', '');
       var password = passwordController.text;
 
       try{

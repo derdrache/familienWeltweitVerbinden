@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
 
 DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
@@ -232,7 +233,7 @@ class ChatDatabase{
       "zu": messageData["zu"]
     };
 
-    await addNewMessage(newChatGroup, messageData);
+    await addNewMessageAndSendNotification(newChatGroup, messageData);
 
     return newChatGroup;
   }
@@ -263,7 +264,7 @@ class ChatDatabase{
 
   }
 
-  addNewMessage(chatgroupData, messageData)async {
+  addNewMessageAndSendNotification(chatgroupData, messageData)async {
     var users = chatgroupData["users"];
     if(users is String) users = jsonDecode(chatgroupData["users"]);
     users = users.keys.toList();
@@ -282,6 +283,7 @@ class ChatDatabase{
     }));
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
+    sendNotification(messageData);
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
@@ -346,4 +348,20 @@ class ChatDatabase{
   }
 }
 
+
+sendNotification(messageData){
+  var url = Uri.parse(databaseUrl + "notification.php");
+  var toToken = ProfilDatabase().getOneData("token", "id", messageData["zu"]);
+  
+
+  http.post(url, body: json.encode({
+    "to": toToken,
+    "from": messageData["von"],
+    "inhalt": messageData["message"],
+    "chatId": messageData["id"],
+    "apiKey": firebaseWebKey
+
+  }));
+
+}
 

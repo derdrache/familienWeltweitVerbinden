@@ -21,7 +21,7 @@
     "userEmailNichtGefunden": "kein User zu der Email Adresse gefunden",
     "spracheAuswaehlen": "Sprachen auswählen",
     "interessenAuswaehlen" : "Interessen auswählen",
-    "stadtNichtBestaetigt": "Stadt nicht bestätigt",
+    "ortNichtBestaetigt": "Ort nicht bestätigt",
     "bitteEingabeKorrigieren": "Bitte Eingaben korrigieren: ",
     "usernameInVerwendung": "Name wird schon verwendet",
     "reiseartAuswaehlen": "Reiseart auswählen",
@@ -29,7 +29,7 @@
     "genauenStandortWaehlen": "Bitte den genauen Standort wählen",
     "profilErstellen": "Profil erstellen",
     "benutzername" : "Benutzername",
-    "stadtEingeben": "Aktuelle Stadt eingeben",
+    "ortEingeben": "Aktuelle Ort eingeben",
     "anzahlUndAlterKinder": "Anzahl und Alter der Kinder:",
     "emailNichtBestaetigt": "Email ist noch nicht bestätigt worden",
     "benutzerNichtGefunden" : "Benutzer nicht gefunden",
@@ -43,8 +43,8 @@
     "ueberMichVeraendern": "Über mich verändern",
     "ueberMich": "Über mich",
     "kinderAendern": "Kinder ändern",
-    "stadtAendern": "Aktuelle Stadt verändern",
-    "bitteGenaueStadtAuswaehlen": "Bitte die gewünschte Stadt auswählen",
+    "ortAendern": "Aktuelle Ort verändern",
+    "bitteGenaueOrtAuswaehlen": "Bitte die gewünschte Ort auswählen",
     "emailOderPasswortFalsch": "Email oder Passwort falsch",
     "emailAendern": "Email ändern",
     "neueEmail": "neue Email",
@@ -69,7 +69,7 @@
     "privatsphaereSicherheit":"Privatsphäre und Sicherheit",
     "abmelden": "Abmelden",
     "antippenZumAendern": "Antippen, um Einträge zu ändern",
-    "aktuelleStadt": "Aktuelle Stadt",
+    "aktuelleOrt": "Aktuelle Ort",
     "artDerReise": "Art der Reise",
     "alterDerKinder": "Alter der Kinder",
     "interessen": "Interessen",
@@ -104,7 +104,6 @@
     "usernameZuLang": "Benutzername ist zu lang, maximal 40 Zeichen",
     "feedbackDanke": "Vielen Dank für dein Feedback",
     "erfolgreichGeaender": "erfolgreich geändert",
-    "alterSicherheitsabfrageTitle": "Kind mit 0-1 Monaten hinzugefügt",
-    "alterSicherheitsabfrageBody" : "Bist du sicher, dass du ein Neugeborenes hinzufügen möchtest?"
+    "ortEingabeInformation": "Beim Ort kannst du entscheiden wie genau deine Eingabe sein soll. \nJe genauer deine Eingabe ist, desto wahrscheinlich ist es, dass du von anderen angeschrieben wirst. \n\nBeispiele für die Eingabe: Stadt / Land / Region"
 
 }

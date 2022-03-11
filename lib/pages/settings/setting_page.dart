@@ -255,7 +255,7 @@ class _SettingPageState extends State<SettingPage> {
               Wrap(
                 children: [
                   profilThemeContainer(
-                      ortKontroller.text, AppLocalizations.of(context).aktuelleStadt,
+                      ortKontroller.text, AppLocalizations.of(context).aktuelleOrt,
                       ChangeCityPage(userId: userID)),
                   profilThemeContainer(reiseArtInput.getSelected(), AppLocalizations.of(context).artDerReise,
                       ChangeReiseartPage(

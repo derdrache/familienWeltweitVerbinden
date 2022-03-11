@@ -64,11 +64,11 @@ class _StartPageState extends State<StartPage>{
     var userDeviceTokenDb = await ProfilDatabase().getOneData("token","id",userID);
     var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
 
-    if(userAuthEmail != userDBEmail){
+    if(userAuthEmail != userDBEmail["email"]){
       ProfilDatabase().updateProfil(userID, "email",userAuthEmail);
     }
 
-    if(userDeviceTokenDb != userDeviceTokenReal){
+    if(userDeviceTokenDb["token"] != userDeviceTokenReal){
       ProfilDatabase().updateProfil(userID, "token", userDeviceTokenReal);
     }
 
@@ -76,6 +76,7 @@ class _StartPageState extends State<StartPage>{
   }
 
   checkIfFirstLogin(){
+    return true;
     if(widget.registered){ return false; }
 
     if(userName == null || userName == ""){

@@ -1,4 +1,5 @@
-import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
 
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,6 +26,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   MapController mapController = MapController();
   var ownProfil;
   List<String> allUserName = [];
+  var countriesList = {};
   var filterList = [];
   var databaseProfils = [];
   var profils = [];
@@ -63,9 +65,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     profils.remove(ownProfil);
 
+    countriesList = await LocationService().getAllCountries();
+    var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+    var countryDropDownList = spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
+
     searchAutocomplete =  SearchAutocomplete(
       searchableItems: global_var.reisearten + global_var.interessenListe +
-          global_var.sprachenListe + allUserName,
+          global_var.sprachenListe + allUserName + countryDropDownList,
       onConfirm: () => changeMapFilter(),
       onDelete:() => changeMapFilter() ,
     );
@@ -224,6 +230,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var profilReiseart = profil["reiseart"];
     var profilSprachen = profil["sprachen"];
     var profilName = profil["name"];
+    var profilLand = profil["land"];
 
     if(filterList.isEmpty) return true;
 
@@ -234,8 +241,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var interesseMatch = checkMatch(filterList, profilInteressen,
         global_var.interessenListe +global_var.interessenListeEnglisch);
     var userMatch = checkMatch(filterList, [profilName], allUserName, userSearch: true);
+    var countryMatch = checkMatch(filterList, [profilLand], countriesList["ger"] + countriesList["eng"]);
 
-    if(spracheMatch && reiseartMatch && interesseMatch && userMatch) return true;
+    if(spracheMatch && reiseartMatch && interesseMatch && userMatch && countryMatch) return true;
 
     return false;
   }
@@ -434,7 +442,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed){
             if(buildLoaded){
-              print(position.center);
               mapPosition = position.center;
               mapZoom = position.zoom;
               FocusScope.of(context).unfocus();
