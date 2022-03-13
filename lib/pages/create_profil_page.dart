@@ -33,6 +33,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var reiseArtenAuswahlBox = CustomDropDownButton();
   var interessenAuswahlBox = CustomMultiTextForm();
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
+  bool isLoading = false;
 
 
 
@@ -53,8 +54,22 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     super.initState();
   }
 
+  setLoading(){
+    if(isLoading){
+      isLoading = false;
+    } else{
+      isLoading = true;
+    }
+
+    setState(() {
+
+    });
+  }
+
 
   saveFunction()async {
+    setLoading();
+
     var children = childrenAgePickerBox.getDates();
 
     ortMapData = ortAuswahlBox.getGoogleLocationData();
@@ -66,6 +81,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
 
       if(userName.length > 40){
+        setLoading();
         customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
         return;
       }
@@ -88,6 +104,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "reiseart": reiseArtenAuswahlBox.getSelected(),
             "sprachen": sprachenAuswahlBox.getSelected(),
             "token": !kIsWeb? await  FirebaseMessaging.instance.getToken(): null,
+            "lastLogin": DateTime.now().toString()
           };
 
           ProfilDatabase().addNewProfil(data);
@@ -97,6 +114,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         }
       }
     }
+    setLoading();
   }
 
   childrenInputValidation(){
@@ -160,9 +178,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                 ),
               ),
               const Expanded(child: SizedBox.shrink()),
-              TextButton(
+              isLoading ? CircularProgressIndicator() : TextButton(
                   onPressed: saveFunction,
-                  child: const Icon(Icons.done, size: 35),
+                  child: const Icon(Icons.done, size: 35, color: Colors.green,),
               )
           ]),
         ),
@@ -184,7 +202,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                       pageTitle(),
                       customTextInput(AppLocalizations.of(context).benutzername, userNameKontroller,
                           validator: global_functions.checkValidatorEmpty(context)),
-                      Align(child: ortAuswahlBox),
+                      Align(child: Container(margin: EdgeInsets.only(left: 5, right: 5), child: ortAuswahlBox)),
                       reiseArtenAuswahlBox,
                       sprachenAuswahlBox,
                       interessenAuswahlBox,
