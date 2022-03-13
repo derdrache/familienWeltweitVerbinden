@@ -11,6 +11,40 @@ import '../auth/secrets.dart';
 
 class LocationService {
 
+  getGoogleAutocompleteItems(input, sessionToken) async {
+    var deviceLanguage = kIsWeb? window.locale.languageCode :  Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
+    try{
+      var url = "https://families-worldwide.com/services/googleAutocomplete.php";
+      var zusatz = "?param1=$google_key&param2=$input&param3=$sprache&param4=$sessionToken";
+
+      var response = await http.get(Uri.parse(url + zusatz), headers: {"Accept": "application/json"});
+      var json = convert.jsonDecode(response.body);
+
+      return json;
+
+    } catch(error){
+      return [];
+    }
+
+  }
+
+  getLocationdataFromGoogleID(id, sessionToken) async {
+    try{
+      var url = "https://families-worldwide.com/services/googlePlaceDetails.php";
+      var zusatz = "?param1=$google_key&param2=$id&param3=$sessionToken";
+
+      var response = await http.get(Uri.parse(url + zusatz), headers: {"Accept": "application/json"});
+      var json = convert.jsonDecode(response.body);
+
+      return json;
+
+    } catch(error){
+      print(error);
+      return [];
+    }
+  }
+
   getLocationMapDataGoogle(input) async{
     var deviceLanguage = kIsWeb? window.locale.languageCode :  Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
@@ -61,11 +95,11 @@ class LocationService {
         var formattedAddressList = result["formatted_address"].split(", ");
         var formattedCity = formattedAddressList.first.split(" ");
 
-        var city = _isNumeric(formattedCity.first) ?
+        var city = isNumeric(formattedCity.first) ?
         formattedCity.last : formattedCity.join(" ");
         var cityList = [];
         for(var item in city.split(" ")){
-          if(!_isNumeric(item)) cityList.add(item);
+          if(!isNumeric(item)) cityList.add(item);
         }
         city = cityList.join(" ");
 
@@ -75,7 +109,7 @@ class LocationService {
           city = city.split(" - ")[0];
           country = country.split(" - ")[1];
         }
-        if(_isNumeric(country)) country = formattedAddressList[formattedAddressList.length -2];
+        if(isNumeric(country)) country = formattedAddressList[formattedAddressList.length -2];
 
         var mapData = {
           "city": city,
@@ -94,7 +128,8 @@ class LocationService {
     }
   }
 
-  bool _isNumeric(String str) {
+
+  bool isNumeric(String str) {
     if(str == null) {
       return false;
     }

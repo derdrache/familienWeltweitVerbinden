@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
-import '../../services/locationsService.dart';
+import '../../global/search_autocomplete.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -19,6 +19,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   List<Widget> suggestedCitiesList = [];
   int selectedIndex = -1;
   var locationData = {};
+  var autoComplete = SearchAutocomplete(googleAutocomplete: true);
 
   @override
   void initState() {
@@ -37,21 +38,16 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   }
 
   saveLocation() async {
-    if(suggestedCities.isEmpty) {
-      suggestedCities = await LocationService()
-          .getLocationMapDataGoogle2(ortChangeKontroller.text);
-
-      if(suggestedCities.length > 1){
-        setState(() {});
-        customSnackbar(context, AppLocalizations.of(context).genauenStandortWaehlen);
-      } else{
-        await pushLocationDataToDB(suggestedCities[0]);
-        customSnackbar(context,
-            AppLocalizations.of(context).aktuelleOrt +" "+
-                AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
-        Navigator.pop(context);
-      }
+    var locationData = autoComplete.getGoogleLocationData();
+    if(locationData == null) {
+      return;
     }
+
+    await pushLocationDataToDB(suggestedCities[0]);
+    customSnackbar(context,
+        AppLocalizations.of(context).aktuelleOrt +" "+
+            AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+    Navigator.pop(context);
   }
 
   saveButton(){
@@ -64,58 +60,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    createSuggestedList(List suggestedCities){
-      List<Widget> newSuggestList = [];
-
-      for(var i = 0; i<suggestedCities.length; i++){
-        newSuggestList.add(
-            GestureDetector(
-              onTap: () {
-                selectedIndex = i;
-                locationData = suggestedCities[i];
-                pushLocationDataToDB(locationData);
-                Navigator.pop(context);
-              },
-              child: Container(
-                  margin: const EdgeInsets.only(top:20, left: 10),
-                  child: Text(
-                    suggestedCities[i]["adress"],
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: selectedIndex == i ? Colors.green : Colors.black)
-                    ,)
-              ),
-            )
-        );
-      }
-
-      suggestedCitiesList = newSuggestList;
-
-    }
-
-    createSuggestedList(suggestedCities);
-
-    openInfoWindow(text){
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Information"),
-            content: Text(text),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-
+    autoComplete.hintText = AppLocalizations.of(context).ortEingeben;
 
     return Scaffold(
       appBar: customAppBar(
@@ -125,21 +70,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          customTextInput(AppLocalizations.of(context).ortEingeben,
-              ortChangeKontroller,
-              onSubmit: () => saveLocation(),
-            informationWindow: () => openInfoWindow(AppLocalizations.of(context).ortEingabeInformation)
-
-          ),
-          suggestedCitiesList.isNotEmpty ? Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text(
-              AppLocalizations.of(context).bitteGenaueOrtAuswaehlen + ":",
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ): const SizedBox.shrink(),
-          ...suggestedCitiesList
-
+          autoComplete,
         ],
       ),
     );

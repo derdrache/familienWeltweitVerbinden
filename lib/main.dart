@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -24,7 +22,7 @@ import 'pages/login_register_page/login_page.dart';
 var appIcon = '@mipmap/ic_launcher';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-
+  print("test");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -101,8 +99,6 @@ class MyApp extends StatelessWidget {
           LocalNotificationService().display(message);
         }
       }
-
-
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async{
@@ -113,6 +109,8 @@ class MyApp extends StatelessWidget {
       }
 
     });
+
+
   }
 
 
