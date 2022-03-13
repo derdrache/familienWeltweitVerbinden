@@ -48,6 +48,7 @@ dependencies:
   package_info_plus: ^1.4.0
   in_app_update: ^3.0.0
   flutter_google_places: ^0.3.0
+  uuid: ^3.0.6
 
 
   flutter_localizations:

@@ -76,7 +76,6 @@ class _StartPageState extends State<StartPage>{
   }
 
   checkIfFirstLogin(){
-    return true;
     if(widget.registered){ return false; }
 
     if(userName == null || userName == ""){

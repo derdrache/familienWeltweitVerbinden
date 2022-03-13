@@ -274,7 +274,7 @@ class ChatDatabase{
     messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
 
     var url = Uri.parse(databaseUrl + "database/chats/newMessage.php");
-    await http.post(url, body: json.encode({
+    http.post(url, body: json.encode({
       "id": chatID,
       "date": date,
       "message": messageData["message"],
@@ -283,6 +283,7 @@ class ChatDatabase{
     }));
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
+
     sendNotification(messageData);
   }
 
@@ -349,18 +350,19 @@ class ChatDatabase{
 }
 
 
-sendNotification(messageData){
+sendNotification(messageData) async {
   var url = Uri.parse(databaseUrl + "notification.php");
-  var toToken = ProfilDatabase().getOneData("token", "id", messageData["zu"]);
-  
+  var chatPartnerName = await ProfilDatabase().getOneData("name", "id", messageData["von"]);
+  chatPartnerName = chatPartnerName["name"];
+  var toToken = await ProfilDatabase().getOneData("token", "id", messageData["zu"]);
+  toToken = toToken["token"];
 
   http.post(url, body: json.encode({
     "to": toToken,
-    "from": messageData["von"],
+    "from": chatPartnerName,
     "inhalt": messageData["message"],
     "chatId": messageData["id"],
     "apiKey": firebaseWebKey
-
   }));
 
 }
