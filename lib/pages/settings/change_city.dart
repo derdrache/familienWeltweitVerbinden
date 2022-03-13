@@ -40,10 +40,11 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   saveLocation() async {
     var locationData = autoComplete.getGoogleLocationData();
     if(locationData == null) {
+      customSnackbar(context, AppLocalizations.of(context).ortNichtBestaetigt);
       return;
     }
 
-    await pushLocationDataToDB(suggestedCities[0]);
+    await pushLocationDataToDB(locationData);
     customSnackbar(context,
         AppLocalizations.of(context).aktuelleOrt +" "+
             AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
