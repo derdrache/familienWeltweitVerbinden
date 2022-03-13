@@ -284,7 +284,7 @@ class ChatDatabase{
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
-    sendNotification(messageData);
+    sendNotification(chatID, messageData);
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
@@ -350,18 +350,25 @@ class ChatDatabase{
 }
 
 
-sendNotification(messageData) async {
+sendNotification(chatId, messageData) async {
+  var toActiveChat = await ProfilDatabase().getOneData("activeChat", "id", messageData["zu"]);
+  toActiveChat = toActiveChat["activeChat"];
+
+  if(toActiveChat == chatId) return;
+
+
   var url = Uri.parse(databaseUrl + "notification.php");
   var chatPartnerName = await ProfilDatabase().getOneData("name", "id", messageData["von"]);
+
   chatPartnerName = chatPartnerName["name"];
   var toToken = await ProfilDatabase().getOneData("token", "id", messageData["zu"]);
   toToken = toToken["token"];
 
-  http.post(url, body: json.encode({
+  await http.post(url, body: json.encode({
     "to": toToken,
     "from": chatPartnerName,
     "inhalt": messageData["message"],
-    "chatId": messageData["id"],
+    "chatId": chatId,
     "apiKey": firebaseWebKey
   }));
 

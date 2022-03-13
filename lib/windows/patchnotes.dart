@@ -55,6 +55,7 @@ class PatchnotesWindow{
         children:
 
         isGerman ? [
+          _patch(patch113D),
           _patch(patch112D),
           _patch(patch111D),
           _patch(patch110D),
@@ -62,6 +63,7 @@ class PatchnotesWindow{
           _patch(patch1D),
         ] :
         [
+          _patch(patch113E),
           _patch(patch112E),
           _patch(patch111E),
           _patch(patch110E),
@@ -72,6 +74,56 @@ class PatchnotesWindow{
   }
 
 }
+
+var patch113E= {
+  "title": "1.1.3",
+  "inhalt": [
+    "The age query from the children now only asks for the year",
+    "Notification work on Android again",
+    "Map - On the lowest zoom level the countries are summarized for a better overview. It will be improved with a later update.",
+    "Map - One's location is shown on the map with a flag",
+    "Map Filter - Filter has been limited to 3",
+    "Map Filter - It is possible to filter by country",
+    "Chat - User search for new chat now works with autocomplete",
+    "Location input - Input now works with autocomplete",
+    "Label change - 'city' => 'town'",
+    "Web - Autologin set",
+    "Web - Map is properly updated when using the mouse wheel",
+    "Web - Tab icon added",
+    "The length from the username was limited to 40 characters",
+    "The map back zoom button now goes back in single steps",
+    "The apostrophe can now be used in the user name",
+    "When entering the location, there is now a ! for more information",
+    "Login/Registration - The bug with the space before and after the email has been fixed",
+    "various small changes",
+    "various small bug fixes"
+  ]
+};
+var patch113D= {
+  "title": "1.1.3",
+  "inhalt": [
+    "Bei der Altersabfrage von den Kindern wird nur noch das Jahr abgefragt",
+    "Notification funktionieren auf Android wieder",
+    "Karte - Auf der niedrigsten Zoomstufe werden die Länder zur besseren Übersicht zusammengefasst. Mit einem späteren Update wird es noch verbessert.",
+    "Karte - Der eigene Standort wird auf der Karte mit einer Fahne angezeigt",
+    "Karte Filter - Filter wurde auf 3 beschränkt",
+    "Karte Filter - Es kann nach Ländern gefiltert werden",
+    "Chat - Benutzersuche für neuen Chat funktioniert jetzt mit Autocomplete",
+    "Ort Eingabe - Die Eingabe funktioniert jetzt mit Autocomplete",
+    "Bezeichnungsänderung - 'Stadt' => 'Ort'",
+    "Web - Autologin eingestellt",
+    "Web - Die Karte wird bei der Benutzung des Mausrads ordentlich upgedatet",
+    "Web - Tab Icon eingebaut",
+    "Die Länge vom Benutzernamen wurde auf 40 Zeichen beschränkt",
+    "Der Karten Zurück-Zoom-Button geht jetzt in einzelnen Schritten zurück",
+    "Beim Benutzernmen kann jetzt auch das Apostroph benutzt werden",
+    "Bei der Eingabe vom Ort gibt es jetzt ein ! für mehr Information",
+    "Login/Registrierung - Der Fehler mit dem Leerzeichen vor und nach der Email wurde behoben",
+    "verschiedene kleine Änderungen",
+    "verschiedene kleine Fehlerbehebungen"
+  ]
+};
+
 
 var patch112E= {
   "title": "1.1.2",

@@ -50,7 +50,7 @@ class SearchAutocomplete extends StatefulWidget {
     this.onConfirm,
     this.onDelete,
     this.withFilter = true,
-    this.hintText = "search",
+    this.hintText = "Filter",
     this.suche = true,
     this.googleAutocomplete = false,
   }) : isDense = !withFilter;
@@ -226,7 +226,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
       width: widget.googleAutocomplete ? 600:  double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(7)),
+          borderRadius: BorderRadius.all(Radius.circular(5)),
           border: Border.all()
         ),
         height:  dropdownExtraBoxHeight + dropdownItemSumHeight,

@@ -83,7 +83,6 @@ class _StartPageState extends State<StartPage>{
     }
 
     return false;
-
   }
   
 

@@ -30,6 +30,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var filterList = [];
   var databaseProfils = [];
   var profils = [];
+  var profilBetweenCountries = [];
   var profilCountries = [];
   var profilsBetween = [];
   var profilsCities = [];
@@ -92,9 +93,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   }
 
-  createProfilBetween(list, profil){
+  createProfilBetween(list, profil, abstand){
       var newPoint = false;
-      var abstand = 1.5;
 
       for(var i = 0; i< list.length; i++){
         double originalLatt = double.parse(profil["latt"]);
@@ -156,7 +156,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       for (var i = 0; i<list.length; i++){
         var listCountryLocation = await LocationService().getCountryLocation(list[i]["countryname"]);
-
         var profilCountryLocation = await LocationService().getCountryLocation(profil["land"]);
 
         if(listCountryLocation["latt"] == profilCountryLocation["latt"] &&
@@ -183,18 +182,57 @@ class _ErkundenPageState extends State<ErkundenPage>{
     return list;
   }
 
+  createProfilBetweenCountries(list, profil) async {
+    var newPoint = true;
+    var abstand = 8;
+    double originalLatt;
+    double originalLongth;
+    var landGedataProfil = await LocationService().getCountryLocation(profil["land"]);
+
+    for(var i = 0; i< list.length; i++){
+      var landGeodataList = await LocationService().getCountryLocation(list[i]["countryname"]);
+
+      originalLatt = landGedataProfil["latt"];
+      double newLatt = landGeodataList["latt"];
+      originalLongth = landGedataProfil["longt"];
+      double newLongth = landGeodataList["longt"];
+      bool check = (newLatt + abstand/2 >= originalLatt && newLatt - abstand/2 <= originalLatt) &&
+          (newLongth + abstand >= originalLongth && newLongth - abstand<= originalLongth);
+
+      if(check || list[i]["countryname"] == profil["land"]){
+        newPoint = false;
+        list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
+        list[i]["profils"].add(profil);
+      }
+    }
+    if(newPoint){
+      list.add({
+        "countryname": profil["land"],
+        "name": "1",
+        "latt": landGedataProfil["latt"],
+        "longt":landGedataProfil["longt"],
+        "profils": [profil]
+      });
+    }
+
+    return list;
+  }
+
   createAndSetZoomProfils() async {
     var pufferProfilCities = [];
     var pufferProfilBetween = [];
     var pufferProfilCountries = [];
+    var pufferProfilBetweenCountries =[];
 
     for(var i= 0; i<profils.length; i++){
       pufferProfilCountries = await createProfilCountries(pufferProfilCountries,
                                                           profils[i]);
-      pufferProfilBetween = await createProfilBetween(pufferProfilBetween,
-                                                       profils[i]);
+      pufferProfilBetweenCountries = await createProfilBetweenCountries(
+        pufferProfilBetweenCountries, profils[i]);
 
-      pufferProfilCities = await createProfilCities(pufferProfilCities,
+      pufferProfilBetween = createProfilBetween(pufferProfilBetween, profils[i], 1);
+
+      pufferProfilCities = createProfilCities(pufferProfilCities,
                                                      profils[i]);
 
     }
@@ -202,6 +240,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       profilsCities = pufferProfilCities;
       profilsBetween = pufferProfilBetween;
       profilCountries = pufferProfilCountries;
+      profilBetweenCountries = pufferProfilBetweenCountries;
 
       changeProfil(mapZoom);
 
@@ -215,8 +254,10 @@ class _ErkundenPageState extends State<ErkundenPage>{
       choosenProfils = profilsCities;
     } else if(zoom > 4.0){
       choosenProfils = profilsBetween;
-    } else{
+    } else if (zoom > 2.5){
       choosenProfils = profilCountries;
+    } else {
+      choosenProfils = profilBetweenCountries;
     }
 
 
@@ -407,10 +448,25 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
     createAllMarker() async{
-
       List<Marker> markerList = [];
-      for (var profil in aktiveProfils) {
 
+      if(ownProfil != null) {
+        markerList.add(
+            Marker(
+              width: 30.0,
+              height: 30.0,
+              point: LatLng(double.parse(ownProfil["latt"])+0.07, double.parse(ownProfil["longt"])+0.02),
+              builder: (ctx) => FloatingActionButton(
+                backgroundColor: Colors.transparent,
+                mini: true,
+                child: Icon(Icons.flag ,color: Colors.green[900], size: 30,),
+                onPressed: null,
+              ),
+            )
+        );
+      }
+
+      for (var profil in aktiveProfils) {
         var position = LatLng(profil["latt"], profil["longt"]);
         markerList.add(
             ownMarker(
@@ -431,6 +487,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     ownFlutterMap(){
       createAllMarker();
+
+
 
       return FlutterMap(
         mapController: mapController,
