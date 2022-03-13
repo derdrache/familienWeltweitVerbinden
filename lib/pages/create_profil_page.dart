@@ -25,7 +25,6 @@ class CreateProfilPage extends StatefulWidget {
 
 class _CreateProfilPageState extends State<CreateProfilPage> {
   final _formKey = GlobalKey<FormState>();
-  bool selectedCity = false;
   var userNameKontroller = TextEditingController();
   var ortAuswahlBox = SearchAutocomplete(googleAutocomplete: true);
   var ortMapData = {};
@@ -75,7 +74,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         var userID = FirebaseAuth.instance.currentUser?.uid;
         var email = FirebaseAuth.instance.currentUser?.email;
 
-        if(selectedCity){
+        if(ortMapData != null){
           var data = {
             "id": userID,
             "email": email,
@@ -185,7 +184,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                       pageTitle(),
                       customTextInput(AppLocalizations.of(context).benutzername, userNameKontroller,
                           validator: global_functions.checkValidatorEmpty(context)),
-                      ortAuswahlBox,
+                      Align(child: ortAuswahlBox),
                       reiseArtenAuswahlBox,
                       sprachenAuswahlBox,
                       interessenAuswahlBox,

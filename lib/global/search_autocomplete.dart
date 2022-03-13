@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,9 @@ class SearchAutocomplete extends StatefulWidget {
   }
 
   _googleAutoCompleteSuche(input) async {
-    var googleSuche = await LocationService().getGoogleAutocompleteItems(input, sessionToken);
+    var googleInput = input;
+    googleInput = googleInput.replaceAll(" ", "_");
+    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken);
     if(googleSuche.isEmpty) return;
 
     final Map<String, dynamic> data = Map.from(googleSuche);
@@ -80,8 +83,6 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
         widget.autoCompleteItems.add(item);
       } else if(item.toLowerCase().contains(text.toLowerCase())) widget.autoCompleteItems.add(item);
     }
-
-    setState(() {});
   }
 
   deleteFilterItem(item){
@@ -141,19 +142,8 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
       "latt": locationData["result"]["geometry"]["location"]["lat"],
       "adress": locationData["result"]["formatted_address"]
     };
-    /*
-    {html_attributions: [],
-    result: {formatted_address: Wiesbaden, Germany,
-      geometry: {location: {lat: 50.0782184, lng: 8.239760799999999},
-      viewport: {northeast: {lat: 50.15180528728477, lng: 8.386191987556698},
-      southwest: {lat: 49.99315976979197, lng: 8.110514779998914}}}},
-      status: OK}
-
- */
 
     return locationDataMap;
-
-
 
   }
 
@@ -182,7 +172,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: global_var.borderColorGrey))
           ),
-          child: Text(item["description"])
+          child: Text(widget.googleAutocomplete ? item["description"]: item)
         ),
       );
     }
@@ -233,59 +223,61 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     }
 
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(7)),
-        border: Border.all()
-      ),
-      height:  dropdownExtraBoxHeight + dropdownItemSumHeight,
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.only(left: 5),
-      child:Stack(
-        overflow: Overflow.visible,
-        children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: TextField(
-                  textAlignVertical: TextAlignVertical.top,
-                  controller: widget.searchKontroller,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.only(top: widget.withFilter? widget.isDense? 9 : 5 : 15),
-                    isDense: widget.isDense,
-                    border: InputBorder.none,
-                    hintText: widget.hintText,
-                  ),
-                  style: TextStyle(
-                  ),
-                  onChanged: (value) async {
-                    if(widget.googleAutocomplete) await widget._googleAutoCompleteSuche(value);
+      width: widget.googleAutocomplete ? 600:  double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(7)),
+          border: Border.all()
+        ),
+        height:  dropdownExtraBoxHeight + dropdownItemSumHeight,
+        margin: EdgeInsets.all(5),
+        //padding: EdgeInsets.only(left: 5),
+        child:Stack(
+          overflow: Overflow.visible,
+          children: [
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: TextField(
+                    textAlignVertical: TextAlignVertical.top,
+                    controller: widget.searchKontroller,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(top: widget.withFilter? widget.isDense? 9 : 0 : 15),
+                      isDense: widget.isDense,
+                      border: InputBorder.none,
+                      hintText: widget.hintText,
+                      hintStyle: TextStyle(fontSize: 13, color: Colors.grey)
+                    ),
+                    style: const TextStyle(),
+                    onChanged: (value) async {
+                      if(widget.googleAutocomplete) await widget._googleAutoCompleteSuche(value);
 
-                    showAutoComplete(value);
-                    addAutoCompleteItems(value);
-                  }
-                  ,
+                      showAutoComplete(value);
+                      addAutoCompleteItems(value);
+
+                      setState(() {});
+                    }
+                  ),
+                ),
+                if(widget.isSearching) autoCompleteDropdownBox()
+
+              ],
             ),
-              ),
-              if(widget.isSearching) autoCompleteDropdownBox()
-
-            ],
-          ),
-          if(widget.isDense && widget.withFilter) Positioned(
-            top: 30,
-            child: createFilterBox()
-          ),
-          Positioned(
-            right: 15,
-            top: 12,
-            child: GestureDetector(
-              onTap: null,
-              child: Icon(Icons.search, size: 25,)
-            )
-          ),
-        ],
-      ),
+            if(widget.isDense && widget.withFilter) Positioned(
+              top: 30,
+              child: createFilterBox()
+            ),
+            Positioned(
+              right: 15,
+              top: 12,
+              child: GestureDetector(
+                onTap: null,
+                child: Icon(Icons.search, size: 25,)
+              )
+            ),
+          ],
+        ),
     );
   }
 }
