@@ -22,7 +22,6 @@ import 'pages/login_register_page/login_page.dart';
 var appIcon = '@mipmap/ic_launcher';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("test");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -131,7 +130,6 @@ class MyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,
     ));
-
 
 
     return FutureBuilder(

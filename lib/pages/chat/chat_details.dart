@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_functions;
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
@@ -118,7 +116,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     var messageData = {
       "message" :message,
       "von": userID,
-      "date": Timestamp.now().seconds,
+      "date": DateTime.now().millisecondsSinceEpoch * 1000,
       "zu": chatPartnerID
     };
     if(widget.newChat){

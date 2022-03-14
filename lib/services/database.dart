@@ -1,21 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
 
-DatabaseReference realtimeDatabase = FirebaseDatabase.instanceFor(
-    databaseURL: "https://praxis-cab-236720-default-rtdb.europe-west1.firebasedatabase.app",
-    app: Firebase.app()).ref();
-var chatGroupsDB = realtimeDatabase.child("chats");
-var chatMessagesDB = realtimeDatabase.child("chatMessages");
-var profilsDB = realtimeDatabase.child("profils");
-var feedbackDB = realtimeDatabase.child("feedback");
-var testDB = realtimeDatabase.child("test");
 
 var databaseUrl = "https://families-worldwide.com/";
 
