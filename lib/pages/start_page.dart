@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
+
 import 'board_page.dart';
 import 'create_profil_page.dart';
 import 'erkunden_page.dart';
@@ -26,9 +27,9 @@ class StartPage extends StatefulWidget{
 }
 
 class _StartPageState extends State<StartPage>{
-  var userID = FirebaseAuth.instance.currentUser.uid;
+  var userID = FirebaseAuth.instance.currentUser?.uid;
   var userName = FirebaseAuth.instance.currentUser?.displayName;
-  var userAuthEmail = FirebaseAuth.instance.currentUser.email;
+  var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
   PackageInfo packageInfo;
 
 
@@ -41,11 +42,11 @@ class _StartPageState extends State<StartPage>{
 
   _asyncMethod() async{
     try{
+
       var updateInformation = await InAppUpdate.checkForUpdate();
       if(updateInformation.updateAvailability ==
-          UpdateAvailability.updateAvailable && !kIsWeb){
+          UpdateAvailability.updateAvailable && !kIsWeb) {
         InAppUpdate.startFlexibleUpdate();
-
       }
     } catch (error){
       print("kein Playstore");
@@ -179,9 +180,6 @@ class _StartPageState extends State<StartPage>{
                 icon: Icon(Icons.location_city),
                 label: 'Dein Umkreis',
               ),
-
-
-
  */
               BottomNavigationBarItem(
                 icon: chatIcon(),

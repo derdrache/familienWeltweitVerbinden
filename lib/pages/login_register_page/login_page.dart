@@ -23,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   var email = "";
   var passwort = "";
   bool isLoading = false;
+  bool angemeldetBleiben = true;
 
   loading(){
     return const SizedBox(
@@ -33,7 +34,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   userLogin() async{
-    if(kIsWeb) FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+    if(kIsWeb && angemeldetBleiben) {
+      print("angemeldet bleiben");
+      FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+    }
 
     try{
       email = email.replaceAll(' ', '');
@@ -86,6 +90,21 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
+    angemeldetBleibenBox(){
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Switch(value: angemeldetBleiben, onChanged: (value){
+            setState(() {
+              angemeldetBleiben = value;
+            });
+          }),
+          SizedBox(width: 10),
+          Text("Angemeldet bleiben?")
+        ],
+      );
+    }
+
     Widget forgetPassButton(){
       return Align(
         child: SizedBox(
@@ -130,6 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                     passwort: true,
                     textInputAction: TextInputAction.done,
                     onSubmit: () => doLogin()),
+                if(kIsWeb) angemeldetBleibenBox(),
                 forgetPassButton(),
                 isLoading ? loading() : customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended(AppLocalizations.of(context).registrieren, (){
