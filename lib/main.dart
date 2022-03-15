@@ -67,6 +67,7 @@ class MyApp extends StatelessWidget {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     buildNumber = int.parse(packageInfo.buildNumber);
 
+
     final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettings = InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher')
@@ -82,16 +83,14 @@ class MyApp extends StatelessWidget {
     FirebaseMessaging.instance.getInitialMessage().then((value){
       if(value != null){
         var messageChatId = json.decode(value.data.values.last)["link"];
-
         changeToChat(messageChatId);
       }
 
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
-      var messageChatId = json.decode(message.data.values.last)["link"];
-
       if(message.data.isNotEmpty){
+        var messageChatId = json.decode(message.data.values.last)["link"];
         var activeChat = await ProfilDatabase().getOneData("activeChat","id",userId);
 
         if(activeChat == null || activeChat != messageChatId){
@@ -109,9 +108,7 @@ class MyApp extends StatelessWidget {
 
     });
 
-
   }
-
 
 
   changeToChat(chatId)async {
@@ -141,7 +138,6 @@ class MyApp extends StatelessWidget {
           if(snapshot.connectionState == ConnectionState.waiting){
             return const Center(child: CircularProgressIndicator());
           }
-
           if(buildNumber < importantUpdateNumber){
             InAppUpdate.performImmediateUpdate();
             return const Center(child: CircularProgressIndicator());
