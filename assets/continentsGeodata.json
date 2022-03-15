@@ -1,0 +1,10 @@
+{"data": [
+  {"nameGer": "MittelAmerika", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
+  {"nameGer": "Südamerika", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
+  {"nameGer": "NordAfrika", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
+  {"nameGer": "Südafrika", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
+  {"nameGer": "Asien", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
+  {"nameGer": "WestEuropa", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
+  {"nameGer": "Mitteleuropa", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
+  {"nameGer": "Osteuropa", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []}
+]}
