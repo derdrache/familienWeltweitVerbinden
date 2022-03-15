@@ -34,13 +34,15 @@ class _RegisterPageState extends State<RegisterPage> {
   registration() async{
     if(formKey.currentState.validate()){
       var email = emailController.text;
-      email = email.replaceAll(' ', '');
+      email = email.replaceAll(" ", "");
       var password = passwordController.text;
 
       try{
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
         await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
         FirebaseAuth.instance.currentUser?.sendEmailVerification();
+
+
 
         return true;
       }on FirebaseAuthException catch(error){

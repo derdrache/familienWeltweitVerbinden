@@ -10,7 +10,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
 
-import 'board_page.dart';
+import 'news_page.dart';
 import 'create_profil_page.dart';
 import 'erkunden_page.dart';
 import 'chat/chat_page.dart';
@@ -164,12 +164,11 @@ class _StartPageState extends State<StartPage>{
             items: <BottomNavigationBarItem>[
               /*
               BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Board',
+                icon: Icon(Icons.feed),
+                label: 'News',
               ),
 
                */
-
               const BottomNavigationBarItem(
                 icon: Icon(Icons.map),
                 label: 'World',

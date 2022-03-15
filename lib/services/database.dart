@@ -6,7 +6,8 @@ import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
 
 
-var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 
 class AllgemeinDatabase{
 
@@ -65,7 +66,6 @@ class ProfilDatabase{
     }));
   }
 
-  //kein Stream mehr
   getAllProfils() async{
     var url = Uri.parse(databaseUrl + "database/profils/getAllProfils.php");
     var res = await http.get(url, headers: {"Accept": "application/json"});
@@ -145,7 +145,7 @@ class ProfilDatabase{
 
     return responseBody;
   }
-  
+
   updateProfilName(userId, oldName, newName) async{
     FirebaseAuth.instance.currentUser.updateDisplayName(newName);
 
@@ -188,6 +188,20 @@ class ProfilDatabase{
       "longt":locationDict["longt"],
       "latt": locationDict["latt"]
     }));
+  }
+
+  deleteProfil(userId) async {
+    FirebaseAuth.instance.currentUser.delete();
+
+    _deleteAllInTable("profils", userId);
+
+    var allChatGroups = await ChatDatabase().getAllChatgroupsFromUser(userId);
+    for (var chat in allChatGroups){
+      var chatId = chat["id"];
+      _deleteAllInTable("messages", chatId);
+      _deleteAllInTable("chats", chatId);
+    }
+
   }
 
 }
@@ -361,5 +375,15 @@ sendNotification(chatId, messageData) async {
     "apiKey": firebaseWebKey
   }));
 
+}
+
+_deleteAllInTable(table, id) async {
+  var url = Uri.parse(databaseUrl + "database/deleteAll.php");
+
+  var test = await http.post(url, body: json.encode({
+    "id": id,
+    "table": table
+  }));
+  print(test.body);
 }
 

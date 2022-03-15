@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../global/global_functions.dart' as global_functions;
 import '../../services/database.dart';
+import '../login_register_page/login_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
   var profil;
@@ -39,12 +41,28 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       );
     }
 
+    deleteProfilContainer(){
+      return FloatingActionButton.extended(
+        backgroundColor: Colors.red,
+        label: Text("Account löschen"),
+        onPressed: () async {
+          var userId = FirebaseAuth.instance.currentUser?.uid;
+          ProfilDatabase().deleteProfil(userId);
+          setState(() {});
+          global_functions.changePageForever(context, const LoginPage());
+        },
+      );
+    }
+
     return Scaffold(
       appBar: customAppBar(title: AppLocalizations.of(context).privatsphaereSicherheit),
       body: Column(
         children: [
           SizedBox(height: 20,),
-          emailSettingContainer()
+          emailSettingContainer(),
+          Expanded(child: SizedBox.shrink()),
+          deleteProfilContainer(),
+          SizedBox(height: 10)
         ],
       ),
     );
