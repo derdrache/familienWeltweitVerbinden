@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import 'package:familien_suche/pages/umkreis_page.dart';
+import 'package:familien_suche/pages/events/event_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -91,7 +89,7 @@ class _StartPageState extends State<StartPage>{
     List<Widget> tabPages = <Widget>[
       //BoardPage(),
       ErkundenPage(),
-      //UmkreisPage(),
+      EventPage(),
       ChatPage(),
       const SettingPage()
     ];
@@ -162,24 +160,21 @@ class _StartPageState extends State<StartPage>{
             selectedItemColor: Colors.white,
             onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
-              /*
+/*
               BottomNavigationBarItem(
                 icon: Icon(Icons.feed),
                 label: 'News',
               ),
 
-               */
+ */
               const BottomNavigationBarItem(
                 icon: Icon(Icons.map),
                 label: 'World',
               ),
-
-/*
-              BottomNavigationBarItem(
-                icon: Icon(Icons.location_city),
-                label: 'Dein Umkreis',
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.event),
+                label: 'Events',
               ),
- */
               BottomNavigationBarItem(
                 icon: chatIcon(),
                 label: 'Chat',
