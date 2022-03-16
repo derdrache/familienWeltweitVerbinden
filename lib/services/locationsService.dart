@@ -11,14 +11,19 @@ import '../auth/secrets.dart';
 
 class LocationService {
 
-  getGoogleAutocompleteItems(input, sessionToken) async {
+  getGoogleAutocompleteItems(input, sessionToken, address) async {
     var deviceLanguage = kIsWeb? window.locale.languageCode :  Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
     try{
-      var url = "https://families-worldwide.com/services/googleAutocomplete.php";
+
+      var url = address == false ? "https://families-worldwide.com/services/googleAutocomplete.php":
+      "https://families-worldwide.com/services/googleAutocompleteAddress.php";
+
       var zusatz = "?param1=$google_key&param2=$input&param3=$sprache&param4=$sessionToken";
 
       var response = await http.get(Uri.parse(url + zusatz), headers: {"Accept": "application/json"});
+      print("google Data");
+      print(response.body);
       var json = convert.jsonDecode(response.body);
 
       return json;

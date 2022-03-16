@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:familien_suche/services/locationsService.dart';
@@ -34,7 +33,7 @@ class SearchAutocomplete extends StatefulWidget {
   _googleAutoCompleteSuche(input) async {
     var googleInput = input;
     googleInput = googleInput.replaceAll(" ", "_");
-    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken);
+    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken, false);
     if(googleSuche.isEmpty) return;
 
     final Map<String, dynamic> data = Map.from(googleSuche);

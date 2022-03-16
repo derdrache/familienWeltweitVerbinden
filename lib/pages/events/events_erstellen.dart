@@ -7,11 +7,10 @@ import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
-import '../../global/search_autocomplete.dart';
+import '../../global/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 
 // Wo ? Ort wählen => Adresse eingeben => neue php Datei => Adresse + Stadt + Land + Geodaten
-// einmalig oder wöchentlich
 
 
 class EventErstellen extends StatefulWidget {
@@ -39,8 +38,7 @@ class _EventErstellenState extends State<EventErstellen> {
     hintText: "Häufigkeit des Events eingeben",
     items: const ["einmalig", "wöchentlich", "monatlich"],
   );
-  var ortAuswahlBox = SearchAutocomplete(googleAutocomplete: true);
-
+  var ortAuswahlBox = GoogleAutoComplete(googleAddress: true);
 
 
 
@@ -129,9 +127,9 @@ class _EventErstellenState extends State<EventErstellen> {
                   validator: global_functions.checkValidatorEmpty(context)
               ),
               eventArtDropdown,
-              sprachenAuswahlBox,
               ortTypAuswahl,
               ortEingabeBox(),
+              sprachenAuswahlBox,
               eventInterval,
               customTextInput(
                   "Event Beschreibung",

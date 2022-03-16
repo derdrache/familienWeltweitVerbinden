@@ -171,10 +171,13 @@ class _StartPageState extends State<StartPage>{
                 icon: Icon(Icons.map),
                 label: 'World',
               ),
+
               const BottomNavigationBarItem(
                 icon: Icon(Icons.event),
                 label: 'Events',
               ),
+
+
               BottomNavigationBarItem(
                 icon: chatIcon(),
                 label: 'Chat',
