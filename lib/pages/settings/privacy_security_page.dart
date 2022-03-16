@@ -61,8 +61,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           SizedBox(height: 20,),
           emailSettingContainer(),
           Expanded(child: SizedBox.shrink()),
-          deleteProfilContainer(),
-          SizedBox(height: 10)
+          //deleteProfilContainer(),
+          //SizedBox(height: 10)
         ],
       ),
     );
