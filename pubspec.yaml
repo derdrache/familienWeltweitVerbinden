@@ -48,6 +48,7 @@ dependencies:
   flutter_google_places: ^0.3.0
   uuid: ^3.0.6
   flutter_iconpicker: ^3.1.2
+  google_sign_in: ^5.2.4
 
 
   flutter_localizations:

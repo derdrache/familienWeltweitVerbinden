@@ -1,10 +1,14 @@
+import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
+import '../create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
@@ -35,7 +39,6 @@ class _LoginPageState extends State<LoginPage> {
 
   userLogin() async{
     if(kIsWeb && angemeldetBleiben) {
-      print("angemeldet bleiben");
       FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
     }
 
@@ -68,6 +71,45 @@ class _LoginPageState extends State<LoginPage> {
         customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
       }
     }
+  }
+
+  signInWithGoogleWeb() async {
+    await Firebase.initializeApp();
+    User user;
+
+    FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+    GoogleAuthProvider authProvider = GoogleAuthProvider();
+
+    try {
+      final UserCredential userCredential =
+      await FirebaseAuth.instance.signInWithPopup(authProvider);
+
+      user = userCredential.user;
+    } catch (e) {
+      print(e);
+    }
+
+    return user;
+  }
+
+  signInWithGoogleAndroid() async {
+    // Trigger the authentication flow
+    GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+
+
   }
 
   @override
@@ -154,7 +196,34 @@ class _LoginPageState extends State<LoginPage> {
                 isLoading ? loading() : customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended(AppLocalizations.of(context).registrieren, (){
                   global_functions.changePage(context, const RegisterPage());
-                })
+                }),
+                /*
+                TextButton(
+                  child: Text("Google Log In"),
+                  onPressed: ()async {
+                    if (kIsWeb){
+                      await signInWithGoogleWeb();
+                    } else{
+                      await signInWithGoogleAndroid();
+                    }
+                    var userId = FirebaseAuth.instance.currentUser.uid;
+
+                    if(userId == null) return;
+                    var userExist = await ProfilDatabase().getOneData("name", "id", userId);
+                    print(userExist == false);
+                    if(userExist == false){
+                      global_functions.changePageForever(context, CreateProfilPage());
+                    } else{
+                      global_functions.changePageForever(context, StartPage());
+                    }
+
+
+
+                  },
+
+                )
+
+                 */
               ],
             )
         )

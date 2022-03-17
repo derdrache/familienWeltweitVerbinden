@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:familien_suche/pages/create_profil_page.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -48,6 +49,7 @@ void main()async {
 class MyApp extends StatelessWidget {
   var userLogedIn = FirebaseAuth.instance.currentUser;
   var userId = FirebaseAuth.instance.currentUser?.uid;
+  var profilExist;
   var pageContext;
   dynamic importantUpdateNumber = 0;
   dynamic buildNumber = 0;
@@ -60,7 +62,10 @@ class MyApp extends StatelessWidget {
       userLogedIn = FirebaseAuth.instance.currentUser;
     }
 
+    profilExist = await ProfilDatabase().getOneData("name", "id", userId);
+
     if(kIsWeb) return ;
+
 
     importantUpdateNumber = await AllgemeinDatabase().getOneData("importantUpdate");
     importantUpdateNumber = int.parse(importantUpdateNumber["importantUpdate"]);
@@ -159,7 +164,9 @@ class MyApp extends StatelessWidget {
             ],
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
-            home: userLogedIn != null ? StartPage() :const LoginPage()
+            home: userLogedIn == null ? const LoginPage() :
+            profilExist == false ? const CreateProfilPage() : StartPage()
+
           );
         }
     );
