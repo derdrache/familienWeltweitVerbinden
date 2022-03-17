@@ -203,7 +203,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
         width: webWidth,
         margin: EdgeInsets.all(sideSpace),
         child: MultiSelectDialogField (
-          buttonIcon: widget.icon,
+            buttonIcon: widget.icon,
             initialValue: widget.selected,
             buttonText: Text(
               createDropdownText(),
@@ -338,11 +338,13 @@ class CustomDropDownButton extends StatefulWidget {
   List<String> items;
   String hintText;
   String selected;
+  var onChange;
 
   CustomDropDownButton({Key key,
     this.items,
     this.hintText = "",
-    this.selected = ""
+    this.selected = "",
+    this.onChange
   }) : super(key: key);
 
 
@@ -386,9 +388,11 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
             style: const TextStyle(color: Colors.black),
             icon: const Icon(Icons.arrow_downward, color: Colors.black,),
             onChanged: (newValue){
+
               setState(() {
                 widget.selected = newValue;
               });
+              widget.onChange();
             },
             items: createDropdownItems(),
           ),

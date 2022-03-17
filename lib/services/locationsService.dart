@@ -22,8 +22,7 @@ class LocationService {
       var zusatz = "?param1=$google_key&param2=$input&param3=$sprache&param4=$sessionToken";
 
       var response = await http.get(Uri.parse(url + zusatz), headers: {"Accept": "application/json"});
-      print("google Data");
-      print(response.body);
+
       var json = convert.jsonDecode(response.body);
 
       return json;

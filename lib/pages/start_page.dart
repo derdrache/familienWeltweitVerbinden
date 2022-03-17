@@ -74,16 +74,6 @@ class _StartPageState extends State<StartPage>{
     ProfilDatabase().updateProfil(userID, "lastLogin", DateTime.now().toString());
   }
 
-  checkIfFirstLogin(){
-    if(widget.registered){ return false; }
-
-    if(userName == null || userName == ""){
-      return true;
-    }
-
-    return false;
-  }
-  
 
   Widget build(BuildContext context){
     List<Widget> tabPages = <Widget>[
@@ -149,7 +139,7 @@ class _StartPageState extends State<StartPage>{
 
     }
 
-    return checkIfFirstLogin() ? const CreateProfilPage(): Scaffold(
+    return Scaffold(
           body: Center(
             child: tabPages.elementAt(widget.selectedIndex),
           ),

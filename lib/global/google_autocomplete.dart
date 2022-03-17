@@ -189,6 +189,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                     ),
                     style: const TextStyle(),
                     onChanged: (value) async {
+                      value = value.replaceAll(" ", "_");
                       await widget._googleAutoCompleteSuche(value);
 
                       showAutoComplete(value);
