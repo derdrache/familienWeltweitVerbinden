@@ -74,8 +74,8 @@ class _EventErstellenState extends State<EventErstellen> {
 
     var eventData = {
       "name" : eventNameKontroller.text,
-      "erstelltAm": DateTime.now().toString(),
-      "erstelltVon": FirebaseAuth.instance.currentUser.displayName,
+      "erstelltAm": (DateTime.now().millisecondsSinceEpoch / 1000).round(),
+      "erstelltVon": FirebaseAuth.instance.currentUser.uid,
       "beschreibung": eventBeschreibungKontroller.text,
       "stadt": locationData["city"],
       "art": eventArtDropdown.getSelected(),
@@ -87,12 +87,8 @@ class _EventErstellenState extends State<EventErstellen> {
       "longt": locationData["longt"],
       "latt": locationData["latt"],
     };
-    print(eventData);
+
     EventDatabase().addNewEvent(eventData);
-
-
-
-
 
   }
 

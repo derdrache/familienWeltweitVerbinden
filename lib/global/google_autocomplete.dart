@@ -19,24 +19,24 @@ class GoogleAutoComplete extends StatefulWidget {
   bool isSearching = false;
   bool suche;
   String hintText;
-  var googleSearchResult = {
-    "city": null,
-    "countryname": null,
-    "longt": null,
-    "latt": null,
-    "adress": null
-  };
+  var googleSearchResult;
   var sessionToken = Uuid().v4();
 
   getGoogleLocationData(){
-    return googleSearchResult;
+    return googleSearchResult ?? {
+      "city": null,
+      "countryname": null,
+      "longt": null,
+      "latt": null,
+      "adress": null
+    };
   }
 
   _googleAutoCompleteSuche(input) async {
     var googleInput = input;
     searchableItems = [];
     var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken);
-    if(googleSuche.isEmpty) return;
+    if(googleSuche.isEmpty) return ;
 
     final Map<String, dynamic> data = Map.from(googleSuche);
     searchableItems = data["predictions"];
