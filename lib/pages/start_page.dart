@@ -78,7 +78,7 @@ class _StartPageState extends State<StartPage>{
   Widget build(BuildContext context){
     List<Widget> tabPages = <Widget>[
       //BoardPage(),
-      ErkundenPage(),
+      //ErkundenPage(),
       EventPage(),
       ChatPage(),
       const SettingPage()
@@ -157,11 +157,14 @@ class _StartPageState extends State<StartPage>{
               ),
 
  */
+            /*
               const BottomNavigationBarItem(
                 icon: Icon(Icons.map),
                 label: 'World',
               ),
 
+
+             */
               const BottomNavigationBarItem(
                 icon: Icon(Icons.event),
                 label: 'Events',

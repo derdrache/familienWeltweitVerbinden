@@ -354,13 +354,33 @@ class ChatDatabase{
 
 class EventDatabase{
 
-  addNewEvent(eventData) async{
+  addNewEvent(eventData) {
     var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
-    var test = await http.post(url, body: json.encode(eventData));
-    print(test.body);
+    http.post(url, body: json.encode(eventData));
   }
 
+  getEvents(userId) async {
+    var url = databaseUrl + "database/events/getEvent.php";
+    var data = "?param1=$userId";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    var responseBody = json.decode(res.body);
 
+    return responseBody;
+
+  }
+
+  getAllEvents() async {
+    var url = Uri.parse(databaseUrl + "database/events/getAllEvents.php");
+    var res = await http.get(url, headers: {"Accept": "application/json"});
+    var responseBody = json.decode(res.body);
+
+    for(var body in responseBody){
+      body["sprache"] = json.decode(body["sprachen"]);
+    }
+
+    return responseBody;
+  }
 
 }
 
