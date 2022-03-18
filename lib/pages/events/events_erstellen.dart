@@ -1,16 +1,18 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_iconpicker/flutter_iconpicker.dart';
+import 'package:intl/intl.dart';
 
+import '../../services/database.dart';
 import '../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../global/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
-
-// Wo ? Ort wählen => Adresse eingeben => neue php Datei => Adresse + Stadt + Land + Geodaten
 
 
 class EventErstellen extends StatefulWidget {
@@ -27,18 +29,10 @@ class _EventErstellenState extends State<EventErstellen> {
   var eventUhrzeit;
   var eventBeschreibungKontroller = TextEditingController();
   var eventOrtKontroller = TextEditingController();
-  var iconAuswahl;
   var sprachenAuswahlBox = CustomMultiTextForm();
-  var eventArtDropdown = CustomDropDownButton(
-    hintText: "Eventart auswählen",
-    items: const ["Privat", "Öffentlich"],
-  );
-  var ortTypAuswahl = CustomDropDownButton();
-  var eventInterval = CustomDropDownButton(
-    hintText: "Häufigkeit des Events eingeben",
-    items: const ["einmalig", "wöchentlich", "monatlich"],
-  );
-  var ortAuswahlBox = GoogleAutoComplete(googleAddress: true);
+  var eventArtDropdown = CustomDropDownButton();
+  var ortTypDropdown = CustomDropDownButton();
+  var ortAuswahlBox = GoogleAutoComplete();
 
 
 
@@ -51,8 +45,8 @@ class _EventErstellenState extends State<EventErstellen> {
       global_var.sprachenListe : global_var.sprachenListeEnglisch
     );
 
-    ortTypAuswahl = CustomDropDownButton(
-      hintText: "Orttyp auswählen",
+    ortTypDropdown = CustomDropDownButton(
+      hintText: "Offline oder Online Event ?",
       items: const ["offline", "online"],
       onChange: () {
         setState(() {
@@ -61,18 +55,95 @@ class _EventErstellenState extends State<EventErstellen> {
       },
     );
 
+    eventArtDropdown = CustomDropDownButton(
+      hintText: "Öffentliches oder Privates Event ?",
+      items: const ["Privat", "Öffentlich"],
+    );
+
     super.initState();
+  }
+
+  saveEvent(){
+    var locationData = ortAuswahlBox.getGoogleLocationData();
+    var allFilled = checkAllValidations(locationData);
+    if(!allFilled) return;
+
+
+    var date = DateTime(eventDatum.year, eventDatum.month, eventDatum.day,
+        eventUhrzeit.hour, eventUhrzeit.minute);
+
+    var eventData = {
+      "name" : eventNameKontroller.text,
+      "erstelltAm": DateTime.now().toString(),
+      "erstelltVon": FirebaseAuth.instance.currentUser.displayName,
+      "beschreibung": eventBeschreibungKontroller.text,
+      "stadt": locationData["city"],
+      "art": eventArtDropdown.getSelected(),
+      "wann" : date.toString(),
+      "typ": ortTypDropdown.getSelected(),
+      "sprache": json.encode(sprachenAuswahlBox.getSelected())   ,
+      "link": ortTypDropdown.getSelected() == "online" ? eventOrtKontroller.text : "",
+      "land": locationData["countryname"],
+      "longt": locationData["longt"],
+      "latt": locationData["latt"],
+    };
+    print(eventData);
+    EventDatabase().addNewEvent(eventData);
+
+
+
+
+
+  }
+
+  checkAllValidations(locationData){
+    var validationFailText = "";
+
+    if(eventNameKontroller.text.isEmpty){
+      validationFailText = "Bitte einen Namen eingeben";
+    } else if(eventArtDropdown.getSelected().isEmpty){
+      validationFailText = "Bitte wählen ob privates oder öffentliches Event";
+    } else if(ortTypDropdown.getSelected().isEmpty){
+      validationFailText = "Bitte wählen: offline oder Online Event";
+    } else if(ortTypDropdown.getSelected() == "offline" && locationData["city"] == null){
+      validationFailText = "Bitte Stadt eingeben";
+    } else if (ortTypDropdown.getSelected() == "online" && eventOrtKontroller.text.isEmpty) {
+      validationFailText = "Bitte Link zum Event eingeben";
+    }else if(sprachenAuswahlBox.getSelected().isEmpty){
+      validationFailText = "Bitte Sprache auswählen";
+    } else if(eventDatum == null){
+      validationFailText = "Bitte Datum des Events eingeben";
+    } else if(eventUhrzeit == null){
+      validationFailText = "Bitte Uhrzeit des Events eingeben";
+    } else if(eventBeschreibungKontroller.text.isEmpty){
+      validationFailText = "Bitte Beschreibung zum Event eingeben";
+    }
+
+    if(validationFailText.isEmpty) return true;
+
+    customSnackbar(context, validationFailText);
+    return false;
+
   }
 
   @override
   Widget build(BuildContext context) {
+    ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
 
     dateAndTimeBox(){
+      var dateString = "Datum auswählen";
+      if(eventDatum != null){
+        var dateFormat = DateFormat('dd-MM-yyyy');
+        var dateTime = DateTime(eventDatum.year, eventDatum.month, eventDatum.day);
+        dateString = dateFormat.format(dateTime);
+      }
+
+
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton(
-            child: Text(eventDatum == null ? "Datum auswählen" : eventDatum),
+            child: Text(dateString),
             onPressed: () async {
               eventDatum = await showDatePicker(
                   context: context,
@@ -80,9 +151,8 @@ class _EventErstellenState extends State<EventErstellen> {
                   firstDate: DateTime.now(),
                   lastDate: DateTime(DateTime.now().year + 1)
               );
+
               setState(() {
-                eventDatum = eventDatum.day.toString() + "." +
-                    eventDatum.month.toString() + "." + eventDatum.year.toString();
               });
             },
           ),
@@ -103,11 +173,11 @@ class _EventErstellenState extends State<EventErstellen> {
     }
 
     ortEingabeBox(){
-      if(ortTypAuswahl.selected == "online"){
+      if(ortTypDropdown.selected == "online"){
         return customTextInput("Link vom Event eingeben", eventOrtKontroller,
             validator: global_functions.checkValidatorEmpty(context)
         );
-      } else if(ortTypAuswahl.selected == "offline"){
+      } else if(ortTypDropdown.selected == "offline"){
         return ortAuswahlBox;
       } else{
         return SizedBox.shrink();
@@ -118,7 +188,13 @@ class _EventErstellenState extends State<EventErstellen> {
 
     return Scaffold(
       appBar: customAppBar(
-          title: "Event erstellen"
+        title: "Event erstellen",
+        buttons: [
+          IconButton(
+              onPressed: () => saveEvent(),
+              icon: Icon(Icons.done, color: Colors.green)
+          )
+        ]
       ),
       body: Container(
           child: ListView(
@@ -127,28 +203,15 @@ class _EventErstellenState extends State<EventErstellen> {
                   validator: global_functions.checkValidatorEmpty(context)
               ),
               eventArtDropdown,
-              ortTypAuswahl,
+              ortTypDropdown,
               ortEingabeBox(),
               sprachenAuswahlBox,
-              eventInterval,
+              dateAndTimeBox(),
               customTextInput(
                   "Event Beschreibung",
                   eventBeschreibungKontroller,
                   moreLines: 8
               ),
-              dateAndTimeBox(),
-              Container(
-                margin: EdgeInsets.only(left:10, right: 10),
-                child: ElevatedButton(
-                  child: iconAuswahl == null ? Text("Event Icon auswählen") : iconAuswahl,
-                  onPressed: () async {
-                    var iconData = await FlutterIconPicker.showIconPicker(context);
-                    setState(() {
-                      iconAuswahl = Icon(iconData);
-                    });
-                  },
-                ),
-              )
             ],
           )
       ),

@@ -61,7 +61,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
   @override
   Widget build(BuildContext context) {
-    autoComplete.hintText = AppLocalizations.of(context).ortEingeben;
+    autoComplete.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
 
     return Scaffold(
       appBar: customAppBar(
