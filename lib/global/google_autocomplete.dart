@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:ui';
+
 
 import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +17,15 @@ class GoogleAutoComplete extends StatefulWidget {
   var isDense = false;
   var searchKontroller = TextEditingController();
   bool isSearching = false;
-  bool googleAddress = false;
   bool suche;
   String hintText;
-  var googleSearchResult;
+  var googleSearchResult = {
+    "city": null,
+    "countryname": null,
+    "longt": null,
+    "latt": null,
+    "adress": null
+  };
   var sessionToken = Uuid().v4();
 
   getGoogleLocationData(){
@@ -27,8 +34,8 @@ class GoogleAutoComplete extends StatefulWidget {
 
   _googleAutoCompleteSuche(input) async {
     var googleInput = input;
-    googleInput = googleInput.replaceAll(" ", "_");
-    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken, googleAddress);
+    searchableItems = [];
+    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken);
     if(googleSuche.isEmpty) return;
 
     final Map<String, dynamic> data = Map.from(googleSuche);
@@ -39,9 +46,8 @@ class GoogleAutoComplete extends StatefulWidget {
 
   GoogleAutoComplete({Key key,
     this.searchableItems,
-    this.hintText = "Ort eingeben",
+    this.hintText,
     this.suche = true,
-    this.googleAddress = false
   });
 
   @override
@@ -189,7 +195,6 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                     ),
                     style: const TextStyle(),
                     onChanged: (value) async {
-                      value = value.replaceAll(" ", "_");
                       await widget._googleAutoCompleteSuche(value);
 
                       showAutoComplete(value);

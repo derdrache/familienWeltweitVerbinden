@@ -33,7 +33,7 @@ class SearchAutocomplete extends StatefulWidget {
   _googleAutoCompleteSuche(input) async {
     var googleInput = input;
     googleInput = googleInput.replaceAll(" ", "_");
-    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken, false);
+    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken);
     if(googleSuche.isEmpty) return;
 
     final Map<String, dynamic> data = Map.from(googleSuche);

@@ -352,6 +352,18 @@ class ChatDatabase{
   }
 }
 
+class EventDatabase{
+
+  addNewEvent(eventData) async{
+    var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
+    var test = await http.post(url, body: json.encode(eventData));
+    print(test.body);
+  }
+
+
+
+}
+
 
 sendNotification(chatId, messageData) async {
   var toActiveChat = await ProfilDatabase().getOneData("activeChat", "id", messageData["zu"]);

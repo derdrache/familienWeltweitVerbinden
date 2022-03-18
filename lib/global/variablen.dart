@@ -5,12 +5,15 @@ List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
 List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
   "Gemeinsame Aktivitäten", "Weltreise", "Langsam reisen", "Gemeinsam reisen"];
 List<String> sprachenListe = ["Deutsch", "Englisch"];
+List<String> eventInterval = ["einmalig", "wöchentlich", "monatlich"];
+
 
 List<String> reiseartenEnglisch = ["fixed location", "airplane/housing",
   "car/housing","mobile home/camping", "boat"];
 List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldschooling",
   "joint activities", "world Travel", "travel slowly", "travel together"];
 List<String> sprachenListeEnglisch = ["german", "english"];
+
 
 Color borderColorGrey = const Color(0xFFDFDDDD);
 

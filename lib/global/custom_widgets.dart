@@ -39,7 +39,7 @@ Widget customTextInput(text, controller, {validator, passwort = false,
                   border: const OutlineInputBorder(),
                   alignLabelWithHint: true,
                   labelText: text,
-                  labelStyle: const TextStyle(fontSize: 13, color: Colors.grey),
+                  labelStyle: const TextStyle(fontSize: 15, color: Colors.grey),
                   //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
                 ),
                 validator: validator
@@ -392,7 +392,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
               setState(() {
                 widget.selected = newValue;
               });
-              widget.onChange();
+              if(widget.onChange != null) widget.onChange();
             },
             items: createDropdownItems(),
           ),

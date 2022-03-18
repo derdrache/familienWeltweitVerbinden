@@ -161,7 +161,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     interessenAuswahlBox.hintText = AppLocalizations.of(context).interessenAuswaehlen;
     reiseArtenAuswahlBox.hintText = AppLocalizations.of(context).artDerReiseAuswaehlen;
     childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
-    ortAuswahlBox.hintText = AppLocalizations.of(context).ortEingeben ;
+    ortAuswahlBox.hintText = AppLocalizations.of(context).aktuellenOrtEingeben ;
 
     pageTitle(){
       return Align(

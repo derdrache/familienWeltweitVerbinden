@@ -29,7 +29,7 @@
     "genauenStandortWaehlen": "Please select the exact location",
     "profilErstellen": "Create profile",
     "benutzername" : "User name",
-    "ortEingeben": "Enter current location",
+    "aktuellenOrtEingeben": "Enter current location",
     "anzahlUndAlterKinder": "number and ages of children:",
     "emailNichtBestaetigt": "Email has not yet been confirmed",
     "benutzerNichtGefunden" : "user not found",
@@ -103,7 +103,8 @@
     "usernameZuLang": "Username is too long, maximum 40 characters",
     "feedbackDanke": "Thanks for your feedback",
     "erfolgreichGeaender": "successfully changed",
-    "ortEingabeInformation": "For the location, you can decide how precise your input should be. \n The more precise your input is, the more likely it is that you will be contacted by others.  \n\n Examples for the input: City / Country / Region"
+    "ortEingabeInformation": "For the location, you can decide how precise your input should be. \n The more precise your input is, the more likely it is that you will be contacted by others.  \n\n Examples for the input: City / Country / Region",
+    "stadtEingeben": "Stadt eingeben"
 
 }
 
