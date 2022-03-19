@@ -9,10 +9,12 @@ var userId = FirebaseAuth.instance.currentUser.uid;
 class EventCard extends StatelessWidget {
   var margin;
   var event;
+  var withInteresse;
 
   EventCard({
     Key key,
     this.event,
+    this.withInteresse = false,
     this.margin = const EdgeInsets.only(top:10, bottom: 10, right: 10, left: 10)
   });
 
@@ -50,7 +52,7 @@ class EventCard extends StatelessWidget {
                   ),
                   child: Image.asset(event["bild"]),
                 ),
-                if(event["interesse"] != null) Positioned(
+                if(withInteresse) Positioned(
                   top: 2,
                   right: 8,
                   child: InteresseButton(

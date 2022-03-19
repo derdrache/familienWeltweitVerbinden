@@ -384,6 +384,18 @@ class EventDatabase{
 
   }
 
+  getEventsCheckList(userId, where) async {
+    var url = databaseUrl + "database/events/getEventCheckList.php";
+    var data = "?param1=$userId&param2=$where";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+
+    var responseBody = json.decode(res.body);
+
+    return responseBody;
+
+  }
+
   getAllEvents() async {
     var url = Uri.parse(databaseUrl + "database/events/getAllEvents.php");
     var res = await http.get(url, headers: {"Accept": "application/json"});

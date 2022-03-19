@@ -17,6 +17,21 @@ class _EventPageState extends State<EventPage>{
 
   Widget build(BuildContext context){
 
+    createEventCards(events, withInteresse){
+      List<Widget> eventCards = [];
+
+      for(var event in events){
+        eventCards.add(
+            EventCard(
+              event: event,
+              withInteresse: withInteresse,
+            )
+        );
+      }
+
+      return eventCards;
+    }
+
     meineInteressiertenEventsBox(){
       return Container(
         padding: EdgeInsets.all(10),
@@ -25,30 +40,42 @@ class _EventPageState extends State<EventPage>{
             border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
         ),
         child: Column(
-          children: const [
-            Align(
-                alignment: Alignment.centerLeft,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+                margin: EdgeInsets.only(left: 10),
                 child: Text(
                   "Events für die ich mich interessiere",
                   style: TextStyle(fontSize: 20),
                 )
+            ),
+            FutureBuilder(
+                future: EventDatabase().getEventsCheckList(userId, "interesse"),
+                builder: (
+                    BuildContext context,
+                    AsyncSnapshot snapshot,
+                    ){
+                  if (snapshot.data != null){
+                    return Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Wrap(
+                            direction: Axis.vertical,
+                            children: createEventCards(snapshot.data, true)
+                        ),
+                      ),
+                    );
+                  }
+                  return SizedBox.shrink();
+                }
             )
           ],
         )
       );
     }
 
-    meineEvents(events){
-      List<Widget> meineEvents = [];
 
-      for(var event in events){
-        meineEvents.add(
-            EventCard(event: event)
-        );
-      }
 
-      return meineEvents;
-    }
 
     meineErstellenEventsBox(){
       return Container(
@@ -80,7 +107,7 @@ class _EventPageState extends State<EventPage>{
                         scrollDirection: Axis.horizontal,
                         child: Wrap(
                             direction: Axis.vertical,
-                            children: meineEvents(snapshot.data)
+                            children: createEventCards(snapshot.data, false)
                           ),
                       ),
                   );

@@ -135,8 +135,6 @@ class _StartPageState extends State<StartPage>{
               return const Icon(Icons.chat);
           });
 
-
-
     }
 
     return Scaffold(
@@ -157,15 +155,14 @@ class _StartPageState extends State<StartPage>{
               ),
 
  */
-/*
+            /*
               const BottomNavigationBarItem(
                 icon: Icon(Icons.map),
                 label: 'World',
               ),
 
 
- */
-
+             */
 
               const BottomNavigationBarItem(
                 icon: Icon(Icons.event),
