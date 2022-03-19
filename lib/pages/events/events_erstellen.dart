@@ -74,7 +74,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
     var eventData = {
       "name" : eventNameKontroller.text, //maximal 20 zeichen, dann ...
-      "erstelltAm": (DateTime.now().millisecondsSinceEpoch / 1000).round(),
+      "erstelltAm": DateTime.now().toString(),
       "erstelltVon": FirebaseAuth.instance.currentUser.uid,
       "beschreibung": eventBeschreibungKontroller.text,
       "stadt": locationData["city"],
@@ -89,7 +89,7 @@ class _EventErstellenState extends State<EventErstellen> {
     };
 
     EventDatabase().addNewEvent(eventData);
-
+    // in die Event Detail ansicht
   }
 
   checkAllValidations(locationData){

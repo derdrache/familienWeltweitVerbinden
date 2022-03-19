@@ -43,13 +43,7 @@ class _EventPageState extends State<EventPage>{
 
       for(var event in events){
         meineEvents.add(
-            EventCard(
-              title: event["name"],
-              bild: event["bild"],
-              date: "23.03.2022 10:00",
-              stadt: event["stadt"],
-              land: event["land"]
-            )
+            EventCard(event: event)
         );
       }
 
