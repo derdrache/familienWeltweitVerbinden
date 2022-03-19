@@ -1,3 +1,4 @@
+import 'package:familien_suche/pages/events/events_suchen.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -44,9 +45,10 @@ class _EventPageState extends State<EventPage>{
         meineEvents.add(
             EventCard(
               title: event["name"],
-              bild: "assets/bilder/strand.jpg",
+              bild: event["bild"],
               date: "23.03.2022 10:00",
               stadt: event["stadt"],
+              land: event["land"]
             )
         );
       }
@@ -114,7 +116,7 @@ class _EventPageState extends State<EventPage>{
             FloatingActionButton(
               heroTag: "event suchen",
               child: Icon(Icons.search),
-              onPressed: null
+              onPressed: () => global_functions.changePage(context, EventsSuchenPage())
             ),
             SizedBox(width: 10),
             FloatingActionButton(
