@@ -73,7 +73,7 @@ class _EventErstellenState extends State<EventErstellen> {
         eventUhrzeit.hour, eventUhrzeit.minute);
 
     var eventData = {
-      "name" : eventNameKontroller.text,
+      "name" : eventNameKontroller.text, //maximal 20 zeichen, dann ...
       "erstelltAm": (DateTime.now().millisecondsSinceEpoch / 1000).round(),
       "erstelltVon": FirebaseAuth.instance.currentUser.uid,
       "beschreibung": eventBeschreibungKontroller.text,

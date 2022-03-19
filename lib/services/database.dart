@@ -375,10 +375,6 @@ class EventDatabase{
     var res = await http.get(url, headers: {"Accept": "application/json"});
     var responseBody = json.decode(res.body);
 
-    for(var body in responseBody){
-      body["sprache"] = json.decode(body["sprachen"]);
-    }
-
     return responseBody;
   }
 
