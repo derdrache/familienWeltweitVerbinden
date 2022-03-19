@@ -359,6 +359,20 @@ class EventDatabase{
     http.post(url, body: json.encode(eventData));
   }
 
+  updateOne(id, change, data){
+    var url = Uri.parse(databaseUrl + "database/events/changeEvent.php");
+
+    if(data is List){
+      data = json.encode(data);
+    }
+
+    http.post(url, body: json.encode({
+      "id": id,
+      "change": change,
+      "data": data
+    }));
+  }
+
   getEvents(userId) async {
     var url = databaseUrl + "database/events/getEvent.php";
     var data = "?param1=$userId";
@@ -374,6 +388,10 @@ class EventDatabase{
     var url = Uri.parse(databaseUrl + "database/events/getAllEvents.php");
     var res = await http.get(url, headers: {"Accept": "application/json"});
     var responseBody = json.decode(res.body);
+
+    for(var i = 0; i < responseBody.length; i++){
+      responseBody[i]["interesse"] = jsonDecode(responseBody[i]["interesse"]);
+    }
 
     return responseBody;
   }
