@@ -392,6 +392,10 @@ class EventDatabase{
 
     var responseBody = json.decode(res.body);
 
+    for(var i = 0; i < responseBody.length; i++){
+      responseBody[i]["interesse"] = jsonDecode(responseBody[i]["interesse"]);
+    }
+
     return responseBody;
 
   }

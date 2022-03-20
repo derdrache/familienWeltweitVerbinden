@@ -63,7 +63,6 @@ class MyApp extends StatelessWidget {
     }
 
     profilExist = await ProfilDatabase().getOneData("name", "id", userId);
-    print(profilExist);
 
     if(kIsWeb) return ;
 

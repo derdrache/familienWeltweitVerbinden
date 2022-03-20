@@ -34,7 +34,7 @@ class _EventPageState extends State<EventPage>{
 
     meineInteressiertenEventsBox(){
       return Container(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.only(top: 10),
         width: double.infinity,
         decoration: BoxDecoration(
             border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
@@ -73,9 +73,6 @@ class _EventPageState extends State<EventPage>{
         )
       );
     }
-
-
-
 
     meineErstellenEventsBox(){
       return Container(
