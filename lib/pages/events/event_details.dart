@@ -66,12 +66,14 @@ class EventDetailsPage extends StatelessWidget {
                       margin: const EdgeInsets.only(left: 30, right: 30),
                       width: 800,
                       child: ShowDataAndChangeWindow(
+                        eventId: event["id"],
                         windowTitle: "Event Name ändern",
                         rowData: event["name"],
                         inputHintText: "Event Name eingeben",
                         isCreator: isCreator,
                         modus: "textInput",
                         singleShow: true,
+                        databaseKennzeichnung: "name"
                        )
                   )
               )
@@ -86,59 +88,73 @@ class EventDetailsPage extends StatelessWidget {
         child: Column(
           children: [
             ShowDataAndChangeWindow(
+              eventId: event["id"],
               windowTitle: "Datum ändern",
               rowTitle: "Datum",
               rowData: event["wann"].split(" ")[0].split("-").reversed.join("."),
               inputHintText: "Neues Datum eingeben",
               isCreator: isCreator,
               modus: "date",
+              oldDate: event["wann"],
+              databaseKennzeichnung: "wann"
             ),
             const SizedBox(height: 10),
             ShowDataAndChangeWindow(
+                eventId: event["id"],
                 windowTitle: "Uhrzeit ändern",
                 rowTitle: "Uhrzeit",
                 rowData: event["wann"].split(" ")[1].split(":").take(2).join(":") + " Uhr",
                 inputHintText: "Neue Uhrzeit eingeben",
                 isCreator: isCreator,
-                modus: "uhrzeit",
+                modus: "dateTime",
+                oldDate: event["wann"],
+                databaseKennzeichnung: "wann"
             ),
             const SizedBox(height: 10),
             ShowDataAndChangeWindow(
+              eventId: event["id"],
               windowTitle: "Stadt verändern",
               rowTitle: "Ort",
               rowData: event["stadt"] + ", " + event["land"],
               inputHintText: "Neue Stadt eingeben",
               isCreator: isCreator,
-              modus: "googleAutoComplete"
+              modus: "googleAutoComplete",
+              databaseKennzeichnung: "location"
             ),
             const SizedBox(height: 10),
             ShowDataAndChangeWindow(
+              eventId: event["id"],
               windowTitle: "Map Link verändern",
               rowTitle: "Map",
               rowData: event["link"],
               inputHintText: "Karten Link eingeben",
               isCreator: isCreator,
               modus: "textInput",
+              databaseKennzeichnung: "link"
             ),
             const SizedBox(height: 10),
             ShowDataAndChangeWindow(
+              eventId: event["id"],
               windowTitle: "Event Art ändern",
               isCreator: isCreator,
               rowTitle: "Art",
               rowData: event["art"],
               inputHintText: "Öffentliches oder Privates Event ?",
               items: global_var.eventArt,
-              modus: "dropdown"
+              modus: "dropdown",
+              databaseKennzeichnung: "art"
             ),
             const SizedBox(height: 10),
             ShowDataAndChangeWindow(
+              eventId: event["id"],
               windowTitle: "Event Wiederholung ändern",
               isCreator: isCreator,
               rowTitle: "Häufigkeit",
               rowData: event["eventInterval"],
               inputHintText: "Einmalig oder regelmäßig ?",
               items: global_var.eventInterval,
-              modus: "dropdown"
+              modus: "dropdown",
+              databaseKennzeichnung: "eventInterval"
             ),
           ],
         ),
@@ -155,19 +171,21 @@ class EventDetailsPage extends StatelessWidget {
                   minHeight: 100.0,
                 ),
                 child: ShowDataAndChangeWindow(
+                  eventId: event["id"],
                   windowTitle: "Event Beschreibung ändern",
                   rowData: event["beschreibung"],
                   inputHintText: "Event Beschreibung eingeben",
                   isCreator: isCreator,
                   modus: "textInput",
                   multiLines: true,
+                  databaseKennzeichnung: "beschreibung"
                 ),
               )
           )
       );
     }
 
-    creatorChngeHintBox(){
+    creatorChangeHintBox(){
       if (isCreator){
         return const Center(
           child: Text(
@@ -206,7 +224,7 @@ class EventDetailsPage extends StatelessWidget {
                 children: [
                   bildAndTitleBox(),
                   const SizedBox(height: 20),
-                  creatorChngeHintBox(),
+                  creatorChangeHintBox(),
                   eventInformationBox(),
                   eventBeschreibung()
                 ],
@@ -219,6 +237,7 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 }
+
 
 class InteresseButton extends StatefulWidget {
   var interesse;
@@ -274,6 +293,9 @@ class ShowDataAndChangeWindow extends StatefulWidget {
   var modus;
   var singleShow;
   var multiLines;
+  var databaseKennzeichnung;
+  var oldDate;
+  var eventId;
 
   ShowDataAndChangeWindow({
     this.windowTitle,
@@ -284,7 +306,10 @@ class ShowDataAndChangeWindow extends StatefulWidget {
     this.items,
     this.modus,
     this.singleShow = false,
-    this.multiLines = false
+    this.multiLines = false,
+    this.databaseKennzeichnung,
+    this.oldDate,
+    this.eventId
     });
 
   @override
@@ -302,9 +327,12 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
   @override
   void initState() {
+    if(!(widget.databaseKennzeichnung == "link")) inputKontroller.text = widget.rowData;
+
     dropdownInput = CustomDropDownButton(
       hintText: widget.inputHintText,
       items: widget.items,
+      selected: widget.rowData,
     );
 
     ortAuswahlBox.hintText = widget.inputHintText;
@@ -321,7 +349,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       }
       if(widget.modus == "dropdown") return dropdownInput;
       if(widget.modus == "googleAutoComplete") return ortAuswahlBox;
-      if(widget.modus == "uhrzeit") return uhrZeitButton;
+      if(widget.modus == "dateTime") return uhrZeitButton;
       if(widget.modus == "date") return datumButton;
     }
 
@@ -344,7 +372,59 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                       ),
                       TextButton(
                           child: Text("Speichern", style: TextStyle(fontSize: fontsize)),
-                          onPressed: () => print("Database")
+                          onPressed: (){
+                            var data;
+
+                            if(widget.databaseKennzeichnung == "name"){
+                              data = inputKontroller.text;
+                            } else if (widget.databaseKennzeichnung == "location"){
+                              data = ortAuswahlBox.googleSearchResult;
+                            } else if (widget.databaseKennzeichnung == "link"){
+                              data = inputKontroller.text;
+                            }else if (widget.databaseKennzeichnung == "art"){
+                              data = dropdownInput.getSelected();
+                            }else if (widget.databaseKennzeichnung == "eventInterval"){
+                              data = dropdownInput.getSelected();
+                            }else if (widget.databaseKennzeichnung == "beschreibung"){
+                              data = inputKontroller.text;
+                            }else if (widget.modus == "date"){
+                              data = datumButton.eventDatum;
+                              var date = DateTime.parse(widget.oldDate);
+
+                              data = DateTime(data.year, data.month, data.day,
+                                  date.hour, date.minute).toString();
+                            }else if (widget.modus == "dateTime"){
+                              data = uhrZeitButton.uhrZeit;
+                              var date = DateTime.parse(widget.oldDate);
+                              data = DateTime(date.year, date.month, date.day,
+                                  data.hour, data.minute).toString();
+                            }
+
+                            print(data);
+                            if(widget.modus == "date") {
+                              widget.rowData = data.split(" ")[0];
+                            } else if(widget.modus == "dateTime"){
+                              widget.rowData = data.split(" ")[1] + " Uhr";
+                            }else if(widget.databaseKennzeichnung == "location"){
+                              //
+                            }else{
+                              widget.rowData = data;
+                            }
+
+                            Navigator.pop(context);
+
+                            setState(() {
+
+                            });
+
+                            if(widget.databaseKennzeichnung == "location"){
+                              EventDatabase().updateLocation(userId, data);
+                            } else{
+                              EventDatabase().updateOne(widget.eventId, widget.databaseKennzeichnung, data);
+                            }
+
+
+                          }
                       ),
                     ]
                 ),
@@ -378,11 +458,6 @@ class DateButton extends StatefulWidget {
 
   DateButton({Key key, this.getDate = false}) : super(key: key);
 
-  getData(){
-    if(getDate) return uhrZeit;
-
-    return eventDatum;
-  }
 
   @override
   _DateButtonState createState() => _DateButtonState();
@@ -391,7 +466,7 @@ class DateButton extends StatefulWidget {
 class _DateButtonState extends State<DateButton> {
 
   dateBox(){
-    var dateString = "Datum auswählen";
+    var dateString = "Neues Datum auswählen";
     if(widget.eventDatum != null){
       var dateFormat = DateFormat('dd.MM.yyyy');
       var dateTime = DateTime(widget.eventDatum.year, widget.eventDatum.month, widget.eventDatum.day);
@@ -415,12 +490,13 @@ class _DateButtonState extends State<DateButton> {
 
   timeBox(){
     return ElevatedButton(
-      child: Text(widget.uhrZeit == null ? "Uhrzeit auswählen" : widget.uhrZeit.format(context)),
+      child: Text(widget.uhrZeit == null ? "Neue Uhrzeit auswählen" : widget.uhrZeit.format(context)),
       onPressed: () async {
         widget.uhrZeit = await showTimePicker(
           context: context,
           initialTime: TimeOfDay(hour: 12, minute: 00),
         );
+
         setState(() {
 
         });
