@@ -373,6 +373,18 @@ class EventDatabase{
     }));
   }
 
+  updateLocation(id, locationData){
+    var url = Uri.parse(databaseUrl + "database/events/changeLocation.php");
+
+    http.post(url, body: json.encode({
+      "id": id,
+      "stadt": locationData["city"],
+      "land": locationData["countryname"],
+      "latt": locationData["latt"],
+      "longt": locationData["longt"]
+    }));
+  }
+
   getEvents(userId) async {
     var url = databaseUrl + "database/events/getEvent.php";
     var data = "?param1=$userId";
