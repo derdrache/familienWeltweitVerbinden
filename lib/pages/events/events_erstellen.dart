@@ -47,7 +47,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
     ortTypDropdown = CustomDropDownButton(
       hintText: "Offline oder Online Event ?",
-      items: const ["offline", "online"],
+      items: global_var.eventTyp,
       onChange: () {
         setState(() {
 
@@ -57,7 +57,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
     eventArtDropdown = CustomDropDownButton(
       hintText: "Öffentliches oder Privates Event ?",
-      items: const ["Privat", "Öffentlich"],
+      items: global_var.eventArt,
     );
 
     super.initState();
@@ -133,7 +133,6 @@ class _EventErstellenState extends State<EventErstellen> {
         var dateTime = DateTime(eventDatum.year, eventDatum.month, eventDatum.day);
         dateString = dateFormat.format(dateTime);
       }
-
 
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,

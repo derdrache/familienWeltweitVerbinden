@@ -231,7 +231,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             children: [
             Text("Info", style: TextStyle(
                 fontSize: healineTextSize,
-                color: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold
               ),
             ),

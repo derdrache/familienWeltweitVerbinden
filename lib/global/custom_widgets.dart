@@ -596,7 +596,7 @@ class WindowTopbar extends StatelessWidget {
   }
 }
 
-CustomWindow({context, title,List<Widget> children}){
+CustomWindow({context, title,List<Widget> children, double height = double.maxFinite}){
 
   _closeWindow(){
     Navigator.pop(context);
@@ -611,7 +611,7 @@ CustomWindow({context, title,List<Widget> children}){
           ),
           contentPadding: EdgeInsets.zero,
           content: SizedBox(
-              height: double.maxFinite,
+              height: height,
               width: 600,
               child: Stack(
                 overflow: Overflow.visible,
