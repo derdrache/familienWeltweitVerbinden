@@ -37,6 +37,7 @@ class EventCard extends StatelessWidget {
           margin: margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
@@ -55,7 +56,12 @@ class EventCard extends StatelessWidget {
                       topLeft: const Radius.circular(20.0),
                       topRight: const Radius.circular(20.0),
                     ),
-                    child: Image.asset(event["bild"]),
+                    child: Image.asset(
+                        event["bild"],
+                        height: 70 + ((screenHeight-600)/5),
+                        width: 130 + ((screenHeight-600)/5),
+                        fit: BoxFit.fill
+                    ),
                   ),
                   if(withInteresse) Positioned(
                     top: 2,
@@ -86,7 +92,7 @@ class EventCard extends StatelessWidget {
                           children: [
                             Text("Date: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                             Text(
-                                event["wann"].split(" ")[0].split("-").reversed.join("-"),
+                                event["wann"].split(" ")[0].split("-").reversed.join("."),
                                 style: TextStyle(fontSize: fontSize))
                           ],
                         ),
