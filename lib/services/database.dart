@@ -373,7 +373,7 @@ class EventDatabase{
     }));
   }
 
-  updateLocation(id, locationData){
+  updateLocation(id, locationData) {
     var url = Uri.parse(databaseUrl + "database/events/changeLocation.php");
 
     http.post(url, body: json.encode({
@@ -394,6 +394,24 @@ class EventDatabase{
 
     return responseBody;
 
+  }
+
+  getOneData(what, eventId) async {
+    var url = databaseUrl + "database/events/getOneData.php";
+    var data = "?param1=$what&param2=$eventId";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    dynamic responseBody = res.body;
+
+    try{
+      responseBody = jsonDecode(responseBody);
+      responseBody = jsonDecode(responseBody[responseBody.keys.toList()[0]]);
+    }catch(error){
+
+    }
+
+
+    return responseBody;
   }
 
   getEventsCheckList(userId, where) async {

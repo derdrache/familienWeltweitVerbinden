@@ -2,21 +2,20 @@ import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../pages/events/event_details.dart';
-import '../global_functions.dart' as global_functions;
-
 var userId = FirebaseAuth.instance.currentUser.uid;
 
 class EventCard extends StatelessWidget {
   var margin;
   var event;
   var withInteresse;
+  var changePage;
 
   EventCard({
     Key key,
     this.event,
     this.withInteresse = false,
-    this.margin = const EdgeInsets.only(top:10, bottom: 10, right: 10, left: 10)
+    this.margin = const EdgeInsets.only(top:10, bottom: 10, right: 10, left: 10),
+    this.changePage
   });
 
   @override
@@ -28,19 +27,18 @@ class EventCard extends StatelessWidget {
 
 
     return GestureDetector(
-      onTap: () => global_functions.changePage(context, EventDetailsPage(
-        event: event,
-      )),
+      onTap: () => changePage(),
       child: Container(
           width: 130 + ((screenHeight-600)/5), //  Android 165
           height: screenHeight / 3.4, // Android 220 ~3,4
           margin: margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
+              //border: Border.all(color: Colors.green),
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
+                  color: Colors.grey.withOpacity(0.8),
                   spreadRadius: 5,
                   blurRadius: 7,
                   offset: Offset(0, 3), // changes position of shadow
@@ -70,17 +68,17 @@ class EventCard extends StatelessWidget {
                         interesse: event["interesse"],
                         id: event["id"],
                     )
-                  )
+                  ),
                 ],
               ),
               Expanded(
                 child: Container(
                     width: double.infinity,
                     padding: EdgeInsets.only(top: 10, left: 5),
-                    decoration: BoxDecoration(
-                      borderRadius: new BorderRadius.only(
-                        bottomLeft: const Radius.circular(20.0),
-                        bottomRight: const Radius.circular(20.0),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20.0),
+                        bottomRight: Radius.circular(20.0),
                       ),
                       color: Colors.white,
                     ),
@@ -145,22 +143,26 @@ class _InteresseButtonState extends State<InteresseButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () async {
         hasIntereset = hasIntereset ? false : true;
 
+        setState(() {});
+
+        var interesseList = await EventDatabase().getOneData("interesse", widget.id);
+
         if(hasIntereset){
-          widget.interesse.add(userId);
+          interesseList.add(userId);
         } else{
-          widget.interesse.remove(userId);
+          interesseList.remove(userId);
         }
 
-        EventDatabase().updateOne(widget.id, "interesse", widget.interesse);
+        EventDatabase().updateOne(widget.id, "interesse", interesseList);
 
-        setState(() {
 
-        });
       },
       child: Icon(Icons.favorite, color: hasIntereset ? Colors.red : Colors.black)
     );
   }
 }
+
+
