@@ -154,13 +154,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   openProfil() async{
     var chatPartnerProfil = await ProfilDatabase().getProfil("id", chatPartnerID);
-    var userFriendlistData = await ProfilDatabase().getOneData("friendlist","id",userId);
-    var userFriendlist = json.decode(userFriendlistData["friendlist"]);
 
     global_functions.changePage(context, ShowProfilPage(
       userName: userName,
       profil: chatPartnerProfil,
-      userFriendlist: userFriendlist,
     ));
 
   }

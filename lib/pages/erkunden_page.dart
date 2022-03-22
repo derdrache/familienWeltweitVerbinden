@@ -391,7 +391,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 global_functions.changePage(context, ShowProfilPage(
                   userName: ownProfil["name"],
                   profil: profil,
-                  userFriendlist: friendlist,
                 ));
               },
               child: Container(

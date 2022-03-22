@@ -193,13 +193,13 @@ class ProfilDatabase{
   deleteProfil(userId) async {
     FirebaseAuth.instance.currentUser.delete();
 
-    _deleteAllInTable("profils", userId);
+    _deleteInTable("profils", userId);
 
     var allChatGroups = await ChatDatabase().getAllChatgroupsFromUser(userId);
     for (var chat in allChatGroups){
       var chatId = chat["id"];
-      _deleteAllInTable("messages", chatId);
-      _deleteAllInTable("chats", chatId);
+      _deleteInTable("messages", chatId);
+      _deleteInTable("chats", chatId);
     }
 
   }
@@ -442,6 +442,23 @@ class EventDatabase{
     return responseBody;
   }
 
+  delete(eventId){
+    _deleteInTable("events", eventId);
+  }
+
+}
+
+class ReportsDatabase{
+
+  add(von, title, beschreibung){
+    var url = Uri.parse(databaseUrl + "database/reports/addReport.php");
+    http.post(url, body: json.encode({
+      "von": von,
+      "title": title,
+      "beschreibung": beschreibung ,
+    }));
+  }
+
 }
 
 
@@ -469,13 +486,12 @@ sendNotification(chatId, messageData) async {
 
 }
 
-_deleteAllInTable(table, id) async {
+_deleteInTable(table, id) {
   var url = Uri.parse(databaseUrl + "database/deleteAll.php");
 
-  var test = await http.post(url, body: json.encode({
+  http.post(url, body: json.encode({
     "id": id,
     "table": table
   }));
-  print(test.body);
 }
 

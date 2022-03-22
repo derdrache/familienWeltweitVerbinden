@@ -1,8 +1,10 @@
+import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../global/global_functions.dart';
 import '../../global/google_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_var;
@@ -168,7 +170,7 @@ class EventCardDetails extends StatelessWidget {
               child: Container(
                 width: double.infinity,
                 constraints: new BoxConstraints(
-                  minHeight: 50.0,
+                  minHeight: 25.0,
                 ),
                 child: ShowDataAndChangeWindow(
                     eventId: event["id"],
@@ -220,7 +222,8 @@ class EventCardDetails extends StatelessWidget {
           const SizedBox(height: 20),
           creatorChangeHintBox(),
           eventInformationBox(),
-          eventBeschreibung()
+          eventBeschreibung(),
+          OrganisatorBox(organisator: event["erstelltVon"],)
         ],
       ),
     );
@@ -454,7 +457,7 @@ class _ShowImageAndChangeWindowState extends State<ShowImageAndChangeWindow> {
         CustomWindow(
             context: context,
             title: "Event Bild ändern",
-            height: 300,
+            height: 180,
             children: [
               dropdownInput,
               Container(
@@ -482,6 +485,55 @@ class _ShowImageAndChangeWindowState extends State<ShowImageAndChangeWindow> {
             topRight: Radius.circular(20.0),
           ),
           child: Image.asset(widget.currentImage)
+      ),
+    );
+  }
+}
+
+class OrganisatorBox extends StatefulWidget {
+  var organisator;
+
+  OrganisatorBox({Key key, this.organisator}) : super(key: key);
+
+  @override
+  _OrganisatorBoxState createState() => _OrganisatorBoxState();
+}
+
+class _OrganisatorBoxState extends State<OrganisatorBox> {
+  var organisatorText = Text("");
+  var organisatorProfil;
+  var ownName = FirebaseAuth.instance.currentUser.displayName;
+
+@override
+  void initState() {
+    setOrganisatorText();
+    super.initState();
+  }
+
+  setOrganisatorText()async{
+    organisatorProfil = await ProfilDatabase().getProfil("id", widget.organisator);
+
+    setState(() {
+      organisatorText = Text(
+          organisatorProfil["name"],
+          style: TextStyle(color: Colors.grey)
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        changePage(context, ShowProfilPage(
+          userName: ownName,
+          profil: organisatorProfil,
+          ));
+      },
+      child: Container(
+        alignment: Alignment.centerRight,
+        margin: EdgeInsets.all(20),
+        child: organisatorText
       ),
     );
   }
@@ -595,3 +647,4 @@ class _InteresseButtonState extends State<InteresseButton> {
     );
   }
 }
+
