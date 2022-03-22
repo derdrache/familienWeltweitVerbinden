@@ -1,515 +1,120 @@
 import 'package:familien_suche/global/custom_widgets.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-import '../../global/google_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/style.dart' as global_style;
-import '../../global/variablen.dart' as global_var;
 
-var userId = FirebaseAuth.instance.currentUser.uid;
-double fontsize = 16;
 
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsPage extends StatefulWidget {
   var event;
-  var offlineEvent;
-  var isCreator;
+  var teilnahme;
+  var absage;
 
   EventDetailsPage({
     Key key,
     this.event,
-    this.offlineEvent = true
   }) :
-        isCreator = event["erstelltVon"] == userId;
+    teilnahme = event["zusage"].contains(userId),
+    absage = event["absage"].contains(userId);
+
+  @override
+  _EventDetailsPageState createState() => _EventDetailsPageState();
+}
+
+class _EventDetailsPageState extends State<EventDetailsPage> {
 
 
   @override
   Widget build(BuildContext context) {
-
-    bildAndTitleBox(){
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Stack(
-            children: [
-              Image.asset(event["bild"]),
-              if(!isCreator) Positioned(
-                top: 5,
-                right: 8,
-                child: InteresseButton(
-                  interesse: event["interesse"],
-                  id: event["id"],
-                )
-              )
-            ],
-          ),
-          Positioned.fill(
-              bottom: -10,
-              child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                      padding: const EdgeInsets.only(top:10, bottom: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(20)),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3), // changes position of shadow
-                            ),
-                          ]
-                      ),
-                      margin: const EdgeInsets.only(left: 30, right: 30),
-                      width: 800,
-                      child: ShowDataAndChangeWindow(
-                        eventId: event["id"],
-                        windowTitle: "Event Name ändern",
-                        rowData: event["name"],
-                        inputHintText: "Event Name eingeben",
-                        isCreator: isCreator,
-                        modus: "textInput",
-                        singleShow: true,
-                        databaseKennzeichnung: "name"
-                       )
-                  )
-              )
-          )
-        ],
-      );
-    }
-
-    eventInformationBox(){
-      return Container(
-        margin: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            ShowDataAndChangeWindow(
-              eventId: event["id"],
-              windowTitle: "Datum ändern",
-              rowTitle: "Datum",
-              rowData: event["wann"].split(" ")[0].split("-").reversed.join("."),
-              inputHintText: "Neues Datum eingeben",
-              isCreator: isCreator,
-              modus: "date",
-              oldDate: event["wann"],
-              databaseKennzeichnung: "wann"
-            ),
-            const SizedBox(height: 10),
-            ShowDataAndChangeWindow(
-                eventId: event["id"],
-                windowTitle: "Uhrzeit ändern",
-                rowTitle: "Uhrzeit",
-                rowData: event["wann"].split(" ")[1].split(":").take(2).join(":") + " Uhr",
-                inputHintText: "Neue Uhrzeit eingeben",
-                isCreator: isCreator,
-                modus: "dateTime",
-                oldDate: event["wann"],
-                databaseKennzeichnung: "wann"
-            ),
-            const SizedBox(height: 10),
-            ShowDataAndChangeWindow(
-              eventId: event["id"],
-              windowTitle: "Stadt verändern",
-              rowTitle: "Ort",
-              rowData: event["stadt"] + ", " + event["land"],
-              inputHintText: "Neue Stadt eingeben",
-              isCreator: isCreator,
-              modus: "googleAutoComplete",
-              databaseKennzeichnung: "location"
-            ),
-            const SizedBox(height: 10),
-            ShowDataAndChangeWindow(
-              eventId: event["id"],
-              windowTitle: "Map Link verändern",
-              rowTitle: "Map",
-              rowData: event["link"],
-              inputHintText: "Karten Link eingeben",
-              isCreator: isCreator,
-              modus: "textInput",
-              databaseKennzeichnung: "link"
-            ),
-            const SizedBox(height: 10),
-            ShowDataAndChangeWindow(
-              eventId: event["id"],
-              windowTitle: "Event Art ändern",
-              isCreator: isCreator,
-              rowTitle: "Art",
-              rowData: event["art"],
-              inputHintText: "Öffentliches oder Privates Event ?",
-              items: global_var.eventArt,
-              modus: "dropdown",
-              databaseKennzeichnung: "art"
-            ),
-            const SizedBox(height: 10),
-            ShowDataAndChangeWindow(
-              eventId: event["id"],
-              windowTitle: "Event Wiederholung ändern",
-              isCreator: isCreator,
-              rowTitle: "Häufigkeit",
-              rowData: event["eventInterval"],
-              inputHintText: "Einmalig oder regelmäßig ?",
-              items: global_var.eventInterval,
-              modus: "dropdown",
-              databaseKennzeichnung: "eventInterval"
-            ),
-          ],
-        ),
-      );
-    }
-
-    eventBeschreibung(){
-      return Container(
-        margin: const EdgeInsets.all(10),
-          child: Center(
-              child: Container(
-                width: double.infinity,
-                constraints: new BoxConstraints(
-                  minHeight: 100.0,
-                ),
-                child: ShowDataAndChangeWindow(
-                  eventId: event["id"],
-                  windowTitle: "Event Beschreibung ändern",
-                  rowData: event["beschreibung"],
-                  inputHintText: "Event Beschreibung eingeben",
-                  isCreator: isCreator,
-                  modus: "textInput",
-                  multiLines: true,
-                  databaseKennzeichnung: "beschreibung"
-                ),
-              )
-          )
-      );
-    }
-
-    creatorChangeHintBox(){
-      if (isCreator){
-        return const Center(
-          child: Text(
-            "Antippen, um Einträge zu ändern",
-            style: TextStyle(color: Colors.grey)
-          ),
-        );
-      }
-      return const SizedBox.shrink();
-    }
-
 
     return Scaffold(
-      appBar: customAppBar(
-        title: "",
-        buttons: [
-          TextButton(
-            style: global_style.textButtonStyle(),
-            child: const Icon(Icons.message),
-            onPressed: () => print("message"),
-          ),
-          TextButton(
-            style: global_style.textButtonStyle(),
-            child: const Icon(Icons.more_vert),
-            onPressed: () => print("more"),
-          ),
-
-        ]
-      ),
-      body: Container(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  bildAndTitleBox(),
-                  const SizedBox(height: 20),
-                  creatorChangeHintBox(),
-                  eventInformationBox(),
-                  eventBeschreibung()
-                ],
+        appBar: customAppBar(
+            title: "",
+            buttons: [
+              TextButton(
+                style: global_style.textButtonStyle(),
+                child: const Icon(Icons.message),
+                onPressed: () => print("message"),
               ),
-            ),
-          ],
+              TextButton(
+                style: global_style.textButtonStyle(),
+                child: const Icon(Icons.more_vert),
+                onPressed: () => print("more"),
+              ),
 
-        )
-      ),
-    );
-  }
-}
-
-
-class InteresseButton extends StatefulWidget {
-  var interesse;
-  var id;
-
-  InteresseButton({Key key, this.interesse, this.id}) : super(key: key);
-
-  @override
-  _InteresseButtonState createState() => _InteresseButtonState();
-}
-
-class _InteresseButtonState extends State<InteresseButton> {
-  var color = Colors.black;
-  var hasIntereset = false;
-
-  @override
-  void initState() {
-    hasIntereset = widget.interesse.contains(userId);
-
-    super.initState();
-  }
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: (){
-          hasIntereset = hasIntereset ? false : true;
-
-          if(hasIntereset){
-            widget.interesse.add(userId);
-          } else{
-            widget.interesse.remove(userId);
-          }
-
-          EventDatabase().updateOne(widget.id, "interesse", widget.interesse);
-
-          setState(() {
-
-          });
-        },
-        child: Icon(Icons.favorite, color: hasIntereset ? Colors.red : Colors.black, size: 30,)
-    );
-  }
-}
-
-
-class ShowDataAndChangeWindow extends StatefulWidget {
-  var windowTitle;
-  var rowTitle;
-  var rowData;
-  var inputHintText;
-  var isCreator;
-  var items;
-  var modus;
-  var singleShow;
-  var multiLines;
-  var databaseKennzeichnung;
-  var oldDate;
-  var eventId;
-
-  ShowDataAndChangeWindow({
-    this.windowTitle,
-    this.isCreator,
-    this.rowTitle,
-    this.rowData,
-    this.inputHintText,
-    this.items,
-    this.modus,
-    this.singleShow = false,
-    this.multiLines = false,
-    this.databaseKennzeichnung,
-    this.oldDate,
-    this.eventId
-    });
-
-  @override
-  _ShowDataAndChangeWindowState createState() => _ShowDataAndChangeWindowState();
-}
-
-class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
-  var dropdownInput = CustomDropDownButton();
-  var inputKontroller = TextEditingController();
-  var ortAuswahlBox = GoogleAutoComplete();
-  var uhrZeitButton = DateButton();
-  var datumButton = DateButton(getDate: true);
-  var uhrZeit;
-
-
-  @override
-  void initState() {
-    if(!(widget.databaseKennzeichnung == "link")) inputKontroller.text = widget.rowData;
-
-    dropdownInput = CustomDropDownButton(
-      hintText: widget.inputHintText,
-      items: widget.items,
-      selected: widget.rowData,
-    );
-
-    ortAuswahlBox.hintText = widget.inputHintText;
-
-    super.initState();
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    inputBox(){
-      if(widget.modus == "textInput"){
-        return customTextInput(widget.inputHintText, inputKontroller, moreLines: widget.multiLines? 6: 1);
-      }
-      if(widget.modus == "dropdown") return dropdownInput;
-      if(widget.modus == "googleAutoComplete") return ortAuswahlBox;
-      if(widget.modus == "dateTime") return uhrZeitButton;
-      if(widget.modus == "date") return datumButton;
-    }
-
-    return InkWell(
-      onTap: !widget.isCreator ? null:  (){
-        CustomWindow(
-            context: context,
-            title: widget.windowTitle,
-            height: widget.multiLines? 270 : 180,
-            children: [
-              inputBox(),
-              Container(
-                margin: EdgeInsets.only(right: 10),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        child: Text("Abbrechen", style: TextStyle(fontSize: fontsize)),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      TextButton(
-                          child: Text("Speichern", style: TextStyle(fontSize: fontsize)),
-                          onPressed: (){
-                            var data;
-
-                            if(widget.databaseKennzeichnung == "name"){
-                              data = inputKontroller.text;
-                            } else if (widget.databaseKennzeichnung == "location"){
-                              data = ortAuswahlBox.googleSearchResult;
-                            } else if (widget.databaseKennzeichnung == "link"){
-                              data = inputKontroller.text;
-                            }else if (widget.databaseKennzeichnung == "art"){
-                              data = dropdownInput.getSelected();
-                            }else if (widget.databaseKennzeichnung == "eventInterval"){
-                              data = dropdownInput.getSelected();
-                            }else if (widget.databaseKennzeichnung == "beschreibung"){
-                              data = inputKontroller.text;
-                            }else if (widget.modus == "date"){
-                              data = datumButton.eventDatum;
-                              var date = DateTime.parse(widget.oldDate);
-
-                              data = DateTime(data.year, data.month, data.day,
-                                  date.hour, date.minute).toString();
-                            }else if (widget.modus == "dateTime"){
-                              data = uhrZeitButton.uhrZeit;
-                              var date = DateTime.parse(widget.oldDate);
-                              data = DateTime(date.year, date.month, date.day,
-                                  data.hour, data.minute).toString();
-                            }
-
-                            print(data);
-                            if(widget.modus == "date") {
-                              widget.rowData = data.split(" ")[0];
-                            } else if(widget.modus == "dateTime"){
-                              widget.rowData = data.split(" ")[1] + " Uhr";
-                            }else if(widget.databaseKennzeichnung == "location"){
-                              //
-                            }else{
-                              widget.rowData = data;
-                            }
-
-                            Navigator.pop(context);
-
-                            setState(() {
-
-                            });
-
-                            if(widget.databaseKennzeichnung == "location"){
-                              EventDatabase().updateLocation(userId, data);
-                            } else{
-                              EventDatabase().updateOne(widget.eventId, widget.databaseKennzeichnung, data);
-                            }
-
-
-                          }
-                      ),
-                    ]
-                ),
-              )
             ]
-        );
-      },
-      child: !widget.singleShow && !widget.multiLines ? Row(
-        children: [
-          Text(widget.rowTitle + " ", style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold)),
-          const Expanded(child: const SizedBox.shrink()),
-          Text(widget.rowData, style: TextStyle(fontSize: fontsize))
-        ],
-      ):
-      Text(
-          widget.rowData,
-          style: !widget.multiLines ?
-          TextStyle(fontSize: fontsize +8, fontWeight: FontWeight.bold) :
-          TextStyle(fontSize: fontsize),
-          textAlign: TextAlign.center,
-      )
+        ),
+        body: Column(
+          children: [
+            EventCardDetails(
+              event: widget.event,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (widget.teilnahme != true) Container(
+                  margin: EdgeInsets.only(left: 20, right: 20),
+                  child: FloatingActionButton.extended(
+                      heroTag: "teilnehmen",
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      onPressed: () async {
+
+                        setState(() {
+                          widget.teilnahme = true;
+                          widget.absage = false;
+                        });
+
+
+                        var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
+                        zusageListe.add(userId);
+                        EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
+
+                        var absageListe = await EventDatabase().getOneData("absage", widget.event["id"]);
+                        absageListe.remove(userId);
+                        EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
+
+
+                      },
+                      label: Text("Teilnehmen")
+                  ),
+                ),
+                if(widget.absage != true) Container(
+                  margin: EdgeInsets.only(left: 20, right: 20),
+                  child: FloatingActionButton.extended(
+                    heroTag: "Absagen",
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    label: Text("Absagen"),
+                    onPressed: () async {
+
+                      setState(() {
+                        widget.teilnahme = false;
+                        widget.absage = true;
+                      });
+
+                      var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
+                      zusageListe.remove(userId);
+                      EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
+
+                      var absageListe = await EventDatabase().getOneData("absage", widget.event["id"]);
+                      absageListe.add(userId);
+                      EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
+
+
+                    },
+
+                  ),
+                )
+              ],
+            )
+          ],
+        )
     );
   }
 }
 
 
-class DateButton extends StatefulWidget {
-  var uhrZeit;
-  var eventDatum;
-  var getDate;
-
-  DateButton({Key key, this.getDate = false}) : super(key: key);
 
 
-  @override
-  _DateButtonState createState() => _DateButtonState();
-}
-
-class _DateButtonState extends State<DateButton> {
-
-  dateBox(){
-    var dateString = "Neues Datum auswählen";
-    if(widget.eventDatum != null){
-      var dateFormat = DateFormat('dd.MM.yyyy');
-      var dateTime = DateTime(widget.eventDatum.year, widget.eventDatum.month, widget.eventDatum.day);
-      dateString = dateFormat.format(dateTime);
-    }
-
-    return ElevatedButton(
-          child: Text(dateString),
-          onPressed: () async {
-            widget.eventDatum = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime.now(),
-                lastDate: DateTime(DateTime.now().year + 1)
-            );
-
-            setState(() {});
-          },
-        );
-  }
-
-  timeBox(){
-    return ElevatedButton(
-      child: Text(widget.uhrZeit == null ? "Neue Uhrzeit auswählen" : widget.uhrZeit.format(context)),
-      onPressed: () async {
-        widget.uhrZeit = await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay(hour: 12, minute: 00),
-        );
-
-        setState(() {
-
-        });
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: widget.getDate ? dateBox() : timeBox(),
-    );
-  }
-}
 

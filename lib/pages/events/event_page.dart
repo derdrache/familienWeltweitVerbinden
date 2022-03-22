@@ -5,7 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
-import '../../global/widgets/eventCard.dart';
+import 'eventCard.dart';
+import 'event_details.dart';
 import 'events_erstellen.dart';
 
 class EventPage extends StatefulWidget{
@@ -25,6 +26,12 @@ class _EventPageState extends State<EventPage>{
             EventCard(
               event: event,
               withInteresse: withInteresse,
+              changePage: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => EventDetailsPage(
+                    event: event
+                  )
+                  )).whenComplete(() => setState(() {})),
             )
         );
       }

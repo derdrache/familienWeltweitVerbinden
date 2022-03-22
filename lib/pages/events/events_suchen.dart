@@ -3,8 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/search_autocomplete.dart';
-import '../../global/widgets/eventCard.dart';
+import 'eventCard.dart';
 import '../../services/database.dart';
+import 'event_details.dart';
 
 
 class EventsSuchenPage extends StatefulWidget {
@@ -71,6 +72,12 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
               margin: EdgeInsets.only(top: 10 , bottom: 10, left: 15, right: 15),
               withInteresse: true,
               event: event,
+              changePage: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => EventDetailsPage(
+                      event: event
+                  )
+                  )).whenComplete(() => setState(() {})),
             )
         );
       }
