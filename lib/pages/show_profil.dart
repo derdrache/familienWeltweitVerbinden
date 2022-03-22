@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -16,7 +17,6 @@ import '../services/database.dart';
 class ShowProfilPage extends StatefulWidget {
   var userName;
   var profil;
-  var userFriendlist = [];
   var ownProfil;
 
 
@@ -24,7 +24,6 @@ class ShowProfilPage extends StatefulWidget {
     Key key,
     this.userName,
     this.profil,
-    this.userFriendlist,
     this.ownProfil = false
 
   }) : super(key: key);
@@ -36,9 +35,22 @@ class ShowProfilPage extends StatefulWidget {
 class _ShowProfilPageState extends State<ShowProfilPage> {
   var userID = FirebaseAuth.instance.currentUser.uid;
   var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+  var userFriendlist = [];
   double textSize = 16;
   double healineTextSize = 18;
 
+
+@override
+  void initState() {
+    setFriendList();
+
+    super.initState();
+  }
+
+  setFriendList() async {
+    var userFriendlistMap = await ProfilDatabase().getOneData("friendlist", "name", widget.userName);
+    userFriendlist = json.decode(userFriendlistMap["friendlist"]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +87,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     friendButton(){
-      var onFriendlist = widget.userFriendlist != ""?
-        widget.userFriendlist.contains(widget.profil["name"]) : false;
+      var onFriendlist = userFriendlist != ""?
+        userFriendlist.contains(widget.profil["name"]) : false;
 
       return TextButton(
           style: global_style.textButtonStyle(),
@@ -85,17 +97,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             var snackbarText = "";
 
             if(onFriendlist){
-              widget.userFriendlist.remove(widget.profil["name"]);
+              userFriendlist.remove(widget.profil["name"]);
               snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistEntfernt;
-              if(widget.userFriendlist.isEmpty) widget.userFriendlist = [];
+              if(userFriendlist.isEmpty) userFriendlist = [];
             } else {
-              widget.userFriendlist.add(widget.profil["name"]);
+              userFriendlist.add(widget.profil["name"]);
               snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistHinzugefuegt;
             }
 
             customSnackbar(context, snackbarText, color: Colors.green);
 
-            ProfilDatabase().updateProfil(userID, "friendlist", widget.userFriendlist);
+            ProfilDatabase().updateProfil(userID, "friendlist", userFriendlist);
 
 
             setState(() {});
