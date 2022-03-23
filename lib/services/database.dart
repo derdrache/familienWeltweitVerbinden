@@ -400,6 +400,15 @@ class EventDatabase{
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     var responseBody = json.decode(res.body);
 
+    for(var i = 0; i < responseBody.length; i++){
+      responseBody[i]["interesse"] = jsonDecode(responseBody[i]["interesse"]);
+      responseBody[i]["zusage"] = jsonDecode(responseBody[i]["zusage"]);
+      responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
+      responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
+      responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
+    }
+
+
     return responseBody;
 
   }
@@ -432,7 +441,12 @@ class EventDatabase{
 
     for(var i = 0; i < responseBody.length; i++){
       responseBody[i]["interesse"] = jsonDecode(responseBody[i]["interesse"]);
+      responseBody[i]["zusage"] = jsonDecode(responseBody[i]["zusage"]);
+      responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
+      responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
+      responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
     }
+
 
     return responseBody;
 
@@ -445,6 +459,10 @@ class EventDatabase{
 
     for(var i = 0; i < responseBody.length; i++){
       responseBody[i]["interesse"] = jsonDecode(responseBody[i]["interesse"]);
+      responseBody[i]["zusage"] = jsonDecode(responseBody[i]["zusage"]);
+      responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
+      responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
+      responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
     }
 
     return responseBody;

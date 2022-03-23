@@ -16,10 +16,11 @@ class EventCardDetails extends StatelessWidget {
   var event;
   var offlineEvent;
   var isCreator;
+  var isApproved;
 
 
 
-  EventCardDetails({Key key, this.event, this.offlineEvent=true,}) :
+  EventCardDetails({Key key, this.event, this.offlineEvent=true, this.isApproved = false}) :
         isCreator = event["erstelltVon"] == userId;
 
   @override
@@ -101,7 +102,7 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "wann"
             ),
             const SizedBox(height: 10),
-            ShowDataAndChangeWindow(
+            if(isApproved) ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: "Uhrzeit ändern",
                 rowTitle: "Uhrzeit",
@@ -112,7 +113,7 @@ class EventCardDetails extends StatelessWidget {
                 oldDate: event["wann"],
                 databaseKennzeichnung: "wann"
             ),
-            const SizedBox(height: 10),
+            if(isApproved) const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: "Stadt verändern",
@@ -124,7 +125,7 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "location"
             ),
             const SizedBox(height: 10),
-            ShowDataAndChangeWindow(
+            if(isApproved) ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: "Map Link verändern",
                 rowTitle: "Map",
@@ -134,7 +135,7 @@ class EventCardDetails extends StatelessWidget {
                 modus: "textInput",
                 databaseKennzeichnung: "link"
             ),
-            const SizedBox(height: 10),
+            if(isApproved) const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: "Event Art ändern",
@@ -199,33 +200,70 @@ class EventCardDetails extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-
-    return Container(
-      height: 550,
-      margin: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
+    return Stack(
+      children: [
+        Container(
+          height: 550,
+          margin: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.6),
+                  spreadRadius: 12,
+                  blurRadius: 7,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ]
+          ),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              bildAndTitleBox(),
+              const SizedBox(height: 20),
+              creatorChangeHintBox(),
+              eventInformationBox(),
+              if(isApproved) eventBeschreibung(),
+              OrganisatorBox(organisator: event["erstelltVon"],)
+            ],
+          ),
+        ),
+        if(!isApproved && event["art"] != "Öffentlich") Container(
+          height: 550,
+          width: double.infinity,
+          margin: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
               color: Colors.grey.withOpacity(0.6),
-              spreadRadius: 12,
-              blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
-            ),
-          ]
-      ),
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          bildAndTitleBox(),
-          const SizedBox(height: 20),
-          creatorChangeHintBox(),
-          eventInformationBox(),
-          eventBeschreibung(),
-          OrganisatorBox(organisator: event["erstelltVon"],)
-        ],
-      ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              InkWell(
+                onTap: ()  async {
+                  var isOnList = event["freischalten"].contains(userId);
+
+                  if(isOnList) {
+                    customSnackbar(context, "Der Organisator muss dich noch freischalten");
+                    return;
+                  } else{
+                    var freischaltenList = await EventDatabase().getOneData("freischalten", event["id"]);
+                    freischaltenList.add(userId);
+                    EventDatabase().updateOne(event["id"], "freischalten", freischaltenList);
+                    customSnackbar(context,
+                        "Dein Interesse am Event wurde dem Organisator mitgeteilt",
+                        color: Colors.green);
+                  }
+                } ,
+                child: Icon(Icons.add_circle, size: 80, color: Colors.black,)
+              ),
+              Text(""),
+              SizedBox(height: 40,)
+            ],
+          )
+        )
+      ],
     );
   }
 }
