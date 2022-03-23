@@ -156,7 +156,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               if(!isCreator) TextButton(
                 style: global_style.textButtonStyle(),
                 child: const Icon(Icons.message),
-                onPressed: () => changePage(context, ChatDetailsPage()),
+                onPressed: () => changePage(context, ChatDetailsPage(
+                  chatPartnerId: widget.event["erstelltVon"]
+                )),
               ),
               TextButton(
                 style: global_style.textButtonStyle(),
