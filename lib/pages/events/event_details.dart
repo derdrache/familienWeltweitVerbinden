@@ -31,11 +31,35 @@ class EventDetailsPage extends StatefulWidget {
 class _EventDetailsPageState extends State<EventDetailsPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var isCreator;
+  var isApproved;
 
   @override
   void initState() {
     isCreator = widget.event["erstelltVon"] == userId;
+    isApproved = isCreator ? true : widget.event["freigegeben"].contains(userId);
     super.initState();
+  }
+
+  freischalten(user, angenommen, windowState) async {
+    widget.event["freischalten"].remove(user);
+    windowState((){
+
+    });
+
+
+    var freischaltenList = await EventDatabase().getOneData("freischalten", widget.event["id"]);
+    freischaltenList.remove(user);
+    EventDatabase().updateOne(widget.event["id"], "freischalten", freischaltenList);
+
+    setState(() {});
+
+    if(angenommen){
+      var freigegebenListe = await EventDatabase().getOneData("freigegeben", widget.event["id"]);
+      freigegebenListe.add(user);
+      EventDatabase().updateOne(widget.event["id"], "freigegeben", freigegebenListe);
+    } else{
+      print("abgelehnt");
+    }
   }
 
 
@@ -144,10 +168,138 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       );
     }
 
+    teilnahmeButtonBox(){
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (widget.teilnahme != true) Container(
+            margin: EdgeInsets.only(left: 20, right: 20),
+            child: FloatingActionButton.extended(
+                heroTag: "teilnehmen",
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                onPressed: () async {
+
+                  setState(() {
+                    widget.teilnahme = true;
+                    widget.absage = false;
+                  });
+
+
+                  var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
+                  zusageListe.add(userId);
+                  EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
+
+                  var absageListe = await EventDatabase().getOneData("absage", widget.event["id"]);
+                  absageListe.remove(userId);
+                  EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
+
+
+                },
+                label: Text("Teilnehmen")
+            ),
+          ),
+          if(widget.absage != true) Container(
+            margin: EdgeInsets.only(left: 20, right: 20),
+            child: FloatingActionButton.extended(
+              heroTag: "Absagen",
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              label: Text("Absagen"),
+              onPressed: () async {
+
+                setState(() {
+                  widget.teilnahme = false;
+                  widget.absage = true;
+                });
+
+                var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
+                zusageListe.remove(userId);
+                EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
+
+                var absageListe = await EventDatabase().getOneData("absage", widget.event["id"]);
+                absageListe.add(userId);
+                EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
+
+
+              },
+
+            ),
+          )
+        ],
+      );
+    }
+
+    userFreischaltenList(windowSetState) async {
+      List<Widget>freizugebenListe = [];
+
+      for(var user in widget.event["freischalten"]){
+        var name = await ProfilDatabase().getOneData("name", "id", user);
+
+        freizugebenListe.add(
+            Container(
+                child: Row(
+                  children: [
+                    Text(name),
+                    Expanded(child: SizedBox(width: 10)),
+                    IconButton(
+                        onPressed: () => freischalten(user, true, windowSetState),
+                        icon: Icon(Icons.check_circle, size: 27)
+                    ),
+                    IconButton(
+                        onPressed: () => freischalten(user, false, windowSetState),
+                        icon: Icon(Icons.cancel, size: 27,)
+                    ),
+                  ],
+                )
+            )
+        );
+      }
+
+      return freizugebenListe;
+    }
+
+    userfreischalteWindow() async{
+      var windowSetState;
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context){
+            return StatefulBuilder(
+                builder: (context, setState){
+                  windowSetState = setState;
+                  return AlertDialog(
+                    title: Text("Familien freigeben"),
+                    content: FutureBuilder(
+                      future: userFreischaltenList(windowSetState),
+                      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                        if(snapshot.hasData){
+                          return Column(
+                            children: snapshot.data,
+                          );
+                        } else{
+                          return Column(
+                            children: [CircularProgressIndicator()],
+                          );
+                        }
+
+                      },
+                    ),
+                  );
+            });
+
+          }
+      );
+    }
+
+
     return Scaffold(
         appBar: customAppBar(
             title: "",
             buttons: [
+              if(isCreator && widget.event["art"] != "Öffentlich") TextButton(
+                style: global_style.textButtonStyle(),
+                child: const Icon(Icons.event_available),
+                onPressed: () => userfreischalteWindow(),
+              ),
               TextButton(
                 style: global_style.textButtonStyle(),
                 child: const Icon(Icons.link),
@@ -165,6 +317,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 child: const Icon(Icons.more_vert),
                 onPressed: () => moreMenu(),
               ),
+
             ]
         ),
         body: Stack(
@@ -173,64 +326,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               children: [
                 EventCardDetails(
                   event: widget.event,
+                  isApproved: isApproved,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (widget.teilnahme != true) Container(
-                      margin: EdgeInsets.only(left: 20, right: 20),
-                      child: FloatingActionButton.extended(
-                          heroTag: "teilnehmen",
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          onPressed: () async {
-
-                            setState(() {
-                              widget.teilnahme = true;
-                              widget.absage = false;
-                            });
-
-
-                            var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
-                            zusageListe.add(userId);
-                            EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
-
-                            var absageListe = await EventDatabase().getOneData("absage", widget.event["id"]);
-                            absageListe.remove(userId);
-                            EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
-
-
-                          },
-                          label: Text("Teilnehmen")
-                      ),
-                    ),
-                    if(widget.absage != true) Container(
-                      margin: EdgeInsets.only(left: 20, right: 20),
-                      child: FloatingActionButton.extended(
-                        heroTag: "Absagen",
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        label: Text("Absagen"),
-                        onPressed: () async {
-
-                          setState(() {
-                            widget.teilnahme = false;
-                            widget.absage = true;
-                          });
-
-                          var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
-                          zusageListe.remove(userId);
-                          EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
-
-                          var absageListe = await EventDatabase().getOneData("absage", widget.event["id"]);
-                          absageListe.add(userId);
-                          EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
-
-
-                        },
-
-                      ),
-                    )
-                  ],
-                )
+                if(isApproved) teilnahmeButtonBox(),
               ],
             ),
           ],
