@@ -63,11 +63,11 @@ class _StartPageState extends State<StartPage>{
     var userDeviceTokenDb = await ProfilDatabase().getOneData("token","id",userID);
     var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
 
-    if(userAuthEmail != userDBEmail["email"]){
+    if(userAuthEmail != userDBEmail){
       ProfilDatabase().updateProfil(userID, "email",userAuthEmail);
     }
 
-    if(userDeviceTokenDb["token"] != userDeviceTokenReal){
+    if(userDeviceTokenDb != userDeviceTokenReal){
       ProfilDatabase().updateProfil(userID, "token", userDeviceTokenReal);
     }
 
@@ -102,7 +102,7 @@ class _StartPageState extends State<StartPage>{
               if(snap.hasData) {
                   var newMessages = snap.data;
 
-                  newMessages = newMessages == false ? 0 : int.parse(newMessages["newMessages"]);
+                  newMessages = newMessages == false ? 0 : newMessages;
 
                   return Stack(
                     clipBehavior: Clip.none, children: <Widget>[
