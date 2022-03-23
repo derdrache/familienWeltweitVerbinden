@@ -107,16 +107,24 @@ class ProfilDatabase{
     var uri = Uri.parse(url+data);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     dynamic responseBody = res.body;
+
     try{
       responseBody = jsonDecode(responseBody);
+      responseBody = jsonDecode(responseBody[responseBody.keys.toList()[0]]);
     }catch(error){
 
     }
 
+    try{
+      responseBody = responseBody[responseBody.keys.toList()[0]];
+    }catch(error){
+
+    }
 
     return responseBody;
 
   }
+
 
   getOneDataFromAll(what) async{
     var url = databaseUrl + "database/profils/getOneDataFromAll.php";

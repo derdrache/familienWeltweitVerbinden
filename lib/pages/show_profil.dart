@@ -47,9 +47,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     super.initState();
   }
 
+
   setFriendList() async {
-    var userFriendlistMap = await ProfilDatabase().getOneData("friendlist", "name", widget.userName);
-    userFriendlist = json.decode(userFriendlistMap["friendlist"]);
+    if (widget.userName == null) return;
+    userFriendlist = await ProfilDatabase().getOneData("friendlist", "name", widget.userName);
   }
 
   @override
@@ -61,7 +62,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           child: const Icon(Icons.message),
           onPressed: () async {
             var profilID = await ProfilDatabase().getOneData("id", "name", widget.profil["name"]);
-            var users = [userID, profilID["id"]];
+            var users = [userID, profilID];
 
             var newChat = false;
 
@@ -80,7 +81,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
             global_functions.changePage(context, ChatDetailsPage(
               groupChatData: groupChatData,
-              newChat: newChat,
             ));
           }
       );

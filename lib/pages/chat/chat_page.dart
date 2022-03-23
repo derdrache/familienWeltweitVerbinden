@@ -30,7 +30,6 @@ class _ChatPageState extends State<ChatPage>{
     dynamic userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
     var allName = await ProfilDatabase().getOneDataFromAll("name");
 
-    userFriendlist = userFriendlist["friendlist"];
     if(userFriendlist is String) userFriendlist = jsonDecode(userFriendlist);
 
     userFriendlist??= [];
@@ -81,8 +80,6 @@ class _ChatPageState extends State<ChatPage>{
   searchUser() async {
     var chatPartner = searchAutocomplete.getSelected()[0];
     var chatPartnerId = await ProfilDatabase().getOneData("id", "name", chatPartner);
-
-    chatPartnerId = chatPartnerId["id"];
 
     validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
   }
@@ -168,21 +165,11 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   validCheckAndOpenChatgroup({chatPartnerID, name}) async {
-    //alles in chatDetails klären
 
     if(chatPartnerID == null){
       chatPartnerID = await ProfilDatabase().getOneData("id", "name", name);
-      chatPartnerID = chatPartnerID["id"];
     }
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
-
-    //dieser Prozess muss in chatDetails
-    var userData = {
-      "users": {
-        chatPartnerID: {"name": name, "newMessages": 0},
-        userId: {"name": userName, "newMessages": 0},
-      }
-    };
 
     Navigator.pop(context);
 
@@ -190,8 +177,8 @@ class _ChatPageState extends State<ChatPage>{
       Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => ChatDetailsPage(
-              groupChatData: userData,
-              newChat: true
+            chatPartnerId: chatPartnerID,
+            chatPartnerName: name,
           ))
       ).whenComplete(() => setState(() {}));
 
