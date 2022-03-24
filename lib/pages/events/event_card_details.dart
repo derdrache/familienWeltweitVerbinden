@@ -1,5 +1,6 @@
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -10,7 +11,8 @@ import '../../services/database.dart';
 import '../../global/variablen.dart' as global_var;
 
 var userId = FirebaseAuth.instance.currentUser.uid;
-double fontsize = 16;
+var isWebDesktop = kIsWeb && (defaultTargetPlatform != TargetPlatform.iOS || defaultTargetPlatform != TargetPlatform.android);
+double fontsize = isWebDesktop? 12 : 16;
 
 class EventCardDetails extends StatelessWidget {
   var event;
@@ -200,70 +202,73 @@ class EventCardDetails extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Stack(
-      children: [
-        Container(
-          height: 550,
-          margin: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.6),
-                  spreadRadius: 12,
-                  blurRadius: 7,
-                  offset: Offset(0, 3), // changes position of shadow
-                ),
-              ]
+    return Center(
+      child: Stack(
+        children: [
+          Container(
+            width: isWebDesktop ? 300 : 350,
+            height: isWebDesktop ? 450: 550,
+            margin: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.6),
+                    spreadRadius: 12,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ]
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                bildAndTitleBox(),
+                const SizedBox(height: 20),
+                creatorChangeHintBox(),
+                eventInformationBox(),
+                if(isApproved || event["art"] == "Öffentlich") eventBeschreibung(),
+                OrganisatorBox(organisator: event["erstelltVon"],)
+              ],
+            ),
           ),
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              bildAndTitleBox(),
-              const SizedBox(height: 20),
-              creatorChangeHintBox(),
-              eventInformationBox(),
-              if(isApproved || event["art"] == "Öffentlich") eventBeschreibung(),
-              OrganisatorBox(organisator: event["erstelltVon"],)
-            ],
-          ),
-        ),
-        if(!isApproved && event["art"] != "Öffentlich") Container(
-          height: 550,
-          width: double.infinity,
-          margin: EdgeInsets.all(20),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.grey.withOpacity(0.6),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              InkWell(
-                onTap: ()  async {
-                  var isOnList = event["freischalten"].contains(userId);
+          if(!isApproved && event["art"] != "Öffentlich") Container(
+            width: isWebDesktop ? 300 : 350,
+            height: isWebDesktop ? 450 : 550,
+            margin: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.grey.withOpacity(0.6),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                InkWell(
+                  onTap: ()  async {
+                    var isOnList = event["freischalten"].contains(userId);
 
-                  if(isOnList) {
-                    customSnackbar(context, "Der Organisator muss dich noch freischalten");
-                    return;
-                  } else{
-                    var freischaltenList = await EventDatabase().getOneData("freischalten", event["id"]);
-                    freischaltenList.add(userId);
-                    EventDatabase().updateOne(event["id"], "freischalten", freischaltenList);
-                    customSnackbar(context,
-                        "Dein Interesse am Event wurde dem Organisator mitgeteilt",
-                        color: Colors.green);
-                  }
-                } ,
-                child: Icon(Icons.add_circle, size: 80, color: Colors.black,)
-              ),
-              Text(""),
-              SizedBox(height: 40,)
-            ],
+                    if(isOnList) {
+                      customSnackbar(context, "Der Organisator muss dich noch freischalten");
+                      return;
+                    } else{
+                      var freischaltenList = await EventDatabase().getOneData("freischalten", event["id"]);
+                      freischaltenList.add(userId);
+                      EventDatabase().updateOne(event["id"], "freischalten", freischaltenList);
+                      customSnackbar(context,
+                          "Dein Interesse am Event wurde dem Organisator mitgeteilt",
+                          color: Colors.green);
+                    }
+                  } ,
+                  child: Icon(Icons.add_circle, size: 80, color: Colors.black,)
+                ),
+                Text(""),
+                SizedBox(height: 40,)
+              ],
+            )
           )
-        )
-      ],
+        ],
+      ),
     );
   }
 }
