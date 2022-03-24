@@ -7,8 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../global/search_autocomplete.dart';
-import '../../global/variablen.dart' as global_var;
 import '../../services/database.dart';
 import '../../global/style.dart' as global_style;
 import '../start_page.dart';
@@ -373,19 +371,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
             ]
         ),
-        body: Stack(
-          children: [
+        body:
             Column(
               children: [
                 EventCardDetails(
                   event: widget.event,
                   isApproved: isApproved,
                 ),
-                if(isApproved) teilnahmeButtonBox(),
+                if(isApproved || widget.event["art"] == "Öffentlich") teilnahmeButtonBox(),
               ],
             ),
-          ],
-        )
     );
   }
 }

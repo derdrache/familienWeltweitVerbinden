@@ -28,13 +28,20 @@ class _ErkundenPageState extends State<ErkundenPage>{
   List<String> allUserName = [];
   var countriesList = {};
   var filterList = [];
-  var databaseProfils = [];
+  var profilsBackup = [];
   var profils = [];
   var profilBetweenCountries = [];
   var profilCountries = [];
   var profilsBetween = [];
   var profilsCities = [];
   var aktiveProfils = [];
+  var events = [];
+  var eventsBetweenCountries = [];
+  var eventsCountries = [];
+  var eventsBetween = [];
+  var eventsCities = [];
+  var aktiveEvents = [];
+  var eventsBackup = [];
   double minMapZoom = kIsWeb ? 2.0:  1.6;
   double maxZoom = 9;
   double mapZoom = 1.6;
@@ -52,9 +59,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   _asyncMethod() async{
-    profils = await ProfilDatabase().getAllProfils();
+    await getAndSetProfils();
+    setSearchAutocomplete();
+    getAndSetEvents();
 
-    allUserName = [];
+    buildLoaded = true;
+  }
+
+  getAndSetProfils()async{
+    profils = await ProfilDatabase().getAllProfils();
 
     for(var profil in profils){
       if(getOwnProfil(profil) != null){
@@ -66,6 +79,11 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     profils.remove(ownProfil);
 
+    profilsBackup = profils;
+    createAndSetZoomProfils();
+  }
+
+  setSearchAutocomplete() async {
     countriesList = await LocationService().getAllCountries();
     var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
     var countryDropDownList = spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
@@ -76,11 +94,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
       onConfirm: () => changeMapFilter(),
       onDelete:() => changeMapFilter() ,
     );
+  }
 
-    databaseProfils = profils;
-    createAndSetZoomProfils();
-
-    buildLoaded = true;
+  getAndSetEvents()async{
+    events = await EventDatabase().getAllEvents();
+    eventsBackup = events;
+    createAndSetZoomEvents();
   }
 
 
@@ -93,7 +112,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   }
 
-  createProfilBetween(list, profil, abstand){
+  createBetween(list, profil, abstand){
       var newPoint = false;
 
       for(var i = 0; i< list.length; i++){
@@ -124,7 +143,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     return list;
   }
 
-  createProfilCities(list, profil){
+  createCities(list, profil){
       var newCity = false;
 
       for(var i = 0; i< list.length; i++){
@@ -151,7 +170,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     return list;
   }
 
-  createProfilCountries(list, profil) async {
+  createCountries(list, profil) async {
       var checkNewCountry = true;
 
       for (var i = 0; i<list.length; i++){
@@ -182,7 +201,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     return list;
   }
 
-  createProfilBetweenCountries(list, profil) async {
+  createBetweenCountries(list, profil) async {
     var newPoint = true;
     var abstand = 8;
     double originalLatt;
@@ -225,14 +244,14 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var pufferProfilBetweenCountries =[];
 
     for(var i= 0; i<profils.length; i++){
-      pufferProfilCountries = await createProfilCountries(pufferProfilCountries,
+      pufferProfilCountries = await createCountries(pufferProfilCountries,
                                                           profils[i]);
-      pufferProfilBetweenCountries = await createProfilBetweenCountries(
+      pufferProfilBetweenCountries = await createBetweenCountries(
         pufferProfilBetweenCountries, profils[i]);
 
-      pufferProfilBetween = createProfilBetween(pufferProfilBetween, profils[i], 1);
+      pufferProfilBetween = createBetween(pufferProfilBetween, profils[i], 1);
 
-      pufferProfilCities = createProfilCities(pufferProfilCities,
+      pufferProfilCities = createCities(pufferProfilCities,
                                                      profils[i]);
 
     }
@@ -243,26 +262,57 @@ class _ErkundenPageState extends State<ErkundenPage>{
       profilBetweenCountries = pufferProfilBetweenCountries;
 
       changeProfil(mapZoom);
+  }
 
+  createAndSetZoomEvents() async {
+    var pufferEventsCities = [];
+    var pufferEventsBetween = [];
+    var pufferEventsCountries = [];
+    var pufferEventsBetweenCountries =[];
 
+    for(var i= 0; i<events.length; i++){
+      pufferEventsCountries = await createCountries(pufferEventsCountries,
+          events[i]);
+      pufferEventsBetweenCountries = await createBetweenCountries(
+          pufferEventsBetweenCountries, events[i]);
+
+      pufferEventsBetween = createBetween(pufferEventsBetween, events[i], 1);
+
+      pufferEventsCities = createCities(pufferEventsCities,
+          events[i]);
+
+    }
+
+    eventsCities = pufferEventsCities;
+    eventsBetween = pufferEventsBetween;
+    eventsCountries = pufferEventsCountries;
+    eventsBetweenCountries = pufferEventsBetweenCountries;
+
+    changeProfil(mapZoom);
   }
 
   changeProfil(zoom){
     var choosenProfils = [];
+    var selectedEventList = [];
 
     if(zoom > cityZoom){
       choosenProfils = profilsCities;
+      selectedEventList = eventsCities;
     } else if(zoom > 4.0){
       choosenProfils = profilsBetween;
+      selectedEventList = eventsBetween;
     } else if (zoom > 2.5){
       choosenProfils = profilCountries;
+      selectedEventList = eventsCountries;
     } else {
       choosenProfils = profilBetweenCountries;
+      selectedEventList = eventsBetweenCountries;
     }
 
 
     setState(() {
       aktiveProfils = choosenProfils;
+      aktiveEvents = selectedEventList;
     });
   }
 
@@ -322,7 +372,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var filterProfils = [];
     filterList = searchAutocomplete.getSelected();
 
-    for(var profil in databaseProfils){
+    for(var profil in profilsBackup){
       if(checkFilter(profil)) filterProfils.add(profil);
     }
 
@@ -431,7 +481,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     }
 
-    Marker ownMarker(text, position,  buttonFunction){
+    Marker profilMarker(numberText, position,  buttonFunction){
       return Marker(
         width: 30.0,
         height: 30.0,
@@ -439,7 +489,38 @@ class _ErkundenPageState extends State<ErkundenPage>{
         builder: (ctx) => FloatingActionButton(
           backgroundColor: Theme.of(context).colorScheme.primary,
           mini: true,
-          child: Text(text),
+          child: Text(numberText),
+          onPressed: buttonFunction,
+        ),
+      );
+    }
+
+    Marker eventMarker(numberText, position,  buttonFunction){
+
+      return Marker(
+        width: 32.0,
+        height: 32.0,
+        point: position,
+        builder: (ctx) => IconButton(
+          //backgroundColor: Theme.of(context).colorScheme.secondary,
+          //mini: true,
+          padding: EdgeInsets.zero,
+          icon: Stack(
+            children: [
+              Icon(Icons.calendar_today, size: 32, color: Theme.of(context).colorScheme.primary),
+              Positioned(
+                top:10.5,
+                left:5.5,
+                child: Container(
+                  padding: EdgeInsets.only( left:2, top: 1),
+                  width: 21,
+                  height: 18,
+                  color: Colors.white,
+                    child: Center(child: Text(numberText+"1", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14, color: Colors.black)))
+                )
+              )
+            ],
+          ),
           onPressed: buttonFunction,
         ),
       );
@@ -467,7 +548,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       for (var profil in aktiveProfils) {
         var position = LatLng(profil["latt"], profil["longt"]);
         markerList.add(
-            ownMarker(
+            profilMarker(
                 profil["name"],
                 position,
                 () {
@@ -479,14 +560,28 @@ class _ErkundenPageState extends State<ErkundenPage>{
         );
       }
 
+      //if(mapZoom > cityZoom){
+        for(var event in aktiveEvents){
+          var basisVerschiebung = 0.35;
+          var anpassungsVerschiebung = mapZoom - cityZoom > 0 ? mapZoom - cityZoom : 0;
+          var position = LatLng(event["latt"], event["longt"] + basisVerschiebung - (anpassungsVerschiebung/9.5));
+
+          markerList.add(
+              eventMarker(event["name"], position, (){
+                markerPopupWindow(event);
+                zoomAtPoint(position);
+              })
+          );
+        //}
+      }
+
+
       allMarker = markerList;
 
     }
 
     ownFlutterMap(){
       createAllMarker();
-
-
 
       return FlutterMap(
         mapController: mapController,
