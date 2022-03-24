@@ -293,6 +293,7 @@ class ChatDatabase{
       "zu": messageData["zu"]
     }));
 
+
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
     sendNotification(chatID, messageData);
@@ -301,10 +302,10 @@ class ChatDatabase{
   _changeNewMessageCounter(chatPartnerId, chatData) async{
     var activeChat = await ProfilDatabase().getOneData("activeChat", "id", chatPartnerId);
 
-    if(chatData["id"] != activeChat["activeChat"]){
+    if(chatData["id"] != activeChat){
       var allNewMessages = await ProfilDatabase().getOneData("newMessages", "id", chatPartnerId);
 
-      ProfilDatabase().updateProfil(chatPartnerId, "newMessages", int.parse(allNewMessages["newMessages"]) +1);
+      ProfilDatabase().updateProfil(chatPartnerId, "newMessages", allNewMessages +1);
 
       var oldChatNewMessages = await ChatDatabase().getNewMessages(chatData["id"], chatPartnerId);
 
@@ -490,7 +491,6 @@ class ReportsDatabase{
 
 sendNotification(chatId, messageData) async {
   var toActiveChat = await ProfilDatabase().getOneData("activeChat", "id", messageData["zu"]);
-  toActiveChat = toActiveChat["activeChat"];
 
   if(toActiveChat == chatId) return;
 
@@ -498,9 +498,8 @@ sendNotification(chatId, messageData) async {
   var url = Uri.parse(databaseUrl + "notification.php");
   var chatPartnerName = await ProfilDatabase().getOneData("name", "id", messageData["von"]);
 
-  chatPartnerName = chatPartnerName["name"];
   var toToken = await ProfilDatabase().getOneData("token", "id", messageData["zu"]);
-  toToken = toToken["token"];
+  toToken = toToken;
 
   await http.post(url, body: json.encode({
     "to": toToken,

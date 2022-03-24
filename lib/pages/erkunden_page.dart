@@ -371,7 +371,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       List<Widget> createPopupProfils(){
         List<Widget> profilsList = [SizedBox(height: 10)];
-        var friendlist = ownProfil["friendlist"] ?? [];
 
         childrenAgeStringToStringAge(childrenAgeList){
           List yearChildrenAgeList = [];

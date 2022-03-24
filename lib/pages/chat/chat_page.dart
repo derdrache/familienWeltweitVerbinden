@@ -85,7 +85,6 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   Widget personenSuchBox(buildContext, allName){
-    var personenSucheController = TextEditingController();
     searchAutocomplete = SearchAutocomplete(
       searchableItems: allName,
       withFilter: false,
@@ -98,35 +97,6 @@ class _ChatPageState extends State<ChatPage>{
             child: SizedBox(
               width: 300,
               child: searchAutocomplete
-              /*
-              TextField(
-                  controller: personenSucheController,
-                  decoration: InputDecoration(
-                      enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
-                      ),
-                      border: const OutlineInputBorder(),
-                      hintText: AppLocalizations.of(context).personSuchen,
-                      hintStyle: const TextStyle(fontSize: 12, color: Colors.grey)
-                  ),
-                  onSubmitted: (eingabe){
-                    searchUser(eingabe, buildContext);
-                  },
-              ),
-
-
-
-            ),
-            TextButton(
-              child: const Icon(Icons.search),
-              onPressed: () async {
-                var chatPartner = personenSucheController.text;
-                searchUser(chatPartner, buildContext);
-                personenSucheController.text = "";
-              },
-            )
-
- */
             )
           );
   }
