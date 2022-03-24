@@ -2,11 +2,13 @@ import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/events/event_card_details.dart';
-import 'package:familien_suche/pages/events/event_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
+import '../../global/search_autocomplete.dart';
+import '../../global/variablen.dart' as global_var;
 import '../../services/database.dart';
 import '../../global/style.dart' as global_style;
 import '../start_page.dart';
@@ -32,12 +34,23 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var isCreator;
   var isApproved;
+  var searchAutocomplete;
+  var allName;
+  var userFriendlist;
 
   @override
   void initState() {
     isCreator = widget.event["erstelltVon"] == userId;
     isApproved = isCreator ? true : widget.event["freigegeben"].contains(userId);
+
+    getDatabaseData();
+
     super.initState();
+  }
+
+  getDatabaseData() async{
+    allName = await ProfilDatabase().getOneDataFromAll("name");
+    userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
   }
 
   freischalten(user, angenommen, windowState) async {
@@ -290,6 +303,54 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       );
     }
 
+    friendlistBox(userFriendlist){
+      List<Widget> friendsBoxen = [];
+
+      for(var friend in userFriendlist){
+        friendsBoxen.add(
+            GestureDetector(
+              onTap: () => print(friend),
+              child: Container(
+                  width: double.maxFinite,
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                      border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
+                  ),
+                  child: Text(friend)
+              ),
+            )
+        );
+      }
+
+      return friendsBoxen;
+    }
+
+    linkTeilenWindow() async{
+      allName??= await ProfilDatabase().getOneDataFromAll("name");
+      userFriendlist ??= await ProfilDatabase().getOneData("friendlist", "id", userId);
+      searchAutocomplete = SearchAutocomplete(
+        searchableItems: allName,
+        withFilter: false,
+        onConfirm: () async{
+          var chatPartner = searchAutocomplete.getSelected()[0];
+          print(chatPartner);
+        },
+      );
+
+      return CustomWindow(
+        context: context,
+        title: "Event teilen",
+        children: [
+          searchAutocomplete,
+          ListView(
+            shrinkWrap: true,
+            children: friendlistBox(userFriendlist),
+          )
+
+        ]
+      );
+    }
+
 
     return Scaffold(
         appBar: customAppBar(
@@ -303,7 +364,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               TextButton(
                 style: global_style.textButtonStyle(),
                 child: const Icon(Icons.link),
-                onPressed: () => print("teilen"),
+                onPressed: () => linkTeilenWindow(),
               ),
               if(!isCreator) TextButton(
                 style: global_style.textButtonStyle(),

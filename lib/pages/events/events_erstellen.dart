@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../services/database.dart';
 import '../../global/custom_widgets.dart';
@@ -65,6 +66,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
   saveEvent(){
     var locationData = ortAuswahlBox.getGoogleLocationData();
+    var uuid = Uuid();
     var allFilled = checkAllValidations(locationData);
     if(!allFilled) return;
 
@@ -73,6 +75,7 @@ class _EventErstellenState extends State<EventErstellen> {
         eventUhrzeit.hour, eventUhrzeit.minute);
 
     var eventData = {
+      "id": uuid.v4(),
       "name" : eventNameKontroller.text, //maximal 20 zeichen, dann ...
       "erstelltAm": DateTime.now().toString(),
       "erstelltVon": FirebaseAuth.instance.currentUser.uid,

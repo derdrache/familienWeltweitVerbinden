@@ -32,7 +32,7 @@ class ChatDetailsPage extends StatefulWidget {
 class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser.displayName;
-  bool newChat;
+  bool newChat = false;
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
   var messageInputHeight = 50.0;
@@ -57,7 +57,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   _asyncMethod() async {
     await getAndSetChatData();
     await writeActiveChat();
-    await resetNewMessageCounter();
+    if(widget.groupChatData != false) await resetNewMessageCounter();
 
     setState(() {
       timer = Timer.periodic(
