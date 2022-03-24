@@ -5,7 +5,7 @@ import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter/services.dart';
 
 import '../../global/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
@@ -303,50 +303,42 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       );
     }
 
-    friendlistBox(userFriendlist){
-      List<Widget> friendsBoxen = [];
-
-      for(var friend in userFriendlist){
-        friendsBoxen.add(
-            GestureDetector(
-              onTap: () => print(friend),
-              child: Container(
-                  width: double.maxFinite,
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
-                  ),
-                  child: Text(friend)
-              ),
-            )
-        );
-      }
-
-      return friendsBoxen;
-    }
-
     linkTeilenWindow() async{
-      allName??= await ProfilDatabase().getOneDataFromAll("name");
-      userFriendlist ??= await ProfilDatabase().getOneData("friendlist", "id", userId);
-      searchAutocomplete = SearchAutocomplete(
-        searchableItems: allName,
-        withFilter: false,
-        onConfirm: () async{
-          var chatPartner = searchAutocomplete.getSelected()[0];
-          print(chatPartner);
-        },
-      );
-
       return CustomWindow(
         context: context,
-        title: "Event teilen",
+        title: "Event link",
         children: [
-          searchAutocomplete,
-          ListView(
-            shrinkWrap: true,
-            children: friendlistBox(userFriendlist),
-          )
+          Container(
+            margin: EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              border: Border.all()
+            ),
+            child: Text("</eventId=" + widget.event["id"])
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 20, right: 20),
+            child: FloatingActionButton.extended(
+              onPressed: () async {
+                Clipboard.setData(ClipboardData(text: "</eventId=" + widget.event["id"]));
 
+                await showDialog(
+                    context: context,
+                    builder: (context) {
+                      Future.delayed(Duration(seconds: 1), () {
+                        Navigator.of(context).pop(true);
+                      });
+                      return AlertDialog(
+                        content: Text("Link wurde kopiert"),
+                      );
+                    });
+                Navigator.pop(context);
+              },
+              label: Text("Link kopieren"),
+              icon: Icon(Icons.copy),
+            ),
+          )
         ]
       );
     }

@@ -102,7 +102,7 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "wann"
             ),
             const SizedBox(height: 10),
-            if(isApproved) ShowDataAndChangeWindow(
+            if(isApproved|| event["art"] == "Öffentlich") ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: "Uhrzeit ändern",
                 rowTitle: "Uhrzeit",
@@ -113,7 +113,7 @@ class EventCardDetails extends StatelessWidget {
                 oldDate: event["wann"],
                 databaseKennzeichnung: "wann"
             ),
-            if(isApproved) const SizedBox(height: 10),
+            if(isApproved|| event["art"] == "Öffentlich") const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: "Stadt verändern",
@@ -125,7 +125,7 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "location"
             ),
             const SizedBox(height: 10),
-            if(isApproved) ShowDataAndChangeWindow(
+            if(isApproved|| event["art"] == "Öffentlich") ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: "Map Link verändern",
                 rowTitle: "Map",
@@ -135,7 +135,7 @@ class EventCardDetails extends StatelessWidget {
                 modus: "textInput",
                 databaseKennzeichnung: "link"
             ),
-            if(isApproved) const SizedBox(height: 10),
+            if(isApproved|| event["art"] == "Öffentlich") const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: "Event Art ändern",
@@ -224,7 +224,7 @@ class EventCardDetails extends StatelessWidget {
               const SizedBox(height: 20),
               creatorChangeHintBox(),
               eventInformationBox(),
-              if(isApproved) eventBeschreibung(),
+              if(isApproved || event["art"] == "Öffentlich") eventBeschreibung(),
               OrganisatorBox(organisator: event["erstelltVon"],)
             ],
           ),

@@ -15,7 +15,7 @@ class EventCard extends StatelessWidget {
     this.event,
     this.withInteresse = false,
     this.margin = const EdgeInsets.only(top:10, bottom: 10, right: 10, left: 10),
-    this.changePage
+    this.changePage,
   });
 
   @override
@@ -34,7 +34,6 @@ class EventCard extends StatelessWidget {
           margin: margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              //border: Border.all(color: Colors.green),
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
@@ -73,7 +72,6 @@ class EventCard extends StatelessWidget {
               ),
               Expanded(
                 child: Container(
-                    width: double.infinity,
                     padding: EdgeInsets.only(top: 10, left: 5),
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
