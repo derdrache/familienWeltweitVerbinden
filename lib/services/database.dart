@@ -394,8 +394,27 @@ class EventDatabase{
     }));
   }
 
-  getEvents(userId) async {
+  getEvent(eventId) async {
     var url = databaseUrl + "database/events/getEvent.php";
+    var data = "?param1=$eventId";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    var responseBody = json.decode(res.body);
+
+    responseBody["interesse"] = jsonDecode(responseBody["interesse"]);
+    responseBody["zusage"] = jsonDecode(responseBody["zusage"]);
+    responseBody["absage"] = jsonDecode(responseBody["absage"]);
+    responseBody["freischalten"] = jsonDecode(responseBody["freischalten"]);
+    responseBody["freigegeben"] = jsonDecode(responseBody["freigegeben"]);
+
+
+
+    return responseBody;
+
+  }
+
+  getEvents(userId) async {
+    var url = databaseUrl + "database/events/getEvents.php";
     var data = "?param1=$userId";
     var uri = Uri.parse(url+data);
     var res = await http.get(uri, headers: {"Accept": "application/json"});

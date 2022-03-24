@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
+import 'package:familien_suche/pages/events/eventCard.dart';
+import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
+import '../events/event_details.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   var chatPartnerId;
@@ -39,6 +42,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   var messageRows = 0;
   Timer timer;
   var pufferList;
+  var eventCardList = [];
 
   @override
   void dispose() {
@@ -63,6 +67,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       timer = Timer.periodic(
           Duration(seconds: 10), (Timer t) => checkNewMessages());
     });
+  }
+
+  Future initialize() async{
+    var allMessages = await ChatDatabase().getAllMessages(widget.chatId);
+
+    for(var message in allMessages){
+      if(message["message"].contains("</eventId=")){
+        var eventId = message["message"].split("=")[1];
+        var eventData = await EventDatabase().getEvent(eventId);
+        eventCardList.add(eventData);
+      }
+    }
+
+
+
+    return allMessages;
   }
 
   checkNewMessages() {
@@ -190,14 +210,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    messageList(messages) {
+
+    messageList(messages){
       List<Widget> messageBox = [];
+      var eventCardCounter = 0;
 
-      for (var message in messages) {
-        if (message["message"] == "") {
-          continue;
-        }
-
+      for (var i = 0; i< messages.length; i++) {
+        var message = messages[i];
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
 
@@ -206,12 +225,37 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           boxColor = Colors.greenAccent;
         }
 
+        if (message["message"] == "") {
+          continue;
+        }
+
+        if(message["message"].contains("</eventId=")){
+          if (eventCardList[eventCardCounter] != false){
+            messageBox.add(
+                Align(
+                  alignment: textAlign,
+                  child: EventCard(
+                    withInteresse: true,
+                    event: eventCardList[eventCardCounter],
+                    changePage: () => global_functions.changePage(context,
+                        EventDetailsPage(event: eventCardList[eventCardCounter])),
+                  ),
+                )
+            );
+            continue;
+          }
+          eventCardCounter += 1;
+        }
+
+
+
+
         messageBox.add(
           Align(
             alignment: textAlign, //right and left
             child: Container(
                 constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.85),
+                maxWidth: MediaQuery.of(context).size.width * 0.85),
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     color: boxColor,
@@ -254,7 +298,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     showMessages() {
       return FutureBuilder(
-          future: ChatDatabase().getAllMessages(widget.chatId),
+          future: initialize(),
           builder: (
             BuildContext context,
             AsyncSnapshot snap,
