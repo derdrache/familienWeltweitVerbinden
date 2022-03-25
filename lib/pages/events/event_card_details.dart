@@ -207,7 +207,7 @@ class EventCardDetails extends StatelessWidget {
         children: [
           Container(
             width: isWebDesktop ? 300 : 350,
-            height: isWebDesktop ? 450: 550,
+            height: isWebDesktop ? 450: 500,
             margin: EdgeInsets.all(20),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -235,7 +235,7 @@ class EventCardDetails extends StatelessWidget {
           ),
           if(!isApproved && event["art"] != "Öffentlich") Container(
             width: isWebDesktop ? 300 : 350,
-            height: isWebDesktop ? 450 : 550,
+            height: isWebDesktop ? 450 : 500,
             margin: EdgeInsets.all(20),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),

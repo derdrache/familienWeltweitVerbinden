@@ -413,9 +413,9 @@ class EventDatabase{
 
   }
 
-  getEvents(userId) async {
+  getEvents(whereCondition) async {
     var url = databaseUrl + "database/events/getEvents.php";
-    var data = "?param1=$userId";
+    var data = "?param1=$whereCondition";
     var uri = Uri.parse(url+data);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     var responseBody = json.decode(res.body);
@@ -476,6 +476,24 @@ class EventDatabase{
     var url = Uri.parse(databaseUrl + "database/events/getAllEvents.php");
     var res = await http.get(url, headers: {"Accept": "application/json"});
     var responseBody = json.decode(res.body);
+
+    for(var i = 0; i < responseBody.length; i++){
+      responseBody[i]["interesse"] = jsonDecode(responseBody[i]["interesse"]);
+      responseBody[i]["zusage"] = jsonDecode(responseBody[i]["zusage"]);
+      responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
+      responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
+      responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
+    }
+
+    return responseBody;
+  }
+
+  getAllEventsWhere(whereCondition) async{
+    var url = databaseUrl + "database/events/getEvents.php";
+    var data = "?param1=$whereCondition";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    dynamic responseBody = res.body;
 
     for(var i = 0; i < responseBody.length; i++){
       responseBody[i]["interesse"] = jsonDecode(responseBody[i]["interesse"]);

@@ -97,7 +97,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getAndSetEvents()async{
-    events = await EventDatabase().getAllEvents();
+    events = await EventDatabase().getEvents("art != 'Privat'");
     eventsBackup = events;
     createAndSetZoomEvents();
   }
@@ -502,8 +502,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
         height: 32.0,
         point: position,
         builder: (ctx) => IconButton(
-          //backgroundColor: Theme.of(context).colorScheme.secondary,
-          //mini: true,
           padding: EdgeInsets.zero,
           icon: Stack(
             children: [
@@ -513,10 +511,10 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 left:5.5,
                 child: Container(
                   padding: EdgeInsets.only( left:2, top: 1),
-                  width: 21,
+                  width: 21.5,
                   height: 18,
                   color: Colors.white,
-                    child: Center(child: Text(numberText+"1", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14, color: Colors.black)))
+                    child: Center(child: Text(numberText, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14, color: Colors.black)))
                 )
               )
             ],
@@ -562,9 +560,25 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       //if(mapZoom > cityZoom){
         for(var event in aktiveEvents){
-          var basisVerschiebung = 0.35;
-          var anpassungsVerschiebung = mapZoom - cityZoom > 0 ? mapZoom - cityZoom : 0;
-          var position = LatLng(event["latt"], event["longt"] + basisVerschiebung - (anpassungsVerschiebung/9.5));
+          var basisVerschiebung;
+          var anpassungsVerschiebung;
+          var geteiltDurch;
+
+          if(mapZoom > cityZoom){
+            basisVerschiebung = 0.35;
+            anpassungsVerschiebung = mapZoom - cityZoom;
+            geteiltDurch = 9.5;
+          } else if(mapZoom > 4.0){
+            basisVerschiebung = 1.5;
+            anpassungsVerschiebung = mapZoom - 4.0;
+            geteiltDurch = 2;
+          } else{
+            basisVerschiebung = 20;
+            anpassungsVerschiebung = mapZoom;
+            geteiltDurch = 0.23;
+          }
+
+          var position = LatLng(event["latt"], event["longt"] + basisVerschiebung - (anpassungsVerschiebung/geteiltDurch));
 
           markerList.add(
               eventMarker(event["name"], position, (){
