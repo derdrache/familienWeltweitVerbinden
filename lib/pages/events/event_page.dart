@@ -100,7 +100,8 @@ class _EventPageState extends State<EventPage>{
               )
             ),
             FutureBuilder(
-              future: EventDatabase().getEvents(userId),
+              //future: EventDatabase().getEvents("erstelltVon = '"+userId+"'"),
+              future: EventDatabase().getEvents("art = '"+global_var.eventArt[0]+"'"),
               builder: (
                 BuildContext context,
                 AsyncSnapshot snapshot,
