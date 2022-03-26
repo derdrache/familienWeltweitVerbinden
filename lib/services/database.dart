@@ -545,33 +545,18 @@ sendChatNotification(chatId, messageData) async {
     "apiKey": firebaseWebKey,
     "typ" : "chat"
   }));
-
 }
 
-sendNotification(userId) async {
-  var userDeviceTokenDb = await ProfilDatabase().getOneData("token","id",userId);
-  var eventInformation = {
-    "to": userDeviceTokenDb,
-    "title": "Event Freigabe",
-    "inhalt": "Du hast jetzt Zugriff auf folgendes Event: Spielplatz",
-    "changePageId": "430e4714-c4b0-41b5-9b0e-4a8411e55f46",
-    "typ": "event"
-  };
-
+sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
-
-  var sendToken = await FirebaseMessaging.instance.getToken();
-
-  var test = await http.post(url, body: json.encode({
-    "to": sendToken,
-    "title": eventInformation["title"],
-    "inhalt": eventInformation["inhalt"],
-    "changePageId": eventInformation["changePageId"],
+  http.post(url, body: json.encode({
+    "to": notificationInformation["to"],
+    "title": notificationInformation["title"],
+    "inhalt": notificationInformation["inhalt"],
+    "changePageId": notificationInformation["changePageId"],
     "apiKey": firebaseWebKey,
-    "typ": eventInformation["typ"]
+    "typ": notificationInformation["typ"]
   }));
-
-  print(test.body);
 
 }
 
