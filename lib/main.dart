@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:familien_suche/pages/create_profil_page.dart';
+import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -131,7 +132,13 @@ class MyApp extends StatelessWidget {
   }
 
   changeToEvent(eventId) async {
-    print("im Aufbau");
+    var eventData = await EventDatabase().getEvent(eventId);
+
+    navigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (_) => EventDetailsPage(
+            event: eventData)
+        )
+    );
   }
 
   @override

@@ -52,25 +52,38 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   freischalten(user, angenommen, windowState) async {
+    var eventId = widget.event["id"];
+
     widget.event["freischalten"].remove(user);
     windowState((){
 
     });
 
 
-    var freischaltenList = await EventDatabase().getOneData("freischalten", widget.event["id"]);
+    var freischaltenList = await EventDatabase().getOneData("freischalten", eventId);
     freischaltenList.remove(user);
-    EventDatabase().updateOne(widget.event["id"], "freischalten", freischaltenList);
+    EventDatabase().updateOne(eventId, "freischalten", freischaltenList);
 
     setState(() {});
 
-    if(angenommen){
-      var freigegebenListe = await EventDatabase().getOneData("freigegeben", widget.event["id"]);
-      freigegebenListe.add(user);
-      EventDatabase().updateOne(widget.event["id"], "freigegeben", freigegebenListe);
-    } else{
-      print("abgelehnt");
-    }
+    if(angenommen) return;
+    
+    var freigegebenListe = await EventDatabase().getOneData("freigegeben", eventId);
+    freigegebenListe.add(user);
+    EventDatabase().updateOne(eventId, "freigegeben", freigegebenListe);
+
+    var receiverToken = await ProfilDatabase().getOneData("token", "id", user);
+
+    var notificationInformation = {
+      "to": receiverToken,
+      "title": "Event Freigabe",
+      "inhalt": "Du hast jetzt Zugriff auf folgendes Event: " + widget.event["name"],
+      "changePageId": eventId,
+      "typ": "event"
+    };
+
+    sendNotification(notificationInformation);
+     
   }
 
 
