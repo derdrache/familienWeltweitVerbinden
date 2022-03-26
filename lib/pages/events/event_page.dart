@@ -139,6 +139,11 @@ class _EventPageState extends State<EventPage>{
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
+                heroTag: "test",
+                child: Icon(Icons.bug_report),
+                onPressed: () => sendNotification(userId)
+            ),
+            FloatingActionButton(
               heroTag: "event suchen",
               child: Icon(Icons.search),
               onPressed: () => global_functions.changePage(context, EventsSuchenPage())

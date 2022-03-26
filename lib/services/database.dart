@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -295,7 +296,7 @@ class ChatDatabase{
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
-    sendNotification(chatID, messageData);
+    sendChatNotification(chatID, messageData);
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
@@ -362,9 +363,9 @@ class ChatDatabase{
 
 class EventDatabase{
 
-  addNewEvent(eventData) {
+  addNewEvent(eventData) async {
     var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
-    http.post(url, body: json.encode(eventData));
+    await http.post(url, body: json.encode(eventData));
   }
 
   updateOne(id, change, data){
@@ -525,25 +526,52 @@ class ReportsDatabase{
 }
 
 
-sendNotification(chatId, messageData) async {
+sendChatNotification(chatId, messageData) async {
   var toActiveChat = await ProfilDatabase().getOneData("activeChat", "id", messageData["zu"]);
 
   if(toActiveChat == chatId) return;
 
 
-  var url = Uri.parse(databaseUrl + "notification.php");
+  var url = Uri.parse(databaseUrl + "services/sendNotification.php");
   var chatPartnerName = await ProfilDatabase().getOneData("name", "id", messageData["von"]);
 
   var toToken = await ProfilDatabase().getOneData("token", "id", messageData["zu"]);
-  toToken = toToken;
 
   await http.post(url, body: json.encode({
     "to": toToken,
-    "from": chatPartnerName,
+    "title": chatPartnerName,
     "inhalt": messageData["message"],
-    "chatId": chatId,
-    "apiKey": firebaseWebKey
+    "changePageId": chatId,
+    "apiKey": firebaseWebKey,
+    "typ" : "chat"
   }));
+
+}
+
+sendNotification(userId) async {
+  var userDeviceTokenDb = await ProfilDatabase().getOneData("token","id",userId);
+  var eventInformation = {
+    "to": userDeviceTokenDb,
+    "title": "Event Freigabe",
+    "inhalt": "Du hast jetzt Zugriff auf folgendes Event: Spielplatz",
+    "changePageId": "430e4714-c4b0-41b5-9b0e-4a8411e55f46",
+    "typ": "event"
+  };
+
+  var url = Uri.parse(databaseUrl + "services/sendNotification.php");
+
+  var sendToken = await FirebaseMessaging.instance.getToken();
+
+  var test = await http.post(url, body: json.encode({
+    "to": sendToken,
+    "title": eventInformation["title"],
+    "inhalt": eventInformation["inhalt"],
+    "changePageId": eventInformation["changePageId"],
+    "apiKey": firebaseWebKey,
+    "typ": eventInformation["typ"]
+  }));
+
+  print(test.body);
 
 }
 
