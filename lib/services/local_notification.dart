@@ -21,13 +21,24 @@ class LocalNotificationService{
           priority: Priority.high,
         ),
       );
-      
+
+      var typ = jsonEncode(json.decode(message.data.values.last)["typ"]);
+      var link = jsonEncode(json.decode(message.data.values.last)["link"]);
+
       await _notificationsPlugin.show(
           id,
           message.notification.title,
           message.notification.body,
           notificationDetails,
-          payload: json.decode(message.data.values.last)["link"]
+          payload: '{"typ": $typ, "link" : $link}'
+
+
+
+
+
+
+
+          //json.decode(message.data.values.last)["link"]
       );
     } on Exception catch (e) {
       // TODO

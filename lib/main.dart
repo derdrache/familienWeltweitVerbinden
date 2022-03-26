@@ -80,7 +80,12 @@ class MyApp extends StatelessWidget {
     _notificationsPlugin.initialize(
         initializationSettings,
         onSelectNotification: (payload) async {
-          changeToChat(payload);
+          final Map<String, dynamic> payLoadMap = json.decode(payload);
+
+          if(payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
+
+          if(payLoadMap["typ"] == "event") changeToEvent(payLoadMap["link"]);
+          //
         }
     );
 
@@ -123,6 +128,10 @@ class MyApp extends StatelessWidget {
         MaterialPageRoute(builder: (_) => ChatDetailsPage(
             groupChatData: groupChatData))
     );
+  }
+
+  changeToEvent(eventId) async {
+    print("im Aufbau");
   }
 
   @override

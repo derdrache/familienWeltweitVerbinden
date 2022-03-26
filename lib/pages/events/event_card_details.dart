@@ -440,6 +440,17 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     return data;
   }
 
+  checkValidation(data){
+    var validationText = "";
+
+    if(widget.databaseKennzeichnung == "name"){
+      if(data.isEmpty) validationText = "Bitte einen Namen eingeben";
+      if(data.length > 40) validationText = "Name ist zu lang, höchstens 40 Zeichen";
+    }
+
+    return validationText;
+  }
+
   changeRowData(data){
     if(widget.modus == "date") {
       widget.rowData = data.split(" ")[0];
@@ -454,6 +465,12 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
   saveChanges(){
     var data = getData();
+
+    var errorText = checkValidation(data);
+    if(!errorText.isEmpty){
+      customSnackbar(context, errorText);
+      return;
+    }
 
     changeRowData(data);
 

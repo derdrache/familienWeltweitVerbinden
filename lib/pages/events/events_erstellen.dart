@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
+import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -14,6 +15,7 @@ import '../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../global/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
+import 'event_page.dart';
 
 
 class EventErstellen extends StatefulWidget {
@@ -64,7 +66,7 @@ class _EventErstellenState extends State<EventErstellen> {
     super.initState();
   }
 
-  saveEvent(){
+  saveEvent() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = Uuid();
     var allFilled = checkAllValidations(locationData);
@@ -91,8 +93,9 @@ class _EventErstellenState extends State<EventErstellen> {
       "latt": locationData["latt"],
     };
 
-    EventDatabase().addNewEvent(eventData);
-    // in die Event Detail ansicht
+    await EventDatabase().addNewEvent(eventData);
+    global_functions.changePage(context, EventPage());
+    global_functions.changePage(context, EventDetailsPage(event: eventData));
   }
 
   checkAllValidations(locationData){
@@ -100,6 +103,8 @@ class _EventErstellenState extends State<EventErstellen> {
 
     if(eventNameKontroller.text.isEmpty){
       validationFailText = "Bitte einen Namen eingeben";
+    } else if(eventNameKontroller.text.length > 40){
+      validationFailText = "Name ist zu lang, höchstens 40 Zeichen";
     } else if(eventArtDropdown.getSelected().isEmpty){
       validationFailText = "Bitte Art des Events eingeben";
     } else if(ortTypDropdown.getSelected().isEmpty){
