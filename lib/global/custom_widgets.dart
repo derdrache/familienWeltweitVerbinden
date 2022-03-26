@@ -596,7 +596,7 @@ class WindowTopbar extends StatelessWidget {
   }
 }
 
-CustomWindow({context, title,List<Widget> children, double height = double.maxFinite}){
+CustomWindow({context, title = "",List<Widget> children, double height = double.maxFinite}){
 
   _closeWindow(){
     Navigator.pop(context);

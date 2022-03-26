@@ -125,7 +125,6 @@ class ProfilDatabase{
 
   }
 
-
   getOneDataFromAll(what) async{
     var url = databaseUrl + "database/profils/getOneDataFromAll.php";
     var data = "?param1=$what";

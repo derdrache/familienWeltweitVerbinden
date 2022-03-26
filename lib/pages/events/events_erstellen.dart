@@ -57,7 +57,7 @@ class _EventErstellenState extends State<EventErstellen> {
     );
 
     eventArtDropdown = CustomDropDownButton(
-      hintText: "Öffentliches oder Privates Event ?",
+      hintText: "Event Art",
       items: global_var.eventArt,
     );
 
@@ -101,7 +101,7 @@ class _EventErstellenState extends State<EventErstellen> {
     if(eventNameKontroller.text.isEmpty){
       validationFailText = "Bitte einen Namen eingeben";
     } else if(eventArtDropdown.getSelected().isEmpty){
-      validationFailText = "Bitte wählen ob privates oder öffentliches Event";
+      validationFailText = "Bitte Art des Events eingeben";
     } else if(ortTypDropdown.getSelected().isEmpty){
       validationFailText = "Bitte wählen: offline oder Online Event";
     } else if(ortTypDropdown.getSelected() == "offline" && locationData["city"] == null){
@@ -183,6 +183,72 @@ class _EventErstellenState extends State<EventErstellen> {
 
     }
 
+    eventArtInformation(){
+      return Positioned(
+          top: -5,
+          left: -5,
+          child: IconButton(
+            icon: Icon(Icons.help,size: 15),
+            onPressed: () => CustomWindow(
+                height: 500,
+                context: context,
+                title: "Information zur Event Art",
+                children: [
+                  SizedBox(height: 10),
+                  Container(
+                    margin: EdgeInsets.only(left: 5, right: 5),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Text("Diese können in der globalen Suche nicht gefunden "
+                            "werden.\nDas teilen funktioniert nur per Link.\nWenn eine "
+                            "Familie interesse hat, muss sie für das Event noch vom "
+                            "Organisator freigegeben werden.",
+                          maxLines: 10,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )
+                    ]),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    margin: EdgeInsets.only(left: 5, right: 5),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Container(
+                          width: 70,
+                          child: Text("halb-öffentlich",style: TextStyle(fontWeight: FontWeight.bold))
+                      ),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Text("Diese können überall gefunden werden.\nUm die details "
+                            "von dem Event zu sehen, ist eine Freigabe durch den Organisator nötig.",
+                          maxLines: 10,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      )
+                    ]),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    margin: EdgeInsets.only(left: 5, right: 5),
+                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text("öffentlich", style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: Text("Diese können überall gefunden und von jedem komplett eingesehen werden",
+                          maxLines: 10,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ]),
+                  )
+                ]
+            ),
+          )
+      );
+    }
+
 
     return Scaffold(
       appBar: customAppBar(
@@ -200,7 +266,12 @@ class _EventErstellenState extends State<EventErstellen> {
               customTextInput("Eventname", eventNameKontroller,
                   validator: global_functions.checkValidatorEmpty(context)
               ),
-              eventArtDropdown,
+              Stack(
+                children: [
+                  eventArtDropdown,
+                  eventArtInformation()
+                ],
+              ),
               ortTypDropdown,
               ortEingabeBox(),
               sprachenAuswahlBox,
