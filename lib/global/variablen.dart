@@ -7,7 +7,7 @@ List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
 List<String> sprachenListe = ["Deutsch", "Englisch"];
 List<String> eventInterval = ["einmalig", "wöchentlich", "monatlich"];
 List<String> eventTyp = ["offline", "online"];
-List<String> eventArt = ["Privat", "Öffentlich"];
+List<String> eventArt = ["privat", "halb-öffentlich", "öffentlich"];
 
 List<String> reiseartenEnglisch = ["fixed location", "airplane/housing",
   "car/housing","mobile home/camping", "boat"];

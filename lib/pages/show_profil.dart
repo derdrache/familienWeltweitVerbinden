@@ -73,7 +73,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               newChat = true;
               groupChatData = {
                 "users": {
-                  profilID["id"]: {"name": widget.profil["name"], "newMessages" : 0},
+                  profilID: {"name": widget.profil["name"], "newMessages" : 0},
                   userID: {"name": widget.userName, "newMessages" : 0}
                 }
               };

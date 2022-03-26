@@ -80,8 +80,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       }
     }
 
-
-
     return allMessages;
   }
 
@@ -92,7 +90,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   getAndSetChatData() async {
     if (widget.groupChatData != null) {
       widget.chatId = widget.groupChatData["id"];
-      var groupchatUsers = jsonDecode(widget.groupChatData["users"]);
+      var groupchatUsers = widget.groupChatData["users"];
       groupchatUsers.forEach((key, value) {
         if (key != userId) {
           widget.chatPartnerName = value["name"];
@@ -174,6 +172,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     } else {
       await ChatDatabase()
           .addNewMessageAndSendNotification(widget.groupChatData, messageData);
+
+      if(messageData["message"].contains("</eventId=")){
+        messageData["message"] = "<Event Card>";
+      }
       ChatDatabase().updateChatGroup(
           widget.chatId, "lastMessage", messageData["message"]);
       ChatDatabase().updateChatGroup(
@@ -207,6 +209,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           profil: chatPartnerProfil,
         ));
   }
+
 
   @override
   Widget build(BuildContext context) {

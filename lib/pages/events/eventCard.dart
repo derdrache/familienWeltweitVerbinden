@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
 
-class EventCard extends StatelessWidget {
+class EventCard extends StatefulWidget {
   var margin;
   var event;
   var withInteresse;
@@ -19,26 +19,115 @@ class EventCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    event["bild"] ??= "assets/bilder/strand.jpg";
+  _EventCardState createState() => _EventCardState();
+}
 
+class _EventCardState extends State<EventCard> {
+  var shadowColor = Colors.grey.withOpacity(0.8);
+
+  @override
+  void initState() {
+    widget.event["bild"] ??= "assets/bilder/strand.jpg";
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height; //laptop: 619 -  Android 737
     var fontSize = screenHeight / 52; //Android 14   51,58  => 52,6
 
+    if(widget.event["zusage"].contains(userId)) shadowColor = Colors.green.withOpacity(0.8);
+    if(widget.event["absage"].contains(userId)) shadowColor = Colors.red.withOpacity(0.8);
+
+
+    cardMenu(tapPosition){
+      var onAbsageList = widget.event["absage"].contains(userId);
+      var onZusageList = widget.event["zusage"].contains(userId);
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+
+      showMenu(
+        context: context,
+        position: RelativeRect.fromRect(
+            tapPosition & Size(40, 40),
+            Offset.zero & overlay.size
+        ),
+        elevation: 8.0,
+        items: [
+          if(!onZusageList) PopupMenuItem(
+            child: Row(
+              children: const [
+                Icon(Icons.check_circle),
+                SizedBox(width: 10),
+                Text("Zusagen"),
+              ],
+            ),
+            onTap: () async{
+              setState(() {
+                widget.event["zusage"].add(userId);
+                onZusageList = true;
+                onAbsageList = false;
+              });
+
+              var zusageList = await EventDatabase().getOneData("zusage", widget.event["id"]);
+              zusageList.add(userId);
+              EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
+
+              if(!onAbsageList) return;
+
+              var absageList = await EventDatabase().getOneData("absage", widget.event["id"]);
+              absageList.remove(userId);
+              EventDatabase().updateOne(widget.event["id"], "absage", absageList);
+
+
+            },
+          ),
+          if(!onAbsageList) PopupMenuItem(
+            child: Row(
+              children: const [
+                Icon(Icons.cancel, color: Colors.red,),
+                SizedBox(width: 10),
+                Text("Absagen"),
+              ],
+            ),
+            onTap: () async{
+              setState(() {
+                widget.event["absage"].add(userId);
+                onAbsageList = true;
+                onZusageList = false;
+              });
+
+              var absageList = await EventDatabase().getOneData("absage", widget.event["id"]);
+              absageList.add(userId);
+              EventDatabase().updateOne(widget.event["id"], "absage", absageList);
+
+              if(!onZusageList) return;
+
+              var zusageList = await EventDatabase().getOneData("zusage", widget.event["id"]);
+              zusageList.remove(userId);
+              EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
+
+            },
+          ),
+        ],
+      );
+    }
+
 
     return GestureDetector(
-      onTap: () => changePage(),
+      onLongPressStart: (tapdownDetails) => cardMenu(tapdownDetails.globalPosition),
+      onTap: () => widget.changePage(),
       child: Container(
           width: 130 + ((screenHeight-600)/5), //  Android 165
           height: screenHeight / 3.4, // Android 220 ~3,4
-          margin: margin,
+          margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.8),
-                  spreadRadius: 5,
+                  color: shadowColor,
+                  spreadRadius: 8,
                   blurRadius: 7,
                   offset: Offset(0, 3), // changes position of shadow
                 ),
@@ -54,19 +143,19 @@ class EventCard extends StatelessWidget {
                       topRight: const Radius.circular(20.0),
                     ),
                     child: Image.asset(
-                        event["bild"],
+                        widget.event["bild"],
                         height: 70 + ((screenHeight-600)/5),
                         width: 130 + ((screenHeight-600)/5),
                         fit: BoxFit.fill
                     ),
                   ),
-                  if(withInteresse) Positioned(
-                    top: 2,
-                    right: 8,
-                    child: InteresseButton(
-                        interesse: event["interesse"],
-                        id: event["id"],
-                    )
+                  if(widget.withInteresse) Positioned(
+                      top: 2,
+                      right: 8,
+                      child: InteresseButton(
+                        interesse: widget.event["interesse"],
+                        id: widget.event["id"],
+                      )
                   ),
                 ],
               ),
@@ -82,13 +171,13 @@ class EventCard extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        Text(event["name"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize),),
+                        Text(widget.event["name"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize),),
                         SizedBox(height: 10),
                         Row(
                           children: [
                             Text("Date: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                             Text(
-                                event["wann"].split(" ")[0].split("-").reversed.join("."),
+                                widget.event["wann"].split(" ")[0].split("-").reversed.join("."),
                                 style: TextStyle(fontSize: fontSize))
                           ],
                         ),
@@ -96,14 +185,14 @@ class EventCard extends StatelessWidget {
                         Row(
                           children: [
                             Text("Stadt: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
-                            Text(event["stadt"], style: TextStyle(fontSize: fontSize))
+                            Text(widget.event["stadt"], style: TextStyle(fontSize: fontSize))
                           ],
                         ),
                         SizedBox(height: 5),
                         Row(
                           children: [
                             Text("Land: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
-                            Text(event["land"], style: TextStyle(fontSize: fontSize))
+                            Text(widget.event["land"], style: TextStyle(fontSize: fontSize))
                           ],
                         ),
                       ],
@@ -162,5 +251,3 @@ class _InteresseButtonState extends State<InteresseButton> {
     );
   }
 }
-
-

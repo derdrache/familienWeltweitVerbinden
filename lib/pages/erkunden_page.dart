@@ -97,7 +97,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getAndSetEvents()async{
-    events = await EventDatabase().getEvents("art != 'Privat'");
+    events = await EventDatabase().getEvents("art != 'privat'");
     eventsBackup = events;
     createAndSetZoomEvents();
   }
@@ -417,7 +417,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   Widget build(BuildContext context){
     List<Marker> allMarker = [];
 
-    markerPopupWindow(profils){
+    markerPopupWindow({profil, event}){
 
       List<Widget> createPopupProfils(){
         List<Widget> profilsList = [SizedBox(height: 10)];
@@ -433,7 +433,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
         }
 
 
-        profils["profils"].forEach((profil){
+        profil["profils"].forEach((profil){
           profilsList.add(
             GestureDetector(
               onTap: () {
@@ -475,8 +475,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       return CustomWindow(
           context: context,
-          title: mapZoom > cityZoom ? createWindowTitle(profils["profils"], "ort") :
-              createWindowTitle(profils["profils"], "land"),
+          title: mapZoom > cityZoom ? createWindowTitle(profil["profils"], "ort") :
+              createWindowTitle(profil["profils"], "land"),
           children: createPopupProfils());
 
     }
@@ -550,7 +550,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 profil["name"],
                 position,
                 () {
-                  markerPopupWindow(profil);
+                  markerPopupWindow(profil: profil);
                   zoomAtPoint(position);
                 }
             )
@@ -582,7 +582,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
           markerList.add(
               eventMarker(event["name"], position, (){
-                markerPopupWindow(event);
+                markerPopupWindow(event: event);
                 zoomAtPoint(position);
               })
           );
