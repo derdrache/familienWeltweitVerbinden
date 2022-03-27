@@ -104,6 +104,41 @@
     "feedbackDanke": "Vielen Dank für dein Feedback",
     "erfolgreichGeaender": "erfolgreich geändert",
     "ortEingabeInformation": "Beim Ort kannst du entscheiden wie genau deine Eingabe sein soll. \nJe genauer deine Eingabe ist, desto wahrscheinlich ist es, dass du von anderen angeschrieben wirst. \n\nBeispiele für die Eingabe: Stadt / Land / Region",
-    "stadtEingeben": "Stadt eingeben"
+    "stadtEingeben": "Stadt eingeben",
+    "favoritenEvents": "Für mich interessant",
+    "meineEvents": "Meine Events",
+    "eventArten": "öffentlich / halb-öffentlich / privat",
+    "bitteNameEingeben": "Bitte einen Namen eingeben",
+    "bitteEventArtEingeben": "Bitte Art des Events eingeben",
+    "bitteEventTypEingeben": "Bitte wählen: offline oder Online Event",
+    "bitteStadtEingeben": "Bitte Stadt eingeben",
+    "bitteLinkEingeben": "Bitte Link zum Event eingeben",
+    "bitteSpracheEingeben": "Bitte Sprache auswählen",
+    "bitteEventDatumEingeben": "Bitte Datum des Events eingeben",
+    "bitteEventUhrzeitEingeben": "Bitte Uhrzeit des Events eingeben",
+    "bitteEventBeschreibungEingeben": "Bitte Beschreibung zum Event eingeben",
+    "datumAuswaehlen": "Datum auswählen",
+    "uhrzeitAuswaehlen": "Uhrzeit auswählen",
+    "eventLinkEingeben": "Link vom Event eingeben",
+    "informationEventArt": "Information zur Event Art",
+    "privatInformationText": "Diese können in der globalen Suche nicht gefunden werden.\nDas teilen funktioniert nur per Link.\nWenn eine Familie interesse hat, muss sie für das Event noch vom Organisator freigegeben werden.",
+    "halbOeffentlich": "halb-öffentlich",
+    "halbOeffentlichInformationText" : "Diese können überall gefunden werden.\nUm die details von dem Event zu sehen, ist eine Freigabe durch den Organisator nötig.",
+    "oeffentlich": "öffentlich",
+    "oeffentlichInformationText": "Diese können überall gefunden und von jedem komplett eingesehen werden",
+    "eventErstellen": "Event erstellen",
+    "eventBeschreibung": "Event Beschreibung",
+    "eventSuchen": "Events suchen",
+    "eventMelden": "Event melden",
+    "eventMeldenFrage": "Warum möchtest du das Event melden?",
+    "eventLoeschen": "Event löschen",
+    "linkKopieren": "Link kopieren",
+    "linkWurdekopiert": "Link wurde kopiert",
+    "familienFreigeben": "Familien freigeben",
+    "teilnehmen": "Teilnehmen",
+    "absagen": "Absagen"
+
+
+
 
 }

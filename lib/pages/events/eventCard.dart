@@ -171,7 +171,8 @@ class _EventCardState extends State<EventCard> {
                     ),
                     child: Column(
                       children: [
-                        Text(widget.event["name"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize),),
+                        Text(widget.event["name"],
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                         SizedBox(height: 10),
                         Row(
                           children: [

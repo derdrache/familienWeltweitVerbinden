@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../services/database.dart';
 import '../../global/style.dart' as global_style;
@@ -121,9 +122,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       CustomWindow(
         context: context,
         height: 500,
-        title: "Event melden",
+        title: AppLocalizations.of(context).eventMelden,
         children: [
-          customTextInput("Warum möchtest du das Event melden?", reportController, moreLines: 10),
+          customTextInput(AppLocalizations.of(context).eventMeldenFrage, reportController, moreLines: 10),
           Container(
             margin: EdgeInsets.only(left: 30, top: 10, right: 30),
             child: FloatingActionButton.extended(
@@ -136,7 +137,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   );
                   // send to db
                 },
-                label: Text("Senden")
+                label: Text(AppLocalizations.of(context).senden)
             ),
           )
         ]
@@ -162,7 +163,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         children: [
                           Icon(Icons.delete),
                           SizedBox(width: 10),
-                          Text("Event löschen"),
+                          Text(AppLocalizations.of(context).eventLoeschen),
                         ],
                       ),
                       onPressed: () {
@@ -175,7 +176,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         children: [
                           Icon(Icons.report),
                           SizedBox(width: 10),
-                          Text("Event melden"),
+                          Text(AppLocalizations.of(context).eventMelden),
                         ],
                       ),
                       onPressed: (){
@@ -219,7 +220,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
 
                 },
-                label: Text("Teilnehmen")
+                label: Text(AppLocalizations.of(context).teilnehmen)
             ),
           ),
           if(widget.absage != true) Container(
@@ -227,7 +228,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             child: FloatingActionButton.extended(
               heroTag: "Absagen",
               backgroundColor: Theme.of(context).colorScheme.primary,
-              label: Text("Absagen"),
+              label: Text(AppLocalizations.of(context).absagen),
               onPressed: () async {
 
                 setState(() {
@@ -291,7 +292,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 builder: (context, setState){
                   windowSetState = setState;
                   return AlertDialog(
-                    title: Text("Familien freigeben"),
+                    title: Text(AppLocalizations.of(context).familienFreigeben),
                     content: FutureBuilder(
                       future: userFreischaltenList(windowSetState),
                       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -341,12 +342,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         Navigator.of(context).pop(true);
                       });
                       return AlertDialog(
-                        content: Text("Link wurde kopiert"),
+                        content: Text(AppLocalizations.of(context).linkWurdekopiert),
                       );
                     });
                 Navigator.pop(context);
               },
-              label: Text("Link kopieren"),
+              label: Text(AppLocalizations.of(context).linkKopieren),
               icon: Icon(Icons.copy),
             ),
           )
