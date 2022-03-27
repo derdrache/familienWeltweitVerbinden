@@ -507,7 +507,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
             children: [
               Icon(Icons.calendar_today, size: 32, color: Theme.of(context).colorScheme.primary),
               Positioned(
-                top:10.5,
+                top:9.5,
                 left:5.5,
                 child: Container(
                   padding: EdgeInsets.only( left:2, top: 1),

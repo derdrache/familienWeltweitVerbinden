@@ -19,16 +19,18 @@ class EventCardDetails extends StatelessWidget {
   var offlineEvent;
   var isCreator;
   var isApproved;
-  double cardWidth = isWebDesktop ? 300 : 350;
-  double cardHeight = isWebDesktop ? 450: 550; // Anna 600
-
-
 
   EventCardDetails({Key key, this.event, this.offlineEvent=true, this.isApproved = false}) :
         isCreator = event["erstelltVon"] == userId;
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    if(screenWidth > 500) screenWidth = kIsWeb ? 400 : 500;
+    double cardWidth = screenWidth / 1.12;//isWebDesktop ? 300 : 450; // Handy 392 => 350: Tablet 768
+    double cardHeight = screenHeight / 1.34;
+    
 
     bildAndTitleBox(){
       return Stack(
@@ -89,72 +91,6 @@ class EventCardDetails extends StatelessWidget {
       );
     }
 
-    eventArtInformation(){
-      return Positioned(
-        top: -15,
-        left:10,
-        child: IconButton(
-            icon: Icon(Icons.help,size: 15),
-            onPressed: () => CustomWindow(
-              height: 500,
-              context: context,
-              title: "Information zur Event Art",
-              children: [
-                SizedBox(height: 10),
-                Container(
-                  margin: EdgeInsets.only(left: 5, right: 5),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                   Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
-                   SizedBox(width: 5),
-                   Expanded(
-                     child: Text("Diese können in der globalen Suche nicht gefunden "
-                         "werden.\nDas teilen funktioniert nur per Link.\nWenn eine "
-                         "Familie interesse hat, muss sie für das Event noch vom "
-                         "Organisator freigegeben werden.",
-                       maxLines: 10,
-                       overflow: TextOverflow.ellipsis,
-                     ),
-                   )
-                  ]),
-                ),
-                SizedBox(height: 20),
-                Container(
-                  margin: EdgeInsets.only(left: 5, right: 5),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Container(
-                      width: 70,
-                      child: Text("halb-öffentlich",style: TextStyle(fontWeight: FontWeight.bold))
-                    ),
-                    SizedBox(width: 5),
-                    Expanded(
-                      child: Text("Diese können überall gefunden werden.\nUm die details "
-                          "von dem Event zu sehen, ist eine Freigabe durch den Organisator nötig.",
-                        maxLines: 10,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    )
-                  ]),
-                ),
-                SizedBox(height: 20),
-                Container(
-                    margin: EdgeInsets.only(left: 5, right: 5),
-                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text("öffentlich", style: TextStyle(fontWeight: FontWeight.bold)),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text("Diese können überall gefunden und von jedem komplett eingesehen werden",
-                          maxLines: 10,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                ]),
-                  )
-              ]
-            ),
-        )
-      );
-    }
-
     eventInformationBox(){
       return Container(
         margin: const EdgeInsets.all(10),
@@ -206,22 +142,6 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "link"
             ),
             if(isApproved|| event["art"] == "öffentlich") const SizedBox(height: 10),
-            Stack(
-              children: [
-                ShowDataAndChangeWindow(
-                    eventId: event["id"],
-                    windowTitle: "Event Art ändern",
-                    isCreator: isCreator,
-                    rowTitle: "Art",
-                    rowData: event["art"],
-                    inputHintText: "öffentliches oder privates Event ?",
-                    items: global_var.eventArt,
-                    modus: "dropdown",
-                    databaseKennzeichnung: "art"
-                ),
-                eventArtInformation()
-              ],
-            ),
             const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
@@ -344,7 +264,8 @@ class EventCardDetails extends StatelessWidget {
                 SizedBox(height: 40,)
               ],
             )
-          )
+          ),
+          EventArtButton(event: event)
         ],
       ),
     );
@@ -785,4 +706,145 @@ class _InteresseButtonState extends State<InteresseButton> {
     );
   }
 }
+
+class EventArtButton extends StatefulWidget {
+  var event;
+
+  EventArtButton({Key key, this.event}) : super(key: key);
+
+  @override
+  _EventArtButtonState createState() => _EventArtButtonState();
+}
+
+class _EventArtButtonState extends State<EventArtButton> {
+  var eventTypInput = CustomDropDownButton();
+
+
+  eventArtSave(){
+    var auswahl = eventTypInput.getSelected();
+    if(auswahl == widget.event["art"]) return;
+
+
+    widget.event["art"] = auswahl;
+    setState(() {});
+
+    EventDatabase().updateOne(widget.event["id"], "art", auswahl);
+
+    Navigator.pop(context);
+
+  }
+
+  eventArtInformation(){
+    return Positioned(
+        top: -15,
+        left:10,
+        child: IconButton(
+          icon: Icon(Icons.help,size: 15),
+          onPressed: () => CustomWindow(
+              height: 500,
+              context: context,
+              title: "Information zur Event Art",
+              children: [
+                SizedBox(height: 10),
+                Container(
+                  margin: EdgeInsets.only(left: 5, right: 5),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(width: 5),
+                    Expanded(
+                      child: Text("Diese können in der globalen Suche nicht gefunden "
+                          "werden.\nDas teilen funktioniert nur per Link.\nWenn eine "
+                          "Familie interesse hat, muss sie für das Event noch vom "
+                          "Organisator freigegeben werden.",
+                        maxLines: 10,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  ]),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  margin: EdgeInsets.only(left: 5, right: 5),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Container(
+                        width: 70,
+                        child: Text("halb-öffentlich",style: TextStyle(fontWeight: FontWeight.bold))
+                    ),
+                    SizedBox(width: 5),
+                    Expanded(
+                      child: Text("Diese können überall gefunden werden.\nUm die details "
+                          "von dem Event zu sehen, ist eine Freigabe durch den Organisator nötig.",
+                        maxLines: 10,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  ]),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  margin: EdgeInsets.only(left: 5, right: 5),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text("öffentlich", style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(width: 5),
+                    Expanded(
+                      child: Text("Diese können überall gefunden und von jedem komplett eingesehen werden",
+                        maxLines: 10,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ]),
+                )
+              ]
+          ),
+        )
+    );
+  }
+
+  @override
+  void initState() {
+    eventTypInput = CustomDropDownButton(
+      items: global_var.eventArt,
+      hintText: "öffentlich / halb-öffentlich / privat",
+      selected: widget.event["art"],
+    );
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 0,
+      left: -10,
+      child: IconButton(
+        icon: Icon(widget.event["art"] != "öffentlich" ?
+          Icons.lock : Icons.lock_open, color: Theme.of(context).colorScheme.primary),
+        onPressed: () => CustomWindow(
+            context: context,
+            title: "Event Art ändern",
+            height: 180,
+            children: [
+              eventTypInput,
+              Container(
+                margin: EdgeInsets.only(right: 10),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        child: Text("Abbrechen", style: TextStyle(fontSize: fontsize)),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      TextButton(
+                          child: Text("Speichern", style: TextStyle(fontSize: fontsize)),
+                          onPressed: () => eventArtSave()
+                      ),
+                    ]
+                ),
+              )
+            ]
+        ),
+      ),
+    );
+  }
+}
+
 

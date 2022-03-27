@@ -3,6 +3,8 @@ import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
 import 'eventCard.dart';
@@ -52,7 +54,7 @@ class _EventPageState extends State<EventPage>{
             Container(
                 margin: EdgeInsets.only(left: 10),
                 child: Text(
-                  "Events für die ich mich interessiere",
+                  AppLocalizations.of(context).favoritenEvents,
                   style: TextStyle(fontSize: 20),
                 )
             ),
@@ -95,7 +97,7 @@ class _EventPageState extends State<EventPage>{
             Container(
               margin: EdgeInsets.only(left: 10),
               child: Text(
-                "Meine Events",
+                AppLocalizations.of(context).meineEvents,
                 style: TextStyle(fontSize: 20),
               )
             ),
@@ -131,7 +133,7 @@ class _EventPageState extends State<EventPage>{
             children: [
               Expanded(child: meineInteressiertenEventsBox()),
               Expanded(child: meineErstellenEventsBox()),
-              SizedBox(height: 90)
+              SizedBox(height: 80)
             ]
           )
         ),

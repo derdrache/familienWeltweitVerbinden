@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/search_autocomplete.dart';
@@ -87,7 +88,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
     return Scaffold(
       appBar: customAppBar(
-        title: "Events suchen"
+        title: AppLocalizations.of(context).eventSuchen
       ),
       body: Container(
           padding: EdgeInsets.only(top:10),

@@ -43,13 +43,13 @@ class _EventErstellenState extends State<EventErstellen> {
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
       icon: Icon(Icons.arrow_downward, color: Colors.black,),
-      hintText: "Sprache auswählen",
+      hintText: AppLocalizations.of(context).spracheAuswaehlen,
       auswahlList: isGerman ?
       global_var.sprachenListe : global_var.sprachenListeEnglisch
     );
 
     ortTypDropdown = CustomDropDownButton(
-      hintText: "Offline oder Online Event ?",
+      hintText: "offline / online",
       items: global_var.eventTyp,
       onChange: () {
         setState(() {
@@ -59,7 +59,7 @@ class _EventErstellenState extends State<EventErstellen> {
     );
 
     eventArtDropdown = CustomDropDownButton(
-      hintText: "Event Art",
+      hintText: AppLocalizations.of(context).eventArten,
       items: global_var.eventArt,
     );
 
@@ -78,7 +78,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
     var eventData = {
       "id": uuid.v4(),
-      "name" : eventNameKontroller.text, //maximal 20 zeichen, dann ...
+      "name" : eventNameKontroller.text,
       "erstelltAm": DateTime.now().toString(),
       "erstelltVon": FirebaseAuth.instance.currentUser.uid,
       "beschreibung": eventBeschreibungKontroller.text,
@@ -102,25 +102,25 @@ class _EventErstellenState extends State<EventErstellen> {
     var validationFailText = "";
 
     if(eventNameKontroller.text.isEmpty){
-      validationFailText = "Bitte einen Namen eingeben";
+      validationFailText = AppLocalizations.of(context).bitteNameEingeben;
     } else if(eventNameKontroller.text.length > 40){
-      validationFailText = "Name ist zu lang, höchstens 40 Zeichen";
+      validationFailText = AppLocalizations.of(context).usernameZuLang;
     } else if(eventArtDropdown.getSelected().isEmpty){
-      validationFailText = "Bitte Art des Events eingeben";
+      validationFailText = AppLocalizations.of(context).bitteEventArtEingeben;
     } else if(ortTypDropdown.getSelected().isEmpty){
-      validationFailText = "Bitte wählen: offline oder Online Event";
+      validationFailText = AppLocalizations.of(context).bitteEventTypEingeben;
     } else if(ortTypDropdown.getSelected() == "offline" && locationData["city"] == null){
-      validationFailText = "Bitte Stadt eingeben";
+      validationFailText = AppLocalizations.of(context).bitteStadtEingeben;
     } else if (ortTypDropdown.getSelected() == "online" && eventOrtKontroller.text.isEmpty) {
-      validationFailText = "Bitte Link zum Event eingeben";
+      validationFailText = AppLocalizations.of(context).bitteLinkEingeben;
     }else if(sprachenAuswahlBox.getSelected().isEmpty){
-      validationFailText = "Bitte Sprache auswählen";
+      validationFailText = AppLocalizations.of(context).bitteSpracheEingeben;
     } else if(eventDatum == null){
-      validationFailText = "Bitte Datum des Events eingeben";
+      validationFailText = AppLocalizations.of(context).bitteEventDatumEingeben;
     } else if(eventUhrzeit == null){
-      validationFailText = "Bitte Uhrzeit des Events eingeben";
+      validationFailText = AppLocalizations.of(context).bitteEventUhrzeitEingeben;
     } else if(eventBeschreibungKontroller.text.isEmpty){
-      validationFailText = "Bitte Beschreibung zum Event eingeben";
+      validationFailText = AppLocalizations.of(context).bitteEventBeschreibungEingeben;
     }
 
     if(validationFailText.isEmpty) return true;
@@ -135,7 +135,7 @@ class _EventErstellenState extends State<EventErstellen> {
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
 
     dateAndTimeBox(){
-      var dateString = "Datum auswählen";
+      var dateString = AppLocalizations.of(context).datumAuswaehlen;
       if(eventDatum != null){
         var dateFormat = DateFormat('dd-MM-yyyy');
         var dateTime = DateTime(eventDatum.year, eventDatum.month, eventDatum.day);
@@ -161,7 +161,7 @@ class _EventErstellenState extends State<EventErstellen> {
           ),
           SizedBox(width: 20),
           ElevatedButton(
-            child: Text(eventUhrzeit == null ? "Uhrzeit auswählen" : eventUhrzeit.format(context)),
+            child: Text(eventUhrzeit == null ? AppLocalizations.of(context).uhrzeitAuswaehlen : eventUhrzeit.format(context)),
             onPressed: () async {
               eventUhrzeit = await showTimePicker(
                 context: context,
@@ -177,7 +177,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
     ortEingabeBox(){
       if(ortTypDropdown.selected == "online"){
-        return customTextInput("Link vom Event eingeben", eventOrtKontroller,
+        return customTextInput(AppLocalizations.of(context).eventLinkEingeben, eventOrtKontroller,
             validator: global_functions.checkValidatorEmpty(context)
         );
       } else if(ortTypDropdown.selected == "offline"){
@@ -197,7 +197,7 @@ class _EventErstellenState extends State<EventErstellen> {
             onPressed: () => CustomWindow(
                 height: 500,
                 context: context,
-                title: "Information zur Event Art",
+                title: AppLocalizations.of(context).informationEventArt,
                 children: [
                   SizedBox(height: 10),
                   Container(
@@ -206,10 +206,7 @@ class _EventErstellenState extends State<EventErstellen> {
                       Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
                       SizedBox(width: 5),
                       Expanded(
-                        child: Text("Diese können in der globalen Suche nicht gefunden "
-                            "werden.\nDas teilen funktioniert nur per Link.\nWenn eine "
-                            "Familie interesse hat, muss sie für das Event noch vom "
-                            "Organisator freigegeben werden.",
+                        child: Text(AppLocalizations.of(context).privatInformationText,
                           maxLines: 10,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -222,12 +219,11 @@ class _EventErstellenState extends State<EventErstellen> {
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Container(
                           width: 70,
-                          child: Text("halb-öffentlich",style: TextStyle(fontWeight: FontWeight.bold))
+                          child: Text(AppLocalizations.of(context).halbOeffentlich,style: TextStyle(fontWeight: FontWeight.bold))
                       ),
                       SizedBox(width: 5),
                       Expanded(
-                        child: Text("Diese können überall gefunden werden.\nUm die details "
-                            "von dem Event zu sehen, ist eine Freigabe durch den Organisator nötig.",
+                        child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
                           maxLines: 10,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -238,10 +234,10 @@ class _EventErstellenState extends State<EventErstellen> {
                   Container(
                     margin: EdgeInsets.only(left: 5, right: 5),
                     child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text("öffentlich", style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(AppLocalizations.of(context).oeffentlich, style: TextStyle(fontWeight: FontWeight.bold)),
                       SizedBox(width: 5),
                       Expanded(
-                        child: Text("Diese können überall gefunden und von jedem komplett eingesehen werden",
+                        child: Text(AppLocalizations.of(context).oeffentlichInformationText,
                           maxLines: 10,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -257,7 +253,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
     return Scaffold(
       appBar: customAppBar(
-        title: "Event erstellen",
+        title: AppLocalizations.of(context).eventErstellen,
         buttons: [
           IconButton(
               onPressed: () => saveEvent(),
@@ -268,7 +264,7 @@ class _EventErstellenState extends State<EventErstellen> {
       body: Container(
           child: ListView(
             children: [
-              customTextInput("Eventname", eventNameKontroller,
+              customTextInput("Event Name", eventNameKontroller,
                   validator: global_functions.checkValidatorEmpty(context)
               ),
               Stack(
@@ -282,7 +278,7 @@ class _EventErstellenState extends State<EventErstellen> {
               sprachenAuswahlBox,
               dateAndTimeBox(),
               customTextInput(
-                  "Event Beschreibung",
+                  AppLocalizations.of(context).eventBeschreibung,
                   eventBeschreibungKontroller,
                   moreLines: 8
               ),

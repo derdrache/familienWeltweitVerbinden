@@ -61,10 +61,10 @@ class MyApp extends StatelessWidget {
     if(userLogedIn == null){
       await FirebaseAuth.instance.authStateChanges().first;
       userLogedIn = FirebaseAuth.instance.currentUser;
+      userId = FirebaseAuth.instance.currentUser.uid;
     }
 
     profilExist = await ProfilDatabase().getOneData("name", "id", userId);
-
     if(kIsWeb) return ;
 
 
