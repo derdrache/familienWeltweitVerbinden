@@ -136,7 +136,31 @@
     "linkWurdekopiert": "Link wurde kopiert",
     "familienFreigeben": "Familien freigeben",
     "teilnehmen": "Teilnehmen",
-    "absagen": "Absagen"
+    "absagen": "Absagen",
+    "datum": "Datum: ",
+    "stadt": "Stadt: ",
+    "land": "Land: ",
+    "eventNameAendern": "Event Name ändern",
+    "eventDatumAendern": "Event Datum ändern",
+    "neuesDatumEingeben": "neues Datum eingeben",
+    "eventUhrzeitAendern": "Event Uhrzeit ändern",
+    "neueUhrzeitEingeben" :"neue Uhrzeit eingeben",
+    "eventStadtAendern": "Event Stadt verändern",
+    "neueStadtEingeben": "Neue Stadt eingeben",
+    "eventMapLinkAendern": "Event Kartenlink verändern",
+    "neuenKartenlinkEingeben": "neuen Karten Link eingeben",
+    "eventIntervalAendern": "Event Interval ändern",
+    "eventBeschreibungAendern": "Event Beschreibung ändern",
+    "neueBeschreibungEingeben" : "neue Beschreibung eingeben",
+    "eventOrganisatorMussFreischalten" : "Der Organisator muss dich noch freischalten",
+    "eventInteresseMitgeteilt": "Dein Interesse am Event wurde dem Organisator mitgeteilt",
+    "speichern": "speichern",
+    "abbrechen": "abbrechen",
+    "eventBildAendern": "Event Bild ändern",
+    "neuesDatumAuswaehlen": "Neues Datum auswählen",
+    "neueUhrzeitAuswaehlen": "Neue Uhrzeit auswählen",
+    "eventArtAendern" : "Event Art ändern"
+
 
 
 

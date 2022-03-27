@@ -136,7 +136,30 @@
     "linkWurdekopiert": "Link has been copied",
     "familienFreigeben": "Share families",
     "teilnehmen": "Take part",
-    "absagen": "Refuse"
+    "absagen": "Refuse",
+    "datum": "Date: ",
+    "stadt": "City: ",
+    "land": "Country: ",
+    "eventNameAendern": "Change event name",
+    "eventDatumAendern": "Change event Date",
+    "neuesDatumEingeben": "enter new date",
+    "eventUhrzeitAendern": "Change event time",
+    "neueUhrzeitEingeben": "enter new time",
+    "eventStadtAendern": "Change event city",
+    "neueStadtEingeben": "Enter new city",
+    "eventMapLinkAendern": "Change event map link",
+    "neuenKartenlinkEingeben": "enter new map link",
+    "eventIntervalAendern": "Change event interval",
+    "eventBeschreibungAendern": "Change event description",
+    "neueBeschreibungEingeben" : "enter new description",
+    "eventOrganisatorMussFreischalten" : "The organizer still has to activate you",
+    "eventInteresseMitgeteilt": "Your interest in the event has been sended to the organizer",
+    "speichern": "save",
+    "abbrechen": "cancel",
+    "eventBildAendern": "Change event image",
+    "neuesDatumAuswaehlen": "Select new date",
+    "neueUhrzeitAuswaehlen": "Select new time",
+    "eventArtAendern" : "Change event type"
 
 }
 

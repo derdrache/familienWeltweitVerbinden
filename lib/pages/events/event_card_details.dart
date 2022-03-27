@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
@@ -76,9 +77,9 @@ class EventCardDetails extends StatelessWidget {
                       width: 800,
                       child: ShowDataAndChangeWindow(
                           eventId: event["id"],
-                          windowTitle: "Event Name ändern",
+                          windowTitle: AppLocalizations.of(context).eventNameAendern,
                           rowData: event["name"],
-                          inputHintText: "Event Name eingeben",
+                          inputHintText: AppLocalizations.of(context).neuenNamenEingeben,
                           isCreator: isCreator,
                           modus: "textInput",
                           singleShow: true,
@@ -98,10 +99,10 @@ class EventCardDetails extends StatelessWidget {
           children: [
             ShowDataAndChangeWindow(
                 eventId: event["id"],
-                windowTitle: "Datum ändern",
+                windowTitle: AppLocalizations.of(context).eventDatumAendern,
                 rowTitle: "Datum",
                 rowData: event["wann"].split(" ")[0].split("-").reversed.join("."),
-                inputHintText: "Neues Datum eingeben",
+                inputHintText: AppLocalizations.of(context).neuesDatumEingeben,
                 isCreator: isCreator,
                 modus: "date",
                 oldDate: event["wann"],
@@ -110,10 +111,10 @@ class EventCardDetails extends StatelessWidget {
             const SizedBox(height: 10),
             if(isApproved|| event["art"] == "öffentlich") ShowDataAndChangeWindow(
                 eventId: event["id"],
-                windowTitle: "Uhrzeit ändern",
+                windowTitle: AppLocalizations.of(context).eventUhrzeitAendern,
                 rowTitle: "Uhrzeit",
                 rowData: event["wann"].split(" ")[1].split(":").take(2).join(":") + " Uhr",
-                inputHintText: "Neue Uhrzeit eingeben",
+                inputHintText: AppLocalizations.of(context).neueUhrzeitEingeben,
                 isCreator: isCreator,
                 modus: "dateTime",
                 oldDate: event["wann"],
@@ -122,10 +123,10 @@ class EventCardDetails extends StatelessWidget {
             if(isApproved|| event["art"] == "öffentlich") const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
-                windowTitle: "Stadt verändern",
+                windowTitle: AppLocalizations.of(context).eventStadtAendern,
                 rowTitle: "Ort",
                 rowData: event["stadt"] + ", " + event["land"],
-                inputHintText: "Neue Stadt eingeben",
+                inputHintText: AppLocalizations.of(context).neueStadtEingeben,
                 isCreator: isCreator,
                 modus: "googleAutoComplete",
                 databaseKennzeichnung: "location"
@@ -133,23 +134,21 @@ class EventCardDetails extends StatelessWidget {
             const SizedBox(height: 10),
             if(isApproved|| event["art"] == "öffentlich") ShowDataAndChangeWindow(
                 eventId: event["id"],
-                windowTitle: "Map Link verändern",
+                windowTitle: AppLocalizations.of(context).eventMapLinkAendern,
                 rowTitle: "Map",
                 rowData: event["link"],
-                inputHintText: "Karten Link eingeben",
+                inputHintText: AppLocalizations.of(context).neuenKartenlinkEingeben,
                 isCreator: isCreator,
                 modus: "textInput",
                 databaseKennzeichnung: "link"
             ),
             if(isApproved|| event["art"] == "öffentlich") const SizedBox(height: 10),
-            const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
-                windowTitle: "Event Wiederholung ändern",
+                windowTitle: AppLocalizations.of(context).eventIntervalAendern,
                 isCreator: isCreator,
                 rowTitle: "Häufigkeit",
                 rowData: event["eventInterval"],
-                inputHintText: "Einmalig oder regelmäßig ?",
                 items: global_var.eventInterval,
                 modus: "dropdown",
                 databaseKennzeichnung: "eventInterval"
@@ -170,9 +169,9 @@ class EventCardDetails extends StatelessWidget {
                 ),
                 child: ShowDataAndChangeWindow(
                     eventId: event["id"],
-                    windowTitle: "Event Beschreibung ändern",
+                    windowTitle: AppLocalizations.of(context).eventBeschreibungAendern,
                     rowData: event["beschreibung"],
-                    inputHintText: "Event Beschreibung eingeben",
+                    inputHintText: AppLocalizations.of(context).neueBeschreibungEingeben,
                     isCreator: isCreator,
                     modus: "textInput",
                     multiLines: true,
@@ -185,9 +184,9 @@ class EventCardDetails extends StatelessWidget {
 
     creatorChangeHintBox(){
       if (isCreator){
-        return const Center(
+        return Center(
           child: Text(
-              "Antippen, um Einträge zu ändern",
+              AppLocalizations.of(context).antippenZumAendern,
               style: TextStyle(color: Colors.grey)
           ),
         );
@@ -242,11 +241,11 @@ class EventCardDetails extends StatelessWidget {
                     var isOnList = event["freischalten"].contains(userId);
 
                     if(isOnList) {
-                      customSnackbar(context, "Der Organisator muss dich noch freischalten");
+                      customSnackbar(context, AppLocalizations.of(context).eventOrganisatorMussFreischalten);
                       return;
                     } else{
                       customSnackbar(context,
-                          "Dein Interesse am Event wurde dem Organisator mitgeteilt",
+                          AppLocalizations.of(context).eventInteresseMitgeteilt,
                           color: Colors.green);
 
                       var freischaltenList = await EventDatabase().getOneData("freischalten", event["id"]);
@@ -365,8 +364,8 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     var validationText = "";
 
     if(widget.databaseKennzeichnung == "name"){
-      if(data.isEmpty) validationText = "Bitte einen Namen eingeben";
-      if(data.length > 40) validationText = "Name ist zu lang, höchstens 40 Zeichen";
+      if(data.isEmpty) validationText = AppLocalizations.of(context).bitteNameEingeben;
+      if(data.length > 40) validationText = AppLocalizations.of(context).usernameZuLang;
     }
 
     return validationText;
@@ -434,11 +433,11 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          child: Text("Abbrechen", style: TextStyle(fontSize: fontsize)),
+                          child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
                           onPressed: () => Navigator.pop(context),
                         ),
                         TextButton(
-                            child: Text("Speichern", style: TextStyle(fontSize: fontsize)),
+                            child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
                             onPressed: () => saveChanges()
                         ),
                       ]
@@ -515,7 +514,7 @@ class _ShowImageAndChangeWindowState extends State<ShowImageAndChangeWindow> {
       onTap: !widget.isCreator ? null: () {
         CustomWindow(
             context: context,
-            title: "Event Bild ändern",
+            title: AppLocalizations.of(context).eventBildAendern,
             height: 180,
             children: [
               dropdownInput,
@@ -525,11 +524,11 @@ class _ShowImageAndChangeWindowState extends State<ShowImageAndChangeWindow> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        child: Text("Abbrechen", style: TextStyle(fontSize: fontsize)),
+                        child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
                         onPressed: () => Navigator.pop(context),
                       ),
                       TextButton(
-                          child: Text("Speichern", style: TextStyle(fontSize: fontsize)),
+                          child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
                           onPressed: () => saveChanges()
                       ),
                     ]
@@ -614,7 +613,7 @@ class DateButton extends StatefulWidget {
 class _DateButtonState extends State<DateButton> {
 
   dateBox(){
-    var dateString = "Neues Datum auswählen";
+    var dateString = AppLocalizations.of(context).neuesDatumAuswaehlen;
     if(widget.eventDatum != null){
       var dateFormat = DateFormat('dd.MM.yyyy');
       var dateTime = DateTime(widget.eventDatum.year, widget.eventDatum.month, widget.eventDatum.day);
@@ -638,7 +637,10 @@ class _DateButtonState extends State<DateButton> {
 
   timeBox(){
     return ElevatedButton(
-      child: Text(widget.uhrZeit == null ? "Neue Uhrzeit auswählen" : widget.uhrZeit.format(context)),
+      child: Text(
+          widget.uhrZeit == null ? AppLocalizations.of(context).neueUhrzeitAuswaehlen:
+          widget.uhrZeit.format(context)
+      ),
       onPressed: () async {
         widget.uhrZeit = await showTimePicker(
           context: context,
@@ -743,7 +745,7 @@ class _EventArtButtonState extends State<EventArtButton> {
           onPressed: () => CustomWindow(
               height: 500,
               context: context,
-              title: "Information zur Event Art",
+              title: AppLocalizations.of(context).informationEventArt,
               children: [
                 SizedBox(height: 10),
                 Container(
@@ -752,10 +754,7 @@ class _EventArtButtonState extends State<EventArtButton> {
                     Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(width: 5),
                     Expanded(
-                      child: Text("Diese können in der globalen Suche nicht gefunden "
-                          "werden.\nDas teilen funktioniert nur per Link.\nWenn eine "
-                          "Familie interesse hat, muss sie für das Event noch vom "
-                          "Organisator freigegeben werden.",
+                      child: Text(AppLocalizations.of(context).privatInformationText,
                         maxLines: 10,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -768,12 +767,11 @@ class _EventArtButtonState extends State<EventArtButton> {
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Container(
                         width: 70,
-                        child: Text("halb-öffentlich",style: TextStyle(fontWeight: FontWeight.bold))
+                        child: Text(AppLocalizations.of(context).halbOeffentlich,style: TextStyle(fontWeight: FontWeight.bold))
                     ),
                     SizedBox(width: 5),
                     Expanded(
-                      child: Text("Diese können überall gefunden werden.\nUm die details "
-                          "von dem Event zu sehen, ist eine Freigabe durch den Organisator nötig.",
+                      child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
                         maxLines: 10,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -784,10 +782,10 @@ class _EventArtButtonState extends State<EventArtButton> {
                 Container(
                   margin: EdgeInsets.only(left: 5, right: 5),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text("öffentlich", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(AppLocalizations.of(context).oeffentlich, style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(width: 5),
                     Expanded(
-                      child: Text("Diese können überall gefunden und von jedem komplett eingesehen werden",
+                      child: Text(AppLocalizations.of(context).oeffentlichInformationText,
                         maxLines: 10,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -804,7 +802,6 @@ class _EventArtButtonState extends State<EventArtButton> {
   void initState() {
     eventTypInput = CustomDropDownButton(
       items: global_var.eventArt,
-      hintText: "öffentlich / halb-öffentlich / privat",
       selected: widget.event["art"],
     );
     super.initState();
@@ -812,6 +809,7 @@ class _EventArtButtonState extends State<EventArtButton> {
 
   @override
   Widget build(BuildContext context) {
+
     return Positioned(
       top: 0,
       left: -10,
@@ -820,7 +818,7 @@ class _EventArtButtonState extends State<EventArtButton> {
           Icons.lock : Icons.lock_open, color: Theme.of(context).colorScheme.primary),
         onPressed: () => CustomWindow(
             context: context,
-            title: "Event Art ändern",
+            title: AppLocalizations.of(context).eventArtAendern,
             height: 180,
             children: [
               eventTypInput,
@@ -830,11 +828,11 @@ class _EventArtButtonState extends State<EventArtButton> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        child: Text("Abbrechen", style: TextStyle(fontSize: fontsize)),
+                        child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
                         onPressed: () => Navigator.pop(context),
                       ),
                       TextButton(
-                          child: Text("Speichern", style: TextStyle(fontSize: fontsize)),
+                          child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
                           onPressed: () => eventArtSave()
                       ),
                     ]

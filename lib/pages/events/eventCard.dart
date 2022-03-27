@@ -1,6 +1,7 @@
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
 
@@ -56,10 +57,10 @@ class _EventCardState extends State<EventCard> {
         items: [
           if(!onZusageList) PopupMenuItem(
             child: Row(
-              children: const [
+              children: [
                 Icon(Icons.check_circle),
                 SizedBox(width: 10),
-                Text("Zusagen"),
+                Text(AppLocalizations.of(context).teilnehmen),
               ],
             ),
             onTap: () async{
@@ -84,10 +85,10 @@ class _EventCardState extends State<EventCard> {
           ),
           if(!onAbsageList) PopupMenuItem(
             child: Row(
-              children: const [
+              children:[
                 Icon(Icons.cancel, color: Colors.red,),
                 SizedBox(width: 10),
-                Text("Absagen"),
+                Text(AppLocalizations.of(context).absagen),
               ],
             ),
             onTap: () async{
@@ -176,7 +177,7 @@ class _EventCardState extends State<EventCard> {
                         SizedBox(height: 10),
                         Row(
                           children: [
-                            Text("Date: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
+                            Text(AppLocalizations.of(context).datum, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                             Text(
                                 widget.event["wann"].split(" ")[0].split("-").reversed.join("."),
                                 style: TextStyle(fontSize: fontSize))
@@ -185,14 +186,14 @@ class _EventCardState extends State<EventCard> {
                         SizedBox(height: 5),
                         Row(
                           children: [
-                            Text("Stadt: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
+                            Text(AppLocalizations.of(context).stadt, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                             Text(widget.event["stadt"], style: TextStyle(fontSize: fontSize))
                           ],
                         ),
                         SizedBox(height: 5),
                         Row(
                           children: [
-                            Text("Land: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
+                            Text(AppLocalizations.of(context).land, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                             Text(widget.event["land"], style: TextStyle(fontSize: fontSize))
                           ],
                         ),
