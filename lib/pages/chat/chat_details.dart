@@ -90,7 +90,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   getAndSetChatData() async {
     if (widget.groupChatData != null) {
       widget.chatId = widget.groupChatData["id"];
-      var groupchatUsers = widget.groupChatData["users"];
+      var groupchatUsers = jsonDecode(widget.groupChatData["users"]);
       groupchatUsers.forEach((key, value) {
         if (key != userId) {
           widget.chatPartnerName = value["name"];

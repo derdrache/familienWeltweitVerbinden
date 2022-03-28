@@ -159,7 +159,11 @@
     "eventBildAendern": "Change event image",
     "neuesDatumAuswaehlen": "Select new date",
     "neueUhrzeitAuswaehlen": "Select new time",
-    "eventArtAendern" : "Change event type"
+    "eventArtAendern" : "Change event type",
+    "uhrzeit": "Time: ",
+    "ort": "Location: ",
+    "eventSpracheAendern": "Change event language",
+    "sprache": "Language: "
 
 }
 

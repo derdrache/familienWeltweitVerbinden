@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:familien_suche/pages/create_profil_page.dart';
+import 'package:familien_suche/pages/landing.dart';
+import 'package:familien_suche/pages/login_register_page/create_profil_page.dart';
 import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
+
     if(userLogedIn == null){
       await FirebaseAuth.instance.authStateChanges().first;
       userLogedIn = FirebaseAuth.instance.currentUser;

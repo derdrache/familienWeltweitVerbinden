@@ -406,7 +406,7 @@ class EventDatabase{
     responseBody["absage"] = jsonDecode(responseBody["absage"]);
     responseBody["freischalten"] = jsonDecode(responseBody["freischalten"]);
     responseBody["freigegeben"] = jsonDecode(responseBody["freigegeben"]);
-
+    responseBody["sprache"] = jsonDecode(responseBody["sprache"]);
 
 
     return responseBody;
@@ -426,6 +426,7 @@ class EventDatabase{
       responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
       responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
       responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
+      responseBody[i]["sprache"] = jsonDecode(responseBody[i]["sprache"]);
     }
 
 
@@ -465,6 +466,7 @@ class EventDatabase{
       responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
       responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
       responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
+      responseBody[i]["sprache"] = jsonDecode(responseBody[i]["sprache"]);
     }
 
 
@@ -483,6 +485,7 @@ class EventDatabase{
       responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
       responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
       responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
+      responseBody[i]["sprache"] = jsonDecode(responseBody[i]["sprache"]);
     }
 
     return responseBody;
@@ -501,6 +504,7 @@ class EventDatabase{
       responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
       responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
       responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
+      responseBody[i]["sprache"] = jsonDecode(responseBody[i]["sprache"]);
     }
 
     return responseBody;

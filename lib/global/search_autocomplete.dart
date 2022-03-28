@@ -16,7 +16,6 @@ class SearchAutocomplete extends StatefulWidget {
   var searchKontroller = TextEditingController();
   bool isSearching = false;
   bool withFilter;
-  bool suche;
   String hintText;
   var googleAutocomplete;
   var googleSearchResult;
@@ -50,7 +49,6 @@ class SearchAutocomplete extends StatefulWidget {
     this.onDelete,
     this.withFilter = true,
     this.hintText = "Filter",
-    this.suche = true,
     this.googleAutocomplete = false,
   }) : isDense = !withFilter;
 

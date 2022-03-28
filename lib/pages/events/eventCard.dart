@@ -183,14 +183,14 @@ class _EventCardState extends State<EventCard> {
                                 style: TextStyle(fontSize: fontSize))
                           ],
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 2.5),
                         Row(
                           children: [
                             Text(AppLocalizations.of(context).stadt, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                             Text(widget.event["stadt"], style: TextStyle(fontSize: fontSize))
                           ],
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 2.5),
                         Row(
                           children: [
                             Text(AppLocalizations.of(context).land, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
