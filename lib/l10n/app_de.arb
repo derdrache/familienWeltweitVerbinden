@@ -159,7 +159,12 @@
     "eventBildAendern": "Event Bild ändern",
     "neuesDatumAuswaehlen": "Neues Datum auswählen",
     "neueUhrzeitAuswaehlen": "Neue Uhrzeit auswählen",
-    "eventArtAendern" : "Event Art ändern"
+    "eventArtAendern" : "Event Art ändern",
+    "uhrzeit": "Uhrzeit: ",
+    "ort": "Ort: ",
+    "eventSpracheAendern": "Event Sprache ändern",
+    "sprache": "Sprache: "
+
 
 
 

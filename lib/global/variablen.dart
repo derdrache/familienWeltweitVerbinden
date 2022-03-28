@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+Color borderColorGrey = const Color(0xFFDFDDDD);
+
 List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
   "Auto/Unterkünfte", "Wohnmobile/Camping", "Boot"];
 List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
@@ -8,16 +10,18 @@ List<String> sprachenListe = ["Deutsch", "Englisch"];
 List<String> eventInterval = ["einmalig", "wöchentlich", "monatlich"];
 List<String> eventTyp = ["offline", "online"];
 List<String> eventArt = ["privat", "halb-öffentlich", "öffentlich"];
-List<String> eventBilder = ["Fußball", "Pool", "Spielplatz", "Strand"];
+List<String> eventBilder = ["fußball", "pool", "spielplatz", "strand"];
 
 List<String> reiseartenEnglisch = ["fixed location", "airplane/housing",
   "car/housing","mobile home/camping", "boat"];
 List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldschooling",
   "joint activities", "world Travel", "travel slowly", "travel together"];
 List<String> sprachenListeEnglisch = ["german", "english"];
+List<String> eventIntervalEnglisch = ["once", "weekly", "monthly"];
+List<String> eventTypEnglisch = ["offline", "online"];
+List<String> eventArtEnglisch = ["private", "semi-public", "public"];
+List<String> eventBilderEnglisch = ["soccer", "pool", "playground", "beach"];
 
-
-Color borderColorGrey = const Color(0xFFDFDDDD);
 
 changeGermanToEnglish(list){
   var englishOutputList = [];
@@ -33,9 +37,18 @@ changeGermanToEnglish(list){
     englishList = sprachenListeEnglisch;
   }
   if(list.runtimeType == String && checkList.isEmpty){
-    var index = reisearten.indexOf(list);
-    if(index == -1) return list;
-    return reiseartenEnglisch[index];
+    var reiseartenIndex = reisearten.indexOf(list);
+    var eventBilderIndex = eventBilder.indexOf(list);
+    var eventIntervalIndex = eventInterval.indexOf(list);
+    var eventArtIndex = eventArt.indexOf(list);
+
+    if(reiseartenIndex > -1) return reiseartenEnglisch[reiseartenIndex];
+    if(eventBilderIndex > -1) return eventBilderEnglisch[eventBilderIndex];
+    if(eventIntervalIndex > -1) return eventIntervalEnglisch[eventIntervalIndex];
+    if(eventArtIndex > -1) return eventArtEnglisch[eventArtIndex];
+
+
+    return list;
   }
   if(checkList.isEmpty) return list;
 
@@ -63,10 +76,17 @@ changeEnglishToGerman(list){
   }
 
   if(list.runtimeType == String && checkList.isEmpty){
-    var index = reiseartenEnglisch.indexOf(list);
-    if(index == -1) return list;
+    var reiseartenIndex = reiseartenEnglisch.indexOf(list);
+    var imageBilderIndex = eventBilderEnglisch.indexOf(list);
+    var eventIntervalIndex = eventIntervalEnglisch.indexOf(list);
+    var eventArtIndex = eventArtEnglisch.indexOf(list);
 
-    return reisearten[index];
+    if(reiseartenIndex > -1) return reisearten[reiseartenIndex];
+    if(imageBilderIndex > -1) return eventBilder[imageBilderIndex];
+    if(eventIntervalIndex > -1) return eventInterval[eventIntervalIndex];
+    if(eventArtIndex > -1) return eventArt[eventArtIndex];
+
+    return list;
   }
   if(checkList.isEmpty) return list;
 

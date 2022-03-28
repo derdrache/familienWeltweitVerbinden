@@ -43,14 +43,13 @@ class _EventErstellenState extends State<EventErstellen> {
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
       icon: Icon(Icons.arrow_downward, color: Colors.black,),
-      hintText: AppLocalizations.of(context).spracheAuswaehlen,
       auswahlList: isGerman ?
       global_var.sprachenListe : global_var.sprachenListeEnglisch
     );
 
     ortTypDropdown = CustomDropDownButton(
       hintText: "offline / online",
-      items: global_var.eventTyp,
+      items: isGerman ? global_var.eventTyp : global_var.eventTypEnglisch,
       onChange: () {
         setState(() {
 
@@ -59,8 +58,7 @@ class _EventErstellenState extends State<EventErstellen> {
     );
 
     eventArtDropdown = CustomDropDownButton(
-      hintText: AppLocalizations.of(context).eventArten,
-      items: global_var.eventArt,
+      items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
     );
 
     super.initState();
@@ -132,6 +130,8 @@ class _EventErstellenState extends State<EventErstellen> {
 
   @override
   Widget build(BuildContext context) {
+    sprachenAuswahlBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
+    eventArtDropdown.hintText = AppLocalizations.of(context).eventArten;
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
 
     dateAndTimeBox(){

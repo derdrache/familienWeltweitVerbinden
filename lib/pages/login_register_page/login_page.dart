@@ -8,7 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
-import '../create_profil_page.dart';
+import 'create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
@@ -51,7 +51,16 @@ class _LoginPageState extends State<LoginPage> {
       bool emailVerified = FirebaseAuth.instance.currentUser?.emailVerified?? false;
 
       if(emailVerified){
-        global_functions.changePageForever(context, StartPage());
+        var userId = FirebaseAuth.instance.currentUser.uid;
+        var profilName = await ProfilDatabase().getOneData("name", "id", userId);
+
+        if(profilName != false){
+          global_functions.changePageForever(context, StartPage());
+        } else{
+          global_functions.changePageForever(context, CreateProfilPage());
+        }
+
+
       } else{
         setState(() {
           isLoading = false;
@@ -216,13 +225,8 @@ class _LoginPageState extends State<LoginPage> {
                     } else{
                       global_functions.changePageForever(context, StartPage());
                     }
-
-
-
                   },
-
                 )
-
                  */
               ],
             )

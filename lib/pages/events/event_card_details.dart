@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -14,15 +17,22 @@ import '../../global/variablen.dart' as global_var;
 var userId = FirebaseAuth.instance.currentUser.uid;
 var isWebDesktop = kIsWeb && (defaultTargetPlatform != TargetPlatform.iOS || defaultTargetPlatform != TargetPlatform.android);
 double fontsize = isWebDesktop? 12 : 16;
+var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
 class EventCardDetails extends StatelessWidget {
   var event;
   var offlineEvent;
   var isCreator;
   var isApproved;
+  var isPublic;
 
-  EventCardDetails({Key key, this.event, this.offlineEvent=true, this.isApproved = false}) :
-        isCreator = event["erstelltVon"] == userId;
+  EventCardDetails({Key key,
+    this.event,
+    this.offlineEvent=true,
+    this.isApproved = false
+  }) :
+        isCreator = event["erstelltVon"] == userId,
+        isPublic = event["art"] == "öffentlich" || event["art"] == "public";
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +41,8 @@ class EventCardDetails extends StatelessWidget {
     if(screenWidth > 500) screenWidth = kIsWeb ? 400 : 500;
     double cardWidth = screenWidth / 1.12;//isWebDesktop ? 300 : 450; // Handy 392 => 350: Tablet 768
     double cardHeight = screenHeight / 1.34;
-    
+    event["eventInterval"] = isGerman ? global_var.changeEnglishToGerman(event["eventInterval"]):
+      global_var.changeGermanToEnglish(event["eventInterval"]);
 
     bildAndTitleBox(){
       return Stack(
@@ -43,7 +54,7 @@ class EventCardDetails extends StatelessWidget {
                 id: event["id"],
                 isCreator: isCreator,
                 currentImage: event["bild"],
-                items: ["Fußball", "Pool", "Spielplatz", "Strand"]
+                items: isGerman ? global_var.eventBilder : global_var.eventBilderEnglisch
               ),
               if(!isCreator) Positioned(
                   top: 5,
@@ -100,7 +111,7 @@ class EventCardDetails extends StatelessWidget {
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventDatumAendern,
-                rowTitle: "Datum",
+                rowTitle: AppLocalizations.of(context).datum,
                 rowData: event["wann"].split(" ")[0].split("-").reversed.join("."),
                 inputHintText: AppLocalizations.of(context).neuesDatumEingeben,
                 isCreator: isCreator,
@@ -109,22 +120,22 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "wann"
             ),
             const SizedBox(height: 10),
-            if(isApproved|| event["art"] == "öffentlich") ShowDataAndChangeWindow(
+            if(isApproved|| isPublic) ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventUhrzeitAendern,
-                rowTitle: "Uhrzeit",
-                rowData: event["wann"].split(" ")[1].split(":").take(2).join(":") + " Uhr",
+                rowTitle: AppLocalizations.of(context).uhrzeit,
+                rowData: event["wann"].split(" ")[1].split(":").take(2).join(":"),
                 inputHintText: AppLocalizations.of(context).neueUhrzeitEingeben,
                 isCreator: isCreator,
                 modus: "dateTime",
                 oldDate: event["wann"],
                 databaseKennzeichnung: "wann"
             ),
-            if(isApproved|| event["art"] == "öffentlich") const SizedBox(height: 10),
+            if(isApproved|| isPublic) const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventStadtAendern,
-                rowTitle: "Ort",
+                rowTitle: AppLocalizations.of(context).ort,
                 rowData: event["stadt"] + ", " + event["land"],
                 inputHintText: AppLocalizations.of(context).neueStadtEingeben,
                 isCreator: isCreator,
@@ -132,26 +143,38 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "location"
             ),
             const SizedBox(height: 10),
-            if(isApproved|| event["art"] == "öffentlich") ShowDataAndChangeWindow(
+            if(isApproved|| isPublic) ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventMapLinkAendern,
-                rowTitle: "Map",
+                rowTitle: "Map: ",
                 rowData: event["link"],
                 inputHintText: AppLocalizations.of(context).neuenKartenlinkEingeben,
                 isCreator: isCreator,
                 modus: "textInput",
                 databaseKennzeichnung: "link"
             ),
-            if(isApproved|| event["art"] == "öffentlich") const SizedBox(height: 10),
+            if(isApproved|| isPublic) const SizedBox(height: 10),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventIntervalAendern,
+                inputHintText: "",
                 isCreator: isCreator,
-                rowTitle: "Häufigkeit",
+                rowTitle: "Interval",
                 rowData: event["eventInterval"],
-                items: global_var.eventInterval,
+                items: isGerman ? global_var.eventInterval : global_var.eventIntervalEnglisch,
                 modus: "dropdown",
                 databaseKennzeichnung: "eventInterval"
+            ),
+            ShowDataAndChangeWindow(
+                eventId: event["id"],
+                windowTitle: AppLocalizations.of(context).eventSpracheAendern,
+                inputHintText: "",
+                isCreator: isCreator,
+                rowTitle: AppLocalizations.of(context).sprache,
+                rowData: event["sprache"].join(", "),
+                items: isGerman ? global_var.sprachenListe : global_var.sprachenListeEnglisch,
+                modus: "dropdown",
+                databaseKennzeichnung: "sprache"
             ),
           ],
         ),
@@ -220,12 +243,12 @@ class EventCardDetails extends StatelessWidget {
                 const SizedBox(height: 20),
                 creatorChangeHintBox(),
                 eventInformationBox(),
-                if(isApproved || event["art"] == "öffentlich") eventBeschreibung(),
+                if(isApproved || isPublic) eventBeschreibung(),
                 OrganisatorBox(organisator: event["erstelltVon"],)
               ],
             ),
           ),
-          if(!isApproved && event["art"] != "öffentlich") Container(
+          if(!isApproved && !isPublic) Container(
             width: cardWidth,
             height: cardHeight,
             margin: EdgeInsets.all(20),
@@ -264,7 +287,7 @@ class EventCardDetails extends StatelessWidget {
               ],
             )
           ),
-          EventArtButton(event: event)
+          EventArtButton(event: event, isCreator: isCreator)
         ],
       ),
     );
@@ -487,10 +510,10 @@ class _ShowImageAndChangeWindowState extends State<ShowImageAndChangeWindow> {
   @override
   void initState() {
     var selected = widget.currentImage.split("/").last.split(".")[0];
-    selected = selected[0].toUpperCase() + selected.substring(1);
 
     dropdownInput = CustomDropDownButton(
-      selected: selected,
+      selected: isGerman ? global_var.changeEnglishToGerman(selected) :
+        global_var.changeGermanToEnglish(selected),
       items: widget.items
     );
 
@@ -499,7 +522,9 @@ class _ShowImageAndChangeWindowState extends State<ShowImageAndChangeWindow> {
 
   saveChanges(){
     var selectedImage = dropdownInput.selected;
-    var imageDatei = "assets/bilder/" + selectedImage[0].toLowerCase() + selectedImage.substring(1) + ".jpg";
+    var imageName = selectedImage[0].toLowerCase() + selectedImage.substring(1);
+    var imageNameDeutsch = global_var.changeEnglishToGerman(imageName);
+    var imageDatei = "assets/bilder/" + imageNameDeutsch + ".jpg";
 
     widget.currentImage = imageDatei;
     setState(() {});
@@ -711,8 +736,9 @@ class _InteresseButtonState extends State<InteresseButton> {
 
 class EventArtButton extends StatefulWidget {
   var event;
+  var isCreator;
 
-  EventArtButton({Key key, this.event}) : super(key: key);
+  EventArtButton({Key key, this.event, this.isCreator}) : super(key: key);
 
   @override
   _EventArtButtonState createState() => _EventArtButtonState();
@@ -801,8 +827,9 @@ class _EventArtButtonState extends State<EventArtButton> {
   @override
   void initState() {
     eventTypInput = CustomDropDownButton(
-      items: global_var.eventArt,
-      selected: widget.event["art"],
+      items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
+      selected: isGerman ? global_var.changeEnglishToGerman(widget.event["art"]):
+        global_var.changeGermanToEnglish(widget.event["art"]),
     );
     super.initState();
   }
@@ -811,12 +838,12 @@ class _EventArtButtonState extends State<EventArtButton> {
   Widget build(BuildContext context) {
 
     return Positioned(
-      top: 0,
+      top: -5,
       left: -10,
       child: IconButton(
-        icon: Icon(widget.event["art"] != "öffentlich" ?
+        icon: Icon(widget.event["art"] != "öffentlich" && widget.event["art"] != "public" ?
           Icons.lock : Icons.lock_open, color: Theme.of(context).colorScheme.primary),
-        onPressed: () => CustomWindow(
+        onPressed: !widget.isCreator ? null : () => CustomWindow(
             context: context,
             title: AppLocalizations.of(context).eventArtAendern,
             height: 180,

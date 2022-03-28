@@ -9,7 +9,7 @@ import 'package:in_app_update/in_app_update.dart';
 
 
 import 'news_page.dart';
-import 'create_profil_page.dart';
+import 'login_register_page/create_profil_page.dart';
 import 'erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
@@ -17,9 +17,8 @@ import 'settings/setting_page.dart';
 
 class StartPage extends StatefulWidget{
   var selectedIndex;
-  bool registered;
 
-  StartPage({this.selectedIndex=0, this.registered = false});
+  StartPage({this.selectedIndex=0});
 
   _StartPageState createState() => _StartPageState();
 }

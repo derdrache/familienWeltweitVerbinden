@@ -88,9 +88,6 @@ class _EventPageState extends State<EventPage>{
         padding: EdgeInsets.only(top:10),
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -133,7 +130,7 @@ class _EventPageState extends State<EventPage>{
             children: [
               Expanded(child: meineInteressiertenEventsBox()),
               Expanded(child: meineErstellenEventsBox()),
-              SizedBox(height: 80)
+              SizedBox(height: 30)
             ]
           )
         ),
