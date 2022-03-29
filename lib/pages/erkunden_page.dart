@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:familien_suche/pages/events/eventCard.dart';
+import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -10,7 +13,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../services/database.dart';
-import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_var;
 import '../global/search_autocomplete.dart';
@@ -28,27 +30,19 @@ class _ErkundenPageState extends State<ErkundenPage>{
   List<String> allUserName = [];
   var countriesList = {};
   var filterList = [];
-  var profilsBackup = [];
-  var profils = [];
-  var profilBetweenCountries = [];
-  var profilCountries = [];
-  var profilsBetween = [];
-  var profilsCities = [];
-  var aktiveProfils = [];
-  var events = [];
-  var eventsBetweenCountries = [];
-  var eventsCountries = [];
-  var eventsBetween = [];
-  var eventsCities = [];
-  var aktiveEvents = [];
-  var eventsBackup = [];
+  List profilsBackup = [], profils = [], aktiveProfils = [];
+  List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
+  List eventsBetweenCountries, eventsCountries, eventsBetween, eventsCities;
+  List eventsBackup = [], events = [], aktiveEvents = [];
   double minMapZoom = kIsWeb ? 2.0:  1.6;
   double maxZoom = 9;
   double mapZoom = 1.6;
   double cityZoom = 6.5;
-  dynamic searchAutocomplete = SizedBox.shrink();
+  dynamic searchAutocomplete = const SizedBox.shrink();
   var mapPosition;
   bool buildLoaded = false;
+  bool popupActive = false;
+  List<Widget> popupItems = [];
 
 
   @override
@@ -311,8 +305,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
 
     setState(() {
-      aktiveProfils = choosenProfils;
-      aktiveEvents = selectedEventList;
+      aktiveProfils = choosenProfils ?? [];
+      aktiveEvents = selectedEventList ?? [];
     });
   }
 
@@ -417,48 +411,17 @@ class _ErkundenPageState extends State<ErkundenPage>{
   Widget build(BuildContext context){
     List<Marker> allMarker = [];
 
-    markerPopupWindow({profil, event}){
+    createPopupProfils(profil){
+      popupItems = [];
 
-      List<Widget> createPopupProfils(){
-        List<Widget> profilsList = [SizedBox(height: 10)];
-
-        childrenAgeStringToStringAge(childrenAgeList){
-          List yearChildrenAgeList = [];
-          childrenAgeList.forEach((child){
-            var childYears = global_functions.ChangeTimeStamp(child).intoYears();
-            yearChildrenAgeList.add(childYears.toString() + "J");
-          });
-
-          return yearChildrenAgeList.join(" , ");
-        }
-
-
-        profil["profils"].forEach((profil){
-          profilsList.add(
-            GestureDetector(
-              onTap: () {
-                global_functions.changePage(context, ShowProfilPage(
-                  userName: ownProfil["name"],
-                  profil: profil,
-                ));
-              },
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border(top: BorderSide(width: 1, color: global_var.borderColorGrey))
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(profil["name"], style: TextStyle(fontWeight: FontWeight.bold),),
-                    Text(AppLocalizations.of(context).kinder +" :" + childrenAgeStringToStringAge(profil["kinder"]))
-                  ]
-                )
-              ),
-            )
-          );
+      childrenAgeStringToStringAge(childrenAgeList){
+        List yearChildrenAgeList = [];
+        childrenAgeList.forEach((child){
+          var childYears = global_functions.ChangeTimeStamp(child).intoYears();
+          yearChildrenAgeList.add(childYears.toString() + "J");
         });
-        return profilsList;
+
+        return yearChildrenAgeList.join(" , ");
       }
 
       createWindowTitle(list, filter){
@@ -469,16 +432,67 @@ class _ErkundenPageState extends State<ErkundenPage>{
         }
 
         return titleList.join(" / ");
-
       }
 
+      popupItems.add(
+          Container(
+            alignment: Alignment.center,
+            child: Text(
+                mapZoom > cityZoom ? createWindowTitle(profil["profils"], "ort") :
+                createWindowTitle(profil["profils"], "land"),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+            )
+          )
+      );
 
-      return CustomWindow(
-          context: context,
-          title: mapZoom > cityZoom ? createWindowTitle(profil["profils"], "ort") :
-              createWindowTitle(profil["profils"], "land"),
-          children: createPopupProfils());
 
+
+      profil["profils"].forEach((profil){
+        popupItems.add(
+            GestureDetector(
+              onTap: () {
+                global_functions.changePage(context, ShowProfilPage(
+                  userName: ownProfil["name"],
+                  profil: profil,
+                ));
+              },
+              child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
+                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(profil["name"], style: const TextStyle(fontWeight: FontWeight.bold),),
+                        Text(AppLocalizations.of(context).kinder +" :" + childrenAgeStringToStringAge(profil["kinder"]))
+                      ]
+                  )
+              ),
+            )
+        );
+      });
+
+      setState(() {
+
+      });
+    }
+
+    createPopupEvents(event){
+      popupItems = [];
+
+      for(var event in event["profils"]){
+        popupItems.add(
+            EventCard(event: event, withInteresse: true)
+        );
+      }
+
+      popupItems = [Wrap(alignment: WrapAlignment.center, children: popupItems)];
+      // kann geändert werden wenn Profils auch Karten sind
+
+      setState(() {
+
+      });
     }
 
     Marker profilMarker(numberText, position,  buttonFunction){
@@ -510,17 +524,65 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 top:9.5,
                 left:5.5,
                 child: Container(
-                  padding: EdgeInsets.only( left:2, top: 1),
+                  padding: const EdgeInsets.only( left:2, top: 1),
                   width: 21.5,
                   height: 18,
                   color: Colors.white,
-                    child: Center(child: Text(numberText, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14, color: Colors.black)))
+                    child: Center(child: Text(numberText, style: const TextStyle(fontWeight: FontWeight.bold,fontSize: 14, color: Colors.black)))
                 )
               )
             ],
           ),
           onPressed: buttonFunction,
         ),
+      );
+    }
+
+    markerPopupContainer(){
+      return Positioned.fill(
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.25,
+            minChildSize: 0.2,
+            maxChildSize: 0.5,
+              builder: (context, controller){
+                return Stack(
+                  clipBehavior: Clip.none, children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                      child: Container(
+                          color: Colors.white,
+                          child: ListView(
+                            padding: const EdgeInsets.only(top:5),
+                            controller: controller,
+                            children: popupItems
+                          ),
+                      ),
+                    ),
+                    Positioned(
+                      top: -5,
+                      right: -10,
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.red,),
+                          onPressed: (){
+                            setState(() {
+                              popupActive = false;
+                            });
+                          },
+                        )
+                    ),
+                    if(mapZoom > minMapZoom) Positioned(
+                      top: -65,
+                      right: 0,
+                      child: FloatingActionButton(
+                          heroTag: "zoom out",
+                          child: const Icon(Icons.zoom_out_map),
+                          onPressed: () => zoomOut()
+                      ),
+                    ),
+                  ],
+                );
+              }
+          )
       );
     }
 
@@ -550,7 +612,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 profil["name"],
                 position,
                 () {
-                  markerPopupWindow(profil: profil);
+                  popupActive = true;
+                  createPopupProfils(profil);
                   zoomAtPoint(position);
                 }
             )
@@ -582,7 +645,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
           markerList.add(
               eventMarker(event["name"], position, (){
-                markerPopupWindow(event: event);
+                popupActive = true;
+                createPopupEvents(event);
                 zoomAtPoint(position);
               })
           );
@@ -633,15 +697,18 @@ class _ErkundenPageState extends State<ErkundenPage>{
       child: Stack(children: [
         ownFlutterMap(),
         searchAutocomplete,
-        if(mapZoom > minMapZoom) Positioned(
+        if(popupActive) markerPopupContainer(),
+        if(mapZoom > minMapZoom && !popupActive) Positioned(
           bottom: 10,
           right: 10,
           child: FloatingActionButton(
-              child: Icon(Icons.zoom_out_map),
+              heroTag: "zoom out 1",
+              child: const Icon(Icons.zoom_out_map),
               onPressed: () => zoomOut()
           ),
-        )
+        ),
       ]),
+
     );
 
   }
