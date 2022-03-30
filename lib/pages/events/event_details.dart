@@ -400,7 +400,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   event: widget.event,
                   isApproved: isApproved,
                 ),
-                if(isApproved || widget.event["art"] == "Öffentlich") teilnahmeButtonBox(),
+                if(isApproved || widget.event["art"] == "öffentlich" ||
+                    widget.event["art"] == "public") teilnahmeButtonBox(),
               ],
             ),
     );

@@ -113,7 +113,7 @@ class EventCardDetails extends StatelessWidget {
                 oldDate: event["wann"],
                 databaseKennzeichnung: "wann"
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             if(isApproved|| isPublic) ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventUhrzeitAendern,
@@ -125,7 +125,7 @@ class EventCardDetails extends StatelessWidget {
                 oldDate: event["wann"],
                 databaseKennzeichnung: "wann"
             ),
-            if(isApproved|| isPublic) const SizedBox(height: 10),
+            if(isApproved|| isPublic) const SizedBox(height: 5),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventStadtAendern,
@@ -136,7 +136,7 @@ class EventCardDetails extends StatelessWidget {
                 modus: "googleAutoComplete",
                 databaseKennzeichnung: "location"
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             if(isApproved|| isPublic) ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventMapLinkAendern,
@@ -147,7 +147,7 @@ class EventCardDetails extends StatelessWidget {
                 modus: "textInput",
                 databaseKennzeichnung: "link"
             ),
-            if(isApproved|| isPublic) const SizedBox(height: 10),
+            if(isApproved|| isPublic) const SizedBox(height: 5),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventIntervalAendern,
@@ -159,6 +159,7 @@ class EventCardDetails extends StatelessWidget {
                 modus: "dropdown",
                 databaseKennzeichnung: "eventInterval"
             ),
+            const SizedBox(height: 5),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventSpracheAendern,
