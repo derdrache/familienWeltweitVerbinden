@@ -132,7 +132,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     var usersAllNewMessages =
         await ProfilDatabase().getOneData("newMessages", "id", userId);
-    usersAllNewMessages = int.parse(usersAllNewMessages);
+    usersAllNewMessages = usersAllNewMessages;
 
     ProfilDatabase().updateProfil(
         userId,
@@ -240,11 +240,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   child: EventCard(
                     withInteresse: true,
                     event: eventCardList[eventCardCounter],
+                    afterPageVisit: () => setState((){}),
+                    /*
                     changePage: () => global_functions.changePage(context,
                         EventDetailsPage(event: eventCardList[eventCardCounter])),
+
+                     */
                   ),
                 )
             );
+            eventCardCounter += 1;
             continue;
           }
           eventCardCounter += 1;

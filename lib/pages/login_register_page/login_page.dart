@@ -124,6 +124,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     double sideSpace = 20;
+    var screensize = MediaQuery. of(context).size;
 
     Widget header(){
       return Container(
@@ -134,7 +135,10 @@ class _LoginPageState extends State<LoginPage> {
                 child: Image.asset('assets/WeltFlugzeug.png')
             ),
             SizedBox(height: 15),
-            Text(AppLocalizations.of(context).willkommenBeiAppName, style: TextStyle(fontSize: 20),)
+            Text(AppLocalizations.of(context).willkommenBeiAppName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            SizedBox(height: 20),
+            Text("Die Vernetzungsapp für Reise- und Auswanderfamilien"),
+            Text("Schnell und einfach, auf der ganzen Welt, Familien finden und treffen")
           ],
         )
 

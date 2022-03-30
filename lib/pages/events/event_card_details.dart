@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
@@ -187,7 +188,7 @@ class EventCardDetails extends StatelessWidget {
           child: Center(
               child: Container(
                 width: double.infinity,
-                constraints: new BoxConstraints(
+                constraints: const BoxConstraints(
                   minHeight: 25.0,
                 ),
                 child: ShowDataAndChangeWindow(
@@ -210,7 +211,7 @@ class EventCardDetails extends StatelessWidget {
         return Center(
           child: Text(
               AppLocalizations.of(context).antippenZumAendern,
-              style: TextStyle(color: Colors.grey)
+              style: const TextStyle(color: Colors.grey)
           ),
         );
       }
@@ -223,7 +224,7 @@ class EventCardDetails extends StatelessWidget {
           Container(
             width: cardWidth,
             height: cardHeight,
-            margin: EdgeInsets.all(20),
+            margin: const EdgeInsets.all(20),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
@@ -232,7 +233,7 @@ class EventCardDetails extends StatelessWidget {
                     color: Colors.grey.withOpacity(0.6),
                     spreadRadius: 12,
                     blurRadius: 7,
-                    offset: Offset(0, 3), // changes position of shadow
+                    offset: const Offset(0, 3), // changes position of shadow
                   ),
                 ]
             ),
@@ -251,7 +252,7 @@ class EventCardDetails extends StatelessWidget {
           if(!isApproved && !isPublic) Container(
             width: cardWidth,
             height: cardHeight,
-            margin: EdgeInsets.all(20),
+            margin: const EdgeInsets.all(20),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.grey.withOpacity(0.6),
@@ -264,7 +265,9 @@ class EventCardDetails extends StatelessWidget {
                     var isOnList = event["freischalten"].contains(userId);
 
                     if(isOnList) {
-                      customSnackbar(context, AppLocalizations.of(context).eventOrganisatorMussFreischalten);
+                      customSnackbar(context,
+                          AppLocalizations.of(context).eventOrganisatorMussFreischalten,
+                          color: Colors.green);
                       return;
                     } else{
                       customSnackbar(context,
@@ -280,10 +283,10 @@ class EventCardDetails extends StatelessWidget {
                       EventDatabase().updateOne(event["id"], "interesse", interessenList);
                     }
                   } ,
-                  child: Icon(Icons.add_circle, size: 80, color: Colors.black,)
+                  child: const Icon(Icons.add_circle, size: 80, color: Colors.black,)
                 ),
-                Text(""),
-                SizedBox(height: 40,)
+                const Text(""),
+                const SizedBox(height: 40,)
               ],
             )
           ),
@@ -389,6 +392,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     if(widget.databaseKennzeichnung == "name"){
       if(data.isEmpty) validationText = AppLocalizations.of(context).bitteNameEingeben;
       if(data.length > 40) validationText = AppLocalizations.of(context).usernameZuLang;
+    }else if(widget.databaseKennzeichnung == "link"){
+      if(data.substring(0,3) != "http" || data.substring(0,3) != "www.")
+        validationText = "Eingabe ist kein Link";
     }
 
     return validationText;
@@ -451,7 +457,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
               children: [
                 inputBox(),
                 Container(
-                  margin: EdgeInsets.only(right: 10),
+                  margin: const EdgeInsets.only(right: 10),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -473,7 +479,25 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
           children: [
             Text(widget.rowTitle + " ", style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold)),
             const Expanded(child: const SizedBox.shrink()),
-            Text(widget.rowData, style: TextStyle(fontSize: fontsize))
+            InkWell(
+                child: Container(
+                  width: 200,
+                  child: Text(
+                    widget.rowData,
+                    style: TextStyle(
+                        fontSize: fontsize,
+                        color: widget.databaseKennzeichnung != "link" ?
+                          Colors.black : Colors.blue
+                    ),
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              onTap: widget.databaseKennzeichnung != "link" ? null : (){
+                  launch(widget.rowData);
+              },
+            )
           ],
         ):
         Text(
@@ -544,7 +568,7 @@ class _ShowImageAndChangeWindowState extends State<ShowImageAndChangeWindow> {
             children: [
               dropdownInput,
               Container(
-                margin: EdgeInsets.only(right: 10),
+                margin: const EdgeInsets.only(right: 10),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -583,7 +607,7 @@ class OrganisatorBox extends StatefulWidget {
 }
 
 class _OrganisatorBoxState extends State<OrganisatorBox> {
-  var organisatorText = Text("");
+  var organisatorText = const Text("");
   var organisatorProfil;
   var ownName = FirebaseAuth.instance.currentUser.displayName;
 
@@ -599,7 +623,7 @@ class _OrganisatorBoxState extends State<OrganisatorBox> {
     setState(() {
       organisatorText = Text(
           organisatorProfil["name"],
-          style: TextStyle(color: Colors.grey)
+          style: const TextStyle(color: Colors.grey)
       );
     });
   }
@@ -615,7 +639,7 @@ class _OrganisatorBoxState extends State<OrganisatorBox> {
       },
       child: Container(
         alignment: Alignment.centerRight,
-        margin: EdgeInsets.all(20),
+        margin: const EdgeInsets.all(20),
         child: organisatorText
       ),
     );
@@ -669,7 +693,7 @@ class _DateButtonState extends State<DateButton> {
       onPressed: () async {
         widget.uhrZeit = await showTimePicker(
           context: context,
-          initialTime: TimeOfDay(hour: 12, minute: 00),
+          initialTime: const TimeOfDay(hour: 12, minute: 00),
         );
 
         setState(() {
@@ -682,7 +706,7 @@ class _DateButtonState extends State<DateButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: widget.getDate ? dateBox() : timeBox(),
     );
   }
@@ -767,18 +791,18 @@ class _EventArtButtonState extends State<EventArtButton> {
         top: -15,
         left:10,
         child: IconButton(
-          icon: Icon(Icons.help,size: 15),
+          icon: const Icon(Icons.help,size: 15),
           onPressed: () => CustomWindow(
               height: 500,
               context: context,
               title: AppLocalizations.of(context).informationEventArt,
               children: [
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Container(
-                  margin: EdgeInsets.only(left: 5, right: 5),
+                  margin: const EdgeInsets.only(left: 5, right: 5),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
-                    SizedBox(width: 5),
+                    const Text("privat       ", style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 5),
                     Expanded(
                       child: Text(AppLocalizations.of(context).privatInformationText,
                         maxLines: 10,
@@ -787,15 +811,15 @@ class _EventArtButtonState extends State<EventArtButton> {
                     )
                   ]),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Container(
-                  margin: EdgeInsets.only(left: 5, right: 5),
+                  margin: const EdgeInsets.only(left: 5, right: 5),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Container(
                         width: 70,
-                        child: Text(AppLocalizations.of(context).halbOeffentlich,style: TextStyle(fontWeight: FontWeight.bold))
+                        child: Text(AppLocalizations.of(context).halbOeffentlich,style: const TextStyle(fontWeight: FontWeight.bold))
                     ),
-                    SizedBox(width: 5),
+                    const SizedBox(width: 5),
                     Expanded(
                       child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
                         maxLines: 10,
@@ -804,12 +828,12 @@ class _EventArtButtonState extends State<EventArtButton> {
                     )
                   ]),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Container(
-                  margin: EdgeInsets.only(left: 5, right: 5),
+                  margin: const EdgeInsets.only(left: 5, right: 5),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(AppLocalizations.of(context).oeffentlich, style: TextStyle(fontWeight: FontWeight.bold)),
-                    SizedBox(width: 5),
+                    Text(AppLocalizations.of(context).oeffentlich, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 5),
                     Expanded(
                       child: Text(AppLocalizations.of(context).oeffentlichInformationText,
                         maxLines: 10,
@@ -850,7 +874,7 @@ class _EventArtButtonState extends State<EventArtButton> {
             children: [
               eventTypInput,
               Container(
-                margin: EdgeInsets.only(right: 10),
+                margin: const EdgeInsets.only(right: 10),
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

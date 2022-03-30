@@ -279,6 +279,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         );
       }
 
+
+      if(widget.event["freischalten"].length == 0) freizugebenListe.add(
+        Container(
+          child: Text("keine Familien zum Freigeben vorhanden", style: TextStyle(color: Colors.grey),),
+        )
+      );
+
       return freizugebenListe;
     }
 
@@ -360,10 +367,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         appBar: customAppBar(
             title: "",
             buttons: [
-              if(isCreator && widget.event["art"] != "Öffentlich") TextButton(
+              if(isCreator && (widget.event["art"] != "öffentlich" && widget.event["art"] != "public")) TextButton(
                 style: global_style.textButtonStyle(),
                 child: const Icon(Icons.event_available),
-                onPressed: () => userfreischalteWindow(),
+                onPressed: () => userfreischalteWindow()
+
               ),
               TextButton(
                 style: global_style.textButtonStyle(),
@@ -386,7 +394,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             ]
         ),
         body:
-            Column(
+            ListView(
               children: [
                 EventCardDetails(
                   event: widget.event,
