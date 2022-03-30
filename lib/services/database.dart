@@ -536,32 +536,46 @@ sendChatNotification(chatId, messageData) async {
   if(toActiveChat == chatId) return;
 
 
-  var url = Uri.parse(databaseUrl + "services/sendNotification.php");
   var chatPartnerName = await ProfilDatabase().getOneData("name", "id", messageData["von"]);
-
   var toToken = await ProfilDatabase().getOneData("token", "id", messageData["zu"]);
 
-  await http.post(url, body: json.encode({
-    "to": toToken,
+  var notificationInformation = {
+    "toId": messageData["zu"],
+    "token": toToken,
     "title": chatPartnerName,
     "inhalt": messageData["message"],
     "changePageId": chatId,
     "apiKey": firebaseWebKey,
     "typ" : "chat"
-  }));
+  };
+
+  sendNotification(notificationInformation);
+
+
 }
 
 sendNotification(notificationInformation) async {
   //neu
-  var url = Uri.parse(databaseUrl + "services/sendNotification.php");
-  http.post(url, body: json.encode({
-    "to": notificationInformation["to"],
-    "title": notificationInformation["title"],
-    "inhalt": notificationInformation["inhalt"],
-    "changePageId": notificationInformation["changePageId"],
-    "apiKey": firebaseWebKey,
-    "typ": notificationInformation["typ"]
-  }));
+    if(notificationInformation["token"] == "" || notificationInformation["token"] == null){
+      var emailAdresse = await ProfilDatabase().getOneData("email", "id", notificationInformation["toId"]);
+      var url = Uri.parse(databaseUrl + "services/sendEmail.php");
+      http.post(url, body: json.encode({
+        "to": emailAdresse,
+        "title": notificationInformation["title"],
+        "inhalt": notificationInformation["inhalt"],
+      }));
+
+    }else{
+      var url = Uri.parse(databaseUrl + "services/sendNotification.php");
+      http.post(url, body: json.encode({
+        "to": notificationInformation["token"],
+        "title": notificationInformation["title"],
+        "inhalt": notificationInformation["inhalt"],
+        "changePageId": notificationInformation["changePageId"],
+        "apiKey": firebaseWebKey,
+        "typ": notificationInformation["typ"]
+      }));
+    }
 
 }
 

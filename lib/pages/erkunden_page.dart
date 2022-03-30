@@ -42,6 +42,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   bool buildLoaded = false;
   bool popupActive = false;
   List<Widget> popupItems = [];
+  var lastEventPopup;
 
 
   @override
@@ -491,21 +492,29 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
 
       for(var event in event["profils"]){
-        print("refresh");
         popupItems.add(
             EventCard(
               margin: EdgeInsets.only(top: 15, bottom: 15, left: 10, right: 10),
               event: event,
               withInteresse: true,
-              afterPageVisit: () async{
+              afterPageVisit: () async {
                 events = await EventDatabase().getEvents("art != 'privat' AND art != 'private'");
+                var refreshEvents = [];
 
-                popupActive = true;
-                createPopupEvents(event);
-                zoomAtPoint(mapPosition);
+                for(var oldEvent in lastEventPopup["profils"]){
+                  for(var newEvents in events){
+                    if(oldEvent["id"] == newEvents["id"]){
+                      refreshEvents.add(newEvents);
+                    }
+                  }
+                }
+
+                lastEventPopup["profils"] = refreshEvents;
+                createPopupEvents(lastEventPopup);
                 setState(() {
 
                 });
+
               }
             )
         );
@@ -682,6 +691,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
           markerList.add(
               eventMarker(event["name"], position, (){
+                lastEventPopup = event;
                 popupActive = true;
                 createPopupEvents(event);
                 zoomAtPoint(position);
