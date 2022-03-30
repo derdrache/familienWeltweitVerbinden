@@ -280,7 +280,7 @@ class ChatDatabase{
     if(users is String) users = jsonDecode(chatgroupData["users"]);
     users = users.keys.toList();
     var chatID = global_functions.getChatID(users);
-    var date = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+    var date = DateTime.now().millisecondsSinceEpoch;
 
     messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
 

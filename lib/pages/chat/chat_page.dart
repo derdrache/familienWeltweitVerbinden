@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 import '../../services/database.dart';
 import '../../global/custom_widgets.dart';
@@ -205,7 +206,6 @@ class _ChatPageState extends State<ChatPage>{
 
   @override
   Widget build(BuildContext context){
-
     chatUserList(groupdata) {
       List<Widget> groupContainer = [];
 
@@ -222,7 +222,7 @@ class _ChatPageState extends State<ChatPage>{
         var lastMessage = cutMessage(group["lastMessage"]);
 
         var ownChatNewMessages = users[userId]["newMessages"];
-        var lastMessageTime = dbSecondsToTimeString(json.decode(group["lastMessageDate"]));
+        var lastMessageTime = DateTime.fromMillisecondsSinceEpoch(int.parse(group["lastMessageDate"]));
 
         groupContainer.add(
           GestureDetector(
@@ -247,7 +247,7 @@ class _ChatPageState extends State<ChatPage>{
                     children: [
                       Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       const Expanded(child: SizedBox.shrink()),
-                      Text(lastMessageTime, style: TextStyle(color: Colors.grey[600]))
+                      Text(DateFormat('dd-MM hh:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600]))
                     ],
                   ),
                   const SizedBox(height: 10),

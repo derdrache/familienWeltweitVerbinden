@@ -163,7 +163,8 @@
     "uhrzeit": "Time: ",
     "ort": "Location: ",
     "eventSpracheAendern": "Change event language",
-    "sprache": "Language: "
+    "sprache": "Language: ",
+    "eingabeKeinLink": "Input is not a link"
 
 }
 

@@ -90,7 +90,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getAndSetEvents()async{
-    events = await EventDatabase().getEvents("art != 'privat'");
+    events = await EventDatabase().getEvents("art != 'privat' AND art != 'private'");
     eventsBackup = events;
     createAndSetZoomEvents();
   }
@@ -389,7 +389,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   zoomOut(){
-    print("test");
     var newZoom;
     if(mapZoom > 6.6){
       newZoom = 6.6;
@@ -492,20 +491,21 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
 
       for(var event in event["profils"]){
-        print("test");
+        print("refresh");
         popupItems.add(
             EventCard(
               margin: EdgeInsets.only(top: 15, bottom: 15, left: 10, right: 10),
               event: event,
               withInteresse: true,
-              afterPageVisit: (){
-                getAndSetEvents();
+              afterPageVisit: () async{
+                events = await EventDatabase().getEvents("art != 'privat' AND art != 'private'");
 
+                popupActive = true;
+                createPopupEvents(event);
+                zoomAtPoint(mapPosition);
                 setState(() {
-                  popupActive = false;
-                  popupActive = true;
-                });
 
+                });
               }
             )
         );
@@ -513,10 +513,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       popupItems = [Wrap(spacing: 10, alignment: WrapAlignment.center, children: popupItems)];
       // kann geändert werden wenn Profils auch Karten sind
-
-      setState(() {
-
-      });
     }
 
     Marker profilMarker(numberText, position,  buttonFunction){
@@ -563,52 +559,52 @@ class _ErkundenPageState extends State<ErkundenPage>{
       );
     }
 
-    test(){
-      setState(() {
-
-      });
-    }
-
     markerPopupContainer(){
       return Positioned.fill(
           child: DraggableScrollableSheet(
-            initialChildSize: 0.25,
-            minChildSize: 0.2,
-            maxChildSize: 0.5,
+            snap: true,
+            initialChildSize: 0.4,
+            minChildSize: 0.25,
+            maxChildSize: 0.6,
               builder: (context, controller){
                 return Stack(
-                  clipBehavior: Clip.none, children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                      child: Container(
-                          color: Colors.white,
-                          child: ScrollConfiguration(
-                            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                              PointerDeviceKind.touch,
-                              PointerDeviceKind.mouse,
-                            }),
-                            child: ListView(
-                              padding: const EdgeInsets.only(top:5),
-                              controller: controller,
-                              children: popupItems
-                            ),
-                          ),
+                  alignment: Alignment.topCenter,
+                  clipBehavior: Clip.none,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top:60),
+                      child: ClipRRect(
+                       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                       child: Container(
+                           color: Colors.white,
+                           child: ScrollConfiguration(
+                             behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                               PointerDeviceKind.touch,
+                               PointerDeviceKind.mouse,
+                             }),
+                             child: ListView(
+                               padding: const EdgeInsets.only(top:5),
+                               controller: controller,
+                               children: popupItems
+                             ),
+                           ),
+                       ),
                       ),
                     ),
                     Positioned(
-                      top: -5,
-                      right: -5,
-                        child: IconButton(
-                          icon: const Icon(Icons.close, color: Colors.red,),
-                          onPressed: (){
-                            setState(() {
-                              popupActive = false;
-                            });
-                          },
-                        )
+                      right: 0,
+                      top: 55,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.red,),
+                        onPressed: (){
+                          setState(() {
+                            popupActive = false;
+                          });
+                        },
+                      ),
                     ),
                     if(mapZoom > minMapZoom) Positioned(
-                      top: -65,
+                      top: 0,
                       right: 0,
                       child: FloatingActionButton(
                           heroTag: "zoom out",
@@ -689,9 +685,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 popupActive = true;
                 createPopupEvents(event);
                 zoomAtPoint(position);
-                setState(() {
-
-                });
               })
           );
         //}

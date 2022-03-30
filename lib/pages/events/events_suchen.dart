@@ -140,15 +140,6 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
                 setState(() {});
               }
-              /*
-              changePage: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => EventDetailsPage(
-                      event: event
-                  )
-                  )).whenComplete(() => setState(() {})),
-
-               */
             )
         );
       }
