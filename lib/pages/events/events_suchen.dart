@@ -135,12 +135,20 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
               margin: EdgeInsets.only(top: 10 , bottom: 10, left: 15, right: 15),
               withInteresse: true,
               event: event,
+              afterPageVisit: () async {
+                eventsBackup = allEvents = await EventDatabase().getEvents("art != 'privat' AND erstelltVon != '"+userId+"'");
+
+                setState(() {});
+              }
+              /*
               changePage: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => EventDetailsPage(
                       event: event
                   )
                   )).whenComplete(() => setState(() {})),
+
+               */
             )
         );
       }

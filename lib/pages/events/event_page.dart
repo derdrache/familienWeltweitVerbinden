@@ -28,12 +28,16 @@ class _EventPageState extends State<EventPage>{
             EventCard(
               event: event,
               withInteresse: withInteresse,
+              afterPageVisit: ()=> setState(() {})
+              /*
               changePage: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => EventDetailsPage(
                     event: event
                   )
                   )).whenComplete(() => setState(() {})),
+
+               */
             )
         );
       }
@@ -43,7 +47,7 @@ class _EventPageState extends State<EventPage>{
 
     meineInteressiertenEventsBox(){
       return Container(
-        padding: EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 10),
         width: double.infinity,
         decoration: BoxDecoration(
             border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
@@ -52,10 +56,10 @@ class _EventPageState extends State<EventPage>{
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-                margin: EdgeInsets.only(left: 10),
+                margin: const EdgeInsets.only(left: 10),
                 child: Text(
                   AppLocalizations.of(context).favoritenEvents,
-                  style: TextStyle(fontSize: 20),
+                  style: const TextStyle(fontSize: 20),
                 )
             ),
             FutureBuilder(
@@ -75,7 +79,7 @@ class _EventPageState extends State<EventPage>{
                       ),
                     );
                   }
-                  return SizedBox.shrink();
+                  return const SizedBox.shrink();
                 }
             )
           ],
@@ -85,17 +89,17 @@ class _EventPageState extends State<EventPage>{
 
     meineErstellenEventsBox(){
       return Container(
-        padding: EdgeInsets.only(top:10),
+        padding: const EdgeInsets.only(top:10),
         width: double.infinity,
         height: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: EdgeInsets.only(left: 10),
+              margin: const EdgeInsets.only(left: 10),
               child: Text(
                 AppLocalizations.of(context).meineEvents,
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
               )
             ),
             FutureBuilder(
@@ -115,7 +119,7 @@ class _EventPageState extends State<EventPage>{
                       ),
                   );
                 }
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               }
             )
           ],
@@ -130,7 +134,7 @@ class _EventPageState extends State<EventPage>{
             children: [
               Expanded(child: meineInteressiertenEventsBox()),
               Expanded(child: meineErstellenEventsBox()),
-              SizedBox(height: 30)
+              const SizedBox(height: 30)
             ]
           )
         ),
@@ -139,14 +143,17 @@ class _EventPageState extends State<EventPage>{
           children: [
             FloatingActionButton(
               heroTag: "event suchen",
-              child: Icon(Icons.search),
-              onPressed: () => global_functions.changePage(context, EventsSuchenPage())
+              child: const Icon(Icons.search),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EventsSuchenPage()
+                  )).whenComplete(() => setState(() {}))
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             FloatingActionButton(
               heroTag: "event hinzufügen",
-              child: Icon(Icons.add),
-              onPressed: () => global_functions.changePage(context, EventErstellen())
+              child: const Icon(Icons.add),
+              onPressed: () => global_functions.changePage(context, const EventErstellen())
             ),
           ],
         ),

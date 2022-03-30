@@ -552,6 +552,7 @@ sendChatNotification(chatId, messageData) async {
 }
 
 sendNotification(notificationInformation) async {
+  //neu
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
   http.post(url, body: json.encode({
     "to": notificationInformation["to"],

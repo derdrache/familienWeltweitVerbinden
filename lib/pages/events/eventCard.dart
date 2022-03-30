@@ -3,21 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'event_details.dart';
+
 var userId = FirebaseAuth.instance.currentUser.uid;
 
 class EventCard extends StatefulWidget {
   var margin;
   var event;
   var withInteresse;
-  var changePage;
+  var afterPageVisit;
+  var isCreator;
 
   EventCard({
     Key key,
     this.event,
     this.withInteresse = false,
     this.margin = const EdgeInsets.only(top:10, bottom: 10, right: 10, left: 10),
-    this.changePage,
-  });
+    this.afterPageVisit,
+  }): isCreator = event["erstelltVon"] == userId;
 
   @override
   _EventCardState createState() => _EventCardState();
@@ -28,15 +31,19 @@ class _EventCardState extends State<EventCard> {
 
   @override
   void initState() {
-    widget.event["bild"] ??= "assets/bilder/strand.jpg";
+
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    widget.event["bild"] ??= "assets/bilder/strand.jpg";
     double screenHeight = MediaQuery.of(context).size.height; //laptop: 619 -  Android 737
     var fontSize = screenHeight / 52; //Android 14   51,58  => 52,6
+    var forTeilnahmeFreigegeben = (widget.event["art"] == "public" ||
+        widget.event["art"] == "öffentlich") || widget.event["freigegeben"].contains(userId);
+
 
     if(widget.event["zusage"].contains(userId)) shadowColor = Colors.green.withOpacity(0.8);
     if(widget.event["absage"].contains(userId)) shadowColor = Colors.red.withOpacity(0.8);
@@ -50,7 +57,7 @@ class _EventCardState extends State<EventCard> {
       showMenu(
         context: context,
         position: RelativeRect.fromRect(
-            tapPosition & Size(40, 40),
+            tapPosition & const Size(40, 40),
             Offset.zero & overlay.size
         ),
         elevation: 8.0,
@@ -58,14 +65,15 @@ class _EventCardState extends State<EventCard> {
           if(!onZusageList) PopupMenuItem(
             child: Row(
               children: [
-                Icon(Icons.check_circle),
-                SizedBox(width: 10),
+                const Icon(Icons.check_circle),
+                const SizedBox(width: 10),
                 Text(AppLocalizations.of(context).teilnehmen),
               ],
             ),
             onTap: () async{
               setState(() {
                 widget.event["zusage"].add(userId);
+                widget.event["absage"].remove(userId);
                 onZusageList = true;
                 onAbsageList = false;
               });
@@ -74,26 +82,26 @@ class _EventCardState extends State<EventCard> {
               zusageList.add(userId);
               EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
 
-              if(!onAbsageList) return;
+              if(!widget.event["absage"].contains(userId)) return;
 
               var absageList = await EventDatabase().getOneData("absage", widget.event["id"]);
               absageList.remove(userId);
               EventDatabase().updateOne(widget.event["id"], "absage", absageList);
-
 
             },
           ),
           if(!onAbsageList) PopupMenuItem(
             child: Row(
               children:[
-                Icon(Icons.cancel, color: Colors.red,),
-                SizedBox(width: 10),
+                const Icon(Icons.cancel, color: Colors.red,),
+                const SizedBox(width: 10),
                 Text(AppLocalizations.of(context).absagen),
               ],
             ),
             onTap: () async{
               setState(() {
                 widget.event["absage"].add(userId);
+                widget.event["zusage"].remove(userId);
                 onAbsageList = true;
                 onZusageList = false;
               });
@@ -102,7 +110,7 @@ class _EventCardState extends State<EventCard> {
               absageList.add(userId);
               EventDatabase().updateOne(widget.event["id"], "absage", absageList);
 
-              if(!onZusageList) return;
+              if(!widget.event["zusage"].contains(userId)) return;
 
               var zusageList = await EventDatabase().getOneData("zusage", widget.event["id"]);
               zusageList.remove(userId);
@@ -116,8 +124,17 @@ class _EventCardState extends State<EventCard> {
 
 
     return GestureDetector(
-      onLongPressStart: (tapdownDetails) => cardMenu(tapdownDetails.globalPosition),
-      onTap: () => widget.changePage(),
+      onLongPressStart: forTeilnahmeFreigegeben ?
+          (tapdownDetails) => cardMenu(tapdownDetails.globalPosition) : null,
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => EventDetailsPage(
+                event: widget.event
+            )
+            )).whenComplete(() => widget.afterPageVisit());
+
+      },
       child: Container(
           width: 130 + ((screenHeight-600)/5), //  Android 165
           height: screenHeight / 3.4, // Android 220 ~3,4
@@ -130,7 +147,7 @@ class _EventCardState extends State<EventCard> {
                   color: shadowColor,
                   spreadRadius: 8,
                   blurRadius: 7,
-                  offset: Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3), // changes position of shadow
                 ),
               ]
           ),
@@ -139,9 +156,9 @@ class _EventCardState extends State<EventCard> {
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: new BorderRadius.only(
-                      topLeft: const Radius.circular(20.0),
-                      topRight: const Radius.circular(20.0),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
                     ),
                     child: Image.asset(
                         widget.event["bild"],
@@ -150,7 +167,7 @@ class _EventCardState extends State<EventCard> {
                         fit: BoxFit.fill
                     ),
                   ),
-                  if(widget.withInteresse) Positioned(
+                  if(widget.withInteresse  && !widget.isCreator) Positioned(
                       top: 2,
                       right: 8,
                       child: InteresseButton(
@@ -162,7 +179,7 @@ class _EventCardState extends State<EventCard> {
               ),
               Expanded(
                 child: Container(
-                    padding: EdgeInsets.only(top: 10, left: 5),
+                    padding: const EdgeInsets.only(top: 10, left: 5),
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(20.0),
@@ -174,7 +191,7 @@ class _EventCardState extends State<EventCard> {
                       children: [
                         Text(widget.event["name"],
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
                             Text(AppLocalizations.of(context).datum, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
@@ -183,14 +200,14 @@ class _EventCardState extends State<EventCard> {
                                 style: TextStyle(fontSize: fontSize))
                           ],
                         ),
-                        SizedBox(height: 2.5),
+                        const SizedBox(height: 2.5),
                         Row(
                           children: [
                             Text(AppLocalizations.of(context).stadt, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                             Text(widget.event["stadt"], style: TextStyle(fontSize: fontSize))
                           ],
                         ),
-                        SizedBox(height: 2.5),
+                        const SizedBox(height: 2.5),
                         Row(
                           children: [
                             Text(AppLocalizations.of(context).land, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),

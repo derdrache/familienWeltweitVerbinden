@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:familien_suche/pages/events/eventCard.dart';
-import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -385,12 +384,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     mapPosition = position;
     mapController.move(position, mapZoom);
-    setState(() {
-      changeProfil(mapZoom);
-    });
+
+    changeProfil(mapZoom);
   }
 
   zoomOut(){
+    print("test");
     var newZoom;
     if(mapZoom > 6.6){
       newZoom = 6.6;
@@ -411,6 +410,16 @@ class _ErkundenPageState extends State<ErkundenPage>{
   Widget build(BuildContext context){
     List<Marker> allMarker = [];
 
+    createPopupWindowTitle(list, filter){
+      var titleList = [];
+
+      for(var item in list){
+        if(!titleList.contains(item[filter])) titleList.add(item[filter]);
+      }
+
+      return titleList.join(" / ");
+    }
+
     createPopupProfils(profil){
       popupItems = [];
 
@@ -424,22 +433,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
         return yearChildrenAgeList.join(" , ");
       }
 
-      createWindowTitle(list, filter){
-        var titleList = [];
-
-        for(var item in list){
-          if(!titleList.contains(item[filter])) titleList.add(item[filter]);
-        }
-
-        return titleList.join(" / ");
-      }
-
       popupItems.add(
           Container(
+            padding: EdgeInsets.only(top: 5, bottom: 5),
             alignment: Alignment.center,
             child: Text(
-                mapZoom > cityZoom ? createWindowTitle(profil["profils"], "ort") :
-                createWindowTitle(profil["profils"], "land"),
+                mapZoom > cityZoom ? createPopupWindowTitle(profil["profils"], "ort") :
+                createPopupWindowTitle(profil["profils"], "land"),
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
             )
           )
@@ -472,22 +472,46 @@ class _ErkundenPageState extends State<ErkundenPage>{
             )
         );
       });
-
-      setState(() {
-
-      });
     }
 
     createPopupEvents(event){
       popupItems = [];
 
+
+      popupItems.add(
+          Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.only(top: 5, bottom: 5),
+              child: Text(
+                  mapZoom > cityZoom ? createPopupWindowTitle(event["profils"], "stadt") :
+                  createPopupWindowTitle(event["profils"], "land"),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
+              )
+          )
+      );
+
+
       for(var event in event["profils"]){
+        print("test");
         popupItems.add(
-            EventCard(event: event, withInteresse: true)
+            EventCard(
+              margin: EdgeInsets.only(top: 15, bottom: 15, left: 10, right: 10),
+              event: event,
+              withInteresse: true,
+              afterPageVisit: (){
+                getAndSetEvents();
+
+                setState(() {
+                  popupActive = false;
+                  popupActive = true;
+                });
+
+              }
+            )
         );
       }
 
-      popupItems = [Wrap(alignment: WrapAlignment.center, children: popupItems)];
+      popupItems = [Wrap(spacing: 10, alignment: WrapAlignment.center, children: popupItems)];
       // kann geändert werden wenn Profils auch Karten sind
 
       setState(() {
@@ -501,6 +525,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
         height: 30.0,
         point: position,
         builder: (ctx) => FloatingActionButton(
+          heroTag: "MapMarker" + position.toString(),
           backgroundColor: Theme.of(context).colorScheme.primary,
           mini: true,
           child: Text(numberText),
@@ -538,6 +563,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
       );
     }
 
+    test(){
+      setState(() {
+
+      });
+    }
+
     markerPopupContainer(){
       return Positioned.fill(
           child: DraggableScrollableSheet(
@@ -551,16 +582,22 @@ class _ErkundenPageState extends State<ErkundenPage>{
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                       child: Container(
                           color: Colors.white,
-                          child: ListView(
-                            padding: const EdgeInsets.only(top:5),
-                            controller: controller,
-                            children: popupItems
+                          child: ScrollConfiguration(
+                            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                              PointerDeviceKind.touch,
+                              PointerDeviceKind.mouse,
+                            }),
+                            child: ListView(
+                              padding: const EdgeInsets.only(top:5),
+                              controller: controller,
+                              children: popupItems
+                            ),
                           ),
                       ),
                     ),
                     Positioned(
                       top: -5,
-                      right: -10,
+                      right: -5,
                         child: IconButton(
                           icon: const Icon(Icons.close, color: Colors.red,),
                           onPressed: (){
@@ -596,6 +633,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
               height: 30.0,
               point: LatLng(double.parse(ownProfil["latt"])+0.07, double.parse(ownProfil["longt"])+0.02),
               builder: (ctx) => FloatingActionButton(
+                heroTag: "ownMarker",
                 backgroundColor: Colors.transparent,
                 mini: true,
                 child: Icon(Icons.flag ,color: Colors.green[900], size: 30,),
@@ -615,6 +653,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
                   popupActive = true;
                   createPopupProfils(profil);
                   zoomAtPoint(position);
+                  setState(() {
+
+                  });
                 }
             )
 
@@ -648,6 +689,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 popupActive = true;
                 createPopupEvents(event);
                 zoomAtPoint(position);
+                setState(() {
+
+                });
               })
           );
         //}
