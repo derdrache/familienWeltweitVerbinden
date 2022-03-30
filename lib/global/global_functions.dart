@@ -86,14 +86,6 @@ class ChangeTimeStamp{
 
 }
 
-dbSecondsToTimeString(seconds){
-  DateTime secondsToDateTime = DateTime.fromMillisecondsSinceEpoch(seconds*1000);
-  var dateTimeToDate = DateFormat('dd-MM').format(secondsToDateTime);
-  var dateTimeToTime = DateFormat.Hm().format(secondsToDateTime);
-
-  return dateTimeToDate + " "+dateTimeToTime;
-}
-
 getChatID(usersList){
   var sortedList = usersList.toList(growable: false)..sort();
   return sortedList.join("_");

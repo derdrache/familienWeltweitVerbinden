@@ -30,13 +30,6 @@ class _EventCardState extends State<EventCard> {
   var shadowColor = Colors.grey.withOpacity(0.8);
 
   @override
-  void initState() {
-
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     widget.event["bild"] ??= "assets/bilder/strand.jpg";
     double screenHeight = MediaQuery.of(context).size.height; //laptop: 619 -  Android 737
@@ -133,7 +126,6 @@ class _EventCardState extends State<EventCard> {
                 event: widget.event
             )
             )).whenComplete(() => widget.afterPageVisit());
-
       },
       child: Container(
           width: 130 + ((screenHeight-600)/5), //  Android 165
@@ -171,7 +163,7 @@ class _EventCardState extends State<EventCard> {
                       top: 2,
                       right: 8,
                       child: InteresseButton(
-                        interesse: widget.event["interesse"],
+                        hasIntereset: widget.event["interesse"].contains(userId),
                         id: widget.event["id"],
                       )
                   ),
@@ -227,10 +219,10 @@ class _EventCardState extends State<EventCard> {
 
 
 class InteresseButton extends StatefulWidget {
-  var interesse;
+  var hasIntereset;
   var id;
 
-  InteresseButton({Key key, this.interesse, this.id}) : super(key: key);
+  InteresseButton({Key key, this.hasIntereset, this.id}) : super(key: key);
 
   @override
   _InteresseButtonState createState() => _InteresseButtonState();
@@ -238,25 +230,19 @@ class InteresseButton extends StatefulWidget {
 
 class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
-  var hasIntereset = false;
 
-  @override
-  void initState() {
-    hasIntereset = widget.interesse.contains(userId);
 
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        hasIntereset = hasIntereset ? false : true;
+        widget.hasIntereset = widget.hasIntereset ? false : true;
 
         setState(() {});
 
         var interesseList = await EventDatabase().getOneData("interesse", widget.id);
 
-        if(hasIntereset){
+        if(widget.hasIntereset){
           interesseList.add(userId);
         } else{
           interesseList.remove(userId);
@@ -266,7 +252,7 @@ class _InteresseButtonState extends State<InteresseButton> {
 
 
       },
-      child: Icon(Icons.favorite, color: hasIntereset ? Colors.red : Colors.black)
+      child: Icon(Icons.favorite, color: widget.hasIntereset ? Colors.red : Colors.black)
     );
   }
 }

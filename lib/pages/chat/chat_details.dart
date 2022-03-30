@@ -10,6 +10,7 @@ import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 import '../../global/custom_widgets.dart';
 import '../events/event_details.dart';
@@ -158,7 +159,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     var messageData = {
       "message": message,
       "von": userID,
-      "date": DateTime.now().millisecondsSinceEpoch * 1000,
+      "date": DateTime.now().millisecondsSinceEpoch,
       "zu": widget.chatPartnerId
     };
     if (newChat) {
@@ -218,8 +219,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       List<Widget> messageBox = [];
       var eventCardCounter = 0;
 
+
       for (var i = 0; i< messages.length; i++) {
         var message = messages[i];
+        var messageTime = DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
 
@@ -241,11 +244,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                     withInteresse: true,
                     event: eventCardList[eventCardCounter],
                     afterPageVisit: () => setState((){}),
-                    /*
-                    changePage: () => global_functions.changePage(context,
-                        EventDetailsPage(event: eventCardList[eventCardCounter])),
-
-                     */
                   ),
                 )
             );
@@ -282,8 +280,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                     Container(
                       padding: const EdgeInsets.only(bottom: 5, right: 10),
                       child: Text(
-                          global_functions.dbSecondsToTimeString(
-                              json.decode(message["date"])),
+                          DateFormat('dd-MM hh:mm').format(messageTime),
                           style: TextStyle(color: Colors.grey[600])),
                     )
                   ],

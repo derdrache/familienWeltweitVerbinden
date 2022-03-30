@@ -57,14 +57,7 @@ class EventCardDetails extends StatelessWidget {
                 currentImage: event["bild"],
                 items: isGerman ? global_var.eventBilder : global_var.eventBilderEnglisch
               ),
-              if(!isCreator) Positioned(
-                  top: 5,
-                  right: 8,
-                  child: InteresseButton(
-                    interesse: event["interesse"],
-                    id: event["id"],
-                  )
-              )
+
             ],
           ),
           Positioned.fill(
@@ -99,7 +92,7 @@ class EventCardDetails extends StatelessWidget {
                       )
                   )
               )
-          )
+          ),
         ],
       );
     }
@@ -290,7 +283,15 @@ class EventCardDetails extends StatelessWidget {
               ],
             )
           ),
-          EventArtButton(event: event, isCreator: isCreator)
+          EventArtButton(event: event, isCreator: isCreator),
+          if(!isCreator) Positioned(
+              top: 25,
+              right: 28,
+              child: InteresseButton(
+                hasIntereset: event["interesse"].contains(userId),
+                id: event["id"],
+              )
+          ),
         ],
       ),
     );
@@ -394,7 +395,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       if(data.length > 40) validationText = AppLocalizations.of(context).usernameZuLang;
     }else if(widget.databaseKennzeichnung == "link"){
       if(data.substring(0,3) != "http" || data.substring(0,3) != "www.")
-        validationText = "Eingabe ist kein Link";
+        validationText = AppLocalizations.of(context).eingabeKeinLink;
     }
 
     return validationText;
@@ -714,10 +715,10 @@ class _DateButtonState extends State<DateButton> {
 
 
 class InteresseButton extends StatefulWidget {
-  var interesse;
+  var hasIntereset;
   var id;
 
-  InteresseButton({Key key, this.interesse, this.id}) : super(key: key);
+  InteresseButton({Key key, this.hasIntereset, this.id}) : super(key: key);
 
   @override
   _InteresseButtonState createState() => _InteresseButtonState();
@@ -725,25 +726,18 @@ class InteresseButton extends StatefulWidget {
 
 class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
-  var hasIntereset = false;
 
-  @override
-  void initState() {
-    hasIntereset = widget.interesse.contains(userId);
-
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () async {
-          hasIntereset = hasIntereset ? false : true;
+          widget.hasIntereset = widget.hasIntereset ? false : true;
 
           setState(() {});
 
           var interesseList = await EventDatabase().getOneData("interesse", widget.id);
 
-          if(hasIntereset){
+          if(widget.hasIntereset){
             interesseList.add(userId);
           } else{
             interesseList.remove(userId);
@@ -753,7 +747,7 @@ class _InteresseButtonState extends State<InteresseButton> {
 
 
         },
-        child: Icon(Icons.favorite, color: hasIntereset ? Colors.red : Colors.black, size: 30,)
+        child: Icon(Icons.favorite, color: widget.hasIntereset ? Colors.red : Colors.black, size: 30,)
     );
   }
 }
@@ -770,7 +764,7 @@ class EventArtButton extends StatefulWidget {
 
 class _EventArtButtonState extends State<EventArtButton> {
   var eventTypInput = CustomDropDownButton();
-
+  var icon;
 
   eventArtSave(){
     var auswahl = eventTypInput.getSelected();
@@ -850,6 +844,12 @@ class _EventArtButtonState extends State<EventArtButton> {
 
   @override
   void initState() {
+    icon = widget.event["art"] == "öffentlich" || widget.event["art"] == "public" ?
+    Icons.lock_open:
+    widget.event["art"] == "privat" || widget.event["art"] == "private" ?
+    Icons.enhanced_encryption :
+    Icons.lock;
+
     eventTypInput = CustomDropDownButton(
       items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
       selected: isGerman ? global_var.changeEnglishToGerman(widget.event["art"]):
@@ -865,8 +865,7 @@ class _EventArtButtonState extends State<EventArtButton> {
       top: -5,
       left: -10,
       child: IconButton(
-        icon: Icon(widget.event["art"] != "öffentlich" && widget.event["art"] != "public" ?
-          Icons.lock : Icons.lock_open, color: Theme.of(context).colorScheme.primary),
+        icon: Icon(icon, color: Theme.of(context).colorScheme.primary),
         onPressed: !widget.isCreator ? null : () => CustomWindow(
             context: context,
             title: AppLocalizations.of(context).eventArtAendern,
