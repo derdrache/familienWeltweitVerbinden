@@ -103,7 +103,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   child: Text("Ok"),
                   onPressed: (){
                     EventDatabase().delete(widget.event["id"]);
-                    changePageForever(context, StartPage(selectedIndex: 1));
+                    changePage(context, StartPage(selectedIndex: 1));
                   },
                 ),
                 TextButton(

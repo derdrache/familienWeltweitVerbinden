@@ -621,12 +621,15 @@ CustomWindow({context, title = "",List<Widget> children, double height = double.
                       PointerDeviceKind.touch,
                       PointerDeviceKind.mouse,
                     }),
-                    child: ListView(
-                        children: [
-                          WindowTopbar(title: title),
-                          const SizedBox(height: 10),
-                          ...children
-                        ],
+                    child: Container(
+                      margin: EdgeInsets.only(left: 10),
+                      child: ListView(
+                          children: [
+                            WindowTopbar(title: title),
+                            const SizedBox(height: 10),
+                            ...children
+                          ],
+                      ),
                     ),
                   ),
                   Positioned(

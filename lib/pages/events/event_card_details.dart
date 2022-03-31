@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
@@ -14,6 +15,7 @@ import '../../global/global_functions.dart';
 import '../../global/google_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_var;
+import '../../widgets/image_galerie.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
 var isWebDesktop = kIsWeb && (defaultTargetPlatform != TargetPlatform.iOS || defaultTargetPlatform != TargetPlatform.android);
@@ -37,6 +39,7 @@ class EventCardDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var isAssetImage = event["bild"].substring(0,5) == "asset" ? true : false;
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     if(screenWidth > 500) screenWidth = kIsWeb ? 400 : 500;
@@ -44,6 +47,7 @@ class EventCardDetails extends StatelessWidget {
     double cardHeight = screenHeight / 1.34;
     event["eventInterval"] = isGerman ? global_var.changeEnglishToGerman(event["eventInterval"]):
       global_var.changeGermanToEnglish(event["eventInterval"]);
+    
 
     bildAndTitleBox(){
       return Stack(
@@ -51,11 +55,18 @@ class EventCardDetails extends StatelessWidget {
         children: [
           Stack(
             children: [
-              ShowImageAndChangeWindow(
+              ImageGalerie(
                 id: event["id"],
                 isCreator: isCreator,
-                currentImage: event["bild"],
-                items: isGerman ? global_var.eventBilder : global_var.eventBilderEnglisch
+                child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                    ),
+                    child: isAssetImage ?  Image.asset(event["bild"]) :
+                    Image.network(event["bild"])
+                ),
+
               ),
 
             ],
@@ -509,92 +520,6 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
           TextStyle(fontSize: fontsize),
           textAlign: TextAlign.center,
         )
-    );
-  }
-}
-
-class ShowImageAndChangeWindow extends StatefulWidget {
-  var items;
-  var currentImage;
-  var id;
-  var isCreator;
-
-  ShowImageAndChangeWindow({
-    Key key, this.items,
-    this.currentImage,
-    this.id,
-    this.isCreator
-  }) : super(key: key);
-
-  @override
-  _ShowImageAndChangeWindowState createState() => _ShowImageAndChangeWindowState();
-}
-
-class _ShowImageAndChangeWindowState extends State<ShowImageAndChangeWindow> {
-  var dropdownInput = CustomDropDownButton();
-
-  @override
-  void initState() {
-    var selected = widget.currentImage.split("/").last.split(".")[0];
-
-    dropdownInput = CustomDropDownButton(
-      selected: isGerman ? global_var.changeEnglishToGerman(selected) :
-        global_var.changeGermanToEnglish(selected),
-      items: widget.items
-    );
-
-    super.initState();
-  }
-
-  saveChanges(){
-    var selectedImage = dropdownInput.selected;
-    var imageName = selectedImage[0].toLowerCase() + selectedImage.substring(1);
-    var imageNameDeutsch = global_var.changeEnglishToGerman(imageName);
-    var imageDatei = "assets/bilder/" + imageNameDeutsch + ".jpg";
-
-    widget.currentImage = imageDatei;
-    setState(() {});
-
-    EventDatabase().updateOne(widget.id, "bild", imageDatei);
-    Navigator.pop(context);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: !widget.isCreator ? null: () {
-        CustomWindow(
-            context: context,
-            title: AppLocalizations.of(context).eventBildAendern,
-            height: 180,
-            children: [
-              dropdownInput,
-              Container(
-                margin: const EdgeInsets.only(right: 10),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      TextButton(
-                          child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
-                          onPressed: () => saveChanges()
-                      ),
-                    ]
-                ),
-              )
-            ]
-        );
-      },
-      child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20.0),
-            topRight: Radius.circular(20.0),
-          ),
-          child: Image.asset(widget.currentImage)
-      ),
     );
   }
 }

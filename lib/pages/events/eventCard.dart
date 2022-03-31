@@ -36,6 +36,7 @@ class _EventCardState extends State<EventCard> {
     var fontSize = screenHeight / 52; //Android 14   51,58  => 52,6
     var forTeilnahmeFreigegeben = (widget.event["art"] == "public" ||
         widget.event["art"] == "öffentlich") || widget.event["freigegeben"].contains(userId);
+    var isAssetImage = widget.event["bild"].substring(0,5) == "asset" ? true : false;
 
 
     if(widget.event["zusage"].contains(userId)) shadowColor = Colors.green.withOpacity(0.8);
@@ -152,7 +153,12 @@ class _EventCardState extends State<EventCard> {
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0),
                     ),
-                    child: Image.asset(
+                    child: isAssetImage ? Image.asset(
+                        widget.event["bild"],
+                        height: 70 + ((screenHeight-600)/5),
+                        width: 130 + ((screenHeight-600)/5),
+                        fit: BoxFit.fill
+                    ) : Image.network(
                         widget.event["bild"],
                         height: 70 + ((screenHeight-600)/5),
                         width: 130 + ((screenHeight-600)/5),
