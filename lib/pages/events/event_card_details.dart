@@ -63,7 +63,7 @@ class EventCardDetails extends StatelessWidget {
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0),
                     ),
-                    child: isAssetImage ?  Image.asset(event["bild"]) :
+                    child: isAssetImage ?  Image.asset(event["bild"], fit: BoxFit.fill,) :
                     Image.network(event["bild"])
                 ),
 
