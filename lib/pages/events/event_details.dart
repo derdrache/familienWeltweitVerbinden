@@ -10,6 +10,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../services/database.dart';
 import '../../global/style.dart' as global_style;
+import '../../widgets/badge_icon.dart';
 import '../start_page.dart';
 
 
@@ -36,11 +37,21 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   var searchAutocomplete;
   var allName;
   var userFriendlist;
+  var eventDetails = {};
+  var isNotPublic;
 
   @override
   void initState() {
     isCreator = widget.event["erstelltVon"] == userId;
     isApproved = isCreator ? true : widget.event["freigegeben"].contains(userId);
+    isNotPublic = widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
+
+    eventDetails = {
+      "zusagen": widget.event["zusage"].length,
+      "absagen": widget.event["absage"].length,
+      "interessierte": widget.event["interesse"].length,
+      "freigegeben": widget.event["freigegeben"].length
+    };
 
     getDatabaseData();
 
@@ -96,18 +107,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           context: context,
           builder: (BuildContext context){
             return AlertDialog(
-              title: Text("Event löschen"),
-              content: Text("Du möchtest das Event löschen?"),
+              title: const Text("Event löschen"),
+              content: const Text("Du möchtest das Event löschen?"),
               actions: [
                 TextButton(
-                  child: Text("Ok"),
+                  child: const Text("Ok"),
                   onPressed: (){
                     EventDatabase().delete(widget.event["id"]);
                     changePage(context, StartPage(selectedIndex: 1));
                   },
                 ),
                 TextButton(
-                  child: Text("Abbrechen"),
+                  child: const Text("Abbrechen"),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -126,7 +137,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         children: [
           customTextInput(AppLocalizations.of(context).eventMeldenFrage, reportController, moreLines: 10),
           Container(
-            margin: EdgeInsets.only(left: 30, top: 10, right: 30),
+            margin: const EdgeInsets.only(left: 30, top: 10, right: 30),
             child: FloatingActionButton.extended(
                 onPressed: () {
                   Navigator.pop(context);
@@ -144,46 +155,93 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       );
     }
 
-    moreMenu(){
+    deleteEventDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.delete),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).eventLoeschen),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          deleteEventWindow();
+        },
+      );
+    }
 
+    reportEventDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.report),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).eventMelden),
+          ],
+        ),
+        onPressed: (){
+          Navigator.pop(context);
+          reportEventWindow();
+        } ,
+      );
+    }
+
+    eventDetailsDialog(){
+      return SimpleDialogOption(
+          child: Row(
+            children: const [
+              Icon(Icons.info),
+              SizedBox(width: 10),
+              Text("Event Info"),
+            ],
+          ),
+        onPressed: () => CustomWindow(
+          context: context,
+          title: "Event Information",
+          children: [
+            const SizedBox(height: 10),
+            Text(
+                AppLocalizations.of(context).interessierte + eventDetails["interessierte"].toString(),
+                style: TextStyle(fontSize: fontsize)
+            ),
+            const SizedBox(height: 10),
+            Text(
+                AppLocalizations.of(context).zusagen+ eventDetails["zusagen"].toString(),
+                style: TextStyle(fontSize: fontsize)
+            ),
+            const SizedBox(height: 10),
+            Text(
+                AppLocalizations.of(context).absagen + eventDetails["absagen"].toString(),
+                style: TextStyle(fontSize: fontsize)
+            ),
+            const SizedBox(height: 10),
+            if(isNotPublic) Text(
+                AppLocalizations.of(context).freigegeben + eventDetails["freigegeben"].toString(),
+                style: TextStyle(fontSize: fontsize)
+            )
+          ]
+        ),
+      );
+    }
+
+    moreMenu(){
       showDialog(
         context: context,
         builder: (BuildContext context){
           return Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Container(
-                width: 180,
+              SizedBox(
+                width: 250,
                 child: SimpleDialog(
                   contentPadding: EdgeInsets.zero,
-                  insetPadding: EdgeInsets.only(top:40, left: 0, right:10),
+                  insetPadding: const EdgeInsets.only(top:40, left: 0, right:10),
                   children: [
-                    if(isCreator) SimpleDialogOption(
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete),
-                          SizedBox(width: 10),
-                          Text(AppLocalizations.of(context).eventLoeschen),
-                        ],
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        deleteEventWindow();
-                      },
-                    ),
-                    if(!isCreator) SimpleDialogOption(
-                      child: Row(
-                        children: [
-                          Icon(Icons.report),
-                          SizedBox(width: 10),
-                          Text(AppLocalizations.of(context).eventMelden),
-                        ],
-                      ),
-                      onPressed: (){
-                        Navigator.pop(context);
-                        reportEventWindow();
-                      } ,
-                    )
+                    if(isCreator) eventDetailsDialog(),
+                    if(isCreator) const SizedBox(height: 15),
+                    if(isCreator) deleteEventDialog(),
+                    if(!isCreator) reportEventDialog()
                   ],
                 ),
               ),
@@ -198,7 +256,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (widget.teilnahme != true) Container(
-            margin: EdgeInsets.only(left: 20, right: 20),
+            margin: const EdgeInsets.only(left: 20, right: 20),
             child: FloatingActionButton.extended(
                 heroTag: "teilnehmen",
                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -224,7 +282,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             ),
           ),
           if(widget.absage != true) Container(
-            margin: EdgeInsets.only(left: 20, right: 20),
+            margin: const EdgeInsets.only(left: 20, right: 20),
             child: FloatingActionButton.extended(
               heroTag: "Absagen",
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -264,14 +322,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 child: Row(
                   children: [
                     Text(name),
-                    Expanded(child: SizedBox(width: 10)),
+                    const Expanded(child: SizedBox(width: 10)),
                     IconButton(
                         onPressed: () => freischalten(user, true, windowSetState),
-                        icon: Icon(Icons.check_circle, size: 27)
+                        icon: const Icon(Icons.check_circle, size: 27)
                     ),
                     IconButton(
                         onPressed: () => freischalten(user, false, windowSetState),
-                        icon: Icon(Icons.cancel, size: 27,)
+                        icon: const Icon(Icons.cancel, size: 27,)
                     ),
                   ],
                 )
@@ -280,11 +338,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       }
 
 
-      if(widget.event["freischalten"].length == 0) freizugebenListe.add(
-        Container(
-          child: Text("keine Familien zum Freigeben vorhanden", style: TextStyle(color: Colors.grey),),
-        )
+      if(widget.event["freischalten"].length == 0) {
+        freizugebenListe.add(
+        Text(AppLocalizations.of(context).keineFamilienFreigebenVorhanden, style: const TextStyle(color: Colors.grey),)
       );
+      }
 
       return freizugebenListe;
     }
@@ -309,7 +367,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           );
                         } else{
                           return Column(
-                            children: [CircularProgressIndicator()],
+                            children: const [CircularProgressIndicator()],
                           );
                         }
 
@@ -328,16 +386,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         title: "Event link",
         children: [
           Container(
-            margin: EdgeInsets.all(10),
-            padding: EdgeInsets.all(10),
+            margin: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
               border: Border.all()
             ),
             child: Text("</eventId=" + widget.event["id"])
           ),
           Container(
-            margin: EdgeInsets.only(left: 20, right: 20),
+            margin: const EdgeInsets.only(left: 20, right: 20),
             child: FloatingActionButton.extended(
               onPressed: () async {
                 Clipboard.setData(ClipboardData(text: "</eventId=" + widget.event["id"]));
@@ -345,7 +403,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 await showDialog(
                     context: context,
                     builder: (context) {
-                      Future.delayed(Duration(seconds: 1), () {
+                      Future.delayed(const Duration(seconds: 1), () {
                         Navigator.of(context).pop(true);
                       });
                       return AlertDialog(
@@ -355,7 +413,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 Navigator.pop(context);
               },
               label: Text(AppLocalizations.of(context).linkKopieren),
-              icon: Icon(Icons.copy),
+              icon: const Icon(Icons.copy),
             ),
           )
         ]
@@ -367,11 +425,21 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         appBar: customAppBar(
             title: "",
             buttons: [
-              if(isCreator && (widget.event["art"] != "öffentlich" && widget.event["art"] != "public")) TextButton(
-                style: global_style.textButtonStyle(),
-                child: const Icon(Icons.event_available),
-                onPressed: () => userfreischalteWindow()
+              if(isCreator && isNotPublic) FutureBuilder(
+                future: EventDatabase().getOneData("freischalten", widget.event["id"]),
+                builder: (context, snap) {
+                  var data = snap.hasData ? snap.data.length.toString() : "";
+                  if(data == "0") data = "";
 
+                  return TextButton(
+                    style: global_style.textButtonStyle(),
+                    child: BadgeIcon(
+                      icon: Icons.event_available,
+                      text: data.toString()
+                    ),//const Icon(Icons.event_available),
+                    onPressed: () => userfreischalteWindow()
+                  );
+                }
               ),
               TextButton(
                 style: global_style.textButtonStyle(),
@@ -400,8 +468,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   event: widget.event,
                   isApproved: isApproved,
                 ),
-                if(isApproved || widget.event["art"] == "öffentlich" ||
-                    widget.event["art"] == "public") teilnahmeButtonBox(),
+                if(isApproved || !isNotPublic) teilnahmeButtonBox(),
               ],
             ),
     );
