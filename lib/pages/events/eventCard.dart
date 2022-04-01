@@ -148,21 +148,26 @@ class _EventCardState extends State<EventCard> {
             children: [
               Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0),
+                  Container(
+                    constraints: BoxConstraints(
+                      minHeight: 100,
                     ),
-                    child: isAssetImage ? Image.asset(
-                        widget.event["bild"],
-                        height: 70 + ((screenHeight-600)/5),
-                        width: 130 + ((screenHeight-600)/5),
-                        fit: BoxFit.fill
-                    ) : Image.network(
-                        widget.event["bild"],
-                        height: 70 + ((screenHeight-600)/5),
-                        width: 130 + ((screenHeight-600)/5),
-                        fit: BoxFit.fill
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
+                      ),
+                      child: isAssetImage ? Image.asset(
+                          widget.event["bild"],
+                          height: 70 + ((screenHeight-600)/5),
+                          width: 130 + ((screenHeight-600)/5),
+                          fit: BoxFit.fill
+                      ) : Image.network(
+                          widget.event["bild"],
+                          height: 70 + ((screenHeight-600)/5),
+                          width: 130 + ((screenHeight-600)/5),
+                          fit: BoxFit.fill
+                      ),
                     ),
                   ),
                   if(widget.withInteresse  && !widget.isCreator) Positioned(

@@ -123,7 +123,7 @@
     "informationEventArt": "Information zur Event Art",
     "privatInformationText": "Diese können in der globalen Suche nicht gefunden werden.\nDas teilen funktioniert nur per Link.\nWenn eine Familie interesse hat, muss sie für das Event noch vom Organisator freigegeben werden.",
     "halbOeffentlich": "halb-öffentlich",
-    "halbOeffentlichInformationText" : "Diese können überall gefunden werden.\nUm die details von dem Event zu sehen, ist eine Freigabe durch den Organisator nötig.",
+    "halbOeffentlichInformationText" : "Diese können überall gefunden werden.\nUm die Details von dem Event zu sehen, ist eine Freigabe durch den Organisator nötig.",
     "oeffentlich": "öffentlich",
     "oeffentlichInformationText": "Diese können überall gefunden und von jedem komplett eingesehen werden",
     "eventErstellen": "Event erstellen",
@@ -164,7 +164,12 @@
     "ort": "Ort: ",
     "eventSpracheAendern": "Event Sprache ändern",
     "sprache": "Sprache: ",
-    "eingabeKeinLink": "Eingabe ist kein Link"
+    "eingabeKeinLink": "Eingabe ist kein Link",
+    "bitteBildAussuchen": "Bitte ein Bild aussuchen",
+    "slogn1": "Die Vernetzungsapp für Reise- und Auswanderfamilien.",
+    "slogn2": "Finde schnell und einfach Familien auf der ganzen Welt und organisiere treffen",
+    "linkBearbeiten": "Link bearbeiten",
+    "linkOeffnen": "Link öffnen"
 
 
 
