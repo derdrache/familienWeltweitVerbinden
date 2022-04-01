@@ -370,7 +370,6 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: Alignment.topCenter,
       child: Container(
         width: webWidth,
         margin: const EdgeInsets.all(10),

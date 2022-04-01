@@ -619,7 +619,7 @@ class _CardFeedState extends State<CardFeed> {
       width: widget.width,
       child: Row(
         children: [
-          Text("Teilnehmer: ", style: TextStyle(fontSize: fontsize)),
+          Text(AppLocalizations.of(context).teilnehmer, style: TextStyle(fontSize: fontsize)),
           Text(teilnehmerAnzahl, style: TextStyle(fontSize: fontsize)),
           Expanded(child: SizedBox()),
           InkWell(

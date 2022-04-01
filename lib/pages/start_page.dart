@@ -8,6 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
 
+import '../widgets/badge_icon.dart';
 import 'news_page.dart';
 import 'login_register_page/create_profil_page.dart';
 import 'erkunden_page.dart';
@@ -103,33 +104,10 @@ class _StartPageState extends State<StartPage>{
 
                   newMessages = newMessages == false ? 0 : newMessages;
 
-                  return Stack(
-                    clipBehavior: Clip.none, children: <Widget>[
-                    const Icon(Icons.chat),
-                    newMessages > 0 ? Positioned(
-                        top: -10,
-                        right: -10,
-                        child: Container(
-                            height: 20,
-                            width: 20,
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondary,
-                                shape: BoxShape.circle
-                            ),
-                            child: Center(
-                              child: FittedBox(
-                                child: Text(
-                                newMessages.toString(),
-                                  style: const TextStyle(fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            )
-                        )
-                    ) : SizedBox.shrink()
-                  ],
+                  return BadgeIcon(
+                    icon: Icons.chat,
+                    text: newMessages > 0 ? newMessages.toString() : ""
                   );
-                return const Icon(Icons.chat);
               }
               return const Icon(Icons.chat);
           });

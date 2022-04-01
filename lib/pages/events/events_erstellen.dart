@@ -130,9 +130,11 @@ class _EventErstellenState extends State<EventErstellen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery. of(context). size. width;
     sprachenAuswahlBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
     eventArtDropdown.hintText = AppLocalizations.of(context).eventArten;
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
+    print(screenWidth);
 
     dateAndTimeBox(){
       var dateString = AppLocalizations.of(context).datumAuswaehlen;
@@ -191,7 +193,7 @@ class _EventErstellenState extends State<EventErstellen> {
     eventArtInformation(){
       return Positioned(
           top: -5,
-          left: -5,
+          left: screenWidth <640 ? -5 : ((screenWidth - 640) / 2) +5,
           child: IconButton(
             icon: Icon(Icons.help,size: 15),
             onPressed: () => CustomWindow(

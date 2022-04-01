@@ -169,7 +169,14 @@
     "slogn1": "The networking app for travel and expat families.",
     "slogn2": "Find families around the world quickly and easily and organize meetings",
     "linkBearbeiten": "edit link",
-    "linkOeffnen": "open link"
+    "linkOeffnen": "open link",
+    "teilnehmer": "Participant: ",
+    "organisatorWechsel": "Change organizer",
+    "keineFamilienFreigebenVorhanden": "no families to share",
+    "interessierte" : "Interested: ",
+    "zusagen": "Commitments: ",
+    "absagen": "Cancellations: ",
+    "freigegeben" : "Shared: "
 
 }
 

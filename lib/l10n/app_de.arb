@@ -169,7 +169,14 @@
     "slogn1": "Die Vernetzungsapp für Reise- und Auswanderfamilien.",
     "slogn2": "Finde schnell und einfach Familien auf der ganzen Welt und organisiere treffen",
     "linkBearbeiten": "Link bearbeiten",
-    "linkOeffnen": "Link öffnen"
+    "linkOeffnen": "Link öffnen",
+    "teilnehmer": "Teilnehmer: ",
+    "organisatorWechsel": "Organisator wechsel",
+    "keineFamilienFreigebenVorhanden": "keine Familien zum Freigeben vorhanden",
+    "interessierte" : "Interessierte: ",
+    "zusagen": "Zusagen: ",
+    "absagen": "Absagen: ",
+    "freigegeben" : "Freigegeben: "
 
 
 
