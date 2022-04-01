@@ -60,12 +60,14 @@ class _ImageGalerieState extends State<ImageGalerie> {
 
   saveChanges(){
     if(selected == "" && ownPictureKontroller.text == ""){
-      customSnackbar(context, "Kein Bild ausgesucht");
+      customSnackbar(context, AppLocalizations.of(context).bitteBildAussuchen);
       return;
     }
 
     if(selected == "") selected = ownPictureKontroller.text;
 
+    widget.child = Image.asset(selected, fit: BoxFit.fitWidth);
+    setState(() {});
     EventDatabase().updateOne(widget.id, "bild", selected);
     Navigator.pop(context);
 
@@ -80,8 +82,6 @@ class _ImageGalerieState extends State<ImageGalerie> {
 
       for(var image in imagePaths){
         var imageDecode = Uri.decodeComponent(image);
-        print(selected);
-        print(imageDecode);
 
         allImages.add(
             InkWell(
@@ -192,12 +192,15 @@ class _ImageGalerieState extends State<ImageGalerie> {
       );
     }
 
-    return !widget.isCreator ? null :  InkWell(
+    return InkWell(
       child: Container(
+        constraints: BoxConstraints(
+            minHeight: 200,
+        ),
         width: double.infinity,
         child:widget.child,
       ),
-      onTap: () => showDialog(
+      onTap:!widget.isCreator ? null :   () => showDialog(
           context: context,
           builder: (BuildContext buildContext){
             return StatefulBuilder(
@@ -209,7 +212,7 @@ class _ImageGalerieState extends State<ImageGalerie> {
                     ),
                     contentPadding: EdgeInsets.zero,
                     content: SizedBox(
-                      height: 400,
+                      height: 500,
                       width: 600,
                       child: Stack(
                         overflow: Overflow.visible,

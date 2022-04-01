@@ -63,8 +63,8 @@ class EventCardDetails extends StatelessWidget {
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0),
                     ),
-                    child: isAssetImage ?  Image.asset(event["bild"], fit: BoxFit.fill,) :
-                    Image.network(event["bild"])
+                    child: isAssetImage ?  Image.asset(event["bild"], fit: BoxFit.fitWidth) :
+                    Image.network(event["bild"], fit: BoxFit.fitWidth,)
                 ),
 
               ),
@@ -190,6 +190,7 @@ class EventCardDetails extends StatelessWidget {
     eventBeschreibung(){
       return Container(
           margin: const EdgeInsets.all(10),
+          padding: EdgeInsets.only(bottom: 20),
           child: Center(
               child: Container(
                 width: double.infinity,
@@ -250,7 +251,6 @@ class EventCardDetails extends StatelessWidget {
                 creatorChangeHintBox(),
                 eventInformationBox(),
                 if(isApproved || isPublic) eventBeschreibung(),
-                OrganisatorBox(organisator: event["erstelltVon"],)
               ],
             ),
           ),
@@ -304,6 +304,15 @@ class EventCardDetails extends StatelessWidget {
                 id: event["id"],
               )
           ),
+          Positioned(
+            bottom: 30,
+            left: 30,
+            child: CardFeed(
+              organisator: event["erstelltVon"],
+              eventId: event["id"],
+              width: cardWidth
+            )
+          )
         ],
       ),
     );
@@ -406,7 +415,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       if(data.isEmpty) validationText = AppLocalizations.of(context).bitteNameEingeben;
       if(data.length > 40) validationText = AppLocalizations.of(context).usernameZuLang;
     }else if(widget.databaseKennzeichnung == "link"){
-      if(data.substring(0,3) != "http" || data.substring(0,3) != "www.")
+      if(data.substring(0,4) != "http" && data.substring(0,3) != "www")
         validationText = AppLocalizations.of(context).eingabeKeinLink;
     }
 
@@ -461,32 +470,65 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
     }
 
+    openChangeWindow(){
+      CustomWindow(
+          context: context,
+          title: widget.windowTitle,
+          height: widget.multiLines || widget.modus == "googleAutoComplete"? 300 : 180,
+          children: [
+            inputBox(),
+            Container(
+              margin: const EdgeInsets.only(right: 10),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    TextButton(
+                        child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
+                        onPressed: () => saveChanges()
+                    ),
+                  ]
+              ),
+            )
+          ]
+      );
+    }
+
+    openLinkAskWindow(){
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                  openChangeWindow();
+                },
+                child: Text(AppLocalizations.of(context).linkBearbeiten),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context);
+                  launch(widget.rowData);
+                },
+                child: Text(AppLocalizations.of(context).linkOeffnen),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
+
     return InkWell(
         onTap: !widget.isCreator ? null:  (){
-          CustomWindow(
-              context: context,
-              title: widget.windowTitle,
-              height: widget.multiLines || widget.modus == "googleAutoComplete"? 300 : 180,
-              children: [
-                inputBox(),
-                Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        TextButton(
-                            child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
-                            onPressed: () => saveChanges()
-                        ),
-                      ]
-                  ),
-                )
-              ]
-          );
+          openChangeWindow();
         },
         child: !widget.singleShow && !widget.multiLines ? Row(
           children: [
@@ -507,8 +549,12 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                     textAlign: TextAlign.end,
                   ),
                 ),
-              onTap: widget.databaseKennzeichnung != "link" ? null : (){
-                  launch(widget.rowData);
+              onTap: widget.databaseKennzeichnung != "link" || widget.rowData == "" ? null : (){
+                  if(widget.isCreator){
+                    openLinkAskWindow();
+                  }else{
+                    launch(widget.rowData);
+                  }
               },
             )
           ],
@@ -524,23 +570,27 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
   }
 }
 
-class OrganisatorBox extends StatefulWidget {
+class CardFeed extends StatefulWidget {
   var organisator;
+  var eventId;
+  var width;
 
-  OrganisatorBox({Key key, this.organisator}) : super(key: key);
+  CardFeed({Key key, this.organisator, this.width, this.eventId}) : super(key: key);
 
   @override
-  _OrganisatorBoxState createState() => _OrganisatorBoxState();
+  _CardFeedState createState() => _CardFeedState();
 }
 
-class _OrganisatorBoxState extends State<OrganisatorBox> {
+class _CardFeedState extends State<CardFeed> {
   var organisatorText = const Text("");
   var organisatorProfil;
   var ownName = FirebaseAuth.instance.currentUser.displayName;
+  var teilnehmerAnzahl = "";
 
 @override
   void initState() {
     setOrganisatorText();
+    setTeilnehmerAnzahl();
     super.initState();
   }
 
@@ -550,24 +600,38 @@ class _OrganisatorBoxState extends State<OrganisatorBox> {
     setState(() {
       organisatorText = Text(
           organisatorProfil["name"],
-          style: const TextStyle(color: Colors.grey)
+          style: TextStyle(color: Colors.blue, fontSize: fontsize)
       );
     });
+  }
+  
+  setTeilnehmerAnzahl() async{
+    var teilnehmer = await EventDatabase().getOneData("zusage", widget.eventId);
+
+    teilnehmerAnzahl = teilnehmer.length.toString();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        changePage(context, ShowProfilPage(
-          userName: ownName,
-          profil: organisatorProfil,
-          ));
-      },
-      child: Container(
-        alignment: Alignment.centerRight,
-        margin: const EdgeInsets.all(20),
-        child: organisatorText
+    return Container(
+      padding: EdgeInsets.only(right: 20),
+      width: widget.width,
+      child: Row(
+        children: [
+          Text("Teilnehmer: ", style: TextStyle(fontSize: fontsize)),
+          Text(teilnehmerAnzahl, style: TextStyle(fontSize: fontsize)),
+          Expanded(child: SizedBox()),
+          InkWell(
+            child: organisatorText,
+            onTap: () {
+              changePage(context, ShowProfilPage(
+                userName: ownName,
+                profil: organisatorProfil,
+              ));
+            },
+          )
+        ],
       ),
     );
   }

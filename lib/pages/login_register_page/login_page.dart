@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
 
     Widget header(){
       return Container(
-        margin: EdgeInsets.only(top: sideSpace, bottom: sideSpace),
+        margin: EdgeInsets.only(top: sideSpace, bottom: sideSpace, left: sideSpace*2, right:sideSpace*2),
         child: Column(
           children: [
             Center(
@@ -137,8 +137,7 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: 15),
             Text(AppLocalizations.of(context).willkommenBeiAppName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 20),
-            Text("Die Vernetzungsapp für Reise- und Auswanderfamilien"),
-            Text("Schnell und einfach, auf der ganzen Welt, Familien finden und treffen")
+            Text(AppLocalizations.of(context).slogn1 + "\n" + AppLocalizations.of(context).slogn2),
           ],
         )
 

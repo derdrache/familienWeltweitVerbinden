@@ -43,14 +43,18 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 @override
   void initState() {
     setFriendList();
-
+    checkOwnProfil();
     super.initState();
   }
 
+  checkOwnProfil(){
+    if(widget.profil["id"] == userID) widget.ownProfil = true;
+  }
 
   setFriendList() async {
     if (widget.userName == null) return;
-    userFriendlist = await ProfilDatabase().getOneData("friendlist", "name", widget.userName);
+    var dbFriendlist = await ProfilDatabase().getOneData("friendlist", "name", widget.userName);
+    userFriendlist = dbFriendlist == "" ? []: dbFriendlist;
   }
 
   @override

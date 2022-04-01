@@ -164,7 +164,12 @@
     "ort": "Location: ",
     "eventSpracheAendern": "Change event language",
     "sprache": "Language: ",
-    "eingabeKeinLink": "Input is not a link"
+    "eingabeKeinLink": "Input is not a link",
+    "bitteBildAussuchen": "Please choose an image",
+    "slogn1": "The networking app for travel and expat families.",
+    "slogn2": "Find families around the world quickly and easily and organize meetings",
+    "linkBearbeiten": "edit link",
+    "linkOeffnen": "open link"
 
 }
 
