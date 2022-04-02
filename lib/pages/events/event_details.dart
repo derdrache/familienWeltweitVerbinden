@@ -265,6 +265,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   setState(() {
                     widget.teilnahme = true;
                     widget.absage = false;
+                    widget.event["zusage"].add(userId);
+                    widget.event["absage"].remove(userId);
                   });
 
 
@@ -286,12 +288,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             child: FloatingActionButton.extended(
               heroTag: "Absagen",
               backgroundColor: Theme.of(context).colorScheme.primary,
-              label: Text(AppLocalizations.of(context).absagen),
+              label: Text(AppLocalizations.of(context).absage),
               onPressed: () async {
 
                 setState(() {
                   widget.teilnahme = false;
                   widget.absage = true;
+                  widget.event["zusage"].remove(userId);
+                  widget.event["absage"].add(userId);
                 });
 
                 var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
@@ -340,11 +344,22 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
       if(widget.event["freischalten"].length == 0) {
         freizugebenListe.add(
-        Text(AppLocalizations.of(context).keineFamilienFreigebenVorhanden, style: const TextStyle(color: Colors.grey),)
-      );
+          Padding(
+            padding: const EdgeInsets.only(top:50),
+            child: Center(
+              child: Text(
+                AppLocalizations.of(context).keineFamilienFreigebenVorhanden,
+                style: const TextStyle(color: Colors.grey),
+              ),
+            ),
+          )
+        );
       }
 
-      return freizugebenListe;
+      return ListView(
+        shrinkWrap: true,
+        children: freizugebenListe
+      );
     }
 
     userfreischalteWindow() async{
@@ -357,21 +372,47 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 builder: (context, setState){
                   windowSetState = setState;
                   return AlertDialog(
-                    title: Text(AppLocalizations.of(context).familienFreigeben),
-                    content: FutureBuilder(
-                      future: userFreischaltenList(windowSetState),
-                      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                        if(snapshot.hasData){
-                          return Column(
-                            children: snapshot.data,
-                          );
-                        } else{
-                          return Column(
-                            children: const [CircularProgressIndicator()],
-                          );
-                        }
-
-                      },
+                    contentPadding: EdgeInsets.zero,
+                    content: Stack(
+                      clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                        height: 600,
+                        width: 600,
+                        child: FutureBuilder(
+                          future: userFreischaltenList(windowSetState),
+                          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                            if(snapshot.hasData){
+                              return Column(
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.all(10),
+                                      child: Text(
+                                          AppLocalizations.of(context).familienFreigeben,
+                                        style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    snapshot.data
+                                  ]
+                              );
+                            }
+                            return SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                        Positioned(
+                          height: 30,
+                          right: -13,
+                          top: -7,
+                          child: InkResponse(
+                              onTap: () => Navigator.pop(context),
+                              child: const CircleAvatar(
+                                child: Icon(Icons.close, size: 16,),
+                                backgroundColor: Colors.red,
+                              )
+                          ),
+                        ),
+                    ]
                     ),
                   );
             });

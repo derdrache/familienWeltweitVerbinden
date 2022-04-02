@@ -613,7 +613,7 @@ CustomWindow({context, title = "",List<Widget> children, double height = double.
               height: height,
               width: 600,
               child: Stack(
-                overflow: Overflow.visible,
+                clipBehavior: Clip.none,
                 children: [
                   ScrollConfiguration(
                     behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
