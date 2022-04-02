@@ -31,7 +31,7 @@ class _ChatPageState extends State<ChatPage>{
     dynamic userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
     var allName = await ProfilDatabase().getOneDataFromAll("name");
 
-    if(userFriendlist is String) userFriendlist = jsonDecode(userFriendlist);
+    if(userFriendlist is String ) userFriendlist = jsonDecode(userFriendlist);
 
     userFriendlist??= [];
 

@@ -76,8 +76,6 @@ class _EventCardState extends State<EventCard> {
               zusageList.add(userId);
               EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
 
-              if(!widget.event["absage"].contains(userId)) return;
-
               var absageList = await EventDatabase().getOneData("absage", widget.event["id"]);
               absageList.remove(userId);
               EventDatabase().updateOne(widget.event["id"], "absage", absageList);
@@ -89,7 +87,7 @@ class _EventCardState extends State<EventCard> {
               children:[
                 const Icon(Icons.cancel, color: Colors.red,),
                 const SizedBox(width: 10),
-                Text(AppLocalizations.of(context).absagen),
+                Text(AppLocalizations.of(context).absage),
               ],
             ),
             onTap: () async{
@@ -104,8 +102,6 @@ class _EventCardState extends State<EventCard> {
               absageList.add(userId);
               EventDatabase().updateOne(widget.event["id"], "absage", absageList);
 
-              if(!widget.event["zusage"].contains(userId)) return;
-
               var zusageList = await EventDatabase().getOneData("zusage", widget.event["id"]);
               zusageList.remove(userId);
               EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
@@ -118,7 +114,7 @@ class _EventCardState extends State<EventCard> {
 
 
     return GestureDetector(
-      onLongPressStart: forTeilnahmeFreigegeben ?
+      onLongPressStart: widget.isCreator || forTeilnahmeFreigegeben ?
           (tapdownDetails) => cardMenu(tapdownDetails.globalPosition) : null,
       onTap: () {
         Navigator.push(
