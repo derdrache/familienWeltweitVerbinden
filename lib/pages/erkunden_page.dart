@@ -83,6 +83,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var countryDropDownList = spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
     searchAutocomplete =  SearchAutocomplete(
+      hintText: AppLocalizations.of(context).filterErkunden,
       searchableItems: global_var.reisearten + global_var.interessenListe +
           global_var.sprachenListe + allUserName + countryDropDownList,
       onConfirm: () => changeMapFilter(),

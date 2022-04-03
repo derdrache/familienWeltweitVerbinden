@@ -76,8 +76,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     freischaltenList.remove(user);
     EventDatabase().updateOne(eventId, "freischalten", freischaltenList);
 
-    setState(() {});
-
     if(angenommen) return;
     
     var freigegebenListe = await EventDatabase().getOneData("freigegeben", eventId);
@@ -96,6 +94,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     sendNotification(notificationInformation);
      
+  }
+
+  freigegebenEntfernen(user, windowState) async{
+    var eventId = widget.event["id"];
+
+    windowState((){
+      widget.event["freigegeben"].remove(user);
+    });
+
+    var freigegebenList = await EventDatabase().getOneData("freigegeben", eventId);
+    freigegebenList.remove(user);
+    EventDatabase().updateOne(eventId, "freigegeben", freigegebenList);
   }
 
 
@@ -279,6 +289,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
 
 
+
                 },
                 label: Text(AppLocalizations.of(context).teilnehmen)
             ),
@@ -297,6 +308,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   widget.event["zusage"].remove(userId);
                   widget.event["absage"].add(userId);
                 });
+
 
                 var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
                 zusageListe.remove(userId);
@@ -362,6 +374,49 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       );
     }
 
+    freigeschalteteUser(windowSetState) async{
+      List<Widget>freigeschlatetList = [];
+
+      for(var user in widget.event["freigegeben"]){
+        var name = await ProfilDatabase().getOneData("name", "id", user);
+
+        freigeschlatetList.add(
+            Container(
+                child: Row(
+                  children: [
+                    Text(name),
+                    const Expanded(child: SizedBox(width: 10)),
+                    IconButton(
+                        onPressed: () => freigegebenEntfernen(user, windowSetState),
+                        icon: const Icon(Icons.cancel, size: 27,)
+                    ),
+                  ],
+                )
+            )
+        );
+      }
+
+
+      if(widget.event["freischalten"].length == 0) {
+        freigeschlatetList.add(
+            Padding(
+              padding: const EdgeInsets.only(top:50),
+              child: Center(
+                child: Text(
+                  AppLocalizations.of(context).keineFamilienFreigebenVorhanden,
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ),
+            )
+        );
+      }
+
+      return ListView(
+          shrinkWrap: true,
+          children: freigeschlatetList
+      );
+    }
+
     userfreischalteWindow() async{
       var windowSetState;
 
@@ -377,28 +432,55 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       clipBehavior: Clip.none,
                         children: [
                           Container(
-                        height: 600,
-                        width: 600,
-                        child: FutureBuilder(
-                          future: userFreischaltenList(windowSetState),
-                          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                            if(snapshot.hasData){
-                              return Column(
-                                  children: [
-                                    Container(
-                                      margin: EdgeInsets.all(10),
-                                      child: Text(
-                                          AppLocalizations.of(context).familienFreigeben,
-                                        style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    snapshot.data
-                                  ]
-                              );
-                            }
-                            return SizedBox.shrink();
-                          },
-                        ),
+                            height: 600,
+                            width: 600,
+                            child: Column(children: [
+                              Container(
+                                margin: EdgeInsets.all(10),
+                                child: Text(
+                                  AppLocalizations.of(context).familienFreigeben,
+                                  style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Expanded(
+                                child: FutureBuilder(
+                                  future: userFreischaltenList(windowSetState),
+                                  builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                    if(snapshot.hasData){
+                                      return Column(
+                                        children: [
+                                        snapshot.data,
+                                        ],
+                                      );
+                                    }
+                                    return SizedBox.shrink();
+                                  },
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.all(10),
+                                child: Text(
+                                  AppLocalizations.of(context).freigegebeneFamilien,
+                                  style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Expanded(
+                                child: FutureBuilder(
+                                  future: freigeschalteteUser(windowSetState),
+                                  builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                    if(snapshot.hasData){
+                                      return Column(
+                                        children: [
+                                          snapshot.data,
+                                        ],
+                                      );
+                                    }
+                                    return SizedBox.shrink();
+                                  },
+                                ),
+                              )
+
+                            ])
                       ),
                         Positioned(
                           height: 30,

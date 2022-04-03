@@ -5,7 +5,6 @@
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
-            <category android:name="android.intent.category.BROWSABLE" />
             <data android:scheme="https" />
         </intent>
     </queries>
@@ -13,6 +12,10 @@
    <application
         android:label="Families worldwide"
         android:icon="@mipmap/ic_launcher">
+
+       <activity android:name="io.flutter.plugins.urllauncher.WebViewActivity"
+           android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+           android:exported="false"/>
 
         <activity
             android:name=".MainActivity"

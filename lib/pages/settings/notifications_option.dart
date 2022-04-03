@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -22,7 +23,11 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
     return Row(
       children: [
         SizedBox(width: 20),
-        Text(AppLocalizations.of(context).benachrichtigungenErhalten, style: TextStyle(fontSize: 20),),
+        Text(
+          kIsWeb? AppLocalizations.of(context).emailErhalten :
+          AppLocalizations.of(context).benachrichtigungenErhalten, //email erhalten
+          style: TextStyle(fontSize: 20)
+        ),
         Expanded(child: SizedBox(width: 20)),
         Switch(
             value: widget.profil["notificationstatus"] ?? true,

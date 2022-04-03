@@ -176,7 +176,11 @@
     "interessierte" : "Interessierte: ",
     "zusagen": "Zusagen: ",
     "absagen": "Absagen: ",
-    "freigegeben" : "Freigegeben: "
+    "freigegeben" : "Freigegeben: ",
+    "freigegebeneFamilien": "Freigegebene Familien",
+    "filterEventSuche": "Filtern nach Sprachen, Länder, Städte",
+    "filterErkunden": "Familien, Sprachen, Reiseart, Interessen, Länder",
+    "emailErhalten" : "Email erhalten"
 
 
 
