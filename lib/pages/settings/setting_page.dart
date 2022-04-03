@@ -336,9 +336,11 @@ class _SettingPageState extends State<SettingPage> {
                           context, PrivacySecurityPage(profil: userProfil)
                       )
               ),
-              if(!kIsWeb) const SizedBox(height: 20),
-              if(!kIsWeb) settingThemeContainer(AppLocalizations.of(context).benachrichtigungen, Icons.notifications,
-                      () => global_functions.changePage(
+              const SizedBox(height: 20),
+              settingThemeContainer(
+                  AppLocalizations.of(context).benachrichtigungen,
+                  Icons.notifications,
+                  () => global_functions.changePage(
                       context, NotificationsOptionsPage(profil: userProfil)
                   )
               ),

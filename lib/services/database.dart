@@ -555,7 +555,11 @@ sendChatNotification(chatId, messageData) async {
 }
 
 sendNotification(notificationInformation) async {
-  //neu
+    var notificationsAllowed = await ProfilDatabase().
+      getOneData("notificationstatus", "id", notificationInformation["toId"]);
+
+    if(notificationsAllowed == 0) return;
+
     if(notificationInformation["token"] == "" || notificationInformation["token"] == null){
       var emailAdresse = await ProfilDatabase().getOneData("email", "id", notificationInformation["toId"]);
       var url = Uri.parse(databaseUrl + "services/sendEmail.php");

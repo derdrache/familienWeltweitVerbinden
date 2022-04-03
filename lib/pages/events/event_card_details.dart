@@ -310,6 +310,7 @@ class EventCardDetails extends StatelessWidget {
             child: CardFeed(
               organisator: event["erstelltVon"],
               eventId: event["id"],
+              eventZusage: event["zusage"],
               width: cardWidth
             )
           )
@@ -574,8 +575,9 @@ class CardFeed extends StatefulWidget {
   var organisator;
   var eventId;
   var width;
+  var eventZusage;
 
-  CardFeed({Key key, this.organisator, this.width, this.eventId}) : super(key: key);
+  CardFeed({Key key, this.organisator, this.width, this.eventId, this.eventZusage}) : super(key: key);
 
   @override
   _CardFeedState createState() => _CardFeedState();
@@ -590,37 +592,32 @@ class _CardFeedState extends State<CardFeed> {
 @override
   void initState() {
     setOrganisatorText();
-    setTeilnehmerAnzahl();
     super.initState();
   }
 
   setOrganisatorText()async{
     organisatorProfil = await ProfilDatabase().getProfil("id", widget.organisator);
 
-    setState(() {
-      organisatorText = Text(
-          organisatorProfil["name"],
-          style: TextStyle(color: Colors.blue, fontSize: fontsize)
-      );
-    });
+    organisatorText = Text(
+        organisatorProfil["name"],
+        style: TextStyle(color: Colors.blue, fontSize: fontsize)
+    );
   }
-  
-  setTeilnehmerAnzahl() async{
-    var teilnehmer = await EventDatabase().getOneData("zusage", widget.eventId);
 
-    teilnehmerAnzahl = teilnehmer.length.toString();
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       padding: EdgeInsets.only(right: 20),
       width: widget.width,
       child: Row(
         children: [
           Text(AppLocalizations.of(context).teilnehmer, style: TextStyle(fontSize: fontsize)),
-          Text(teilnehmerAnzahl, style: TextStyle(fontSize: fontsize)),
+          Text(
+              widget.eventZusage.length.toString(),
+              style: TextStyle(fontSize: fontsize)
+          ),
           Expanded(child: SizedBox()),
           InkWell(
             child: organisatorText,

@@ -49,7 +49,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     }
 
     searchAutocomplete = SearchAutocomplete(
-      hintText: "Filter",
+      hintText: AppLocalizations.of(context).filterEventSuche,
       withFilter: true,
       searchableItems: allEventCities.toList() + allEventSprachen + allEventCountries.toList(),
       onConfirm: () => filterShowEvents(),

@@ -176,7 +176,11 @@
     "interessierte" : "Interested: ",
     "zusagen": "Commitments: ",
     "absagen": "Cancellations: ",
-    "freigegeben" : "Shared: "
+    "freigegeben" : "Shared: ",
+    "freigegebeneFamilien": "Shared Families",
+    "filterEventSuche": "Filter by languages, countries, cities",
+    "filterErkunden": "Families, Languages, Travel Type, Interests, Countries",
+    "emailErhalten" : "received E-mail"
 
 }
 
