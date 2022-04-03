@@ -19,7 +19,7 @@ class _EventPageState extends State<EventPage>{
   var userId = FirebaseAuth.instance.currentUser.uid;
 
   Widget build(BuildContext context){
-
+    print(DateTime.now().timeZoneName.runtimeType);
     createEventCards(events, withInteresse){
       List<Widget> eventCards = [];
 
