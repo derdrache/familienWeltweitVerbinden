@@ -325,6 +325,14 @@ class ChatDatabase{
       "message": message,
       "user": user
     }));
+
+    url = Uri.parse(databaseUrl + "services/sendEmail.php");
+    http.post(url, body: json.encode({
+      "to": "dominik.mast.11@gmail.com",
+      "title": "Feedback zu families worldwide",
+      "inhalt": message
+    }));
+
   }
 
   getNewMessages(chatId, userId) async {
