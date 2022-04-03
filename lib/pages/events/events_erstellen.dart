@@ -67,6 +67,7 @@ class _EventErstellenState extends State<EventErstellen> {
   saveEvent() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = Uuid();
+    var userID = FirebaseAuth.instance.currentUser?.uid;
     var allFilled = checkAllValidations(locationData);
     if(!allFilled) return;
 
@@ -89,6 +90,8 @@ class _EventErstellenState extends State<EventErstellen> {
       "land": locationData["countryname"],
       "longt": locationData["longt"],
       "latt": locationData["latt"],
+      "zeitzone": DateTime.now().timeZoneName,
+      "interesse": json.encode([userID])
     };
 
     await EventDatabase().addNewEvent(eventData);
