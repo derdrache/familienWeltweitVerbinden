@@ -409,6 +409,8 @@ class EventDatabase{
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     var responseBody = json.decode(res.body);
 
+    if(responseBody == false) return false;
+
     responseBody["interesse"] = jsonDecode(responseBody["interesse"]);
     responseBody["zusage"] = jsonDecode(responseBody["zusage"]);
     responseBody["absage"] = jsonDecode(responseBody["absage"]);
@@ -569,7 +571,9 @@ sendNotification(notificationInformation) async {
     if(notificationsAllowed == 0) return;
 
     if(notificationInformation["token"] == "" || notificationInformation["token"] == null){
+      print(notificationInformation["toId"]);
       var emailAdresse = await ProfilDatabase().getOneData("email", "id", notificationInformation["toId"]);
+
       var url = Uri.parse(databaseUrl + "services/sendEmail.php");
       http.post(url, body: json.encode({
         "to": emailAdresse,

@@ -23,8 +23,8 @@ class EventDetailsPage extends StatefulWidget {
     Key key,
     this.event,
   }) :
-    teilnahme = event["zusage"].contains(userId),
-    absage = event["absage"].contains(userId);
+    teilnahme = event["zusage"] == null ? [] :event["zusage"].contains(userId),
+    absage = event["absage"] == null ? [] :event["absage"].contains(userId);
 
   @override
   _EventDetailsPageState createState() => _EventDetailsPageState();
@@ -47,10 +47,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     isNotPublic = widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
 
     eventDetails = {
-      "zusagen": widget.event["zusage"].length,
-      "absagen": widget.event["absage"].length,
-      "interessierte": widget.event["interesse"].length,
-      "freigegeben": widget.event["freigegeben"].length
+      "zusagen": widget.event["zusage"] == null ? [] :widget.event["zusage"].length,
+      "absagen": widget.event["absage"] == null ? [] :widget.event["absage"].length,
+      "interessierte": widget.event["interesse"] == null ? [] :widget.event["interesse"].length,
+      "freigegeben": widget.event["freigegeben"] == null ? [] :widget.event["freigegeben"].length
     };
 
     getDatabaseData();
@@ -67,6 +67,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     var eventId = widget.event["id"];
 
     widget.event["freischalten"].remove(user);
+    widget.event["freigegeben"].add(user);
     windowState((){
 
     });
@@ -76,11 +77,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     freischaltenList.remove(user);
     EventDatabase().updateOne(eventId, "freischalten", freischaltenList);
 
-    if(angenommen) return;
-    
+    if(!angenommen) return;
+
     var freigegebenListe = await EventDatabase().getOneData("freigegeben", eventId);
     freigegebenListe.add(user);
     EventDatabase().updateOne(eventId, "freigegeben", freigegebenListe);
+
+    setState(() {
+
+    });
 
     var receiverToken = await ProfilDatabase().getOneData("token", "id", user);
 
@@ -89,9 +94,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       "title": "Event Freigabe",
       "inhalt": "Du hast jetzt Zugriff auf folgendes Event: " + widget.event["name"],
       "changePageId": eventId,
-      "typ": "event"
+      "typ": "event",
+      "toId": user
     };
-
     sendNotification(notificationInformation);
      
   }
@@ -335,6 +340,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
         freizugebenListe.add(
             Container(
+                margin: EdgeInsets.only(left: 20),
                 child: Row(
                   children: [
                     Text(name),
@@ -382,6 +388,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
         freigeschlatetList.add(
             Container(
+                margin: EdgeInsets.only(left: 20),
                 child: Row(
                   children: [
                     Text(name),
@@ -546,6 +553,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     return Scaffold(
         appBar: customAppBar(
+          context: context,
             title: "",
             buttons: [
               if(isCreator && isNotPublic) FutureBuilder(

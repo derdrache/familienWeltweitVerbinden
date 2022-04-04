@@ -19,7 +19,7 @@ class NotificationsOptionsPage extends StatefulWidget {
 class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
 
-  mitteilungEinstellung(){
+  allNotificationSetting(){
     return Row(
       children: [
         SizedBox(width: 20),
@@ -43,6 +43,34 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
     );
   }
 
+  chatNotificationSetting(){
+    return Row(
+      children: [
+        SizedBox(width: 20),
+        Text(
+            kIsWeb? AppLocalizations.of(context).chatEmailErhalten :
+            AppLocalizations.of(context).chatNotificationErhalten,
+            style: TextStyle(fontSize: 20)
+        ),
+        Expanded(child: SizedBox(width: 20)),
+        Switch(
+            value: widget.profil["chatNotificationOn"] ?? true,
+            onChanged: (value){
+              setState(() {
+                widget.profil["chatNotificationOn"] = value;
+              });
+
+              ProfilDatabase().updateProfil(userId, "chatNotificationOn", value);
+
+            })
+      ],
+    );
+  }
+
+  eventNotificationSetting(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +78,9 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       body: Column(
         children: [
           SizedBox(height: 20,),
-          mitteilungEinstellung()
+          allNotificationSetting(),
+          chatNotificationSetting(),
+          eventNotificationSetting()
         ],
       ),
     );

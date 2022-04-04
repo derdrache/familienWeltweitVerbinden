@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
 import 'package:familien_suche/pages/events/event_details.dart';
+import 'package:familien_suche/pages/start_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -48,6 +49,7 @@ class _EventErstellenState extends State<EventErstellen> {
     );
 
     ortTypDropdown = CustomDropDownButton(
+      selected: "offline",
       hintText: "offline / online",
       items: isGerman ? global_var.eventTyp : global_var.eventTypEnglisch,
       onChange: () {
@@ -67,6 +69,7 @@ class _EventErstellenState extends State<EventErstellen> {
   saveEvent() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = Uuid();
+    var eventId = uuid.v4();
     var userID = FirebaseAuth.instance.currentUser?.uid;
     var allFilled = checkAllValidations(locationData);
     if(!allFilled) return;
@@ -76,7 +79,7 @@ class _EventErstellenState extends State<EventErstellen> {
         eventUhrzeit.hour, eventUhrzeit.minute);
 
     var eventData = {
-      "id": uuid.v4(),
+      "id": eventId,
       "name" : eventNameKontroller.text,
       "erstelltAm": DateTime.now().toString(),
       "erstelltVon": FirebaseAuth.instance.currentUser.uid,
@@ -91,12 +94,15 @@ class _EventErstellenState extends State<EventErstellen> {
       "longt": locationData["longt"],
       "latt": locationData["latt"],
       "zeitzone": DateTime.now().timeZoneName,
-      "interesse": json.encode([userID])
+      "interesse": json.encode([userID]),
+      "bild": "assets/bilder/strand.jpg",
     };
 
     await EventDatabase().addNewEvent(eventData);
-    global_functions.changePage(context, EventPage());
-    global_functions.changePage(context, EventDetailsPage(event: eventData));
+    var dbEventData = await EventDatabase().getEvent(eventId);
+
+    global_functions.changePage(context, StartPage(selectedIndex: 1));
+    global_functions.changePage(context, EventDetailsPage(event: dbEventData));
   }
 
   checkAllValidations(locationData){
@@ -112,8 +118,8 @@ class _EventErstellenState extends State<EventErstellen> {
       validationFailText = AppLocalizations.of(context).bitteEventTypEingeben;
     } else if(ortTypDropdown.getSelected() == "offline" && locationData["city"] == null){
       validationFailText = AppLocalizations.of(context).bitteStadtEingeben;
-    } else if (ortTypDropdown.getSelected() == "online" && eventOrtKontroller.text.isEmpty) {
-      validationFailText = AppLocalizations.of(context).bitteLinkEingeben;
+    //} else if (ortTypDropdown.getSelected() == "online" && eventOrtKontroller.text.isEmpty) {
+    //  validationFailText = AppLocalizations.of(context).bitteLinkEingeben;
     }else if(sprachenAuswahlBox.getSelected().isEmpty){
       validationFailText = AppLocalizations.of(context).bitteSpracheEingeben;
     } else if(eventDatum == null){
@@ -137,7 +143,6 @@ class _EventErstellenState extends State<EventErstellen> {
     sprachenAuswahlBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
     eventArtDropdown.hintText = AppLocalizations.of(context).eventArten;
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
-    print(screenWidth);
 
     dateAndTimeBox(){
       var dateString = AppLocalizations.of(context).datumAuswaehlen;
@@ -278,7 +283,7 @@ class _EventErstellenState extends State<EventErstellen> {
                   eventArtInformation()
                 ],
               ),
-              ortTypDropdown,
+              //ortTypDropdown,
               ortEingabeBox(),
               sprachenAuswahlBox,
               dateAndTimeBox(),

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:familien_suche/global/year_picker.dart';
+import 'package:familien_suche/pages/events/event_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -93,10 +94,11 @@ customSnackbar(context, text, {color = Colors.red}){
   return ScaffoldMessenger.of(context).showSnackBar(snackbar);
 }
 
-customAppBar({title, buttons, elevation = 4.0, var onTap}){
+customAppBar({title, buttons, elevation = 4.0, var onTap, context}){
   buttons ??= <Widget>[];
 
     return AppBar(
+      leading: null,
       title: InkWell(
           onTap: onTap,
           child: Row(

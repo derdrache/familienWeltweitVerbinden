@@ -73,13 +73,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   Future initialize() async{
     var allMessages = await ChatDatabase().getAllMessages(widget.chatId);
 
-    for(var message in allMessages){
-      if(message["message"].contains("</eventId=")){
-        var eventId = message["message"].split("=")[1];
+
+    for(var i = 0; i< allMessages.length; i++){
+      if(allMessages[i]["message"].contains("</eventId=")){
+        var eventId = allMessages[i]["message"].split("=")[1];
         var eventData = await EventDatabase().getEvent(eventId);
+
+        if(eventData == false) {
+          allMessages[i]["message"] = "** veraltetes Event **";
+          continue;
+        }
+
         eventCardList.add(eventData);
       }
     }
+
+
+
 
     return allMessages;
   }
@@ -219,7 +229,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       List<Widget> messageBox = [];
       var eventCardCounter = 0;
 
-
       for (var i = 0; i< messages.length; i++) {
         var message = messages[i];
         var messageTime = DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
@@ -241,6 +250,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                 Align(
                   alignment: textAlign,
                   child: EventCard(
+                    margin: EdgeInsets.all(10),
                     withInteresse: true,
                     event: eventCardList[eventCardCounter],
                     afterPageVisit: () => setState((){}),

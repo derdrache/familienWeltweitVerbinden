@@ -36,7 +36,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
   }
 
   initialize() async {
-    eventsBackup = await EventDatabase().getEvents("art != 'privat' AND erstelltVon != '"+userId+"'");
+    eventsBackup = await EventDatabase().getEvents("art != 'privat' AND erstelltVon != '"+userId+"' ORDER BY erstelltAm ASC");
     allEvents = eventsBackup;
 
     allEventCities = Set();

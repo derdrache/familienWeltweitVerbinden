@@ -180,7 +180,9 @@
     "freigegebeneFamilien": "Freigegebene Familien",
     "filterEventSuche": "Filtern nach Sprachen, Länder, Städte",
     "filterErkunden": "Familien, Sprachen, Reiseart, Interessen, Länder",
-    "emailErhalten" : "Email erhalten"
+    "emailErhalten" : "Email erhalten",
+    "chatNotificationErhalten": "Chat-Notification erhalten",
+    "chatEmailErhalten": "Chat-Emails erhalten"
 
 
 
