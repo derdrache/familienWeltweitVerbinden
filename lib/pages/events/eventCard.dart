@@ -18,7 +18,7 @@ class EventCard extends StatefulWidget {
     Key key,
     this.event,
     this.withInteresse = false,
-    this.margin = const EdgeInsets.only(top:10, bottom: 10, right: 10, left: 10),
+    this.margin = const EdgeInsets.only(top:10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
   }): isCreator = event["erstelltVon"] == userId;
 

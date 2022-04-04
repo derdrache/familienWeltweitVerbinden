@@ -602,6 +602,8 @@ class _CardFeedState extends State<CardFeed> {
         organisatorProfil["name"],
         style: TextStyle(color: Colors.blue, fontSize: fontsize)
     );
+
+    setState(() {});
   }
 
 

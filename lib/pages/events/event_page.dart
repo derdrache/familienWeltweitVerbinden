@@ -19,7 +19,7 @@ class _EventPageState extends State<EventPage>{
   var userId = FirebaseAuth.instance.currentUser.uid;
 
   Widget build(BuildContext context){
-    print(DateTime.now().timeZoneName.runtimeType);
+
     createEventCards(events, withInteresse){
       List<Widget> eventCards = [];
 
@@ -29,15 +29,7 @@ class _EventPageState extends State<EventPage>{
               event: event,
               withInteresse: withInteresse,
               afterPageVisit: ()=> setState(() {})
-              /*
-              changePage: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => EventDetailsPage(
-                    event: event
-                  )
-                  )).whenComplete(() => setState(() {})),
 
-               */
             )
         );
       }
@@ -103,7 +95,7 @@ class _EventPageState extends State<EventPage>{
               )
             ),
             FutureBuilder(
-              future: EventDatabase().getEvents("erstelltVon = '"+userId+"'"),
+              future: EventDatabase().getEvents("erstelltVon = '"+userId+"' ORDER BY wann ASC"),
               builder: (
                 BuildContext context,
                 AsyncSnapshot snapshot,
@@ -134,7 +126,7 @@ class _EventPageState extends State<EventPage>{
             children: [
               Expanded(child: meineInteressiertenEventsBox()),
               Expanded(child: meineErstellenEventsBox()),
-              const SizedBox(height: 30)
+              const SizedBox(height: 50)
             ]
           )
         ),
