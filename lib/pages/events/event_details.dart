@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../global/search_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/style.dart' as global_style;
 import '../../widgets/badge_icon.dart';
@@ -91,8 +92,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     var notificationInformation = {
       "to": receiverToken,
-      "title": "Event Freigabe",
-      "inhalt": "Du hast jetzt Zugriff auf folgendes Event: " + widget.event["name"],
+      "title": AppLocalizations.of(context).eventFreigeben,
+      "inhalt": AppLocalizations.of(context).zugriffFolgendesEvent + widget.event["name"],
       "changePageId": eventId,
       "typ": "event",
       "toId": user
@@ -111,6 +112,48 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     var freigegebenList = await EventDatabase().getOneData("freigegeben", eventId);
     freigegebenList.remove(user);
     EventDatabase().updateOne(eventId, "freigegeben", freigegebenList);
+  }
+
+  changeOrganisatorWindow(){
+    var inputKontroller = TextEditingController();
+
+    searchAutocomplete = SearchAutocomplete(
+      searchKontroller: inputKontroller,
+      searchableItems: allName,
+      withFilter: false,
+      onConfirm: (){
+        inputKontroller.text= searchAutocomplete.getSelected()[0];
+      },
+    );
+
+    CustomWindow(
+      context: context,
+      height: 300,
+      title: AppLocalizations.of(context).organisatorAbgeben,
+      children: [
+        searchAutocomplete,
+        SizedBox(height: 40),
+        FloatingActionButton.extended(
+          label: Text(AppLocalizations.of(context).uebertragen),
+          onPressed: () async{
+            var selectedUserId = await ProfilDatabase().getOneData("id", "name", inputKontroller.text);
+            await EventDatabase().updateOne(widget.event["id"], "erstelltVon", selectedUserId);
+            setState(() {
+
+            });
+
+            Navigator.pop(context);
+
+            customSnackbar(
+              context,
+                AppLocalizations.of(context).eventUebergebenAn1
+                    + inputKontroller.text + AppLocalizations.of(context).eventUebergebenAn2,
+              color: Colors.green
+            );
+          },
+        )
+      ]
+    );
   }
 
 
@@ -240,6 +283,22 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       );
     }
 
+    changeOrganisatorDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.change_circle),
+            const SizedBox(width: 10),
+            Text("Organisator abgeben"),
+          ],
+        ),
+        onPressed: (){
+          Navigator.pop(context);
+          changeOrganisatorWindow();
+        } ,
+      );
+    }
+
     moreMenu(){
       showDialog(
         context: context,
@@ -253,10 +312,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   contentPadding: EdgeInsets.zero,
                   insetPadding: const EdgeInsets.only(top:40, left: 0, right:10),
                   children: [
+                    if(!isCreator) reportEventDialog(),
                     if(isCreator) eventDetailsDialog(),
+                    if(isCreator) changeOrganisatorDialog(),
                     if(isCreator) const SizedBox(height: 15),
                     if(isCreator) deleteEventDialog(),
-                    if(!isCreator) reportEventDialog()
+
                   ],
                 ),
               ),

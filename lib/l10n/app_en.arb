@@ -182,7 +182,15 @@
     "filterErkunden": "Families, Languages, Travel Type, Interests, Countries",
     "emailErhalten" : "received E-mail",
     "chatNotificationErhalten": "Receive chat notification",
-    "chatEmailErhalten": "Receive chat emails"
+    "chatEmailErhalten": "Receive chat emails",
+    "eventNotificationErhalten": "Receive event notification",
+    "eventEmailErhalten": "Receive event emails",
+    "eventUebergebenAn1": "the event was successfully handed over to ",
+    "eventUebergebenAn2": " ",
+    "uebertragen": "transfer",
+    "organisatorAbgeben": "submit organizer",
+    "eventFreigeben": "Event release",
+    "zugriffFolgendesEvent": "You now have access to the following event: "
 
 }
 

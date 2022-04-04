@@ -9,7 +9,6 @@ import 'package:intl/intl.dart';
 
 import '../../services/database.dart';
 import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart';
 import '../../global/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 import 'chat_details.dart';
@@ -30,8 +29,6 @@ class _ChatPageState extends State<ChatPage>{
   selectChatpartnerWindow() async {
     dynamic userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
     var allName = await ProfilDatabase().getOneDataFromAll("name");
-
-    if(userFriendlist is String ) userFriendlist = jsonDecode(userFriendlist);
 
     userFriendlist??= [];
 

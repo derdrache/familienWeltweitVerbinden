@@ -21,6 +21,17 @@ class SearchAutocomplete extends StatefulWidget {
   var googleSearchResult;
   var sessionToken = Uuid().v4();
 
+  SearchAutocomplete({Key key,
+    this.searchableItems,
+    this.onConfirm,
+    this.onDelete,
+    this.withFilter = true,
+    this.hintText = "Filter",
+    this.googleAutocomplete = false,
+    this.searchKontroller
+  }) : isDense = !withFilter;
+
+
   getSelected(){
     return filterList;
   }
@@ -43,14 +54,6 @@ class SearchAutocomplete extends StatefulWidget {
 
 
 
-  SearchAutocomplete({Key key,
-    this.searchableItems,
-    this.onConfirm,
-    this.onDelete,
-    this.withFilter = true,
-    this.hintText = "Filter",
-    this.googleAutocomplete = false,
-  }) : isDense = !withFilter;
 
   @override
   _SearchAutocompleteState createState() => _SearchAutocompleteState();
