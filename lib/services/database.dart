@@ -97,6 +97,8 @@ class ProfilDatabase{
     if(responseBody["friendlist"] != "") responseBody["friendlist"] = json.decode(responseBody["friendlist"]);
     responseBody["emailAnzeigen"] = responseBody["emailAnzeigen"] == "0"? false : true;
     responseBody["notificationstatus"] = responseBody["notificationstatus"] == "0"? false : true;
+    responseBody["chatNotificationOn"] = responseBody["chatNotificationOn"] == "0"? false : true;
+    responseBody["eventNotificationOn"] = responseBody["eventNotificationOn"] == "0"? false : true;
 
     return responseBody;
 
@@ -571,7 +573,7 @@ sendNotification(notificationInformation) async {
     if(notificationsAllowed == 0) return;
 
     if(notificationInformation["token"] == "" || notificationInformation["token"] == null){
-      print(notificationInformation["toId"]);
+
       var emailAdresse = await ProfilDatabase().getOneData("email", "id", notificationInformation["toId"]);
 
       var url = Uri.parse(databaseUrl + "services/sendEmail.php");

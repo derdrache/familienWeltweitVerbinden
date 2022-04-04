@@ -68,7 +68,27 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   }
 
   eventNotificationSetting(){
+    return Row(
+      children: [
+        SizedBox(width: 20),
+        Text(
+            kIsWeb? AppLocalizations.of(context).eventEmailErhalten :
+            AppLocalizations.of(context).eventNotificationErhalten,
+            style: TextStyle(fontSize: 20)
+        ),
+        Expanded(child: SizedBox(width: 20)),
+        Switch(
+            value: widget.profil["eventNotificationOn"] ?? true,
+            onChanged: (value){
+              setState(() {
+                widget.profil["eventNotificationOn"] = value;
+              });
 
+              ProfilDatabase().updateProfil(userId, "eventNotificationOn", value);
+
+            })
+      ],
+    );
   }
 
   @override
@@ -79,8 +99,8 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         children: [
           SizedBox(height: 20,),
           allNotificationSetting(),
-          chatNotificationSetting(),
-          eventNotificationSetting()
+          if(widget.profil["notificationstatus"]) chatNotificationSetting(),
+          if(widget.profil["notificationstatus"]) eventNotificationSetting()
         ],
       ),
     );

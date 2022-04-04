@@ -623,7 +623,7 @@ CustomWindow({context, title = "",List<Widget> children, double height = double.
                       PointerDeviceKind.mouse,
                     }),
                     child: Container(
-                      margin: EdgeInsets.only(left: 10),
+                      margin: EdgeInsets.only(left: 10, right: 10),
                       child: ListView(
                           children: [
                             WindowTopbar(title: title),

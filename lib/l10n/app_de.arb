@@ -182,7 +182,15 @@
     "filterErkunden": "Familien, Sprachen, Reiseart, Interessen, Länder",
     "emailErhalten" : "Email erhalten",
     "chatNotificationErhalten": "Chat-Notification erhalten",
-    "chatEmailErhalten": "Chat-Emails erhalten"
+    "chatEmailErhalten": "Chat-Emails erhalten",
+    "eventNotificationErhalten": "Event-Notification erhalten",
+    "eventEmailErhalten": "Event-Emails erhalten",
+    "eventUebergebenAn1": "Das Event wurde erfolgreich an ",
+    "eventUebergebenAn2": " übergeben",
+    "uebertragen": "Übertragen",
+    "organisatorAbgeben": "Organisator abgeben",
+    "eventFreigeben": "Event Freigabe",
+    "zugriffFolgendesEvent": "Du hast jetzt Zugriff auf folgendes Event: "
 
 
 
