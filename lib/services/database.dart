@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
@@ -9,6 +11,7 @@ import '../global/global_functions.dart'as global_functions;
 
 //var databaseUrl = "https://families-worldwide.com/";
 var databaseUrl = "http://test.families-worldwide.com/";
+var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
 class AllgemeinDatabase{
 
@@ -287,7 +290,7 @@ class ChatDatabase{
     messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
 
     var url = Uri.parse(databaseUrl + "database/chats/newMessage.php");
-    http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "id": chatID,
       "date": date,
       "message": messageData["message"],
@@ -548,17 +551,19 @@ sendChatNotification(chatId, messageData) async {
   if(toActiveChat == chatId) return;
 
 
-  var chatPartnerName = await ProfilDatabase().getOneData("name", "id", messageData["von"]);
+  var fromName = await ProfilDatabase().getOneData("name", "id", messageData["von"]);
   var toToken = await ProfilDatabase().getOneData("token", "id", messageData["zu"]);
+  var chatPartnerName = await ProfilDatabase().getOneData("name", "id", messageData["zu"]);
 
   var notificationInformation = {
     "toId": messageData["zu"],
     "token": toToken,
-    "title": chatPartnerName,
+    "title": fromName,
     "inhalt": messageData["message"],
     "changePageId": chatId,
     "apiKey": firebaseWebKey,
-    "typ" : "chat"
+    "typ" : "chat",
+    "toName": chatPartnerName
   };
 
   sendNotification(notificationInformation);
@@ -573,14 +578,21 @@ sendNotification(notificationInformation) async {
     if(notificationsAllowed == 0) return;
 
     if(notificationInformation["token"] == "" || notificationInformation["token"] == null){
-
       var emailAdresse = await ProfilDatabase().getOneData("email", "id", notificationInformation["toId"]);
 
       var url = Uri.parse(databaseUrl + "services/sendEmail.php");
       http.post(url, body: json.encode({
         "to": emailAdresse,
-        "title": notificationInformation["title"],
-        "inhalt": notificationInformation["inhalt"],
+        "title": notificationInformation["title"] + (spracheIstDeutsch ?
+          " hat dir eine Nachricht geschrieben": " has written you a message"),
+        "inhalt": "Hi ${notificationInformation["toName"]},\n\n" +
+            (spracheIstDeutsch ?
+            "du hast in der families worldwide App folgende Nachricht von "
+                "${notificationInformation["title"]} erhalten: \n\n" :
+            "you have received the following message from "
+                "${notificationInformation["title"]} in the families worldwide app: \n\n"
+            ) +
+        "${notificationInformation["inhalt"]}"
       }));
 
     }else{
