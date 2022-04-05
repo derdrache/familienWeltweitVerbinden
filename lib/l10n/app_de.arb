@@ -191,7 +191,10 @@
     "organisatorAbgeben": "Organisator abgeben",
     "eventFreigeben": "Event Freigabe",
     "zugriffFolgendesEvent": "Du hast jetzt Zugriff auf folgendes Event: ",
-    "hatDirNachrichtGeschrieben": " hat dir eine Nachricht geschrieben"
+    "hatDirNachrichtGeschrieben": " hat dir eine Nachricht geschrieben",
+    "eventZeitzoneAendern": "Event Zeitzone ändern",
+    "zeitzone": "Zeitzone: ",
+    "neueZeitzoneEingeben": "Neue Zeitzone eingeben"
 
 
 

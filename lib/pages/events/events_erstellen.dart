@@ -93,7 +93,7 @@ class _EventErstellenState extends State<EventErstellen> {
       "land": locationData["countryname"],
       "longt": locationData["longt"],
       "latt": locationData["latt"],
-      "zeitzone": DateTime.now().timeZoneName,
+      "zeitzone": DateTime.now().timeZoneOffset.inHours.toString(),
       "interesse": json.encode([userID]),
       "bild": "assets/bilder/strand.jpg",
     };

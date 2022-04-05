@@ -191,7 +191,10 @@
     "organisatorAbgeben": "submit organizer",
     "eventFreigeben": "Event release",
     "zugriffFolgendesEvent": "You now have access to the following event: ",
-    "hatDirNachrichtGeschrieben": " has written you a message"
+    "hatDirNachrichtGeschrieben": " has written you a message",
+    "eventZeitzoneAendern": "Change event time zone",
+    "zeitzone": "Time zone: ",
+    "neueZeitzoneEingeben": "Enter new time zone"
 
 }
 

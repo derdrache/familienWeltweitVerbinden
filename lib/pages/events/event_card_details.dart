@@ -22,6 +22,7 @@ var isWebDesktop = kIsWeb && (defaultTargetPlatform != TargetPlatform.iOS || def
 double fontsize = isWebDesktop? 12 : 16;
 var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
+
 class EventCardDetails extends StatelessWidget {
   var event;
   var offlineEvent;
@@ -117,7 +118,7 @@ class EventCardDetails extends StatelessWidget {
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventDatumAendern,
                 rowTitle: AppLocalizations.of(context).datum,
-                rowData: event["wann"].split(" ")[0].split("-").reversed.join("."),
+                rowData: event["wann"].substring(0,16),
                 inputHintText: AppLocalizations.of(context).neuesDatumEingeben,
                 isCreator: isCreator,
                 modus: "date",
@@ -125,18 +126,18 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "wann"
             ),
             const SizedBox(height: 5),
-            if(isApproved|| isPublic) ShowDataAndChangeWindow(
-                eventId: event["id"],
-                windowTitle: AppLocalizations.of(context).eventUhrzeitAendern,
-                rowTitle: AppLocalizations.of(context).uhrzeit,
-                rowData: event["wann"].split(" ")[1].split(":").take(2).join(":"),
-                inputHintText: AppLocalizations.of(context).neueUhrzeitEingeben,
-                isCreator: isCreator,
-                modus: "dateTime",
-                oldDate: event["wann"],
-                databaseKennzeichnung: "wann"
+            ShowDataAndChangeWindow(
+              eventId: event["id"],
+              windowTitle: AppLocalizations.of(context).eventZeitzoneAendern,
+              rowTitle: AppLocalizations.of(context).zeitzone,
+              rowData: event["zeitzone"],
+              inputHintText: AppLocalizations.of(context).neueZeitzoneEingeben,
+              isCreator: isCreator,
+              modus: "dropdown",
+              databaseKennzeichnung: "zeitzone",
+              items: global_var.eventZeitzonen
             ),
-            if(isApproved|| isPublic) const SizedBox(height: 5),
+            const SizedBox(height: 5),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventStadtAendern,
@@ -394,16 +395,11 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     }else if (widget.databaseKennzeichnung == "beschreibung"){
       data = inputKontroller.text;
     }else if (widget.modus == "date"){
-      data = datumButton.eventDatum;
-      var date = DateTime.parse(widget.oldDate);
+      var date = datumButton.eventDatum ?? DateTime.parse(widget.oldDate);
+      var time = uhrZeitButton.uhrZeit ?? DateTime.parse(widget.oldDate);
 
-      data = DateTime(data.year, data.month, data.day,
-          date.hour, date.minute).toString();
-    }else if (widget.modus == "dateTime"){
-      data = uhrZeitButton.uhrZeit;
-      var date = DateTime.parse(widget.oldDate);
       data = DateTime(date.year, date.month, date.day,
-          data.hour, data.minute).toString();
+          time.hour, time.minute).toString().substring(0,16);
     }
 
     return data;
@@ -424,11 +420,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
   }
 
   changeRowData(data){
-    if(widget.modus == "date") {
-      widget.rowData = data.split(" ")[0];
-    } else if(widget.modus == "dateTime"){
-      widget.rowData = data.split(" ")[1] + " Uhr";
-    }else if(widget.databaseKennzeichnung == "location"){
+    if(widget.databaseKennzeichnung == "location"){
       widget.rowData = data["city"] + ", " + data["countryname"];
     }else{
       widget.rowData = data;
@@ -466,16 +458,22 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       }
       if(widget.modus == "dropdown") return dropdownInput;
       if(widget.modus == "googleAutoComplete") return ortAuswahlBox;
-      if(widget.modus == "dateTime") return uhrZeitButton;
-      if(widget.modus == "date") return datumButton;
-
+      if(widget.modus== "date"){
+        return Column(children: [
+          datumButton,
+          SizedBox(height: 20),
+          uhrZeitButton,
+          SizedBox(height: 50)
+        ]);
+      }
     }
 
     openChangeWindow(){
       CustomWindow(
           context: context,
           title: widget.windowTitle,
-          height: widget.multiLines || widget.modus == "googleAutoComplete"? 300 : 180,
+          height: widget.multiLines || widget.modus == "googleAutoComplete" ||
+              widget.modus == "date"? 300 : 180,
           children: [
             inputBox(),
             Container(
@@ -539,7 +537,8 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                 child: Container(
                   width: 200,
                   child: Text(
-                    widget.rowData,
+                    widget.databaseKennzeichnung =="zeitzone" ? "UTC " + widget.rowData:
+                      widget.rowData,
                     style: TextStyle(
                         fontSize: fontsize,
                         color: widget.databaseKennzeichnung != "link" ?
