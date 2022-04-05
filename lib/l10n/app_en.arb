@@ -190,7 +190,8 @@
     "uebertragen": "transfer",
     "organisatorAbgeben": "submit organizer",
     "eventFreigeben": "Event release",
-    "zugriffFolgendesEvent": "You now have access to the following event: "
+    "zugriffFolgendesEvent": "You now have access to the following event: ",
+    "hatDirNachrichtGeschrieben": " has written you a message"
 
 }
 
