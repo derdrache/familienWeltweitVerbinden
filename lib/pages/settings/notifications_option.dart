@@ -30,10 +30,10 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         ),
         Expanded(child: SizedBox(width: 20)),
         Switch(
-            value: widget.profil["notificationstatus"] ?? true,
+            value: widget.profil["notificationstatus"] == 1 ? true : false,
             onChanged: (value){
               setState(() {
-                widget.profil["notificationstatus"] = value;
+                widget.profil["notificationstatus"] = value == true ? 1 : 0;
               });
 
               ProfilDatabase().updateProfil(userId, "notificationstatus", value);
@@ -54,10 +54,10 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         ),
         Expanded(child: SizedBox(width: 20)),
         Switch(
-            value: widget.profil["chatNotificationOn"] ?? true,
+            value: widget.profil["chatNotificationOn"] == 1 ? true : false,
             onChanged: (value){
               setState(() {
-                widget.profil["chatNotificationOn"] = value;
+                widget.profil["chatNotificationOn"] = value == true ? 1 : 0;
               });
 
               ProfilDatabase().updateProfil(userId, "chatNotificationOn", value);
@@ -78,10 +78,10 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         ),
         Expanded(child: SizedBox(width: 20)),
         Switch(
-            value: widget.profil["eventNotificationOn"] ?? true,
+            value: widget.profil["eventNotificationOn"] == 1 ? true : false,
             onChanged: (value){
               setState(() {
-                widget.profil["eventNotificationOn"] = value;
+                widget.profil["eventNotificationOn"] = value == true ? 1 : 0;
               });
 
               ProfilDatabase().updateProfil(userId, "eventNotificationOn", value);
@@ -99,8 +99,8 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         children: [
           SizedBox(height: 20,),
           allNotificationSetting(),
-          if(widget.profil["notificationstatus"]) chatNotificationSetting(),
-          if(widget.profil["notificationstatus"]) eventNotificationSetting()
+          if(widget.profil["notificationstatus"] == 1) chatNotificationSetting(),
+          if(widget.profil["notificationstatus"] == 1) eventNotificationSetting()
         ],
       ),
     );

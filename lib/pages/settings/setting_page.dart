@@ -407,7 +407,7 @@ class _SettingPageState extends State<SettingPage> {
 
 
     return FutureBuilder(
-          future: ProfilDatabase().getProfil("id", userID),
+          future: ProfilDatabase().getData("*", "WHERE id = '${userID}'"),
           builder: (
           BuildContext context,
           AsyncSnapshot snapshot,

@@ -29,10 +29,10 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           Text(AppLocalizations.of(context).emailAlleSichtbar, style: TextStyle(fontSize: 20),),
           Expanded(child: SizedBox(width: 20)),
           Switch(
-              value: widget.profil["emailAnzeigen"],
+              value: widget.profil["emailAnzeigen"] == 1 ? true: false,
               onChanged: (value){
                 setState(() {
-                  widget.profil["emailAnzeigen"] = value;
+                  widget.profil["emailAnzeigen"] = value == true ? 1 : 0;
                 });
                 ProfilDatabase().updateProfil(
                     userID, "emailAnzeigen", widget.profil["emailAnzeigen"]);

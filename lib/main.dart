@@ -66,7 +66,8 @@ class MyApp extends StatelessWidget {
       userId = FirebaseAuth.instance.currentUser.uid;
     }
 
-    profilExist = await ProfilDatabase().getOneData("name", "id", userId);
+    profilExist = await ProfilDatabase()
+        .getData("name", "WHERE id = '${userId}'");
     if(kIsWeb) return ;
 
 
@@ -104,7 +105,8 @@ class MyApp extends StatelessWidget {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
       if(message.data.isNotEmpty){
         var messageChatId = json.decode(message.data.values.last)["link"];
-        var activeChat = await ProfilDatabase().getOneData("activeChat","id",userId);
+        var activeChat = await ProfilDatabase()
+            .getData("activeChat", "WHERE id = '${userId}'");
 
         if(activeChat == null || activeChat != messageChatId){
           LocalNotificationService().display(message);

@@ -52,7 +52,8 @@ class ChangeEmailPage extends StatelessWidget {
         return;
       }
 
-      var emailInUse = await ProfilDatabase().getOneData("id", "email", emailKontroller.text);
+      var emailInUse = await ProfilDatabase()
+          .getData("id", "WHERE email = '${emailKontroller.text}'");
       if (emailInUse != false){
         customSnackbar(context, AppLocalizations.of(context).emailInBenutzung);
         return;

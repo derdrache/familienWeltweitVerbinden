@@ -48,7 +48,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
   @override
   void initState() {
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
-
     super.initState();
   }
 
@@ -58,10 +57,11 @@ class _ErkundenPageState extends State<ErkundenPage>{
     getAndSetEvents();
 
     buildLoaded = true;
+
   }
 
   getAndSetProfils()async{
-    profils = await ProfilDatabase().getAllProfils();
+    profils = await ProfilDatabase().getData("*", "");
 
     for(var profil in profils){
       if(getOwnProfil(profil) != null){
@@ -111,9 +111,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
       var newPoint = false;
 
       for(var i = 0; i< list.length; i++){
-        double originalLatt = double.parse(profil["latt"]);
+        double originalLatt = profil["latt"];
         double newLatt = list[i]["latt"];
-        double originalLongth = double.parse(profil["longt"]);
+        double originalLongth = profil["longt"];
         double newLongth = list[i]["longt"];
         bool check = (newLatt + abstand >= originalLatt && newLatt - abstand <= originalLatt) &&
             (newLongth + abstand >= originalLongth && newLongth - abstand<= originalLongth);
@@ -129,8 +129,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         list.add({
           "ort": profil["ort"],
           "name": "1",
-          "latt": double.parse(profil["latt"]),
-          "longt": double.parse(profil["longt"]),
+          "latt": profil["latt"],
+          "longt": profil["longt"],
           "profils": [profil]
         });
       }
@@ -142,8 +142,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
       var newCity = false;
 
       for(var i = 0; i< list.length; i++){
-        double profilLongt = double.parse(profil["longt"]);
-        double profilLatt = double.parse(profil["latt"]);
+        double profilLongt = profil["longt"];
+        double profilLatt = profil["latt"];
 
         if(profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"]){
           newCity = true;
@@ -156,8 +156,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
         list.add({
           "ort": profil["ort"],
           "name": "1",
-          "latt": double.parse(profil["latt"]),
-          "longt": double.parse(profil["longt"]),
+          "latt": profil["latt"],
+          "longt": profil["longt"],
           "profils": [profil]
         });
       }
@@ -637,7 +637,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
             Marker(
               width: 30.0,
               height: 30.0,
-              point: LatLng(double.parse(ownProfil["latt"])+0.07, double.parse(ownProfil["longt"])+0.02),
+              point: LatLng(ownProfil["latt"]+0.07, ownProfil["longt"]+0.02),
               builder: (ctx) => FloatingActionButton(
                 heroTag: "ownMarker",
                 backgroundColor: Colors.transparent,
