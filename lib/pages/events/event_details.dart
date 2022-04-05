@@ -75,13 +75,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     });
 
 
-    var freischaltenList = await EventDatabase().getOneData("freischalten", eventId);
+    var freischaltenList = await EventDatabase()
+        .getData("freischalten", "WHERE id = '${eventId}");
     freischaltenList.remove(user);
     EventDatabase().updateOne(eventId, "freischalten", freischaltenList);
 
     if(!angenommen) return;
 
-    var freigegebenListe = await EventDatabase().getOneData("freigegeben", eventId);
+    var freigegebenListe = await EventDatabase()
+        .getData("freigegeben", "WHERE id = '${eventId}");
     freigegebenListe.add(user);
     EventDatabase().updateOne(eventId, "freigegeben", freigegebenListe);
 
@@ -110,7 +112,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       widget.event["freigegeben"].remove(user);
     });
 
-    var freigegebenList = await EventDatabase().getOneData("freigegeben", eventId);
+    var freigegebenList = await EventDatabase()
+        .getData("freigegeben", "WHERE id = '${eventId}");
     freigegebenList.remove(user);
     EventDatabase().updateOne(eventId, "freigegeben", freigegebenList);
   }
@@ -347,11 +350,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   });
 
 
-                  var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
+                  var zusageListe = await EventDatabase()
+                      .getData("zusage", "WHERE id = '${widget.event["id"]}");
                   zusageListe.add(userId);
                   EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
 
-                  var absageListe = await EventDatabase().getOneData("absage", widget.event["id"]);
+                  var absageListe = await EventDatabase()
+                      .getData("absage", "WHERE id = '${widget.event["id"]}");
                   absageListe.remove(userId);
                   EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
 
@@ -377,11 +382,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 });
 
 
-                var zusageListe = await EventDatabase().getOneData("zusage", widget.event["id"]);
+                var zusageListe = await EventDatabase()
+                    .getData("zusage", "WHERE id = '${widget.event["id"]}");
                 zusageListe.remove(userId);
                 EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
 
-                var absageListe = await EventDatabase().getOneData("absage", widget.event["id"]);
+                var absageListe = await EventDatabase()
+                    .getData("absage", "WHERE id = '${widget.event["id"]}");
                 absageListe.add(userId);
                 EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
 
@@ -619,7 +626,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             title: "",
             buttons: [
               if(isCreator && isNotPublic) FutureBuilder(
-                future: EventDatabase().getOneData("freischalten", widget.event["id"]),
+                future: EventDatabase().getData("freischalten", "WHERE id = '${widget.event["id"]}"),
                 builder: (context, snap) {
                   var data = snap.hasData ? snap.data.length.toString() : "";
                   if(data == "0") data = "";

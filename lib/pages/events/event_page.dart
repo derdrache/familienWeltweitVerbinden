@@ -55,7 +55,8 @@ class _EventPageState extends State<EventPage>{
                 )
             ),
             FutureBuilder(
-                future: EventDatabase().getEventsCheckList(userId, "interesse"),
+                future: EventDatabase().getData(
+                    "*", "WHERE JSON_CONTAINS(interesse, '\"${userId}\"') > 0 ORDER BY wann ASC"),
                 builder: (
                     BuildContext context,
                     AsyncSnapshot snapshot,

@@ -280,11 +280,13 @@ class EventCardDetails extends StatelessWidget {
                           AppLocalizations.of(context).eventInteresseMitgeteilt,
                           color: Colors.green);
 
-                      var freischaltenList = await EventDatabase().getOneData("freischalten", event["id"]);
+                      var freischaltenList = await EventDatabase()
+                          .getData("freischalten", "WHERE id = '${event["id"]}");
                       freischaltenList.add(userId);
                       EventDatabase().updateOne(event["id"], "freischalten", freischaltenList);
 
-                      var interessenList = await EventDatabase().getOneData("interesse", event["id"]);
+                      var interessenList = await EventDatabase()
+                          .getData("interesse", "WHERE id = '${event["id"]}");
                       interessenList.add(userId);
                       EventDatabase().updateOne(event["id"], "interesse", interessenList);
                     }
@@ -724,7 +726,8 @@ class _InteresseButtonState extends State<InteresseButton> {
 
           setState(() {});
 
-          var interesseList = await EventDatabase().getOneData("interesse", widget.id);
+          var interesseList = await EventDatabase()
+              .getData("interesse", "WHERE id = '${widget.id}");
 
           if(widget.hasIntereset){
             interesseList.add(userId);
