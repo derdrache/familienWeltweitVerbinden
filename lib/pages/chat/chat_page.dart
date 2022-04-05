@@ -168,7 +168,7 @@ class _ChatPageState extends State<ChatPage>{
     var check = [true, -1];
 
     for(var i = 0;i < globalChatGroups.length; i++){
-      var users = json.decode(globalChatGroups[i]["users"]);
+      var users = globalChatGroups[i]["users"];
       if(users[chatPartnerId] != null){
         check = [false,i];
       }
@@ -182,7 +182,7 @@ class _ChatPageState extends State<ChatPage>{
     num realNewMessages = 0;
 
     for(var group in globalChatGroups){
-      var users = json.decode(group["users"]);
+      var users = group["users"];
       realNewMessages += users[userId]["newMessages"];
     }
 
@@ -209,7 +209,7 @@ class _ChatPageState extends State<ChatPage>{
 
       for(dynamic group in groupdata){
         var chatPartnerName;
-        var users = json.decode(group["users"]);
+        var users = group["users"];
 
         users.forEach((key, value) async {
           if(key != userId){
@@ -218,9 +218,8 @@ class _ChatPageState extends State<ChatPage>{
         });
 
         var lastMessage = cutMessage(group["lastMessage"]);
-
         var ownChatNewMessages = users[userId]["newMessages"];
-        var lastMessageTime = DateTime.fromMillisecondsSinceEpoch(int.parse(group["lastMessageDate"]));
+        var lastMessageTime = DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
 
         groupContainer.add(
           GestureDetector(
@@ -306,7 +305,8 @@ class _ChatPageState extends State<ChatPage>{
         padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
         child:
             FutureBuilder(
-              future: ChatDatabase().getAllChatgroupsFromUser(userId),
+              //future: ChatDatabase().getAllChatgroupsFromUser(userId),
+              future: ChatDatabase().getChatData("*", "WHERE id like '%$userId%'"),
                 builder: (
                     BuildContext context,
                     AsyncSnapshot snapshot,

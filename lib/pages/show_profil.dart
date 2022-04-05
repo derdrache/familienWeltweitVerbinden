@@ -68,11 +68,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             var profilID = await ProfilDatabase()
                 .getData("id", "WHERE name = '${widget.profil["name"]}'");
             var users = [userID, profilID];
-
+            var chatId = global_functions.getChatID(users);
             var newChat = false;
 
-            var groupChatData = await ChatDatabase()
-                .getChat(global_functions.getChatID(users));
+            var groupChatData = await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
             if(groupChatData == false){
               newChat = true;

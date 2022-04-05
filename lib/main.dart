@@ -127,7 +127,7 @@ class MyApp extends StatelessWidget {
 
 
   changeToChat(chatId)async {
-    var groupChatData = await ChatDatabase().getChat(chatId);
+    var groupChatData = await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
     navigatorKey.currentState?.push(
         MaterialPageRoute(builder: (_) => ChatDetailsPage(

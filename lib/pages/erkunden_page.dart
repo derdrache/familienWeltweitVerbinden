@@ -92,7 +92,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getAndSetEvents()async{
-    events = await EventDatabase().getEvents("art != 'privat' AND art != 'private'");
+    events = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private'");
     eventsBackup = events;
     createAndSetZoomEvents();
   }
@@ -499,7 +499,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
               event: event,
               withInteresse: true,
               afterPageVisit: () async {
-                events = await EventDatabase().getEvents("art != 'privat' AND art != 'private'");
+                events = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private'");
                 var refreshEvents = [];
 
                 for(var oldEvent in lastEventPopup["profils"]){
