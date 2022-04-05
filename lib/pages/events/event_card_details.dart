@@ -366,6 +366,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
   @override
   void initState() {
+    if(widget.rowData != String) widget.rowData = widget.rowData.toString();
     if(!(widget.databaseKennzeichnung == "link")) inputKontroller.text = widget.rowData;
 
     dropdownInput = CustomDropDownButton(
@@ -595,7 +596,7 @@ class _CardFeedState extends State<CardFeed> {
   }
 
   setOrganisatorText()async{
-    organisatorProfil = await ProfilDatabase().getProfil("id", widget.organisator);
+    organisatorProfil = await ProfilDatabase().getData("*", "WHERE id = '${widget.organisator}'");
 
     organisatorText = Text(
         organisatorProfil["name"],

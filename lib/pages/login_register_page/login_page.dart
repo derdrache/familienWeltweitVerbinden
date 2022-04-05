@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if(emailVerified){
         var userId = FirebaseAuth.instance.currentUser.uid;
-        var profilName = await ProfilDatabase().getOneData("name", "id", userId);
+        var profilName = await ProfilDatabase().getData("name", "WHERE id = '${userId}'");
 
         if(profilName != false){
           global_functions.changePageForever(context, StartPage());

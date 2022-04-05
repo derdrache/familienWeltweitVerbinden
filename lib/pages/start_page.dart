@@ -59,8 +59,8 @@ class _StartPageState extends State<StartPage>{
   profilCheck() async{
     if(userName == null) return;
 
-    var userDBEmail = await ProfilDatabase().getOneData("email","id",userID);
-    var userDeviceTokenDb = await ProfilDatabase().getOneData("token","id",userID);
+    var userDBEmail = await ProfilDatabase().getData("email", "WHERE id = '$userID'");
+    var userDeviceTokenDb = await ProfilDatabase().getData("token", "WHERE id = '${userID}'");
     var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
 
     if(userAuthEmail != userDBEmail){
@@ -94,13 +94,14 @@ class _StartPageState extends State<StartPage>{
 
     chatIcon(){
       return FutureBuilder(
-          future: ProfilDatabase().getOneData("newMessages", "id", userID),
+          future: ProfilDatabase().getData("newMessages", "WHERE id = '${userID}'"),
           builder: (
               BuildContext context,
               AsyncSnapshot snap,
               ){
               if(snap.hasData) {
-                  var newMessages = snap.data;
+                var newMessages = snap.data;
+
 
                   newMessages = newMessages == false ? 0 : newMessages;
 

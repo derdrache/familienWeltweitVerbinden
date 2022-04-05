@@ -26,7 +26,8 @@ class ChangeNamePage extends StatelessWidget {
         var newUserName = nameKontroller.text;
         newUserName = newUserName.replaceAll("'" , "\\'");
 
-        var checkUserProfilExist = await ProfilDatabase().getOneData("id", "name", newUserName);
+        var checkUserProfilExist = await ProfilDatabase()
+            .getData("id", "WHERE name = '${newUserName}'");
         if(checkUserProfilExist == false){
 
           await ProfilDatabase().updateProfilName(

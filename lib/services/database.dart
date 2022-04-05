@@ -70,91 +70,40 @@ class ProfilDatabase{
     }));
   }
 
-  getAllProfils() async{
-    var url = Uri.parse(databaseUrl + "database/profils/getAllProfils.php");
-    var res = await http.get(url, headers: {"Accept": "application/json"});
-    var responseBody = json.decode(res.body);
-
-    for(var body in responseBody){
-      body["kinder"] = json.decode(body["kinder"]);
-      body["sprachen"] = json.decode(body["sprachen"]);
-      body["interessen"] = json.decode(body["interessen"]);
-      body["friendlist"] = body["friendlist"] == ""? []: json.decode(body["friendlist"]);
-      body["emailAnzeigen"] = body["emailAnzeigen"] == "0"? false : true;
-      body["notificationstatus"] = body["notificationstatus"] == "0"? false : true;
-    }
-
-    return responseBody;
-  }
-
-  getProfil(look, inhalt) async{
-    var url = databaseUrl + "database/profils/getProfil.php";
-    var data = "?param1=$look&param2=$inhalt";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
-
-    var responseBody = json.decode(res.body);
-    responseBody["kinder"] = json.decode(responseBody["kinder"]);
-    responseBody["sprachen"] = json.decode(responseBody["sprachen"]);
-    responseBody["interessen"] = json.decode(responseBody["interessen"]);
-    if(responseBody["friendlist"] != "") responseBody["friendlist"] = json.decode(responseBody["friendlist"]);
-    responseBody["emailAnzeigen"] = responseBody["emailAnzeigen"] == "0"? false : true;
-    responseBody["notificationstatus"] = responseBody["notificationstatus"] == "0"? false : true;
-    responseBody["chatNotificationOn"] = responseBody["chatNotificationOn"] == "0"? false : true;
-    responseBody["eventNotificationOn"] = responseBody["eventNotificationOn"] == "0"? false : true;
-
-    return responseBody;
-
-  }
-
-  getOneData(what, look, inhalt) async {
-    var url = databaseUrl + "database/profils/getOneData.php";
-    var data = "?param1=$what&param2=$look&param3=$inhalt";
+  getData(whatData, queryEnd) async{
+    //neue Datenabfrage um alle get zu ersetzen
+    var url = databaseUrl + "database/profils/getData.php";
+    var data = "?param1=$whatData&param2=$queryEnd";
     var uri = Uri.parse(url+data);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     dynamic responseBody = res.body;
 
-    try{
-      responseBody = jsonDecode(responseBody);
-      responseBody = jsonDecode(responseBody[responseBody.keys.toList()[0]]);
-    }catch(error){
+    responseBody = jsonDecode(responseBody);
 
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList() == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(error){
+
+        }
+
+      }
     }
 
-    try{
-      responseBody = responseBody[responseBody.keys.toList()[0]];
-    }catch(error){
-
+    if(responseBody.length == 1){
+      responseBody = responseBody[0];
+      if(responseBody.keys.toList().length == 1) responseBody = responseBody[responseBody.keys.toList()[0]];
     }
 
-    return responseBody;
-
-  }
-
-  getOneDataFromAll(what) async{
-    var url = databaseUrl + "database/profils/getOneDataFromAll.php";
-    var data = "?param1=$what";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
-    dynamic responseBody = res.body;
-
-    try{
-      responseBody = jsonDecode(responseBody);
-    }catch(error){
-
-    }
-
-
-    return responseBody;
-
-  }
-
-  getAllFriendlists() async {
-    var url = databaseUrl + "database/profils/getAllFriendlists.php";
-    var uri = Uri.parse(url);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
-
-    var responseBody = json.decode(res.body);
 
     return responseBody;
   }
@@ -172,8 +121,7 @@ class ProfilDatabase{
       ChatDatabase().updateChatGroup(chat["id"], "users", newUserData);
     }
 
-
-    var allProfilFriendlists = await getAllFriendlists();
+    var allProfilFriendlists = await getData("id, friendlist", "");
 
     for(var profil in allProfilFriendlists){
       if(profil["friendlist"] == "" || profil["friendlist"] == []){
@@ -305,10 +253,12 @@ class ChatDatabase{
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
-    var activeChat = await ProfilDatabase().getOneData("activeChat", "id", chatPartnerId);
+    var activeChat = await ProfilDatabase()
+        .getData("activeChat", "WHERE id = '${chatPartnerId}'");
 
     if(chatData["id"] != activeChat){
-      var allNewMessages = await ProfilDatabase().getOneData("newMessages", "id", chatPartnerId);
+      var allNewMessages = await ProfilDatabase()
+          .getData("newMessages", "WHERE id = '${chatPartnerId}'");
 
       ProfilDatabase().updateProfil(chatPartnerId, "newMessages", allNewMessages +1);
 
@@ -435,13 +385,14 @@ class EventDatabase{
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     var responseBody = json.decode(res.body);
 
-    for(var i = 0; i < responseBody.length; i++){
-      responseBody[i]["interesse"] = jsonDecode(responseBody[i]["interesse"]);
-      responseBody[i]["zusage"] = jsonDecode(responseBody[i]["zusage"]);
-      responseBody[i]["absage"] = jsonDecode(responseBody[i]["absage"]);
-      responseBody[i]["freischalten"] = jsonDecode(responseBody[i]["freischalten"]);
-      responseBody[i]["freigegeben"] = jsonDecode(responseBody[i]["freigegeben"]);
-      responseBody[i]["sprache"] = jsonDecode(responseBody[i]["sprache"]);
+    for(var body in responseBody){
+      for(var key in body.keys.toList()){
+        try{
+          body[key] = jsonDecode(body[key]);
+        }catch(error){
+
+        }
+      }
     }
 
 
@@ -546,14 +497,18 @@ class ReportsDatabase{
 
 
 sendChatNotification(chatId, messageData) async {
-  var toActiveChat = await ProfilDatabase().getOneData("activeChat", "id", messageData["zu"]);
+  var toActiveChat = await ProfilDatabase()
+      .getData("activeChat", "WHERE id = '${messageData["zu"]}'");
 
   if(toActiveChat == chatId) return;
 
 
-  var fromName = await ProfilDatabase().getOneData("name", "id", messageData["von"]);
-  var toToken = await ProfilDatabase().getOneData("token", "id", messageData["zu"]);
-  var chatPartnerName = await ProfilDatabase().getOneData("name", "id", messageData["zu"]);
+  var fromName = await ProfilDatabase()
+      .getData("name", "WHERE id = '${messageData["von"]}'");
+  var toToken = await ProfilDatabase()
+      .getData("token", "WHERE id = '${messageData["zu"]}'");
+  var chatPartnerName = await ProfilDatabase()
+      .getData("name", "WHERE id = '${messageData["zu"]}'");
 
   var notificationInformation = {
     "toId": messageData["zu"],
@@ -572,13 +527,14 @@ sendChatNotification(chatId, messageData) async {
 }
 
 sendNotification(notificationInformation) async {
-    var notificationsAllowed = await ProfilDatabase().
-      getOneData("notificationstatus", "id", notificationInformation["toId"]);
+    var notificationsAllowed = await ProfilDatabase()
+        .getData("notificationstatus", "WHERE id = '${notificationInformation["toId"]}'");
 
     if(notificationsAllowed == 0) return;
 
     if(notificationInformation["token"] == "" || notificationInformation["token"] == null){
-      var emailAdresse = await ProfilDatabase().getOneData("email", "id", notificationInformation["toId"]);
+      var emailAdresse = await ProfilDatabase()
+          .getData("email", "WHERE id = '${notificationInformation["toId"]}'");
 
       var url = Uri.parse(databaseUrl + "services/sendEmail.php");
       http.post(url, body: json.encode({

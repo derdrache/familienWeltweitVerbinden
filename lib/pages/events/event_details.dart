@@ -60,8 +60,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   getDatabaseData() async{
-    allName = await ProfilDatabase().getOneDataFromAll("name");
-    userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
+    allName = await ProfilDatabase().getData("name", "");
+
+    userFriendlist = await ProfilDatabase().getData("friendlist", "WHERE id = '${userId}'");
   }
 
   freischalten(user, angenommen, windowState) async {
@@ -88,7 +89,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     });
 
-    var receiverToken = await ProfilDatabase().getOneData("token", "id", user);
+    var receiverToken = await ProfilDatabase().getData("token", "WHERE id = '${user}'");
 
     var notificationInformation = {
       "to": receiverToken,
@@ -136,7 +137,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         FloatingActionButton.extended(
           label: Text(AppLocalizations.of(context).uebertragen),
           onPressed: () async{
-            var selectedUserId = await ProfilDatabase().getOneData("id", "name", inputKontroller.text);
+            var selectedUserId = await ProfilDatabase().getData("id", "WHERE name = '${inputKontroller.text}'");
             await EventDatabase().updateOne(widget.event["id"], "erstelltVon", selectedUserId);
             setState(() {
 
@@ -397,7 +398,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       List<Widget>freizugebenListe = [];
 
       for(var user in widget.event["freischalten"]){
-        var name = await ProfilDatabase().getOneData("name", "id", user);
+        var name = await ProfilDatabase().getData("name", "WHERE id = '${user}'");
 
         freizugebenListe.add(
             Container(
@@ -445,7 +446,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       List<Widget>freigeschlatetList = [];
 
       for(var user in widget.event["freigegeben"]){
-        var name = await ProfilDatabase().getOneData("name", "id", user);
+        var name = await ProfilDatabase().getData("name", "WHERE id = '${user}'");
 
         freigeschlatetList.add(
             Container(

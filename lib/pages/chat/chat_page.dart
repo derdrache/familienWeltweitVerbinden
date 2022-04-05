@@ -27,8 +27,9 @@ class _ChatPageState extends State<ChatPage>{
 
 
   selectChatpartnerWindow() async {
-    dynamic userFriendlist = await ProfilDatabase().getOneData("friendlist", "id", userId);
-    var allName = await ProfilDatabase().getOneDataFromAll("name");
+    dynamic userFriendlist = await ProfilDatabase().getData("friendlist", "WHERE id = '${userId}'");
+    var allName = await ProfilDatabase().getData("name", "");
+
 
     userFriendlist??= [];
 
@@ -77,7 +78,7 @@ class _ChatPageState extends State<ChatPage>{
 
   searchUser() async {
     var chatPartner = searchAutocomplete.getSelected()[0];
-    var chatPartnerId = await ProfilDatabase().getOneData("id", "name", chatPartner);
+    var chatPartnerId = await ProfilDatabase().getData("id", "WHERE name = '${chatPartner}'");
 
     validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
   }
@@ -123,8 +124,8 @@ class _ChatPageState extends State<ChatPage>{
 
 
   findUserGetId(user) async {
-    var foundOnName = await ProfilDatabase().getOneData("id", "name", user);
-    var foundOnEmail = await ProfilDatabase().getOneData("id", "email", user);
+    var foundOnName = await ProfilDatabase().getData("id", "WHERE name = '${user}'");
+    var foundOnEmail = await ProfilDatabase().getData("id", "WHERE email = '${user}'");
 
     if(foundOnName != null) return foundOnName;
     if(foundOnEmail != null) return foundOnEmail;
@@ -135,7 +136,7 @@ class _ChatPageState extends State<ChatPage>{
   validCheckAndOpenChatgroup({chatPartnerID, name}) async {
 
     if(chatPartnerID == null){
-      chatPartnerID = await ProfilDatabase().getOneData("id", "name", name);
+      chatPartnerID = await ProfilDatabase().getData("id", "WHERE name = '${name}'");
     }
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
 
@@ -177,7 +178,7 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   checkNewMessageCounter() async{
-    var dbNewMessages = await ProfilDatabase().getOneData("newMessages", "id", userId);
+    var dbNewMessages = await ProfilDatabase().getData("newMessages", "WHERE id = '${userId}'");
     num realNewMessages = 0;
 
     for(var group in globalChatGroups){

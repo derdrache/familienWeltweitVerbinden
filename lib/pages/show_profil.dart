@@ -53,7 +53,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   setFriendList() async {
     if (widget.userName == null) return;
-    var dbFriendlist = await ProfilDatabase().getOneData("friendlist", "name", widget.userName);
+    var dbFriendlist = await ProfilDatabase().getData("friendlist", "WHERE name = '${widget.userName}'");
     userFriendlist = dbFriendlist == "" ? []: dbFriendlist;
   }
 
@@ -65,7 +65,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           style: global_style.textButtonStyle(),
           child: const Icon(Icons.message),
           onPressed: () async {
-            var profilID = await ProfilDatabase().getOneData("id", "name", widget.profil["name"]);
+            var profilID = await ProfilDatabase()
+                .getData("id", "WHERE name = '${widget.profil["name"]}'");
             var users = [userID, profilID];
 
             var newChat = false;
@@ -284,7 +285,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               ),
             ),
             const SizedBox(height: 10),
-            widget.profil["emailAnzeigen"] ?
+            widget.profil["emailAnzeigen"] ==1 ?
                 Row(children: [
                   Text("Email: " ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: textSize),),
                   Text(widget.profil["email"],style: TextStyle(fontSize: textSize))
@@ -317,7 +318,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                     const SizedBox(height: 15),
                     infoProfil(),
                     const SizedBox(height: 15),
-                    if(widget.profil["emailAnzeigen"]) kontaktProfil(),
+                    if(widget.profil["emailAnzeigen"] == 1) kontaktProfil(),
                   ]
               ),
           ),

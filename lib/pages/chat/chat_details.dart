@@ -70,30 +70,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     });
   }
 
-  Future initialize() async{
-    var allMessages = await ChatDatabase().getAllMessages(widget.chatId);
-
-
-    for(var i = 0; i< allMessages.length; i++){
-      if(allMessages[i]["message"].contains("</eventId=")){
-        var eventId = allMessages[i]["message"].split("=")[1];
-        var eventData = await EventDatabase().getEvent(eventId);
-
-        if(eventData == false) {
-          allMessages[i]["message"] = "** veraltetes Event **";
-          continue;
-        }
-
-        eventCardList.add(eventData);
-      }
-    }
-
-
-
-
-    return allMessages;
-  }
-
   checkNewMessages() {
     setState(() {});
   }
@@ -101,7 +77,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   getAndSetChatData() async {
     if (widget.groupChatData != null) {
       widget.chatId = widget.groupChatData["id"];
-      var groupchatUsers = jsonDecode(widget.groupChatData["users"]);
+      var groupchatUsers = widget.groupChatData["users"];
       groupchatUsers.forEach((key, value) {
         if (key != userId) {
           widget.chatPartnerName = value["name"];
@@ -112,12 +88,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       return;
     }
 
-    widget.chatPartnerId ??=
-        await ProfilDatabase().getOneData("id", "name", widget.chatPartnerName);
+
+    widget.chatPartnerId ??= await ProfilDatabase()
+        .getData("id", "WHERE name = '${widget.chatPartnerName}'");
 
 
-    widget.chatPartnerName ??=
-        await ProfilDatabase().getOneData("name", "id", widget.chatPartnerId);
+    widget.chatPartnerName ??= await ProfilDatabase()
+        .getData("name", "WHERE id = '${widget.chatPartnerId}'");
+
 
     widget.chatId ??=
         global_functions.getChatID([userId, widget.chatPartnerId]);
@@ -141,8 +119,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     if (usersChatNewMessages == 0) return;
 
-    var usersAllNewMessages =
-        await ProfilDatabase().getOneData("newMessages", "id", userId);
+    var usersAllNewMessages = await ProfilDatabase()
+        .getData("newMessages", "WHERE id = '${userId}'");
     usersAllNewMessages = usersAllNewMessages;
 
     ProfilDatabase().updateProfil(
@@ -211,7 +189,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   openProfil() async {
     var chatPartnerProfil =
-        await ProfilDatabase().getProfil("id", widget.chatPartnerId);
+        await ProfilDatabase().getData("*", "WHERE id = '${widget.chatPartnerId}'");
+
 
     global_functions.changePage(
         context,
@@ -245,25 +224,27 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         }
 
         if(message["message"].contains("</eventId=")){
-          if (eventCardList[eventCardCounter] != false){
             messageBox.add(
                 Align(
                   alignment: textAlign,
-                  child: EventCard(
-                    margin: EdgeInsets.all(10),
-                    withInteresse: true,
-                    event: eventCardList[eventCardCounter],
-                    afterPageVisit: () => setState((){}),
+                  child: FutureBuilder(
+                    future: EventDatabase().getEvent(message["message"].substring(10)),
+                    builder: (context, snapshot) {
+                      if(snapshot.hasData && snapshot.data != false) {
+                        return EventCard(
+                          margin: EdgeInsets.all(10),
+                          withInteresse: true,
+                          event: eventCardList[eventCardCounter],
+                          afterPageVisit: () => setState((){}),
+                        );
+                      }
+                      return SizedBox.shrink();
+                    }
                   ),
                 )
             );
-            eventCardCounter += 1;
             continue;
-          }
-          eventCardCounter += 1;
         }
-
-
 
 
         messageBox.add(
@@ -313,7 +294,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     showMessages() {
       return FutureBuilder(
-          future: initialize(),
+          future: ChatDatabase().getAllMessages(widget.chatId),
           builder: (
             BuildContext context,
             AsyncSnapshot snap,
