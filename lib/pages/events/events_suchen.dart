@@ -36,7 +36,8 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
   }
 
   initialize() async {
-    eventsBackup = await EventDatabase().getEvents("art != 'privat' AND erstelltVon != '"+userId+"' ORDER BY erstelltAm ASC");
+    eventsBackup = await EventDatabase()
+        .getData("*", "WHERE art != 'privat' AND erstelltVon != '"+userId+"' ORDER BY erstelltAm ASC");
     allEvents = eventsBackup;
 
     allEventCities = Set();
@@ -136,7 +137,8 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
               withInteresse: true,
               event: event,
               afterPageVisit: () async {
-                eventsBackup = allEvents = await EventDatabase().getEvents("art != 'privat' AND erstelltVon != '"+userId+"'");
+                eventsBackup = allEvents = await EventDatabase()
+                    .getData("*", "WHERE art != 'privat' AND erstelltVon != '"+userId+"'");
 
                 setState(() {});
               }

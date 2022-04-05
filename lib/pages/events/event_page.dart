@@ -95,7 +95,7 @@ class _EventPageState extends State<EventPage>{
               )
             ),
             FutureBuilder(
-              future: EventDatabase().getEvents("erstelltVon = '"+userId+"' ORDER BY wann ASC"),
+              future: EventDatabase().getData("*", "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC"),
               builder: (
                 BuildContext context,
                 AsyncSnapshot snapshot,

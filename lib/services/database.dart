@@ -72,8 +72,8 @@ class ProfilDatabase{
 
   getData(whatData, queryEnd) async{
     //neue Datenabfrage um alle get zu ersetzen
-    var url = databaseUrl + "database/profils/getData.php";
-    var data = "?param1=$whatData&param2=$queryEnd";
+    var url = databaseUrl + "database/getData.php";
+    var data = "?param1=$whatData&param2=$queryEnd&param3=profils";
     var uri = Uri.parse(url+data);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
     dynamic responseBody = res.body;
@@ -113,7 +113,7 @@ class ProfilDatabase{
 
     updateProfil(userId, "name", newName);
 
-    var chats = await ChatDatabase().getAllChatgroupsFromUser(userId);
+    var chats = await ChatDatabase().getChatData("*", "WHERE id like '%$userId%'");
     for(var chat in chats){
       var newUserData = jsonDecode(chat["users"]);
       newUserData[userId]["name"] = newName;
@@ -156,7 +156,7 @@ class ProfilDatabase{
 
     _deleteInTable("profils", userId);
 
-    var allChatGroups = await ChatDatabase().getAllChatgroupsFromUser(userId);
+    var allChatGroups = await ChatDatabase().getChatData("*", "WHERE id like '%$userId%'");
     for (var chat in allChatGroups){
       var chatId = chat["id"];
       _deleteInTable("messages", chatId);
@@ -202,6 +202,68 @@ class ChatDatabase{
     return newChatGroup;
   }
 
+  getChatData(whatData, queryEnd) async{
+    //neue Datenabfrage um alle chat get zu ersetzen
+    var url = databaseUrl + "database/getData.php";
+    var data = "?param1=$whatData&param2=$queryEnd&param3=chats";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    dynamic responseBody = res.body;
+
+    responseBody = jsonDecode(responseBody);
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList() == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(error){
+
+        }
+
+      }
+    }
+
+
+    return responseBody;
+  }
+
+  getAllMessages(chatId) async {
+    var url = databaseUrl + "database/chats/getAllMessages.php";
+    var data = "?param1=$chatId";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+
+    var responseBody = json.decode(res.body);
+
+    return responseBody;
+  }
+
+  /*
+  getNewMessages(chatId, userId) async {
+    var url = databaseUrl + "database/chats/getNewMessageCounter.php";
+    var data = "?param1=$chatId";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+
+    var responseBody = json.decode(res.body);
+
+    return responseBody;
+  }
+
+   */
+
+
+
+
+/*
   getChat(chatId) async {
     var url = databaseUrl + "database/chats/getChat.php";
     var data = "?param1=$chatId";
@@ -209,9 +271,68 @@ class ChatDatabase{
     var res = await http.get(uri, headers: {"Accept": "application/json"});
 
     var responseBody = json.decode(res.body);
+
+    if(responseBody == false) return responseBody;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList() == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(error){
+
+        }
+
+      }
+    }
+
+
     return responseBody;
 
   }
+
+
+
+  getAllChatgroupsFromUser(userId)async  {
+    var url = databaseUrl + "database/chats/getAllChatsForUser.php";
+    var data = "?param1=$userId";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    var responseBody = json.decode(res.body);
+
+    if(responseBody == false) return responseBody;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList() == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(error){
+
+        }
+
+      }
+    }
+
+    return responseBody;
+
+  }
+ */
+
 
   updateChatGroup(chatId, change, data)async{
     var url = Uri.parse(databaseUrl + "database/chats/updateChat.php");
@@ -262,7 +383,8 @@ class ChatDatabase{
 
       ProfilDatabase().updateProfil(chatPartnerId, "newMessages", allNewMessages +1);
 
-      var oldChatNewMessages = await ChatDatabase().getNewMessages(chatData["id"], chatPartnerId);
+      var chatId = chatData['id'];
+      var oldChatNewMessages = await ChatDatabase().getChatData("users", "WHERE id = '$chatId'");
 
       oldChatNewMessages = oldChatNewMessages["users"];
       var oldChatNewMessagesMap= Map<String, dynamic>.from(jsonDecode(oldChatNewMessages));
@@ -290,38 +412,9 @@ class ChatDatabase{
 
   }
 
-  getNewMessages(chatId, userId) async {
-    var url = databaseUrl + "database/chats/getNewMessageCounter.php";
-    var data = "?param1=$chatId";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
 
-    var responseBody = json.decode(res.body);
 
-    return responseBody;
-  }
 
-  getAllChatgroupsFromUser(userId)async  {
-    var url = databaseUrl + "database/chats/getAllChatsForUser.php";
-    var data = "?param1=$userId";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
-    var responseBody = json.decode(res.body);
-
-    return responseBody;
-
-  }
-
-  getAllMessages(chatId) async {
-    var url = databaseUrl + "database/chats/getAllMessages.php";
-    var data = "?param1=$chatId";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
-
-    var responseBody = json.decode(res.body);
-
-    return responseBody;
-  }
 }
 
 class EventDatabase{
@@ -357,6 +450,45 @@ class EventDatabase{
     }));
   }
 
+  getData(whatData, queryEnd) async{
+    //neue Datenabfrage um alle get zu ersetzen
+    var url = databaseUrl + "database/getData.php";
+    var data = "?param1=$whatData&param2=$queryEnd&param3=events";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    dynamic responseBody = res.body;
+
+    responseBody = jsonDecode(responseBody);
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList() == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(error){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1){
+      responseBody = responseBody[0];
+      if(responseBody.keys.toList().length == 1) responseBody = responseBody[responseBody.keys.toList()[0]];
+    }
+
+
+    return responseBody;
+  }
+
+
   getEvent(eventId) async {
     var url = databaseUrl + "database/events/getEvent.php";
     var data = "?param1=$eventId";
@@ -378,6 +510,7 @@ class EventDatabase{
 
   }
 
+  /*
   getEvents(whereCondition) async {
     var url = databaseUrl + "database/events/getEvents.php";
     var data = "?param1=$whereCondition";
@@ -399,6 +532,8 @@ class EventDatabase{
     return responseBody;
 
   }
+
+   */
 
   getOneData(what, eventId) async {
     var url = databaseUrl + "database/events/getOneData.php";
@@ -440,6 +575,7 @@ class EventDatabase{
 
   }
 
+  /*
   getAllEvents() async {
     var url = Uri.parse(databaseUrl + "database/events/getAllEvents.php");
     var res = await http.get(url, headers: {"Accept": "application/json"});
@@ -456,6 +592,8 @@ class EventDatabase{
 
     return responseBody;
   }
+
+   */
 
   getAllEventsWhere(whereCondition) async{
     var url = databaseUrl + "database/events/getEvents.php";
@@ -475,6 +613,8 @@ class EventDatabase{
 
     return responseBody;
   }
+
+
 
   delete(eventId){
     _deleteInTable("events", eventId);

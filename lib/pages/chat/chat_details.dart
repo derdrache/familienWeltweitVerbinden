@@ -100,7 +100,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     widget.chatId ??=
         global_functions.getChatID([userId, widget.chatPartnerId]);
 
-    widget.groupChatData ??= await ChatDatabase().getChat(widget.chatId);
+    widget.groupChatData ??= await ChatDatabase().getChatData("*", "WHERE id = '$widget.chatId'");
 
     if (widget.groupChatData == false) {
       newChat = true;
@@ -113,7 +113,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   resetNewMessageCounter() async {
     var users = widget.groupChatData["users"];
-    if (users is String) users = json.decode(users);
 
     var usersChatNewMessages = users[userId]["newMessages"];
 
@@ -129,7 +128,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         usersAllNewMessages - usersChatNewMessages < 0
             ? 0
             : usersAllNewMessages - usersChatNewMessages);
-    widget.groupChatData["users"] = json.decode(widget.groupChatData["users"]);
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
     ChatDatabase().updateChatGroup(
