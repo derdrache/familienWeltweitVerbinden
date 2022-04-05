@@ -99,7 +99,7 @@ class _EventErstellenState extends State<EventErstellen> {
     };
 
     await EventDatabase().addNewEvent(eventData);
-    var dbEventData = await EventDatabase().getEvent(eventId);
+    var dbEventData = await EventDatabase().getData("*", "WHERE id = '${eventId}'");
 
     global_functions.changePage(context, StartPage(selectedIndex: 1));
     global_functions.changePage(context, EventDetailsPage(event: dbEventData));

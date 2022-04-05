@@ -136,7 +136,7 @@ class MyApp extends StatelessWidget {
   }
 
   changeToEvent(eventId) async {
-    var eventData = await EventDatabase().getEvent(eventId);
+    var eventData = await EventDatabase().getData("*", "WHERE id = '${eventId}");
 
     navigatorKey.currentState?.push(
         MaterialPageRoute(builder: (_) => EventDetailsPage(

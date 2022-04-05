@@ -226,7 +226,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                 Align(
                   alignment: textAlign,
                   child: FutureBuilder(
-                    future: EventDatabase().getEvent(message["message"].substring(10)),
+                    future: EventDatabase()
+                        .getData("*", "WHERE id = '${message["message"].substring(10)}"),
                     builder: (context, snapshot) {
                       if(snapshot.hasData && snapshot.data != false) {
                         return EventCard(

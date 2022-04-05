@@ -72,11 +72,13 @@ class _EventCardState extends State<EventCard> {
                 onAbsageList = false;
               });
 
-              var zusageList = await EventDatabase().getOneData("zusage", widget.event["id"]);
+              var zusageList = await EventDatabase()
+                  .getData("zusage", "WHERE id = '${widget.event["id"]}");
               zusageList.add(userId);
               EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
 
-              var absageList = await EventDatabase().getOneData("absage", widget.event["id"]);
+              var absageList = await EventDatabase()
+                  .getData("absage", "WHERE id = '${widget.event["id"]}");
               absageList.remove(userId);
               EventDatabase().updateOne(widget.event["id"], "absage", absageList);
 
@@ -98,11 +100,13 @@ class _EventCardState extends State<EventCard> {
                 onZusageList = false;
               });
 
-              var absageList = await EventDatabase().getOneData("absage", widget.event["id"]);
+              var absageList = await EventDatabase()
+                  .getData("absage", "WHERE id = '${widget.event["id"]}");
               absageList.add(userId);
               EventDatabase().updateOne(widget.event["id"], "absage", absageList);
 
-              var zusageList = await EventDatabase().getOneData("zusage", widget.event["id"]);
+              var zusageList = await EventDatabase()
+                  .getData("zusage", "WHERE id = '${widget.event["id"]}");
               zusageList.remove(userId);
               EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
 
@@ -247,7 +251,7 @@ class _InteresseButtonState extends State<InteresseButton> {
 
         setState(() {});
 
-        var interesseList = await EventDatabase().getOneData("interesse", widget.id);
+        var interesseList = await EventDatabase().getData("interesse", "WHERE id = '${widget.id}");
 
         if(widget.hasIntereset){
           interesseList.add(userId);
