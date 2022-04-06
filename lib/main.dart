@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
 import 'package:familien_suche/pages/login_register_page/create_profil_page.dart';
 import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -48,20 +50,19 @@ void main()async {
 }
 
 class MyApp extends StatelessWidget {
-  var userLogedIn = FirebaseAuth.instance.currentUser;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var profilExist;
   var pageContext;
   dynamic importantUpdateNumber = 0;
   dynamic buildNumber = 0;
+  var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
 
-    if(userLogedIn == null){
+    if(userId == null){
       await FirebaseAuth.instance.authStateChanges().first;
-      userLogedIn = FirebaseAuth.instance.currentUser;
       userId = FirebaseAuth.instance.currentUser.uid;
     }
 
@@ -159,11 +160,14 @@ class MyApp extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(AppLocalizations.of(context).wichtigesUpdateTitle,
+                Text(spracheIstDeutsch ? "Families worldwide hat ein großes Update bekommen":
+                "Families worldwide has received a major update",
                   style: const TextStyle(fontSize: 20),
                 ),
                 const SizedBox(height: 30),
-                Text(AppLocalizations.of(context).wichtigesUpdateBody,
+                Text(spracheIstDeutsch ?
+                "Bitte im Playstore die neuste Version runterladen. \n\nDa es sich um eine Beta Version handelt, muss das Update manuell über den PlayStore installiert werden":
+                "Please download the latest version from the Playstore. \n\nSince this is a beta version, the update must be installed manually via the PlayStore.",
                 style: const TextStyle(fontSize: 16),
                 ),
               ]
@@ -206,7 +210,7 @@ class MyApp extends StatelessWidget {
             ],
             navigatorKey: navigatorKey,
             debugShowCheckedModeBanner: false,
-            home: userLogedIn == null ? const LoginPage() :
+            home: userId == null ? const LoginPage() :
             profilExist == false ? const CreateProfilPage() : StartPage()
 
           );
