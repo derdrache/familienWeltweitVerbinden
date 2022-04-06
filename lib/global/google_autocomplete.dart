@@ -1,14 +1,9 @@
-import 'dart:convert';
 import 'dart:ui';
-
 
 import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'variablen.dart' as global_var;
-
-
-// api aussuchen 1. stadt/Land 2. Straße
 
 
 class GoogleAutoComplete extends StatefulWidget {

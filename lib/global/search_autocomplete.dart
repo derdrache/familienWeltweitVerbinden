@@ -13,12 +13,10 @@ class SearchAutocomplete extends StatefulWidget {
   var onDelete;
   List autoCompleteItems = [];
   var isDense = false;
-  var searchKontroller = TextEditingController();
+  var searchKontroller;
   bool isSearching = false;
   bool withFilter;
   String hintText;
-  var googleAutocomplete;
-  var googleSearchResult;
   var sessionToken = Uuid().v4();
 
   SearchAutocomplete({Key key,
@@ -27,7 +25,6 @@ class SearchAutocomplete extends StatefulWidget {
     this.onDelete,
     this.withFilter = true,
     this.hintText = "Filter",
-    this.googleAutocomplete = false,
     this.searchKontroller
   }) : isDense = !withFilter;
 
@@ -36,24 +33,6 @@ class SearchAutocomplete extends StatefulWidget {
     return filterList;
   }
 
-  getGoogleLocationData(){
-    return googleSearchResult;
-  }
-
-  _googleAutoCompleteSuche(input) async {
-    var googleInput = input;
-    googleInput = googleInput.replaceAll(" ", "_");
-    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken);
-    if(googleSuche.isEmpty) return;
-
-    final Map<String, dynamic> data = Map.from(googleSuche);
-
-    searchableItems = data["predictions"];
-
-  }
-
-
-
 
   @override
   _SearchAutocompleteState createState() => _SearchAutocompleteState();
@@ -61,6 +40,12 @@ class SearchAutocomplete extends StatefulWidget {
 
 class _SearchAutocompleteState extends State<SearchAutocomplete> {
   double dropdownExtraBoxHeight = 55;
+
+  @override
+  void initState() {
+    widget.searchKontroller ??= TextEditingController();
+    super.initState();
+  }
 
 
   showAutoComplete(text){
@@ -79,9 +64,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     if(text.isEmpty) return widget.autoCompleteItems;
 
     for(var item in widget.searchableItems){
-      if(widget.googleAutocomplete && item["description"] != widget.searchKontroller.text){
-        widget.autoCompleteItems.add(item);
-      } else if(item.toLowerCase().contains(text.toLowerCase())) widget.autoCompleteItems.add(item);
+      if(item.toLowerCase().contains(text.toLowerCase())) widget.autoCompleteItems.add(item);
     }
   }
 
@@ -103,7 +86,6 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
   }
 
   resetSearchBar(){
-    if(!widget.googleAutocomplete) widget.searchKontroller.text = "";
     widget.isSearching = false;
     widget.autoCompleteItems = [];
     FocusScope.of(context).unfocus();
@@ -147,8 +129,10 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
   }
 
+
   @override
   Widget build(BuildContext context) {
+
     double dropdownItemSumHeight = widget.autoCompleteItems.length *38.0;
     if(widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = widget.withFilter? 160 : 152;
 
@@ -156,15 +140,8 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
       return GestureDetector(
         onTap: widget.onConfirm,
         onTapUp: (details) async {
-          if(widget.googleAutocomplete){
-            widget.searchKontroller.text = item["description"];
-            resetSearchBar();
-            widget.googleSearchResult = await getGoogleSearchLocationData(item["place_id"]);
-          } else{
             addFilterItem(item);
             resetSearchBar();
-          }
-
         },
         child: Container(
           padding: EdgeInsets.all(10),
@@ -172,7 +149,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
           decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: global_var.borderColorGrey))
           ),
-          child: Text(widget.googleAutocomplete ? item["description"]: item)
+          child: Text(item)
         ),
       );
     }
@@ -223,7 +200,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     }
 
     return Container(
-      width: widget.googleAutocomplete ? 600:  double.infinity,
+      width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -251,8 +228,6 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                     ),
                     style: const TextStyle(),
                     onChanged: (value) async {
-                      if(widget.googleAutocomplete) await widget._googleAutoCompleteSuche(value);
-
                       showAutoComplete(value);
                       addAutoCompleteItems(value);
 
