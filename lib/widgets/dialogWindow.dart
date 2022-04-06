@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
 import 'Window_topbar.dart';
 
 
@@ -78,14 +77,3 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
     );
   }
 }
-
-/*
-
-showDialog(
-context: context,
-builder: (BuildContext buildContext){
-return
-});
-
-
- */
