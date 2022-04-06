@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:familien_suche/pages/landing.dart';
 import 'package:familien_suche/pages/login_register_page/create_profil_page.dart';
 import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -153,6 +152,25 @@ class MyApp extends StatelessWidget {
       statusBarColor: Colors.black,
     ));
 
+    importantUpdateScreen(){
+      return Container(
+        margin: const EdgeInsets.all(20),
+        child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(AppLocalizations.of(context).wichtigesUpdateTitle,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 30),
+                Text(AppLocalizations.of(context).wichtigesUpdateBody,
+                style: const TextStyle(fontSize: 16),
+                ),
+              ]
+            )
+        ),
+      );
+    }
 
     return FutureBuilder(
       future: initialization(),
@@ -165,7 +183,11 @@ class MyApp extends StatelessWidget {
           }
           if(buildNumber < importantUpdateNumber){
             InAppUpdate.performImmediateUpdate();
-            return const Center(child: CircularProgressIndicator());
+            return MaterialApp(
+              home: Scaffold(
+                body: importantUpdateScreen()
+              ),
+            );
           }
           return MaterialApp(
             title: "families worldwide",
