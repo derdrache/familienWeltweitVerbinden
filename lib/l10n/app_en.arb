@@ -195,7 +195,9 @@
     "eventZeitzoneAendern": "Change event time zone",
     "zeitzone": "Time zone: ",
     "neueZeitzoneEingeben": "Enter new time zone",
-    "bestitzerWechseln": "Change Owner"
+    "bestitzerWechseln": "Change Owner",
+    "wichtigesUpdateTitle": "Families worldwide has received a major update",
+    "wichtigesUpdateBody": "Please download the latest version from the Playstore. \n\nSince this is a beta version, the update must be installed manually via the PlayStore."
 
 }
 
