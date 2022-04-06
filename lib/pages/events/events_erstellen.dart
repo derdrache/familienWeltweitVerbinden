@@ -14,7 +14,8 @@ import 'package:uuid/uuid.dart';
 import '../../services/database.dart';
 import '../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
-import '../../global/google_autocomplete.dart';
+import '../../widgets/dialogWindow.dart';
+import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 import 'event_page.dart';
 
@@ -204,7 +205,65 @@ class _EventErstellenState extends State<EventErstellen> {
           left: screenWidth <640 ? -5 : ((screenWidth - 640) / 2) +5,
           child: IconButton(
             icon: Icon(Icons.help,size: 15),
-            onPressed: () => CustomWindow(
+            onPressed: () => showDialog(
+                context: context,
+                builder: (BuildContext buildContext) {
+                  return CustomAlertDialog(
+                    height: 500,
+                    title: AppLocalizations.of(context).informationEventArt,
+                    children: [
+                      SizedBox(height: 10),
+                      Container(
+                        margin: EdgeInsets.only(left: 5, right: 5),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: Text(AppLocalizations.of(context).privatInformationText,
+                              maxLines: 10,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        ]),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        margin: EdgeInsets.only(left: 5, right: 5),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Container(
+                              width: 70,
+                              child: Text(AppLocalizations.of(context).halbOeffentlich,style: TextStyle(fontWeight: FontWeight.bold))
+                          ),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
+                              maxLines: 10,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        ]),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        margin: EdgeInsets.only(left: 5, right: 5),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(AppLocalizations.of(context).oeffentlich, style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(width: 5),
+                          Expanded(
+                            child: Text(AppLocalizations.of(context).oeffentlichInformationText,
+                              maxLines: 10,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ]),
+                      )
+                    ]
+                  );
+                }
+            )
+
+              /*
+              CustomWindow(
                 height: 500,
                 context: context,
                 title: AppLocalizations.of(context).informationEventArt,
@@ -256,6 +315,7 @@ class _EventErstellenState extends State<EventErstellen> {
                   )
                 ]
             ),
+        */
           )
       );
     }

@@ -11,7 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
-import '../../global/google_autocomplete.dart';
+import '../../widgets/dialogWindow.dart';
+import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/image_galerie.dart';
@@ -471,31 +472,38 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     }
 
     openChangeWindow(){
-      CustomWindow(
+
+      showDialog(
           context: context,
-          title: widget.windowTitle,
-          height: widget.multiLines || widget.modus == "googleAutoComplete" ||
-              widget.modus == "date"? 300 : 180,
-          children: [
-            inputBox(),
-            Container(
-              margin: const EdgeInsets.only(right: 10),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
-                      onPressed: () => Navigator.pop(context),
+          builder: (BuildContext buildContext){
+            return CustomAlertDialog(
+                title: widget.windowTitle,
+                height: widget.multiLines || widget.modus == "googleAutoComplete" ||
+                    widget.modus == "date"? 300 : 180,
+                children: [
+                  inputBox(),
+                  Container(
+                    margin: const EdgeInsets.only(right: 10),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          TextButton(
+                              child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
+                              onPressed: () => saveChanges()
+                          ),
+                        ]
                     ),
-                    TextButton(
-                        child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
-                        onPressed: () => saveChanges()
-                    ),
-                  ]
-              ),
-            )
-          ]
-      );
+                  )
+                ]
+            );
+          });
+
+
+
     }
 
     openLinkAskWindow(){
@@ -777,58 +785,62 @@ class _EventArtButtonState extends State<EventArtButton> {
         left:10,
         child: IconButton(
           icon: const Icon(Icons.help,size: 15),
-          onPressed: () => CustomWindow(
-              height: 500,
+          onPressed: () => showDialog(
               context: context,
-              title: AppLocalizations.of(context).informationEventArt,
-              children: [
-                const SizedBox(height: 10),
-                Container(
-                  margin: const EdgeInsets.only(left: 5, right: 5),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Text(AppLocalizations.of(context).privatInformationText,
-                        maxLines: 10,
-                        overflow: TextOverflow.ellipsis,
+              builder: (BuildContext buildContext){
+                return CustomAlertDialog(
+                    height: 500,
+                    title: AppLocalizations.of(context).informationEventArt,
+                    children: [
+                      const SizedBox(height: 10),
+                      Container(
+                        margin: const EdgeInsets.only(left: 5, right: 5),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          const Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(AppLocalizations.of(context).privatInformationText,
+                              maxLines: 10,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        ]),
                       ),
-                    )
-                  ]),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  margin: const EdgeInsets.only(left: 5, right: 5),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    SizedBox(
-                        width: 70,
-                        child: Text(AppLocalizations.of(context).halbOeffentlich,style: const TextStyle(fontWeight: FontWeight.bold))
-                    ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
-                        maxLines: 10,
-                        overflow: TextOverflow.ellipsis,
+                      const SizedBox(height: 20),
+                      Container(
+                        margin: const EdgeInsets.only(left: 5, right: 5),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          SizedBox(
+                              width: 70,
+                              child: Text(AppLocalizations.of(context).halbOeffentlich,style: const TextStyle(fontWeight: FontWeight.bold))
+                          ),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
+                              maxLines: 10,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        ]),
                       ),
-                    )
-                  ]),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  margin: const EdgeInsets.only(left: 5, right: 5),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(AppLocalizations.of(context).oeffentlich, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Text(AppLocalizations.of(context).oeffentlichInformationText,
-                        maxLines: 10,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ]),
-                )
-              ]
-          ),
+                      const SizedBox(height: 20),
+                      Container(
+                        margin: const EdgeInsets.only(left: 5, right: 5),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(AppLocalizations.of(context).oeffentlich, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(AppLocalizations.of(context).oeffentlichInformationText,
+                              maxLines: 10,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ]),
+                      )
+                    ]
+                );
+              })
+
         )
     );
   }
@@ -857,30 +869,33 @@ class _EventArtButtonState extends State<EventArtButton> {
       left: -10,
       child: IconButton(
         icon: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        onPressed: !widget.isCreator ? null : () => CustomWindow(
+        onPressed: !widget.isCreator ? null : () => showDialog(
             context: context,
-            title: AppLocalizations.of(context).eventArtAendern,
-            height: 180,
-            children: [
-              eventTypInput,
-              Container(
-                margin: const EdgeInsets.only(right: 10),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
-                        onPressed: () => Navigator.pop(context),
+            builder: (BuildContext buildContext){
+              return CustomAlertDialog(
+                  title: AppLocalizations.of(context).eventArtAendern,
+                  height: 180,
+                  children: [
+                    eventTypInput,
+                    Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                                child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
+                                onPressed: () => eventArtSave()
+                            ),
+                          ]
                       ),
-                      TextButton(
-                          child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
-                          onPressed: () => eventArtSave()
-                      ),
-                    ]
-                ),
-              )
-            ]
-        ),
+                    )
+                  ]
+              );
+            })
       ),
     );
   }

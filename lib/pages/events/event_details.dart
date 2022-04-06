@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../global/search_autocomplete.dart';
+import '../../widgets/dialogWindow.dart';
+import '../../widgets/search_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/style.dart' as global_style;
 import '../../widgets/badge_icon.dart';
@@ -130,34 +131,39 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       },
     );
 
-    CustomWindow(
-      context: context,
-      height: 300,
-      title: AppLocalizations.of(context).organisatorAbgeben,
-      children: [
-        searchAutocomplete,
-        SizedBox(height: 40),
-        FloatingActionButton.extended(
-          label: Text(AppLocalizations.of(context).uebertragen),
-          onPressed: () async{
-            var selectedUserId = await ProfilDatabase().getData("id", "WHERE name = '${inputKontroller.text}'");
-            await EventDatabase().updateOne(widget.event["id"], "erstelltVon", selectedUserId);
-            setState(() {
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext){
+          return CustomAlertDialog(
+              height: 300,
+              title: AppLocalizations.of(context).organisatorAbgeben,
+              children: [
+                searchAutocomplete,
+                const SizedBox(height: 40),
+                FloatingActionButton.extended(
+                  label: Text(AppLocalizations.of(context).uebertragen),
+                  onPressed: () async{
+                    var selectedUserId = await ProfilDatabase().getData("id", "WHERE name = '${inputKontroller.text}'");
+                    await EventDatabase().updateOne(widget.event["id"], "erstelltVon", selectedUserId);
+                    setState(() {
 
-            });
+                    });
 
-            Navigator.pop(context);
+                    Navigator.pop(context);
 
-            customSnackbar(
-              context,
-                AppLocalizations.of(context).eventUebergebenAn1
-                    + inputKontroller.text + AppLocalizations.of(context).eventUebergebenAn2,
-              color: Colors.green
-            );
-          },
-        )
-      ]
-    );
+                    customSnackbar(
+                        context,
+                        AppLocalizations.of(context).eventUebergebenAn1
+                            + inputKontroller.text + AppLocalizations.of(context).eventUebergebenAn2,
+                        color: Colors.green
+                    );
+                  },
+                )
+              ]
+          );
+        });
+
+
   }
 
 
@@ -192,29 +198,34 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     reportEventWindow(){
       var reportController = TextEditingController();
 
-      CustomWindow(
-        context: context,
-        height: 500,
-        title: AppLocalizations.of(context).eventMelden,
-        children: [
-          customTextInput(AppLocalizations.of(context).eventMeldenFrage, reportController, moreLines: 10),
-          Container(
-            margin: const EdgeInsets.only(left: 30, top: 10, right: 30),
-            child: FloatingActionButton.extended(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ReportsDatabase().add(
-                      userId,
-                      "Melde Event id: " + widget.event["id"],
-                      reportController.text
-                  );
-                  // send to db
-                },
-                label: Text(AppLocalizations.of(context).senden)
-            ),
-          )
-        ]
-      );
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+                height: 500,
+                title: AppLocalizations.of(context).eventMelden,
+                children: [
+                  customTextInput(AppLocalizations.of(context).eventMeldenFrage, reportController, moreLines: 10),
+                  Container(
+                    margin: const EdgeInsets.only(left: 30, top: 10, right: 30),
+                    child: FloatingActionButton.extended(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ReportsDatabase().add(
+                              userId,
+                              "Melde Event id: " + widget.event["id"],
+                              reportController.text
+                          );
+                          // send to db
+                        },
+                        label: Text(AppLocalizations.of(context).senden)
+                    ),
+                  )
+                ]
+            );
+          });
+
+
     }
 
     deleteEventDialog(){
@@ -258,32 +269,35 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               Text("Event Info"),
             ],
           ),
-        onPressed: () => CustomWindow(
-          context: context,
-          title: "Event Information",
-          children: [
-            const SizedBox(height: 10),
-            Text(
-                AppLocalizations.of(context).interessierte + eventDetails["interessierte"].toString(),
-                style: TextStyle(fontSize: fontsize)
-            ),
-            const SizedBox(height: 10),
-            Text(
-                AppLocalizations.of(context).zusagen+ eventDetails["zusagen"].toString(),
-                style: TextStyle(fontSize: fontsize)
-            ),
-            const SizedBox(height: 10),
-            Text(
-                AppLocalizations.of(context).absagen + eventDetails["absagen"].toString(),
-                style: TextStyle(fontSize: fontsize)
-            ),
-            const SizedBox(height: 10),
-            if(isNotPublic) Text(
-                AppLocalizations.of(context).freigegeben + eventDetails["freigegeben"].toString(),
-                style: TextStyle(fontSize: fontsize)
-            )
-          ]
-        ),
+        onPressed: () => showDialog(
+            context: context,
+            builder: (BuildContext buildContext) {
+              return CustomAlertDialog(
+                  title: "Event Information",
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                        AppLocalizations.of(context).interessierte + eventDetails["interessierte"].toString(),
+                        style: TextStyle(fontSize: fontsize)
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                        AppLocalizations.of(context).zusagen+ eventDetails["zusagen"].toString(),
+                        style: TextStyle(fontSize: fontsize)
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                        AppLocalizations.of(context).absagen + eventDetails["absagen"].toString(),
+                        style: TextStyle(fontSize: fontsize)
+                    ),
+                    const SizedBox(height: 10),
+                    if(isNotPublic) Text(
+                        AppLocalizations.of(context).freigegeben + eventDetails["freigegeben"].toString(),
+                        style: TextStyle(fontSize: fontsize)
+                    )
+                  ]
+              );
+            })
       );
     }
 
@@ -293,7 +307,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           children: [
             const Icon(Icons.change_circle),
             const SizedBox(width: 10),
-            Text("Organisator abgeben"),
+            Text(AppLocalizations.of(context).bestitzerWechseln),
           ],
         ),
         onPressed: (){
@@ -409,7 +423,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
         freizugebenListe.add(
             Container(
-                margin: EdgeInsets.only(left: 20),
+                margin: const EdgeInsets.only(left: 20),
                 child: Row(
                   children: [
                     Text(name),
@@ -457,7 +471,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
         freigeschlatetList.add(
             Container(
-                margin: EdgeInsets.only(left: 20),
+                margin: const EdgeInsets.only(left: 20),
                 child: Row(
                   children: [
                     Text(name),
@@ -494,7 +508,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     userfreischalteWindow() async{
-      var windowSetState;
+      StateSetter windowSetState;
 
       showDialog(
           context: context,
@@ -507,12 +521,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     content: Stack(
                       clipBehavior: Clip.none,
                         children: [
-                          Container(
+                          SizedBox(
                             height: 600,
                             width: 600,
                             child: Column(children: [
                               Container(
-                                margin: EdgeInsets.all(10),
+                                margin: const EdgeInsets.all(10),
                                 child: Text(
                                   AppLocalizations.of(context).familienFreigeben,
                                   style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold),
@@ -529,12 +543,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                         ],
                                       );
                                     }
-                                    return SizedBox.shrink();
+                                    return const SizedBox.shrink();
                                   },
                                 ),
                               ),
                               Container(
-                                margin: EdgeInsets.all(10),
+                                margin: const EdgeInsets.all(10),
                                 child: Text(
                                   AppLocalizations.of(context).freigegebeneFamilien,
                                   style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold),
@@ -551,7 +565,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                         ],
                                       );
                                     }
-                                    return SizedBox.shrink();
+                                    return const SizedBox.shrink();
                                   },
                                 ),
                               )
@@ -580,8 +594,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     linkTeilenWindow() async{
-      return CustomWindow(
-        context: context,
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
         title: "Event link",
         children: [
           Container(
@@ -617,6 +633,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           )
         ]
       );
+    });
     }
 
 

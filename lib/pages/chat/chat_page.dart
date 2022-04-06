@@ -9,7 +9,8 @@ import 'package:intl/intl.dart';
 
 import '../../services/database.dart';
 import '../../global/custom_widgets.dart';
-import '../../global/search_autocomplete.dart';
+import '../../widgets/Window_topbar.dart';
+import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 import 'chat_details.dart';
 

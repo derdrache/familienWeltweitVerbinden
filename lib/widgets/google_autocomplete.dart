@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'variablen.dart' as global_var;
+import '../global/variablen.dart' as global_var;
 
 
 class GoogleAutoComplete extends StatefulWidget {

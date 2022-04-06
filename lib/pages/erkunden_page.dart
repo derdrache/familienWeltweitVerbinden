@@ -14,7 +14,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/database.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_var;
-import '../global/search_autocomplete.dart';
+import '../widgets/search_autocomplete.dart';
 import '../services/locationsService.dart';
 
 

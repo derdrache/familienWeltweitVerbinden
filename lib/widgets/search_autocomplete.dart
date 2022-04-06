@@ -1,9 +1,8 @@
 import 'dart:ui';
 
-import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'variablen.dart' as global_var;
+import '../global/variablen.dart' as global_var;
 
 
 class SearchAutocomplete extends StatefulWidget {
@@ -95,40 +94,6 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     });
   }
 
-  getGoogleSearchLocationData(placeId) async {
-    var locationData = await LocationService().getLocationdataFromGoogleID(placeId, widget.sessionToken);
-
-    var formattedAddressList = locationData["result"]["formatted_address"].split(", ");
-    var formattedCity = formattedAddressList.first.split(" ");
-
-    var city = LocationService().isNumeric(formattedCity.first) ?
-    formattedCity.last : formattedCity.join(" ");
-    var cityList = [];
-    for(var item in city.split(" ")){
-      if(!LocationService().isNumeric(item)) cityList.add(item);
-    }
-    city = cityList.join(" ");
-
-
-    var country = formattedAddressList.last;
-    if(country.contains(" - ")){
-      city = city.split(" - ")[0];
-      country = country.split(" - ")[1];
-    }
-    if(LocationService().isNumeric(country)) country = formattedAddressList[formattedAddressList.length -2];
-
-    var locationDataMap = {
-      "city":city,
-      "countryname": country,
-      "longt": locationData["result"]["geometry"]["location"]["lng"],
-      "latt": locationData["result"]["geometry"]["location"]["lat"],
-      "adress": locationData["result"]["formatted_address"]
-    };
-
-    return locationDataMap;
-
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -208,10 +173,8 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
         ),
         height:  dropdownExtraBoxHeight + dropdownItemSumHeight,
         margin: EdgeInsets.all(5),
-        //padding: EdgeInsets.only(left: 5),
         child:Stack(
-          overflow: Overflow.visible,
-          children: [
+          clipBehavior: Clip.none, children: [
             Column(
               children: [
                 Padding(

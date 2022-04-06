@@ -194,7 +194,8 @@
     "hatDirNachrichtGeschrieben": " has written you a message",
     "eventZeitzoneAendern": "Change event time zone",
     "zeitzone": "Time zone: ",
-    "neueZeitzoneEingeben": "Enter new time zone"
+    "neueZeitzoneEingeben": "Enter new time zone",
+    "bestitzerWechseln": "Change Owner"
 
 }
 

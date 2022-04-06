@@ -1,13 +1,10 @@
 import 'dart:ui';
 
-import 'package:familien_suche/global/year_picker.dart';
-import 'package:familien_suche/pages/events/event_page.dart';
+import 'package:familien_suche/widgets/year_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'month_picker.dart';
-import 'global_functions.dart' as global_functions;
 
 double sideSpace = 10;
 double borderRounding = 5;
@@ -51,14 +48,14 @@ Widget customTextInput(text, controller, {validator, passwort = false,
             top: 2,
             child: Container(
               alignment: Alignment.topCenter,
-              margin: EdgeInsets.only(bottom: 10),
+              margin: const EdgeInsets.only(bottom: 10),
               width: 20,
               height: 20,
               child: IconButton(
-                  padding: EdgeInsets.all(0),
+                  padding: const EdgeInsets.all(0),
                   alignment: Alignment.topCenter,
                   iconSize: 20,
-                  icon: Icon(Icons.info),
+                  icon: const Icon(Icons.info),
                   onPressed: () => informationWindow()
               ),
             )
@@ -85,7 +82,7 @@ Widget customFloatbuttonExtended(text, function){
 
 customSnackbar(context, text, {color = Colors.red}){
   var snackbar = SnackBar(
-        duration: Duration(seconds: 5),
+        duration: const Duration(seconds: 5),
           backgroundColor: color,
           content: Text(text)
       );
@@ -103,7 +100,7 @@ customAppBar({title, buttons, elevation = 4.0, var onTap, context}){
           onTap: onTap,
           child: Row(
               children: [
-                Container(
+                SizedBox(
                     height: 50,
                     child: Center(child: Text(title, style: const TextStyle(color: Colors.black)))
                 )
@@ -289,7 +286,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
       if (widget.dateIsSelected){
         return Text(widget.hintText, style: const TextStyle(fontSize: 16, color: Colors.black));
       } else{
-        return Text("Year", style: const TextStyle(fontSize: 13, color: Colors.grey));
+        return const Text("Year", style: TextStyle(fontSize: 13, color: Colors.grey));
       }
     }
 
@@ -384,7 +381,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
           child: DropdownButton<String>(
             isExpanded: true,
             value: widget.selected == "" ? null : widget.selected,
-            hint: Text(widget.hintText, style: TextStyle(color: Colors.grey)),
+            hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
             elevation: 16,
             style: const TextStyle(color: Colors.black),
             icon: const Icon(Icons.arrow_downward, color: Colors.black,),
@@ -555,7 +552,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
     return Align(
       alignment: Alignment.topCenter,
-      child: Container(
+      child: SizedBox(
         width: webWidth,
         child: Wrap(
           children: [
@@ -568,90 +565,5 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
   }
 }
 
-class WindowTopbar extends StatelessWidget {
-  var title;
-
-  WindowTopbar({Key key,this.title}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      child: Row(
-        children: [
-          Expanded(
-            child: Center(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold
-
-                  ),
-                )
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-CustomWindow({context, title = "",List<Widget> children, double height = double.maxFinite}){
-
-  _closeWindow(){
-    Navigator.pop(context);
-  }
-
-  return showDialog(
-      context: context,
-      builder: (BuildContext buildContext){
-        return AlertDialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))
-          ),
-          contentPadding: EdgeInsets.zero,
-          content: SizedBox(
-              height: height,
-              width: 600,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  ScrollConfiguration(
-                    behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    }),
-                    child: Container(
-                      margin: EdgeInsets.only(left: 10, right: 10),
-                      child: ListView(
-                          children: [
-                            WindowTopbar(title: title),
-                            const SizedBox(height: 10),
-                            ...children
-                          ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    height: 30,
-                    right: -13,
-                    top: -7,
-                    child: InkResponse(
-                        onTap: () => _closeWindow(),
-                        child: const CircleAvatar(
-                          child: Icon(Icons.close, size: 16,),
-                          backgroundColor: Colors.red,
-                        )
-                    ),
-                  ),
-                ] ,
-              ),
-            ),
-
-        );
-      }
-  );
-}
 
 

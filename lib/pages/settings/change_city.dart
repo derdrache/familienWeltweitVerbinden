@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
-import '../../global/google_autocomplete.dart';
+import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 

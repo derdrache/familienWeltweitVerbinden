@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/dialogWindow.dart';
+
 
 
 class PatchnotesWindow{
@@ -49,28 +51,32 @@ class PatchnotesWindow{
   }
 
   openWindow(){
-    return CustomWindow(
+    showDialog(
         context: context,
-        title: patchnotesTitle,
-        children:
+        builder: (BuildContext buildContext){
+          return CustomAlertDialog(
+              title: patchnotesTitle,
+              children:
 
-        isGerman ? [
-          _patch(patch113D),
-          _patch(patch112D),
-          _patch(patch111D),
-          _patch(patch110D),
-          _patch(patch101D),
-          _patch(patch1D),
-        ] :
-        [
-          _patch(patch113E),
-          _patch(patch112E),
-          _patch(patch111E),
-          _patch(patch110E),
-          _patch(patch101E),
-          _patch(patch1E),
-        ]
-    );
+              isGerman ? [
+                _patch(patch113D),
+                _patch(patch112D),
+                _patch(patch111D),
+                _patch(patch110D),
+                _patch(patch101D),
+                _patch(patch1D),
+              ] :
+              [
+                _patch(patch113E),
+                _patch(patch112E),
+                _patch(patch111E),
+                _patch(patch110E),
+                _patch(patch101E),
+                _patch(patch1E),
+              ]
+          );
+        });
+
   }
 
 }
