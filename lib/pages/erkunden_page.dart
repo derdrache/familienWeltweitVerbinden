@@ -43,6 +43,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
   bool popupActive = false;
   List<Widget> popupItems = [];
   var lastEventPopup;
+  var beforeZoomPosition;
+  var beforeZoomZoom;
 
 
   @override
@@ -97,7 +99,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
     createAndSetZoomEvents();
   }
 
-
   getOwnProfil(profil){
     var userEmail = FirebaseAuth.instance.currentUser.email;
 
@@ -120,7 +121,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
         if(check){
           newPoint = true;
-          list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
+          var numberName = int.parse(list[i]["name"]) + 1;
+          if(numberName > 99) numberName = 99;
+          list[i]["name"] = numberName.toString();
           list[i]["profils"].add(profil);
         }
       }
@@ -147,7 +150,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
         if(profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"]){
           newCity = true;
-          list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
+          var addNumberName = int.parse(list[i]["name"]) + 1;
+          if(addNumberName > 99) addNumberName = 99;
+          list[i]["name"] = addNumberName.toString();
           list[i]["profils"].add(profil);
         }
       }
@@ -175,7 +180,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
         if(listCountryLocation["latt"] == profilCountryLocation["latt"] &&
             listCountryLocation["longt"] == profilCountryLocation["longt"] ){
           checkNewCountry = false;
-          list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
+          var addNumberName = int.parse(list[i]["name"]) + 1;
+          if(addNumberName > 99) addNumberName = 99;
+          list[i]["name"] = addNumberName.toString();
           list[i]["profils"].add(profil);
         }
       }
@@ -215,7 +222,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       if(check || list[i]["countryname"] == profil["land"]){
         newPoint = false;
-        list[i]["name"] = (int.parse(list[i]["name"]) + 1).toString();
+        var addNumberName = int.parse(list[i]["name"]) + 1;
+        if(addNumberName > 99) addNumberName = 99;
+        list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
       }
     }
@@ -392,6 +401,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   zoomOut(){
     var newZoom;
+
     if(mapZoom > 6.6){
       newZoom = 6.6;
     } else if (mapZoom > 4.1){
@@ -400,7 +410,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
       newZoom = minMapZoom;
     }
 
+    if(beforeZoomPosition != null) {
+      newZoom = beforeZoomZoom;
+      mapPosition = beforeZoomPosition;
 
+      beforeZoomZoom = beforeZoomPosition = null;
+    }
     mapController.move(mapPosition, newZoom);
     mapZoom = newZoom;
     FocusScope.of(context).unfocus();
@@ -522,7 +537,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       }
 
       popupItems = [Wrap(spacing: 10, alignment: WrapAlignment.center, children: popupItems)];
-      // kann geändert werden wenn Profils auch Karten sind
+      // kann geändert werden wenn Profils auch Karten sind (wie die Events)
     }
 
     Marker profilMarker(numberText, position,  buttonFunction){
@@ -658,6 +673,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 () {
                   popupActive = true;
                   createPopupProfils(profil);
+                  beforeZoomPosition = mapPosition;
+                  beforeZoomZoom= mapZoom;
                   zoomAtPoint(position);
                   setState(() {
 
@@ -695,6 +712,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 lastEventPopup = event;
                 popupActive = true;
                 createPopupEvents(event);
+                beforeZoomPosition = mapPosition;
+                beforeZoomZoom= mapZoom;
                 zoomAtPoint(position);
               })
           );

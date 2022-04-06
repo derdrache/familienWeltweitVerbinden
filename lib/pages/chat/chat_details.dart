@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
 import 'package:familien_suche/pages/events/eventCard.dart';
-import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +11,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../../global/custom_widgets.dart';
-import '../events/event_details.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   var chatPartnerId;
@@ -44,6 +41,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   Timer timer;
   var pufferList;
   var eventCardList = [];
+  var chatPartnerProfil;
 
   @override
   void dispose() {
@@ -62,6 +60,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   _asyncMethod() async {
     await getAndSetChatData();
     await writeActiveChat();
+    chatPartnerProfil =
+    await ProfilDatabase().getData("*", "WHERE id = '${widget.chatPartnerId}'");
     if(widget.groupChatData != false) await resetNewMessageCounter();
 
     setState(() {
@@ -186,8 +186,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   }
 
   openProfil() async {
-    var chatPartnerProfil =
-        await ProfilDatabase().getData("*", "WHERE id = '${widget.chatPartnerId}'");
+    chatPartnerProfil ??= await ProfilDatabase()
+          .getData("*", "WHERE id = '${widget.chatPartnerId}'");
 
 
     global_functions.changePage(
@@ -227,14 +227,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   alignment: textAlign,
                   child: FutureBuilder(
                     future: EventDatabase()
-                        .getData("*", "WHERE id = '${message["message"].substring(10)}"),
+                        .getData("*", "WHERE id = '${message["message"].substring(10)}'"),
                     builder: (context, snapshot) {
                       if(snapshot.hasData && snapshot.data != false) {
-                        return EventCard(
-                          margin: EdgeInsets.all(10),
-                          withInteresse: true,
-                          event: eventCardList[eventCardCounter],
-                          afterPageVisit: () => setState((){}),
+                        return Column(
+                          children: [
+                            EventCard(
+                              margin: EdgeInsets.all(10),
+                              withInteresse: true,
+                              event: snapshot.data,
+                              afterPageVisit: () => setState((){}),
+                            ),
+                            Text(
+                                DateFormat('dd-MM hh:mm').format(messageTime),
+                                style: TextStyle(color: Colors.grey[600])
+                            )
+                          ],
                         );
                       }
                       return SizedBox.shrink();

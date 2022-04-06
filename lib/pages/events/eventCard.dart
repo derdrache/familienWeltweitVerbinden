@@ -14,13 +14,12 @@ class EventCard extends StatefulWidget {
   var afterPageVisit;
   var isCreator;
 
-  EventCard({
-    Key key,
+  EventCard({Key key,
     this.event,
     this.withInteresse = false,
     this.margin = const EdgeInsets.only(top:10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
-  }): isCreator = event["erstelltVon"] == userId;
+  }): isCreator = event["erstelltVon"] == userId, super(key: key);
 
   @override
   _EventCardState createState() => _EventCardState();
@@ -32,8 +31,8 @@ class _EventCardState extends State<EventCard> {
   @override
   Widget build(BuildContext context) {
     widget.event["bild"] ??= "assets/bilder/strand.jpg";
-    double screenHeight = MediaQuery.of(context).size.height; //laptop: 619 -  Android 737
-    var fontSize = screenHeight / 52; //Android 14   51,58  => 52,6
+    double screenHeight = MediaQuery.of(context).size.height;
+    var fontSize = screenHeight / 52;
     var forTeilnahmeFreigegeben = (widget.event["art"] == "public" ||
         widget.event["art"] == "öffentlich") || widget.event["freigegeben"].contains(userId);
     var isAssetImage = widget.event["bild"].substring(0,5) == "asset" ? true : false;
@@ -72,13 +71,14 @@ class _EventCardState extends State<EventCard> {
                 onAbsageList = false;
               });
 
-              var zusageList = await EventDatabase()
-                  .getData("zusage", "WHERE id = '${widget.event["id"]}");
+              var dbData = await EventDatabase()
+                  .getData("absage, zusage", "WHERE id = '${widget.event["id"]}'");
+              var absageList = dbData["absage"];
+              var zusageList = dbData["zusage"];
+
               zusageList.add(userId);
               EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
 
-              var absageList = await EventDatabase()
-                  .getData("absage", "WHERE id = '${widget.event["id"]}");
               absageList.remove(userId);
               EventDatabase().updateOne(widget.event["id"], "absage", absageList);
 
@@ -100,13 +100,14 @@ class _EventCardState extends State<EventCard> {
                 onZusageList = false;
               });
 
-              var absageList = await EventDatabase()
-                  .getData("absage", "WHERE id = '${widget.event["id"]}");
+              var dbData = await EventDatabase()
+                  .getData("absage, zusage", "WHERE id = '${widget.event["id"]}'");
+              var absageList = dbData["absage"];
+              var zusageList = dbData["zusage"];
+
               absageList.add(userId);
               EventDatabase().updateOne(widget.event["id"], "absage", absageList);
 
-              var zusageList = await EventDatabase()
-                  .getData("zusage", "WHERE id = '${widget.event["id"]}");
               zusageList.remove(userId);
               EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
 
@@ -149,7 +150,7 @@ class _EventCardState extends State<EventCard> {
               Stack(
                 children: [
                   Container(
-                    constraints: BoxConstraints(
+                    constraints: const BoxConstraints(
                       minHeight: 100,
                     ),
                     child: ClipRRect(

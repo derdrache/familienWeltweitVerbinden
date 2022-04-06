@@ -138,7 +138,8 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
               event: event,
               afterPageVisit: () async {
                 eventsBackup = allEvents = await EventDatabase()
-                    .getData("*", "WHERE art != 'privat' AND erstelltVon != '"+userId+"'");
+                    .getData("*", "WHERE art != 'privat' AND erstelltVon != '"+userId+"'",
+                    returnList: true);
 
                 setState(() {});
               }

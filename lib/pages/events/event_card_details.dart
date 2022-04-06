@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
@@ -44,7 +43,7 @@ class EventCardDetails extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     if(screenWidth > 500) screenWidth = kIsWeb ? 400 : 500;
-    double cardWidth = screenWidth / 1.12;//isWebDesktop ? 300 : 450; // Handy 392 => 350: Tablet 768
+    double cardWidth = screenWidth / 1.12;
     double cardHeight = screenHeight / 1.34;
     event["eventInterval"] = isGerman ? global_var.changeEnglishToGerman(event["eventInterval"]):
       global_var.changeGermanToEnglish(event["eventInterval"]);
@@ -191,7 +190,7 @@ class EventCardDetails extends StatelessWidget {
     eventBeschreibung(){
       return Container(
           margin: const EdgeInsets.all(10),
-          padding: EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.only(bottom: 20),
           child: Center(
               child: Container(
                 width: double.infinity,
@@ -281,12 +280,12 @@ class EventCardDetails extends StatelessWidget {
                           color: Colors.green);
 
                       var freischaltenList = await EventDatabase()
-                          .getData("freischalten", "WHERE id = '${event["id"]}");
+                          .getData("freischalten", "WHERE id = '${event["id"]}'");
                       freischaltenList.add(userId);
                       EventDatabase().updateOne(event["id"], "freischalten", freischaltenList);
 
                       var interessenList = await EventDatabase()
-                          .getData("interesse", "WHERE id = '${event["id"]}");
+                          .getData("interesse", "WHERE id = '${event["id"]}'");
                       interessenList.add(userId);
                       EventDatabase().updateOne(event["id"], "interesse", interessenList);
                     }
@@ -464,9 +463,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       if(widget.modus== "date"){
         return Column(children: [
           datumButton,
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           uhrZeitButton,
-          SizedBox(height: 50)
+          const SizedBox(height: 50)
         ]);
       }
     }
@@ -535,9 +534,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
         child: !widget.singleShow && !widget.multiLines ? Row(
           children: [
             Text(widget.rowTitle + " ", style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold)),
-            const Expanded(child: const SizedBox.shrink()),
+            const Expanded(child: SizedBox.shrink()),
             InkWell(
-                child: Container(
+                child: SizedBox(
                   width: 200,
                   child: Text(
                     widget.databaseKennzeichnung =="zeitzone" ? "UTC " + widget.rowData:
@@ -613,7 +612,7 @@ class _CardFeedState extends State<CardFeed> {
   Widget build(BuildContext context) {
 
     return Container(
-      padding: EdgeInsets.only(right: 20),
+      padding: const EdgeInsets.only(right: 20),
       width: widget.width,
       child: Row(
         children: [
@@ -622,7 +621,7 @@ class _CardFeedState extends State<CardFeed> {
               widget.eventZusage.length.toString(),
               style: TextStyle(fontSize: fontsize)
           ),
-          Expanded(child: SizedBox()),
+          const Expanded(child: SizedBox()),
           InkWell(
             child: organisatorText,
             onTap: () {
@@ -727,7 +726,7 @@ class _InteresseButtonState extends State<InteresseButton> {
           setState(() {});
 
           var interesseList = await EventDatabase()
-              .getData("interesse", "WHERE id = '${widget.id}");
+              .getData("interesse", "WHERE id = '${widget.id}'");
 
           if(widget.hasIntereset){
             interesseList.add(userId);
@@ -787,7 +786,7 @@ class _EventArtButtonState extends State<EventArtButton> {
                 Container(
                   margin: const EdgeInsets.only(left: 5, right: 5),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text("privat       ", style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(width: 5),
                     Expanded(
                       child: Text(AppLocalizations.of(context).privatInformationText,
@@ -801,7 +800,7 @@ class _EventArtButtonState extends State<EventArtButton> {
                 Container(
                   margin: const EdgeInsets.only(left: 5, right: 5),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Container(
+                    SizedBox(
                         width: 70,
                         child: Text(AppLocalizations.of(context).halbOeffentlich,style: const TextStyle(fontWeight: FontWeight.bold))
                     ),
