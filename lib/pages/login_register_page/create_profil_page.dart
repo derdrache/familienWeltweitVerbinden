@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'dart:io';
 
-import 'package:familien_suche/global/search_autocomplete.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
+import '../../global/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../services/database.dart';
 import '../start_page.dart';
@@ -26,7 +26,8 @@ class CreateProfilPage extends StatefulWidget {
 class _CreateProfilPageState extends State<CreateProfilPage> {
   final _formKey = GlobalKey<FormState>();
   var userNameKontroller = TextEditingController();
-  var ortAuswahlBox = SearchAutocomplete(googleAutocomplete: true);
+  var aboutusKontroller = TextEditingController();
+  var ortAuswahlBox = GoogleAutoComplete();
   var ortMapData = {};
   var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
   var sprachenAuswahlBox = CustomMultiTextForm();
@@ -66,7 +67,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     });
   }
 
-
   saveFunction()async {
     setLoading();
 
@@ -105,7 +105,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             "reiseart": reiseArtenAuswahlBox.getSelected(),
             "sprachen": sprachenAuswahlBox.getSelected(),
             "token": !kIsWeb? await  FirebaseMessaging.instance.getToken(): null,
-            "lastLogin": DateTime.now().toString()
+            "lastLogin": DateTime.now().toString(),
+            "aboutme": aboutusKontroller.text
           };
 
           ProfilDatabase().addNewProfil(data);
@@ -221,6 +222,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                         ),
                       ),
                       childrenAgePickerBox,
+                      customTextInput("Über uns *optional*", aboutusKontroller,
+                        moreLines: 4
+                      )
                     ],
                   ),
             ),

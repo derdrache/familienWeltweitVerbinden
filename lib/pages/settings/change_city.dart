@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
-import '../../global/search_autocomplete.dart';
+import '../../global/google_autocomplete.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -19,7 +19,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   List<Widget> suggestedCitiesList = [];
   int selectedIndex = -1;
   var locationData = {};
-  var autoComplete = SearchAutocomplete(googleAutocomplete: true);
+  var autoComplete = GoogleAutoComplete();
 
   @override
   void initState() {
