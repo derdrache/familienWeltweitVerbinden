@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../global/custom_widgets.dart';
+import '../widgets/dialogWindow.dart';
 
 class UmcomingUpdatesWindow{
   var context;
@@ -24,25 +25,28 @@ class UmcomingUpdatesWindow{
   openWindow(){
     var patchnotesTitle = AppLocalizations.of(context).geplanteErweiterungen;
 
-    return CustomWindow(
+    showDialog(
         context: context,
-        title: patchnotesTitle,
-        children: [
-          _update(AppLocalizations.of(context).familienAnzeige),
-          _update(AppLocalizations.of(context).automatischerStandort),
-          _update(AppLocalizations.of(context).nutzerBlockieren),
-          _update(AppLocalizations.of(context).eventsPlanen),
-          _update(AppLocalizations.of(context).reisePlanung),
-          _update(AppLocalizations.of(context).gemeinschaftenUpdate),
-          _update(AppLocalizations.of(context).freundeMarkieren),
-          _update(AppLocalizations.of(context).chatgruppen),
-          _update(AppLocalizations.of(context).eventboard),
-          _update(AppLocalizations.of(context).anonymeAnmelden),
-          _update(AppLocalizations.of(context).chatErweiterung),
-          _update(AppLocalizations.of(context).accountLoeschen),
-          _update(AppLocalizations.of(context).layoutVerbessern),
-        ]
-    );
+        builder: (BuildContext buildContext){
+          return CustomAlertDialog(
+              title: patchnotesTitle,
+              children: [
+                _update(AppLocalizations.of(context).familienAnzeige),
+                _update(AppLocalizations.of(context).automatischerStandort),
+                _update(AppLocalizations.of(context).nutzerBlockieren),
+                _update(AppLocalizations.of(context).eventsPlanen),
+                _update(AppLocalizations.of(context).reisePlanung),
+                _update(AppLocalizations.of(context).gemeinschaftenUpdate),
+                _update(AppLocalizations.of(context).freundeMarkieren),
+                _update(AppLocalizations.of(context).chatgruppen),
+                _update(AppLocalizations.of(context).eventboard),
+                _update(AppLocalizations.of(context).anonymeAnmelden),
+                _update(AppLocalizations.of(context).chatErweiterung),
+                _update(AppLocalizations.of(context).accountLoeschen),
+                _update(AppLocalizations.of(context).layoutVerbessern),
+              ]
+          );
+        });
   }
 
 }
