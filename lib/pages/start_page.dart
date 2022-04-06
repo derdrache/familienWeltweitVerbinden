@@ -10,7 +10,6 @@ import 'package:in_app_update/in_app_update.dart';
 
 import '../widgets/badge_icon.dart';
 import 'news_page.dart';
-import 'login_register_page/create_profil_page.dart';
 import 'erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
@@ -101,8 +100,6 @@ class _StartPageState extends State<StartPage>{
               ){
               if(snap.hasData) {
                 var newMessages = snap.data;
-
-
                   newMessages = newMessages == false ? 0 : newMessages;
 
                   return BadgeIcon(

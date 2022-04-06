@@ -85,13 +85,16 @@ class ChangeEmailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: customAppBar(title: AppLocalizations.of(context).emailAendern,buttons: [saveButton()]),
-      body: Column(
-        children: [
-          customTextInput(AppLocalizations.of(context).neueEmail,emailKontroller),
-          const SizedBox(height: 15),
-          customTextInput(AppLocalizations.of(context).passwortBestaetigen,
-              passwortKontroller, passwort: true, onSubmit: () => saveFunction())
-        ],
+      body: Container(
+        margin: EdgeInsets.only(top: 20),
+        child: Column(
+          children: [
+            customTextInput(AppLocalizations.of(context).neueEmail,emailKontroller),
+            const SizedBox(height: 15),
+            customTextInput(AppLocalizations.of(context).passwortBestaetigen,
+                passwortKontroller, passwort: true, onSubmit: () => saveFunction())
+          ],
+        ),
       )
     );
   }

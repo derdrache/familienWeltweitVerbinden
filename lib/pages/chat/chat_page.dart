@@ -30,7 +30,6 @@ class _ChatPageState extends State<ChatPage>{
     dynamic userFriendlist = await ProfilDatabase().getData("friendlist", "WHERE id = '${userId}'");
     var allName = await ProfilDatabase().getData("name", "");
 
-
     userFriendlist??= [];
 
     return showDialog(
@@ -305,8 +304,9 @@ class _ChatPageState extends State<ChatPage>{
         padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
         child:
             FutureBuilder(
-              //future: ChatDatabase().getAllChatgroupsFromUser(userId),
-              future: ChatDatabase().getChatData("*", "WHERE id like '%$userId%'"),
+              future: ChatDatabase()
+                  .getChatData("*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
+              returnList: true),
                 builder: (
                     BuildContext context,
                     AsyncSnapshot snapshot,

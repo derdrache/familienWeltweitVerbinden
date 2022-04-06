@@ -51,6 +51,8 @@ class ProfilDatabase{
       "reiseart": profilData["reiseart"],
       "sprachen": json.encode(profilData["sprachen"]),
       "token": profilData["token"],
+      "lastLogin": profilData["lastLogin"],
+      "aboutme": profilData["aboutme"]
     }));
 
     FirebaseAuth.instance.currentUser.updateDisplayName(profilData["name"]);
@@ -70,7 +72,7 @@ class ProfilDatabase{
     }));
   }
 
-  getData(whatData, queryEnd) async{
+  getData(whatData, queryEnd, {returnList = false}) async{
     //neue Datenabfrage um alle get zu ersetzen
     var url = databaseUrl + "database/getData.php";
     var data = "?param1=$whatData&param2=$queryEnd&param3=profils";
@@ -79,17 +81,17 @@ class ProfilDatabase{
     dynamic responseBody = res.body;
 
     responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
 
     for(var i = 0; i < responseBody.length; i++){
 
-      if(responseBody[i].keys.toList() == 1){
+      if(responseBody[i].keys.toList().length == 1){
         var key = responseBody[i].keys.toList()[0];
         responseBody[i] = responseBody[i][key];
         continue;
       }
 
       for(var key in responseBody[i].keys.toList()){
-
         try{
           responseBody[i][key] = jsonDecode(responseBody[i][key]);
         }catch(error){
@@ -99,11 +101,12 @@ class ProfilDatabase{
       }
     }
 
-    if(responseBody.length == 1){
+    if(responseBody.length == 1 && !returnList){
       responseBody = responseBody[0];
-      if(responseBody.keys.toList().length == 1) responseBody = responseBody[responseBody.keys.toList()[0]];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(error){}
     }
-
 
     return responseBody;
   }
@@ -115,7 +118,7 @@ class ProfilDatabase{
 
     var chats = await ChatDatabase().getChatData("*", "WHERE id like '%$userId%'");
     for(var chat in chats){
-      var newUserData = jsonDecode(chat["users"]);
+      var newUserData = chat["users"];
       newUserData[userId]["name"] = newName;
 
       ChatDatabase().updateChatGroup(chat["id"], "users", newUserData);
@@ -127,7 +130,7 @@ class ProfilDatabase{
       if(profil["friendlist"] == "" || profil["friendlist"] == []){
         if(profil["friendlist"].isEmpty) continue;
 
-        var friendlist = jsonDecode(profil["friendlist"]);
+        var friendlist = profil["friendlist"];
 
         if(profil["friendlist"].contains(oldName)){
           friendlist.add(newName);
@@ -202,7 +205,7 @@ class ChatDatabase{
     return newChatGroup;
   }
 
-  getChatData(whatData, queryEnd) async{
+  getChatData(whatData, queryEnd, {returnList = false}) async{
     //neue Datenabfrage um alle chat get zu ersetzen
     var url = databaseUrl + "database/getData.php";
     var data = "?param1=$whatData&param2=$queryEnd&param3=chats";
@@ -211,10 +214,11 @@ class ChatDatabase{
     dynamic responseBody = res.body;
 
     responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
 
     for(var i = 0; i < responseBody.length; i++){
 
-      if(responseBody[i].keys.toList() == 1){
+      if(responseBody[i].keys.toList().length == 1){
         var key = responseBody[i].keys.toList()[0];
         responseBody[i] = responseBody[i][key];
         continue;
@@ -231,6 +235,12 @@ class ChatDatabase{
       }
     }
 
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(error){}
+    }
 
     return responseBody;
   }
@@ -297,12 +307,11 @@ class ChatDatabase{
 
       var chatId = chatData['id'];
       var oldChatNewMessages = await ChatDatabase().getChatData("users", "WHERE id = '$chatId'");
+      oldChatNewMessages = oldChatNewMessages;
 
-      oldChatNewMessages = oldChatNewMessages["users"];
-      var oldChatNewMessagesMap= Map<String, dynamic>.from(jsonDecode(oldChatNewMessages));
-      oldChatNewMessagesMap[chatPartnerId]["newMessages"] = oldChatNewMessagesMap[chatPartnerId]["newMessages"] +1;
+      oldChatNewMessages[chatPartnerId]["newMessages"] = oldChatNewMessages[chatPartnerId]["newMessages"] +1;
 
-      ChatDatabase().updateChatGroup(chatData["id"], "users", oldChatNewMessagesMap);
+      ChatDatabase().updateChatGroup(chatData["id"], "users", oldChatNewMessages);
 
     }
 
@@ -359,19 +368,21 @@ class EventDatabase{
     }));
   }
 
-  getData(whatData, queryEnd) async{
+  getData(whatData, queryEnd, {returnList = false}) async{
     //neue Datenabfrage um alle get zu ersetzen
     var url = databaseUrl + "database/getData.php";
     var data = "?param1=$whatData&param2=$queryEnd&param3=events";
     var uri = Uri.parse(url+data);
     var res = await http.get(uri, headers: {"Accept": "application/json"});
-    dynamic responseBody = res.body;
 
+    dynamic responseBody = res.body;
     responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
 
     for(var i = 0; i < responseBody.length; i++){
 
-      if(responseBody[i].keys.toList() == 1){
+      if(responseBody[i].keys.toList().length == 1){
         var key = responseBody[i].keys.toList()[0];
         responseBody[i] = responseBody[i][key];
         continue;
@@ -388,9 +399,11 @@ class EventDatabase{
       }
     }
 
-    if(responseBody.length == 1){
+    if(responseBody.length == 1 && !returnList){
       responseBody = responseBody[0];
-      if(responseBody.keys.toList().length == 1) responseBody = responseBody[responseBody.keys.toList()[0]];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(error){}
     }
 
 
