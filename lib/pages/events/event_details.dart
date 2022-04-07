@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../global/variablen.dart' as global_var;
 
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/search_autocomplete.dart';
@@ -47,7 +48,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   void initState() {
     isCreator = widget.event["erstelltVon"] == userId;
     isApproved = isCreator ? true : widget.event["freigegeben"].contains(userId);
-    isNotPublic = widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
 
     eventDetails = {
       "zusagen": widget.event["zusage"] == null ? [] :widget.event["zusage"].length,
@@ -205,6 +205,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    isNotPublic = widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
 
     deleteEventWindow() {
       showDialog(
@@ -677,13 +678,168 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         body:
             ListView(
               children: [
-                EventCardDetails(
-                  event: widget.event,
-                  isApproved: isApproved,
-                ),
+                Stack(children: [
+                  EventCardDetails(
+                    event: widget.event,
+                    isApproved: isApproved,
+                  ),
+                  EventArtButton(event: widget.event, isCreator: isCreator, pageState: setState,),
+                ]),
                 if(isApproved || !isNotPublic) teilnahmeButtonBox(),
               ],
             ),
+    );
+  }
+}
+
+
+class EventArtButton extends StatefulWidget {
+  var event;
+  var isCreator;
+  var pageState;
+
+  EventArtButton({Key key, this.event, this.isCreator, this.pageState}) : super(key: key);
+
+  @override
+  _EventArtButtonState createState() => _EventArtButtonState();
+}
+
+class _EventArtButtonState extends State<EventArtButton> {
+  var eventTypInput = CustomDropDownButton();
+  var icon;
+
+  eventArtSave(){
+    var auswahl = eventTypInput.getSelected();
+    if(auswahl == widget.event["art"]) return;
+
+
+    widget.event["art"] = auswahl;
+    setState(() {});
+    widget.pageState((){});
+
+    EventDatabase().update(widget.event["id"], "art = '$auswahl'");
+
+    Navigator.pop(context);
+
+  }
+
+  eventArtInformation(){
+    return Positioned(
+        top: -15,
+        left:10,
+        child: IconButton(
+            icon: const Icon(Icons.help,size: 15),
+            onPressed: () => showDialog(
+                context: context,
+                builder: (BuildContext buildContext){
+                  return CustomAlertDialog(
+                      height: 500,
+                      title: AppLocalizations.of(context).informationEventArt,
+                      children: [
+                        const SizedBox(height: 10),
+                        Container(
+                          margin: const EdgeInsets.only(left: 5, right: 5),
+                          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            const Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(AppLocalizations.of(context).privatInformationText,
+                                maxLines: 10,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          ]),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          margin: const EdgeInsets.only(left: 5, right: 5),
+                          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            SizedBox(
+                                width: 70,
+                                child: Text(AppLocalizations.of(context).halbOeffentlich,style: const TextStyle(fontWeight: FontWeight.bold))
+                            ),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
+                                maxLines: 10,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                          ]),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          margin: const EdgeInsets.only(left: 5, right: 5),
+                          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Text(AppLocalizations.of(context).oeffentlich, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Text(AppLocalizations.of(context).oeffentlichInformationText,
+                                maxLines: 10,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ]),
+                        )
+                      ]
+                  );
+                })
+
+        )
+    );
+  }
+
+  @override
+  void initState() {
+    eventTypInput = CustomDropDownButton(
+      items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
+      selected: isGerman ? global_var.changeEnglishToGerman(widget.event["art"]):
+      global_var.changeGermanToEnglish(widget.event["art"]),
+    );
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    icon = widget.event["art"] == "öffentlich" || widget.event["art"] == "public" ?
+    Icons.lock_open:
+    widget.event["art"] == "privat" || widget.event["art"] == "private" ?
+    Icons.enhanced_encryption :
+    Icons.lock;
+
+    return Positioned(
+      top: -5,
+      left: -10,
+      child: IconButton(
+          icon: Icon(icon, color: Theme.of(context).colorScheme.primary),
+          onPressed: !widget.isCreator ? null : () => showDialog(
+              context: context,
+              builder: (BuildContext buildContext){
+                return CustomAlertDialog(
+                    title: AppLocalizations.of(context).eventArtAendern,
+                    height: 180,
+                    children: [
+                      eventTypInput,
+                      Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                              TextButton(
+                                  child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
+                                  onPressed: () => eventArtSave()
+                              ),
+                            ]
+                        ),
+                      )
+                    ]
+                );
+              })
+      ),
     );
   }
 }
