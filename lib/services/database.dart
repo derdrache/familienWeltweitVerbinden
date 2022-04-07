@@ -127,18 +127,16 @@ class ProfilDatabase{
     var allProfilFriendlists = await getData("id, friendlist", "");
 
     for(var profil in allProfilFriendlists){
-      if(profil["friendlist"] == "" || profil["friendlist"] == []){
-        if(profil["friendlist"].isEmpty) continue;
+      if(profil["friendlist"].isEmpty) continue;
 
-        var friendlist = profil["friendlist"];
+      var friendlist = profil["friendlist"];
 
-        if(profil["friendlist"].contains(oldName)){
-          friendlist.add(newName);
-          friendlist.remove(oldName);
-        }
-
-        updateProfil(profil["id"], "friendlist", friendlist);
+      if(profil["friendlist"].contains(oldName)){
+        friendlist.add(newName);
+        friendlist.remove(oldName);
       }
+
+      updateProfil(profil["id"], "friendlist", friendlist);
     }
   }
 
@@ -296,18 +294,16 @@ class ChatDatabase{
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
-    var activeChat = await ProfilDatabase()
-        .getData("activeChat", "WHERE id = '${chatPartnerId}'");
+    var dbData = await ProfilDatabase().getData("activeChat, newMessages", "WHERE id = '$chatPartnerId'");
+    var activeChat = dbData["activeChat"];
+    var allNewMessages = dbData["newMessages"];
+
 
     if(chatData["id"] != activeChat){
-      var allNewMessages = await ProfilDatabase()
-          .getData("newMessages", "WHERE id = '${chatPartnerId}'");
-
       ProfilDatabase().updateProfil(chatPartnerId, "newMessages", allNewMessages +1);
 
       var chatId = chatData['id'];
       var oldChatNewMessages = await ChatDatabase().getChatData("users", "WHERE id = '$chatId'");
-      oldChatNewMessages = oldChatNewMessages;
 
       oldChatNewMessages[chatPartnerId]["newMessages"] = oldChatNewMessages[chatPartnerId]["newMessages"] +1;
 
@@ -342,17 +338,12 @@ class EventDatabase{
     await http.post(url, body: json.encode(eventData));
   }
 
-  updateOne(id, change, data){
-    var url = Uri.parse(databaseUrl + "database/events/changeEvent.php");
+  update(id, changes) async  {
+    var url = Uri.parse(databaseUrl + "database/events/updateEvent.php");
 
-    if(data is List){
-      data = json.encode(data);
-    }
-
-    http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "id": id,
-      "change": change,
-      "data": data
+      "changes": changes
     }));
   }
 

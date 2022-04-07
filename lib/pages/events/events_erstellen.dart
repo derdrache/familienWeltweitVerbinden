@@ -17,7 +17,6 @@ import '../../../global/global_functions.dart' as global_functions;
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
-import 'event_page.dart';
 
 
 class EventErstellen extends StatefulWidget {
@@ -44,7 +43,7 @@ class _EventErstellenState extends State<EventErstellen> {
   @override
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
-      icon: Icon(Icons.arrow_downward, color: Colors.black,),
+      icon: const Icon(Icons.arrow_downward, color: Colors.black,),
       auswahlList: isGerman ?
       global_var.sprachenListe : global_var.sprachenListeEnglisch
     );
@@ -69,12 +68,13 @@ class _EventErstellenState extends State<EventErstellen> {
 
   saveEvent() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
-    var uuid = Uuid();
+    var uuid = const Uuid();
     var eventId = uuid.v4();
     var userID = FirebaseAuth.instance.currentUser?.uid;
     var allFilled = checkAllValidations(locationData);
-    if(!allFilled) return;
 
+
+    if(!allFilled) return;
 
     var date = DateTime(eventDatum.year, eventDatum.month, eventDatum.day,
         eventUhrzeit.hour, eventUhrzeit.minute);
@@ -100,7 +100,7 @@ class _EventErstellenState extends State<EventErstellen> {
     };
 
     await EventDatabase().addNewEvent(eventData);
-    var dbEventData = await EventDatabase().getData("*", "WHERE id = '${eventId}'");
+    var dbEventData = await EventDatabase().getData("*", "WHERE id = '$eventId'");
 
     global_functions.changePage(context, StartPage(selectedIndex: 1));
     global_functions.changePage(context, EventDetailsPage(event: dbEventData));
@@ -170,13 +170,13 @@ class _EventErstellenState extends State<EventErstellen> {
               });
             },
           ),
-          SizedBox(width: 20),
+          const SizedBox(width: 20),
           ElevatedButton(
             child: Text(eventUhrzeit == null ? AppLocalizations.of(context).uhrzeitAuswaehlen : eventUhrzeit.format(context)),
             onPressed: () async {
               eventUhrzeit = await showTimePicker(
                 context: context,
-                initialTime: TimeOfDay(hour: 12, minute: 00),
+                initialTime: const TimeOfDay(hour: 12, minute: 00),
               );
               setState(() {
               });
@@ -194,7 +194,7 @@ class _EventErstellenState extends State<EventErstellen> {
       } else if(ortTypDropdown.selected == "offline"){
         return ortAuswahlBox;
       } else{
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       }
 
     }
@@ -204,7 +204,7 @@ class _EventErstellenState extends State<EventErstellen> {
           top: -5,
           left: screenWidth <640 ? -5 : ((screenWidth - 640) / 2) +5,
           child: IconButton(
-            icon: Icon(Icons.help,size: 15),
+            icon: const Icon(Icons.help,size: 15),
             onPressed: () => showDialog(
                 context: context,
                 builder: (BuildContext buildContext) {
@@ -212,12 +212,12 @@ class _EventErstellenState extends State<EventErstellen> {
                     height: 500,
                     title: AppLocalizations.of(context).informationEventArt,
                     children: [
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
-                        margin: EdgeInsets.only(left: 5, right: 5),
+                        margin: const EdgeInsets.only(left: 5, right: 5),
                         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
-                          SizedBox(width: 5),
+                          const Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 5),
                           Expanded(
                             child: Text(AppLocalizations.of(context).privatInformationText,
                               maxLines: 10,
@@ -226,15 +226,15 @@ class _EventErstellenState extends State<EventErstellen> {
                           )
                         ]),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Container(
-                        margin: EdgeInsets.only(left: 5, right: 5),
+                        margin: const EdgeInsets.only(left: 5, right: 5),
                         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Container(
+                          SizedBox(
                               width: 70,
-                              child: Text(AppLocalizations.of(context).halbOeffentlich,style: TextStyle(fontWeight: FontWeight.bold))
+                              child: Text(AppLocalizations.of(context).halbOeffentlich,style: const TextStyle(fontWeight: FontWeight.bold))
                           ),
-                          SizedBox(width: 5),
+                          const SizedBox(width: 5),
                           Expanded(
                             child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
                               maxLines: 10,
@@ -243,12 +243,12 @@ class _EventErstellenState extends State<EventErstellen> {
                           )
                         ]),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       Container(
-                        margin: EdgeInsets.only(left: 5, right: 5),
+                        margin: const EdgeInsets.only(left: 5, right: 5),
                         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(AppLocalizations.of(context).oeffentlich, style: TextStyle(fontWeight: FontWeight.bold)),
-                          SizedBox(width: 5),
+                          Text(AppLocalizations.of(context).oeffentlich, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(width: 5),
                           Expanded(
                             child: Text(AppLocalizations.of(context).oeffentlichInformationText,
                               maxLines: 10,
@@ -261,61 +261,6 @@ class _EventErstellenState extends State<EventErstellen> {
                   );
                 }
             )
-
-              /*
-              CustomWindow(
-                height: 500,
-                context: context,
-                title: AppLocalizations.of(context).informationEventArt,
-                children: [
-                  SizedBox(height: 10),
-                  Container(
-                    margin: EdgeInsets.only(left: 5, right: 5),
-                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text("privat       ", style: TextStyle(fontWeight: FontWeight.bold)),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text(AppLocalizations.of(context).privatInformationText,
-                          maxLines: 10,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      )
-                    ]),
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    margin: EdgeInsets.only(left: 5, right: 5),
-                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Container(
-                          width: 70,
-                          child: Text(AppLocalizations.of(context).halbOeffentlich,style: TextStyle(fontWeight: FontWeight.bold))
-                      ),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text(AppLocalizations.of(context).halbOeffentlichInformationText,
-                          maxLines: 10,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      )
-                    ]),
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    margin: EdgeInsets.only(left: 5, right: 5),
-                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(AppLocalizations.of(context).oeffentlich, style: TextStyle(fontWeight: FontWeight.bold)),
-                      SizedBox(width: 5),
-                      Expanded(
-                        child: Text(AppLocalizations.of(context).oeffentlichInformationText,
-                          maxLines: 10,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ]),
-                  )
-                ]
-            ),
-        */
           )
       );
     }
@@ -327,33 +272,31 @@ class _EventErstellenState extends State<EventErstellen> {
         buttons: [
           IconButton(
               onPressed: () => saveEvent(),
-              icon: Icon(Icons.done, color: Colors.green)
+              icon: const Icon(Icons.done, color: Colors.green)
           )
         ]
       ),
-      body: Container(
-          child: ListView(
+      body: ListView(
+        children: [
+          customTextInput("Event Name", eventNameKontroller,
+              validator: global_functions.checkValidatorEmpty(context)
+          ),
+          Stack(
             children: [
-              customTextInput("Event Name", eventNameKontroller,
-                  validator: global_functions.checkValidatorEmpty(context)
-              ),
-              Stack(
-                children: [
-                  eventArtDropdown,
-                  eventArtInformation()
-                ],
-              ),
-              //ortTypDropdown,
-              ortEingabeBox(),
-              sprachenAuswahlBox,
-              dateAndTimeBox(),
-              customTextInput(
-                  AppLocalizations.of(context).eventBeschreibung,
-                  eventBeschreibungKontroller,
-                  moreLines: 8
-              ),
+              eventArtDropdown,
+              eventArtInformation()
             ],
-          )
+          ),
+          //ortTypDropdown,
+          ortEingabeBox(),
+          sprachenAuswahlBox,
+          dateAndTimeBox(),
+          customTextInput(
+              AppLocalizations.of(context).eventBeschreibung,
+              eventBeschreibungKontroller,
+              moreLines: 8
+          ),
+        ],
       ),
     );
   }

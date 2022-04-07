@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +16,8 @@ class EventCard extends StatefulWidget {
   var afterPageVisit;
   var isCreator;
 
-  EventCard({Key key,
+  EventCard({
+    Key key,
     this.event,
     this.withInteresse = false,
     this.margin = const EdgeInsets.only(top:10, bottom: 0, right: 10, left: 10),
@@ -26,11 +29,58 @@ class EventCard extends StatefulWidget {
 }
 
 class _EventCardState extends State<EventCard> {
+  var onAbsageList;
+  var onZusageList;
   var shadowColor = Colors.grey.withOpacity(0.8);
 
   @override
+  void initState() {
+    onAbsageList = widget.event["absage"].contains(userId);
+    onZusageList = widget.event["zusage"].contains(userId);
+
+    super.initState();
+  }
+
+  confirmEvent(bool confirm) async{
+    if(confirm){
+      setState(() {
+        widget.event["zusage"].add(userId);
+        widget.event["absage"].remove(userId);
+        onZusageList = true;
+        onAbsageList = false;
+      });
+    } else{
+      setState(() {
+        widget.event["absage"].add(userId);
+        widget.event["zusage"].remove(userId);
+        onAbsageList = true;
+        onZusageList = false;
+      });
+    }
+
+    var dbData = await EventDatabase()
+        .getData("absage, zusage", "WHERE id = '${widget.event["id"]}'");
+
+    var zusageList = dbData["zusage"];
+    var absageList = dbData["absage"];
+
+    if(confirm){
+      zusageList.add(userId);
+      absageList.remove(userId);
+    } else{
+      zusageList.remove(userId);
+      absageList.add(userId);
+    }
+
+    var zusageListJson = json.encode(zusageList);
+    var absageListJson = json.encode(absageList);
+
+    EventDatabase().update(widget.event["id"], "absage = '$absageListJson', zusage = '$zusageListJson'");
+  }
+
+
+  @override
   Widget build(BuildContext context) {
-    widget.event["bild"] ??= "assets/bilder/strand.jpg";
     double screenHeight = MediaQuery.of(context).size.height;
     var fontSize = screenHeight / 52;
     var forTeilnahmeFreigegeben = (widget.event["art"] == "public" ||
@@ -43,8 +93,6 @@ class _EventCardState extends State<EventCard> {
 
 
     cardMenu(tapPosition){
-      var onAbsageList = widget.event["absage"].contains(userId);
-      var onZusageList = widget.event["zusage"].contains(userId);
       final RenderBox overlay = Overlay.of(context).context.findRenderObject();
 
       showMenu(
@@ -63,26 +111,7 @@ class _EventCardState extends State<EventCard> {
                 Text(AppLocalizations.of(context).teilnehmen),
               ],
             ),
-            onTap: () async{
-              setState(() {
-                widget.event["zusage"].add(userId);
-                widget.event["absage"].remove(userId);
-                onZusageList = true;
-                onAbsageList = false;
-              });
-
-              var dbData = await EventDatabase()
-                  .getData("absage, zusage", "WHERE id = '${widget.event["id"]}'");
-              var absageList = dbData["absage"];
-              var zusageList = dbData["zusage"];
-
-              zusageList.add(userId);
-              EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
-
-              absageList.remove(userId);
-              EventDatabase().updateOne(widget.event["id"], "absage", absageList);
-
-            },
+            onTap: () => confirmEvent(true),
           ),
           if(!onAbsageList) PopupMenuItem(
             child: Row(
@@ -92,26 +121,7 @@ class _EventCardState extends State<EventCard> {
                 Text(AppLocalizations.of(context).absage),
               ],
             ),
-            onTap: () async{
-              setState(() {
-                widget.event["absage"].add(userId);
-                widget.event["zusage"].remove(userId);
-                onAbsageList = true;
-                onZusageList = false;
-              });
-
-              var dbData = await EventDatabase()
-                  .getData("absage, zusage", "WHERE id = '${widget.event["id"]}'");
-              var absageList = dbData["absage"];
-              var zusageList = dbData["zusage"];
-
-              absageList.add(userId);
-              EventDatabase().updateOne(widget.event["id"], "absage", absageList);
-
-              zusageList.remove(userId);
-              EventDatabase().updateOne(widget.event["id"], "zusage", zusageList);
-
-            },
+            onTap: () => confirmEvent(false),
           ),
         ],
       );
@@ -259,8 +269,10 @@ class _InteresseButtonState extends State<InteresseButton> {
         } else{
           interesseList.remove(userId);
         }
+        var interesseListJson = json.encode(interesseList);
 
-        EventDatabase().updateOne(widget.id, "interesse", interesseList);
+        EventDatabase().update(widget.id, "interesse = '$interesseListJson'");
+
 
 
       },

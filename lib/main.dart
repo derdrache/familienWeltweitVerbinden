@@ -115,10 +115,10 @@ class MyApp extends StatelessWidget {
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async{
-      var messageChatId = json.decode(message.data.values.last)["link"];
+      var messagePageId = json.decode(message.data.values.last)["link"];
 
       if(pageContext != null){
-        changeToChat(messageChatId);
+        changeToChat(messagePageId);
       }
 
     });

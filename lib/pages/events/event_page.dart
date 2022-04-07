@@ -8,16 +8,19 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
 import 'eventCard.dart';
-import 'event_details.dart';
 import 'events_erstellen.dart';
 
 class EventPage extends StatefulWidget{
+  const EventPage({Key key}) : super(key: key);
+
+  @override
   _EventPageState createState() => _EventPageState();
 }
 
 class _EventPageState extends State<EventPage>{
   var userId = FirebaseAuth.instance.currentUser.uid;
 
+  @override
   Widget build(BuildContext context){
 
     createEventCards(events, withInteresse){
@@ -29,7 +32,6 @@ class _EventPageState extends State<EventPage>{
               event: event,
               withInteresse: withInteresse,
               afterPageVisit: ()=> setState(() {})
-
             )
         );
       }
@@ -42,7 +44,9 @@ class _EventPageState extends State<EventPage>{
         padding: const EdgeInsets.only(top: 10),
         width: double.infinity,
         decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
+            border: Border(
+                bottom: BorderSide(width: 1, color: global_var.borderColorGrey)
+            )
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,12 +60,10 @@ class _EventPageState extends State<EventPage>{
             ),
             FutureBuilder(
                 future: EventDatabase().getData(
-                    "*", "WHERE JSON_CONTAINS(interesse, '\"${userId}\"') > 0 ORDER BY wann ASC",
+                    "*",
+                    "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 ORDER BY wann ASC",
                     returnList: true),
-                builder: (
-                    BuildContext context,
-                    AsyncSnapshot snapshot,
-                    ){
+                builder: (BuildContext context, AsyncSnapshot snapshot){
                   if (snapshot.data != null){
                     return Expanded(
                       child: SingleChildScrollView(
@@ -82,10 +84,8 @@ class _EventPageState extends State<EventPage>{
     }
 
     meineErstellenEventsBox(){
-      return Container(
+      return Padding(
         padding: const EdgeInsets.only(top:10),
-        width: double.infinity,
-        height: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

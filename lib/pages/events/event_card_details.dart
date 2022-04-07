@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
@@ -30,13 +31,14 @@ class EventCardDetails extends StatelessWidget {
   var isApproved;
   var isPublic;
 
-  EventCardDetails({Key key,
+  EventCardDetails({
+    Key key,
     this.event,
     this.offlineEvent=true,
     this.isApproved = false
   }) :
         isCreator = event["erstelltVon"] == userId,
-        isPublic = event["art"] == "öffentlich" || event["art"] == "public";
+        isPublic = event["art"] == "öffentlich" || event["art"] == "public", super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -280,15 +282,20 @@ class EventCardDetails extends StatelessWidget {
                           AppLocalizations.of(context).eventInteresseMitgeteilt,
                           color: Colors.green);
 
-                      var freischaltenList = await EventDatabase()
-                          .getData("freischalten", "WHERE id = '${event["id"]}'");
-                      freischaltenList.add(userId);
-                      EventDatabase().updateOne(event["id"], "freischalten", freischaltenList);
+                      var dbDaten = await EventDatabase()
+                          .getData("freischalten, interesse", "WHERE id = '${event["id"]}'");
 
-                      var interessenList = await EventDatabase()
-                          .getData("interesse", "WHERE id = '${event["id"]}'");
+                      var freischaltenList = dbDaten["freischalten"];
+                      freischaltenList.add(userId);
+
+                      var interessenList = dbDaten["interesse"];
                       interessenList.add(userId);
-                      EventDatabase().updateOne(event["id"], "interesse", interessenList);
+
+                      EventDatabase().update(
+                          event["id"],
+                          "freischalten = '${json.encode(freischaltenList)}', "
+                          "interesse = '${json.encode(interessenList)}'"
+                      );
                     }
                   } ,
                   child: const Icon(Icons.add_circle, size: 80, color: Colors.black,)
@@ -339,6 +346,7 @@ class ShowDataAndChangeWindow extends StatefulWidget {
   var eventId;
 
   ShowDataAndChangeWindow({
+    Key key,
     this.windowTitle,
     this.isCreator,
     this.rowTitle,
@@ -351,7 +359,7 @@ class ShowDataAndChangeWindow extends StatefulWidget {
     this.databaseKennzeichnung,
     this.oldDate,
     this.eventId
-  });
+  }) : super(key: key);
 
   @override
   _ShowDataAndChangeWindowState createState() => _ShowDataAndChangeWindowState();
@@ -415,8 +423,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       if(data.isEmpty) validationText = AppLocalizations.of(context).bitteNameEingeben;
       if(data.length > 40) validationText = AppLocalizations.of(context).usernameZuLang;
     }else if(widget.databaseKennzeichnung == "link"){
-      if(data.substring(0,4) != "http" && data.substring(0,3) != "www")
+      if(data.substring(0,4) != "http" && data.substring(0,3) != "www") {
         validationText = AppLocalizations.of(context).eingabeKeinLink;
+      }
     }
 
     return validationText;
@@ -448,7 +457,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     if(widget.databaseKennzeichnung == "location"){
       EventDatabase().updateLocation(widget.eventId, data);
     } else{
-      EventDatabase().updateOne(widget.eventId, widget.databaseKennzeichnung, data);
+      EventDatabase().update(widget.eventId, "${widget.databaseKennzeichnung} = '$data'");
     }
   }
 
@@ -507,7 +516,6 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     }
 
     openLinkAskWindow(){
-
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -534,7 +542,6 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     }
 
 
-
     return InkWell(
         onTap: !widget.isCreator ? null:  (){
           openChangeWindow();
@@ -547,7 +554,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                 child: SizedBox(
                   width: 200,
                   child: Text(
-                    widget.databaseKennzeichnung =="zeitzone" ? "UTC " + widget.rowData:
+                    widget.databaseKennzeichnung =="zeitzone" ? "UTC " + widget.rowData.toString():
                       widget.rowData,
                     style: TextStyle(
                         fontSize: fontsize,
@@ -742,7 +749,8 @@ class _InteresseButtonState extends State<InteresseButton> {
             interesseList.remove(userId);
           }
 
-          EventDatabase().updateOne(widget.id, "interesse", interesseList);
+          EventDatabase()
+              .update(widget.id, "interesse = '${json.encode(interesseList)}'");
 
 
         },
@@ -773,7 +781,7 @@ class _EventArtButtonState extends State<EventArtButton> {
     widget.event["art"] = auswahl;
     setState(() {});
 
-    EventDatabase().updateOne(widget.event["id"], "art", auswahl);
+    EventDatabase().update(widget.event["id"], "art = '$auswahl'");
 
     Navigator.pop(context);
 

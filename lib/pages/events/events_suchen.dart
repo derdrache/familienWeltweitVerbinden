@@ -7,7 +7,6 @@ import '../../global/custom_widgets.dart';
 import '../../widgets/search_autocomplete.dart';
 import 'eventCard.dart';
 import '../../services/database.dart';
-import 'event_details.dart';
 
 
 class EventsSuchenPage extends StatefulWidget {
@@ -22,9 +21,9 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
   var searchAutocomplete = SearchAutocomplete();
   var eventsBackup = [];
   var allEvents = [];
-  var allEventCities;
-  var allEventCountries;
-  var allEventSprachen;
+  var allEventCities = <dynamic>{};
+  var allEventCountries = <dynamic>{};
+  var allEventSprachen = global_var.sprachenListe + global_var.sprachenListeEnglisch;
 
 
 
@@ -39,10 +38,6 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     eventsBackup = await EventDatabase()
         .getData("*", "WHERE art != 'privat' AND erstelltVon != '"+userId+"' ORDER BY erstelltAm ASC");
     allEvents = eventsBackup;
-
-    allEventCities = Set();
-    allEventCountries = Set();
-    allEventSprachen = global_var.sprachenListe + global_var.sprachenListeEnglisch;
 
     for(var event in eventsBackup){
       allEventCities.add(event["stadt"]);
@@ -133,7 +128,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
       for(var event in allEvents){
         meineEvents.add(
             EventCard(
-              margin: EdgeInsets.only(top: 10 , bottom: 10, left: 15, right: 15),
+              margin: const EdgeInsets.only(top: 10 , bottom: 10, left: 15, right: 15),
               withInteresse: true,
               event: event,
               afterPageVisit: () async {
@@ -155,13 +150,13 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
         title: AppLocalizations.of(context).eventSuchen
       ),
       body: Container(
-          padding: EdgeInsets.only(top:10),
+          padding: const EdgeInsets.only(top:10),
           width: double.infinity,
           height: double.infinity,
           child: Stack(
             children: [
               SingleChildScrollView(
-                padding: EdgeInsets.only(top:70),
+                padding: const EdgeInsets.only(top:70),
                 child: Wrap(
                     children: showEvents()
                 ),
