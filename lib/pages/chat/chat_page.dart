@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -8,7 +7,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../../services/database.dart';
-import '../../global/custom_widgets.dart';
 import '../../widgets/Window_topbar.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
@@ -25,12 +23,42 @@ class _ChatPageState extends State<ChatPage>{
   var globalChatGroups = [];
   var testWindow;
   var searchAutocomplete;
+  var allName = [];
+  var userFriendlist = [];
+  var dbData;
 
+  @override
+  void initState() {
+
+    super.initState();
+  }
+
+
+  initializer() async{
+    await initilizeCreateChatData();
+
+    return ChatDatabase().getChatData(
+        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
+        returnList: true);
+  }
+
+  initilizeCreateChatData() async {
+    dynamic userFriendIdList = await ProfilDatabase().getData("friendlist", "WHERE id = '${userId}'");
+    dbData = await ProfilDatabase().getData("name, id", "");
+
+    for(var data in dbData){
+      allName.add(data["name"]);
+
+      for(var user in userFriendIdList){
+        if(data["id"] == user){
+          userFriendlist.add(data["name"]);
+          break;
+        }
+      }
+    }
+  }
 
   selectChatpartnerWindow() async {
-    dynamic userFriendlist = await ProfilDatabase().getData("friendlist", "WHERE id = '${userId}'");
-    var allName = await ProfilDatabase().getData("name", "");
-
     userFriendlist??= [];
 
     return showDialog(
@@ -204,18 +232,29 @@ class _ChatPageState extends State<ChatPage>{
 
   @override
   Widget build(BuildContext context){
+
     chatUserList(groupdata) {
       List<Widget> groupContainer = [];
 
       for(dynamic group in groupdata){
-        var chatPartnerName;
+        var chatPartnerName = "";
+        var chatPartnerId;
         var users = group["users"];
 
         users.forEach((key, value) async {
           if(key != userId){
-            chatPartnerName = value["name"];
+            chatPartnerId = key;
           }
         });
+
+
+        for(var data in dbData){
+          if(data["id"] == chatPartnerId){
+
+            chatPartnerName = data["name"];
+            break;
+          }
+        }
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
@@ -305,9 +344,7 @@ class _ChatPageState extends State<ChatPage>{
         padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
         child:
             FutureBuilder(
-              future: ChatDatabase()
-                  .getChatData("*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
-              returnList: true),
+              future: initializer(),
                 builder: (
                     BuildContext context,
                     AsyncSnapshot snapshot,

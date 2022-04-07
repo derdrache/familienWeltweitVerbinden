@@ -91,8 +91,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     friendButton(){
-      var onFriendlist = userFriendlist != ""?
-        userFriendlist.contains(widget.profil["name"]) : false;
+      var onFriendlist = userFriendlist.isNotEmpty?
+        userFriendlist.contains(widget.profil["id"]) : false;
 
       return TextButton(
           style: global_style.textButtonStyle(),
@@ -101,11 +101,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             var snackbarText = "";
 
             if(onFriendlist){
-              userFriendlist.remove(widget.profil["name"]);
+              userFriendlist.remove(widget.profil["id"]);
               snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistEntfernt;
               if(userFriendlist.isEmpty) userFriendlist = [];
             } else {
-              userFriendlist.add(widget.profil["name"]);
+              userFriendlist.add(widget.profil["id"]);
               snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistHinzugefuegt;
             }
 
