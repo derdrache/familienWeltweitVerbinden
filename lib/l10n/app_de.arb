@@ -195,7 +195,8 @@
     "eventZeitzoneAendern": "Event Zeitzone ändern",
     "zeitzone": "Zeitzone: ",
     "neueZeitzoneEingeben": "Neue Zeitzone eingeben",
-    "bestitzerWechseln": "Besitzer wechseln"
+    "bestitzerWechseln": "Besitzer wechseln",
+    "eventWirklichLoeschen": "Möchtest du das Event wirklich löschen?"
 
 
 

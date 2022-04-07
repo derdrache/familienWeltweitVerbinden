@@ -8,12 +8,14 @@ import 'Window_topbar.dart';
 class CustomAlertDialog extends StatefulWidget {
   var title = "";
   List<Widget> children = [];
+  List<Widget> actions = [];
   double height = double.maxFinite;
 
   CustomAlertDialog({
     Key key,
     this.title,
     this.children,
+    this.actions,
     this.height
   }) : super(key: key);
 
@@ -36,6 +38,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
           borderRadius: BorderRadius.all(Radius.circular(20.0))
       ),
       contentPadding: EdgeInsets.zero,
+      actions: widget.actions,
       content: SizedBox(
         height: widget.height,
         width: 600,

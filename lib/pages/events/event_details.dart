@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -26,7 +27,7 @@ class EventDetailsPage extends StatefulWidget {
     this.event,
   }) :
     teilnahme = event["zusage"] == null ? [] :event["zusage"].contains(userId),
-    absage = event["absage"] == null ? [] :event["absage"].contains(userId);
+    absage = event["absage"] == null ? [] :event["absage"].contains(userId), super(key: key);
 
   @override
   _EventDetailsPageState createState() => _EventDetailsPageState();
@@ -63,7 +64,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   getDatabaseData() async{
     allName = await ProfilDatabase().getData("name", "");
 
-    userFriendlist = await ProfilDatabase().getData("friendlist", "WHERE id = '${userId}'");
+    userFriendlist = await ProfilDatabase().getData("friendlist", "WHERE id = '$userId'");
   }
 
   freischalten(user, angenommen, windowState) async {
@@ -77,22 +78,22 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
 
     var freischaltenList = await EventDatabase()
-        .getData("freischalten", "WHERE id = '${eventId}");
+        .getData("freischalten", "WHERE id = '$eventId");
     freischaltenList.remove(user);
-    EventDatabase().updateOne(eventId, "freischalten", freischaltenList);
+    EventDatabase().update(eventId, "freischalten = '${json.encode(freischaltenList)}'");
 
     if(!angenommen) return;
 
     var freigegebenListe = await EventDatabase()
-        .getData("freigegeben", "WHERE id = '${eventId}");
+        .getData("freigegeben", "WHERE id = '$eventId");
     freigegebenListe.add(user);
-    EventDatabase().updateOne(eventId, "freigegeben", freigegebenListe);
+    EventDatabase().update(eventId, "freigegeben = '${json.encode(freigegebenListe)}'");
 
     setState(() {
 
     });
 
-    var receiverToken = await ProfilDatabase().getData("token", "WHERE id = '${user}'");
+    var receiverToken = await ProfilDatabase().getData("token", "WHERE id = '$user'");
 
     var notificationInformation = {
       "to": receiverToken,
@@ -114,9 +115,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     });
 
     var freigegebenList = await EventDatabase()
-        .getData("freigegeben", "WHERE id = '${eventId}");
+        .getData("freigegeben", "WHERE id = '$eventId");
     freigegebenList.remove(user);
-    EventDatabase().updateOne(eventId, "freigegeben", freigegebenList);
+    EventDatabase().update(eventId, "freigegeben = '${json.encode(freigegebenList)}'");
   }
 
   changeOrganisatorWindow(){
@@ -144,7 +145,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   label: Text(AppLocalizations.of(context).uebertragen),
                   onPressed: () async{
                     var selectedUserId = await ProfilDatabase().getData("id", "WHERE name = '${inputKontroller.text}'");
-                    await EventDatabase().updateOne(widget.event["id"], "erstelltVon", selectedUserId);
+                    await EventDatabase().update(widget.event["id"], "erstelltVon = '$selectedUserId'");
                     setState(() {
 
                     });
@@ -166,6 +167,41 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   }
 
+  confirmEvent(bool confirm) async{
+    if(confirm){
+      setState(() {
+        widget.teilnahme = true;
+        widget.absage = false;
+        widget.event["zusage"].add(userId);
+        widget.event["absage"].remove(userId);
+      });
+    } else{
+      setState(() {
+        widget.teilnahme = false;
+        widget.absage = true;
+        widget.event["zusage"].remove(userId);
+        widget.event["absage"].add(userId);
+      });
+    }
+
+    var dbData = await EventDatabase()
+        .getData("absage, zusage", "WHERE id = '${widget.event["id"]}'");
+
+    var zusageList = dbData["zusage"];
+    var absageList = dbData["absage"];
+
+    if(confirm){
+      zusageList.add(userId);
+      absageList.remove(userId);
+    } else{
+      zusageList.remove(userId);
+      absageList.add(userId);
+    }
+
+    EventDatabase().update(
+        widget.event["id"], "absage = '${json.encode(absageList)}', zusage = '${json.encode(zusageList)}'");
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -174,9 +210,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       showDialog(
           context: context,
           builder: (BuildContext context){
-            return AlertDialog(
-              title: const Text("Event löschen"),
-              content: const Text("Du möchtest das Event löschen?"),
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).eventLoeschen,
+              height: 90,
+              children: [
+                const SizedBox(height: 10),
+                Center(child: Text(AppLocalizations.of(context).eventWirklichLoeschen))
+              ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
@@ -186,7 +226,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   },
                 ),
                 TextButton(
-                  child: const Text("Abbrechen"),
+                  child: Text(AppLocalizations.of(context).abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -354,29 +394,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             child: FloatingActionButton.extended(
                 heroTag: "teilnehmen",
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                onPressed: () async {
-
-                  setState(() {
-                    widget.teilnahme = true;
-                    widget.absage = false;
-                    widget.event["zusage"].add(userId);
-                    widget.event["absage"].remove(userId);
-                  });
-
-
-                  var zusageListe = await EventDatabase()
-                      .getData("zusage", "WHERE id = '${widget.event["id"]}");
-                  zusageListe.add(userId);
-                  EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
-
-                  var absageListe = await EventDatabase()
-                      .getData("absage", "WHERE id = '${widget.event["id"]}");
-                  absageListe.remove(userId);
-                  EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
-
-
-
-                },
+                onPressed: () => confirmEvent(true),
                 label: Text(AppLocalizations.of(context).teilnehmen)
             ),
           ),
@@ -386,29 +404,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               heroTag: "Absagen",
               backgroundColor: Theme.of(context).colorScheme.primary,
               label: Text(AppLocalizations.of(context).absage),
-              onPressed: () async {
-
-                setState(() {
-                  widget.teilnahme = false;
-                  widget.absage = true;
-                  widget.event["zusage"].remove(userId);
-                  widget.event["absage"].add(userId);
-                });
-
-
-                var zusageListe = await EventDatabase()
-                    .getData("zusage", "WHERE id = '${widget.event["id"]}");
-                zusageListe.remove(userId);
-                EventDatabase().updateOne(widget.event["id"], "zusage", zusageListe);
-
-                var absageListe = await EventDatabase()
-                    .getData("absage", "WHERE id = '${widget.event["id"]}");
-                absageListe.add(userId);
-                EventDatabase().updateOne(widget.event["id"], "absage", absageListe);
-
-
-              },
-
+              onPressed: () => confirmEvent(false),
             ),
           )
         ],
@@ -419,7 +415,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       List<Widget>freizugebenListe = [];
 
       for(var user in widget.event["freischalten"]){
-        var name = await ProfilDatabase().getData("name", "WHERE id = '${user}'");
+        var name = await ProfilDatabase().getData("name", "WHERE id = '$user'");
 
         freizugebenListe.add(
             Container(
@@ -467,7 +463,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       List<Widget>freigeschlatetList = [];
 
       for(var user in widget.event["freigegeben"]){
-        var name = await ProfilDatabase().getData("name", "WHERE id = '${user}'");
+        var name = await ProfilDatabase().getData("name", "WHERE id = '$user'");
 
         freigeschlatetList.add(
             Container(

@@ -195,6 +195,7 @@
     "eventZeitzoneAendern": "Change event time zone",
     "zeitzone": "Time zone: ",
     "neueZeitzoneEingeben": "Enter new time zone",
-    "bestitzerWechseln": "Change Owner"
+    "bestitzerWechseln": "Change Owner",
+    "eventWirklichLoeschen": "Do you really want to delete the event?"
 }
 

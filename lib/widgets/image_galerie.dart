@@ -68,7 +68,7 @@ class _ImageGalerieState extends State<ImageGalerie> {
 
     widget.child = Image.asset(selected, fit: BoxFit.fitWidth);
     setState(() {});
-    EventDatabase().updateOne(widget.id, "bild", selected);
+    EventDatabase().update(widget.id, "bild = '$selected'");
     Navigator.pop(context);
 
   }
