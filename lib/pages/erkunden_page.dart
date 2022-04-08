@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../services/database.dart';
 import '../global/global_functions.dart' as global_functions;
@@ -24,9 +25,11 @@ class ErkundenPage extends StatefulWidget{
 }
 
 class _ErkundenPageState extends State<ErkundenPage>{
+  var profilBox;
+  var eventBox;
   MapController mapController = MapController();
   var ownProfil;
-  List<String> allUserName = [];
+  Set<String> allUserName = {};
   var countriesList = {};
   var filterList = [];
   List profilsBackup = [], profils = [], aktiveProfils = [];
@@ -49,6 +52,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   @override
   void initState() {
+    profilBox = Hive.box('profilBox');
+    eventBox = Hive.box("eventBox");
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
     super.initState();
   }
@@ -63,7 +68,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getAndSetProfils()async{
-    profils = await ProfilDatabase().getData("*", "");
+    if (profils.isNotEmpty || profilBox.get("list") == null){
+      profils = await ProfilDatabase().getData("*", "");
+      profilBox.put("list", profils);
+    } else{
+      profils = profilBox.get("list");
+      _asyncMethod();
+    }
 
     for(var profil in profils){
       if(getOwnProfil(profil) != null){
@@ -87,14 +98,22 @@ class _ErkundenPageState extends State<ErkundenPage>{
     searchAutocomplete =  SearchAutocomplete(
       hintText: AppLocalizations.of(context).filterErkunden,
       searchableItems: global_var.reisearten + global_var.interessenListe +
-          global_var.sprachenListe + allUserName + countryDropDownList,
+          global_var.sprachenListe + allUserName.toList() + countryDropDownList,
       onConfirm: () => changeMapFilter(),
       onDelete:() => changeMapFilter() ,
     );
   }
 
   getAndSetEvents()async{
-    events = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private'");
+
+    if(events.isNotEmpty|| eventBox.get("list") == null){
+      events = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private'");
+      eventBox.put("list", events);
+    } else{
+      events = eventBox.get("list");
+    }
+
+
     eventsBackup = events;
     createAndSetZoomEvents();
   }
