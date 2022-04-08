@@ -230,19 +230,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                         .getData("*", "WHERE id = '${message["message"].substring(10)}'"),
                     builder: (context, snapshot) {
                       if(snapshot.hasData && snapshot.data != false) {
-                        return Column(
-                          children: [
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 25),
+                          child: Stack(
+                            clipBehavior: Clip.none, children: [
                             EventCard(
-                              margin: EdgeInsets.all(10),
+                              margin: EdgeInsets.all(15),
                               withInteresse: true,
                               event: snapshot.data,
                               afterPageVisit: () => setState((){}),
                             ),
-                            Text(
-                                DateFormat('dd-MM hh:mm').format(messageTime),
-                                style: TextStyle(color: Colors.grey[600])
+                            Positioned(
+                              bottom: -20,
+                              right: 0,
+                              child: Text(
+                                  DateFormat('dd-MM hh:mm').format(messageTime),
+                                  style: TextStyle(color: Colors.grey[600])
+                              ),
                             )
-                          ],
+                            ]
+                          ),
                         );
                       }
                       return SizedBox.shrink();

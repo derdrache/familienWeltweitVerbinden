@@ -116,6 +116,9 @@ class ProfilDatabase{
 
     updateProfil(userId, "name", newName);
 
+
+    /*
+
     var chats = await ChatDatabase().getChatData("*", "WHERE id like '%$userId%'");
     for(var chat in chats){
       var newUserData = chat["users"];
@@ -138,6 +141,8 @@ class ProfilDatabase{
 
       updateProfil(profil["id"], "friendlist", friendlist);
     }
+
+     */
   }
 
   updateProfilLocation(userId, locationDict) {

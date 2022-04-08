@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
+import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -101,6 +102,11 @@ class _EventErstellenState extends State<EventErstellen> {
 
     await EventDatabase().addNewEvent(eventData);
     var dbEventData = await EventDatabase().getData("*", "WHERE id = '$eventId'");
+
+    if(dbEventData == false){
+      print("error");
+      return;
+    }
 
     global_functions.changePage(context, StartPage(selectedIndex: 1));
     global_functions.changePage(context, EventDetailsPage(event: dbEventData));
