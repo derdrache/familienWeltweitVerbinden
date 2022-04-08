@@ -60,6 +60,13 @@ hiveInit() async {
     'eventBox',
     encryptionCipher: HiveAesCipher(encryptionKey),
   );
+
+  await Hive.openBox(
+    'ownProfilBox',
+    encryptionCipher: HiveAesCipher(encryptionKey),
+  );
+
+
 }
 
 void main()async {

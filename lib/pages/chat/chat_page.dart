@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../../services/database.dart';
@@ -17,6 +18,8 @@ class ChatPage extends StatefulWidget{
 }
 
 class _ChatPageState extends State<ChatPage>{
+  var profilBox;
+  var ownProfilBox;
   var userId = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser.displayName;
   var userEmail = FirebaseAuth.instance.currentUser.email;
@@ -29,7 +32,8 @@ class _ChatPageState extends State<ChatPage>{
 
   @override
   void initState() {
-
+    profilBox = Hive.box('profilBox');
+    ownProfilBox = Hive.box("ownProfilBox");
     super.initState();
   }
 
@@ -43,8 +47,14 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   initilizeCreateChatData() async {
-    dynamic userFriendIdList = await ProfilDatabase().getData("friendlist", "WHERE id = '$userId'");
-    dbData = await ProfilDatabase().getData("name, id", "");
+    dynamic userFriendIdList = ownProfilBox.get("list")["friendlist"];
+    dbData = profilBox.get("list");
+
+
+
+
+    allName = [];
+    userFriendlist = [];
 
     for(var data in dbData){
       allName.add(data["name"]);
@@ -60,7 +70,6 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   selectChatpartnerWindow() async {
-    if(dbData.isEmpty == null) await initilizeCreateChatData();
     userFriendlist??= [];
 
     return showDialog(

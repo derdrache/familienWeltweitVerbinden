@@ -27,6 +27,7 @@ class ErkundenPage extends StatefulWidget{
 class _ErkundenPageState extends State<ErkundenPage>{
   var profilBox;
   var eventBox;
+  var ownProfilBox;
   MapController mapController = MapController();
   var ownProfil;
   Set<String> allUserName = {};
@@ -54,6 +55,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   void initState() {
     profilBox = Hive.box('profilBox');
     eventBox = Hive.box("eventBox");
+    ownProfilBox = Hive.box("ownProfilBox");
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
     super.initState();
   }
@@ -79,6 +81,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     for(var profil in profils){
       if(getOwnProfil(profil) != null){
         ownProfil = getOwnProfil(profil);
+        ownProfilBox.put("list", ownProfil);
       } else {
         allUserName.add(profil["name"]);
       }

@@ -21,6 +21,13 @@ class _EventPageState extends State<EventPage>{
   var userId = FirebaseAuth.instance.currentUser.uid;
 
   @override
+  void initState() {
+
+    super.initState();
+  }
+
+
+  @override
   Widget build(BuildContext context){
 
     createEventCards(events, withInteresse){
@@ -75,7 +82,7 @@ class _EventPageState extends State<EventPage>{
                       ),
                     );
                   }
-                  return const Center( heightFactor: 6, child: CircularProgressIndicator());
+                  return const Center( heightFactor: 5, child: CircularProgressIndicator());
                 }
             )
           ],
@@ -84,8 +91,9 @@ class _EventPageState extends State<EventPage>{
     }
 
     meineErstellenEventsBox(){
-      return Padding(
-        padding: const EdgeInsets.only(top:10),
+      return Container(
+          padding: const EdgeInsets.only(top: 10),
+          width: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -114,7 +122,7 @@ class _EventPageState extends State<EventPage>{
                       ),
                   );
                 }
-                return const Center( heightFactor: 6, child: CircularProgressIndicator());
+                return const Center( heightFactor: 5, child: CircularProgressIndicator());
               }
             )
           ],
