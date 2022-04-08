@@ -99,9 +99,17 @@ customAppBar({title, buttons, elevation = 4.0, var onTap, context}){
           onTap: onTap,
           child: Row(
               children: [
-                SizedBox(
-                    height: 50,
-                    child: Center(child: Text(title, style: const TextStyle(color: Colors.black)))
+                Flexible(
+                  child: SizedBox(
+                      height: 50,
+                      child: Center(
+                        child: Text(
+                            title,
+                            overflow: TextOverflow.fade,
+                            style: const TextStyle(color: Colors.black, fontSize: 20)
+                        ),
+                      )
+                  ),
                 )
               ]
           )

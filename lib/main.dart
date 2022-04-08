@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/start_page.dart';
@@ -36,35 +35,17 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 hiveInit() async {
   await Hive.initFlutter();
 
-  const secureStorage = FlutterSecureStorage();
-  final encryprionKey = await secureStorage.read(key: 'key');
-
-  if (encryprionKey == null) {
-    final key = Hive.generateSecureKey();
-    await secureStorage.write(
-      key: 'key',
-      value: base64UrlEncode(key),
-    );
-  }
-
-  final key = await secureStorage.read(key: 'key');
-  final encryptionKey = base64Url.decode(key);
-
-
   await Hive.openBox(
     'profilBox',
-    encryptionCipher: HiveAesCipher(encryptionKey),
+  );
+  await Hive.openBox(
+    'ownProfilBox',
   );
 
   await Hive.openBox(
     'eventBox',
-    encryptionCipher: HiveAesCipher(encryptionKey),
   );
 
-  await Hive.openBox(
-    'ownProfilBox',
-    encryptionCipher: HiveAesCipher(encryptionKey),
-  );
 
 
 }

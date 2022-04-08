@@ -48,9 +48,8 @@ class _ChatPageState extends State<ChatPage>{
 
   initilizeCreateChatData() async {
     dynamic userFriendIdList = ownProfilBox.get("list")["friendlist"];
+    print(ownProfilBox.get("list"));
     dbData = profilBox.get("list");
-
-
 
 
     allName = [];
@@ -117,7 +116,7 @@ class _ChatPageState extends State<ChatPage>{
 
   searchUser() async {
     var chatPartner = searchAutocomplete.getSelected()[0];
-    var chatPartnerId = await ProfilDatabase().getData("id", "WHERE name = '$chatPartner'");
+    var chatPartnerId = await ProfilDatabase().getData("id", "WHERE name = '${chatPartner}'");
 
     validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
   }

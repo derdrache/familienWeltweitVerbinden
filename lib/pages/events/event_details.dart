@@ -332,8 +332,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         style: TextStyle(fontSize: fontsize)
                     ),
                     const SizedBox(height: 10),
+                    Text(
+                        AppLocalizations.of(context).unsicher +
+                            (eventDetails["interessierte"] - eventDetails["zusagen"]
+                          - eventDetails["absagen"]).toString(),
+                      style: TextStyle(fontSize: fontsize)
+                    ),
+                    const SizedBox(height: 10),
                     if(isNotPublic) Text(
-                        AppLocalizations.of(context).freigegeben + eventDetails["freigegeben"].toString(),
+                        AppLocalizations.of(context).freigegeben +
+                            (eventDetails["freigegeben"] +1).toString(),
                         style: TextStyle(fontSize: fontsize)
                     )
                   ]
@@ -371,8 +379,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   contentPadding: EdgeInsets.zero,
                   insetPadding: const EdgeInsets.only(top:40, left: 0, right:10),
                   children: [
+                    if(isApproved || !isNotPublic) eventDetailsDialog(),
+
                     if(!isCreator) reportEventDialog(),
-                    if(isCreator) eventDetailsDialog(),
+
                     if(isCreator) changeOrganisatorDialog(),
                     if(isCreator) const SizedBox(height: 15),
                     if(isCreator) deleteEventDialog(),

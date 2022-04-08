@@ -71,7 +71,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   getAndSetProfils()async{
     if (profils.isNotEmpty || profilBox.get("list") == null){
-      profils = await ProfilDatabase().getData("*", "");
+      profils = await ProfilDatabase().getData("id, name, land, interessen, kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, emailAnzeigen", "");
       profilBox.put("list", profils);
     } else{
       profils = profilBox.get("list");
@@ -79,8 +79,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
     for(var profil in profils){
-      if(getOwnProfil(profil) != null){
-        ownProfil = getOwnProfil(profil);
+      if(profil["id"] == userId){
+        ownProfil = profil;
         ownProfilBox.put("list", ownProfil);
       } else {
         allUserName.add(profil["name"]);
