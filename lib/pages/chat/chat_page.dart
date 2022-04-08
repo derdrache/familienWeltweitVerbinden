@@ -25,7 +25,7 @@ class _ChatPageState extends State<ChatPage>{
   var searchAutocomplete;
   var allName = [];
   var userFriendlist = [];
-  var dbData;
+  var dbData = [];
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   initilizeCreateChatData() async {
-    dynamic userFriendIdList = await ProfilDatabase().getData("friendlist", "WHERE id = '${userId}'");
+    dynamic userFriendIdList = await ProfilDatabase().getData("friendlist", "WHERE id = '$userId'");
     dbData = await ProfilDatabase().getData("name, id", "");
 
     for(var data in dbData){
@@ -56,9 +56,11 @@ class _ChatPageState extends State<ChatPage>{
         }
       }
     }
+
   }
 
   selectChatpartnerWindow() async {
+    if(dbData.isEmpty == null) await initilizeCreateChatData();
     userFriendlist??= [];
 
     return showDialog(
@@ -106,7 +108,7 @@ class _ChatPageState extends State<ChatPage>{
 
   searchUser() async {
     var chatPartner = searchAutocomplete.getSelected()[0];
-    var chatPartnerId = await ProfilDatabase().getData("id", "WHERE name = '${chatPartner}'");
+    var chatPartnerId = await ProfilDatabase().getData("id", "WHERE name = '$chatPartner'");
 
     validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
   }
@@ -152,8 +154,8 @@ class _ChatPageState extends State<ChatPage>{
 
 
   findUserGetId(user) async {
-    var foundOnName = await ProfilDatabase().getData("id", "WHERE name = '${user}'");
-    var foundOnEmail = await ProfilDatabase().getData("id", "WHERE email = '${user}'");
+    var foundOnName = await ProfilDatabase().getData("id", "WHERE name = '$user'");
+    var foundOnEmail = await ProfilDatabase().getData("id", "WHERE email = '$user'");
 
     if(foundOnName != null) return foundOnName;
     if(foundOnEmail != null) return foundOnEmail;
@@ -164,7 +166,7 @@ class _ChatPageState extends State<ChatPage>{
   validCheckAndOpenChatgroup({chatPartnerID, name}) async {
 
     if(chatPartnerID == null){
-      chatPartnerID = await ProfilDatabase().getData("id", "WHERE name = '${name}'");
+      chatPartnerID = await ProfilDatabase().getData("id", "WHERE name = '$name'");
     }
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
 
@@ -206,7 +208,7 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   checkNewMessageCounter() async{
-    var dbNewMessages = await ProfilDatabase().getData("newMessages", "WHERE id = '${userId}'");
+    var dbNewMessages = await ProfilDatabase().getData("newMessages", "WHERE id = '$userId'");
     num realNewMessages = 0;
 
     for(var group in globalChatGroups){
@@ -250,7 +252,6 @@ class _ChatPageState extends State<ChatPage>{
 
         for(var data in dbData){
           if(data["id"] == chatPartnerId){
-
             chatPartnerName = data["name"];
             break;
           }
@@ -350,7 +351,9 @@ class _ChatPageState extends State<ChatPage>{
                     AsyncSnapshot snapshot,
                 ){
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const SizedBox.shrink(); //const CircularProgressIndicator();
+                    return Center(
+                        child: const CircularProgressIndicator()
+                    );
                   } else if (snapshot.data != null) {
                     var chatGroups = snapshot.data;
 
@@ -359,7 +362,7 @@ class _ChatPageState extends State<ChatPage>{
                     globalChatGroups = chatGroups;
                     return chatUserList(chatGroups);
                   }
-                  return Container();
+                  return const CircularProgressIndicator();
                 }
             )
       ),

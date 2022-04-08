@@ -75,7 +75,7 @@ class _EventPageState extends State<EventPage>{
                       ),
                     );
                   }
-                  return const SizedBox.shrink();
+                  return const Center( heightFactor: 6, child: CircularProgressIndicator());
                 }
             )
           ],
@@ -114,7 +114,7 @@ class _EventPageState extends State<EventPage>{
                       ),
                   );
                 }
-                return const SizedBox.shrink();
+                return const Center( heightFactor: 6, child: CircularProgressIndicator());
               }
             )
           ],
