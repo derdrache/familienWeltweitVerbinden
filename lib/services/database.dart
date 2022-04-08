@@ -74,6 +74,7 @@ class ProfilDatabase{
 
   getData(whatData, queryEnd, {returnList = false}) async{
     //neue Datenabfrage um alle get zu ersetzen
+    queryEnd = Uri.encodeComponent(queryEnd);
     var url = databaseUrl + "database/getData.php";
     var data = "?param1=$whatData&param2=$queryEnd&param3=profils";
     var uri = Uri.parse(url+data);
@@ -210,6 +211,8 @@ class ChatDatabase{
 
   getChatData(whatData, queryEnd, {returnList = false}) async{
     //neue Datenabfrage um alle chat get zu ersetzen
+
+    queryEnd = Uri.encodeComponent(queryEnd);
     var url = databaseUrl + "database/getData.php";
     var data = "?param1=$whatData&param2=$queryEnd&param3=chats";
     var uri = Uri.parse(url+data);
@@ -366,6 +369,7 @@ class EventDatabase{
 
   getData(whatData, queryEnd, {returnList = false}) async{
     //neue Datenabfrage um alle get zu ersetzen
+    queryEnd = Uri.encodeComponent(queryEnd);
     var url = databaseUrl + "database/getData.php";
     var data = "?param1=$whatData&param2=$queryEnd&param3=events";
     var uri = Uri.parse(url+data);

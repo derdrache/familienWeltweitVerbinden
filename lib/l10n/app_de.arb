@@ -196,7 +196,8 @@
     "zeitzone": "Zeitzone: ",
     "neueZeitzoneEingeben": "Neue Zeitzone eingeben",
     "bestitzerWechseln": "Besitzer wechseln",
-    "eventWirklichLoeschen": "Möchtest du das Event wirklich löschen?"
+    "eventWirklichLoeschen": "Möchtest du das Event wirklich löschen?",
+    "unsicher": "Unsicher: "
 
 
 

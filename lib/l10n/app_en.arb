@@ -196,6 +196,7 @@
     "zeitzone": "Time zone: ",
     "neueZeitzoneEingeben": "Enter new time zone",
     "bestitzerWechseln": "Change Owner",
-    "eventWirklichLoeschen": "Do you really want to delete the event?"
+    "eventWirklichLoeschen": "Do you really want to delete the event?",
+    "unsicher": "Unsure: "
 }
 

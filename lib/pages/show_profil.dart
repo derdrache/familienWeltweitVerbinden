@@ -69,18 +69,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 .getData("id", "WHERE name = '${widget.profil["name"]}'");
             var users = [userID, profilID];
             var chatId = global_functions.getChatID(users);
-            var newChat = false;
 
             var groupChatData = await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
             if(groupChatData == false){
-              newChat = true;
               groupChatData = {
                 "users": {
                   profilID: {"name": widget.profil["name"], "newMessages" : 0},
                   userID: {"name": widget.userName, "newMessages" : 0}
                 }
               };
+
             }
 
             global_functions.changePage(context, ChatDetailsPage(
@@ -123,15 +122,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     titelBox(){
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.only(top: 20,bottom: 10),
-        child: SizedBox(
-            child:
-            Text(
-              widget.profil["name"],
-              style: const TextStyle(
-                  fontSize: 24
-              ),
-            )
+        padding: EdgeInsets.only(top: 20,bottom: 10, left: 20, right: 20),
+        child: Text(
+          widget.profil["name"],
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+              fontSize: 24
+          ),
         ),
       );
     }
@@ -285,10 +282,19 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             ),
             const SizedBox(height: 10),
             widget.profil["emailAnzeigen"] ==1 ?
-                Row(children: [
-                  Text("Email: " ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: textSize),),
-                  Text(widget.profil["email"],style: TextStyle(fontSize: textSize))
-                ]) : const SizedBox.shrink()
+                FutureBuilder(
+                  future: ProfilDatabase().getData("email", "WHERE id = '${widget.profil["id"]}'"),
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData){
+                      return Row(children: [
+                        Text("Email: " ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: textSize),),
+                        Text(snapshot.data,style: TextStyle(fontSize: textSize))
+                      ]);
+                    }
+                    return Container();
+                    }
+
+                ) : const SizedBox.shrink()
 
           ],
         ),

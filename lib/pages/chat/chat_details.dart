@@ -76,6 +76,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   getAndSetChatData() async {
     if (widget.groupChatData != null) {
+      if(widget.groupChatData["id"] == null) newChat = true;
+
       widget.chatId = widget.groupChatData["id"];
       var groupchatUsers = widget.groupChatData["users"];
       groupchatUsers.forEach((key, value) {
@@ -149,11 +151,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       "zu": widget.chatPartnerId
     };
     if (newChat) {
+
       widget.groupChatData = await ChatDatabase().addNewChatGroup(
           {userID: userName, widget.chatPartnerId: widget.chatPartnerName},
           messageData);
 
       setState(() {
+        widget.chatId = widget.groupChatData["id"];
         newChat = false;
       });
     } else {
@@ -201,10 +205,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-
     messageList(messages){
       List<Widget> messageBox = [];
-      var eventCardCounter = 0;
 
       for (var i = 0; i< messages.length; i++) {
         var message = messages[i];
@@ -241,7 +243,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                               afterPageVisit: () => setState((){}),
                             ),
                             Positioned(
-                              bottom: -20,
+                              bottom: -15,
                               right: 0,
                               child: Text(
                                   DateFormat('dd-MM hh:mm').format(messageTime),

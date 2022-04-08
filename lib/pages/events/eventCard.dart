@@ -262,7 +262,7 @@ class _InteresseButtonState extends State<InteresseButton> {
 
         setState(() {});
 
-        var interesseList = await EventDatabase().getData("interesse", "WHERE id = '${widget.id}");
+        var interesseList = await EventDatabase().getData("interesse", "WHERE id = '${widget.id}'");
 
         if(widget.hasIntereset){
           interesseList.add(userId);
