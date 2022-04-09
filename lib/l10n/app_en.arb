@@ -163,7 +163,7 @@
     "sprache": "Language: ",
     "eingabeKeinLink": "Input is not a link",
     "bitteBildAussuchen": "Please choose an image",
-    "slogn1": "The networking app for travel and expat families.",
+    "slogn1": "The networking app for families worldwide.",
     "slogn2": "Find families around the world quickly and easily and organize meetings",
     "linkBearbeiten": "edit link",
     "linkOeffnen": "open link",
@@ -198,6 +198,7 @@
     "onlineEvents": "Online events",
     "eventsOrganisationstools": "Events organization tools",
     "newsBoard": "News Board",
-    "freundeUpdate": "Friends extension"
+    "freundeUpdate": "Friends extension",
+    "loginMitGoogle": "Login with Google"
 }
 

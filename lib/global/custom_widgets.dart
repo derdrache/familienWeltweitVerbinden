@@ -67,12 +67,17 @@ Widget customTextInput(text, controller, {validator, passwort = false,
 Widget customFloatbuttonExtended(text, function){
   return Align(
     child: Container(
-      width: webWidth,
+      width: 300,
       margin: EdgeInsets.only(top:sideSpace,bottom: sideSpace),
       padding: EdgeInsets.only(left: sideSpace, right:sideSpace),
       child: FloatingActionButton.extended(
         heroTag: text,
-          label: Text(text),
+          label: Text(text, style: const TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white
+              )
+          ),
           onPressed: function
       )
     ),
