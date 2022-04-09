@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
@@ -107,6 +107,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               userFriendlist.add(widget.profil["id"]);
               snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistHinzugefuegt;
             }
+
+            var ownProfilBox = Hive.box("ownProfilBox");
+            var ownProfil = ownProfilBox.get("list");
+
+            ownProfil["friendlist"] = userFriendlist;
+
+            ownProfilBox.put("list", ownProfil);
 
             customSnackbar(context, snackbarText, color: Colors.green);
 

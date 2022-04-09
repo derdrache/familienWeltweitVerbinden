@@ -77,31 +77,33 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     });
 
 
-    var freischaltenList = await EventDatabase()
-        .getData("freischalten", "WHERE id = '$eventId");
+    var dbDaten = await EventDatabase()
+        .getData("freischalten, freigegeben", "WHERE id = '$eventId'");
+
+
+    var freischaltenList = dbDaten["freischalten"];
     freischaltenList.remove(user);
     EventDatabase().update(eventId, "freischalten = '${json.encode(freischaltenList)}'");
 
     if(!angenommen) return;
 
-    var freigegebenListe = await EventDatabase()
-        .getData("freigegeben", "WHERE id = '$eventId");
+    var freigegebenListe = dbDaten["freigegeben"];
     freigegebenListe.add(user);
     EventDatabase().update(eventId, "freigegeben = '${json.encode(freigegebenListe)}'");
 
     setState(() {
 
     });
-
-    var receiverToken = await ProfilDatabase().getData("token", "WHERE id = '$user'");
+    var dbData = await ProfilDatabase().getData("name, token", "WHERE id = '$user'");
 
     var notificationInformation = {
-      "to": receiverToken,
+      "to": dbData["token"],
       "title": AppLocalizations.of(context).eventFreigeben,
       "inhalt": AppLocalizations.of(context).zugriffFolgendesEvent + widget.event["name"],
       "changePageId": eventId,
       "typ": "event",
-      "toId": user
+      "toId": user,
+      "toName": dbData["name"]
     };
     sendNotification(notificationInformation);
      
@@ -494,7 +496,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       }
 
 
-      if(widget.event["freischalten"].length == 0) {
+      if(widget.event["freigegeben"].length == 0) {
         freigeschlatetList.add(
             Padding(
               padding: const EdgeInsets.only(top:50),
