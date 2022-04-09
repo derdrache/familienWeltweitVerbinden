@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
         if(profilName != false){
           global_functions.changePageForever(context, StartPage());
         } else{
-          global_functions.changePageForever(context, CreateProfilPage());
+          global_functions.changePageForever(context, const CreateProfilPage());
         }
 
 
@@ -123,7 +123,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     double sideSpace = 20;
-    var screensize = MediaQuery. of(context).size;
 
     Widget header(){
       return Container(
@@ -133,9 +132,9 @@ class _LoginPageState extends State<LoginPage> {
             Center(
                 child: Image.asset('assets/WeltFlugzeug.png')
             ),
-            SizedBox(height: 15),
-            Text(AppLocalizations.of(context).willkommenBeiAppName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 20),
+            const SizedBox(height: 15),
+            Text(AppLocalizations.of(context).willkommenBeiAppName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
             Text(AppLocalizations.of(context).slogn1 + "\n" + AppLocalizations.of(context).slogn2),
           ],
         )
@@ -152,8 +151,8 @@ class _LoginPageState extends State<LoginPage> {
               angemeldetBleiben = value;
             });
           }),
-          SizedBox(width: 10),
-          Text("Angemeldet bleiben?")
+          const SizedBox(width: 10),
+          const Text("Angemeldet bleiben?")
         ],
       );
     }
@@ -208,9 +207,8 @@ class _LoginPageState extends State<LoginPage> {
                 customFloatbuttonExtended(AppLocalizations.of(context).registrieren, (){
                   global_functions.changePage(context, const RegisterPage());
                 }),
-                TextButton(
-                  child: Text("Google Log In"),
-                  onPressed: ()async {
+                InkWell(
+                  onTap: () async {
                     if (kIsWeb){
                       await signInWithGoogleWeb();
                     } else{
@@ -220,14 +218,48 @@ class _LoginPageState extends State<LoginPage> {
 
                     if(userId == null) return;
                     var userExist = await ProfilDatabase().getData("name", "WHERE id = '$userId'");
-                    print(userExist == false);
+
                     if(userExist == false){
-                      global_functions.changePageForever(context, CreateProfilPage());
+                      global_functions.changePageForever(context, const CreateProfilPage());
                     } else{
                       global_functions.changePageForever(context, StartPage());
                     }
                   },
-                )
+                  child: Container(
+                    height: 50,
+                    width: 300,
+                    margin: const EdgeInsets.only(top: 10, bottom: 10, right: 55, left: 55),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondary,
+                      borderRadius: const BorderRadius.all(Radius.circular(30))
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            height: 30.0,
+                            width: 30.0,
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                  image:
+                                  AssetImage('assets/googleGIcon.jpg'),
+                                  fit: BoxFit.cover),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          Text(AppLocalizations.of(context).loginMitGoogle,
+                            style: const TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white
+                            ),
+                          )
+                        ],
+                      )
+                    )
+                  ),
+                ),
               ],
             )
         )

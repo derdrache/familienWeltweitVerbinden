@@ -163,7 +163,7 @@
     "sprache": "Sprache: ",
     "eingabeKeinLink": "Eingabe ist kein Link",
     "bitteBildAussuchen": "Bitte ein Bild aussuchen",
-    "slogn1": "Die Vernetzungsapp für Reise- und Auswanderfamilien.",
+    "slogn1": "Die Vernetzungsapp für Familien weltweit.",
     "slogn2": "Finde schnell und einfach Familien auf der ganzen Welt und organisiere treffen",
     "linkBearbeiten": "Link bearbeiten",
     "linkOeffnen": "Link öffnen",
@@ -198,10 +198,8 @@
     "onlineEvents": "Online Events",
     "eventsOrganisationstools": "Events Organisationstools",
     "newsBoard": "News Board",
-    "freundeUpdate": "Freunde-Erweiterung"
-
-
-
+    "freundeUpdate": "Freunde-Erweiterung",
+    "loginMitGoogle": "Login mit Google"
 
 
 }
