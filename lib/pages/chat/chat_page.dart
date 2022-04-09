@@ -48,9 +48,7 @@ class _ChatPageState extends State<ChatPage>{
 
   initilizeCreateChatData() async {
     dynamic userFriendIdList = ownProfilBox.get("list")["friendlist"];
-    print(ownProfilBox.get("list"));
     dbData = profilBox.get("list");
-
 
     allName = [];
     userFriendlist = [];

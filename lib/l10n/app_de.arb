@@ -88,12 +88,9 @@
     "familienAnzeige" : "Familienanzeige - Mehrere Accounts verbinden",
     "automatischerStandort": "Automatischer Standort Option",
     "nutzerBlockieren" : "Nutzer blockieren",
-    "eventsPlanen" : "Events planen",
     "reisePlanung": "Reiseplanung/Reiseroute",
     "gemeinschaftenUpdate": "Gemeinschaften Eintragen/Anzeigen",
-    "freundeMarkieren": "Freunde auf Karte farblich markieren und folgen",
     "chatgruppen": "Chatgruppen",
-    "eventboard": "Eventboard",
     "anonymeAnmelden": "Anonyme Anmelden",
     "chatErweiterung": "Chat erweiterungen",
     "accountLoeschen": "Account löschen",
@@ -197,7 +194,11 @@
     "neueZeitzoneEingeben": "Neue Zeitzone eingeben",
     "bestitzerWechseln": "Besitzer wechseln",
     "eventWirklichLoeschen": "Möchtest du das Event wirklich löschen?",
-    "unsicher": "Unsicher: "
+    "unsicher": "Unsicher: ",
+    "onlineEvents": "Online Events",
+    "eventsOrganisationstools": "Events Organisationstools",
+    "newsBoard": "News Board",
+    "freundeUpdate": "Freunde-Erweiterung"
 
 
 

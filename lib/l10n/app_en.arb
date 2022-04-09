@@ -88,12 +88,9 @@
     "familienAnzeige" : "Family display - Connect multiple Accounts",
     "automatischerStandort": "Automatic location option",
     "nutzerBlockieren" : "Block users",
-    "eventsPlanen" : "Plan events",
-    "reisePlanung": "travel planning / travel route",
+    "reisePlanung": "Travel planning / Travel route",
     "gemeinschaftenUpdate": "Register/Show communities",
-    "freundeMarkieren": "Color tag friends on map and follow",
     "chatgruppen": "Chat groups",
-    "eventboard": "Event board",
     "anonymeAnmelden": "Anonymous Login",
     "chatErweiterung": "Chat extensions",
     "accountLoeschen": "Delete account",
@@ -197,6 +194,10 @@
     "neueZeitzoneEingeben": "Enter new time zone",
     "bestitzerWechseln": "Change Owner",
     "eventWirklichLoeschen": "Do you really want to delete the event?",
-    "unsicher": "Unsure: "
+    "unsicher": "Unsure: ",
+    "onlineEvents": "Online events",
+    "eventsOrganisationstools": "Events organization tools",
+    "newsBoard": "News Board",
+    "freundeUpdate": "Friends extension"
 }
 

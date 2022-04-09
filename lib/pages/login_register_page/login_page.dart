@@ -105,7 +105,6 @@ class _LoginPageState extends State<LoginPage> {
     // Trigger the authentication flow
     GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
 
-
     // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
@@ -209,7 +208,6 @@ class _LoginPageState extends State<LoginPage> {
                 customFloatbuttonExtended(AppLocalizations.of(context).registrieren, (){
                   global_functions.changePage(context, const RegisterPage());
                 }),
-                /*
                 TextButton(
                   child: Text("Google Log In"),
                   onPressed: ()async {
@@ -221,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                     var userId = FirebaseAuth.instance.currentUser.uid;
 
                     if(userId == null) return;
-                    var userExist = await ProfilDatabase().getOneData("name", "id", userId);
+                    var userExist = await ProfilDatabase().getData("name", "WHERE id = '$userId'");
                     print(userExist == false);
                     if(userExist == false){
                       global_functions.changePageForever(context, CreateProfilPage());
@@ -230,7 +228,6 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                 )
-                 */
               ],
             )
         )

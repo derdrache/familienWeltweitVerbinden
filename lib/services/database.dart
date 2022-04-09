@@ -444,6 +444,7 @@ sendChatNotification(chatId, messageData) async {
   var chatPartnerName = await ProfilDatabase()
       .getData("name", "WHERE id = '${messageData["zu"]}'");
 
+
   var notificationInformation = {
     "toId": messageData["zu"],
     "token": toToken,
