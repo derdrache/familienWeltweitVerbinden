@@ -116,34 +116,6 @@ class ProfilDatabase{
     FirebaseAuth.instance.currentUser.updateDisplayName(newName);
 
     updateProfil(userId, "name", newName);
-
-
-    /*
-
-    var chats = await ChatDatabase().getChatData("*", "WHERE id like '%$userId%'");
-    for(var chat in chats){
-      var newUserData = chat["users"];
-      newUserData[userId]["name"] = newName;
-
-      ChatDatabase().updateChatGroup(chat["id"], "users", newUserData);
-    }
-
-    var allProfilFriendlists = await getData("id, friendlist", "");
-
-    for(var profil in allProfilFriendlists){
-      if(profil["friendlist"].isEmpty) continue;
-
-      var friendlist = profil["friendlist"];
-
-      if(profil["friendlist"].contains(oldName)){
-        friendlist.add(newName);
-        friendlist.remove(oldName);
-      }
-
-      updateProfil(profil["id"], "friendlist", friendlist);
-    }
-
-     */
   }
 
   updateProfilLocation(userId, locationDict) {
@@ -447,13 +419,12 @@ sendChatNotification(chatId, messageData) async {
 
   var notificationInformation = {
     "toId": messageData["zu"],
-    "token": toToken,
+    "toName": chatPartnerName,
+    "typ" : "chat",
     "title": fromName,
     "inhalt": messageData["message"],
     "changePageId": chatId,
-    "apiKey": firebaseWebKey,
-    "typ" : "chat",
-    "toName": chatPartnerName
+    "token": toToken,
   };
 
   sendNotification(notificationInformation);
@@ -471,21 +442,29 @@ sendNotification(notificationInformation) async {
       var emailAdresse = await ProfilDatabase()
           .getData("email", "WHERE id = '${notificationInformation["toId"]}'");
 
-      var url = Uri.parse(databaseUrl + "services/sendEmail.php");
-      http.post(url, body: json.encode({
-        "to": emailAdresse,
-        "title": notificationInformation["title"] + (spracheIstDeutsch ?
+      if(notificationInformation["typ"] == "chat"){
+        var url = Uri.parse(databaseUrl + "services/sendEmail.php");
+        http.post(url, body: json.encode({
+          "to": emailAdresse,
+          "title": notificationInformation["title"] + (spracheIstDeutsch ?
           " hat dir eine Nachricht geschrieben": " has written you a message"),
-        "inhalt": "Hi ${notificationInformation["toName"]},\n\n" +
-            (spracheIstDeutsch ?
-            "du hast in der families worldwide App folgende Nachricht von "
-                "${notificationInformation["title"]} erhalten: \n\n" :
-            "you have received the following message from "
-                "${notificationInformation["title"]} in the families worldwide app: \n\n"
-            ) +
-        "${notificationInformation["inhalt"]}"
-      }));
-
+          "inhalt": "Hi ${notificationInformation["toName"]},\n\n" +
+              (spracheIstDeutsch ?
+              "du hast in der families worldwide App folgende Nachricht von "
+                  "${notificationInformation["title"]} erhalten: \n\n" :
+              "you have received the following message from "
+                  "${notificationInformation["title"]} in the families worldwide app: \n\n"
+              ) +
+              "${notificationInformation["inhalt"]}"
+        }));
+      }else if(notificationInformation["typ"] == "event"){
+        var url = Uri.parse(databaseUrl + "services/sendEmail.php");
+        http.post(url, body: json.encode({
+          "to": emailAdresse,
+          "title": notificationInformation["title"],
+          "inhalt": notificationInformation["inhalt"]
+        }));
+      }
     }else{
       var url = Uri.parse(databaseUrl + "services/sendNotification.php");
       http.post(url, body: json.encode({

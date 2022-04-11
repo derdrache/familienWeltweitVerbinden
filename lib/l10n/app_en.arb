@@ -200,6 +200,7 @@
     "freundeUpdate": "Friends extension",
     "loginMitGoogle": "Login with Google",
     "alleEvents": "All Events",
-    "ueber": "About"
+    "ueber": "About",
+    "bitteEventIntervalEingeben": "Please enter event interval"
 }
 

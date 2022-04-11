@@ -97,13 +97,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     var dbData = await ProfilDatabase().getData("name, token", "WHERE id = '$user'");
 
     var notificationInformation = {
-      "to": dbData["token"],
+      "toId": user,
+      "toName": dbData["name"],
+      "typ": "event",
       "title": AppLocalizations.of(context).eventFreigeben,
       "inhalt": AppLocalizations.of(context).zugriffFolgendesEvent + widget.event["name"],
       "changePageId": eventId,
-      "typ": "event",
-      "toId": user,
-      "toName": dbData["name"]
+      "token": dbData["token"]
     };
     sendNotification(notificationInformation);
      

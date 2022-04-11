@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
-import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,6 +37,7 @@ class _EventErstellenState extends State<EventErstellen> {
   var eventArtDropdown = CustomDropDownButton();
   var ortTypDropdown = CustomDropDownButton();
   var ortAuswahlBox = GoogleAutoComplete();
+  var eventIntervalDropdown = CustomDropDownButton();
 
 
 
@@ -62,6 +62,10 @@ class _EventErstellenState extends State<EventErstellen> {
 
     eventArtDropdown = CustomDropDownButton(
       items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
+    );
+
+    eventIntervalDropdown = CustomDropDownButton(
+      items: isGerman ? global_var.eventInterval : global_var.eventIntervalEnglisch,
     );
 
     super.initState();
@@ -90,7 +94,8 @@ class _EventErstellenState extends State<EventErstellen> {
       "art": eventArtDropdown.getSelected(),
       "wann" : date.toString(),
       "typ": ortTypDropdown.getSelected(),
-      "sprache": json.encode(sprachenAuswahlBox.getSelected())   ,
+      "sprache": json.encode(sprachenAuswahlBox.getSelected()),
+      "interval": eventIntervalDropdown.getSelected(),
       "link": ortTypDropdown.getSelected() == "online" ? eventOrtKontroller.text : "",
       "land": locationData["countryname"],
       "longt": locationData["longt"],
@@ -103,10 +108,7 @@ class _EventErstellenState extends State<EventErstellen> {
     await EventDatabase().addNewEvent(eventData);
     var dbEventData = await EventDatabase().getData("*", "WHERE id = '$eventId'");
 
-    if(dbEventData == false){
-      print("error");
-      return;
-    }
+    if(dbEventData == false) return;
 
     global_functions.changePage(context, StartPage(selectedIndex: 1));
     global_functions.changePage(context, EventDetailsPage(event: dbEventData));
@@ -119,8 +121,10 @@ class _EventErstellenState extends State<EventErstellen> {
       validationFailText = AppLocalizations.of(context).bitteNameEingeben;
     } else if(eventNameKontroller.text.length > 40){
       validationFailText = AppLocalizations.of(context).usernameZuLang;
-    } else if(eventArtDropdown.getSelected().isEmpty){
+    } else if(eventArtDropdown.getSelected().isEmpty) {
       validationFailText = AppLocalizations.of(context).bitteEventArtEingeben;
+    }else if(eventIntervalDropdown.getSelected().isEmpty){
+      validationFailText = AppLocalizations.of(context).bitteEventIntervalEingeben;
     } else if(ortTypDropdown.getSelected().isEmpty){
       validationFailText = AppLocalizations.of(context).bitteEventTypEingeben;
     } else if(ortTypDropdown.getSelected() == "offline" && locationData["city"] == null){
@@ -149,6 +153,8 @@ class _EventErstellenState extends State<EventErstellen> {
     double screenWidth = MediaQuery. of(context). size. width;
     sprachenAuswahlBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
     eventArtDropdown.hintText = AppLocalizations.of(context).eventArten;
+    eventIntervalDropdown.hintText = isGerman ? global_var.eventInterval.join(", ") :
+        global_var.eventIntervalEnglisch.join(", ");
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
 
     dateAndTimeBox(){
@@ -296,6 +302,7 @@ class _EventErstellenState extends State<EventErstellen> {
           //ortTypDropdown,
           ortEingabeBox(),
           sprachenAuswahlBox,
+          eventIntervalDropdown,
           dateAndTimeBox(),
           customTextInput(
               AppLocalizations.of(context).eventBeschreibung,
