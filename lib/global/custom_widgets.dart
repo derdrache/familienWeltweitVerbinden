@@ -107,7 +107,8 @@ customAppBar({title, buttons, elevation = 4.0, var onTap, context}){
                 Flexible(
                   child: SizedBox(
                       height: 50,
-                      child: Center(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
                             title,
                             overflow: TextOverflow.fade,

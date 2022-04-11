@@ -18,6 +18,14 @@ import '../../services/database.dart';
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/image_galerie.dart';
 
+/*
+Clean Code Notize:
+- ShowDataAndChangeWindow => vereinfachen :
+    => getData ifs mehr zusammenfassen
+    =>
+- isApproved && isPublic zusammenfassen?
+ */
+
 var userId = FirebaseAuth.instance.currentUser.uid;
 var isWebDesktop = kIsWeb && (defaultTargetPlatform != TargetPlatform.iOS || defaultTargetPlatform != TargetPlatform.android);
 double fontsize = isWebDesktop? 12 : 16;
@@ -48,7 +56,8 @@ class EventCardDetails extends StatelessWidget {
     if(screenWidth > 500) screenWidth = kIsWeb ? 400 : 500;
     double cardWidth = screenWidth / 1.12;
     double cardHeight = screenHeight / 1.34;
-    event["eventInterval"] = isGerman ? global_var.changeEnglishToGerman(event["eventInterval"]):
+    event["eventInterval"] = isGerman ?
+      global_var.changeEnglishToGerman(event["eventInterval"]):
       global_var.changeGermanToEnglish(event["eventInterval"]);
     
 
@@ -66,12 +75,12 @@ class EventCardDetails extends StatelessWidget {
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0),
                     ),
-                    child: isAssetImage ?  Image.asset(event["bild"], fit: BoxFit.fitWidth) :
-                    Image.network(event["bild"], fit: BoxFit.fitWidth,)
+                    child: isAssetImage ?
+                      Image.asset(event["bild"], fit: BoxFit.fitWidth) :
+                      Image.network(event["bild"], fit: BoxFit.fitWidth
+                    )
                 ),
-
               ),
-
             ],
           ),
           Positioned.fill(
@@ -81,16 +90,16 @@ class EventCardDetails extends StatelessWidget {
                   child: Container(
                       padding: const EdgeInsets.only(top:10, bottom: 10),
                       decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(20)),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3), // changes position of shadow
-                            ),
-                          ]
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
                       ),
                       margin: const EdgeInsets.only(left: 30, right: 30),
                       width: 800,
@@ -169,7 +178,8 @@ class EventCardDetails extends StatelessWidget {
                 isCreator: isCreator,
                 rowTitle: "Interval",
                 rowData: event["eventInterval"],
-                items: isGerman ? global_var.eventInterval : global_var.eventIntervalEnglisch,
+                items: isGerman ? global_var.eventInterval :
+                  global_var.eventIntervalEnglisch,
                 modus: "dropdown",
                 databaseKennzeichnung: "eventInterval"
             ),
@@ -181,7 +191,8 @@ class EventCardDetails extends StatelessWidget {
                 isCreator: isCreator,
                 rowTitle: AppLocalizations.of(context).sprache,
                 rowData: event["sprache"].join(", "),
-                items: isGerman ? global_var.sprachenListe : global_var.sprachenListeEnglisch,
+                items: isGerman ? global_var.sprachenListe :
+                  global_var.sprachenListeEnglisch,
                 modus: "dropdown",
                 databaseKennzeichnung: "sprache"
             ),
@@ -242,7 +253,7 @@ class EventCardDetails extends StatelessWidget {
                     color: Colors.grey.withOpacity(0.6),
                     spreadRadius: 12,
                     blurRadius: 7,
-                    offset: const Offset(0, 3), // changes position of shadow
+                    offset: const Offset(0, 3),
                   ),
                 ]
             ),
@@ -440,8 +451,8 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
   saveChanges(){
     var data = getData();
-
     var errorText = checkValidation(data);
+
     if(!errorText.isEmpty){
       customSnackbar(context, errorText);
       return;
@@ -480,7 +491,6 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     }
 
     openChangeWindow(){
-
       showDialog(
           context: context,
           builder: (BuildContext buildContext){
@@ -496,11 +506,17 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
-                            child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
+                            child: Text(
+                                AppLocalizations.of(context).abbrechen,
+                                style: TextStyle(fontSize: fontsize)
+                            ),
                             onPressed: () => Navigator.pop(context),
                           ),
                           TextButton(
-                              child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
+                              child: Text(
+                                  AppLocalizations.of(context).speichern,
+                                  style: TextStyle(fontSize: fontsize)
+                              ),
                               onPressed: () => saveChanges()
                           ),
                         ]
@@ -509,9 +525,6 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                 ]
             );
           });
-
-
-
     }
 
     openLinkAskWindow(){
@@ -542,19 +555,20 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
 
     return InkWell(
-        onTap: !widget.isCreator ? null:  (){
-          openChangeWindow();
-        },
+        onTap: !widget.isCreator ? null:  ()=> openChangeWindow(),
         child: !widget.singleShow && !widget.multiLines ? Row(
           children: [
-            Text(widget.rowTitle + " ", style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold)),
+            Text(
+                widget.rowTitle + " ",
+                style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold)
+            ),
             const Expanded(child: SizedBox.shrink()),
             InkWell(
                 child: SizedBox(
                   width: 200,
                   child: Text(
-                    widget.databaseKennzeichnung =="zeitzone" ? "UTC " + widget.rowData.toString():
-                      widget.rowData,
+                    widget.databaseKennzeichnung =="zeitzone" ?
+                    "UTC " + widget.rowData.toString(): widget.rowData,
                     style: TextStyle(
                         fontSize: fontsize,
                         color: widget.databaseKennzeichnung != "link" ?
@@ -565,7 +579,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                     textAlign: TextAlign.end,
                   ),
                 ),
-              onTap: widget.databaseKennzeichnung != "link" || widget.rowData == "" ? null : (){
+              onTap: widget.databaseKennzeichnung != "link" ||
+                  widget.rowData == "" ? null :
+                  (){
                   if(widget.isCreator){
                     openLinkAskWindow();
                   }else{
@@ -592,7 +608,13 @@ class CardFeed extends StatefulWidget {
   var width;
   var eventZusage;
 
-  CardFeed({Key key, this.organisator, this.width, this.eventId, this.eventZusage}) : super(key: key);
+  CardFeed({
+    Key key,
+    this.organisator,
+    this.width,
+    this.eventId,
+    this.eventZusage
+  }) : super(key: key);
 
   @override
   _CardFeedState createState() => _CardFeedState();
@@ -611,7 +633,8 @@ class _CardFeedState extends State<CardFeed> {
   }
 
   setOrganisatorText()async{
-    organisatorProfil = await ProfilDatabase().getData("*", "WHERE id = '${widget.organisator}'");
+    organisatorProfil = await ProfilDatabase()
+        .getData("*", "WHERE id = '${widget.organisator}'");
 
     organisatorText = Text(
         organisatorProfil["name"],
@@ -630,7 +653,10 @@ class _CardFeedState extends State<CardFeed> {
       width: widget.width,
       child: Row(
         children: [
-          Text(AppLocalizations.of(context).teilnehmer, style: TextStyle(fontSize: fontsize)),
+          Text(
+              AppLocalizations.of(context).teilnehmer,
+              style: TextStyle(fontSize: fontsize)
+          ),
           Text(
               widget.eventZusage.length.toString(),
               style: TextStyle(fontSize: fontsize)
@@ -670,7 +696,8 @@ class _DateButtonState extends State<DateButton> {
     var dateString = AppLocalizations.of(context).neuesDatumAuswaehlen;
     if(widget.eventDatum != null){
       var dateFormat = DateFormat('dd.MM.yyyy');
-      var dateTime = DateTime(widget.eventDatum.year, widget.eventDatum.month, widget.eventDatum.day);
+      var dateTime = DateTime(widget.eventDatum.year, widget.eventDatum.month,
+          widget.eventDatum.day);
       dateString = dateFormat.format(dateTime);
     }
 
@@ -750,10 +777,12 @@ class _InteresseButtonState extends State<InteresseButton> {
 
           EventDatabase()
               .update(widget.id, "interesse = '${json.encode(interesseList)}'");
-
-
         },
-        child: Icon(Icons.favorite, color: widget.hasIntereset ? Colors.red : Colors.black, size: 30,)
+        child: Icon(
+          Icons.favorite,
+          color: widget.hasIntereset ? Colors.red : Colors.black,
+          size: 30,
+        )
     );
   }
 }

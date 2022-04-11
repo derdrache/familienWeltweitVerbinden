@@ -59,6 +59,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch120D),
                 _patch(patch113D),
                 _patch(patch112D),
                 _patch(patch111D),
@@ -67,6 +68,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch120E),
                 _patch(patch113E),
                 _patch(patch112E),
                 _patch(patch111E),
@@ -80,6 +82,51 @@ class PatchnotesWindow{
   }
 
 }
+
+var patchVorlage={
+  "title" : "",
+  "inhalt": [
+
+  ]
+};
+
+
+var patch120E={
+  "title" : "1.2.0",
+  "inhalt": [
+    "General - Events have been implemented",
+    "Web Version - Email Notification has been implemented",
+    "Login / Registration - When creating a profile, there is now the possibility to enter 'About us' directly",
+    "World Map - Loading time has been greatly reduced (Only visible after the app is loaded for the first time)",
+    "World map - The information menu got a new layout",
+    "World Map - Zooming out first leads to the old position before zooming in by tabbing to a marker",
+    "World Map - The number on the markers has been limited to 99",
+    "Chat - Fixed the display of the wrong time",
+    "Settings - Donation link should now work again on Android version 10+",
+    "Settings - The app version can now be displayed in the app (Settings => About)",
+    "various small bug fixes",
+    "various small bugs have been fixed",
+  ]
+};
+
+var patch120D={
+  "title" : "1.2.0",
+  "inhalt": [
+    "Allgemein - Events wurden eingebaut",
+    "Web Version - Email Notification wurde eingebaut",
+    "Login / Registrierung - Beim Profil erstellen gibt es jetzt die Möglichkeit direkt 'Über uns' einzutragen",
+    "Login / Registration - Google Login has been added",
+    "Weltkarte - Die Ladezeit wurde stark reduziert (Erst nach dem ersten Laden der App sichtbar)",
+    "Weltkarte - Das Informationsmenu hat ein neues Layout bekommen",
+    "Weltkarte - Das Rauszoomen führt zuerst zur alten Position vor dem ran zoomen durch ein Tab auf eine Markierung",
+    "Weltkarte - Die Nummer auf den Markierungen wurde auf 99 beschränkt",
+    "Chat - Die Anzeige der falschen Uhrzeit wurde behoben"
+    "Settings - Der Spendenlink müsste jetzt bei Android Version 10+ wieder funktionieren",
+    "Settings - Die App Version kann jetzt in der App angezeigt werden (Settings => About)",
+    "verschiedene kleine Fehlerbehebungen",
+    "verschiedene kleine Fehler wurden behoben",
+  ]
+};
 
 var patch113E= {
   "title": "1.1.3",

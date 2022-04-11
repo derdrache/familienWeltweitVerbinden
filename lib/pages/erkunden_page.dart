@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:familien_suche/pages/events/eventCard.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -549,10 +548,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
                 lastEventPopup["profils"] = refreshEvents;
                 createPopupEvents(lastEventPopup);
-                setState(() {
-
-                });
-
               }
             )
         );
