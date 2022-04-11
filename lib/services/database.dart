@@ -15,7 +15,47 @@ var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.l
 
 class AllgemeinDatabase{
 
-  getOneData(what) async{
+  getData(whatData, queryEnd, {returnList = false}) async {
+    //neue Datenabfrage um alle get zu ersetzen
+    queryEnd = Uri.encodeComponent(queryEnd);
+    var url = databaseUrl + "database/getData.php";
+    var data = "?param1=$whatData&param2=$queryEnd&param3=allgemein";
+    var uri = Uri.parse(url+data);
+    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    dynamic responseBody = res.body;
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(error){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(error){}
+    }
+
+    return responseBody;
+  }
+
+  getOneData(what, queryEnd) async{
     var url = databaseUrl + "database/allgemein/getOneData.php";
     var data = "?param1=$what";
     var uri = Uri.parse(url+data);
@@ -316,6 +356,7 @@ class EventDatabase{
   addNewEvent(eventData) async {
     var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
     await http.post(url, body: json.encode(eventData));
+
   }
 
   update(id, changes) async  {

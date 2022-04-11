@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
@@ -19,11 +20,42 @@ class EventPage extends StatefulWidget{
 
 class _EventPageState extends State<EventPage>{
   var userId = FirebaseAuth.instance.currentUser.uid;
+  var myEventsBox;
+  var interestEventsBox;
+  var myEvents = [];
+  var interestEvents = [];
 
   @override
   void initState() {
+    myEventsBox = Hive.box('myEventsBox');
+    interestEventsBox = Hive.box('interestEventsBox');
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
 
     super.initState();
+  }
+
+  _asyncMethod() async{
+    if (myEvents.isNotEmpty || myEventsBox.get("list") == null){
+      myEvents = await EventDatabase().getData("*", "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC",
+          returnList: true);
+      interestEvents = await EventDatabase().getData(
+          "*",
+          "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
+          returnList: true);
+
+      myEventsBox.put("list", myEvents);
+      interestEventsBox.put("list", interestEvents);
+    } else{
+      myEvents = myEventsBox.get("list");
+      interestEvents = interestEventsBox.get("list");
+
+      _asyncMethod();
+    }
+
+    setState(() {
+
+    });
   }
 
 
@@ -65,26 +97,15 @@ class _EventPageState extends State<EventPage>{
                   style: const TextStyle(fontSize: 20),
                 )
             ),
-            FutureBuilder(
-                future: EventDatabase().getData(
-                    "*",
-                    "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
-                    returnList: true),
-                builder: (BuildContext context, AsyncSnapshot snapshot){
-                  if (snapshot.data != null){
-                    return Expanded(
+            Expanded(
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Wrap(
                             direction: Axis.vertical,
-                            children: createEventCards(snapshot.data, true)
+                            children: createEventCards(interestEvents, true)
                         ),
                       ),
-                    );
-                  }
-                  return const Center( heightFactor: 5, child: CircularProgressIndicator());
-                }
-            )
+                    )
           ],
         )
       );
@@ -104,27 +125,15 @@ class _EventPageState extends State<EventPage>{
                 style: const TextStyle(fontSize: 20),
               )
             ),
-            FutureBuilder(
-              future: EventDatabase().getData("*", "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC",
-                  returnList: true),
-              builder: (
-                BuildContext context,
-                AsyncSnapshot snapshot,
-              ){
-                if (snapshot.data != null){
-                  return Expanded(
+            Expanded(
                     child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Wrap(
                             direction: Axis.vertical,
-                            children: createEventCards(snapshot.data, false)
+                            children: createEventCards(myEvents, false)
                           ),
                       ),
-                  );
-                }
-                return const Center( heightFactor: 5, child: CircularProgressIndicator());
-              }
-            )
+                  )
           ],
         )
       );
@@ -150,7 +159,7 @@ class _EventPageState extends State<EventPage>{
               onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const EventsSuchenPage()
-                  )).whenComplete(() => setState(() {}))
+                  )).whenComplete(() => _asyncMethod())
             ),
             const SizedBox(width: 10),
             FloatingActionButton(

@@ -46,6 +46,17 @@ hiveInit() async {
     'eventBox',
   );
 
+  await Hive.openBox(
+    'myEventsBox',
+  );
+
+  await Hive.openBox(
+    'interestEventsBox',
+  );
+
+  await Hive.openBox(
+    'myChatBox',
+  );
 
 
 }
@@ -88,9 +99,7 @@ class MyApp extends StatelessWidget {
         .getData("name", "WHERE id = '${userId}'");
     if(kIsWeb) return ;
 
-
-    importantUpdateNumber = await AllgemeinDatabase().getOneData("importantUpdate");
-    importantUpdateNumber = int.parse(importantUpdateNumber["importantUpdate"]);
+    importantUpdateNumber = await AllgemeinDatabase().getData("importantUpdate", "");
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     buildNumber = int.parse(packageInfo.buildNumber);
 

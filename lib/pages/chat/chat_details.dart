@@ -316,7 +316,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
             AsyncSnapshot snap,
           ) {
             if (snap.connectionState == ConnectionState.waiting) {
-              return pufferList ?? const SizedBox.shrink();
+              return pufferList ?? Center(child: CircularProgressIndicator());
             } else if (snap.data != null) {
               List<dynamic> messages = snap.data;
 

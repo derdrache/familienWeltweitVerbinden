@@ -71,6 +71,7 @@ class _EventErstellenState extends State<EventErstellen> {
     super.initState();
   }
 
+
   saveEvent() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = const Uuid();
@@ -78,9 +79,13 @@ class _EventErstellenState extends State<EventErstellen> {
     var userID = FirebaseAuth.instance.currentUser?.uid;
     var allFilled = checkAllValidations(locationData);
 
+    FocusManager.instance.primaryFocus?.unfocus();
 
-    if(!allFilled) return;
+    if(!allFilled) {
+      customSnackbar(context, allFilled);
+      return;
 
+    }
     var date = DateTime(eventDatum.year, eventDatum.month, eventDatum.day,
         eventUhrzeit.hour, eventUhrzeit.minute);
 

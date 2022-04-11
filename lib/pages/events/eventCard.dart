@@ -43,6 +43,12 @@ class _EventCardState extends State<EventCard> {
 
   confirmEvent(bool confirm) async{
     if(confirm){
+      var onInteresseList = widget.event["interesse"].contains(userId);
+
+      if(!onInteresseList){
+        widget.event["interesse"].add(userId);
+      }
+
       setState(() {
         widget.event["zusage"].add(userId);
         widget.event["absage"].remove(userId);
@@ -59,12 +65,14 @@ class _EventCardState extends State<EventCard> {
     }
 
     var dbData = await EventDatabase()
-        .getData("absage, zusage", "WHERE id = '${widget.event["id"]}'");
+        .getData("absage, zusage, interesse", "WHERE id = '${widget.event["id"]}'");
 
     var zusageList = dbData["zusage"];
     var absageList = dbData["absage"];
+    var interessenList = dbData["interesse"];
 
     if(confirm){
+      interessenList.add(userId);
       zusageList.add(userId);
       absageList.remove(userId);
     } else{
@@ -72,10 +80,8 @@ class _EventCardState extends State<EventCard> {
       absageList.add(userId);
     }
 
-    var zusageListJson = json.encode(zusageList);
-    var absageListJson = json.encode(absageList);
-
-    EventDatabase().update(widget.event["id"], "absage = '$absageListJson', zusage = '$zusageListJson'");
+    EventDatabase().update(widget.event["id"], "absage = '${json.encode(absageList)}', "
+        "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'");
   }
 
 
@@ -253,29 +259,27 @@ class InteresseButton extends StatefulWidget {
 class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
 
+  setInteresse() async {
+    widget.hasIntereset = widget.hasIntereset ? false : true;
+
+    setState(() {});
+
+    var interesseList = await EventDatabase().getData("interesse", "WHERE id = '${widget.id}'");
+
+    if(widget.hasIntereset){
+      interesseList.add(userId);
+    } else{
+      interesseList.remove(userId);
+    }
+
+    EventDatabase().update(widget.id, "interesse = '${json.encode(interesseList)}'");
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () async {
-        widget.hasIntereset = widget.hasIntereset ? false : true;
-
-        setState(() {});
-
-        var interesseList = await EventDatabase().getData("interesse", "WHERE id = '${widget.id}'");
-
-        if(widget.hasIntereset){
-          interesseList.add(userId);
-        } else{
-          interesseList.remove(userId);
-        }
-        var interesseListJson = json.encode(interesseList);
-
-        EventDatabase().update(widget.id, "interesse = '$interesseListJson'");
-
-
-
-      },
+      onTap: () => setInteresse(),
       child: Icon(Icons.favorite, color: widget.hasIntereset ? Colors.red : Colors.black)
     );
   }
