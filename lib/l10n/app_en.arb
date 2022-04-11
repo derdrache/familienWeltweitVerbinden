@@ -125,7 +125,6 @@
     "oeffentlichInformationText": "These can be found anywhere and viewed in full by anyone",
     "eventErstellen": "Create event",
     "eventBeschreibung": "Event description",
-    "eventSuchen": "search events",
     "eventMelden": "Report event",
     "eventMeldenFrage": "Why do you want to report the event?",
     "eventLoeschen": "Delete event",
@@ -199,6 +198,8 @@
     "eventsOrganisationstools": "Events organization tools",
     "newsBoard": "News Board",
     "freundeUpdate": "Friends extension",
-    "loginMitGoogle": "Login with Google"
+    "loginMitGoogle": "Login with Google",
+    "alleEvents": "All Events",
+    "ueber": "About"
 }
 

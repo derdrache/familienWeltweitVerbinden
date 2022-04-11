@@ -9,11 +9,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
+import '../../global/global_functions.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../services/database.dart';
 import '../start_page.dart';
+import 'login_page.dart';
 
 class CreateProfilPage extends StatefulWidget {
 
@@ -173,6 +175,12 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           width: 600,
           child: Row(
             children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back, size: 35),
+                onPressed: (){
+                  changePage(context, const LoginPage());
+                },
+              ),
               const Expanded(child: SizedBox.shrink()),
               Text(
                 AppLocalizations.of(context).profilErstellen,

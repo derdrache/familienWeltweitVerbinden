@@ -131,7 +131,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
       for(var event in allEvents){
         meineEvents.add(
             EventCard(
-              margin: const EdgeInsets.only(top: 10 , bottom: 10, left: 15, right: 15),
+              margin: const EdgeInsets.only(top: 10 , bottom: 10, left: 17, right: 17),
               withInteresse: true,
               event: event,
               afterPageVisit: () async {
@@ -151,7 +151,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
     return Scaffold(
       appBar: customAppBar(
-        title: AppLocalizations.of(context).eventSuchen
+        title: AppLocalizations.of(context).alleEvents
       ),
       body: Container(
           padding: const EdgeInsets.only(top:10),
@@ -159,10 +159,14 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
           height: double.infinity,
           child: Stack(
             children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.only(top:70),
-                child: Wrap(
-                    children: showEvents()
+              Container(
+                margin: const EdgeInsets.only(top:60),
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: Wrap(
+                        children: showEvents()
+                    ),
+                  ),
                 ),
               ),
               searchAutocomplete,

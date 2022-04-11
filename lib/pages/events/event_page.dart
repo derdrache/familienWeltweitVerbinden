@@ -145,7 +145,7 @@ class _EventPageState extends State<EventPage>{
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
-              heroTag: "event suchen",
+              heroTag: "alleEvents",
               child: const Icon(Icons.search),
               onPressed: () => Navigator.push(
                   context,

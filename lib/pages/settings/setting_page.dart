@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
@@ -11,13 +12,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/link.dart' as url_luncher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 
 import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
-import '../../services/locationsService.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../windows/upcoming_updates.dart';
 import '../../windows/patchnotes.dart';
@@ -143,6 +144,21 @@ class _SettingPageState extends State<SettingPage> {
           ),
         ]
     );
+  }
+
+  aboutAppWindow() async{
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext){
+          return CustomAlertDialog(
+            title: "families worldwide app",
+            children: [
+              Text("Version: " +  packageInfo.version)
+            ],
+          );
+        });
   }
 
   @override
@@ -399,12 +415,53 @@ class _SettingPageState extends State<SettingPage> {
                     ],
                   ),
                 ),
-              )
+              ),
+              const SizedBox(height: 20),
+              settingThemeContainer(AppLocalizations.of(context).ueber, Icons.info,
+                      () => aboutAppWindow()
+              ),
             ],
           )
       );
     }
 
+    return Column(
+      children: [
+        menuBar(),
+        FutureBuilder(
+            future: ProfilDatabase().getData("*", "WHERE id = '${userID}'"),
+            builder: (
+                BuildContext context,
+                AsyncSnapshot snapshot,
+                ){
+              if(snapshot.hasData){
+                userProfil = snapshot.data;
+
+                getAndSetDataFromDB();
+
+                return Expanded(
+                  child: ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    }),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                        children: [
+                          nameContainer(),
+                          profilContainer(),
+                          settingContainer(),
+                          aboutAppContainer(),
+                        ]
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            })
+      ],
+    );
 
     return FutureBuilder(
           future: ProfilDatabase().getData("*", "WHERE id = '${userID}'"),

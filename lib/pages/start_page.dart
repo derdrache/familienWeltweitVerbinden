@@ -123,13 +123,12 @@ class _StartPageState extends State<StartPage>{
             selectedItemColor: Colors.white,
             onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
-/*
+              /*
               BottomNavigationBarItem(
                 icon: Icon(Icons.feed),
                 label: 'News',
               ),
-
- */
+*/
 
               const BottomNavigationBarItem(
                 icon: Icon(Icons.map),
