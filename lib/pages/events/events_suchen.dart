@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -163,7 +164,11 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
                 margin: const EdgeInsets.only(top:60),
                 child: SingleChildScrollView(
                   child: Center(
-                    child: Wrap(
+                    child: allEvents.isEmpty ?
+                      Container(
+                          margin: EdgeInsets.only(top: 50),
+                          child:CircularProgressIndicator()
+                      ) : Wrap(
                         children: showEvents()
                     ),
                   ),

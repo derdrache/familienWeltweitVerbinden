@@ -171,6 +171,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   confirmEvent(bool confirm) async{
     if(confirm){
+      var onInteresseList = widget.event["interesse"].contains(userId);
+
+      if(!onInteresseList){
+        widget.event["interesse"].add(userId);
+      }
+
       setState(() {
         widget.teilnahme = true;
         widget.absage = false;
@@ -187,12 +193,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     var dbData = await EventDatabase()
-        .getData("absage, zusage", "WHERE id = '${widget.event["id"]}'");
+        .getData("absage, zusage, interesse", "WHERE id = '${widget.event["id"]}'");
 
     var zusageList = dbData["zusage"];
     var absageList = dbData["absage"];
+    var interessenList = dbData["interesse"];
 
     if(confirm){
+      interessenList.add(userId);
       zusageList.add(userId);
       absageList.remove(userId);
     } else{
@@ -201,7 +209,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     EventDatabase().update(
-        widget.event["id"], "absage = '${json.encode(absageList)}', zusage = '${json.encode(zusageList)}'");
+        widget.event["id"], "absage = '${json.encode(absageList)}', "
+        "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'");
   }
 
 

@@ -20,6 +20,7 @@ class ChatPage extends StatefulWidget{
 class _ChatPageState extends State<ChatPage>{
   var profilBox;
   var ownProfilBox;
+  var myChatBox;
   var userId = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser.displayName;
   var userEmail = FirebaseAuth.instance.currentUser.email;
@@ -34,19 +35,41 @@ class _ChatPageState extends State<ChatPage>{
   void initState() {
     profilBox = Hive.box('profilBox');
     ownProfilBox = Hive.box("ownProfilBox");
+    myChatBox = Hive.box('myChatBox');
+
+    checkNewMessageCounter();
+    initilizeCreateChatData();
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
     super.initState();
   }
 
+  _asyncMethod() async {
+
+    if (globalChatGroups.isNotEmpty || myChatBox.get("list") == null){
+      globalChatGroups = await ChatDatabase().getChatData(
+          "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
+          returnList: true);
+      myChatBox.put("list", globalChatGroups);
+    } else{
+      globalChatGroups = myChatBox.get("list");
+      _asyncMethod();
+    }
+
+    setState(() {
+
+    });
+  }
 
   initializer() async{
-    await initilizeCreateChatData();
+    initilizeCreateChatData();
 
     return ChatDatabase().getChatData(
         "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
         returnList: true);
   }
 
-  initilizeCreateChatData() async {
+  initilizeCreateChatData() {
     dynamic userFriendIdList = ownProfilBox.get("list")["friendlist"];
     dbData = profilBox.get("list");
 
@@ -185,7 +208,7 @@ class _ChatPageState extends State<ChatPage>{
             chatPartnerId: chatPartnerID,
             chatPartnerName: name,
           ))
-      ).whenComplete(() => setState(() {}));
+      ).whenComplete(() => _asyncMethod());
 
 
     } else{
@@ -194,11 +217,12 @@ class _ChatPageState extends State<ChatPage>{
           MaterialPageRoute(builder: (_) => ChatDetailsPage(
             groupChatData: globalChatGroups[checkAndIndex[1]],
           ))
-      ).whenComplete(() => setState(() {}));
+      ).whenComplete(() => _asyncMethod());
 
     }
 
   }
+
 
   checkNewChatGroup(chatPartnerId){
     var check = [true, -1];
@@ -274,7 +298,7 @@ class _ChatPageState extends State<ChatPage>{
                 MaterialPageRoute(builder: (_) => ChatDetailsPage(
                   groupChatData: group,
                 ))
-            ).whenComplete(() => setState(() {})),
+            ).whenComplete(() => _asyncMethod()),
             child: Container(
                 padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
                 width: double.infinity,
@@ -349,28 +373,7 @@ class _ChatPageState extends State<ChatPage>{
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
-        child:
-            FutureBuilder(
-              future: initializer(),
-                builder: (
-                    BuildContext context,
-                    AsyncSnapshot snapshot,
-                ){
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child: const CircularProgressIndicator()
-                    );
-                  } else if (snapshot.data != null) {
-                    var chatGroups = snapshot.data;
-
-                    checkNewMessageCounter();
-
-                    globalChatGroups = chatGroups;
-                    return chatUserList(chatGroups);
-                  }
-                  return const CircularProgressIndicator();
-                }
-            )
+        child: chatUserList(globalChatGroups)
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
