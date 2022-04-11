@@ -502,7 +502,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(profil["name"], style: const TextStyle(fontWeight: FontWeight.bold),),
-                        Text(AppLocalizations.of(context).kinder +" :" + childrenAgeStringToStringAge(profil["kinder"]))
+                        SizedBox(height: 5),
+                        Row(
+                          children: [
+                            Text(AppLocalizations.of(context).kinder +" :" + childrenAgeStringToStringAge(profil["kinder"])),
+                            Expanded(child: SizedBox.shrink()),
+                            Text(profil["ort"]+", " + profil["land"])
+                          ],
+                        )
+
                       ]
                   )
               ),

@@ -51,6 +51,7 @@ class LocationService {
     }
   }
 
+  /*
   getLocationMapDataGoogle(input) async{
     var deviceLanguage = kIsWeb? window.locale.languageCode :  Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
@@ -134,6 +135,8 @@ class LocationService {
     }
   }
 
+
+   */
 
   bool isNumeric(String str) {
     if(str == null) {

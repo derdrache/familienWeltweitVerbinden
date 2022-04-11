@@ -200,7 +200,8 @@
     "freundeUpdate": "Freunde-Erweiterung",
     "loginMitGoogle": "Login mit Google",
     "alleEvents": "Alle Events",
-    "ueber": "Über"
+    "ueber": "Über",
+    "bitteEventIntervalEingeben": "Bitte Event Interval eingeben"
 
 
 }

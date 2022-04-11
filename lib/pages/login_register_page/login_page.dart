@@ -207,57 +207,59 @@ class _LoginPageState extends State<LoginPage> {
                 customFloatbuttonExtended(AppLocalizations.of(context).registrieren, (){
                   global_functions.changePage(context, const RegisterPage());
                 }),
-                InkWell(
-                  onTap: () async {
-                    if (kIsWeb){
-                      await signInWithGoogleWeb();
-                    } else{
-                      await signInWithGoogleAndroid();
-                    }
-                    var userId = FirebaseAuth.instance.currentUser.uid;
+                Align(
+                  child: InkWell(
+                    onTap: () async {
+                      if (kIsWeb){
+                        await signInWithGoogleWeb();
+                      } else{
+                        await signInWithGoogleAndroid();
+                      }
+                      var userId = FirebaseAuth.instance.currentUser.uid;
 
-                    if(userId == null) return;
-                    var userExist = await ProfilDatabase().getData("name", "WHERE id = '$userId'");
+                      if(userId == null) return;
+                      var userExist = await ProfilDatabase().getData("name", "WHERE id = '$userId'");
 
-                    if(userExist == false){
-                      global_functions.changePageForever(context, const CreateProfilPage());
-                    } else{
-                      global_functions.changePageForever(context, StartPage());
-                    }
-                  },
-                  child: Container(
-                    height: 50,
-                    width: 300,
-                    margin: const EdgeInsets.only(top: 10, bottom: 10, right: 55, left: 55),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary,
-                      borderRadius: const BorderRadius.all(Radius.circular(30))
-                    ),
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            height: 30.0,
-                            width: 30.0,
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                  image:
-                                  AssetImage('assets/googleGIcon.jpg'),
-                                  fit: BoxFit.cover),
-                              shape: BoxShape.circle,
+                      if(userExist == false){
+                        global_functions.changePageForever(context, const CreateProfilPage());
+                      } else{
+                        global_functions.changePageForever(context, StartPage());
+                      }
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 280,
+                      margin: const EdgeInsets.only(top: 10, bottom: 10, right: 55, left: 55),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary,
+                        borderRadius: const BorderRadius.all(Radius.circular(30))
+                      ),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              height: 30.0,
+                              width: 30.0,
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                    image:
+                                    AssetImage('assets/googleGIcon.jpg'),
+                                    fit: BoxFit.cover),
+                                shape: BoxShape.circle,
+                              ),
                             ),
-                          ),
-                          Text(AppLocalizations.of(context).loginMitGoogle,
-                            style: const TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white
-                            ),
-                          )
-                        ],
+                            Text(AppLocalizations.of(context).loginMitGoogle,
+                              style: const TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white
+                              ),
+                            )
+                          ],
+                        )
                       )
-                    )
+                    ),
                   ),
                 ),
               ],
