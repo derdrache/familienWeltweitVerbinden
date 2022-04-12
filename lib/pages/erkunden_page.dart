@@ -335,7 +335,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
 
-    setState(() {
+    if(mounted) setState(() {
       aktiveProfils = choosenProfils ?? [];
       aktiveEvents = selectedEventList ?? [];
     });
@@ -611,60 +611,61 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
     markerPopupContainer(){
       return Positioned.fill(
-          child: DraggableScrollableSheet(
-            snap: true,
-            initialChildSize: 0.4,
-            minChildSize: 0.25,
-            maxChildSize: 0.6,
-              builder: (context, controller){
-                return Stack(
-                  alignment: Alignment.topCenter,
-                  clipBehavior: Clip.none,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top:60),
-                      child: ClipRRect(
-                       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                       child: Container(
-                           color: Colors.white,
-                           child: ScrollConfiguration(
-                             behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                               PointerDeviceKind.touch,
-                               PointerDeviceKind.mouse,
-                             }),
+          child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              }),
+              child: DraggableScrollableSheet(
+              snap: true,
+              initialChildSize: 0.4,
+              minChildSize: 0.25,
+              maxChildSize: 0.8,
+                builder: (context, controller){
+                  return Stack(
+                    alignment: Alignment.topCenter,
+                    clipBehavior: Clip.none,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top:60),
+                        child: ClipRRect(
+                         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                         child: Container(
+                             color: Colors.white,
                              child: ListView(
-                               padding: const EdgeInsets.only(top:5),
-                               controller: controller,
-                               children: popupItems
-                             ),
-                           ),
-                       ),
+                                 padding: const EdgeInsets.only(top:5),
+                                 controller: controller,
+                                 children: popupItems
+                               ),
+
+                         ),
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 55,
-                      child: IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red,),
-                        onPressed: (){
-                          setState(() {
-                            popupActive = false;
-                          });
-                        },
+                      Positioned(
+                        right: 0,
+                        top: 55,
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.red,),
+                          onPressed: (){
+                            setState(() {
+                              popupActive = false;
+                            });
+                          },
+                        ),
                       ),
-                    ),
-                    if(mapZoom > minMapZoom) Positioned(
-                      top: 0,
-                      right: 0,
-                      child: FloatingActionButton(
-                          heroTag: "zoom out",
-                          child: const Icon(Icons.zoom_out_map),
-                          onPressed: () => zoomOut()
+                      if(mapZoom > minMapZoom) Positioned(
+                        top: 0,
+                        right: 0,
+                        child: FloatingActionButton(
+                            heroTag: "zoom out",
+                            child: const Icon(Icons.zoom_out_map),
+                            onPressed: () => zoomOut()
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              }
+                    ],
+                  );
+                }
+            ),
           )
       );
     }

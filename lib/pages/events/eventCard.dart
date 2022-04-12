@@ -88,7 +88,7 @@ class _EventCardState extends State<EventCard> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    var fontSize = screenHeight / 52;
+    var fontSize = screenHeight / 55;
     var forTeilnahmeFreigegeben = (widget.event["art"] == "public" ||
         widget.event["art"] == "öffentlich") || widget.event["freigegeben"].contains(userId);
     var isAssetImage = widget.event["bild"].substring(0,5) == "asset" ? true : false;
@@ -167,7 +167,7 @@ class _EventCardState extends State<EventCard> {
                 children: [
                   Container(
                     constraints: const BoxConstraints(
-                      minHeight: 100,
+                      minHeight: 70,
                     ),
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
@@ -176,13 +176,13 @@ class _EventCardState extends State<EventCard> {
                       ),
                       child: isAssetImage ? Image.asset(
                           widget.event["bild"],
-                          height: 70 + ((screenHeight-600)/5),
-                          width: 130 + ((screenHeight-600)/5),
+                          height: 70 + ((screenHeight-600)/4),
+                          width: 135 + ((screenHeight-600)/4),
                           fit: BoxFit.fill
                       ) : Image.network(
                           widget.event["bild"],
-                          height: 70 + ((screenHeight-600)/5),
-                          width: 130 + ((screenHeight-600)/5),
+                          height: 70 + ((screenHeight-600)/4),
+                          width: 130 + ((screenHeight-600)/4),
                           fit: BoxFit.fill
                       ),
                     ),
@@ -209,8 +209,8 @@ class _EventCardState extends State<EventCard> {
                     ),
                     child: Column(
                       children: [
-                        Text(widget.event["name"],
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
+                        Text(widget.event["name"], textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize+1)),
                         const SizedBox(height: 10),
                         Row(
                           children: [
