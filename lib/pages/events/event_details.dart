@@ -217,6 +217,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   @override
   Widget build(BuildContext context) {
     isNotPublic = widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
+    eventDetails = {
+      "zusagen": widget.event["zusage"] == null ? [] :widget.event["zusage"].length,
+      "absagen": widget.event["absage"] == null ? [] :widget.event["absage"].length,
+      "interessierte": widget.event["interesse"] == null ? [] :widget.event["interesse"].length,
+      "freigegeben": widget.event["freigegeben"] == null ? [] :widget.event["freigegeben"].length
+    };
 
     deleteEventWindow() {
       showDialog(

@@ -64,10 +64,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
     await ProfilDatabase().getData("*", "WHERE id = '${widget.chatPartnerId}'");
     if(widget.groupChatData != false) await resetNewMessageCounter();
 
-    setState(() {
-      timer = Timer.periodic(
-          Duration(seconds: 10), (Timer t) => checkNewMessages());
-    });
+    timer = Timer.periodic(
+        Duration(seconds: 10), (Timer t) => checkNewMessages());
   }
 
   checkNewMessages() {
@@ -82,10 +80,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       var groupchatUsers = widget.groupChatData["users"];
       groupchatUsers.forEach((key, value) {
         if (key != userId) {
-          widget.chatPartnerName = value["name"];
           widget.chatPartnerId = key;
         }
       });
+
+      widget.chatPartnerName ??= await ProfilDatabase()
+          .getData("name", "WHERE id = '${widget.chatPartnerId}'");
 
       return;
     }

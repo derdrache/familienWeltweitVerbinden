@@ -102,8 +102,7 @@ class _ChatPageState extends State<ChatPage>{
                     height: double.maxFinite,
                     width: double.maxFinite,
                     child: Stack(
-                      overflow: Overflow.visible,
-                      children: [
+                      clipBehavior: Clip.none, children: [
                         ListView(
                           children: [
                             WindowTopbar(title: AppLocalizations.of(context).neuenChatEroeffnen),
@@ -296,6 +295,7 @@ class _ChatPageState extends State<ChatPage>{
             onTap: () =>Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => ChatDetailsPage(
+                  chatPartnerName: chatPartnerName,
                   groupChatData: group,
                 ))
             ).whenComplete(() => _asyncMethod()),

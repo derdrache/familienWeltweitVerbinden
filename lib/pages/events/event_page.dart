@@ -53,7 +53,7 @@ class _EventPageState extends State<EventPage>{
       _asyncMethod();
     }
 
-    setState(() {
+    if(mounted) setState(() {
 
     });
   }
@@ -70,7 +70,7 @@ class _EventPageState extends State<EventPage>{
             EventCard(
               event: event,
               withInteresse: withInteresse,
-              afterPageVisit: ()=> setState(() {})
+              afterPageVisit: ()=> _asyncMethod()
             )
         );
       }

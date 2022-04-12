@@ -59,7 +59,6 @@ class EventCardDetails extends StatelessWidget {
     event["eventInterval"] = isGerman ?
       global_var.changeEnglishToGerman(event["eventInterval"]):
       global_var.changeGermanToEnglish(event["eventInterval"]);
-    
 
     bildAndTitleBox(){
       return Stack(
@@ -77,8 +76,7 @@ class EventCardDetails extends StatelessWidget {
                     ),
                     child: isAssetImage ?
                       Image.asset(event["bild"], fit: BoxFit.fitWidth) :
-                      Image.network(event["bild"], fit: BoxFit.fitWidth
-                    )
+                      Image.network(event["bild"], fit: BoxFit.fitWidth)
                 ),
               ),
             ],
@@ -171,7 +169,7 @@ class EventCardDetails extends StatelessWidget {
                 databaseKennzeichnung: "link"
             ),
             if(isApproved|| isPublic) const SizedBox(height: 5),
-            ShowDataAndChangeWindow(
+            if(isApproved|| isPublic) ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventIntervalAendern,
                 inputHintText: "",
@@ -183,7 +181,7 @@ class EventCardDetails extends StatelessWidget {
                 modus: "dropdown",
                 databaseKennzeichnung: "eventInterval"
             ),
-            const SizedBox(height: 5),
+            if(isApproved|| isPublic) const SizedBox(height: 5),
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventSpracheAendern,
@@ -238,6 +236,13 @@ class EventCardDetails extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    cardShadowColor(){
+      if(event["zusage"].contains(userId)) return Colors.green;
+      if(event["absage"].contains(userId)) return Colors.red;
+
+      return Colors.grey;
+    }
+
     return Center(
       child: Stack(
         children: [
@@ -250,7 +255,7 @@ class EventCardDetails extends StatelessWidget {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.6),
+                    color: cardShadowColor().withOpacity(0.6),
                     spreadRadius: 12,
                     blurRadius: 7,
                     offset: const Offset(0, 3),
