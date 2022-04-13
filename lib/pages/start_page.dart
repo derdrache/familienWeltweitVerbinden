@@ -61,7 +61,6 @@ class _StartPageState extends State<StartPage>{
     var userDBEmail = await ProfilDatabase().getData("email", "WHERE id = '$userID'");
     var userDeviceTokenDb = await ProfilDatabase().getData("token", "WHERE id = '${userID}'");
     var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
-    print(userDeviceTokenReal);
 
     if(userAuthEmail != userDBEmail){
       ProfilDatabase().updateProfil(userID, "email",userAuthEmail);

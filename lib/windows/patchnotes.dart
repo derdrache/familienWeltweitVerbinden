@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/dialogWindow.dart';
@@ -95,9 +94,10 @@ var patch120E={
   "title" : "1.2.0",
   "inhalt": [
     "General - Events have been implemented",
+    "General - speed of the app start improved",
     "Web Version - Email Notification has been implemented",
+    "Web Version - Bug fixes under some browsers (e.g. Safari)",
     "Login / Registration - When creating a profile, there is now the possibility to enter 'About us' directly",
-    "World Map - Loading time has been greatly reduced (Only visible after the app is loaded for the first time)",
     "World map - The information menu got a new layout",
     "World Map - Zooming out first leads to the old position before zooming in by tabbing to a marker",
     "World Map - The number on the markers has been limited to 99",
@@ -113,10 +113,11 @@ var patch120D={
   "title" : "1.2.0",
   "inhalt": [
     "Allgemein - Events wurden eingebaut",
+    "Allgemein - Geschwindigkeit der App start verbessert",
     "Web Version - Email Notification wurde eingebaut",
+    "Web Version - Fehlerbehebung unter manchen Browsern (z.B. Safari)",
     "Login / Registrierung - Beim Profil erstellen gibt es jetzt die Möglichkeit direkt 'Über uns' einzutragen",
     "Login / Registration - Google Login has been added",
-    "Weltkarte - Die Ladezeit wurde stark reduziert (Erst nach dem ersten Laden der App sichtbar)",
     "Weltkarte - Das Informationsmenu hat ein neues Layout bekommen",
     "Weltkarte - Das Rauszoomen führt zuerst zur alten Position vor dem ran zoomen durch ein Tab auf eine Markierung",
     "Weltkarte - Die Nummer auf den Markierungen wurde auf 99 beschränkt",
