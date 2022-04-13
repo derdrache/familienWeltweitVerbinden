@@ -618,8 +618,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
               }),
               child: DraggableScrollableSheet(
               snap: true,
-              initialChildSize: 0.4,
-              minChildSize: 0.25,
+              initialChildSize: 0.5,
+              minChildSize: 0.3,
               maxChildSize: 0.8,
                 builder: (context, controller){
                   return Stack(

@@ -135,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 15),
             Text(AppLocalizations.of(context).willkommenBeiAppName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
-            Text(AppLocalizations.of(context).slogn1 + "\n" + AppLocalizations.of(context).slogn2),
+            Text(AppLocalizations.of(context).slogn1 + "\n" + AppLocalizations.of(context).slogn2, textAlign: TextAlign.center,),
           ],
         )
 
