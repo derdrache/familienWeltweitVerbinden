@@ -94,17 +94,17 @@ var patch120E={
   "title" : "1.2.0",
   "inhalt": [
     "General - Events have been implemented",
-    "General - speed of the app start improved",
+    "General - App speed greatly improved",
     "Web Version - Email Notification has been implemented",
     "Web Version - Bug fixes under some browsers (e.g. Safari)",
     "Login / Registration - When creating a profile, there is now the possibility to enter 'About us' directly",
     "World map - The information menu got a new layout",
-    "World Map - Zooming out first leads to the old position before zooming in by tabbing to a marker",
+    "World Map - Improvement of the zoom out button",
     "World Map - The number on the markers has been limited to 99",
     "Chat - Fixed the display of the wrong time",
     "Settings - Donation link should now work again on Android version 10+",
     "Settings - The app version can now be displayed in the app (Settings => About)",
-    "various small bug fixes",
+    "various small changes",
     "various small bugs have been fixed",
   ]
 };
@@ -113,18 +113,18 @@ var patch120D={
   "title" : "1.2.0",
   "inhalt": [
     "Allgemein - Events wurden eingebaut",
-    "Allgemein - Geschwindigkeit der App start verbessert",
+    "Allgemein - Geschwindigkeit der App stark verbessert",
     "Web Version - Email Notification wurde eingebaut",
     "Web Version - Fehlerbehebung unter manchen Browsern (z.B. Safari)",
     "Login / Registrierung - Beim Profil erstellen gibt es jetzt die Möglichkeit direkt 'Über uns' einzutragen",
-    "Login / Registration - Google Login has been added",
+    "Login / Registrierung - Google Login wurde hinzugefügt",
     "Weltkarte - Das Informationsmenu hat ein neues Layout bekommen",
-    "Weltkarte - Das Rauszoomen führt zuerst zur alten Position vor dem ran zoomen durch ein Tab auf eine Markierung",
+    "Weltkarte - Verbesserung des Raus-Zoom-Buttons",
     "Weltkarte - Die Nummer auf den Markierungen wurde auf 99 beschränkt",
     "Chat - Die Anzeige der falschen Uhrzeit wurde behoben"
     "Settings - Der Spendenlink müsste jetzt bei Android Version 10+ wieder funktionieren",
     "Settings - Die App Version kann jetzt in der App angezeigt werden (Settings => About)",
-    "verschiedene kleine Fehlerbehebungen",
+    "verschiedene kleine Änderungen",
     "verschiedene kleine Fehler wurden behoben",
   ]
 };
