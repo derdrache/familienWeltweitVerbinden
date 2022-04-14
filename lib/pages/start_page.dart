@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:familien_suche/pages/events/event_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
@@ -50,7 +54,6 @@ class _StartPageState extends State<StartPage>{
     }
 
     profilCheck();
-
 
 
   }

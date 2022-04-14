@@ -36,6 +36,10 @@ hiveInit() async {
   await Hive.initFlutter();
 
   await Hive.openBox(
+    "countryGeodataBox"
+  );
+
+  await Hive.openBox(
     'profilBox',
   );
   await Hive.openBox(

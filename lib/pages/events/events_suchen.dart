@@ -20,12 +20,12 @@ class EventsSuchenPage extends StatefulWidget {
 class _EventsSuchenPageState extends State<EventsSuchenPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var searchAutocomplete = SearchAutocomplete();
-  var eventsBackup = [];
+  dynamic eventsBackup = [];
   var allEvents = [];
   var allEventCities = <dynamic>{};
   var allEventCountries = <dynamic>{};
   var allEventSprachen = global_var.sprachenListe + global_var.sprachenListeEnglisch;
-
+  var keineEventsText = "";
 
 
   @override
@@ -41,6 +41,11 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
         "WHERE art != 'privat' AND art != 'private' AND erstelltVon != '"+userId+"' ORDER BY wann ASC",
         returnList: true
     );
+
+    if(eventsBackup == false) {
+      eventsBackup = [];
+      keineEventsText = "keine Events vorhanden";
+    }
     allEvents = eventsBackup;
 
     for(var event in eventsBackup){
@@ -167,7 +172,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
                     child: allEvents.isEmpty ?
                       Container(
                           margin: EdgeInsets.only(top: 50),
-                          child:CircularProgressIndicator()
+                          child: keineEventsText.isEmpty ? CircularProgressIndicator() : Text(keineEventsText)
                       ) : Wrap(
                         children: showEvents()
                     ),

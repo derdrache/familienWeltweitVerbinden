@@ -89,6 +89,19 @@ var patchVorlage={
   ]
 };
 
+var patch121E={
+  "title" : "1.2.1",
+  "inhalt": [
+    "Bug fixes from patch 1.2.0"
+  ]
+};
+var patch121D={
+  "title" : "1.2.1",
+  "inhalt": [
+    "Fehlerbehebungen aus Patch 1.2.0"
+  ]
+};
+
 
 var patch120E={
   "title" : "1.2.0",

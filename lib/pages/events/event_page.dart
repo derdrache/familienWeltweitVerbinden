@@ -22,8 +22,8 @@ class _EventPageState extends State<EventPage>{
   var userId = FirebaseAuth.instance.currentUser.uid;
   var myEventsBox;
   var interestEventsBox;
-  var myEvents = [];
-  var interestEvents = [];
+  dynamic myEvents = [];
+  dynamic interestEvents = [];
 
   @override
   void initState() {
@@ -36,20 +36,24 @@ class _EventPageState extends State<EventPage>{
   }
 
   _asyncMethod() async{
-    if (myEvents.isNotEmpty || myEventsBox.get("list") == null){
+    if(myEventsBox.get("list") == false) myEventsBox.put("list", null);
+    if(interestEventsBox.get("list") == false)  interestEventsBox.put("list", null);
+
+    if (myEvents.isNotEmpty || myEventsBox.get("list") == null || myEventsBox.get("list").isEmpty){
       myEvents = await EventDatabase().getData("*", "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC",
           returnList: true);
+      if(myEvents == false) myEvents = [];
       interestEvents = await EventDatabase().getData(
           "*",
           "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
           returnList: true);
+      if(interestEvents == false) interestEvents = [];
 
       myEventsBox.put("list", myEvents);
       interestEventsBox.put("list", interestEvents);
     } else{
       myEvents = myEventsBox.get("list");
       interestEvents = interestEventsBox.get("list");
-
       _asyncMethod();
     }
 

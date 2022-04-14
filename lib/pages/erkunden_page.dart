@@ -55,27 +55,20 @@ class _ErkundenPageState extends State<ErkundenPage>{
     profilBox = Hive.box('profilBox');
     eventBox = Hive.box("eventBox");
     ownProfilBox = Hive.box("ownProfilBox");
+
+    setProfils();
+    setEvents();
+
+
+
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
     super.initState();
   }
 
-  _asyncMethod() async{
-    await getAndSetProfils();
-    setSearchAutocomplete();
-    getAndSetEvents();
+  setProfils(){
+    profils = profilBox.get("list");
 
-    buildLoaded = true;
-
-  }
-
-  getAndSetProfils()async{
-    if (profils.isNotEmpty || profilBox.get("list") == null){
-      profils = await ProfilDatabase().getData("id, name, land, interessen, kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, emailAnzeigen", "");
-      profilBox.put("list", profils);
-    } else{
-      profils = profilBox.get("list");
-      _asyncMethod();
-    }
+    profils ??= [];
 
     for(var profil in profils){
       if(profil["id"] == userId){
@@ -92,6 +85,55 @@ class _ErkundenPageState extends State<ErkundenPage>{
     createAndSetZoomProfils();
   }
 
+  setEvents(){
+    events = eventBox.get("list");
+    events ??= [];
+    eventsBackup = events;
+
+    createAndSetZoomEvents();
+  }
+
+  _asyncMethod() async{
+    await getProfilsDB();
+    await getEventsDB();
+
+    setSearchAutocomplete();
+
+    buildLoaded = true;
+
+  }
+
+  getProfilsDB() async{
+    var dbProfils = await ProfilDatabase().getData("id, name, land, interessen, kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, emailAnzeigen", "");
+    if(dbProfils == false) dbProfils = [];
+    profilBox.put("list", dbProfils);
+    profils = dbProfils;
+
+    for(var profil in profils){
+      if(profil["id"] == userId){
+        ownProfil = profil;
+        ownProfilBox.put("list", ownProfil);
+      } else {
+        allUserName.add(profil["name"]);
+      }
+    }
+
+    profils.remove(ownProfil);
+
+    profilsBackup = profils;
+    createAndSetZoomProfils();
+  }
+
+  getEventsDB() async {
+    dynamic dbEvents = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private'", returnList: true);
+    if(dbEvents == false) dbEvents = [];
+    eventBox.put("list", dbEvents);
+    events = dbEvents;
+
+    eventsBackup = events;
+    createAndSetZoomEvents();
+  }
+
   setSearchAutocomplete() async {
     countriesList = await LocationService().getAllCountries();
     var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
@@ -106,19 +148,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
     );
   }
 
-  getAndSetEvents()async{
-
-    if(events.isNotEmpty|| eventBox.get("list") == null){
-      events = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private'");
-      eventBox.put("list", events);
-    } else{
-      events = eventBox.get("list");
-    }
-
-
-    eventsBackup = events;
-    createAndSetZoomEvents();
-  }
 
   getOwnProfil(profil){
     var userEmail = FirebaseAuth.instance.currentUser.email;
