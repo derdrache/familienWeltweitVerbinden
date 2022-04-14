@@ -305,7 +305,7 @@ class _EventErstellenState extends State<EventErstellen> {
             ],
           ),
           //ortTypDropdown,
-          ortEingabeBox(),
+          Align(child: ortEingabeBox()),
           sprachenAuswahlBox,
           eventIntervalDropdown,
           dateAndTimeBox(),

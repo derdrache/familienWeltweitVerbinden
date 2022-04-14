@@ -53,7 +53,7 @@ class EventCardDetails extends StatelessWidget {
     var isAssetImage = event["bild"].substring(0,5) == "asset" ? true : false;
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-    if(screenWidth > 500) screenWidth = kIsWeb ? 400 : 500;
+    if(screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
     double cardHeight = screenHeight / 1.34;
     event["eventInterval"] = isGerman ?
@@ -188,10 +188,12 @@ class EventCardDetails extends StatelessWidget {
                 inputHintText: "",
                 isCreator: isCreator,
                 rowTitle: AppLocalizations.of(context).sprache,
-                rowData: event["sprache"].join(", "),
+                rowData: isGerman ?
+                  global_var.changeEnglishToGerman(event["sprache"]).join(", "):
+                  global_var.changeGermanToEnglish(event["sprache"]).join(", "),
                 items: isGerman ? global_var.sprachenListe :
                   global_var.sprachenListeEnglisch,
-                modus: "dropdown",
+                modus: "multiDropdown",
                 databaseKennzeichnung: "sprache"
             ),
           ],
@@ -201,8 +203,7 @@ class EventCardDetails extends StatelessWidget {
 
     eventBeschreibung(){
       return Container(
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.only(bottom: 20),
+          margin: const EdgeInsets.only(top:5, left:10, right: 10, bottom: 10),
           child: Center(
               child: Container(
                 width: double.infinity,
@@ -247,6 +248,7 @@ class EventCardDetails extends StatelessWidget {
       child: Stack(
         children: [
           Container(
+            padding: EdgeInsets.only(bottom: 30),
             width: cardWidth,
             height: cardHeight,
             margin: const EdgeInsets.all(20),
@@ -262,15 +264,19 @@ class EventCardDetails extends StatelessWidget {
                   ),
                 ]
             ),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                bildAndTitleBox(),
-                const SizedBox(height: 20),
-                creatorChangeHintBox(),
-                eventInformationBox(),
-                if(isApproved || isPublic) eventBeschreibung(),
-              ],
+            child: Scrollbar(
+              isAlwaysShown: true,
+              thickness: 10,
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  bildAndTitleBox(),
+                  const SizedBox(height: 20),
+                  creatorChangeHintBox(),
+                  eventInformationBox(),
+                  if(isApproved || isPublic) eventBeschreibung(),
+                ],
+              ),
             ),
           ),
           if(!isApproved && !isPublic) Container(
@@ -330,7 +336,7 @@ class EventCardDetails extends StatelessWidget {
               )
           ),
           Positioned(
-            bottom: 30,
+            bottom: 25,
             left: 30,
             child: CardFeed(
               organisator: event["erstelltVon"],
@@ -382,6 +388,7 @@ class ShowDataAndChangeWindow extends StatefulWidget {
 
 class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
   var dropdownInput = CustomDropDownButton();
+  var multiDropDownInput = CustomMultiTextForm();
   var inputKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
   var uhrZeitButton = DateButton();
@@ -397,8 +404,14 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     dropdownInput = CustomDropDownButton(
       hintText: widget.inputHintText,
       items: widget.items,
-      selected: widget.rowData,
+      selected: widget.rowData
     );
+
+    multiDropDownInput = CustomMultiTextForm(
+      selected: widget.rowData.split(", "),
+      auswahlList: widget.items,
+    );
+
 
     ortAuswahlBox.hintText = widget.inputHintText;
 
@@ -416,8 +429,10 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       data = inputKontroller.text;
     }else if (widget.databaseKennzeichnung == "art"){
       data = dropdownInput.getSelected();
-    }else if (widget.databaseKennzeichnung == "eventInterval"){
+    }else if (widget.databaseKennzeichnung == "eventInterval") {
       data = dropdownInput.getSelected();
+    }else if (widget.databaseKennzeichnung == "sprache"){
+      data = multiDropDownInput.getSelected();
     }else if (widget.databaseKennzeichnung == "beschreibung"){
       data = inputKontroller.text;
     }else if (widget.modus == "date"){
@@ -484,6 +499,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
         return customTextInput(widget.inputHintText, inputKontroller, moreLines: widget.multiLines? 7: 1);
       }
       if(widget.modus == "dropdown") return dropdownInput;
+      if(widget.modus == "multiDropdown") return multiDropDownInput;
       if(widget.modus == "googleAutoComplete") return ortAuswahlBox;
       if(widget.modus== "date"){
         return Column(children: [

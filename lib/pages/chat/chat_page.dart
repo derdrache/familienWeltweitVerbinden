@@ -65,7 +65,7 @@ class _ChatPageState extends State<ChatPage>{
     initilizeCreateChatData();
 
     return ChatDatabase().getChatData(
-        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
+        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
         returnList: true);
   }
 

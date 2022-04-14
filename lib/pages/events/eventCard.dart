@@ -72,7 +72,7 @@ class _EventCardState extends State<EventCard> {
     var interessenList = dbData["interesse"];
 
     if(confirm){
-      interessenList.add(userId);
+      if(!interessenList.contains(userId)) interessenList.add(userId);
       zusageList.add(userId);
       absageList.remove(userId);
     } else{

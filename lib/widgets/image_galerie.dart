@@ -64,9 +64,13 @@ class _ImageGalerieState extends State<ImageGalerie> {
       return;
     }
 
-    if(selected == "") selected = ownPictureKontroller.text;
+    if(selected == ""){
+      selected = ownPictureKontroller.text;
+      widget.child = Image.network(selected, fit: BoxFit.fitWidth);
+    } else{
+      widget.child = Image.asset(selected, fit: BoxFit.fitWidth);
+    }
 
-    widget.child = Image.asset(selected, fit: BoxFit.fitWidth);
     setState(() {});
     EventDatabase().update(widget.id, "bild = '$selected'");
     Navigator.pop(context);
@@ -215,8 +219,7 @@ class _ImageGalerieState extends State<ImageGalerie> {
                       height: 500,
                       width: 600,
                       child: Stack(
-                        overflow: Overflow.visible,
-                        children: [
+                        clipBehavior: Clip.none, children: [
                           ScrollConfiguration(
                             behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
                               PointerDeviceKind.touch,
