@@ -264,19 +264,15 @@ class EventCardDetails extends StatelessWidget {
                   ),
                 ]
             ),
-            child: Scrollbar(
-              isAlwaysShown: true,
-              thickness: 10,
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  bildAndTitleBox(),
-                  const SizedBox(height: 20),
-                  creatorChangeHintBox(),
-                  eventInformationBox(),
-                  if(isApproved || isPublic) eventBeschreibung(),
-                ],
-              ),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                bildAndTitleBox(),
+                const SizedBox(height: 20),
+                creatorChangeHintBox(),
+                eventInformationBox(),
+                if(isApproved || isPublic) eventBeschreibung(),
+              ],
             ),
           ),
           if(!isApproved && !isPublic) Container(
@@ -496,7 +492,12 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
     inputBox(){
       if(widget.modus == "textInput"){
-        return customTextInput(widget.inputHintText, inputKontroller, moreLines: widget.multiLines? 7: 1);
+        return customTextInput(
+            widget.inputHintText,
+            inputKontroller,
+            moreLines: widget.multiLines? 7: 1,
+            textInputAction: TextInputAction.newline
+        );
       }
       if(widget.modus == "dropdown") return dropdownInput;
       if(widget.modus == "multiDropdown") return multiDropDownInput;

@@ -310,9 +310,10 @@ class _EventErstellenState extends State<EventErstellen> {
           eventIntervalDropdown,
           dateAndTimeBox(),
           customTextInput(
-              AppLocalizations.of(context).eventBeschreibung,
-              eventBeschreibungKontroller,
-              moreLines: 8
+            AppLocalizations.of(context).eventBeschreibung,
+            eventBeschreibungKontroller,
+            moreLines: 8,
+            textInputAction: TextInputAction.newline
           ),
         ],
       ),

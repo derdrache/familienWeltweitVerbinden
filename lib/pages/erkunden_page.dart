@@ -364,10 +364,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
 
-    if(mounted) setState(() {
-      aktiveProfils = choosenProfils ?? [];
-      aktiveEvents = selectedEventList ?? [];
-    });
+    if(mounted) {
+      setState(() {
+        aktiveProfils = choosenProfils ?? [];
+        aktiveEvents = selectedEventList ?? [];
+      });
+    }
   }
 
   checkFilter(profil){
@@ -646,7 +648,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 PointerDeviceKind.mouse,
               }),
               child: DraggableScrollableSheet(
-              snap: true,
               initialChildSize: 0.5,
               minChildSize: 0.3,
               maxChildSize: 0.8,
