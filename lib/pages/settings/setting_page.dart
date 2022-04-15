@@ -10,6 +10,7 @@ import 'package:familien_suche/pages/settings/notifications_option.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
 import 'package:url_launcher/link.dart' as url_luncher;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -429,13 +430,22 @@ class _SettingPageState extends State<SettingPage> {
       children: [
         menuBar(),
         FutureBuilder(
-            future: ProfilDatabase().getData("*", "WHERE id = '${userID}'"),
+            future: ProfilDatabase().getData("*", "WHERE id = '$userID'"),
             builder: (
                 BuildContext context,
                 AsyncSnapshot snapshot,
                 ){
+              var ownProfilBox = Hive.box("ownProfilBox");
+              var data = ownProfilBox.get("list");
+
+
               if(snapshot.hasData){
-                userProfil = snapshot.data;
+                data= snapshot.data;
+                ownProfilBox.put("list", data);
+              }
+
+              if(data != null){
+                userProfil = data;
 
                 getAndSetDataFromDB();
 
@@ -463,35 +473,6 @@ class _SettingPageState extends State<SettingPage> {
       ],
     );
 
-    return FutureBuilder(
-          future: ProfilDatabase().getData("*", "WHERE id = '${userID}'"),
-          builder: (
-          BuildContext context,
-          AsyncSnapshot snapshot,
-          ){
-            if(snapshot.hasData){
-              userProfil = snapshot.data;
-
-              getAndSetDataFromDB();
-
-              return ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                }),
-                child: ListView(
-                      children: [
-                        menuBar(),
-                        nameContainer(),
-                        profilContainer(),
-                        settingContainer(),
-                        aboutAppContainer(),
-                      ]
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          });
   }
 }
 

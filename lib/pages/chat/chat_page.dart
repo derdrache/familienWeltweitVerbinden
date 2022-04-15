@@ -314,7 +314,7 @@ class _ChatPageState extends State<ChatPage>{
                     children: [
                       Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       const Expanded(child: SizedBox.shrink()),
-                      Text(DateFormat('dd-MM hh:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600]))
+                      Text(DateFormat('dd-MM HH:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600]))
                     ],
                   ),
                   const SizedBox(height: 10),

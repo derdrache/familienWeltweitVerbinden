@@ -59,10 +59,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   _asyncMethod() async {
     await getAndSetChatData();
-    await writeActiveChat();
-    chatPartnerProfil =
-    await ProfilDatabase().getData("*", "WHERE id = '${widget.chatPartnerId}'");
-    if(widget.groupChatData != false) await resetNewMessageCounter();
+    writeActiveChat();
+    getChatPartnerProfil();
+
+    if(widget.groupChatData != false) resetNewMessageCounter();
+
+    setState(() {
+
+    });
 
     timer = Timer.periodic(
         Duration(seconds: 10), (Timer t) => checkNewMessages());
@@ -111,6 +115,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   writeActiveChat() {
     ProfilDatabase().updateProfil(userId, "activeChat", widget.chatId);
+  }
+
+  getChatPartnerProfil() async{
+    chatPartnerProfil = await ProfilDatabase()
+        .getData("*", "WHERE id = '${widget.chatPartnerId}'");
   }
 
   resetNewMessageCounter() async {
@@ -246,7 +255,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                               bottom: -15,
                               right: 0,
                               child: Text(
-                                  DateFormat('dd-MM hh:mm').format(messageTime),
+                                  DateFormat('dd-MM HH:mm').format(messageTime),
                                   style: TextStyle(color: Colors.grey[600])
                               ),
                             )
@@ -287,7 +296,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                     Container(
                       padding: const EdgeInsets.only(bottom: 5, right: 10),
                       child: Text(
-                          DateFormat('dd-MM hh:mm').format(messageTime),
+                          DateFormat('dd-MM HH:mm').format(messageTime),
                           style: TextStyle(color: Colors.grey[600])),
                     )
                   ],
@@ -328,27 +337,28 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
           });
     }
 
-    textEingabe() {
+    textEingabe(){
       var myFocusNode = FocusNode();
-      return Container(
-        height: messageInputHeight,
-        padding: const EdgeInsets.only(left: 10),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            border: const Border(top: BorderSide(color: Colors.grey)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3), // changes position of shadow
-              ),
-            ]),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Container(
+
+      return Stack(
+        children: [
+          Container(
+            padding: EdgeInsets.only(left: 10, right: 50),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                border: const Border(top: BorderSide(color: Colors.grey)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ]),
+            child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: 300.0,
+                ),
                 child: TextField(
                   maxLines: null,
                   focusNode: myFocusNode,
@@ -357,33 +367,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   decoration: InputDecoration(
                     hintText: AppLocalizations.of(context).nachricht,
                   ),
-                  onChanged: (value) {
-                    var newLineCounts = countItemsInList(value, "\n");
-
-                    if (countItemsInList(value, "\n") != messageRows) {
-                      setState(() {
-                        messageInputHeight = 50.0 + newLineCounts * 15.0;
-                        messageRows = newLineCounts;
-                      });
-                    }
-                  },
                 ),
               ),
-            ),
-            IconButton(
+          ),
+          Positioned(
+            bottom: 0,
+            right: 2,
+            child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () {
                   messageToDbAndClearMessageInput(nachrichtController.text);
 
                   setState(() {
                     nachrichtController.clear();
-                    messageInputHeight = 50;
                   });
                 },
                 icon: Icon(Icons.send,
-                    size: 30, color: Theme.of(context).colorScheme.secondary)),
-          ],
-        ),
+                    size: 30, color: Theme.of(context).colorScheme.secondary)
+            ),
+          ),
+        ],
       );
     }
 
