@@ -11,6 +11,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../global/global_functions.dart';
 import '../services/database.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_var;
@@ -26,7 +27,6 @@ class ErkundenPage extends StatefulWidget{
 class _ErkundenPageState extends State<ErkundenPage>{
   var profilBox;
   var eventBox;
-  var ownProfilBox;
   MapController mapController = MapController();
   var ownProfil;
   Set<String> allUserName = {};
@@ -54,7 +54,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
   void initState() {
     profilBox = Hive.box('profilBox');
     eventBox = Hive.box("eventBox");
-    ownProfilBox = Hive.box("ownProfilBox");
 
     setProfils();
     setEvents();
@@ -73,7 +72,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
     for(var profil in profils){
       if(profil["id"] == userId){
         ownProfil = profil;
-        ownProfilBox.put("list", ownProfil);
       } else {
         allUserName.add(profil["name"]);
       }
@@ -104,7 +102,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getProfilsDB() async{
-    var dbProfils = await ProfilDatabase().getData("id, name, land, interessen, kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, emailAnzeigen", "");
+    var dbProfils = await ProfilDatabase().getData("id, name, land, interessen, kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, emailAnzeigen", "ORDER BY land ASC, ort ASC");
     if(dbProfils == false) dbProfils = [];
     profilBox.put("list", dbProfils);
     profils = dbProfils;
@@ -112,7 +110,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
     for(var profil in profils){
       if(profil["id"] == userId){
         ownProfil = profil;
-        ownProfilBox.put("list", ownProfil);
       } else {
         allUserName.add(profil["name"]);
       }
@@ -544,21 +541,25 @@ class _ErkundenPageState extends State<ErkundenPage>{
                   decoration: BoxDecoration(
                       border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
                   ),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(profil["name"], style: const TextStyle(fontWeight: FontWeight.bold),),
-                        const SizedBox(height: 5),
-                        Row(
+                  child: Row(
+                    children: [
+                      createDefaultProfileImage(profil),
+                      SizedBox(width: 10),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(AppLocalizations.of(context).kinder +" :" + childrenAgeStringToStringAge(profil["kinder"])),
-                            const Expanded(child: const SizedBox.shrink()),
+                            Text(profil["name"], style: const TextStyle(fontWeight: FontWeight.bold),),
+                            const SizedBox(height: 5),
+                            Text(childrenAgeStringToStringAge(profil["kinder"])),
+                            const SizedBox(height: 5),
                             Text(profil["ort"]+", " + profil["land"])
-                          ],
-                        )
-
-                      ]
+                          ]
+                      )
+                    ],
                   )
+
+
+
               ),
             )
         );

@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
+import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import '../../widgets/Window_topbar.dart';
 import '../../widgets/search_autocomplete.dart';
@@ -40,26 +41,7 @@ class _ChatPageState extends State<ChatPage>{
     checkNewMessageCounter();
     initilizeCreateChatData();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
     super.initState();
-  }
-
-  _asyncMethod() async {
-
-    if (globalChatGroups.isNotEmpty || myChatBox.get("list") == null || myChatBox.get("list") == false){
-      var dbChats = await ChatDatabase().getChatData(
-          "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
-          returnList: true);
-      globalChatGroups = dbChats == false ? []: dbChats;
-      myChatBox.put("list", globalChatGroups);
-    } else{
-      globalChatGroups = myChatBox.get("list");
-      _asyncMethod();
-    }
-
-    setState(() {
-
-    });
   }
 
   initilizeCreateChatData() {
@@ -173,7 +155,7 @@ class _ChatPageState extends State<ChatPage>{
 
     if(userFriendlist.isEmpty) return [Center(
         heightFactor: 10,
-        child: Text("Noch keine Freunde vorhanden", style: TextStyle(color: Colors.grey),)
+        child: Text(AppLocalizations.of(context).nochKeineFreundeVorhanden, style: TextStyle(color: Colors.grey),)
     )];
 
     return friendsBoxen;
@@ -206,7 +188,7 @@ class _ChatPageState extends State<ChatPage>{
             chatPartnerId: chatPartnerID,
             chatPartnerName: name,
           ))
-      ).whenComplete(() => _asyncMethod());
+      );
 
 
     } else{
@@ -215,12 +197,11 @@ class _ChatPageState extends State<ChatPage>{
           MaterialPageRoute(builder: (_) => ChatDetailsPage(
             groupChatData: globalChatGroups[checkAndIndex[1]],
           ))
-      ).whenComplete(() => _asyncMethod());
+      );
 
     }
 
   }
-
 
   checkNewChatGroup(chatPartnerId){
     var check = [true, -1];
@@ -265,7 +246,6 @@ class _ChatPageState extends State<ChatPage>{
 
     chatUserList(groupdata) {
       List<Widget> groupContainer = [];
-
       for(dynamic group in groupdata){
         var chatPartnerName = "";
         var chatPartnerId;
@@ -297,7 +277,7 @@ class _ChatPageState extends State<ChatPage>{
                   chatPartnerName: chatPartnerName,
                   groupChatData: group,
                 ))
-            ).whenComplete(() => _asyncMethod()),
+            ),
             child: Container(
                 padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
                 width: double.infinity,
@@ -306,48 +286,56 @@ class _ChatPageState extends State<ChatPage>{
                       bottom: BorderSide(width: 1, color: global_var.borderColorGrey),
                     )
                 ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Row(
+                  //createDefaultProfileImage(data),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      const Expanded(child: SizedBox.shrink()),
-                      Text(DateFormat('dd-MM HH:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600]))
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        flex: 3,
-                        child: Text(lastMessage,
-                            style: TextStyle(fontSize: 16, color: Colors.grey[600])
-                        )
+                      Row(
+                        children: [
+                          Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Expanded(child: SizedBox.shrink()),
+                          Text(DateFormat('dd-MM HH:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600]))
+                        ],
                       ),
-                      ownChatNewMessages== 0? const SizedBox.shrink(): Container(
-                          height: 30,
-                          width: 30,
-                          decoration: BoxDecoration(
-                              color:Theme.of(context).colorScheme.secondary,
-                              shape: BoxShape.circle
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                              flex: 3,
+                              child: Text(lastMessage,
+                                  style: TextStyle(fontSize: 16, color: Colors.grey[600])
+                              )
                           ),
-                          child: Center(
-                            child: FittedBox(
-                              child: Text(
-                                ownChatNewMessages.toString(),
-                                style: const TextStyle(fontWeight: FontWeight.bold,
-                                    color: Colors.white),
+                          ownChatNewMessages== 0? const SizedBox.shrink(): Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                  color:Theme.of(context).colorScheme.secondary,
+                                  shape: BoxShape.circle
                               ),
-                            ),
+                              child: Center(
+                                child: FittedBox(
+                                  child: Text(
+                                    ownChatNewMessages.toString(),
+                                    style: const TextStyle(fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                ),
+                              )
                           )
+                        ],
                       )
                     ],
                   )
-
                 ],
               )
+
+
+
             ),
           )
         );
@@ -363,14 +351,8 @@ class _ChatPageState extends State<ChatPage>{
           }),
           child: ListView(
               shrinkWrap: true,
-              children: groupContainer.isNotEmpty ? groupContainer :
-                [Center(
-                  heightFactor: 20,
-                    child: Text(
-                        AppLocalizations.of(context).nochKeineChatsVorhanden,
-                        style: TextStyle(fontSize: 20, color: Colors.grey)
-                    )
-                )],
+              children: groupContainer
+
             ),
         ),
       );
@@ -379,7 +361,32 @@ class _ChatPageState extends State<ChatPage>{
     return Scaffold(
       body: Container(
         padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
-        child: chatUserList(globalChatGroups)
+        child: FutureBuilder(
+          future: ChatDatabase().getChatData(
+            "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
+            returnList: true),
+          builder: (context, snapshot) {
+            var myChatBox = Hive.box('myChatBox');
+            dynamic data = myChatBox.get("list");
+
+            if(snapshot.hasData){
+              data= snapshot.data == false ? [] : snapshot.data;
+              myChatBox.put("list", data);
+            }
+
+            if(data != null && data.isNotEmpty){
+              return chatUserList(data);
+            }
+
+            return Center(
+                heightFactor: 20,
+                child: Text(
+                    AppLocalizations.of(context).nochKeineChatsVorhanden,
+                    style: TextStyle(fontSize: 20, color: Colors.grey)
+                )
+            );
+          }
+        )
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",

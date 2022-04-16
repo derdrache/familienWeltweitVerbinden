@@ -202,6 +202,9 @@
     "alleEvents": "Alle Events",
     "ueber": "Über",
     "bitteEventIntervalEingeben": "Bitte Event Interval eingeben",
-    "nochKeineChatsVorhanden": "Noch keine Chats vorhanden"
+    "nochKeineChatsVorhanden": "Noch keine Chats vorhanden",
+    "nochKeineFreundeVorhanden": "Noch keine Freunde vorhanden",
+    "nochKeineEventsAusgewaehlt": "Noch keine Events ausgewählt",
+    "nochKeineEventsErstellt": "Noch keine Events erstellt"
 
 }

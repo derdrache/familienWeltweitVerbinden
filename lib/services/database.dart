@@ -78,7 +78,7 @@ class ProfilDatabase{
 
   addNewProfil(profilData) async{
     var url = Uri.parse(databaseUrl + "database/profils/newProfil.php");
-    await http.post(url, body: json.encode({
+    var data = {
       "id": profilData["id"],
       "name": profilData["name"],
       "email": profilData["email"],
@@ -93,7 +93,11 @@ class ProfilDatabase{
       "token": profilData["token"],
       "lastLogin": profilData["lastLogin"],
       "aboutme": profilData["aboutme"]
-    }));
+    };
+
+    await http.post(url, body: json.encode(data));
+
+
 
     FirebaseAuth.instance.currentUser.updateDisplayName(profilData["name"]);
   }

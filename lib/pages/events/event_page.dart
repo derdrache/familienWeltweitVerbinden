@@ -30,7 +30,7 @@ class _EventPageState extends State<EventPage>{
     myEventsBox = Hive.box('myEventsBox');
     interestEventsBox = Hive.box('interestEventsBox');
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
+    //WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
 
     super.initState();
   }
@@ -101,15 +101,44 @@ class _EventPageState extends State<EventPage>{
                   style: const TextStyle(fontSize: 20),
                 )
             ),
-            Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Wrap(
-                            direction: Axis.vertical,
-                            children: createEventCards(interestEvents, true)
-                        ),
+            FutureBuilder(
+              future: EventDatabase().getData("*",
+                "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
+                returnList: true
+              ),
+              builder: (context, snapshot){
+                var interestEventsBox = Hive.box('interestEventsBox');
+                dynamic data = interestEventsBox.get("list");
+
+                if(snapshot.hasData){
+                  data= snapshot.data == false ? [] : snapshot.data;
+                  interestEventsBox.put("list", data);
+                }
+
+                if(data != null && data.isNotEmpty){
+
+                  return Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Wrap(
+                          direction: Axis.vertical,
+                          children: createEventCards(data, true)
                       ),
+                    ),
+                  );
+                }
+
+                return Center(
+                  heightFactor: 4,
+                    child: Text(
+                      AppLocalizations.of(context).nochKeineEventsAusgewaehlt,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 20, color: Colors.grey),
                     )
+                );
+
+                }),
+
           ],
         )
       );
@@ -129,15 +158,43 @@ class _EventPageState extends State<EventPage>{
                 style: const TextStyle(fontSize: 20),
               )
             ),
-            Expanded(
-                    child: SingleChildScrollView(
+            FutureBuilder(
+                future: EventDatabase().getData("*",
+                    "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC",
+                    returnList: true
+                ),
+                builder: (context, snapshot){
+                  var myEventsBox = Hive.box('myEventsBox');
+                  dynamic data = myEventsBox.get("list");
+
+                  if(snapshot.hasData){
+                    data= snapshot.data == false ? [] : snapshot.data;
+                    myEventsBox.put("list", data);
+                  }
+
+                  if(data != null && data.isNotEmpty){
+
+                    return Expanded(
+                      child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Wrap(
                             direction: Axis.vertical,
-                            children: createEventCards(myEvents, false)
-                          ),
+                            children: createEventCards(data, true)
+                        ),
                       ),
-                  )
+                    );
+                  }
+
+                  return Center(
+                      heightFactor: 4,
+                      child: Text(
+                        AppLocalizations.of(context).nochKeineEventsErstellt,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                      )
+                  );
+
+            }),
           ],
         )
       );
