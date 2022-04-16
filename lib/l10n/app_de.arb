@@ -201,7 +201,7 @@
     "loginMitGoogle": "Login mit Google",
     "alleEvents": "Alle Events",
     "ueber": "Über",
-    "bitteEventIntervalEingeben": "Bitte Event Interval eingeben"
-
+    "bitteEventIntervalEingeben": "Bitte Event Interval eingeben",
+    "nochKeineChatsVorhanden": "Noch keine Chats vorhanden"
 
 }

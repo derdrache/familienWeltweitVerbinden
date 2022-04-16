@@ -12,6 +12,7 @@ import '../auth/secrets.dart';
 
 class LocationService {
   var countryGeodata = Hive.box('countryGeodataBox').get("list");
+  var kontinentGeodata = Hive.box("kontinentGeodataBox").get("list");
 
   getGoogleAutocompleteItems(input, sessionToken) async {
     var deviceLanguage = kIsWeb? window.locale.languageCode :  Platform.localeName.split("_")[0];
@@ -61,37 +62,32 @@ class LocationService {
     return double.tryParse(str) != null;
   }
 
-  getCountryLocation(input) async{
-    if(countryGeodata == null){
-      var jsonText = await rootBundle.loadString('assets/countryGeodata.json');
-      var geodata = json.decode(jsonText)["data"];
-      Hive.box('countryGeodataBox').put("list", geodata);
-      countryGeodata = geodata;
-    }
-
-
+  getCountryLocation(input){
     for (var i = 0; i < countryGeodata.length; i++){
       var nameGer = countryGeodata[i]["nameGer"];
       var nameEng = countryGeodata[i]["nameEng"];
 
       if (nameGer == input || nameEng == input){
-        return {
-          "latt": countryGeodata[i]["latt"],
-          "longt": countryGeodata[i]["longt"]
-        };
+        return countryGeodata[i];
       }
     }
     return null;
   }
 
-  getAllCountries() async {
-    if(countryGeodata == null){
-      var jsonText = await rootBundle.loadString('assets/countryGeodata.json');
-      var geodata = json.decode(jsonText)["data"];
-      Hive.box('countryGeodataBox').put("list", geodata);
-      countryGeodata = geodata;
-    }
+  getKontinentLocation(kontinent){
+    for (var i = 0; i < kontinentGeodata.length; i++){
+      var nameGer = kontinentGeodata[i]["kontinentGer"];
+      var nameEng = kontinentGeodata[i]["kontinentEng"];
 
+      if (nameGer == kontinent || nameEng == kontinent){
+        return kontinentGeodata[i];
+      }
+    }
+    return null;
+
+  }
+
+  getAllCountries() {
     List<String> countriesListGer = [];
     List<String> countriesListEng = [];
 

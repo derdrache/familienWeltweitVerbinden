@@ -1,10 +1,30 @@
 {"data": [
-  {"nameGer": "MittelAmerika", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
-  {"nameGer": "Südamerika", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
-  {"nameGer": "NordAfrika", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
-  {"nameGer": "Südafrika", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
-  {"nameGer": "Asien", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
-  {"nameGer": "WestEuropa", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
-  {"nameGer": "Mitteleuropa", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []},
-  {"nameGer": "Osteuropa", "nameEng": "North America", "latt": 0, "longt": 0, "countries" : []}
+  {
+    "kontinentGer": "Nordamerika", "kontinentEng": "North America", "latt": 38.0, "longt": -97.0},
+  {
+    "kontinentGer": "Mittelamerika", "kontinentEng": "Central America", "latt": 18.25, "longt": -77.5},
+  {
+    "kontinentGer": "Südamerika", "kontinentEng": "South America", "latt": -10.0, "longt": -55.0},
+  {
+    "kontinentGer": "Nordafrika", "kontinentEng": "North Africa", "latt": 20.0, "longt": 14.0},
+  {
+    "kontinentGer": "Südafrika", "kontinentEng": "South Africa", "latt": -15.0, "longt": 30.0},
+  {
+    "kontinentGer": "Westasien", "kontinentEng": "West Asia", "latt": 33.0, "longt": 44.0},
+  {
+    "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia", "latt": 33.0, "longt": 70.0},
+  {
+    "kontinentGer": "Ostasien", "kontinentEng": "East Asia", "latt": 18.0, "longt": 105.0},
+  {
+    "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe", "latt": 46.0, "longt": -8.0},
+  {
+    "kontinentGer": "Mitteleuropa", "kontinentEng": "Central Europe", "latt": 51.0, "longt": 9.0},
+  {
+    "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe", "latt": 51.0, "longt": 32.0},
+  {
+    "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe", "latt": 62.0, "longt": 20.0},
+  {
+    "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe", "latt": 40.83, "longt": 17.0},
+  {
+    "kontinentGer": "Ozeanien", "kontinentEng": "Oceania", "latt": -21.5, "longt": 160.5}
 ]}
