@@ -16,6 +16,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 
+import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
@@ -196,9 +197,15 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  nameTextKontroller.text,
-                  style: const TextStyle(fontSize: 30),
+                Row(
+                  children: [
+                    createDefaultProfileImage(userProfil),
+                    SizedBox(width: 10),
+                    Text(
+                      nameTextKontroller.text,
+                      style: const TextStyle(fontSize: 30),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 5),
                 Text(emailTextKontroller.text)
@@ -437,7 +444,6 @@ class _SettingPageState extends State<SettingPage> {
                 ){
               var ownProfilBox = Hive.box("ownProfilBox");
               var data = ownProfilBox.get("list");
-
 
               if(snapshot.hasData){
                 data= snapshot.data;
