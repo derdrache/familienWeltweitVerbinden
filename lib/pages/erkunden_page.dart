@@ -34,7 +34,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var filterList = [];
   List profilsBackup = [], profils = [], aktiveProfils = [];
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
-  List eventsBetweenCountries, eventsCountries, eventsBetween, eventsCities;
+  List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
   List eventsBackup = [], events = [], aktiveEvents = [];
   double minMapZoom = kIsWeb ? 2.0:  1.6;
   double maxZoom = 9;
@@ -134,8 +134,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
     createAndSetZoomEvents();
   }
 
-  setSearchAutocomplete() async {
-    countriesList = await LocationService().getAllCountries();
+  setSearchAutocomplete() {
+    countriesList = LocationService().getAllCountries();
     var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
     var countryDropDownList = spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
@@ -147,7 +147,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
       onDelete:() => changeMapFilter() ,
     );
   }
-
 
   getOwnProfil(profil){
     var userEmail = FirebaseAuth.instance.currentUser.email;
@@ -220,12 +219,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
     return list;
   }
 
-  createCountries(list, profil) async {
+  createCountries(list, profil) {
       var checkNewCountry = true;
 
       for (var i = 0; i<list.length; i++){
-        var listCountryLocation = await LocationService().getCountryLocation(list[i]["countryname"]);
-        var profilCountryLocation = await LocationService().getCountryLocation(profil["land"]);
+        var listCountryLocation = LocationService().getCountryLocation(list[i]["countryname"]);
+        var profilCountryLocation = LocationService().getCountryLocation(profil["land"]);
 
         if(listCountryLocation["latt"] == profilCountryLocation["latt"] &&
             listCountryLocation["longt"] == profilCountryLocation["longt"] ){
@@ -239,7 +238,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       if(checkNewCountry){
         var country = profil["land"];
-        var position = await LocationService().getCountryLocation(country);
+        var position = LocationService().getCountryLocation(country);
 
         list.add({
           "name": "1",
@@ -253,37 +252,31 @@ class _ErkundenPageState extends State<ErkundenPage>{
     return list;
   }
 
-  createBetweenCountries(list, profil) async {
+  createContinents(list, profil) {
     var newPoint = true;
-    var abstand = 8;
-    double originalLatt;
-    double originalLongth;
-    var landGedataProfil = await LocationService().getCountryLocation(profil["land"]);
+
+    var landGedataProfil = LocationService().getCountryLocation(profil["land"]);
+    var kontinentGeodataProfil = LocationService().getKontinentLocation(landGedataProfil["kontinentGer"]);
 
     for(var i = 0; i< list.length; i++){
-      var landGeodataList = await LocationService().getCountryLocation(list[i]["countryname"]);
-
-      originalLatt = landGedataProfil["latt"];
-      double newLatt = landGeodataList["latt"];
-      originalLongth = landGedataProfil["longt"];
-      double newLongth = landGeodataList["longt"];
-      bool check = (newLatt + abstand/2 >= originalLatt && newLatt - abstand/2 <= originalLatt) &&
-          (newLongth + abstand >= originalLongth && newLongth - abstand<= originalLongth);
-
-      if(check || list[i]["countryname"] == profil["land"]){
+      var kontinentGeodataListitem = LocationService().getKontinentLocation(list[i]["kontinent"]);
+      if(kontinentGeodataListitem["kontinentGer"] == kontinentGeodataProfil["kontinentGer"]){
         newPoint = false;
         var addNumberName = int.parse(list[i]["name"]) + 1;
         if(addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
+        break;
       }
     }
+
     if(newPoint){
       list.add({
-        "countryname": profil["land"],
+        "kontinentName": landGedataProfil["kontinentGer"],
+        "kontinent": landGedataProfil["kontinentGer"],
         "name": "1",
-        "latt": landGedataProfil["latt"],
-        "longt":landGedataProfil["longt"],
+        "latt": kontinentGeodataProfil["latt"],
+        "longt":kontinentGeodataProfil["longt"],
         "profils": [profil]
       });
     }
@@ -300,7 +293,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     for(var i= 0; i<profils.length; i++){
       pufferProfilCountries = await createCountries(pufferProfilCountries,
                                                           profils[i]);
-      pufferProfilBetweenCountries = await createBetweenCountries(
+      pufferProfilBetweenCountries = await createContinents(
         pufferProfilBetweenCountries, profils[i]);
 
       pufferProfilBetween = createBetween(pufferProfilBetween, profils[i], 1);
@@ -327,7 +320,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     for(var i= 0; i<events.length; i++){
       pufferEventsCountries = await createCountries(pufferEventsCountries,
           events[i]);
-      pufferEventsBetweenCountries = await createBetweenCountries(
+      pufferEventsBetweenCountries = await createContinents(
           pufferEventsBetweenCountries, events[i]);
 
       pufferEventsBetween = createBetween(pufferEventsBetween, events[i], 1);
@@ -340,7 +333,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
     eventsCities = pufferEventsCities;
     eventsBetween = pufferEventsBetween;
     eventsCountries = pufferEventsCountries;
-    eventsBetweenCountries = pufferEventsBetweenCountries;
+    eventsKontinente = pufferEventsBetweenCountries;
 
     changeProfil(mapZoom);
   }
@@ -360,7 +353,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       selectedEventList = eventsCountries;
     } else {
       choosenProfils = profilBetweenCountries;
-      selectedEventList = eventsBetweenCountries;
+      selectedEventList = eventsKontinente;
     }
 
 
@@ -426,6 +419,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   changeMapFilter(){
     var filterProfils = [];
+    var filterEvents = [];
     filterList = searchAutocomplete.getSelected();
 
     for(var profil in profilsBackup){
@@ -439,7 +433,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   zoomAtPoint(position){
-    if(mapZoom< 4){
+    if(mapZoom < 2.6){
+      mapZoom = 2.6;
+    } else if(mapZoom< 4){
       mapZoom = 4.1;
     } else if (mapZoom < 6.5){
       mapZoom = 6.6;
@@ -481,11 +477,31 @@ class _ErkundenPageState extends State<ErkundenPage>{
     createPopupWindowTitle(list, filter){
       var titleList = [];
 
+      if(filter == "kontinente"){
+        var locationData = LocationService().getCountryLocation(list[0]["land"]);
+        return locationData["kontinentGer"] + " / " + locationData["kontinentEng"];
+      }else if(filter == "stadt"){
+        return list[0]["ort"];
+      }
+
       for(var item in list){
         if(!titleList.contains(item[filter])) titleList.add(item[filter]);
       }
 
       return titleList.join(" / ");
+    }
+
+    selectPopupMenuText(profils){
+      if(mapZoom <2.5){
+        return createPopupWindowTitle(profils, "kontinente");
+      } else if(mapZoom <4.0){
+        return createPopupWindowTitle(profils, "land");
+      } else if(mapZoom< cityZoom){
+        return createPopupWindowTitle(profils, "land");
+      } else {
+        return createPopupWindowTitle(profils, "stadt");
+      }
+
     }
 
     createPopupProfils(profil){
@@ -503,11 +519,10 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       popupItems.add(
           Container(
-            padding: EdgeInsets.only(top: 5, bottom: 5),
+            padding: const EdgeInsets.all(10),
             alignment: Alignment.center,
             child: Text(
-                mapZoom > cityZoom ? createPopupWindowTitle(profil["profils"], "ort") :
-                createPopupWindowTitle(profil["profils"], "land"),
+                selectPopupMenuText(profil["profils"]),
                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
             )
           )
@@ -533,11 +548,11 @@ class _ErkundenPageState extends State<ErkundenPage>{
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(profil["name"], style: const TextStyle(fontWeight: FontWeight.bold),),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Row(
                           children: [
                             Text(AppLocalizations.of(context).kinder +" :" + childrenAgeStringToStringAge(profil["kinder"])),
-                            Expanded(child: SizedBox.shrink()),
+                            const Expanded(child: const SizedBox.shrink()),
                             Text(profil["ort"]+", " + profil["land"])
                           ],
                         )
@@ -557,10 +572,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
       popupItems.add(
           Container(
               alignment: Alignment.center,
-              padding: EdgeInsets.only(top: 5, bottom: 5),
+              padding: const EdgeInsets.all(10),
               child: Text(
-                  mapZoom > cityZoom ? createPopupWindowTitle(event["profils"], "stadt") :
-                  createPopupWindowTitle(event["profils"], "land"),
+                  selectPopupMenuText(event["profils"]),
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)
               )
           )
@@ -570,7 +584,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
       for(var event in event["profils"]){
         popupItems.add(
             EventCard(
-              margin: EdgeInsets.only(top: 15, bottom: 15, left: 10, right: 10),
+              margin: const EdgeInsets.only(top: 15, bottom: 15, left: 10, right: 10),
               event: event,
               withInteresse: true,
               afterPageVisit: () async {

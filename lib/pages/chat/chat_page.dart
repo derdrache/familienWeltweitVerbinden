@@ -46,10 +46,11 @@ class _ChatPageState extends State<ChatPage>{
 
   _asyncMethod() async {
 
-    if (globalChatGroups.isNotEmpty || myChatBox.get("list") == null){
-      globalChatGroups = await ChatDatabase().getChatData(
+    if (globalChatGroups.isNotEmpty || myChatBox.get("list") == null || myChatBox.get("list") == false){
+      var dbChats = await ChatDatabase().getChatData(
           "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate ASC",
           returnList: true);
+      globalChatGroups = dbChats == false ? []: dbChats;
       myChatBox.put("list", globalChatGroups);
     } else{
       globalChatGroups = myChatBox.get("list");
@@ -59,14 +60,6 @@ class _ChatPageState extends State<ChatPage>{
     setState(() {
 
     });
-  }
-
-  initializer() async{
-    initilizeCreateChatData();
-
-    return ChatDatabase().getChatData(
-        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
-        returnList: true);
   }
 
   initilizeCreateChatData() {
@@ -143,6 +136,7 @@ class _ChatPageState extends State<ChatPage>{
 
   Widget personenSuchBox(buildContext, allName){
     searchAutocomplete = SearchAutocomplete(
+      hintText: AppLocalizations.of(context).personSuchen,
       searchableItems: allName,
       withFilter: false,
       onConfirm: (){
@@ -176,6 +170,11 @@ class _ChatPageState extends State<ChatPage>{
           )
       );
     }
+
+    if(userFriendlist.isEmpty) return [Center(
+        heightFactor: 10,
+        child: Text("Noch keine Freunde vorhanden", style: TextStyle(color: Colors.grey),)
+    )];
 
     return friendsBoxen;
   }
@@ -364,7 +363,14 @@ class _ChatPageState extends State<ChatPage>{
           }),
           child: ListView(
               shrinkWrap: true,
-              children: groupContainer,
+              children: groupContainer.isNotEmpty ? groupContainer :
+                [Center(
+                  heightFactor: 20,
+                    child: Text(
+                        AppLocalizations.of(context).nochKeineChatsVorhanden,
+                        style: TextStyle(fontSize: 20, color: Colors.grey)
+                    )
+                )],
             ),
         ),
       );

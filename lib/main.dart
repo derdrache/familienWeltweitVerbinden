@@ -35,33 +35,32 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 hiveInit() async {
   await Hive.initFlutter();
 
-  await Hive.openBox(
-    "countryGeodataBox"
-  );
+  await Hive.openBox("countryGeodataBox");
 
-  await Hive.openBox(
-    'profilBox',
-  );
-  await Hive.openBox(
-    'ownProfilBox',
-  );
+  if(Hive.box('countryGeodataBox').get("list") == null){
+    var jsonText = await rootBundle.loadString('assets/countryGeodata.json');
+    var geodata = json.decode(jsonText)["data"];
+    Hive.box('countryGeodataBox').put("list", geodata);
+  }
 
-  await Hive.openBox(
-    'eventBox',
-  );
+  await Hive.openBox("kontinentGeodataBox");
+  if(Hive.box('kontinentGeodataBox').get("list") == null){
+    var jsonText = await rootBundle.loadString('assets/continentsGeodata.json');
+    var geodata = json.decode(jsonText)["data"];
+    Hive.box('kontinentGeodataBox').put("list", geodata);
+  }
 
-  await Hive.openBox(
-    'myEventsBox',
-  );
+  await Hive.openBox('profilBox');
 
-  await Hive.openBox(
-    'interestEventsBox',
-  );
+  await Hive.openBox('ownProfilBox');
 
-  await Hive.openBox(
-    'myChatBox',
-  );
+  await Hive.openBox('eventBox');
 
+  await Hive.openBox('myEventsBox');
+
+  await Hive.openBox('interestEventsBox');
+
+  await Hive.openBox('myChatBox');
 
 }
 
