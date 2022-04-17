@@ -11,10 +11,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../global/global_functions.dart';
 import '../services/database.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_var;
+import '../widgets/profil_image.dart';
 import '../widgets/search_autocomplete.dart';
 import '../services/locationsService.dart';
 
@@ -102,7 +102,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getProfilsDB() async{
-    var dbProfils = await ProfilDatabase().getData("id, name, land, interessen, kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, emailAnzeigen", "ORDER BY land ASC, ort ASC");
+    var dbProfils = await ProfilDatabase().getData("id, name, land, interessen, kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, emailAnzeigen, bild, bildStandardFarbe", "ORDER BY land ASC, ort ASC");
     if(dbProfils == false) dbProfils = [];
     profilBox.put("list", dbProfils);
     profils = dbProfils;
@@ -543,7 +543,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
                   ),
                   child: Row(
                     children: [
-                      createDefaultProfileImage(profil),
+                      ProfilImage(profil),
                       SizedBox(width: 10),
                       Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -7,9 +7,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
-import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import '../../widgets/Window_topbar.dart';
+import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 import 'chat_details.dart';
@@ -30,7 +30,7 @@ class _ChatPageState extends State<ChatPage>{
   var searchAutocomplete;
   var allName = [];
   var userFriendlist = [];
-  var dbData = [];
+  var dbProfilData = [];
 
   @override
   void initState() {
@@ -46,12 +46,11 @@ class _ChatPageState extends State<ChatPage>{
 
   initilizeCreateChatData() {
     dynamic userFriendIdList = ownProfilBox.get("list")["friendlist"];
-    dbData = profilBox.get("list");
-
+    dbProfilData = profilBox.get("list");
     allName = [];
     userFriendlist = [];
 
-    for(var data in dbData){
+    for(var data in dbProfilData){
       allName.add(data["name"]);
 
       for(var user in userFriendIdList){
@@ -248,6 +247,7 @@ class _ChatPageState extends State<ChatPage>{
       List<Widget> groupContainer = [];
       for(dynamic group in groupdata){
         var chatPartnerName = "";
+        var chatPartnerProfil;
         var chatPartnerId;
         var users = group["users"];
 
@@ -258,9 +258,10 @@ class _ChatPageState extends State<ChatPage>{
         });
 
 
-        for(var data in dbData){
+        for(var data in dbProfilData){
           if(data["id"] == chatPartnerId){
             chatPartnerName = data["name"];
+            chatPartnerProfil = data;
             break;
           }
         }
@@ -270,7 +271,7 @@ class _ChatPageState extends State<ChatPage>{
         var lastMessageTime = DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
 
         groupContainer.add(
-          GestureDetector(
+          InkWell(
             onTap: () =>Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => ChatDetailsPage(
@@ -288,52 +289,74 @@ class _ChatPageState extends State<ChatPage>{
                 ),
               child: Row(
                 children: [
-                  //createDefaultProfileImage(data),
+                  ProfilImage(chatPartnerProfil),
                   SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 10),
+                    Text(lastMessage,
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600])
+                    )
+                  ]),
+                  Expanded(child: SizedBox.shrink()),
+                  Column( children: [
+                    Text(DateFormat('dd-MM HH:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600])),
+                  ])
+                ],
+              )
+
+
+
+/*
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                          const Expanded(child: SizedBox.shrink()),
-                          Text(DateFormat('dd-MM HH:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600]))
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                              flex: 3,
-                              child: Text(lastMessage,
-                                  style: TextStyle(fontSize: 16, color: Colors.grey[600])
-                              )
-                          ),
-                          ownChatNewMessages== 0? const SizedBox.shrink(): Container(
-                              height: 30,
-                              width: 30,
-                              decoration: BoxDecoration(
-                                  color:Theme.of(context).colorScheme.secondary,
-                                  shape: BoxShape.circle
-                              ),
-                              child: Center(
-                                child: FittedBox(
-                                  child: Text(
-                                    ownChatNewMessages.toString(),
-                                    style: const TextStyle(fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                              )
+                      Text(chatPartnerName,style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      const Expanded(child: SizedBox.shrink()),
+                      Text(DateFormat('dd-MM HH:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600]))
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                          flex: 3,
+                          child: Text(lastMessage,
+                              style: TextStyle(fontSize: 16, color: Colors.grey[600])
                           )
-                        ],
+                      ),
+                      ownChatNewMessages== 0? const SizedBox.shrink(): Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                              color:Theme.of(context).colorScheme.secondary,
+                              shape: BoxShape.circle
+                          ),
+                          child: Center(
+                            child: FittedBox(
+                              child: Text(
+                                ownChatNewMessages.toString(),
+                                style: const TextStyle(fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          )
                       )
                     ],
                   )
                 ],
               )
 
+
+
+
+
+
+               */
 
 
             ),

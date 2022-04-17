@@ -22,6 +22,7 @@ import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
+import '../../widgets/profil_image.dart';
 import '../../windows/upcoming_updates.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
@@ -199,7 +200,7 @@ class _SettingPageState extends State<SettingPage> {
               children: [
                 Row(
                   children: [
-                    createDefaultProfileImage(userProfil),
+                    ProfilImage(userProfil, changeable: true, fullScreenWindow: true),
                     SizedBox(width: 10),
                     Text(
                       nameTextKontroller.text,
