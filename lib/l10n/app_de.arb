@@ -205,6 +205,8 @@
     "nochKeineChatsVorhanden": "Noch keine Chats vorhanden",
     "nochKeineFreundeVorhanden": "Noch keine Freunde vorhanden",
     "nochKeineEventsAusgewaehlt": "Noch keine Events ausgewählt",
-    "nochKeineEventsErstellt": "Noch keine Events erstellt"
+    "nochKeineEventsErstellt": "Noch keine Events erstellt",
+    "profilbildAendern": "Profilbild ändern",
+    "linkProfilbildEingeben": "Link zum Profilbild eingeben"
 
 }

@@ -129,7 +129,7 @@ class _EventPageState extends State<EventPage>{
                 }
 
                 return Center(
-                  heightFactor: 4,
+                  heightFactor: 5,
                     child: Text(
                       AppLocalizations.of(context).nochKeineEventsAusgewaehlt,
                       textAlign: TextAlign.center,
@@ -179,14 +179,14 @@ class _EventPageState extends State<EventPage>{
                         scrollDirection: Axis.horizontal,
                         child: Wrap(
                             direction: Axis.vertical,
-                            children: createEventCards(data, true)
+                            children: createEventCards(data, false)
                         ),
                       ),
                     );
                   }
 
                   return Center(
-                      heightFactor: 4,
+                      heightFactor: 5,
                       child: Text(
                         AppLocalizations.of(context).nochKeineEventsErstellt,
                         textAlign: TextAlign.center,
