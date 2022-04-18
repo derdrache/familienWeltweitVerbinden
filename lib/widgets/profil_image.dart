@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -152,9 +153,6 @@ class OwnProfilImage extends StatelessWidget {
   var fullScreenWindow;
 
   OwnProfilImage(this.profil, {this.fullScreenWindow});
-
-
-
   @override
   Widget build(BuildContext context) {
 
@@ -174,16 +172,20 @@ class OwnProfilImage extends StatelessWidget {
     }
 
 
-
     return InkWell(
-      onTap:  fullScreenWindow? ()=> showBigImage() : null,
-      child: CircleAvatar(
-        radius: 30,
-        backgroundColor: Colors.transparent,
-        backgroundImage: Image.network(
-          profil["bild"],
-        ).image,
-      ),
+      onTap:fullScreenWindow? ()=> showBigImage() : null,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: CachedNetworkImage(
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          imageUrl: profil["bild"],
+          placeholder: (context, url) => Container(color: Colors.black12,)
+            //Center(child: CircularProgressIndicator()),
+        )
+
+      )
     );
   }
 }

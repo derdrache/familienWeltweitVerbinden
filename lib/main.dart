@@ -110,14 +110,13 @@ class MyApp extends StatelessWidget {
 
 
     final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
-    var initializationSettings = InitializationSettings(
+    var initializationSettings = const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher')
     );
     _notificationsPlugin.initialize(
         initializationSettings,
         onSelectNotification: (payload) async {
           final Map<String, dynamic> payLoadMap = json.decode(payload);
-
           if(payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
 
           if(payLoadMap["typ"] == "event") changeToEvent(payLoadMap["link"]);
@@ -230,10 +229,10 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               scaffoldBackgroundColor: Colors.white,
               colorScheme: ColorScheme.fromSwatch().copyWith(
-                primary: Color(0xFFBF1D53),
-                secondary: Color(0xFF3CB28F), //buttonColor?
+                primary: const Color(0xFFBF1D53),
+                secondary: const Color(0xFF3CB28F), //buttonColor?
             ),
-              iconTheme: IconThemeData(color: Color(0xFF3CB28F))
+              iconTheme: const IconThemeData(color: Color(0xFF3CB28F))
             ),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: const [

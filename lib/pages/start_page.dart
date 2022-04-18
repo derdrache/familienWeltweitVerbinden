@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/events/event_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,6 +34,7 @@ class _StartPageState extends State<StartPage>{
   var userName = FirebaseAuth.instance.currentUser?.displayName;
   var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
   PackageInfo packageInfo;
+  var hasInternet = true;
 
 
   @override
@@ -77,6 +80,8 @@ class _StartPageState extends State<StartPage>{
   }
 
 
+
+
   Widget build(BuildContext context){
     List<Widget> tabPages = <Widget>[
       //BoardPage(),
@@ -86,7 +91,16 @@ class _StartPageState extends State<StartPage>{
       const SettingPage()
     ];
 
-
+    Future<bool> hasNetwork() async {
+      try {
+        final result = await InternetAddress.lookup('example.com');
+        if(hasInternet == false) ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        hasInternet = true;
+      } on SocketException catch (_) {
+        hasInternet = false;
+        customSnackbar(context, "kein Internet", duration: Duration(days: 365));
+      }
+    }
 
     void _onItemTapped(int index) {
       setState(() {
@@ -114,6 +128,9 @@ class _StartPageState extends State<StartPage>{
           });
 
     }
+
+
+    hasNetwork();
 
     return Scaffold(
           body: Center(
