@@ -10,6 +10,7 @@ double borderRounding = 5;
 double boxHeight = 50;
 double webWidth = 600;
 
+
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
   onSubmit, informationWindow}){
@@ -84,9 +85,9 @@ Widget customFloatbuttonExtended(text, function){
   );
 }
 
-customSnackbar(context, text, {color = Colors.red}){
+customSnackbar(context, text, {color = Colors.red, duration = const Duration(seconds: 5)}){
   var snackbar = SnackBar(
-        duration: const Duration(seconds: 5),
+        duration: duration,
           backgroundColor: color,
           content: Text(text)
       );

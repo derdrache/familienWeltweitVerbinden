@@ -30,7 +30,7 @@ class ChatDetailsPage extends StatefulWidget {
   _ChatDetailsPageState createState() => _ChatDetailsPageState();
 }
 
-class _ChatDetailsPageState extends State<ChatDetailsPage> {
+class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingObserver{
   var userId = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser.displayName;
   bool newChat = false;
@@ -46,14 +46,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   @override
   void dispose() {
     ProfilDatabase().updateProfil(userId, "activeChat", "");
+    WidgetsBinding.instance.removeObserver(this);
     timer.cancel();
     super.dispose();
+  }
+
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if(state == AppLifecycleState.resumed){
+      ProfilDatabase().updateProfil(userId, "activeChat", widget.chatId);
+    }else{
+      ProfilDatabase().updateProfil(userId, "activeChat", "");
+    }
   }
 
   @override
   void initState() {
     _asyncMethod();
 
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 

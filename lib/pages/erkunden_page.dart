@@ -756,7 +756,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
         );
       }
 
-      //if(mapZoom > cityZoom){
         for(var event in aktiveEvents){
           var basisVerschiebung;
           var anpassungsVerschiebung;
@@ -788,7 +787,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 zoomAtPoint(position);
               })
           );
-        //}
       }
 
 
