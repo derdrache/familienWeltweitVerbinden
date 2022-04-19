@@ -153,8 +153,8 @@
     "speichern": "Speichern",
     "abbrechen": "Abbrechen",
     "eventBildAendern": "Event Bild ändern",
-    "neuesDatumAuswaehlen": "Neues Datum auswählen",
-    "neueUhrzeitAuswaehlen": "Neue Uhrzeit auswählen",
+    "datumAuswaehlen": "Datum auswählen",
+    "uhrzeitAuswaehlen": "Uhrzeit auswählen",
     "eventArtAendern" : "Event Art ändern",
     "uhrzeit": "Uhrzeit: ",
     "ort": "Ort: ",
@@ -207,6 +207,8 @@
     "nochKeineEventsAusgewaehlt": "Noch keine Events ausgewählt",
     "nochKeineEventsErstellt": "Noch keine Events erstellt",
     "profilbildAendern": "Profilbild ändern",
-    "linkProfilbildEingeben": "Link zum Profilbild eingeben"
+    "linkProfilbildEingeben": "Link zum Profilbild eingeben",
+    "bitteEnddatumEventEingeben": "Bitte das Ende des Events eingeben",
+    "eventEnde": "Event ende: "
 
 }

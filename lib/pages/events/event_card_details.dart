@@ -123,6 +123,11 @@ class EventCardDetails extends StatelessWidget {
         margin: const EdgeInsets.all(10),
         child: Column(
           children: [
+            ShowDatetimeBox(
+              event: event,
+              isCreator: isCreator
+            ),
+            /*
             ShowDataAndChangeWindow(
                 eventId: event["id"],
                 windowTitle: AppLocalizations.of(context).eventDatumAendern,
@@ -134,6 +139,8 @@ class EventCardDetails extends StatelessWidget {
                 oldDate: event["wann"],
                 databaseKennzeichnung: "wann"
             ),
+
+             */
             const SizedBox(height: 5),
             ShowDataAndChangeWindow(
               eventId: event["id"],
@@ -248,7 +255,7 @@ class EventCardDetails extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            padding: EdgeInsets.only(bottom: 30),
+            padding: const EdgeInsets.only(bottom: 30),
             width: cardWidth,
             height: cardHeight,
             margin: const EdgeInsets.all(20),
@@ -429,8 +436,10 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       data = dropdownInput.getSelected();
     }else if (widget.databaseKennzeichnung == "sprache"){
       data = multiDropDownInput.getSelected();
-    }else if (widget.databaseKennzeichnung == "beschreibung"){
+    }else if (widget.databaseKennzeichnung == "beschreibung") {
       data = inputKontroller.text;
+    }else if(widget.databaseKennzeichnung == "zeitzone"){
+      data = dropdownInput.getSelected();
     }else if (widget.modus == "date"){
       var date = datumButton.eventDatum ?? DateTime.parse(widget.oldDate);
       var time = uhrZeitButton.uhrZeit ?? DateTime.parse(widget.oldDate);
@@ -502,14 +511,6 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       if(widget.modus == "dropdown") return dropdownInput;
       if(widget.modus == "multiDropdown") return multiDropDownInput;
       if(widget.modus == "googleAutoComplete") return ortAuswahlBox;
-      if(widget.modus== "date"){
-        return Column(children: [
-          datumButton,
-          const SizedBox(height: 20),
-          uhrZeitButton,
-          const SizedBox(height: 50)
-        ]);
-      }
     }
 
     openChangeWindow(){
@@ -624,6 +625,173 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
   }
 }
 
+class ShowDatetimeBox extends StatefulWidget {
+  var event;
+  var isCreator;
+  ShowDatetimeBox({this.event, this.isCreator});
+
+  @override
+  _ShowDatetimeBoxState createState() => _ShowDatetimeBoxState();
+}
+
+class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
+  var isSingeDay;
+  var wannDateInputButton = DateButton(getDate: true);
+  var wannTimeInputButton = DateButton();
+  var bisDateInputButton = DateButton(getDate: true);
+  var bisTimeInputButton = DateButton();
+
+  @override
+  void initState() {
+    isSingeDay = widget.event["eventInterval"] != global_var.eventInterval[2] &&
+        widget.event["eventInterval"] != global_var.eventIntervalEnglisch[2];
+
+
+    super.initState();
+  }
+
+  saveChanges(){
+    var wannDate = wannDateInputButton.eventDatum ?? DateTime.parse(widget.event["wann"]);
+    var wannTime = wannTimeInputButton.uhrZeit ?? DateTime.parse(widget.event["wann"]);
+    var newWannDate = DateTime(wannDate.year, wannDate.month, wannDate.day,
+        wannTime.hour, wannTime.minute).toString().substring(0,16);
+    var newBisDate;
+
+    if(!isSingeDay){
+      var bisDate = bisDateInputButton.eventDatum ?? DateTime.parse(widget.event["bis"]);
+      var bisTime = bisTimeInputButton.eventDatum ?? DateTime.parse(widget.event["bis"]);
+
+      newBisDate = DateTime(bisDate.year, bisDate.month, bisDate.day,
+          bisTime.hour, bisTime.minute).toString().substring(0,16);
+    }
+
+    EventDatabase().update(widget.event["id"], "wann = '$newWannDate', bis = '$newBisDate'");
+    setState(() {
+      widget.event["wann"] = newWannDate;
+      widget.event["bis"] = newBisDate;
+    });
+    Navigator.pop(context);
+  }
+
+  changeWindowMainButtons(){
+    if(isSingeDay){
+      return Column(children: [
+        wannDateInputButton,
+        const SizedBox(height: 20),
+        wannTimeInputButton,
+        const SizedBox(height: 10)
+      ]);
+    } else if(!isSingeDay){
+      return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+       Column(children: [
+         const Text("Event start"),
+         const SizedBox(height: 5),
+         wannDateInputButton,
+         wannTimeInputButton
+       ]),
+       Column(children: [
+         const Text("Event ende"),
+         const SizedBox(height: 5),
+         bisDateInputButton,
+         bisTimeInputButton
+       ])
+      ]);
+    }
+  }
+
+  openChangeWindow(){
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext){
+          return CustomAlertDialog(
+              title: AppLocalizations.of(context).eventDatumAendern,
+              height: 300,
+              children: [
+                const SizedBox(height: 20),
+                changeWindowMainButtons(),
+                const SizedBox(height: 10),
+                Container(
+                  margin: const EdgeInsets.only(right: 10),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          child: Text(
+                              AppLocalizations.of(context).abbrechen,
+                              style: TextStyle(fontSize: fontsize)
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        TextButton(
+                            child: Text(
+                                AppLocalizations.of(context).speichern,
+                                style: TextStyle(fontSize: fontsize)
+                            ),
+                            onPressed: () => saveChanges()
+                        ),
+                      ]
+                  ),
+                )
+              ]
+          );
+        });
+  }
+
+  createInhaltText(){
+    List wannDatetimeList = widget.event["wann"].split(" ");
+    List wannDateList = wannDatetimeList[0].split("-");
+    List wannTimeList = wannDatetimeList[1].split(":");
+
+
+    if(!isSingeDay){
+      var bisDatetimeList = widget.event["bis"].split(" ");
+      List bisDateList = bisDatetimeList[0].split("-");
+      List bisTimeList = bisDatetimeList[1].split(":");
+
+      return wannDateList.last + " - " + bisDateList.reversed.join(".") + "\n " +
+          wannTimeList.take(2).join(":") + " - " + bisTimeList.take(2).join(":");
+    } else{
+      return wannDateList.reversed.join(".") + " " + wannTimeList.take(2).join(":");
+    }
+
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
+
+
+
+    return InkWell(
+        onTap: !widget.isCreator ? null:  ()=> openChangeWindow(),
+        child: Row(
+          children: [
+            Text(
+                AppLocalizations.of(context).datum + " ",
+                style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold)
+            ),
+            const Expanded(child: SizedBox.shrink()),
+            SizedBox(
+              width: 200,
+              child: Text(
+                createInhaltText(),
+                style: TextStyle(
+                    fontSize: fontsize,
+                    color: Colors.black
+                ),
+                softWrap: false,
+                overflow: TextOverflow.fade,
+                textAlign: TextAlign.end,
+              ),
+            )
+          ],
+        )
+    );
+  }
+}
+
+
 class CardFeed extends StatefulWidget {
   var organisator;
   var eventId;
@@ -715,7 +883,7 @@ class DateButton extends StatefulWidget {
 class _DateButtonState extends State<DateButton> {
 
   dateBox(){
-    var dateString = AppLocalizations.of(context).neuesDatumAuswaehlen;
+    var dateString = AppLocalizations.of(context).datumAuswaehlen;
     if(widget.eventDatum != null){
       var dateFormat = DateFormat('dd.MM.yyyy');
       var dateTime = DateTime(widget.eventDatum.year, widget.eventDatum.month,
@@ -741,7 +909,7 @@ class _DateButtonState extends State<DateButton> {
   timeBox(){
     return ElevatedButton(
       child: Text(
-          widget.uhrZeit == null ? AppLocalizations.of(context).neueUhrzeitAuswaehlen:
+          widget.uhrZeit == null ? AppLocalizations.of(context).uhrzeitAuswaehlen:
           widget.uhrZeit.format(context)
       ),
       onPressed: () async {
