@@ -60,23 +60,6 @@ class AllgemeinDatabase{
     return responseBody;
   }
 
-  getOneData(what, queryEnd) async{
-    var url = databaseUrl + "database/allgemein/getOneData.php";
-    var data = "?param1=$what";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
-    dynamic responseBody = res.body;
-
-    try{
-      responseBody = jsonDecode(responseBody);
-    }catch(error){
-
-    }
-
-
-    return responseBody;
-  }
-
 }
 
 class ProfilDatabase{
@@ -280,14 +263,20 @@ class ChatDatabase{
   }
 
   getAllMessages(chatId) async {
-    var url = databaseUrl + "database/chats/getAllMessages.php";
-    var data = "?param1=$chatId";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
 
-    var responseBody = json.decode(res.body);
+    var res = await http.post(url, body: json.encode({
+      "whatData": "*",
+      "queryEnd": "WHERE id = '$chatId'",
+      "table": "messages"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
 
     return responseBody;
+
   }
 
   updateChatGroup(chatId, change, data)async{
