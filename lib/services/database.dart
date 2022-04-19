@@ -1,9 +1,14 @@
+import 'dart:math';
+
+import 'package:crypto/crypto.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Key;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:encrypt/encrypt.dart';
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
@@ -16,13 +21,17 @@ var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.l
 class AllgemeinDatabase{
 
   getData(whatData, queryEnd, {returnList = false}) async {
-    //neue Datenabfrage um alle get zu ersetzen
-    queryEnd = Uri.encodeComponent(queryEnd);
-    var url = databaseUrl + "database/getData.php";
-    var data = "?param1=$whatData&param2=$queryEnd&param3=allgemein";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    //sichere Datenbankabfrage
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+    //queryEnd = Uri.encodeComponent(queryEnd);
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "allgemein"
+    }));
+
     dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if(responseBody.isEmpty) return false;
@@ -117,13 +126,17 @@ class ProfilDatabase{
   }
 
   getData(whatData, queryEnd, {returnList = false}) async{
-    //neue Datenabfrage um alle get zu ersetzen
-    queryEnd = Uri.encodeComponent(queryEnd);
-    var url = databaseUrl + "database/getData.php";
-    var data = "?param1=$whatData&param2=$queryEnd&param3=profils";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    //sichere Datenbankabfrage
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+    //queryEnd = Uri.encodeComponent(queryEnd);
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "profils"
+    }));
     dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if(responseBody.isEmpty) return false;
@@ -154,6 +167,7 @@ class ProfilDatabase{
     }
 
     return responseBody;
+
   }
 
   updateProfilName(userId, oldName, newName) async{
@@ -226,14 +240,16 @@ class ChatDatabase{
   }
 
   getChatData(whatData, queryEnd, {returnList = false}) async{
-    //neue Datenabfrage um alle chat get zu ersetzen
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+    //queryEnd = Uri.encodeComponent(queryEnd);
 
-    queryEnd = Uri.encodeComponent(queryEnd);
-    var url = databaseUrl + "database/getData.php";
-    var data = "?param1=$whatData&param2=$queryEnd&param3=chats";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "chats"
+    }));
     dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if(responseBody.isEmpty) return false;
@@ -360,7 +376,6 @@ class EventDatabase{
   addNewEvent(eventData) async {
     var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
     await http.post(url, body: json.encode(eventData));
-
   }
 
   update(id, changes) async  {
@@ -370,6 +385,7 @@ class EventDatabase{
       "id": id,
       "changes": changes
     }));
+
   }
 
   updateLocation(id, locationData) {
@@ -385,14 +401,18 @@ class EventDatabase{
   }
 
   getData(whatData, queryEnd, {returnList = false}) async{
-    //neue Datenabfrage um alle get zu ersetzen
-    queryEnd = Uri.encodeComponent(queryEnd);
-    var url = databaseUrl + "database/getData.php";
-    var data = "?param1=$whatData&param2=$queryEnd&param3=events";
-    var uri = Uri.parse(url+data);
-    var res = await http.get(uri, headers: {"Accept": "application/json"});
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+    //queryEnd = Uri.encodeComponent(queryEnd);
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "events"
+    }));
 
     dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
     responseBody = jsonDecode(responseBody);
 
     if(responseBody.isEmpty) return false;
@@ -531,5 +551,16 @@ _deleteInTable(table, id) {
     "id": id,
     "table": table
   }));
+}
+
+
+String decrypt(String encrypted) {
+  final key = Key.fromUtf8(phpCryptoKey);
+  final iv = IV.fromUtf8(phpCryptoIV);
+
+  final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
+  Encrypted enBase64 = Encrypted.from64(encrypted);
+  final decrypted = encrypter.decrypt(enBase64, iv: iv);
+  return decrypted;
 }
 

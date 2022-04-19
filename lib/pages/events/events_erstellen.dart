@@ -29,8 +29,10 @@ class EventErstellen extends StatefulWidget {
 class _EventErstellenState extends State<EventErstellen> {
   var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
   var eventNameKontroller = TextEditingController();
-  var eventDatum;
-  var eventUhrzeit;
+  var eventWannDatum;
+  var eventBisDatum;
+  var eventWannUhrzeit;
+  var eventBisUhrzeit;
   var eventBeschreibungKontroller = TextEditingController();
   var eventOrtKontroller = TextEditingController();
   var sprachenAuswahlBox = CustomMultiTextForm();
@@ -66,11 +68,19 @@ class _EventErstellenState extends State<EventErstellen> {
 
     eventIntervalDropdown = CustomDropDownButton(
       items: isGerman ? global_var.eventInterval : global_var.eventIntervalEnglisch,
+      onChange: () {
+        setState(() {
+         });
+      }
     );
 
     super.initState();
   }
 
+  isSeveralDays(eventInterval){
+    return eventInterval == global_var.eventInterval[2] ||
+        eventInterval == global_var.eventIntervalEnglisch[2];
+  }
 
   saveEvent() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
@@ -78,6 +88,8 @@ class _EventErstellenState extends State<EventErstellen> {
     var eventId = uuid.v4();
     var userID = FirebaseAuth.instance.currentUser?.uid;
     var allFilled = checkAllValidations(locationData);
+    var interval = eventIntervalDropdown.getSelected();
+    var bisDate;
 
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -86,8 +98,12 @@ class _EventErstellenState extends State<EventErstellen> {
       return;
 
     }
-    var date = DateTime(eventDatum.year, eventDatum.month, eventDatum.day,
-        eventUhrzeit.hour, eventUhrzeit.minute);
+    var wannDate = DateTime(eventWannDatum.year, eventWannDatum.month, eventWannDatum.day,
+        eventWannUhrzeit.hour, eventWannUhrzeit.minute);
+    if(isSeveralDays(interval)) {
+      bisDate = DateTime(eventBisDatum.year, eventBisDatum.month, eventBisDatum.day,
+        eventBisUhrzeit.hour, eventBisUhrzeit.minute);
+    }
 
     var eventData = {
       "id": eventId,
@@ -97,10 +113,11 @@ class _EventErstellenState extends State<EventErstellen> {
       "beschreibung": eventBeschreibungKontroller.text,
       "stadt": locationData["city"],
       "art": eventArtDropdown.getSelected(),
-      "wann" : date.toString(),
+      "wann" : wannDate.toString(),
+      "bis": bisDate.toString(),
       "typ": ortTypDropdown.getSelected(),
       "sprache": json.encode(sprachenAuswahlBox.getSelected()),
-      "interval": eventIntervalDropdown.getSelected(),
+      "interval": interval,
       "link": ortTypDropdown.getSelected() == "online" ? eventOrtKontroller.text : "",
       "land": locationData["countryname"],
       "longt": locationData["longt"],
@@ -138,9 +155,11 @@ class _EventErstellenState extends State<EventErstellen> {
     //  validationFailText = AppLocalizations.of(context).bitteLinkEingeben;
     }else if(sprachenAuswahlBox.getSelected().isEmpty){
       validationFailText = AppLocalizations.of(context).bitteSpracheEingeben;
-    } else if(eventDatum == null){
+    } else if(eventWannDatum == null){
       validationFailText = AppLocalizations.of(context).bitteEventDatumEingeben;
-    } else if(eventUhrzeit == null){
+    } else if (eventBisDatum == null && isSeveralDays(eventIntervalDropdown.getSelected())){
+      validationFailText = AppLocalizations.of(context).bitteEnddatumEventEingeben;
+    }else if(eventWannUhrzeit == null){
       validationFailText = AppLocalizations.of(context).bitteEventUhrzeitEingeben;
     } else if(eventBeschreibungKontroller.text.isEmpty){
       validationFailText = AppLocalizations.of(context).bitteEventBeschreibungEingeben;
@@ -162,21 +181,23 @@ class _EventErstellenState extends State<EventErstellen> {
         global_var.eventIntervalEnglisch.join(", ");
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
 
-    dateAndTimeBox(){
+    wannDatetimeBox(){
       var dateString = AppLocalizations.of(context).datumAuswaehlen;
-      if(eventDatum != null){
+      if(eventWannDatum != null){
         var dateFormat = DateFormat('dd-MM-yyyy');
-        var dateTime = DateTime(eventDatum.year, eventDatum.month, eventDatum.day);
+        var dateTime = DateTime(eventWannDatum.year, eventWannDatum.month, eventWannDatum.day);
         dateString = dateFormat.format(dateTime);
       }
 
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text("Event start: "),
+          const SizedBox(width: 20),
           ElevatedButton(
             child: Text(dateString),
             onPressed: () async {
-              eventDatum = await showDatePicker(
+              eventWannDatum = await showDatePicker(
                   context: context,
                   initialDate: DateTime.now(),
                   firstDate: DateTime.now(),
@@ -189,9 +210,53 @@ class _EventErstellenState extends State<EventErstellen> {
           ),
           const SizedBox(width: 20),
           ElevatedButton(
-            child: Text(eventUhrzeit == null ? AppLocalizations.of(context).uhrzeitAuswaehlen : eventUhrzeit.format(context)),
+            child: Text(eventWannUhrzeit == null ? AppLocalizations.of(context).uhrzeitAuswaehlen : eventWannUhrzeit.format(context)),
             onPressed: () async {
-              eventUhrzeit = await showTimePicker(
+              eventWannUhrzeit = await showTimePicker(
+                context: context,
+                initialTime: const TimeOfDay(hour: 12, minute: 00),
+              );
+              setState(() {
+              });
+            },
+          )
+        ],
+      );
+    }
+
+    bisDatetimeBox(){
+      // @Zukunfts-Dominik - Sorry, aber mir viel nichts besseres ein
+      var dateString = AppLocalizations.of(context).datumAuswaehlen;
+      if(eventBisDatum != null){
+        var dateFormat = DateFormat('dd-MM-yyyy');
+        var dateTime = DateTime(eventBisDatum.year, eventBisDatum.month, eventBisDatum.day);
+        dateString = dateFormat.format(dateTime);
+      }
+
+      return !isSeveralDays(eventIntervalDropdown.getSelected()) ? SizedBox.shrink(): Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(AppLocalizations.of(context).eventEnde),
+          const SizedBox(width: 20),
+          ElevatedButton(
+            child: Text(dateString),
+            onPressed: () async {
+              eventBisDatum = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(DateTime.now().year + 1)
+              );
+
+              setState(() {
+              });
+            },
+          ),
+          const SizedBox(width: 20),
+          ElevatedButton(
+            child: Text(eventBisUhrzeit == null ? AppLocalizations.of(context).uhrzeitAuswaehlen : eventBisUhrzeit.format(context)),
+            onPressed: () async {
+              eventBisUhrzeit = await showTimePicker(
                 context: context,
                 initialTime: const TimeOfDay(hour: 12, minute: 00),
               );
@@ -308,7 +373,8 @@ class _EventErstellenState extends State<EventErstellen> {
           Align(child: ortEingabeBox()),
           sprachenAuswahlBox,
           eventIntervalDropdown,
-          dateAndTimeBox(),
+          wannDatetimeBox(),
+          bisDatetimeBox(),
           customTextInput(
             AppLocalizations.of(context).eventBeschreibung,
             eventBeschreibungKontroller,
