@@ -122,7 +122,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getEventsDB() async {
-    dynamic dbEvents = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private'", returnList: true);
+    dynamic dbEvents = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC", returnList: true);
     if(dbEvents == false) dbEvents = [];
     eventBox.put("list", dbEvents);
     events = dbEvents;
@@ -589,7 +589,8 @@ class _ErkundenPageState extends State<ErkundenPage>{
               event: event,
               withInteresse: true,
               afterPageVisit: () async {
-                events = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private'");
+                events = await EventDatabase().getData("*", "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC");
+
                 var refreshEvents = [];
 
                 for(var oldEvent in lastEventPopup["profils"]){

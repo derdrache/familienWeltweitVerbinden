@@ -84,6 +84,18 @@ class _EventCardState extends State<EventCard> {
         "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'");
   }
 
+  createDatetimeText(){
+    var datetimeText = widget.event["wann"].split(" ")[0].split("-").reversed.join(".");
+    var datetimeWann = DateTime.parse(widget.event["wann"]);
+
+    if(widget.event["bis"] != null ||
+        DateTime.now().isBefore(datetimeWann)) return datetimeText;
+
+    if(DateTime.now().day > datetimeWann.day){
+      return DateTime.now().toString().split(" ")[0].split("-").reversed.join(".");
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +228,7 @@ class _EventCardState extends State<EventCard> {
                           children: [
                             Text(AppLocalizations.of(context).datum, style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize)),
                             Text(
-                                widget.event["wann"].split(" ")[0].split("-").reversed.join("."),
+                                createDatetimeText(),
                                 style: TextStyle(fontSize: fontSize))
                           ],
                         ),

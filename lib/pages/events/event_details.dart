@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:familien_suche/global/custom_widgets.dart';
-import 'package:familien_suche/global/global_functions.dart';
+import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -240,7 +240,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   child: const Text("Ok"),
                   onPressed: (){
                     EventDatabase().delete(widget.event["id"]);
-                    changePage(context, StartPage(selectedIndex: 1));
+                    global_func.changePage(context, StartPage(selectedIndex: 1));
                   },
                 ),
                 TextButton(
@@ -690,7 +690,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               if(!isCreator) TextButton(
                 style: global_style.textButtonStyle(),
                 child: const Icon(Icons.message),
-                onPressed: () => changePage(context, ChatDetailsPage(
+                onPressed: () => global_func.changePage(context, ChatDetailsPage(
                   chatPartnerId: widget.event["erstelltVon"]
                 )),
               ),
@@ -820,8 +820,8 @@ class _EventArtButtonState extends State<EventArtButton> {
   void initState() {
     eventTypInput = CustomDropDownButton(
       items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
-      selected: isGerman ? global_var.changeEnglishToGerman(widget.event["art"]):
-      global_var.changeGermanToEnglish(widget.event["art"]),
+      selected: isGerman ? global_func.changeEnglishToGerman(widget.event["art"]):
+      global_func.changeGermanToEnglish(widget.event["art"]),
     );
     super.initState();
   }
