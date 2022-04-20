@@ -11,7 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart';
+import '../../global/global_functions.dart' as global_func;
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
@@ -57,8 +57,8 @@ class EventCardDetails extends StatelessWidget {
     double cardWidth = screenWidth / 1.12;
     double cardHeight = screenHeight / 1.34;
     event["eventInterval"] = isGerman ?
-      global_var.changeEnglishToGerman(event["eventInterval"]):
-      global_var.changeGermanToEnglish(event["eventInterval"]);
+      global_func.changeEnglishToGerman(event["eventInterval"]):
+      global_func.changeGermanToEnglish(event["eventInterval"]);
 
     bildAndTitleBox(){
       return Stack(
@@ -127,20 +127,6 @@ class EventCardDetails extends StatelessWidget {
               event: event,
               isCreator: isCreator
             ),
-            /*
-            ShowDataAndChangeWindow(
-                eventId: event["id"],
-                windowTitle: AppLocalizations.of(context).eventDatumAendern,
-                rowTitle: AppLocalizations.of(context).datum,
-                rowData: event["wann"].substring(0,16),
-                inputHintText: AppLocalizations.of(context).neuesDatumEingeben,
-                isCreator: isCreator,
-                modus: "date",
-                oldDate: event["wann"],
-                databaseKennzeichnung: "wann"
-            ),
-
-             */
             const SizedBox(height: 5),
             ShowDataAndChangeWindow(
               eventId: event["id"],
@@ -196,8 +182,8 @@ class EventCardDetails extends StatelessWidget {
                 isCreator: isCreator,
                 rowTitle: AppLocalizations.of(context).sprache,
                 rowData: isGerman ?
-                  global_var.changeEnglishToGerman(event["sprache"]).join(", "):
-                  global_var.changeGermanToEnglish(event["sprache"]).join(", "),
+                  global_func.changeEnglishToGerman(event["sprache"]).join(", "):
+                  global_func.changeGermanToEnglish(event["sprache"]).join(", "),
                 items: isGerman ? global_var.sprachenListe :
                   global_var.sprachenListeEnglisch,
                 modus: "multiDropdown",
@@ -855,7 +841,7 @@ class _CardFeedState extends State<CardFeed> {
           InkWell(
             child: organisatorText,
             onTap: () {
-              changePage(context, ShowProfilPage(
+              global_func.changePage(context, ShowProfilPage(
                 userName: ownName,
                 profil: organisatorProfil,
               ));

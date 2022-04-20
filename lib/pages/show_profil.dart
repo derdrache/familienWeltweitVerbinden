@@ -155,9 +155,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     travelBox(){
       var themaText = AppLocalizations.of(context).artDerReise+": ";
-      var inhaltText = global_variablen.changeGermanToEnglish(widget.profil["reiseart"]);
+      var inhaltText = global_functions.changeGermanToEnglish(widget.profil["reiseart"]);
 
-      if(spracheIstDeutsch) inhaltText = global_variablen.changeEnglishToGerman(widget.profil["reiseart"]);
+      if(spracheIstDeutsch) inhaltText = global_functions.changeEnglishToGerman(widget.profil["reiseart"]);
 
 
      return Row(
@@ -170,9 +170,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     sprachenBox(){
       var themenText = AppLocalizations.of(context).sprachen+": ";
-      var inhaltText = global_variablen.changeGermanToEnglish(widget.profil["sprachen"]).join(", ");
+      var inhaltText = global_functions.changeGermanToEnglish(widget.profil["sprachen"]).join(", ");
 
-      if(spracheIstDeutsch) inhaltText =global_variablen.changeEnglishToGerman(widget.profil["sprachen"]).join(", ");
+      if(spracheIstDeutsch) inhaltText =global_functions.changeEnglishToGerman(widget.profil["sprachen"]).join(", ");
 
       return Row(
           children: [
@@ -207,9 +207,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     interessenBox(){
       var themenText = AppLocalizations.of(context).interessen+": ";
-      var inhaltText = global_variablen.changeGermanToEnglish(widget.profil["interessen"]).join(", ");
+      var inhaltText = global_functions.changeGermanToEnglish(widget.profil["interessen"]).join(", ");
 
-      if(spracheIstDeutsch) inhaltText = global_variablen.changeEnglishToGerman(widget.profil["interessen"]).join(", ");
+      if(spracheIstDeutsch) inhaltText = global_functions.changeEnglishToGerman(widget.profil["interessen"]).join(", ");
 
       return Row(
           crossAxisAlignment: CrossAxisAlignment.start,

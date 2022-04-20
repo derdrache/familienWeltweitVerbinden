@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'package:familien_suche/global/variablen.dart';
+
 
 checkValidatorEmpty(context) {
   return (value){
@@ -89,4 +91,75 @@ class ChangeTimeStamp{
 getChatID(usersList){
   var sortedList = usersList.toList(growable: false)..sort();
   return sortedList.join("_");
+}
+
+changeGermanToEnglish(list){
+  var englishOutputList = [];
+  var checkList = [];
+  var englishList = [];
+
+  if(interessenListe.contains(list[0])) {
+    checkList = interessenListe;
+    englishList = interessenListeEnglisch;
+  }
+  if(sprachenListe.contains(list[0])){
+    checkList = sprachenListe;
+    englishList = sprachenListeEnglisch;
+  }
+  if(list.runtimeType == String && checkList.isEmpty){
+    var reiseartenIndex = reisearten.indexOf(list);
+    var eventIntervalIndex = eventInterval.indexOf(list);
+    var eventArtIndex = eventArt.indexOf(list);
+
+    if(reiseartenIndex > -1) return reiseartenEnglisch[reiseartenIndex];
+    if(eventIntervalIndex > -1) return eventIntervalEnglisch[eventIntervalIndex];
+    if(eventArtIndex > -1) return eventArtEnglisch[eventArtIndex];
+
+
+    return list;
+  }
+  if(checkList.isEmpty) return list;
+
+  for(var i = 0; i < list.length; i++){
+    var index = checkList.indexOf(list[i]);
+    englishOutputList.add(englishList[index]);
+  }
+
+  return englishOutputList;
+}
+
+changeEnglishToGerman(list){
+  var germanOutputList = [];
+  var checkList = [];
+  var germanList = [];
+
+
+  if(interessenListeEnglisch.contains(list[0])) {
+    checkList = interessenListeEnglisch;
+    germanList = interessenListe;
+  }
+  if(sprachenListeEnglisch.contains(list[0])){
+    checkList = sprachenListeEnglisch;
+    germanList = sprachenListe;
+  }
+
+  if(list.runtimeType == String && checkList.isEmpty){
+    var reiseartenIndex = reiseartenEnglisch.indexOf(list);
+    var eventIntervalIndex = eventIntervalEnglisch.indexOf(list);
+    var eventArtIndex = eventArtEnglisch.indexOf(list);
+
+    if(reiseartenIndex > -1) return reisearten[reiseartenIndex];
+    if(eventIntervalIndex > -1) return eventInterval[eventIntervalIndex];
+    if(eventArtIndex > -1) return eventArt[eventArtIndex];
+
+    return list;
+  }
+  if(checkList.isEmpty) return list;
+
+  for(var i = 0; i < list.length; i++){
+    var index = checkList.indexOf(list[i]);
+    germanOutputList.add(germanList[index]);
+  }
+
+  return germanOutputList;
 }

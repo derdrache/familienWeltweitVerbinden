@@ -16,7 +16,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 
-import '../../global/global_functions.dart';
+import '../../global/global_functions.dart' as global_func;
 import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
@@ -81,16 +81,16 @@ class _SettingPageState extends State<SettingPage> {
     emailTextKontroller.text = userProfil["email"];
     ortKontroller.text = userProfil["ort"];
     interessenInputBox.selected = spracheIstDeutsch ?
-        global_variablen.changeEnglishToGerman(userProfil["interessen"]):
-        global_variablen.changeGermanToEnglish(userProfil["interessen"]);
+      global_func.changeEnglishToGerman(userProfil["interessen"]):
+      global_func.changeGermanToEnglish(userProfil["interessen"]);
     kinderAgeBox.setSelected(childrenAgeTimestamp);
     bioTextKontroller.text = userProfil["aboutme"];
     reiseArtInput.selected = spracheIstDeutsch ?
-        global_variablen.changeEnglishToGerman(userProfil["reiseart"]):
-        global_variablen.changeGermanToEnglish(userProfil["reiseart"]);;
+      global_func.changeEnglishToGerman(userProfil["reiseart"]):
+      global_func.changeGermanToEnglish(userProfil["reiseart"]);;
     sprachenInputBox.selected = spracheIstDeutsch ?
-        global_variablen.changeEnglishToGerman(userProfil["sprachen"]):
-        global_variablen.changeGermanToEnglish(userProfil["sprachen"]);;
+      global_func.changeEnglishToGerman(userProfil["sprachen"]):
+      global_func.changeGermanToEnglish(userProfil["sprachen"]);;
 
     }
 
