@@ -209,6 +209,7 @@
     "profilbildAendern": "Change profile picture",
     "linkProfilbildEingeben": "Enter link to profile picture",
     "bitteEnddatumEventEingeben": "Please enter the end of the event",
-    "eventEnde": "Event end: "
+    "eventEnde": "Event end: ",
+    "inaktiv": "inactiv"
 }
 

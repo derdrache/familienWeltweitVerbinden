@@ -88,12 +88,11 @@ class _EventCardState extends State<EventCard> {
     var datetimeText = widget.event["wann"].split(" ")[0].split("-").reversed.join(".");
     var datetimeWann = DateTime.parse(widget.event["wann"]);
 
-    if(widget.event["bis"] != null ||
-        DateTime.now().isBefore(datetimeWann)) return datetimeText;
-
-    if(DateTime.now().day > datetimeWann.day){
+    if(DateTime.now().day > datetimeWann.day && widget.event["bis"] != null){
       return DateTime.now().toString().split(" ")[0].split("-").reversed.join(".");
     }
+
+    return datetimeText;
 
   }
 
@@ -104,7 +103,6 @@ class _EventCardState extends State<EventCard> {
     var forTeilnahmeFreigegeben = (widget.event["art"] == "public" ||
         widget.event["art"] == "öffentlich") || widget.event["freigegeben"].contains(userId);
     var isAssetImage = widget.event["bild"].substring(0,5) == "asset" ? true : false;
-
 
     if(widget.event["zusage"].contains(userId)) shadowColor = Colors.green.withOpacity(0.8);
     if(widget.event["absage"].contains(userId)) shadowColor = Colors.red.withOpacity(0.8);
