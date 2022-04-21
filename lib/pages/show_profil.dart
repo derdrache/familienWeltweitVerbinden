@@ -184,6 +184,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     kinderBox(){
       var childrenProfilList = widget.profil["kinder"];
+      childrenProfilList.sort();
       var childrenList = [];
 
       childrenProfilList.forEach((child){
@@ -200,7 +201,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                   fontWeight: FontWeight.bold
               )
           ),
-          Text(childrenList.join(" , "),style: TextStyle(fontSize: textSize))
+          Text(childrenList.reversed.join(" , "),style: TextStyle(fontSize: textSize))
         ],
       );
     }

@@ -506,12 +506,15 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
       childrenAgeStringToStringAge(childrenAgeList){
         List yearChildrenAgeList = [];
+        childrenAgeList.sort();
+
+
         childrenAgeList.forEach((child){
           var childYears = global_functions.ChangeTimeStamp(child).intoYears();
           yearChildrenAgeList.add(childYears.toString() + "J");
         });
 
-        return yearChildrenAgeList.join(" , ");
+        return yearChildrenAgeList.reversed.join(" , ");
       }
 
       popupItems.add(

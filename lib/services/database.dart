@@ -155,10 +155,10 @@ class ProfilDatabase{
     updateProfil(userId, "name", newName);
   }
 
-  updateProfilLocation(userId, locationDict) {
+  updateProfilLocation(userId, locationDict) async {
     var url = Uri.parse(databaseUrl + "database/profils/updateProfilLocation.php");
 
-    http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "id": userId,
       "land": locationDict["land"],
       "city": locationDict["ort"],
@@ -373,10 +373,10 @@ class EventDatabase{
 
   }
 
-  updateLocation(id, locationData) {
+  updateLocation(id, locationData) async {
     var url = Uri.parse(databaseUrl + "database/events/changeLocation.php");
 
-    http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "id": id,
       "stadt": locationData["city"],
       "land": locationData["countryname"],

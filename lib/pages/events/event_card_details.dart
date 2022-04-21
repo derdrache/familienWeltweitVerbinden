@@ -53,6 +53,7 @@ class EventCardDetails extends StatelessWidget {
     var isAssetImage = event["bild"].substring(0,5) == "asset" ? true : false;
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+
     if(screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
     double cardHeight = screenHeight / 1.34;
@@ -76,7 +77,10 @@ class EventCardDetails extends StatelessWidget {
                     ),
                     child: isAssetImage ?
                       Image.asset(event["bild"], fit: BoxFit.fitWidth) :
-                      Image.network(event["bild"], fit: BoxFit.fitWidth)
+                      Container(
+                          constraints: BoxConstraints(maxHeight: screenHeight / 2.08),
+                          child: Image.network(event["bild"], fit: BoxFit.fitWidth,  )
+                      )
                 ),
               ),
             ],
@@ -460,7 +464,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     }
   }
 
-  saveChanges(){
+  saveChanges() async{
     var data = getData();
     var errorText = checkValidation(data);
 
@@ -476,9 +480,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     setState(() {});
 
     if(widget.databaseKennzeichnung == "location"){
-      EventDatabase().updateLocation(widget.eventId, data);
+      await EventDatabase().updateLocation(widget.eventId, data);
     } else{
-      EventDatabase().update(widget.eventId, "${widget.databaseKennzeichnung} = '$data'");
+      await EventDatabase().update(widget.eventId, "${widget.databaseKennzeichnung} = '$data'");
     }
   }
 
@@ -636,7 +640,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     super.initState();
   }
 
-  saveChanges(){
+  saveChanges() async {
     var wannDate = wannDateInputButton.eventDatum ?? DateTime.parse(widget.event["wann"]);
     var wannTime = wannTimeInputButton.uhrZeit ?? DateTime.parse(widget.event["wann"]);
     var newWannDate = DateTime(wannDate.year, wannDate.month, wannDate.day,
@@ -651,7 +655,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
           bisTime.hour, bisTime.minute).toString().substring(0,16);
     }
 
-    EventDatabase().update(widget.event["id"], "wann = '$newWannDate', bis = '$newBisDate'");
+    await EventDatabase().update(widget.event["id"], "wann = '$newWannDate', bis = '$newBisDate'");
     setState(() {
       widget.event["wann"] = newWannDate;
       widget.event["bis"] = newBisDate;
