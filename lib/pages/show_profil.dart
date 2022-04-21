@@ -38,6 +38,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   var userFriendlist = [];
   double textSize = 16;
   double healineTextSize = 18;
+  var monthsUntilInactive = 3;
+
 
 
 @override
@@ -59,6 +61,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   @override
   Widget build(BuildContext context) {
+    widget.profil["lastLogin"] = widget.profil["lastLogin"] ?? DateTime.now();
+    var timeDifference = Duration(microseconds: (DateTime.now().microsecondsSinceEpoch - DateTime.parse(widget.profil["lastLogin"].toString()).microsecondsSinceEpoch).abs()
+    );
+    var monthDifference = timeDifference.inDays / 30.44;
 
     messageButton(){
       return TextButton(
@@ -243,19 +249,24 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       double columnAbstand = 15;
 
       return Container(
-          padding: const EdgeInsets.only(left: 10, top: 20),
+          padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
           decoration: BoxDecoration(
             border: Border(top: BorderSide(color: global_variablen.borderColorGrey))
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            Text("Info", style: TextStyle(
-                fontSize: healineTextSize,
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold
-              ),
-            ),
+              Row(children: [
+                Text("Info", style: TextStyle(
+                    fontSize: healineTextSize,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold
+                )),
+                Expanded(child: SizedBox.shrink()),
+                if(monthDifference >= monthsUntilInactive) Text(
+                    AppLocalizations.of(context).inaktiv,
+                    style: TextStyle(color: Colors.red, fontSize: healineTextSize))
+              ]),
               SizedBox(height: columnAbstand),
               cityBox(),
               SizedBox(height: columnAbstand),

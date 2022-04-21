@@ -48,6 +48,7 @@ class _ErkundenPageState extends State<ErkundenPage>{
   var lastEventPopup;
   var beforeZoomPosition;
   var beforeZoomZoom;
+  var monthsUntilInactive = 6;
 
 
   @override
@@ -102,17 +103,32 @@ class _ErkundenPageState extends State<ErkundenPage>{
   }
 
   getProfilsDB() async{
-    var dbProfils = await ProfilDatabase().getData("id, name, land, interessen, kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, emailAnzeigen, bild, bildStandardFarbe", "ORDER BY land ASC, ort ASC");
+    var dbProfils = await ProfilDatabase().getData("id, name, land, interessen, "
+        "kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, "
+        "emailAnzeigen, bild, bildStandardFarbe, lastLogin",
+        "ORDER BY land ASC, ort ASC");
     if(dbProfils == false) dbProfils = [];
     profilBox.put("list", dbProfils);
     profils = dbProfils;
+    var inactiveProfils = [];
 
     for(var profil in profils){
+      profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
+      var timeDifference = Duration(microseconds: (DateTime.now().microsecondsSinceEpoch - DateTime.parse(profil["lastLogin"].toString()).microsecondsSinceEpoch).abs()
+      );
+      var monthDifference = timeDifference.inDays / 30.44;
+
       if(profil["id"] == userId){
         ownProfil = profil;
-      } else {
+      } else if(monthDifference >= monthsUntilInactive){
+        inactiveProfils.add(profil);
+      }else {
         allUserName.add(profil["name"]);
       }
+    }
+
+    for(var profil in inactiveProfils){
+      profils.remove(profil);
     }
 
     profils.remove(ownProfil);
