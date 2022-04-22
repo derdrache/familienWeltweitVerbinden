@@ -94,15 +94,51 @@ var patchVorlage={
 };
 
 var patch122E={
-  "title" : "",
+  "title" : "1.2.2",
   "inhalt": [
-
+    "General - profile pictures have been inserted. A link from any picture can be inserted under Settings.",
+    "General - A serious security vulnerability has been closed",
+    "General - Speed of the app has been further improved",
+    "General - A 'no internet' indicator has been added",
+    "World Map - Countries have been grouped together more at the lowest zoom level",
+    "World Map - The size of the menu can now be resized as desired",
+    "Chats - The message input box now adapts to the text",
+    "Events - It is now possible to create multi-day events",
+    "Events - The time zone selection bug has been fixed",
+    "Profile - More languages are available for selection ( Does not change the display language of the app)",
+    "Profile inactive - If inactive for more than a month, a "
+        "Location-still-updated notification will be sent(exception are users with "
+        "of the travel type 'Fixed location'. After 3 months the profile will be "
+        "will be visible to others as inactive. After 6 months the profile "
+        "will no longer be displayed on the world map.\n\nThe inactive counter will be reset with the "
+        "visit in the app is reset.",
+    "Profile - The hint text of 'about us' was adjusted.",
+    "various small improvements were added",
+    "various small bugs have been fixed",
   ]
 };
 var patch122D={
-  "title" : "",
+  "title" : "1.2.2",
   "inhalt": [
-
+    "Allgemein - Profilbilder wurden eingefügt. Unter Settings kann ein Link von einem beliebigen Bild eingefügt werden.",
+    "Allgemein - Es wurde eine schwere Sicherheitslücke geschlossen",
+    "Allgemein - Geschwindigkeit der App wurde weiter verbessert",
+    "Allgemein - Es wurde eine 'Kein-Internet'- Anzeige eingebaut",
+    "Weltkarte - Länder wurden auf der niedrigsten Zoomstufe stärker zusammengefasst",
+    "Weltkarte - Die Größe des Menüs kann jetzt nach belieben verändert werden",
+    "Chats - Die Nachrichten Eingabebox passt sich jetzt dem Text an",
+    "Events - Es ist jetzt auch möglich mehrtägige Events zu erstellen",
+    "Events - Der Fehler bei der Auswahl der Zeitzone wurde behoben",
+    "Profil - Es stehen mehr Sprachen zur Auswahl zur Verfügung ( Verändert nichts an der Anzeigesprache der App)",
+    "Profil inaktiv - Bei einer Inaktivität von mehr als einen Monat, wird eine "
+        "Standort-noch-aktuell Notification versendet(Ausnahme sind Benutzer mit "
+        "der Reise Art 'Fester Standort'. Ab 3 Monaten wird das Profil für "
+        "andere sichtbar als inaktiv angezeigt. Ab 6 Monaten wird das Profil "
+        "nicht mehr auf der Weltkarte angezeigt.\n\nDer Inaktivzähler wird mit dem "
+        "Besuch in der App zurück gesetzt.",
+    "Profil - Der Hinttext von 'über uns' wurde angepasst.",
+    "verschiedene kleine Verbesserungen wurden hinzugefügt",
+    "verschiedene kleine Fehler wurden behoben",
   ]
 };
 

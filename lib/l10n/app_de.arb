@@ -211,6 +211,6 @@
     "bitteEnddatumEventEingeben": "Bitte das Ende des Events eingeben",
     "eventEnde": "Event ende: ",
     "inaktiv": "inaktiv",
-    "aboutusHintText": "Zum Beispiel: \n\nWir reisen weil... \nWir wollen uns vernetzen weil... \nWir suchen...\n"
+    "aboutusHintText": "Wir reisen weil... \nWir wollen uns vernetzen weil... \nWir suchen...\n"
 
 }
