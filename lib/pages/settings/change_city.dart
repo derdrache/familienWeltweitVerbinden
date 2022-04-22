@@ -39,7 +39,8 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
   saveLocation() async {
     var locationData = autoComplete.getGoogleLocationData();
-    if(locationData == null) {
+
+    if(locationData["city"] == null) {
       customSnackbar(context, AppLocalizations.of(context).ortNichtBestaetigt);
       return;
     }
