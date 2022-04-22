@@ -69,11 +69,8 @@ class _SettingPageState extends State<SettingPage> {
   void getAndSetDataFromDB() async {
     List childrenAgeTimestamp = [];
 
-    List childrenDataYears = [];
-
     userProfil["kinder"].forEach((kind){
       var changeTimeStamp = global_functions.ChangeTimeStamp(kind);
-      childrenDataYears.add(changeTimeStamp.intoYears());
       childrenAgeTimestamp.add(changeTimeStamp.intoDate());
     });
 
@@ -85,6 +82,7 @@ class _SettingPageState extends State<SettingPage> {
       global_func.changeGermanToEnglish(userProfil["interessen"]);
     kinderAgeBox.setSelected(childrenAgeTimestamp);
     bioTextKontroller.text = userProfil["aboutme"];
+
     reiseArtInput.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["reiseart"]):
       global_func.changeGermanToEnglish(userProfil["reiseart"]);;
@@ -158,7 +156,8 @@ class _SettingPageState extends State<SettingPage> {
           return CustomAlertDialog(
             title: "families worldwide app",
             children: [
-              Text("Version: " +  packageInfo.version)
+              Text("Version: " +  packageInfo.version),
+              Text("test2")
             ],
           );
         });
@@ -290,7 +289,7 @@ class _SettingPageState extends State<SettingPage> {
                       )
                   ),
                   profilThemeContainer(kinderAgeBox.getDates(years: true)  == null? "":
-                  kinderAgeBox.getDates(years: true).join(", "),
+                  kinderAgeBox.getDates(years: true).reversed.join(", "),
                       AppLocalizations.of(context).alterDerKinder, ChangeChildrenPage(
                         userId: userID, childrenBirthdatePickerBox: kinderAgeBox,
                       )),

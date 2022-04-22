@@ -33,9 +33,10 @@ class ChangeAboutmePage extends StatelessWidget {
       body: Column(
         children: [
           customTextInput(
-              AppLocalizations.of(context).ueberMich,
-              bioTextKontroller,
-              moreLines: 10
+            AppLocalizations.of(context).ueberMich,
+            bioTextKontroller,
+            moreLines: 10,
+            hintText: AppLocalizations.of(context).aboutusHintText
           )
         ],
       )

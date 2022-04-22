@@ -29,12 +29,12 @@
     "genauenStandortWaehlen": "Bitte den genauen Standort wählen",
     "profilErstellen": "Profil erstellen",
     "benutzername" : "Benutzername",
-    "aktuellenOrtEingeben": "Aktuelle Ort eingeben",
+    "aktuellenOrtEingeben": "Aktueller Ort eingeben",
     "anzahlUndAlterKinder": "Anzahl und Alter der Kinder:",
     "emailNichtBestaetigt": "Email ist noch nicht bestätigt worden",
     "benutzerNichtGefunden" : "Benutzer nicht gefunden",
     "passwortFalsch" : "Passwort ist falsch",
-    "kinder": "kinder",
+    "kinder": "Kinder",
     "datumEingeben": "Datum eingeben",
     "artDerReiseAuswaehlen": "Art der Reise auswählen",
     "geburtsdatum": "Geburtsdatum",
@@ -43,7 +43,7 @@
     "ueberMichVeraendern": "Über uns verändern",
     "ueberMich": "Über uns",
     "kinderAendern": "Kinder ändern",
-    "ortAendern": "Aktuelle Ort verändern",
+    "ortAendern": "Aktueller Ort verändern",
     "bitteGenaueOrtAuswaehlen": "Bitte die gewünschte Ort auswählen",
     "emailOderPasswortFalsch": "Email oder Passwort falsch",
     "emailAendern": "Email ändern",
@@ -210,6 +210,7 @@
     "linkProfilbildEingeben": "Link zum Profilbild eingeben",
     "bitteEnddatumEventEingeben": "Bitte das Ende des Events eingeben",
     "eventEnde": "Event ende: ",
-    "inaktiv": "inaktiv"
+    "inaktiv": "inaktiv",
+    "aboutusHintText": "Zum Beispiel: \n\nWir reisen weil... \nWir wollen uns vernetzen weil... \nWir suchen...\n"
 
 }
