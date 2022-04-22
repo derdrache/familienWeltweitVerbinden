@@ -13,7 +13,7 @@ double webWidth = 600;
 
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
-  onSubmit, informationWindow}){
+  onSubmit, informationWindow, hintText}){
   return Align(
     child: Stack(
       children: [
@@ -35,7 +35,9 @@ Widget customTextInput(text, controller, {validator, passwort = false,
                     borderSide: BorderSide(color: Colors.black),
                   ),
                   border: const OutlineInputBorder(),
-                  alignLabelWithHint: true,
+                  //alignLabelWithHint: true,
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  hintText: hintText,
                   labelText: text,
                   labelStyle: const TextStyle(fontSize: 15, color: Colors.grey),
                   //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)

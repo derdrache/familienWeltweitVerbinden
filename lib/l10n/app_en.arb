@@ -210,6 +210,7 @@
     "linkProfilbildEingeben": "Enter link to profile picture",
     "bitteEnddatumEventEingeben": "Please enter the end of the event",
     "eventEnde": "Event end: ",
-    "inaktiv": "inactiv"
+    "inaktiv": "inactiv",
+    "aboutusHintText": "For example: \nWe travel because... \nWe want to network because... \nWe search...\n"
 }
 

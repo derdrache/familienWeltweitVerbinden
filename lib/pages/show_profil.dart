@@ -192,10 +192,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       var childrenProfilList = widget.profil["kinder"];
       childrenProfilList.sort();
       var childrenList = [];
+      var alterZusatz = spracheIstDeutsch ? "J": "y";
 
       childrenProfilList.forEach((child){
         childrenList.add(global_functions.ChangeTimeStamp(child).intoYears()
-            .toString()+"J");
+            .toString() + alterZusatz);
       });
 
       return Row(
@@ -278,7 +279,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               SizedBox(height: columnAbstand),
               interessenBox(),
               SizedBox(height: columnAbstand),
-              aboutmeBox()
+              if(widget.profil["aboutme"].isNotEmpty) aboutmeBox()
             ],
           )
       );

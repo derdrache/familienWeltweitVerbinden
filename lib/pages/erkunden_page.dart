@@ -523,11 +523,12 @@ class _ErkundenPageState extends State<ErkundenPage>{
       childrenAgeStringToStringAge(childrenAgeList){
         List yearChildrenAgeList = [];
         childrenAgeList.sort();
+        var alterZusatz = spracheIstDeutsch ? "J": "y";
 
 
         childrenAgeList.forEach((child){
           var childYears = global_functions.ChangeTimeStamp(child).intoYears();
-          yearChildrenAgeList.add(childYears.toString() + "J");
+          yearChildrenAgeList.add(childYears.toString() +  alterZusatz);
         });
 
         return yearChildrenAgeList.reversed.join(" , ");
