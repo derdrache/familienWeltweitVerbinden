@@ -156,8 +156,9 @@ class _SettingPageState extends State<SettingPage> {
           return CustomAlertDialog(
             title: "families worldwide app",
             children: [
+              SizedBox(height: 20),
               Text("Version: " +  packageInfo.version),
-              Text("test2")
+              SizedBox(height: 20)
             ],
           );
         });
