@@ -269,10 +269,17 @@ class _ErkundenPageState extends State<ErkundenPage>{
     var newPoint = true;
 
     var landGedataProfil = LocationService().getCountryLocation(profil["land"]);
+    landGedataProfil["kontinentGer"] ??= landGedataProfil["nameGer"];
+    landGedataProfil["kontinentEng"] ??= landGedataProfil["nameEng"];
+
     var kontinentGeodataProfil = LocationService().getKontinentLocation(landGedataProfil["kontinentGer"]);
+    kontinentGeodataProfil ??= {"kontinentGer" : landGedataProfil["nameGer"]};
+    kontinentGeodataProfil ??= {"kontinentEng" : landGedataProfil["nameEng"]};
 
     for(var i = 0; i< list.length; i++){
       var kontinentGeodataListitem = LocationService().getKontinentLocation(list[i]["kontinent"]);
+      kontinentGeodataListitem ??= {"kontinentGer" : list[i]["kontinent"]};
+
       if(kontinentGeodataListitem["kontinentGer"] == kontinentGeodataProfil["kontinentGer"]){
         newPoint = false;
         var addNumberName = int.parse(list[i]["name"]) + 1;
@@ -284,12 +291,13 @@ class _ErkundenPageState extends State<ErkundenPage>{
     }
 
     if(newPoint){
+
       list.add({
         "kontinentName": landGedataProfil["kontinentGer"],
-        "kontinent": landGedataProfil["kontinentGer"],
+        "kontinent": landGedataProfil["kontinentGer"] ?? landGedataProfil["land"],
         "name": "1",
-        "latt": kontinentGeodataProfil["latt"],
-        "longt":kontinentGeodataProfil["longt"],
+        "latt": kontinentGeodataProfil["latt"] ?? landGedataProfil["latt"] ,
+        "longt":kontinentGeodataProfil["longt"] ?? landGedataProfil["longt"],
         "profils": [profil]
       });
     }

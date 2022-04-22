@@ -73,6 +73,8 @@ class LocationService {
   }
 
   getKontinentLocation(kontinent){
+    if(kontinent == null) return null;
+
     for (var i = 0; i < kontinentGeodata.length; i++){
       var nameGer = kontinentGeodata[i]["kontinentGer"];
       var nameEng = kontinentGeodata[i]["kontinentEng"];
