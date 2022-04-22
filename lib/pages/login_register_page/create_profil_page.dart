@@ -94,7 +94,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         var userID = FirebaseAuth.instance.currentUser?.uid;
         var email = FirebaseAuth.instance.currentUser?.email;
 
-        if(ortMapData != null){
+        if(ortMapData["city"] != null){
           var data = {
             "id": userID,
             "email": email,
