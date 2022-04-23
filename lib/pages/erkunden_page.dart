@@ -46,7 +46,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
   bool popupActive = false;
   List<Widget> popupItems = [];
   var lastEventPopup;
-  var beforeZoomPosition;
   var beforeZoomZoom;
   var monthsUntilInactive = 6;
 
@@ -453,21 +452,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
     });
   }
 
-  zoomAtPoint(position){
-    if(mapZoom < 2.6){
-      mapZoom = 2.6;
-    } else if(mapZoom< 4){
-      mapZoom = 4.1;
-    } else if (mapZoom < 6.5){
-      mapZoom = 6.6;
-    }
-
-    mapPosition = position;
-    mapController.move(position, mapZoom);
-
-    changeProfil(mapZoom);
-  }
-
   zoomOut(){
     var newZoom;
 
@@ -479,12 +463,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
       newZoom = minMapZoom;
     }
 
-    if(beforeZoomPosition != null) {
-      newZoom = beforeZoomZoom;
-      mapPosition = beforeZoomPosition;
-
-      beforeZoomZoom = beforeZoomPosition = null;
-    }
     mapController.move(mapPosition, newZoom);
     mapZoom = newZoom;
     FocusScope.of(context).unfocus();
@@ -773,9 +751,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 () {
                   popupActive = true;
                   createPopupProfils(profil);
-                  beforeZoomPosition = mapPosition;
-                  beforeZoomZoom= mapZoom;
-                  zoomAtPoint(position);
                   setState(() {
 
                   });
@@ -811,9 +786,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 lastEventPopup = event;
                 popupActive = true;
                 createPopupEvents(event);
-                beforeZoomPosition = mapPosition;
-                beforeZoomZoom= mapZoom;
-                zoomAtPoint(position);
               })
           );
       }
