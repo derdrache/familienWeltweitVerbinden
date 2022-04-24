@@ -245,7 +245,6 @@ class _ChatPageState extends State<ChatPage>{
 
   @override
   Widget build(BuildContext context){
-
     chatUserList(groupdata) {
       List<Widget> groupContainer = [];
       for(dynamic group in groupdata){
@@ -281,7 +280,7 @@ class _ChatPageState extends State<ChatPage>{
                   chatPartnerName: chatPartnerName,
                   groupChatData: group,
                 ))
-            ),
+            ).whenComplete(() => setState(() {})),
             child: Container(
                 padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
                 width: double.infinity,
@@ -308,7 +307,7 @@ class _ChatPageState extends State<ChatPage>{
                       children: [
                     Text(DateFormat('dd-MM HH:mm').format(lastMessageTime), style: TextStyle(color: Colors.grey[600])),
                     const SizedBox(height: 10),
-                    ownChatNewMessages== 0? const SizedBox.shrink(): Container(
+                    ownChatNewMessages== 0? const SizedBox(height:30): Container(
                         height: 30,
                         width: 30,
                         decoration: BoxDecoration(

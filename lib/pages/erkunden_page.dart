@@ -66,7 +66,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
   setProfils(){
     profils = profilBox.get("list");
-
     profils ??= [];
 
     for(var profil in profils){
@@ -575,7 +574,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
     createPopupEvents(event){
       popupItems = [];
 
-
       popupItems.add(
           Container(
               alignment: Alignment.center,
@@ -586,7 +584,6 @@ class _ErkundenPageState extends State<ErkundenPage>{
               )
           )
       );
-
 
       for(var event in event["profils"]){
         popupItems.add(
@@ -609,7 +606,11 @@ class _ErkundenPageState extends State<ErkundenPage>{
 
                 lastEventPopup["profils"] = refreshEvents;
                 createPopupEvents(lastEventPopup);
+                setState(() {
+
+                });
               }
+
             )
         );
       }
@@ -786,6 +787,9 @@ class _ErkundenPageState extends State<ErkundenPage>{
                 lastEventPopup = event;
                 popupActive = true;
                 createPopupEvents(event);
+                setState(() {
+
+                });
               })
           );
       }

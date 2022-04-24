@@ -115,7 +115,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           ProfilDatabase().addNewProfil(data);
           global_functions.changePageForever(context, StartPage());
         } else{
-          customSnackbar(context, AppLocalizations.of(context).ortNichtBestaetigt);
+          customSnackbar(context, AppLocalizations.of(context).ortEingeben);
         }
       }
     }

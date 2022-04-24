@@ -43,7 +43,7 @@ class FeedbackPage extends StatelessWidget {
 
     feedbackEingabe(){
       return customTextInput(
-          AppLocalizations.of(context).feedbackEingeben,
+          AppLocalizations.of(context).feedback,
           feedbackTextKontroller,
           moreLines: 10,
           validator: checkValidatorEmpty(context)

@@ -41,7 +41,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     var locationData = autoComplete.getGoogleLocationData();
 
     if(locationData["city"] == null) {
-      customSnackbar(context, AppLocalizations.of(context).ortNichtBestaetigt);
+      customSnackbar(context, AppLocalizations.of(context).ortEingeben);
       return;
     }
 
@@ -70,7 +70,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
           buttons: <Widget>[saveButton()]
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           autoComplete,
         ],

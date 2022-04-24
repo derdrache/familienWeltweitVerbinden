@@ -45,6 +45,14 @@ class _StartPageState extends State<StartPage>{
   }
 
   _asyncMethod() async{
+    var ownProfilBox = Hive.box("ownProfilBox");
+    if(Hive.box('ownProfilBox').get("list") == null){
+      var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userID'");
+      Hive.box('ownProfilBox').put("list", ownProfil);
+    }
+
+
+
     try{
 
       var updateInformation = await InAppUpdate.checkForUpdate();
@@ -130,7 +138,7 @@ class _StartPageState extends State<StartPage>{
     }
 
 
-    hasNetwork();
+    if(!kIsWeb) hasNetwork();
 
     return Scaffold(
           body: Center(
