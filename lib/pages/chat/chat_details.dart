@@ -81,7 +81,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
     });
 
     timer = Timer.periodic(
-        Duration(seconds: 10), (Timer t) => checkNewMessages());
+        const Duration(seconds: 10), (Timer t) => checkNewMessages());
   }
 
   checkNewMessages() {
@@ -254,11 +254,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
                     builder: (context, snapshot) {
                       if(snapshot.hasData && snapshot.data != false) {
                         return Container(
-                          margin: EdgeInsets.only(bottom: 25),
+                          margin: const EdgeInsets.only(bottom: 25),
                           child: Stack(
                             clipBehavior: Clip.none, children: [
                             EventCard(
-                              margin: EdgeInsets.all(15),
+                              margin: const EdgeInsets.all(15),
                               withInteresse: true,
                               event: snapshot.data,
                               afterPageVisit: () => setState((){}),
@@ -275,7 +275,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
                           ),
                         );
                       }
-                      return SizedBox.shrink();
+                      return const SizedBox.shrink();
                     }
                   ),
                 )
@@ -337,7 +337,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
             AsyncSnapshot snap,
           ) {
             if (snap.connectionState == ConnectionState.waiting) {
-              return pufferList ?? Center(child: CircularProgressIndicator());
+              return pufferList ?? const Center(child: const CircularProgressIndicator());
             } else if (snap.data != null) {
               List<dynamic> messages = snap.data;
 
@@ -355,7 +355,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
       return Stack(
         children: [
           Container(
-            padding: EdgeInsets.only(left: 10, right: 50),
+            padding: const EdgeInsets.only(left: 10, right: 50),
             decoration: BoxDecoration(
                 color: Colors.white,
                 border: const Border(top: BorderSide(color: Colors.grey)),
@@ -368,7 +368,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
                   ),
                 ]),
             child: ConstrainedBox(
-                constraints: BoxConstraints(
+                constraints: const BoxConstraints(
                   maxHeight: 200.0,
                 ),
                 child: TextField(

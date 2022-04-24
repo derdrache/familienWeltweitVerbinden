@@ -30,6 +30,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+
 }
 
 hiveInit() async {
@@ -101,7 +102,7 @@ class MyApp extends StatelessWidget {
     }
 
     profilExist = await ProfilDatabase()
-        .getData("name", "WHERE id = '${userId}'");
+        .getData("name", "WHERE id = '$userId'");
     if(kIsWeb) return ;
 
     importantUpdateNumber = await AllgemeinDatabase().getData("importantUpdate", "");
@@ -117,39 +118,46 @@ class MyApp extends StatelessWidget {
         initializationSettings,
         onSelectNotification: (payload) async {
           final Map<String, dynamic> payLoadMap = json.decode(payload);
-          if(payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
 
+          if(payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
           if(payLoadMap["typ"] == "event") changeToEvent(payLoadMap["link"]);
-          //
+
         }
     );
 
 
     FirebaseMessaging.instance.getInitialMessage().then((value){
       if(value != null){
-        var messageChatId = json.decode(value.data.values.last)["link"];
-        changeToChat(messageChatId);
+        var notificationTyp = json.decode(value.data.values.last)["typ"];
+        var pageId = json.decode(value.data.values.last)["link"];
+
+        if(notificationTyp== "chat") changeToChat(pageId);
+        if(notificationTyp =="event") changeToEvent(pageId);
+
       }
 
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
       if(message.data.isNotEmpty){
-        var messageChatId = json.decode(message.data.values.last)["link"];
-        var activeChat = await ProfilDatabase()
-            .getData("activeChat", "WHERE id = '${userId}'");
+        var notificationTyp = json.decode(message.data.values.last)["typ"];
+        var pageId = json.decode(message.data.values.last)["link"];
 
-        if(activeChat == null || activeChat != messageChatId){
+        var activeChat = await ProfilDatabase()
+            .getData("activeChat", "WHERE id = '$userId'");
+
+        if(activeChat == null || activeChat != pageId){
           LocalNotificationService().display(message);
         }
       }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async{
-      var messagePageId = json.decode(message.data.values.last)["link"];
-
+      var notificationTyp = json.decode(message.data.values.last)["typ"];
+      var pageId = json.decode(message.data.values.last)["link"];
       if(pageContext != null){
-        changeToChat(messagePageId);
+        if(notificationTyp == "chat") changeToChat(pageId);
+        if(notificationTyp == "chat") changeToEvent(pageId);
       }
 
     });
@@ -167,7 +175,7 @@ class MyApp extends StatelessWidget {
   }
 
   changeToEvent(eventId) async {
-    var eventData = await EventDatabase().getData("*", "WHERE id = '${eventId}'");
+    var eventData = await EventDatabase().getData("*", "WHERE id = '$eventId'");
 
     navigatorKey.currentState?.push(
         MaterialPageRoute(builder: (_) => EventDetailsPage(
