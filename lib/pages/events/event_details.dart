@@ -138,7 +138,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         context: context,
         builder: (BuildContext buildContext){
           return CustomAlertDialog(
-              height: 300,
+              height: 250,
               title: AppLocalizations.of(context).organisatorAbgeben,
               children: [
                 searchAutocomplete,
@@ -360,7 +360,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         AppLocalizations.of(context).freigegeben +
                             (eventDetails["freigegeben"] +1).toString(),
                         style: TextStyle(fontSize: fontsize)
-                    )
+                    ),
+                    if(isNotPublic) const SizedBox(height: 10)
                   ]
               );
             })
@@ -654,7 +655,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               label: Text(AppLocalizations.of(context).linkKopieren),
               icon: const Icon(Icons.copy),
             ),
-          )
+          ),
+          SizedBox(height: 10)
         ]
       );
     });

@@ -369,7 +369,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
                 ]),
             child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxHeight: 300.0,
+                  maxHeight: 200.0,
                 ),
                 child: TextField(
                   maxLines: null,

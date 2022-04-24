@@ -26,7 +26,7 @@
   {
     "nameGer": "Österreich", "nameEng": "Austria", "latt": 47.33, "longt": 13.33, "kontinentGer": "Mitteleuropa", "kontinentEng": "Central Europe"},
   {
-    "nameGer": "Australien", "nameEng": "Australia", "latt": -27.0, "longt": 133.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
+    "nameGer": "Australien", "nameEng": "Australia", "latt": -27.0, "longt": 133.0},
   {
     "nameGer": "Aruba", "nameEng": "Aruba", "latt": 12.5, "longt": -69.97, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
   {
@@ -70,7 +70,7 @@
   {
     "nameGer": "Belize", "nameEng": "Belize", "latt": 17.25, "longt": -88.75, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
   {
-    "nameGer": "Kanada", "nameEng": "Canada", "latt": 60.0, "longt": -95.0, "kontinentGer": "Nordamerika", "kontinentEng": "North America"},
+    "nameGer": "Kanada", "nameEng": "Canada", "latt": 60.0, "longt": -95.0},
   {
     "nameGer": "Kokosinseln (Keelinginseln)", "nameEng": "Cocos (Keeling) Islands", "latt": -12.5, "longt": 96.83},
   {
@@ -88,7 +88,7 @@
   {
     "nameGer": "Kamerun", "nameEng": "Cameroon", "latt": 6.0, "longt": 12.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
   {
-    "nameGer": "China", "nameEng": "China", "latt": 35.0, "longt": 105.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
+    "nameGer": "China", "nameEng": "China", "latt": 35.0, "longt": 105.0},
   {
     "nameGer": "Kolumbien", "nameEng": "Colombia", "latt": 4.0, "longt": -72.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
   {
@@ -228,7 +228,7 @@
   {
     "nameGer": "Kaimaninseln", "nameEng": "Cayman Islands", "latt": 19.5, "longt": -80.5, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
   {
-    "nameGer": "Kasachstan", "nameEng": "Kazakhstan", "latt": 48.0, "longt": 68.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
+    "nameGer": "Kasachstan", "nameEng": "Kazakhstan", "latt": 48.0, "longt": 68.0},
   {
     "nameGer": "Laos", "nameEng": "Lao", "latt": 18.0, "longt": 105.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
   {
@@ -270,7 +270,7 @@
   {
     "nameGer": "Myanmar (Birma)", "nameEng": "Myanmar", "latt": 22.0, "longt": 98.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
   {
-    "nameGer": "Mongolei", "nameEng": "Mongolia", "latt": 46.0, "longt": 105.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
+    "nameGer": "Mongolei", "nameEng": "Mongolia", "latt": 46.0, "longt": 105.0},
   {
     "nameGer": "Macau", "nameEng": "Macao", "latt": 22.17, "longt": 113.55, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
   {
@@ -290,7 +290,7 @@
   {
     "nameGer": "Malawi", "nameEng": "Malawi", "latt": -13.5, "longt": 34.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
   {
-    "nameGer": "Mexiko", "nameEng": "Mexico", "latt": 23.0, "longt": -102.0, "kontinentGer": "Nordamerika", "kontinentEng": "North America"},
+    "nameGer": "Mexiko", "nameEng": "Mexico", "latt": 23.0, "longt": -102.0},
   {
     "nameGer": "Malaysia", "nameEng": "Malaysia", "latt": 2.5, "longt": 112.5, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
   {
@@ -312,7 +312,7 @@
   {
     "nameGer": "Norwegen", "nameEng": "Norway", "latt": 62.0, "longt": 10.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
   {
-    "nameGer": "Nepal", "nameEng": "Nepal", "latt": 28.0, "longt": 84.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
+    "nameGer": "Nepal", "nameEng": "Nepal", "latt": 28.0, "longt": 84.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
   {
     "nameGer": "Nauru", "nameEng": "Nauru", "latt": -0.53, "longt": 166.92},
   {
@@ -354,7 +354,7 @@
   {
     "nameGer": "Serbien", "nameEng": "Serbia", "latt": 44.0, "longt": 21.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
   {
-    "nameGer": "Russland", "nameEng": "Russia", "latt": 55.0, "longt": 45.0, "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe"},
+    "nameGer": "Russland", "nameEng": "Russia", "latt": 55.0, "longt": 45.0},
   {
     "nameGer": "Ruanda", "nameEng": "Rwanda", "latt": -2.0, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
   {
@@ -426,7 +426,7 @@
   {
     "nameGer": "Uganda", "nameEng": "Uganda", "latt": 1.0, "longt": 32.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
   {
-    "nameGer": "USA", "nameEng": "USA", "latt": 38.0, "longt": -97.0, "kontinentGer": "Nordamerika", "kontinentEng": "North America"},
+    "nameGer": "USA", "nameEng": "USA", "latt": 38.0, "longt": -97.0},
   {
     "nameGer": "Uruguay", "nameEng": "Uruguay", "latt": -33.0, "longt": -56.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
   {
