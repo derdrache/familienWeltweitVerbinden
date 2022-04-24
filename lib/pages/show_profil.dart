@@ -61,7 +61,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-    widget.profil["lastLogin"] = widget.profil["lastLogin"] ?? DateTime.now();
+    widget.profil["lastLogin"] = widget.profil["lastLogin"] ?? DateTime.parse("2022-02-13");
     var timeDifference = Duration(microseconds: (DateTime.now().microsecondsSinceEpoch - DateTime.parse(widget.profil["lastLogin"].toString()).microsecondsSinceEpoch).abs()
     );
     var monthDifference = timeDifference.inDays / 30.44;

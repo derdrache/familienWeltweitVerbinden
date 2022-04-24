@@ -315,7 +315,7 @@ class ChatDatabase{
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
-    //sendChatNotification(chatID, messageData);
+    sendChatNotification(chatID, messageData);
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{

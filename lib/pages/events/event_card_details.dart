@@ -31,7 +31,335 @@ var isWebDesktop = kIsWeb && (defaultTargetPlatform != TargetPlatform.iOS || def
 double fontsize = isWebDesktop? 12 : 16;
 var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
+class EventCardDetails extends StatefulWidget {
+  var event;
+  var offlineEvent;
+  var isCreator;
+  var isApproved;
+  var isPublic;
 
+  EventCardDetails({
+    Key key,
+    this.event,
+    this.offlineEvent=true,
+    this.isApproved = false
+  }) :
+        isCreator = event["erstelltVon"] == userId,
+        isPublic = event["art"] == "öffentlich" || event["art"] == "public", super(key: key);
+
+  @override
+  _EventCardDetailsState createState() => _EventCardDetailsState();
+}
+
+class _EventCardDetailsState extends State<EventCardDetails> {
+
+  @override
+  Widget build(BuildContext context) {
+    var isAssetImage = widget.event["bild"].substring(0,5) == "asset" ? true : false;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    if(screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
+    double cardWidth = screenWidth / 1.12;
+    double cardHeight = screenHeight / 1.34;
+    widget.event["eventInterval"] = isGerman ?
+    global_func.changeEnglishToGerman(widget.event["eventInterval"]):
+    global_func.changeGermanToEnglish(widget.event["eventInterval"]);
+
+    bildAndTitleBox(){
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Stack(
+            children: [
+              ImageGalerie(
+                id: widget.event["id"],
+                isCreator: widget.isCreator,
+                child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                    ),
+                    child: isAssetImage ?
+                    Image.asset(widget.event["bild"], fit: BoxFit.fitWidth) :
+                    Container(
+                        constraints: BoxConstraints(maxHeight: screenHeight / 2.08),
+                        child: Image.network(widget.event["bild"], fit: BoxFit.fitWidth,  )
+                    )
+                ),
+              ),
+            ],
+          ),
+          Positioned.fill(
+              bottom: -10,
+              child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                      padding: const EdgeInsets.only(top:10, bottom: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(Radius.circular(20)),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 5,
+                              blurRadius: 7,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                      ),
+                      margin: const EdgeInsets.only(left: 30, right: 30),
+                      width: 800,
+                      child: ShowDataAndChangeWindow(
+                          eventId: widget.event["id"],
+                          windowTitle: AppLocalizations.of(context).eventNameAendern,
+                          rowData: widget.event["name"],
+                          inputHintText: AppLocalizations.of(context).neuenNamenEingeben,
+                          isCreator: widget.isCreator,
+                          modus: "textInput",
+                          singleShow: true,
+                          databaseKennzeichnung: "name"
+                      )
+                  )
+              )
+          ),
+        ],
+      );
+    }
+
+    eventInformationBox(){
+      return Container(
+        margin: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            ShowDatetimeBox(
+                event: widget.event,
+                isCreator: widget.isCreator
+            ),
+            const SizedBox(height: 5),
+            ShowDataAndChangeWindow(
+                eventId: widget.event["id"],
+                windowTitle: AppLocalizations.of(context).eventZeitzoneAendern,
+                rowTitle: AppLocalizations.of(context).zeitzone,
+                rowData: widget.event["zeitzone"],
+                inputHintText: AppLocalizations.of(context).neueZeitzoneEingeben,
+                isCreator: widget.isCreator,
+                modus: "dropdown",
+                databaseKennzeichnung: "zeitzone",
+                items: global_var.eventZeitzonen
+            ),
+            const SizedBox(height: 5),
+            ShowDataAndChangeWindow(
+                eventId: widget.event["id"],
+                windowTitle: AppLocalizations.of(context).eventStadtAendern,
+                rowTitle: AppLocalizations.of(context).ort,
+                rowData: widget.event["stadt"] + ", " + widget.event["land"],
+                inputHintText: AppLocalizations.of(context).neueStadtEingeben,
+                isCreator: widget.isCreator,
+                modus: "googleAutoComplete",
+                databaseKennzeichnung: "location"
+            ),
+            const SizedBox(height: 5),
+            if(widget.isApproved|| widget.isPublic) ShowDataAndChangeWindow(
+                eventId: widget.event["id"],
+                windowTitle: AppLocalizations.of(context).eventMapLinkAendern,
+                rowTitle: "Map: ",
+                rowData: widget.event["link"],
+                inputHintText: AppLocalizations.of(context).neuenKartenlinkEingeben,
+                isCreator: widget.isCreator,
+                modus: "textInput",
+                databaseKennzeichnung: "link"
+            ),
+            if(widget.isApproved|| widget.isPublic) const SizedBox(height: 5),
+            if(widget.isApproved|| widget.isPublic) ShowDataAndChangeWindow(
+              eventId: widget.event["id"],
+              windowTitle: AppLocalizations.of(context).eventIntervalAendern,
+              inputHintText: "",
+              isCreator: widget.isCreator,
+              rowTitle: "Interval",
+              rowData: widget.event["eventInterval"],
+              items: isGerman ? global_var.eventInterval :
+              global_var.eventIntervalEnglisch,
+              modus: "dropdown",
+              databaseKennzeichnung: "eventInterval",
+              saveFunction: () async {
+                  widget.event = await EventDatabase().getData("*", "WHERE id = '${widget.event["id"]}'");
+                  setState(() {
+
+                  });
+
+              },
+            ),
+            if(widget.isApproved|| widget.isPublic) const SizedBox(height: 5),
+            ShowDataAndChangeWindow(
+                eventId: widget.event["id"],
+                windowTitle: AppLocalizations.of(context).eventSpracheAendern,
+                inputHintText: "",
+                isCreator: widget.isCreator,
+                rowTitle: AppLocalizations.of(context).sprache,
+                rowData: isGerman ?
+                global_func.changeEnglishToGerman(widget.event["sprache"]).join(", "):
+                global_func.changeGermanToEnglish(widget.event["sprache"]).join(", "),
+                items: isGerman ? global_var.sprachenListe :
+                global_var.sprachenListeEnglisch,
+                modus: "multiDropdown",
+                databaseKennzeichnung: "sprache"
+            ),
+          ],
+        ),
+      );
+    }
+
+    eventBeschreibung(){
+      return Container(
+          margin: const EdgeInsets.only(top:5, left:10, right: 10, bottom: 10),
+          child: Center(
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(
+                  minHeight: 25.0,
+                ),
+                child: ShowDataAndChangeWindow(
+                    eventId: widget.event["id"],
+                    windowTitle: AppLocalizations.of(context).eventBeschreibungAendern,
+                    rowData: widget.event["beschreibung"],
+                    inputHintText: AppLocalizations.of(context).neueBeschreibungEingeben,
+                    isCreator: widget.isCreator,
+                    modus: "textInput",
+                    multiLines: true,
+                    databaseKennzeichnung: "beschreibung"
+                ),
+              )
+          )
+      );
+    }
+
+    creatorChangeHintBox(){
+      if (widget.isCreator){
+        return Center(
+          child: Text(
+              AppLocalizations.of(context).antippenZumAendern,
+              style: const TextStyle(color: Colors.grey)
+          ),
+        );
+      }
+      return const SizedBox.shrink();
+    }
+
+    cardShadowColor(){
+      if(widget.event["zusage"].contains(userId)) return Colors.green;
+      if(widget.event["absage"].contains(userId)) return Colors.red;
+
+      return Colors.grey;
+    }
+
+    return Center(
+      child: Stack(
+        children: [
+          Container(
+            padding: const EdgeInsets.only(bottom: 30),
+            width: cardWidth,
+            height: cardHeight,
+            margin: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: cardShadowColor().withOpacity(0.6),
+                    spreadRadius: 12,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                bildAndTitleBox(),
+                const SizedBox(height: 20),
+                creatorChangeHintBox(),
+                eventInformationBox(),
+                if(widget.isApproved || widget.isPublic) eventBeschreibung(),
+              ],
+            ),
+          ),
+          if(!widget.isApproved && !widget.isPublic) Container(
+              width: cardWidth,
+              height: cardHeight,
+              margin: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.grey.withOpacity(0.6),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                      onTap: ()  async {
+                        var isOnList = widget.event["freischalten"].contains(userId);
+
+                        if(isOnList) {
+                          customSnackbar(context,
+                              AppLocalizations.of(context).eventOrganisatorMussFreischalten,
+                              color: Colors.green);
+                          return;
+                        } else{
+                          customSnackbar(context,
+                              AppLocalizations.of(context).eventInteresseMitgeteilt,
+                              color: Colors.green);
+
+                          var dbDaten = await EventDatabase()
+                              .getData("freischalten, interesse", "WHERE id = '${widget.event["id"]}'");
+
+                          var freischaltenList = dbDaten["freischalten"];
+                          freischaltenList.add(userId);
+
+                          var interessenList = dbDaten["interesse"];
+                          interessenList.add(userId);
+
+                          EventDatabase().update(
+                              widget.event["id"],
+                              "freischalten = '${json.encode(freischaltenList)}', "
+                                  "interesse = '${json.encode(interessenList)}'"
+                          );
+                        }
+                      } ,
+                      child: const Icon(Icons.add_circle, size: 80, color: Colors.black,)
+                  ),
+                  const Text(""),
+                  const SizedBox(height: 40,)
+                ],
+              )
+          ),
+          if(!widget.isCreator) Positioned(
+              top: 25,
+              right: 28,
+              child: InteresseButton(
+                hasIntereset: widget.event["interesse"].contains(userId),
+                id: widget.event["id"],
+              )
+          ),
+          Positioned(
+              bottom: 25,
+              left: 30,
+              child: CardFeed(
+                  organisator: widget.event["erstelltVon"],
+                  eventId: widget.event["id"],
+                  eventZusage: widget.event["zusage"],
+                  width: cardWidth
+              )
+          )
+        ],
+      ),
+    );
+  }
+}
+
+
+
+
+/*
 class EventCardDetails extends StatelessWidget {
   var event;
   var offlineEvent;
@@ -176,7 +504,11 @@ class EventCardDetails extends StatelessWidget {
                 items: isGerman ? global_var.eventInterval :
                   global_var.eventIntervalEnglisch,
                 modus: "dropdown",
-                databaseKennzeichnung: "eventInterval"
+                databaseKennzeichnung: "eventInterval",
+                saveFunction: () {
+                  print("test");
+                  setState((){});
+                },
             ),
             if(isApproved|| isPublic) const SizedBox(height: 5),
             ShowDataAndChangeWindow(
@@ -345,6 +677,8 @@ class EventCardDetails extends StatelessWidget {
 }
 
 
+ */
+
 class ShowDataAndChangeWindow extends StatefulWidget {
   var windowTitle;
   var rowTitle;
@@ -358,6 +692,7 @@ class ShowDataAndChangeWindow extends StatefulWidget {
   var databaseKennzeichnung;
   var oldDate;
   var eventId;
+  var saveFunction;
 
   ShowDataAndChangeWindow({
     Key key,
@@ -372,7 +707,8 @@ class ShowDataAndChangeWindow extends StatefulWidget {
     this.multiLines = false,
     this.databaseKennzeichnung,
     this.oldDate,
-    this.eventId
+    this.eventId,
+    this.saveFunction
   }) : super(key: key);
 
   @override
@@ -479,16 +815,20 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
     setState(() {});
 
+
+
     if(widget.databaseKennzeichnung == "location"){
       await EventDatabase().updateLocation(widget.eventId, data);
     } else{
       await EventDatabase().update(widget.eventId, "${widget.databaseKennzeichnung} = '$data'");
     }
+
+    widget.saveFunction();
   }
+
 
   @override
   Widget build(BuildContext context) {
-
     inputBox(){
       if(widget.modus == "textInput"){
         return customTextInput(
@@ -626,19 +966,11 @@ class ShowDatetimeBox extends StatefulWidget {
 
 class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
   var isSingeDay;
-  var wannDateInputButton = DateButton(getDate: true);
-  var wannTimeInputButton = DateButton();
+  var wannDateInputButton;
+  var wannTimeInputButton;
   var bisDateInputButton = DateButton(getDate: true);
   var bisTimeInputButton = DateButton();
 
-  @override
-  void initState() {
-    isSingeDay = widget.event["eventInterval"] != global_var.eventInterval[2] &&
-        widget.event["eventInterval"] != global_var.eventIntervalEnglisch[2];
-
-
-    super.initState();
-  }
 
   saveChanges() async {
     var wannDate = wannDateInputButton.eventDatum ?? DateTime.parse(widget.event["wann"]);
@@ -648,8 +980,20 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     var newBisDate;
 
     if(!isSingeDay){
-      var bisDate = bisDateInputButton.eventDatum ?? DateTime.parse(widget.event["bis"]);
-      var bisTime = bisTimeInputButton.eventDatum ?? DateTime.parse(widget.event["bis"]);
+      var bisDate = bisDateInputButton.eventDatum;
+      var bisTime = bisTimeInputButton.eventDatum;
+
+      if(bisDate == null){
+        return customSnackbar(context, "Eingeben bis zu welchem Tag das Event geht");
+      } else{
+        bisDate = DateTime.parse(widget.event["bis"]);
+      }
+
+      if(bisTime == null){
+        return customSnackbar(context, "Eingeben bis wieviel Uhr das Event geht");
+      } else{
+        bisTime = DateTime.parse(widget.event["bis"]);
+      }
 
       newBisDate = DateTime(bisDate.year, bisDate.month, bisDate.day,
           bisTime.hour, bisTime.minute).toString().substring(0,16);
@@ -734,12 +1078,21 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
 
     if(!isSingeDay){
-      var bisDatetimeList = widget.event["bis"].split(" ");
-      List bisDateList = bisDatetimeList[0].split("-");
-      List bisTimeList = bisDatetimeList[1].split(":");
+      var bisDatetimeList = widget.event["bis"]?.split(" ");
+      var bisDateText = "?";
+      var bisTimeText = "?";
 
-      return wannDateList.last + " - " + bisDateList.reversed.join(".") + "\n " +
-          wannTimeList.take(2).join(":") + " - " + bisTimeList.take(2).join(":");
+      if(bisDatetimeList != null){
+        List bisDateList = bisDatetimeList[0].split("-");
+        List bisTimeList = bisDatetimeList[1]?.split(":");
+
+        bisDateText = bisDateList.reversed.join(".");
+        bisTimeText = bisTimeList.take(2).join(":");
+      }
+
+
+      return wannDateList.last + " - " + bisDateText + "\n " +
+          wannTimeList.take(2).join(":") + " - " + bisTimeText;
     } else{
       return wannDateList.reversed.join(".") + " " + wannTimeList.take(2).join(":");
     }
@@ -747,11 +1100,31 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
   }
 
 
+@override
+  void initState() {
+    wannDateInputButton = DateButton(
+        getDate: true,
+      eventDatum: DateTime.parse(widget.event["wann"]),
+    );
+    wannTimeInputButton = DateButton(uhrZeit: TimeOfDay(
+        hour: int.parse(widget.event["wann"].split(" ")[1].split(":")[0]),
+        minute: int.parse(widget.event["wann"].split(" ")[1].split(":")[1])
+    ));
+    bisDateInputButton = DateButton(
+        getDate: true,
+      eventDatum: widget.event["bis"] != null ? DateTime.parse(widget.event["bis"]) : null,
+    );
+    bisTimeInputButton = DateButton(uhrZeit: widget.event["bis"] != null ? TimeOfDay(
+        hour: int.parse(widget.event["bis"].split(" ")[1].split(":")[0]),
+        minute: int.parse(widget.event["bis"].split(" ")[1].split(":")[1])
+    ): null);
 
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-
-
+    isSingeDay = widget.event["eventInterval"] != global_var.eventInterval[2] &&
+        widget.event["eventInterval"] != global_var.eventIntervalEnglisch[2];
 
     return InkWell(
         onTap: !widget.isCreator ? null:  ()=> openChangeWindow(),
@@ -863,7 +1236,7 @@ class DateButton extends StatefulWidget {
   var eventDatum;
   var getDate;
 
-  DateButton({Key key, this.getDate = false}) : super(key: key);
+  DateButton({Key key,this.eventDatum, this.uhrZeit, this.getDate = false}) : super(key: key);
 
 
   @override
