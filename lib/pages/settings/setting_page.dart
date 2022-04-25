@@ -202,13 +202,15 @@ class _SettingPageState extends State<SettingPage> {
                   children: [
                     ProfilImage(userProfil, changeable: true, fullScreenWindow: true),
                     SizedBox(width: 10),
-                    Text(
-                      nameTextKontroller.text,
-                      style: const TextStyle(fontSize: 30),
+                    Flexible(
+                      child: Text(
+                        nameTextKontroller.text,
+                        style: const TextStyle(fontSize: 28),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 10),
                 Text(emailTextKontroller.text)
               ]
           )

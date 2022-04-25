@@ -8,6 +8,8 @@ import 'package:hive/hive.dart';
 
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
+import '../../../global/style.dart' as global_style;
+import '../../widgets/badge_icon.dart';
 import 'eventCard.dart';
 import 'events_erstellen.dart';
 
@@ -71,11 +73,29 @@ class _EventPageState extends State<EventPage>{
 
       for(var event in events){
         eventCards.add(
-            EventCard(
-              event: event,
-              withInteresse: withInteresse,
-              afterPageVisit: ()=> _asyncMethod()
-            )
+            Stack(children: [
+              EventCard(
+                  event: event,
+                  withInteresse: withInteresse,
+                  afterPageVisit: ()=> _asyncMethod()
+              ),
+              if(event["erstelltVon"] == userId) Positioned(
+                right: 10,
+                top:10,
+                child: FutureBuilder(
+                    future: EventDatabase().getData("freischalten", "WHERE id = '${event["id"]}'"),
+                    builder: (context, snap) {
+                      var data = snap.hasData ? snap.data.length.toString() : "";
+                      if(data == "0") data = "";
+
+                      return BadgeIcon(
+                        text: data.toString(),
+                      );
+                    }
+                ),
+              )
+            ],)
+
         );
       }
 

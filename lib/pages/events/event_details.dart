@@ -46,9 +46,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   @override
   void initState() {
-    isCreator = widget.event["erstelltVon"] == userId;
-    isApproved = isCreator ? true : widget.event["freigegeben"].contains(userId);
-
     eventDetails = {
       "zusagen": widget.event["zusage"] == null ? [] :widget.event["zusage"].length,
       "absagen": widget.event["absage"] == null ? [] :widget.event["absage"].length,
@@ -149,7 +146,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     var selectedUserId = await ProfilDatabase().getData("id", "WHERE name = '${inputKontroller.text}'");
                     await EventDatabase().update(widget.event["id"], "erstelltVon = '$selectedUserId'");
                     setState(() {
-
+                      widget.event["erstelltVon"] = selectedUserId;
                     });
 
                     Navigator.pop(context);
@@ -216,6 +213,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    isCreator = widget.event["erstelltVon"] == userId;
+    isApproved = isCreator ? true : widget.event["freigegeben"].contains(userId);
     isNotPublic = widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
     eventDetails = {
       "zusagen": widget.event["zusage"] == null ? [] :widget.event["zusage"].length,
@@ -669,7 +668,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             title: "",
             buttons: [
               if(isCreator && isNotPublic) FutureBuilder(
-                future: EventDatabase().getData("freischalten", "WHERE id = '${widget.event["id"]}"),
+                future: EventDatabase().getData("freischalten", "WHERE id = '${widget.event["id"]}'"),
                 builder: (context, snap) {
                   var data = snap.hasData ? snap.data.length.toString() : "";
                   if(data == "0") data = "";

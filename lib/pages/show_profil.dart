@@ -12,6 +12,7 @@ import '../global/variablen.dart' as global_variablen;
 import '../global/style.dart' as global_style;
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
+import '../widgets/profil_image.dart';
 
 
 class ShowProfilPage extends StatefulWidget {
@@ -135,13 +136,21 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     titelBox(){
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.only(top: 20,bottom: 10, left: 20, right: 20),
-        child: Text(
-          widget.profil["name"],
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-              fontSize: 24
-          ),
+        padding: EdgeInsets.only(top: 20,bottom: 10, left: 10, right: 10),
+        child: Row(
+          children: [
+            ProfilImage(widget.profil, fullScreenWindow: true),
+            SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                widget.profil["name"],
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 24
+                ),
+              ),
+            ),
+          ],
         ),
       );
     }

@@ -484,6 +484,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery. of(context). size. width ;
+    var eventCrossAxisCount = screenWidth / 190;
+
     List<Marker> allMarker = [];
 
     createPopupWindowTitle(list, filter) {
@@ -591,6 +594,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     createPopupEvents(event) {
+
+
       popupItems = [];
 
       popupItems.add(SliverAppBar(
@@ -605,7 +610,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       popupItems.add(SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+            crossAxisCount: eventCrossAxisCount.round(), // 392 => 2  => 1036 =>
             childAspectRatio: 0.75,
           ),
           delegate:
@@ -614,7 +619,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
             return EventCard(
                 margin: const EdgeInsets.only(
-                    top: 15, bottom: 15, left: 20, right: 20),
+                    top: 15, bottom: 15, left: 25, right: 25),
                 event: eventData,
                 withInteresse: true,
                 afterPageVisit: () async {
@@ -636,39 +641,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   setState(() {});
                 });
           }, childCount: event["profils"].length)));
-/*
-      popupItems.add(SliverFixedExtentList(
-        itemExtent: 135.0,
-        delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-          var eventData = event["profils"][index];
 
-          return EventCard(
-              margin:
-              const EdgeInsets.only(top: 15, bottom: 15, left: 10, right: 10),
-              event: eventData,
-              withInteresse: true,
-              afterPageVisit: () async {
-                events = await EventDatabase().getData("*",
-                    "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC");
-
-                var refreshEvents = [];
-
-                for (var oldEvent in lastEventPopup["profils"]) {
-                  for (var newEvents in events) {
-                    if (oldEvent["id"] == newEvents["id"]) {
-                      refreshEvents.add(newEvents);
-                    }
-                  }
-                }
-
-                lastEventPopup["profils"] = refreshEvents;
-                createPopupEvents(lastEventPopup);
-                setState(() {});
-              });
-        }, childCount: event["profils"].length, addRepaintBoundaries: false,),
-      ));
-
- */
 
       return popupItems;
     }

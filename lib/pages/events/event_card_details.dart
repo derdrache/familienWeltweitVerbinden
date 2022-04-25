@@ -298,6 +298,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   InkWell(
                       onTap: ()  async {
                         var isOnList = widget.event["freischalten"].contains(userId);
+                        print(widget.event["freischalten"]);
+                        print(userId);
+                        print(widget.event["freischalten"].contains(userId));
 
                         if(isOnList) {
                           customSnackbar(context,
@@ -309,14 +312,19 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                               AppLocalizations.of(context).eventInteresseMitgeteilt,
                               color: Colors.green);
 
+                          setState(() {
+                            widget.event["freischalten"].add(userId);
+                          });
+
+
                           var dbDaten = await EventDatabase()
                               .getData("freischalten, interesse", "WHERE id = '${widget.event["id"]}'");
 
                           var freischaltenList = dbDaten["freischalten"];
-                          freischaltenList.add(userId);
+                          if(!freischaltenList.contains(userId)) freischaltenList.add(userId);
 
                           var interessenList = dbDaten["interesse"];
-                          interessenList.add(userId);
+                          if(!interessenList.contains(userId)) interessenList.add(userId);
 
                           EventDatabase().update(
                               widget.event["id"],
@@ -356,328 +364,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   }
 }
 
-
-
-
-/*
-class EventCardDetails extends StatelessWidget {
-  var event;
-  var offlineEvent;
-  var isCreator;
-  var isApproved;
-  var isPublic;
-
-  EventCardDetails({
-    Key key,
-    this.event,
-    this.offlineEvent=true,
-    this.isApproved = false
-  }) :
-        isCreator = event["erstelltVon"] == userId,
-        isPublic = event["art"] == "öffentlich" || event["art"] == "public", super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var isAssetImage = event["bild"].substring(0,5) == "asset" ? true : false;
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    if(screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
-    double cardWidth = screenWidth / 1.12;
-    double cardHeight = screenHeight / 1.34;
-    event["eventInterval"] = isGerman ?
-      global_func.changeEnglishToGerman(event["eventInterval"]):
-      global_func.changeGermanToEnglish(event["eventInterval"]);
-
-    bildAndTitleBox(){
-      return Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Stack(
-            children: [
-              ImageGalerie(
-                id: event["id"],
-                isCreator: isCreator,
-                child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0),
-                    ),
-                    child: isAssetImage ?
-                      Image.asset(event["bild"], fit: BoxFit.fitWidth) :
-                      Container(
-                          constraints: BoxConstraints(maxHeight: screenHeight / 2.08),
-                          child: Image.network(event["bild"], fit: BoxFit.fitWidth,  )
-                      )
-                ),
-              ),
-            ],
-          ),
-          Positioned.fill(
-              bottom: -10,
-              child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                      padding: const EdgeInsets.only(top:10, bottom: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      ),
-                      margin: const EdgeInsets.only(left: 30, right: 30),
-                      width: 800,
-                      child: ShowDataAndChangeWindow(
-                          eventId: event["id"],
-                          windowTitle: AppLocalizations.of(context).eventNameAendern,
-                          rowData: event["name"],
-                          inputHintText: AppLocalizations.of(context).neuenNamenEingeben,
-                          isCreator: isCreator,
-                          modus: "textInput",
-                          singleShow: true,
-                          databaseKennzeichnung: "name"
-                      )
-                  )
-              )
-          ),
-        ],
-      );
-    }
-
-    eventInformationBox(){
-      return Container(
-        margin: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            ShowDatetimeBox(
-              event: event,
-              isCreator: isCreator
-            ),
-            const SizedBox(height: 5),
-            ShowDataAndChangeWindow(
-              eventId: event["id"],
-              windowTitle: AppLocalizations.of(context).eventZeitzoneAendern,
-              rowTitle: AppLocalizations.of(context).zeitzone,
-              rowData: event["zeitzone"],
-              inputHintText: AppLocalizations.of(context).neueZeitzoneEingeben,
-              isCreator: isCreator,
-              modus: "dropdown",
-              databaseKennzeichnung: "zeitzone",
-              items: global_var.eventZeitzonen
-            ),
-            const SizedBox(height: 5),
-            ShowDataAndChangeWindow(
-                eventId: event["id"],
-                windowTitle: AppLocalizations.of(context).eventStadtAendern,
-                rowTitle: AppLocalizations.of(context).ort,
-                rowData: event["stadt"] + ", " + event["land"],
-                inputHintText: AppLocalizations.of(context).neueStadtEingeben,
-                isCreator: isCreator,
-                modus: "googleAutoComplete",
-                databaseKennzeichnung: "location"
-            ),
-            const SizedBox(height: 5),
-            if(isApproved|| isPublic) ShowDataAndChangeWindow(
-                eventId: event["id"],
-                windowTitle: AppLocalizations.of(context).eventMapLinkAendern,
-                rowTitle: "Map: ",
-                rowData: event["link"],
-                inputHintText: AppLocalizations.of(context).neuenKartenlinkEingeben,
-                isCreator: isCreator,
-                modus: "textInput",
-                databaseKennzeichnung: "link"
-            ),
-            if(isApproved|| isPublic) const SizedBox(height: 5),
-            if(isApproved|| isPublic) ShowDataAndChangeWindow(
-                eventId: event["id"],
-                windowTitle: AppLocalizations.of(context).eventIntervalAendern,
-                inputHintText: "",
-                isCreator: isCreator,
-                rowTitle: "Interval",
-                rowData: event["eventInterval"],
-                items: isGerman ? global_var.eventInterval :
-                  global_var.eventIntervalEnglisch,
-                modus: "dropdown",
-                databaseKennzeichnung: "eventInterval",
-                saveFunction: () {
-                  print("test");
-                  setState((){});
-                },
-            ),
-            if(isApproved|| isPublic) const SizedBox(height: 5),
-            ShowDataAndChangeWindow(
-                eventId: event["id"],
-                windowTitle: AppLocalizations.of(context).eventSpracheAendern,
-                inputHintText: "",
-                isCreator: isCreator,
-                rowTitle: AppLocalizations.of(context).sprache,
-                rowData: isGerman ?
-                  global_func.changeEnglishToGerman(event["sprache"]).join(", "):
-                  global_func.changeGermanToEnglish(event["sprache"]).join(", "),
-                items: isGerman ? global_var.sprachenListe :
-                  global_var.sprachenListeEnglisch,
-                modus: "multiDropdown",
-                databaseKennzeichnung: "sprache"
-            ),
-          ],
-        ),
-      );
-    }
-
-    eventBeschreibung(){
-      return Container(
-          margin: const EdgeInsets.only(top:5, left:10, right: 10, bottom: 10),
-          child: Center(
-              child: Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(
-                  minHeight: 25.0,
-                ),
-                child: ShowDataAndChangeWindow(
-                    eventId: event["id"],
-                    windowTitle: AppLocalizations.of(context).eventBeschreibungAendern,
-                    rowData: event["beschreibung"],
-                    inputHintText: AppLocalizations.of(context).neueBeschreibungEingeben,
-                    isCreator: isCreator,
-                    modus: "textInput",
-                    multiLines: true,
-                    databaseKennzeichnung: "beschreibung"
-                ),
-              )
-          )
-      );
-    }
-
-    creatorChangeHintBox(){
-      if (isCreator){
-        return Center(
-          child: Text(
-              AppLocalizations.of(context).antippenZumAendern,
-              style: const TextStyle(color: Colors.grey)
-          ),
-        );
-      }
-      return const SizedBox.shrink();
-    }
-
-    cardShadowColor(){
-      if(event["zusage"].contains(userId)) return Colors.green;
-      if(event["absage"].contains(userId)) return Colors.red;
-
-      return Colors.grey;
-    }
-
-    return Center(
-      child: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.only(bottom: 30),
-            width: cardWidth,
-            height: cardHeight,
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: cardShadowColor().withOpacity(0.6),
-                    spreadRadius: 12,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-            ),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                bildAndTitleBox(),
-                const SizedBox(height: 20),
-                creatorChangeHintBox(),
-                eventInformationBox(),
-                if(isApproved || isPublic) eventBeschreibung(),
-              ],
-            ),
-          ),
-          if(!isApproved && !isPublic) Container(
-            width: cardWidth,
-            height: cardHeight,
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.grey.withOpacity(0.6),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                InkWell(
-                  onTap: ()  async {
-                    var isOnList = event["freischalten"].contains(userId);
-
-                    if(isOnList) {
-                      customSnackbar(context,
-                          AppLocalizations.of(context).eventOrganisatorMussFreischalten,
-                          color: Colors.green);
-                      return;
-                    } else{
-                      customSnackbar(context,
-                          AppLocalizations.of(context).eventInteresseMitgeteilt,
-                          color: Colors.green);
-
-                      var dbDaten = await EventDatabase()
-                          .getData("freischalten, interesse", "WHERE id = '${event["id"]}'");
-
-                      var freischaltenList = dbDaten["freischalten"];
-                      freischaltenList.add(userId);
-
-                      var interessenList = dbDaten["interesse"];
-                      interessenList.add(userId);
-
-                      EventDatabase().update(
-                          event["id"],
-                          "freischalten = '${json.encode(freischaltenList)}', "
-                          "interesse = '${json.encode(interessenList)}'"
-                      );
-                    }
-                  } ,
-                  child: const Icon(Icons.add_circle, size: 80, color: Colors.black,)
-                ),
-                const Text(""),
-                const SizedBox(height: 40,)
-              ],
-            )
-          ),
-          if(!isCreator) Positioned(
-              top: 25,
-              right: 28,
-              child: InteresseButton(
-                hasIntereset: event["interesse"].contains(userId),
-                id: event["id"],
-              )
-          ),
-          Positioned(
-            bottom: 25,
-            left: 30,
-            child: CardFeed(
-              organisator: event["erstelltVon"],
-              eventId: event["id"],
-              eventZusage: event["zusage"],
-              width: cardWidth
-            )
-          )
-        ],
-      ),
-    );
-  }
-}
-
-
- */
 
 class ShowDataAndChangeWindow extends StatefulWidget {
   var windowTitle;

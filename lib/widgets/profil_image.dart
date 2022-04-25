@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -34,7 +36,7 @@ class _ProfilImageState extends State<ProfilImage> {
       widget.profil["bild"] = newLink;
     });
 
-    ProfilDatabase().updateProfil(widget.profil["id"], "bild", newLink);
+    ProfilDatabase().updateProfil(widget.profil["id"], "bild", json.encode([newLink]));
 
     Navigator.pop(context);
 
@@ -105,12 +107,12 @@ class DefaultProfilImage extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    var symbols = "@!?()/[]{}&%'\"\\\$§=-_+*#|<>^°`´.:,;€";
+    var symbols = "QWERTZUIOPÜASDFGHJKLÖÄYXCVBNMqwertzuiopüasdfghjklöäyxcvbnm1234567890ß";
     var nameToList = profil["name"].split(" ");
     var imageText = "";
 
     for(var letter in nameToList[0].split("")){
-      if(!symbols.contains(letter)){
+      if(symbols.contains(letter)){
         imageText = letter;
         break;
       }
@@ -118,7 +120,7 @@ class DefaultProfilImage extends StatelessWidget{
 
     if(nameToList.length > 1){
       for(var letter in nameToList.last.split("")){
-        if(!symbols.contains(letter)){
+        if(symbols.contains(letter)){
           imageText += letter;
           break;
         }
@@ -165,7 +167,7 @@ class OwnProfilImage extends StatelessWidget {
               backgroundColor: Colors.transparent,
               height: 200,
               children: [
-                Image.network(profil["bild"])
+                Image.network(profil["bild"][0])
               ],
             );
           });
@@ -180,7 +182,7 @@ class OwnProfilImage extends StatelessWidget {
           width: 60,
           height: 60,
           fit: BoxFit.cover,
-          imageUrl: profil["bild"],
+          imageUrl: profil["bild"][0],
           placeholder: (context, url) => Container(color: Colors.black12,)
             //Center(child: CircularProgressIndicator()),
         )
