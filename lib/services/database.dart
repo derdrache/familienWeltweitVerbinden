@@ -10,8 +10,8 @@ import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
 
 
-//var databaseUrl = "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
 class AllgemeinDatabase{
@@ -172,12 +172,15 @@ class ProfilDatabase{
 
     _deleteInTable("profils", userId);
 
+    /*
     var allChatGroups = await ChatDatabase().getChatData("*", "WHERE id like '%$userId%'");
     for (var chat in allChatGroups){
       var chatId = chat["id"];
       _deleteInTable("messages", chatId);
       _deleteInTable("chats", chatId);
     }
+
+     */
 
   }
 
