@@ -211,6 +211,8 @@
     "bitteEnddatumEventEingeben": "Please enter the end of the event",
     "eventEnde": "Event end: ",
     "inaktiv": "inactiv",
-    "aboutusHintText": "We travel because... \nWe want to network because... \nWe search...\n"
+    "aboutusHintText": "We travel because... \nWe want to network because... \nWe search...\n",
+    "eingebenBisTagEvent": "Enter until which day the event goes",
+    "eingebenBisUhrzeitEvent": "Enter until what time the event goes"
 }
 

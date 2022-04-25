@@ -984,13 +984,13 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
       var bisTime = bisTimeInputButton.eventDatum;
 
       if(bisDate == null){
-        return customSnackbar(context, "Eingeben bis zu welchem Tag das Event geht");
+        return customSnackbar(context, AppLocalizations.of(context).eingebenBisTagEvent);
       } else{
         bisDate = DateTime.parse(widget.event["bis"]);
       }
 
       if(bisTime == null){
-        return customSnackbar(context, "Eingeben bis wieviel Uhr das Event geht");
+        return customSnackbar(context, AppLocalizations.of(context).eingebenBisUhrzeitEvent);
       } else{
         bisTime = DateTime.parse(widget.event["bis"]);
       }

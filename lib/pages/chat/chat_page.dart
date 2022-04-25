@@ -268,6 +268,11 @@ class _ChatPageState extends State<ChatPage>{
           }
         }
 
+        if(chatPartnerName.isEmpty) chatPartnerName = "gelöschter User";
+        chatPartnerProfil ??= {
+          "bild": "assets/bilder/museum.jpg"
+        };
+
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
         var lastMessageTime = DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);

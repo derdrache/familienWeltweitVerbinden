@@ -276,36 +276,40 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-        width: webWidth,
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        decoration: BoxDecoration(
-            border: Border.all(width: 1),
-            borderRadius: const BorderRadius.all(Radius.circular(5))
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            isExpanded: true,
-            value: widget.selected == "" ? null : widget.selected,
-            hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
-            elevation: 16,
-            style: const TextStyle(color: Colors.black),
-            icon: const Icon(Icons.arrow_downward, color: Colors.black,),
-            onChanged: (newValue){
-
-              setState(() {
-                widget.selected = newValue;
-              });
-              if(widget.onChange != null) widget.onChange();
-            },
-            items: createDropdownItems(),
+    return Center(
+      child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+        Container(
+          width: webWidth,
+          margin: const EdgeInsets.all(10),
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          decoration: BoxDecoration(
+              border: Border.all(width: 1),
+              borderRadius: const BorderRadius.all(Radius.circular(5))
           ),
-        ),
-      ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: widget.selected == "" ? null : widget.selected,
+              hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
+              elevation: 16,
+              style: const TextStyle(color: Colors.black),
+              icon: const Icon(Icons.arrow_downward, color: Colors.black,),
+              onChanged: (newValue){
+
+                setState(() {
+                  widget.selected = newValue;
+                });
+                if(widget.onChange != null) widget.onChange();
+              },
+              items: createDropdownItems(),
+            ),
+          ),
+        )
+      ]),
     );
+
+
+
   }
 }
 
