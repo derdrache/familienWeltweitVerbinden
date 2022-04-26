@@ -136,7 +136,7 @@ var patch122D={
         "Standort-noch-aktuell Notification versendet(Ausnahme sind Benutzer mit "
         "der Reise Art 'Fester Standort'. Ab 3 Monaten wird das Profil für "
         "andere sichtbar als inaktiv angezeigt. Ab 6 Monaten wird das Profil "
-        "nicht mehr auf der Weltkarte angezeigt.\n\nDer Inaktivzähler wird mit dem "
+        "nicht mehr auf der Weltkarte angezeigt.Der Inaktivzähler wird mit dem "
         "Besuch in der App zurück gesetzt.",
     "Profil - Der Hinttext von 'über uns' wurde angepasst.",
     "verschiedene kleine Verbesserungen wurden hinzugefügt",

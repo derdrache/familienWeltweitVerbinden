@@ -140,7 +140,6 @@ class MyApp extends StatelessWidget {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
       if(message.data.isNotEmpty){
-
         LocalNotificationService().display(message);
       }
     });
