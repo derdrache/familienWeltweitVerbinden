@@ -360,7 +360,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             (eventDetails["freigegeben"] +1).toString(),
                         style: TextStyle(fontSize: fontsize)
                     ),
-                    if(isNotPublic) const SizedBox(height: 10)
+                    if(isNotPublic) const SizedBox(height: 10),
+                    const SizedBox(height: 10)
                   ]
               );
             })
