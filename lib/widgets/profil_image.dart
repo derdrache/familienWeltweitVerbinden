@@ -25,18 +25,21 @@ class _ProfilImageState extends State<ProfilImage> {
   var profilImageLinkKontroller = TextEditingController();
 
   checkAndSaveImage(){
-    var newLink = profilImageLinkKontroller.text;
+    dynamic newLink = profilImageLinkKontroller.text;
 
     if(newLink.isEmpty){
+      newLink = [];
     } else if(newLink.substring(0,4) != "http" && newLink.substring(0,3) != "www") {
       customSnackbar(context, "ungültiger Link");
+    } else{
+      newLink = [newLink];
     }
 
     setState(() {
       widget.profil["bild"] = newLink;
     });
 
-    ProfilDatabase().updateProfil(widget.profil["id"], "bild", json.encode([newLink]));
+    ProfilDatabase().updateProfil(widget.profil["id"], "bild", json.encode(newLink));
 
     Navigator.pop(context);
 
@@ -45,8 +48,7 @@ class _ProfilImageState extends State<ProfilImage> {
 
   @override
   Widget build(BuildContext context) {
-
-    var profilImageWidget = widget.profil["bild"].isEmpty ?
+    var profilImageWidget = widget.profil["bild"] == null || widget.profil["bild"].isEmpty  ?
       DefaultProfilImage(widget.profil) :
       OwnProfilImage(widget.profil, fullScreenWindow: widget.fullScreenWindow);
 
@@ -162,13 +164,9 @@ class OwnProfilImage extends StatelessWidget {
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return CustomAlertDialog(
-              title: "",
+            return AlertDialog(
               backgroundColor: Colors.transparent,
-              height: 200,
-              children: [
-                Image.network(profil["bild"][0])
-              ],
+              content: Image.network(profil["bild"][0])
             );
           });
     }
