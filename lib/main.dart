@@ -140,15 +140,8 @@ class MyApp extends StatelessWidget {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
       if(message.data.isNotEmpty){
-        var notificationTyp = json.decode(message.data.values.last)["typ"];
-        var pageId = json.decode(message.data.values.last)["link"];
 
-        var activeChat = await ProfilDatabase()
-            .getData("activeChat", "WHERE id = '$userId'");
-
-        if(activeChat == null || activeChat != pageId){
-          LocalNotificationService().display(message);
-        }
+        LocalNotificationService().display(message);
       }
     });
 
