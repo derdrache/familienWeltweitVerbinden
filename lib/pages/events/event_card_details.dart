@@ -127,6 +127,18 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       );
     }
 
+    creatorChangeHintBox(){
+      if (widget.isCreator){
+        return Center(
+          child: Text(
+              AppLocalizations.of(context).antippenZumAendern,
+              style: const TextStyle(color: Colors.grey)
+          ),
+        );
+      }
+      return const SizedBox.shrink();
+    }
+
     eventInformationBox(){
       return Container(
         margin: const EdgeInsets.all(10),
@@ -183,10 +195,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               modus: "dropdown",
               databaseKennzeichnung: "eventInterval",
               saveFunction: () async {
-                  widget.event = await EventDatabase().getData("*", "WHERE id = '${widget.event["id"]}'");
-                  setState(() {
+                widget.event = await EventDatabase().getData("*", "WHERE id = '${widget.event["id"]}'");
+                setState(() {
 
-                  });
+                });
 
               },
             ),
@@ -232,18 +244,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               )
           )
       );
-    }
-
-    creatorChangeHintBox(){
-      if (widget.isCreator){
-        return Center(
-          child: Text(
-              AppLocalizations.of(context).antippenZumAendern,
-              style: const TextStyle(color: Colors.grey)
-          ),
-        );
-      }
-      return const SizedBox.shrink();
     }
 
     cardShadowColor(){
@@ -298,9 +298,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   InkWell(
                       onTap: ()  async {
                         var isOnList = widget.event["freischalten"].contains(userId);
-                        print(widget.event["freischalten"]);
-                        print(userId);
-                        print(widget.event["freischalten"].contains(userId));
 
                         if(isOnList) {
                           customSnackbar(context,

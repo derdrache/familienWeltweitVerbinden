@@ -38,18 +38,16 @@ hiveInit() async {
 
   await Hive.openBox("countryGeodataBox");
 
-  if(Hive.box('countryGeodataBox').get("list") == null){
-    var jsonText = await rootBundle.loadString('assets/countryGeodata.json');
-    var geodata = json.decode(jsonText)["data"];
-    Hive.box('countryGeodataBox').put("list", geodata);
-  }
+  var countryJsonText = await rootBundle.loadString('assets/countryGeodata.json');
+  var geodata = json.decode(countryJsonText)["data"];
+  Hive.box('countryGeodataBox').put("list", geodata);
+
 
   await Hive.openBox("kontinentGeodataBox");
-  if(Hive.box('kontinentGeodataBox').get("list") == null){
-    var jsonText = await rootBundle.loadString('assets/continentsGeodata.json');
-    var geodata = json.decode(jsonText)["data"];
-    Hive.box('kontinentGeodataBox').put("list", geodata);
-  }
+  var continentsJsonText = await rootBundle.loadString('assets/continentsGeodata.json');
+  var continentsGeodata = json.decode(continentsJsonText)["data"];
+  Hive.box('kontinentGeodataBox').put("list", continentsGeodata);
+
 
   await Hive.openBox('profilBox');
 
@@ -156,7 +154,6 @@ class MyApp extends StatelessWidget {
 
   }
 
-
   changeToChat(chatId)async {
     var groupChatData = await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
@@ -175,6 +172,7 @@ class MyApp extends StatelessWidget {
         )
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
