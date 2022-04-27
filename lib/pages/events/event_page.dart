@@ -8,7 +8,6 @@ import 'package:hive/hive.dart';
 
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
-import '../../../global/style.dart' as global_style;
 import '../../widgets/badge_icon.dart';
 import 'eventCard.dart';
 import 'events_erstellen.dart';
@@ -31,39 +30,8 @@ class _EventPageState extends State<EventPage>{
   void initState() {
     myEventsBox = Hive.box('myEventsBox');
     interestEventsBox = Hive.box('interestEventsBox');
-
-    //WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
-
     super.initState();
   }
-
-  _asyncMethod() async{
-    if(myEventsBox.get("list") == false) myEventsBox.put("list", null);
-    if(interestEventsBox.get("list") == false)  interestEventsBox.put("list", null);
-
-    if (myEvents.isNotEmpty || myEventsBox.get("list") == null || myEventsBox.get("list").isEmpty){
-      myEvents = await EventDatabase().getData("*", "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC",
-          returnList: true);
-      if(myEvents == false) myEvents = [];
-      interestEvents = await EventDatabase().getData(
-          "*",
-          "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
-          returnList: true);
-      if(interestEvents == false) interestEvents = [];
-
-      myEventsBox.put("list", myEvents);
-      interestEventsBox.put("list", interestEvents);
-    } else{
-      myEvents = myEventsBox.get("list");
-      interestEvents = interestEventsBox.get("list");
-      _asyncMethod();
-    }
-
-    if(mounted) setState(() {
-
-    });
-  }
-
 
   @override
   Widget build(BuildContext context){
@@ -77,7 +45,7 @@ class _EventPageState extends State<EventPage>{
               EventCard(
                   event: event,
                   withInteresse: withInteresse,
-                  afterPageVisit: ()=> _asyncMethod()
+                  afterPageVisit: ()=> setState(() {})
               ),
               if(event["erstelltVon"] == userId) Positioned(
                 right: 10,
@@ -240,7 +208,8 @@ class _EventPageState extends State<EventPage>{
               onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const EventsSuchenPage()
-                  )).whenComplete(() => _asyncMethod())
+                  )).whenComplete(() => setState(() {
+              }))
             ),
             const SizedBox(width: 10),
             FloatingActionButton(

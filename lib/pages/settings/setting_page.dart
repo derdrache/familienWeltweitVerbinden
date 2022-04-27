@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
@@ -171,20 +172,25 @@ class _SettingPageState extends State<SettingPage> {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
     menuBar(){
-      return customAppBar(
-          title: "",
-          elevation: 0.0,
-          buttons: [TextButton(
-            style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    )
-                )
-            ),
-            child: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () => openSettingWindow(),
-          )]
+      return Container(
+        height: 70,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            TextButton(
+              style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                      )
+                  )
+              ),
+              child: const Icon(Icons.more_vert, color: Colors.black),
+              onPressed: () => openSettingWindow(),
+            )
+          ]
+        )
       );
     }
 
