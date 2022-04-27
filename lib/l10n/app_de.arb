@@ -213,6 +213,7 @@
     "inaktiv": "inaktiv",
     "aboutusHintText": "Wir reisen weil... \nWir wollen uns vernetzen weil... \nWir suchen...\n",
     "eingebenBisTagEvent": "Eingeben bis zu welchem Tag das Event geht",
-    "eingebenBisUhrzeitEvent": "Eingeben bis wieviel Uhr das Event geht"
+    "eingebenBisUhrzeitEvent": "Eingeben bis wieviel Uhr das Event geht",
+    "angemeldetBleiben": "Angemeldet bleiben?"
 
 }
