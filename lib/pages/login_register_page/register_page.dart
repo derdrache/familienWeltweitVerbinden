@@ -20,43 +20,47 @@ class _RegisterPageState extends State<RegisterPage> {
   final formKey = GlobalKey<FormState>();
   bool isLoading = false;
 
-  registrationButton()async{
+  registrationButton() async {
     setState(() {
       isLoading = true;
     });
     var registrationComplete = await registration();
-    if(registrationComplete){
-      customSnackbar(context, AppLocalizations.of(context).registerAndEmailBestaetigen, color: Colors.green);
+    if (registrationComplete) {
+      customSnackbar(
+          context, AppLocalizations.of(context).registerAndEmailBestaetigen,
+          color: Colors.green);
       global_functions.changePageForever(context, const LoginPage());
     }
   }
 
-  registration() async{
-    if(formKey.currentState.validate()){
+  registration() async {
+    if (formKey.currentState.validate()) {
       var email = emailController.text;
       email = email.replaceAll(" ", "");
       var password = passwordController.text;
 
-      try{
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-        await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      try {
+        await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+        await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
         FirebaseAuth.instance.currentUser?.sendEmailVerification();
 
-
-
         return true;
-      }on FirebaseAuthException catch(error){
+      } on FirebaseAuthException catch (error) {
         setState(() {
           isLoading = false;
         });
-        if(error.code == "email-already-in-use"){
-          customSnackbar(context, AppLocalizations.of(context).emailInBenutzung);
-        } else if(error.code == "invalid-email"){
+        if (error.code == "email-already-in-use") {
+          customSnackbar(
+              context, AppLocalizations.of(context).emailInBenutzung);
+        } else if (error.code == "invalid-email") {
           customSnackbar(context, AppLocalizations.of(context).emailUngueltig);
-        } else if(error.code == "weak-password"){
+        } else if (error.code == "weak-password") {
           customSnackbar(context, AppLocalizations.of(context).passwortSchwach);
-        } else if(error.code == "network-request-failed"){
-          customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
+        } else if (error.code == "network-request-failed") {
+          customSnackbar(
+              context, AppLocalizations.of(context).keineVerbindungInternet);
         }
 
         return false;
@@ -70,14 +74,12 @@ class _RegisterPageState extends State<RegisterPage> {
     return false;
   }
 
-  loading(){
+  loadingBox() {
     return const SizedBox(
-      width: 40,
-      height: 40,
-      child: Center(child: CircularProgressIndicator())
-    );
+        width: 40,
+        height: 40,
+        child: Center(child: CircularProgressIndicator()));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -86,34 +88,33 @@ class _RegisterPageState extends State<RegisterPage> {
       body: Padding(
         padding: const EdgeInsets.only(top: 15.0),
         child: Center(
-          child: Form(
-            key: formKey,
-            child: ListView(
-              children: [
-                customTextInput(
-                  "Email", emailController,
+            child: Form(
+          key: formKey,
+          child: ListView(
+            children: [
+              customTextInput("Email", emailController,
                   validator: global_functions.checkValidationEmail(context),
-                  textInputAction: TextInputAction.next
-                ),
-                customTextInput(
-                  AppLocalizations.of(context).passwort, passwordController, passwort: true,
+                  textInputAction: TextInputAction.next),
+              customTextInput(
+                  AppLocalizations.of(context).passwort, passwordController,
+                  passwort: true,
                   validator: global_functions.checkValidatorPassword(context),
-                  textInputAction: TextInputAction.next
-                ),
-                customTextInput(
-                  AppLocalizations.of(context).passwortBestaetigen, checkPasswordController, passwort: true,
-                  validator: global_functions.checkValidatorPassword(
-                    context,
-                    passwordCheck: passwordController.text),
-                    textInputAction: TextInputAction.done,
-                    onSubmit: () => registrationButton()
-                  ),
-                isLoading ? loading():
-                customFloatbuttonExtended(AppLocalizations.of(context).registrieren, () => registrationButton())
-              ],
-            ),
-          )
-        ),
+                  textInputAction: TextInputAction.next),
+              customTextInput(AppLocalizations.of(context).passwortBestaetigen,
+                  checkPasswordController,
+                  passwort: true,
+                  validator: global_functions.checkValidatorPassword(context,
+                      passwordCheck: passwordController.text),
+                  textInputAction: TextInputAction.done,
+                  onSubmit: () => registrationButton()),
+              isLoading
+                  ? loadingBox()
+                  : customFloatbuttonExtended(
+                      AppLocalizations.of(context).registrieren,
+                      () => registrationButton())
+            ],
+          ),
+        )),
       ),
     );
   }

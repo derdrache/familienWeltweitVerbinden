@@ -29,55 +29,55 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   bool angemeldetBleiben = true;
 
-  loadingBox(){
+  loadingBox() {
     return const SizedBox(
         width: 40,
         height: 40,
-        child: Center(child: CircularProgressIndicator())
-    );
+        child: Center(child: CircularProgressIndicator()));
   }
 
-  userLogin() async{
-    if(kIsWeb && angemeldetBleiben) {
+  userLogin() async {
+    if (kIsWeb && angemeldetBleiben) {
       FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
     }
 
-    try{
+    try {
       email = email.replaceAll(' ', '');
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email,
-          password: passwort);
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: passwort);
 
-      bool emailVerified = FirebaseAuth.instance.currentUser?.emailVerified?? false;
+      bool emailVerified =
+          FirebaseAuth.instance.currentUser?.emailVerified ?? false;
 
-      if(emailVerified){
+      if (emailVerified) {
         var userId = FirebaseAuth.instance.currentUser.uid;
-        var profilName = await ProfilDatabase().getData("name", "WHERE id = '$userId'");
+        var profilName =
+            await ProfilDatabase().getData("name", "WHERE id = '$userId'");
 
-        if(profilName != false){
+        if (profilName != false) {
           global_functions.changePageForever(context, StartPage());
-        } else{
+        } else {
           global_functions.changePageForever(context, const CreateProfilPage());
         }
-
-
-      } else{
+      } else {
         setState(() {
           isLoading = false;
         });
-        customSnackbar(context, AppLocalizations.of(context).emailNichtBestaetigt);
+        customSnackbar(
+            context, AppLocalizations.of(context).emailNichtBestaetigt);
       }
-
-    }on FirebaseAuthException catch(error){
+    } on FirebaseAuthException catch (error) {
       setState(() {
         isLoading = false;
       });
-      if(error.code == "user-not-found"){
-        customSnackbar(context, AppLocalizations.of(context).benutzerNichtGefunden);
-      } else if(error.code == "wrong-password"){
+      if (error.code == "user-not-found") {
+        customSnackbar(
+            context, AppLocalizations.of(context).benutzerNichtGefunden);
+      } else if (error.code == "wrong-password") {
         customSnackbar(context, AppLocalizations.of(context).passwortFalsch);
-      } else if(error.code == "network-request-failed"){
-        customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
+      } else if (error.code == "network-request-failed") {
+        customSnackbar(
+            context, AppLocalizations.of(context).keineVerbindungInternet);
       }
     }
   }
@@ -91,92 +91,93 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final UserCredential userCredential =
-      await FirebaseAuth.instance.signInWithPopup(authProvider);
+          await FirebaseAuth.instance.signInWithPopup(authProvider);
 
       user = userCredential.user;
-    } catch (_) {
-
-    }
+    } catch (_) {}
 
     return user;
   }
 
   signInWithGoogleAndroid() async {
-    // Trigger the authentication flow
     GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
 
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-    // Create a new credential
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
 
-    // Once signed in, return the UserCredential
     return await FirebaseAuth.instance.signInWithCredential(credential);
-
-
   }
 
   @override
   Widget build(BuildContext context) {
     double sideSpace = 20;
 
-    Widget header(){
+    Widget header() {
       return Container(
-        margin: EdgeInsets.only(top: sideSpace, bottom: sideSpace, left: sideSpace*2, right:sideSpace*2),
-        child: Column(
-          children: [
-            Center(
-                child: Image.asset('assets/WeltFlugzeug.png')
-            ),
-            const SizedBox(height: 15),
-            Text(AppLocalizations.of(context).willkommenBeiAppName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            Text(AppLocalizations.of(context).slogn1 + "\n" + AppLocalizations.of(context).slogn2, textAlign: TextAlign.center,),
-          ],
-        )
-
-      );
+          margin: EdgeInsets.only(
+              top: sideSpace,
+              bottom: sideSpace,
+              left: sideSpace * 2,
+              right: sideSpace * 2),
+          child: Column(
+            children: [
+              Center(child: Image.asset('assets/WeltFlugzeug.png')),
+              const SizedBox(height: 15),
+              Text(AppLocalizations.of(context).willkommenBeiAppName,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              Text(
+                AppLocalizations.of(context).slogn1 +
+                    "\n" +
+                    AppLocalizations.of(context).slogn2,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ));
     }
 
-    angemeldetBleibenBox(){
+    angemeldetBleibenBox() {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Switch(value: angemeldetBleiben, onChanged: (value){
-            setState(() {
-              angemeldetBleiben = value;
-            });
-          }),
+          Switch(
+              value: angemeldetBleiben,
+              onChanged: (value) {
+                setState(() {
+                  angemeldetBleiben = value;
+                });
+              }),
           const SizedBox(width: 10),
           Text(AppLocalizations.of(context).angemeldetBleiben)
         ],
       );
     }
 
-    Widget forgetPassButton(){
+    Widget forgetPassButton() {
       return Align(
         child: SizedBox(
           width: 200,
           child: TextButton(
               style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all(Colors.black)
-              ),
+                  foregroundColor: MaterialStateProperty.all(Colors.black)),
               child: Text(AppLocalizations.of(context).passwortVergessen),
-              onPressed: (){
+              onPressed: () {
                 passwortController.text = "";
-                global_functions.changePage(context, const ForgetPasswordPage());
-              }
-          ),
+                global_functions.changePage(
+                    context, const ForgetPasswordPage());
+              }),
         ),
       );
     }
 
-    doLogin(){
-      if(_formKey.currentState.validate()){
+    doLogin() {
+      if (_formKey.currentState.validate()) {
         setState(() {
           isLoading = true;
           email = emailController.text;
@@ -188,54 +189,61 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
         body: Form(
-          key: _formKey,
+            key: _formKey,
             child: ListView(
               children: [
                 header(),
                 customTextInput("Email", emailController,
                     validator: global_functions.checkValidationEmail(context),
-                    textInputAction: TextInputAction.next
-                ),
-                customTextInput(AppLocalizations.of(context).passwort, passwortController,
+                    textInputAction: TextInputAction.next),
+                customTextInput(
+                    AppLocalizations.of(context).passwort, passwortController,
                     validator: global_functions.checkValidatorPassword(context),
                     passwort: true,
                     textInputAction: TextInputAction.done,
                     onSubmit: () => doLogin()),
-                if(kIsWeb) angemeldetBleibenBox(),
+                if (kIsWeb) angemeldetBleibenBox(),
                 forgetPassButton(),
-                isLoading ? loadingBox() : customFloatbuttonExtended("Login", () => doLogin()),
-                customFloatbuttonExtended(AppLocalizations.of(context).registrieren, (){
+                isLoading
+                    ? loadingBox()
+                    : customFloatbuttonExtended("Login", () => doLogin()),
+                customFloatbuttonExtended(
+                    AppLocalizations.of(context).registrieren, () {
                   global_functions.changePage(context, const RegisterPage());
                 }),
                 Align(
                   child: InkWell(
                     onTap: () async {
-                      if (kIsWeb){
+                      if (kIsWeb) {
                         await signInWithGoogleWeb();
-                      } else{
+                      } else {
                         await signInWithGoogleAndroid();
                       }
                       var userId = FirebaseAuth.instance.currentUser.uid;
 
-                      if(userId == null) return;
-                      var userExist = await ProfilDatabase().getData("name", "WHERE id = '$userId'");
+                      if (userId == null) return;
+                      var userExist = await ProfilDatabase()
+                          .getData("name", "WHERE id = '$userId'");
 
-                      if(userExist == false){
-                        global_functions.changePageForever(context, const CreateProfilPage());
-                      } else{
-                        global_functions.changePageForever(context, StartPage());
+                      if (userExist == false) {
+                        global_functions.changePageForever(
+                            context, const CreateProfilPage());
+                      } else {
+                        global_functions.changePageForever(
+                            context, StartPage());
                       }
                     },
                     child: Container(
-                      height: 50,
-                      width: 280,
-                      margin: const EdgeInsets.only(top: 10, bottom: 10, right: 55, left: 55),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondary,
-                        borderRadius: const BorderRadius.all(Radius.circular(30))
-                      ),
-                      child: Center(
-                        child: Row(
+                        height: 50,
+                        width: 280,
+                        margin: const EdgeInsets.only(
+                            top: 10, bottom: 10, right: 55, left: 55),
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.secondary,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(30))),
+                        child: Center(
+                            child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
@@ -243,28 +251,23 @@ class _LoginPageState extends State<LoginPage> {
                               width: 30.0,
                               decoration: const BoxDecoration(
                                 image: DecorationImage(
-                                    image:
-                                    AssetImage('assets/googleGIcon.jpg'),
+                                    image: AssetImage('assets/googleGIcon.jpg'),
                                     fit: BoxFit.cover),
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            Text(AppLocalizations.of(context).loginMitGoogle,
+                            Text(
+                              AppLocalizations.of(context).loginMitGoogle,
                               style: const TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white
-                              ),
+                                  color: Colors.white),
                             )
                           ],
-                        )
-                      )
-                    ),
+                        ))),
                   ),
                 ),
               ],
-            )
-        )
-    );
+            )));
   }
 }
