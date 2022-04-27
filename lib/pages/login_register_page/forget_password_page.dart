@@ -18,15 +18,18 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   final _formKey = GlobalKey<FormState>();
 
   resetPassword() async {
-    if(_formKey.currentState.validate()){
-      try{
-        await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
-        customSnackbar(context, AppLocalizations.of(context).emailZuruecksetzenPasswort,
+    if (_formKey.currentState.validate()) {
+      try {
+        await FirebaseAuth.instance
+            .sendPasswordResetEmail(email: emailController.text);
+        customSnackbar(
+            context, AppLocalizations.of(context).emailZuruecksetzenPasswort,
             color: Colors.green);
         return true;
-      }on FirebaseAuthException catch(error){
-        if(error.code == "user-not-found"){
-          customSnackbar(context, AppLocalizations.of(context).userEmailNichtGefunden);
+      } on FirebaseAuthException catch (error) {
+        if (error.code == "user-not-found") {
+          customSnackbar(
+              context, AppLocalizations.of(context).userEmailNichtGefunden);
         }
         return false;
       }
@@ -36,24 +39,26 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context).passwortZuruecksetzen),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          children: [
-            const SizedBox(height: 20),
-            Center(child: Text(AppLocalizations.of(context).passwortResetLink)),
-            customTextInput("Email", emailController,
-                validator: globa_functions.checkValidationEmail(context)),
-            customFloatbuttonExtended(AppLocalizations.of(context).emailSenden, () async{
-              var wasReset = await resetPassword();
-              if (wasReset){
-                globa_functions.changePageForever(context, const LoginPage());
-              }
-            })
-          ],
-        ),
-      )
-    );
+        appBar: customAppBar(
+            title: AppLocalizations.of(context).passwortZuruecksetzen),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              const SizedBox(height: 20),
+              Center(
+                  child: Text(AppLocalizations.of(context).passwortResetLink)),
+              customTextInput("Email", emailController,
+                  validator: globa_functions.checkValidationEmail(context)),
+              customFloatbuttonExtended(
+                  AppLocalizations.of(context).emailSenden, () async {
+                var wasReset = await resetPassword();
+                if (wasReset) {
+                  globa_functions.changePageForever(context, const LoginPage());
+                }
+              })
+            ],
+          ),
+        ));
   }
 }
