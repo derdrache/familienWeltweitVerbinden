@@ -14,7 +14,7 @@
     This is a placeholder for base href that will be replaced by the value of
     the `--base-href` argument provided to `flutter build`.
   -->
-  <base href="$FLUTTER_BASE_HREF">
+  <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -33,10 +33,37 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!-- This script installs service_worker.js to provide PWA functionality to
-       application. For more information, see:
-       https://developers.google.com/web/fundamentals/primers/service-workers -->
-  <script>
+<div align='center'>
+  <img src="img/lodingscreen.png"/>
+  <br/>
+  <h1>Willkommen bei Families worldwide</h1>
+  <div>Schön dich hier zu sehen. </div>
+  <div>Das erste Laden der Webseite kann ziemlich lange dauern.</div>
+  <br/>
+  <div>Dieser Text ist nur dafür da, damit du nicht sofort versuchst zu flüchten.</div>
+  <div>Sobald der Text rot wird, hast du es fast geschafft</div>
+  <br/>
+  <div>Ab dem zweiten Besuch geht alles viel schneller, versprochen!</div>
+  <div>Ausgenommen sind Updates, Löschen vom Browsercache und Benutzung des Inkognitomodus...</div>
+  <div>Mehr fällt mir jetzt nicht ein, hoffentlich konntest du soweit nicht mehr lesen 🙂</div>
+  <br/>
+  <h1>Welcome to Families worldwide</h1>
+  <div>Nice to see you here. </div>
+  <div>The first loading of the web page can take quite a long time.</div>
+  <br/>
+  <div>This text is just so you don't try to escape right away.</div>
+  <div>Once the text turns red, you're almost there</div>
+  <br/>
+  <div>From the second visit, everything goes much faster, I promise!</div>
+  <div>Excluded are updates, clearing the browser cache and using the incognito mode...</div>
+  <div>That's all I can think of right now, hopefully you not still reading 🙂</div>
+</div>
+
+<!-- This script installs service_worker.js to provide PWA functionality to
+     application. For more information, see:
+     https://developers.google.com/web/fundamentals/primers/service-workers -->
+
+<script>
     var serviceWorkerVersion = null;
     var scriptLoaded = false;
     function loadMainDartJs() {
@@ -100,5 +127,7 @@
       loadMainDartJs();
     }
   </script>
+
+
 </body>
 </html>

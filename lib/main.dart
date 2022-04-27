@@ -29,8 +29,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-
 }
 
 hiveInit() async {
@@ -38,16 +36,16 @@ hiveInit() async {
 
   await Hive.openBox("countryGeodataBox");
 
-  var countryJsonText = await rootBundle.loadString('assets/countryGeodata.json');
+  var countryJsonText =
+      await rootBundle.loadString('assets/countryGeodata.json');
   var geodata = json.decode(countryJsonText)["data"];
   Hive.box('countryGeodataBox').put("list", geodata);
 
-
   await Hive.openBox("kontinentGeodataBox");
-  var continentsJsonText = await rootBundle.loadString('assets/continentsGeodata.json');
+  var continentsJsonText =
+      await rootBundle.loadString('assets/continentsGeodata.json');
   var continentsGeodata = json.decode(continentsJsonText)["data"];
   Hive.box('kontinentGeodataBox').put("list", continentsGeodata);
-
 
   await Hive.openBox('profilBox');
 
@@ -60,10 +58,9 @@ hiveInit() async {
   await Hive.openBox('interestEventsBox');
 
   await Hive.openBox('myChatBox');
-
 }
 
-void main()async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -72,8 +69,7 @@ void main()async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-
-  if(!kIsWeb){
+  if (!kIsWeb) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
@@ -88,91 +84,94 @@ class MyApp extends StatelessWidget {
   var pageContext;
   dynamic importantUpdateNumber = 0;
   dynamic buildNumber = 0;
-  var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+  var spracheIstDeutsch = kIsWeb
+      ? window.locale.languageCode == "de"
+      : Platform.localeName == "de_DE";
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   initialization() async {
+    await setUserIdAndCheckProfil();
 
-    if(userId == null){
+    if (kIsWeb) return;
+
+    await setUpdateInformation();
+    setFirebaseNotifications();
+
+  }
+
+  setUserIdAndCheckProfil() async{
+    if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
       userId = FirebaseAuth.instance.currentUser.uid;
     }
 
-    profilExist = await ProfilDatabase()
-        .getData("name", "WHERE id = '$userId'");
-    if(kIsWeb) return ;
+    profilExist =
+        await ProfilDatabase().getData("name", "WHERE id = '$userId'");
+  }
 
-    importantUpdateNumber = await AllgemeinDatabase().getData("importantUpdate", "");
+  setUpdateInformation() async {
+    importantUpdateNumber =
+    await AllgemeinDatabase().getData("importantUpdate", "");
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     buildNumber = int.parse(packageInfo.buildNumber);
+  }
 
-
-    final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  setFirebaseNotifications(){
+    final FlutterLocalNotificationsPlugin _notificationsPlugin =
+    FlutterLocalNotificationsPlugin();
     var initializationSettings = const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher')
-    );
-    _notificationsPlugin.initialize(
-        initializationSettings,
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'));
+
+
+    _notificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (payload) async {
           final Map<String, dynamic> payLoadMap = json.decode(payload);
 
-          if(payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
-          if(payLoadMap["typ"] == "event") changeToEvent(payLoadMap["link"]);
+          if (payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
+          if (payLoadMap["typ"] == "event") changeToEvent(payLoadMap["link"]);
+        });
 
-        }
-    );
-
-
-    FirebaseMessaging.instance.getInitialMessage().then((value){
-      if(value != null){
+    FirebaseMessaging.instance.getInitialMessage().then((value) {
+      if (value != null) {
         var notificationTyp = json.decode(value.data.values.last)["typ"];
         var pageId = json.decode(value.data.values.last)["link"];
 
-        if(notificationTyp== "chat") changeToChat(pageId);
-        if(notificationTyp =="event") changeToEvent(pageId);
-
+        if (notificationTyp == "chat") changeToChat(pageId);
+        if (notificationTyp == "event") changeToEvent(pageId);
       }
-
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async{
-      if(message.data.isNotEmpty){
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      if (message.data.isNotEmpty) {
         LocalNotificationService().display(message);
       }
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async{
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       var notificationTyp = json.decode(message.data.values.last)["typ"];
       var pageId = json.decode(message.data.values.last)["link"];
-      if(pageContext != null){
-        if(notificationTyp == "chat") changeToChat(pageId);
-        if(notificationTyp == "chat") changeToEvent(pageId);
+      if (pageContext != null) {
+        if (notificationTyp == "chat") changeToChat(pageId);
+        if (notificationTyp == "chat") changeToEvent(pageId);
       }
-
     });
-
   }
 
-  changeToChat(chatId)async {
-    var groupChatData = await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
+  changeToChat(chatId) async {
+    var groupChatData =
+        await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
-    navigatorKey.currentState?.push(
-        MaterialPageRoute(builder: (_) => ChatDetailsPage(
-            groupChatData: groupChatData))
-    );
+    navigatorKey.currentState?.push(MaterialPageRoute(
+        builder: (_) => ChatDetailsPage(groupChatData: groupChatData)));
   }
 
   changeToEvent(eventId) async {
     var eventData = await EventDatabase().getData("*", "WHERE id = '$eventId'");
 
     navigatorKey.currentState?.push(
-        MaterialPageRoute(builder: (_) => EventDetailsPage(
-            event: eventData)
-        )
-    );
+        MaterialPageRoute(builder: (_) => EventDetailsPage(event: eventData)));
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -182,72 +181,66 @@ class MyApp extends StatelessWidget {
       statusBarColor: Colors.black,
     ));
 
-    importantUpdateScreen(){
+    importantUpdateScreen() {
       return Container(
         margin: const EdgeInsets.all(20),
         child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(spracheIstDeutsch ? "Families worldwide hat ein großes Update bekommen":
-                "Families worldwide has received a major update",
-                  style: const TextStyle(fontSize: 20),
-                ),
-                const SizedBox(height: 30),
-                Text(spracheIstDeutsch ?
-                "Bitte im Playstore die neuste Version runterladen. \n\nDa es sich um eine Beta Version handelt, muss das Update manuell über den PlayStore installiert werden":
-                "Please download the latest version from the Playstore. \n\nSince this is a beta version, the update must be installed manually via the PlayStore.",
-                style: const TextStyle(fontSize: 16),
-                ),
-              ]
-            )
-        ),
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text(
+            spracheIstDeutsch
+                ? "Families worldwide hat ein großes Update bekommen"
+                : "Families worldwide has received a major update",
+            style: const TextStyle(fontSize: 20),
+          ),
+          const SizedBox(height: 30),
+          Text(
+            spracheIstDeutsch
+                ? "Bitte im Playstore die neuste Version runterladen. "
+                  "\n\nDa es sich um eine Beta Version handelt, muss das Update "
+                  "manuell über den PlayStore installiert werden"
+                : "Please download the latest version from the Playstore. "
+                  "\n\nSince this is a beta version, the update must be "
+                  "installed manually via the PlayStore.",
+            style: const TextStyle(fontSize: 16),
+          ),
+        ])),
       );
     }
 
     return FutureBuilder(
-      future: initialization(),
-        builder: (context, snapshot){
-          if(snapshot.hasError){
-            ("something went wrong");
-          }
-          if(snapshot.connectionState == ConnectionState.waiting){
+        future: initialization(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if(buildNumber < importantUpdateNumber){
+          if (buildNumber < importantUpdateNumber) {
             InAppUpdate.performImmediateUpdate();
             return MaterialApp(
-              home: Scaffold(
-                body: importantUpdateScreen()
-              ),
+              home: Scaffold(body: importantUpdateScreen()),
             );
           }
           return MaterialApp(
-            title: "families worldwide",
-            theme: ThemeData(
-              scaffoldBackgroundColor: Colors.white,
-              colorScheme: ColorScheme.fromSwatch().copyWith(
-                primary: const Color(0xFFBF1D53),
-                secondary: const Color(0xFF3CB28F), //buttonColor?
-            ),
-              iconTheme: const IconThemeData(color: Color(0xFF3CB28F))
-            ),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: const [
-              Locale('en', ''),
-              Locale('de', ''),
-            ],
-            navigatorKey: navigatorKey,
-            debugShowCheckedModeBanner: false,
-            home: userId == null ? const LoginPage() :
-            profilExist == false ? const CreateProfilPage() : StartPage()
-
-          );
-        }
-    );
+              title: "families worldwide",
+              theme: ThemeData(
+                  scaffoldBackgroundColor: Colors.white,
+                  colorScheme: ColorScheme.fromSwatch().copyWith(
+                    primary: const Color(0xFFBF1D53),
+                    secondary: const Color(0xFF3CB28F), //buttonColor?
+                  ),
+                  iconTheme: const IconThemeData(color: Color(0xFF3CB28F))),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: const [
+                Locale('en', ''),
+                Locale('de', ''),
+              ],
+              navigatorKey: navigatorKey,
+              debugShowCheckedModeBanner: false,
+              home: userId == null
+                  ? const LoginPage()
+                  : profilExist == false
+                      ? const CreateProfilPage()
+                      : StartPage());
+        });
   }
-
-
 }
-
-
