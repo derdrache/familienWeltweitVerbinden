@@ -14,20 +14,14 @@ import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
 import '../widgets/profil_image.dart';
 
-
+// ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
-  var userName;
+  String userName;
   var profil;
   var ownProfil;
 
-
-  ShowProfilPage({
-    Key key,
-    this.userName,
-    this.profil,
-    this.ownProfil = false
-
-  }) : super(key: key);
+  ShowProfilPage({Key key, this.userName, this.profil, this.ownProfil = false})
+      : super(key: key);
 
   @override
   _ShowProfilPageState createState() => _ShowProfilPageState();
@@ -35,84 +29,100 @@ class ShowProfilPage extends StatefulWidget {
 
 class _ShowProfilPageState extends State<ShowProfilPage> {
   var userID = FirebaseAuth.instance.currentUser.uid;
-  var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+  var spracheIstDeutsch = kIsWeb
+      ? window.locale.languageCode == "de"
+      : Platform.localeName == "de_DE";
   var userFriendlist = [];
   double textSize = 16;
   double healineTextSize = 18;
   var monthsUntilInactive = 3;
 
-
-
-@override
+  @override
   void initState() {
     setFriendList();
     checkOwnProfil();
     super.initState();
   }
 
-  checkOwnProfil(){
-    if(widget.profil["id"] == userID) widget.ownProfil = true;
+  checkOwnProfil() {
+    if (widget.profil["id"] == userID) widget.ownProfil = true;
   }
 
   setFriendList() async {
-    if (widget.userName == null) return;
-    var dbFriendlist = await ProfilDatabase().getData("friendlist", "WHERE name = '${widget.userName}'");
-    userFriendlist = dbFriendlist == "" ? []: dbFriendlist;
+    if (widget.userName.isEmpty) return;
+
+    var dbFriendlist = await ProfilDatabase()
+        .getData("friendlist", "WHERE name = '${widget.userName}'");
+    userFriendlist = dbFriendlist == "" ? [] : dbFriendlist;
+  }
+
+  getMonthDifference(){
+    widget.profil["lastLogin"] =
+        widget.profil["lastLogin"] ?? DateTime.parse("2022-02-13");
+    var timeDifference = Duration(
+        microseconds: (DateTime.now().microsecondsSinceEpoch -
+            DateTime.parse(widget.profil["lastLogin"].toString())
+                .microsecondsSinceEpoch)
+            .abs());
+    return timeDifference.inDays / 30.44;
   }
 
   @override
   Widget build(BuildContext context) {
-    widget.profil["lastLogin"] = widget.profil["lastLogin"] ?? DateTime.parse("2022-02-13");
-    var timeDifference = Duration(microseconds: (DateTime.now().microsecondsSinceEpoch - DateTime.parse(widget.profil["lastLogin"].toString()).microsecondsSinceEpoch).abs()
-    );
-    var monthDifference = timeDifference.inDays / 30.44;
+    var monthDifference = getMonthDifference();
 
-    messageButton(){
+    openChatButton() {
       return TextButton(
           style: global_style.textButtonStyle(),
           child: const Icon(Icons.message),
           onPressed: () async {
-            var profilID = await ProfilDatabase()
+            var profilId = await ProfilDatabase()
                 .getData("id", "WHERE name = '${widget.profil["name"]}'");
-            var users = [userID, profilID];
+            var users = [userID, profilId];
             var chatId = global_functions.getChatID(users);
 
-            var groupChatData = await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
+            var groupChatData =
+                await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
-            if(groupChatData == false){
+            if (groupChatData == false) {
               groupChatData = {
                 "users": {
-                  profilID: {"name": widget.profil["name"], "newMessages" : 0},
-                  userID: {"name": widget.userName, "newMessages" : 0}
+                  profilId: {"name": widget.profil["name"], "newMessages": 0},
+                  userID: {"name": widget.userName, "newMessages": 0}
                 }
               };
-
             }
 
-            global_functions.changePage(context, ChatDetailsPage(
-              groupChatData: groupChatData,
-            ));
-          }
-      );
+            global_functions.changePage(
+                context,
+                ChatDetailsPage(
+                  groupChatData: groupChatData,
+                ));
+          });
     }
 
-    friendButton(){
-      var onFriendlist = userFriendlist.isNotEmpty?
-        userFriendlist.contains(widget.profil["id"]) : false;
+    friendlistButton() {
+      var onFriendlist = userFriendlist.isNotEmpty
+          ? userFriendlist.contains(widget.profil["id"])
+          : false;
 
       return TextButton(
           style: global_style.textButtonStyle(),
-          child: onFriendlist ? const Icon(Icons.person_remove) : const Icon(Icons.person_add),
-          onPressed: (){
+          child: onFriendlist
+              ? const Icon(Icons.person_remove)
+              : const Icon(Icons.person_add),
+          onPressed: () {
             var snackbarText = "";
 
-            if(onFriendlist){
+            if (onFriendlist) {
               userFriendlist.remove(widget.profil["id"]);
-              snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistEntfernt;
-              if(userFriendlist.isEmpty) userFriendlist = [];
+              snackbarText = widget.profil["name"] +
+                  AppLocalizations.of(context).friendlistEntfernt;
+              if (userFriendlist.isEmpty) userFriendlist = [];
             } else {
               userFriendlist.add(widget.profil["id"]);
-              snackbarText = widget.profil["name"] + AppLocalizations.of(context).friendlistHinzugefuegt;
+              snackbarText = widget.profil["name"] +
+                  AppLocalizations.of(context).friendlistHinzugefuegt;
             }
 
             var ownProfilBox = Hive.box("ownProfilBox");
@@ -126,28 +136,24 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
             ProfilDatabase().updateProfil(userID, "friendlist", userFriendlist);
 
-
             setState(() {});
-
-          }
-      );
+          });
     }
 
-    titelBox(){
+    titelBox() {
       return Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.only(top: 20,bottom: 10, left: 10, right: 10),
+        padding:
+            const EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
         child: Row(
           children: [
             ProfilImage(widget.profil, fullScreenWindow: true),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Flexible(
               child: Text(
                 widget.profil["name"],
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 24
-                ),
+                style: const TextStyle(fontSize: 24),
               ),
             ),
           ],
@@ -155,89 +161,97 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       );
     }
 
-    cityBox(){
+    locationBox() {
       return Row(
         children: [
           Text(
-            AppLocalizations.of(context).aktuelleOrt +": ",
+            AppLocalizations.of(context).aktuelleOrt + ": ",
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
           ),
-          Text(
-            widget.profil["ort"],style: TextStyle(fontSize: textSize))
+          Text(widget.profil["ort"], style: TextStyle(fontSize: textSize))
         ],
       );
     }
 
-    travelBox(){
-      var themaText = AppLocalizations.of(context).artDerReise+": ";
-      var inhaltText = global_functions.changeGermanToEnglish(widget.profil["reiseart"]);
+    travelTypBox() {
+      var themaText = AppLocalizations.of(context).artDerReise + ": ";
+      var inhaltText =
+          global_functions.changeGermanToEnglish(widget.profil["reiseart"]);
 
-      if(spracheIstDeutsch) inhaltText = global_functions.changeEnglishToGerman(widget.profil["reiseart"]);
+      if (spracheIstDeutsch) {
+        inhaltText =
+            global_functions.changeEnglishToGerman(widget.profil["reiseart"]);
+      }
 
-
-     return Row(
-           children: [
-             Text(themaText,style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-             Text(inhaltText,style: TextStyle(fontSize: textSize))
-           ]
-         );
+      return Row(children: [
+        Text(themaText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: textSize))
+      ]);
     }
 
-    sprachenBox(){
-      var themenText = AppLocalizations.of(context).sprachen+": ";
-      var inhaltText = global_functions.changeGermanToEnglish(widget.profil["sprachen"]).join(", ");
+    sprachenBox() {
+      var themenText = AppLocalizations.of(context).sprachen + ": ";
+      var inhaltText = global_functions
+          .changeGermanToEnglish(widget.profil["sprachen"])
+          .join(", ");
 
-      if(spracheIstDeutsch) inhaltText =global_functions.changeEnglishToGerman(widget.profil["sprachen"]).join(", ");
+      if (spracheIstDeutsch) {
+        inhaltText = global_functions
+            .changeEnglishToGerman(widget.profil["sprachen"])
+            .join(", ");
+      }
 
-      return Row(
-          children: [
-            Text(themenText,style: TextStyle(fontSize: textSize,fontWeight: FontWeight.bold)),
-            Text(inhaltText,style: TextStyle(fontSize: textSize))
-          ]
-      );
+      return Row(children: [
+        Text(themenText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: textSize))
+      ]);
     }
 
-    kinderBox(){
+    kinderBox() {
       var childrenProfilList = widget.profil["kinder"];
       childrenProfilList.sort();
       var childrenList = [];
-      var alterZusatz = spracheIstDeutsch ? "J": "y";
+      var alterZusatz = spracheIstDeutsch ? "J" : "y";
 
-      childrenProfilList.forEach((child){
-        childrenList.add(global_functions.ChangeTimeStamp(child).intoYears()
-            .toString() + alterZusatz);
+      childrenProfilList.forEach((child) {
+        childrenList.add(
+            global_functions.ChangeTimeStamp(child).intoYears().toString() +
+                alterZusatz);
       });
 
       return Row(
         children: [
-          Text(
-              AppLocalizations.of(context).kinder +": ",
-              style: TextStyle(
-                  fontSize: textSize,
-                  fontWeight: FontWeight.bold
-              )
-          ),
-          Text(childrenList.reversed.join(" , "),style: TextStyle(fontSize: textSize))
+          Text(AppLocalizations.of(context).kinder + ": ",
+              style:
+                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+          Text(childrenList.reversed.join(" , "),
+              style: TextStyle(fontSize: textSize))
         ],
       );
     }
 
-    interessenBox(){
-      var themenText = AppLocalizations.of(context).interessen+": ";
-      var inhaltText = global_functions.changeGermanToEnglish(widget.profil["interessen"]).join(", ");
+    interessenBox() {
+      var themenText = AppLocalizations.of(context).interessen + ": ";
+      var inhaltText = global_functions
+          .changeGermanToEnglish(widget.profil["interessen"])
+          .join(", ");
 
-      if(spracheIstDeutsch) inhaltText = global_functions.changeEnglishToGerman(widget.profil["interessen"]).join(", ");
+      if (spracheIstDeutsch) {
+        inhaltText = global_functions
+            .changeEnglishToGerman(widget.profil["interessen"])
+            .join(", ");
+      }
 
-      return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(themenText,style: TextStyle(fontSize: textSize,fontWeight: FontWeight.bold)),
-            Flexible(child: Text(inhaltText,style: TextStyle(fontSize: textSize)))
-          ]
-      );
+      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(themenText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        Flexible(child: Text(inhaltText, style: TextStyle(fontSize: textSize)))
+      ]);
     }
 
-    aboutmeBox(){
+    aboutmeBox() {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -255,32 +269,33 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       );
     }
 
-    infoProfil(){
+    infoProfil() {
       double columnAbstand = 15;
 
       return Container(
           padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
           decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: global_variablen.borderColorGrey))
-          ),
+              border: Border(
+                  top: BorderSide(color: global_variablen.borderColorGrey))),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(children: [
-                Text("Info", style: TextStyle(
-                    fontSize: healineTextSize,
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold
-                )),
-                Expanded(child: SizedBox.shrink()),
-                if(monthDifference >= monthsUntilInactive) Text(
-                    AppLocalizations.of(context).inaktiv,
-                    style: TextStyle(color: Colors.red, fontSize: healineTextSize))
+                Text("Info",
+                    style: TextStyle(
+                        fontSize: healineTextSize,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold)),
+                const Expanded(child: SizedBox.shrink()),
+                if (monthDifference >= monthsUntilInactive)
+                  Text(AppLocalizations.of(context).inaktiv,
+                      style: TextStyle(
+                          color: Colors.red, fontSize: healineTextSize))
               ]),
               SizedBox(height: columnAbstand),
-              cityBox(),
+              locationBox(),
               SizedBox(height: columnAbstand),
-              travelBox(),
+              travelTypBox(),
               SizedBox(height: columnAbstand),
               sprachenBox(),
               SizedBox(height: columnAbstand),
@@ -288,15 +303,14 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               SizedBox(height: columnAbstand),
               interessenBox(),
               SizedBox(height: columnAbstand),
-              if(widget.profil["aboutme"].isNotEmpty) aboutmeBox()
+              if (widget.profil["aboutme"].isNotEmpty) aboutmeBox()
             ],
-          )
-      );
+          ));
     }
 
-    kontaktProfil(){
+    kontaktProfil() {
       return Container(
-        margin: EdgeInsets.only(top: 10),
+        margin: const EdgeInsets.only(top: 10),
         padding: const EdgeInsets.only(left: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,39 +320,40 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               style: TextStyle(
                   fontSize: healineTextSize,
                   color: Theme.of(context).colorScheme.secondary,
-                  fontWeight: FontWeight.bold
-              ),
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            widget.profil["emailAnzeigen"] ==1 ?
-                FutureBuilder(
-                  future: ProfilDatabase().getData("email", "WHERE id = '${widget.profil["id"]}'"),
-                  builder: (context, snapshot) {
-                    if(snapshot.hasData){
-                      return Row(children: [
-                        Text("Email: " ,style: TextStyle(fontWeight: FontWeight.bold, fontSize: textSize),),
-                        Text(snapshot.data,style: TextStyle(fontSize: textSize))
-                      ]);
-                    }
-                    return Container();
-                    }
-
-                ) : const SizedBox.shrink()
-
+            widget.profil["emailAnzeigen"] == 1
+                ? FutureBuilder(
+                    future: ProfilDatabase().getData(
+                        "email", "WHERE id = '${widget.profil["id"]}'"),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Row(children: [
+                          Text(
+                            "Email: ",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: textSize),
+                          ),
+                          Text(snapshot.data,
+                              style: TextStyle(fontSize: textSize))
+                        ]);
+                      }
+                      return Container();
+                    })
+                : const SizedBox.shrink()
           ],
         ),
       );
     }
 
-
     return Scaffold(
-      appBar: customAppBar(
-          title: "",
-          buttons: [widget.ownProfil ? SizedBox.shrink() : messageButton(),
-                    widget.ownProfil ? SizedBox.shrink() : friendButton()]
-      ),
-      body:
-      SizedBox(
+      appBar: customAppBar(title: "", buttons: [
+        widget.ownProfil ? const SizedBox.shrink() : openChatButton(),
+        widget.ownProfil ? const SizedBox.shrink() : friendlistButton()
+      ]),
+      body: SizedBox(
         width: double.maxFinite,
         child: Scrollbar(
           child: ScrollConfiguration(
@@ -346,20 +361,16 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               PointerDeviceKind.touch,
               PointerDeviceKind.mouse,
             }),
-            child: ListView(
-                  children: [
-                    titelBox(),
-                    const SizedBox(height: 15),
-                    infoProfil(),
-                    const SizedBox(height: 15),
-                    if(widget.profil["emailAnzeigen"] == 1) kontaktProfil(),
-                  ]
-              ),
-          ),
+            child: ListView(children: [
+              titelBox(),
+              const SizedBox(height: 15),
+              infoProfil(),
+              const SizedBox(height: 15),
+              if (widget.profil["emailAnzeigen"] == 1) kontaktProfil(),
+            ]),
           ),
         ),
+      ),
     );
-
-    }
+  }
 }
-

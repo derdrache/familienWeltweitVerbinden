@@ -1,9 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:familien_suche/pages/events/eventCard.dart';
-import 'package:familien_suche/pages/show_profil.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -17,35 +14,39 @@ import '../global/variablen.dart' as global_var;
 import '../widgets/profil_image.dart';
 import '../widgets/search_autocomplete.dart';
 import '../services/locationsService.dart';
+import 'show_profil.dart';
+import 'events/eventCard.dart';
 
 class ErkundenPage extends StatefulWidget {
+  const ErkundenPage({Key key}) : super(key: key);
+
   @override
   _ErkundenPageState createState() => _ErkundenPageState();
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
-  var profilBox;
-  var eventBox;
+  Box profilBox, eventBox;
   MapController mapController = MapController();
   var ownProfil;
   Set<String> allUserName = {};
   var countriesList = {};
-  var filterList = [];
-  List profilsBackup = [], profils = [], aktiveProfils = [];
+  List filterList = [];
+  List profilsBackup = [] , profils = [], aktiveProfils = [];
+  List eventsBackup = [], events = [], aktiveEvents = [];
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
-  List eventsBackup = [], events = [], aktiveEvents = [];
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxZoom = 9;
-  double mapZoom = 1.6;
+  double currentMapZoom = 1.6;
   double cityZoom = 6.5;
-  dynamic searchAutocomplete = const SizedBox.shrink();
+  double countryZoom = 4.0;
+  double kontinentZoom = 2.5;
+  var searchAutocomplete = SearchAutocomplete();
   var mapPosition;
   bool buildLoaded = false;
   bool popupActive = false;
   List<Widget> popupItems = [];
   var lastEventPopup;
-  var beforeZoomZoom;
   var monthsUntilInactive = 6;
 
   @override
@@ -61,8 +62,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   setProfils() {
-    profils = profilBox.get("list");
-    profils ??= [];
+    profils = profilBox.get("list") ?? [];
 
     for (var profil in profils) {
       if (profil["id"] == userId) {
@@ -79,8 +79,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   setEvents() {
-    events = eventBox.get("list");
-    events ??= [];
+    events = eventBox.get("list") ?? [];
     eventsBackup = events;
 
     createAndSetZoomEvents();
@@ -88,7 +87,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   _asyncMethod() async {
     await getProfilsDB();
+    changeProfilList();
+    createAndSetZoomProfils();
+
     await getEventsDB();
+    createAndSetZoomEvents();
 
     setSearchAutocomplete();
 
@@ -97,21 +100,25 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   getProfilsDB() async {
     var dbProfils = await ProfilDatabase().getData(
-        "id, name, land, interessen, "
-            "kinder, latt, longt, ort, reiseart, sprachen, aboutme, friendlist, "
-            "emailAnzeigen, bild, bildStandardFarbe, lastLogin",
+        "id, name, land, interessen, kinder, latt, longt, ort, reiseart,"
+          "sprachen, aboutme, friendlist, emailAnzeigen, bild, bildStandardFarbe,"
+          "lastLogin",
         "ORDER BY land ASC, ort ASC");
     if (dbProfils == false) dbProfils = [];
+
     profilBox.put("list", dbProfils);
     profils = dbProfils;
+  }
+
+  changeProfilList(){
     var inactiveProfils = [];
 
     for (var profil in profils) {
       profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
       var timeDifference = Duration(
           microseconds: (DateTime.now().microsecondsSinceEpoch -
-                  DateTime.parse(profil["lastLogin"].toString())
-                      .microsecondsSinceEpoch)
+              DateTime.parse(profil["lastLogin"].toString())
+                  .microsecondsSinceEpoch)
               .abs());
       var monthDifference = timeDifference.inDays / 30.44;
 
@@ -131,7 +138,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     profils.remove(ownProfil);
 
     profilsBackup = profils;
-    createAndSetZoomProfils();
   }
 
   getEventsDB() async {
@@ -139,11 +145,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
         "*", "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC",
         returnList: true);
     if (dbEvents == false) dbEvents = [];
+
     eventBox.put("list", dbEvents);
     events = dbEvents;
 
     eventsBackup = events;
-    createAndSetZoomEvents();
   }
 
   setSearchAutocomplete() {
@@ -166,14 +172,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     );
   }
 
-  getOwnProfil(profil) {
-    var userEmail = FirebaseAuth.instance.currentUser.email;
-
-    if (profil["email"] == userEmail) {
-      return profil;
-    }
-  }
-
   createBetween(list, profil, abstand) {
     var newPoint = false;
 
@@ -193,6 +191,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         if (numberName > 99) numberName = 99;
         list[i]["name"] = numberName.toString();
         list[i]["profils"].add(profil);
+        break;
       }
     }
 
@@ -222,6 +221,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
+        break;
       }
     }
 
@@ -254,6 +254,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
+        break;
       }
     }
 
@@ -338,7 +339,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     profilCountries = pufferProfilCountries;
     profilBetweenCountries = pufferProfilBetweenCountries;
 
-    changeProfil(mapZoom);
+    changeProfil(currentMapZoom);
   }
 
   createAndSetZoomEvents() async {
@@ -363,7 +364,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     eventsCountries = pufferEventsCountries;
     eventsKontinente = pufferEventsBetweenCountries;
 
-    changeProfil(mapZoom);
+    changeProfil(currentMapZoom);
   }
 
   changeProfil(zoom) {
@@ -373,10 +374,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (zoom > cityZoom) {
       choosenProfils = profilsCities;
       selectedEventList = eventsCities;
-    } else if (zoom > 4.0) {
+    } else if (zoom > countryZoom) {
       choosenProfils = profilsBetween;
       selectedEventList = eventsBetween;
-    } else if (zoom > 2.5) {
+    } else if (zoom > kontinentZoom) {
       choosenProfils = profilCountries;
       selectedEventList = eventsCountries;
     } else {
@@ -452,41 +453,41 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   changeMapFilter() {
     var filterProfils = [];
-    var filterEvents = [];
-    filterList = searchAutocomplete.getSelected();
 
     for (var profil in profilsBackup) {
       if (checkFilter(profil)) filterProfils.add(profil);
     }
 
     setState(() {
+      filterList = searchAutocomplete.getSelected();
       profils = filterProfils;
       createAndSetZoomProfils();
     });
   }
 
   zoomOut() {
-    var newZoom;
+    double newZoom;
 
-    if (mapZoom > 6.6) {
-      newZoom = 6.6;
-    } else if (mapZoom > 4.1) {
-      newZoom = 4.1;
-    } else {
-      newZoom = minMapZoom;
+    if (currentMapZoom > cityZoom + 1) {
+      newZoom = cityZoom;
+    } else if (currentMapZoom > countryZoom ) {
+      newZoom = countryZoom;
+    } else if(currentMapZoom > kontinentZoom) {
+      newZoom = kontinentZoom;
+    } else{
+        newZoom = minMapZoom;
     }
 
-    mapController.move(mapPosition, newZoom);
-    mapZoom = newZoom;
-    FocusScope.of(context).unfocus();
-    changeProfil(mapZoom);
+      mapController.move(mapPosition, newZoom);
+      currentMapZoom = newZoom;
+      FocusScope.of(context).unfocus();
+      changeProfil(currentMapZoom);
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery. of(context). size. width ;
+    double screenWidth = MediaQuery.of(context).size.width;
     var eventCrossAxisCount = screenWidth / 190;
-
     List<Marker> allMarker = [];
 
     createPopupWindowTitle(list, filter) {
@@ -510,11 +511,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     selectPopupMenuText(profils) {
-      if (mapZoom < 2.5) {
+      if (currentMapZoom < kontinentZoom) {
         return createPopupWindowTitle(profils, "kontinente");
-      } else if (mapZoom < 4.0) {
+      } else if (currentMapZoom < countryZoom) {
         return createPopupWindowTitle(profils, "land");
-      } else if (mapZoom < cityZoom) {
+      } else if (currentMapZoom < cityZoom) {
         return createPopupWindowTitle(profils, "land");
       } else {
         return createPopupWindowTitle(profils, "stadt");
@@ -570,7 +571,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 child: Row(
                   children: [
                     ProfilImage(profilData),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -594,8 +595,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     createPopupEvents(event) {
-
-
       popupItems = [];
 
       popupItems.add(SliverAppBar(
@@ -641,7 +640,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   setState(() {});
                 });
           }, childCount: event["profils"].length)));
-
 
       return popupItems;
     }
@@ -735,7 +733,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       },
                     ),
                   ),
-                  if (mapZoom > minMapZoom)
+                  if (currentMapZoom > minMapZoom)
                     Positioned(
                       top: 0,
                       right: 0,
@@ -782,21 +780,19 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
 
       for (var event in aktiveEvents) {
-        var basisVerschiebung;
-        var anpassungsVerschiebung;
-        var geteiltDurch;
+        double basisVerschiebung, anpassungsVerschiebung, geteiltDurch;
 
-        if (mapZoom > cityZoom) {
+        if (currentMapZoom > cityZoom) {
           basisVerschiebung = 0.35;
-          anpassungsVerschiebung = mapZoom - cityZoom;
+          anpassungsVerschiebung = currentMapZoom - cityZoom;
           geteiltDurch = 9.5;
-        } else if (mapZoom > 4.0) {
+        } else if (currentMapZoom > countryZoom) {
           basisVerschiebung = 1.5;
-          anpassungsVerschiebung = mapZoom - 4.0;
+          anpassungsVerschiebung = currentMapZoom - 4.0;
           geteiltDurch = 2;
         } else {
           basisVerschiebung = 20;
-          anpassungsVerschiebung = mapZoom;
+          anpassungsVerschiebung = currentMapZoom;
           geteiltDurch = 0.23;
         }
 
@@ -831,9 +827,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
           onPositionChanged: (position, changed) {
             if (buildLoaded) {
               mapPosition = position.center;
-              mapZoom = position.zoom;
+              currentMapZoom = position.zoom;
               FocusScope.of(context).unfocus();
-              changeProfil(mapZoom);
+              changeProfil(currentMapZoom);
             }
           },
         ),
@@ -854,7 +850,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         ownFlutterMap(),
         searchAutocomplete,
         if (popupActive) markerPopupContainer(),
-        if (mapZoom > minMapZoom && !popupActive)
+        if (currentMapZoom > minMapZoom && !popupActive)
           Positioned(
             bottom: 10,
             right: 10,

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:familien_suche/global/custom_widgets.dart';
@@ -8,105 +7,110 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
-
 import '../widgets/badge_icon.dart';
-import 'news_page.dart';
 import 'erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
 
+class StartPage extends StatefulWidget {
+  int selectedIndex;
 
-class StartPage extends StatefulWidget{
-  var selectedIndex;
+  StartPage({Key key, this.selectedIndex = 0}) : super(key: key);
 
-  StartPage({this.selectedIndex=0});
-
+  @override
   _StartPageState createState() => _StartPageState();
 }
 
-class _StartPageState extends State<StartPage>{
+class _StartPageState extends State<StartPage> {
   var userID = FirebaseAuth.instance.currentUser?.uid;
   var userName = FirebaseAuth.instance.currentUser?.displayName;
   var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
   PackageInfo packageInfo;
   var hasInternet = true;
 
-
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod() );
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
   }
 
-  _asyncMethod() async{
-    var ownProfilBox = Hive.box("ownProfilBox");
-    if(Hive.box('ownProfilBox').get("list") == null){
-      var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userID'");
-      Hive.box('ownProfilBox').put("list", ownProfil);
-    }
+  _asyncMethod() async {
+    await setHiveBoxen();
 
+    checkFlexibleUpdate();
 
-
-    try{
-
-      var updateInformation = await InAppUpdate.checkForUpdate();
-      if(updateInformation.updateAvailability ==
-          UpdateAvailability.updateAvailable && !kIsWeb) {
-        InAppUpdate.startFlexibleUpdate();
-      }
-    } catch (error){
-      print("kein Playstore");
-    }
-
-    profilCheck();
-
-
+    checkAndUpdateProfil();
   }
 
-  profilCheck() async{
-    if(userName == null) return;
+  setHiveBoxen() async{
+    var ownProfilBox = Hive.box("ownProfilBox");
+    if (ownProfilBox.get("list") == null) {
+      var ownProfil =
+      await ProfilDatabase().getData("*", "WHERE id = '$userID'");
+      ownProfilBox.put("list", ownProfil);
+    }
+  }
 
-    var userDBEmail = await ProfilDatabase().getData("email", "WHERE id = '$userID'");
-    var userDeviceTokenDb = await ProfilDatabase().getData("token", "WHERE id = '${userID}'");
-    var userDeviceTokenReal = kIsWeb? null : await FirebaseMessaging.instance.getToken();
+  checkFlexibleUpdate() async{
+    try {
+      var updateInformation = await InAppUpdate.checkForUpdate();
+      if (updateInformation.updateAvailability ==
+          UpdateAvailability.updateAvailable &&
+          !kIsWeb) {
+        InAppUpdate.startFlexibleUpdate();
+      }
+    } catch (_) {
 
-    if(userAuthEmail != userDBEmail){
-      ProfilDatabase().updateProfil(userID, "email",userAuthEmail);
+    }
+  }
+
+  checkAndUpdateProfil() async {
+    if (userName == null) return;
+
+    var dbData = await ProfilDatabase().getData("email, token", "WHERE id = '$userID'");
+
+    var userDBEmail = dbData["email"];
+    var userDeviceTokenDb = dbData["token"];
+    var userDeviceTokenReal =
+        kIsWeb ? null : await FirebaseMessaging.instance.getToken();
+
+    if (userAuthEmail != userDBEmail) {
+      ProfilDatabase().updateProfil(userID, "email", userAuthEmail);
     }
 
-    if(userDeviceTokenDb != userDeviceTokenReal){
+    if (userDeviceTokenDb != userDeviceTokenReal) {
       ProfilDatabase().updateProfil(userID, "token", userDeviceTokenReal);
     }
 
-    ProfilDatabase().updateProfil(userID, "lastLogin", DateTime.now().toString());
+    ProfilDatabase()
+        .updateProfil(userID, "lastLogin", DateTime.now().toString());
   }
 
-
-
-
-  Widget build(BuildContext context){
+  @override
+  Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
       //BoardPage(),
       ErkundenPage(),
-      EventPage(),
-      ChatPage(),
+      const EventPage(),
+      const ChatPage(),
       const SettingPage()
     ];
 
-    Future<bool> hasNetwork() async {
+    void hasNetwork() async {
       try {
-        final result = await InternetAddress.lookup('example.com');
-        if(hasInternet == false) ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        await InternetAddress.lookup('example.com');
+        if (hasInternet == false) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        }
         hasInternet = true;
       } on SocketException catch (_) {
         hasInternet = false;
-        customSnackbar(context, "kein Internet", duration: Duration(days: 365));
+        customSnackbar(context, "kein Internet", duration: const Duration(days: 365));
       }
     }
 
@@ -116,68 +120,60 @@ class _StartPageState extends State<StartPage>{
       });
     }
 
-    chatIcon(){
+    chatIcon() {
       return FutureBuilder(
-          future: ProfilDatabase().getData("newMessages", "WHERE id = '${userID}'"),
-          builder: (
-              BuildContext context,
-              AsyncSnapshot snap,
-              ){
-              if(snap.hasData) {
-                var newMessages = snap.data;
-                  newMessages = newMessages == false ? 0 : newMessages;
+          future: ProfilDatabase()
+              .getData("newMessages", "WHERE id = '$userID'"),
+          builder: ( BuildContext context, AsyncSnapshot snap) {
 
-                  return BadgeIcon(
-                    icon: Icons.chat,
-                    text: newMessages > 0 ? newMessages.toString() : ""
-                  );
-              }
-              return const Icon(Icons.chat);
+            if (!snap.hasData) return const Icon(Icons.chat);
+
+            var newMessages = snap.data;
+            newMessages = newMessages == false ? 0 : newMessages;
+
+            return BadgeIcon(
+                icon: Icons.chat,
+                text: newMessages > 0 ? newMessages.toString() : "");
+
           });
-
     }
 
-
-    if(!kIsWeb) hasNetwork();
+    if (!kIsWeb) hasNetwork();
 
     return Scaffold(
-          body: Center(
-            child: tabPages.elementAt(widget.selectedIndex),
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            currentIndex: widget.selectedIndex,
-            selectedItemColor: Colors.white,
-            onTap: _onItemTapped,
-            items: <BottomNavigationBarItem>[
-              /*
+        body: Center(
+          child: tabPages.elementAt(widget.selectedIndex),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          currentIndex: widget.selectedIndex,
+          selectedItemColor: Colors.white,
+          onTap: _onItemTapped,
+          items: <BottomNavigationBarItem>[
+            /*
               BottomNavigationBarItem(
                 icon: Icon(Icons.feed),
                 label: 'News',
               ),
 */
-
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.map),
-                label: 'World',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.event),
-                label: 'Events',
-              ),
-
-              BottomNavigationBarItem(
-                icon: chatIcon(),
-                label: 'Chat',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: 'Settings',
-              ),
-            ],
-
-          )
-    );
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.map),
+              label: 'World',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.event),
+              label: 'Events',
+            ),
+            BottomNavigationBarItem(
+              icon: chatIcon(),
+              label: 'Chat',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+        ));
   }
 }

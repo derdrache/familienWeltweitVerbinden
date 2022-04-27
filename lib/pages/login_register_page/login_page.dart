@@ -1,4 +1,3 @@
-import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -12,6 +11,7 @@ import 'create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
+import '../../services/database.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -24,12 +24,12 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwortController = TextEditingController();
-  var email = "";
-  var passwort = "";
+  String email = "";
+  String passwort = "";
   bool isLoading = false;
   bool angemeldetBleiben = true;
 
-  loading(){
+  loadingBox(){
     return const SizedBox(
         width: 40,
         height: 40,
@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if(emailVerified){
         var userId = FirebaseAuth.instance.currentUser.uid;
-        var profilName = await ProfilDatabase().getData("name", "WHERE id = '${userId}'");
+        var profilName = await ProfilDatabase().getData("name", "WHERE id = '$userId'");
 
         if(profilName != false){
           global_functions.changePageForever(context, StartPage());
@@ -94,8 +94,8 @@ class _LoginPageState extends State<LoginPage> {
       await FirebaseAuth.instance.signInWithPopup(authProvider);
 
       user = userCredential.user;
-    } catch (e) {
-      print(e);
+    } catch (_) {
+
     }
 
     return user;
@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
             });
           }),
           const SizedBox(width: 10),
-          const Text("Angemeldet bleiben?")
+          Text(AppLocalizations.of(context).angemeldetBleiben)
         ],
       );
     }
@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                     onSubmit: () => doLogin()),
                 if(kIsWeb) angemeldetBleibenBox(),
                 forgetPassButton(),
-                isLoading ? loading() : customFloatbuttonExtended("Login", () => doLogin()),
+                isLoading ? loadingBox() : customFloatbuttonExtended("Login", () => doLogin()),
                 customFloatbuttonExtended(AppLocalizations.of(context).registrieren, (){
                   global_functions.changePage(context, const RegisterPage());
                 }),
