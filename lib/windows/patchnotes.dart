@@ -58,6 +58,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch123D),
                 _patch(patch122D),
                 _patch(patch121D),
                 _patch(patch120D),
@@ -69,6 +70,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch123E),
                 _patch(patch122E),
                 _patch(patch121E),
                 _patch(patch120E),
@@ -90,6 +92,32 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch123E={
+  "title" : "1.2.3",
+  "inhalt": [
+    "General - Fixed minor bugs when changing profile picture",
+    "General - Profile picture in large is now displayed correctly",
+    "Web - Loading screen added",
+    "World map - Display of marker points is now correct",
+    "World map - menu is now sorted better",
+    "Profile - New information 'On trip' added",
+    "Profile - interests selection was expanded"
+
+  ]
+};
+var patch123D={
+  "title" : "1.2.3",
+  "inhalt": [
+    "Allgemein - Kleine Fehler beim Profilbild ändern behoben",
+    "Allgemein - Profilbild in groß wird nun korrekt angezeigt",
+    "Web Version - Ladebildschirm hinzugefügt",
+    "Weltkarte - Anzeige der Markerpunkte ist nun korrekt",
+    "Weltkarte - Menu wird nun besser sortiert",
+    "Profil - Neue Information 'Auf Reise' eingefügt",
+    "Profil - Interessen Auswahl wurde erweitert"
   ]
 };
 

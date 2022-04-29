@@ -15,35 +15,6 @@ Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
   onSubmit, informationWindow, hintText}){
 
-  return Container(
-    width: webWidth,
-    margin: EdgeInsets.all(sideSpace),
-    child: TextFormField(
-        onFieldSubmitted: (string) {
-          if(onSubmit != null)onSubmit();
-        },
-        textInputAction: textInputAction,
-        textAlignVertical: TextAlignVertical.top,
-        maxLines: moreLines,
-        obscureText: passwort,
-        controller: controller,
-        decoration: InputDecoration(
-          isDense: true,
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
-          ),
-          border: const OutlineInputBorder(),
-          //alignLabelWithHint: true,
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          hintText: hintText,
-          labelText: text,
-          labelStyle: const TextStyle(fontSize: 15, color: Colors.grey),
-          //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
-        ),
-        validator: validator
-    ),
-  );
-
   return Stack(
     children: [
       Align(
