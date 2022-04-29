@@ -25,9 +25,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     emailSettingContainer(){
       return Row(
         children: [
-          SizedBox(width: 20),
-          Text(AppLocalizations.of(context).emailAlleSichtbar, style: TextStyle(fontSize: 20),),
-          Expanded(child: SizedBox(width: 20)),
+          const SizedBox(width: 20),
+          Text(AppLocalizations.of(context).emailAlleSichtbar, style: const TextStyle(fontSize: 20),),
+          const Expanded(child: SizedBox(width: 20)),
           Switch(
               value: widget.profil["emailAnzeigen"] == 1 ? true: false,
               onChanged: (value){
@@ -35,7 +35,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                   widget.profil["emailAnzeigen"] = value == true ? 1 : 0;
                 });
                 ProfilDatabase().updateProfil(
-                    userID, "emailAnzeigen", widget.profil["emailAnzeigen"]);
+                  "emailAnzeigen = '${widget.profil["emailAnzeigen"]}'",
+                  "WHERE id = '$userID'");
               })
         ],
       );
@@ -44,7 +45,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     deleteProfilContainer(){
       return FloatingActionButton.extended(
         backgroundColor: Colors.red,
-        label: Text("Account löschen"),
+        label: const Text("Account löschen"),
         onPressed: () async {
           var userId = FirebaseAuth.instance.currentUser?.uid;
           ProfilDatabase().deleteProfil(userId);
@@ -58,9 +59,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       appBar: customAppBar(title: AppLocalizations.of(context).privatsphaereSicherheit),
       body: Column(
         children: [
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
           emailSettingContainer(),
-          Expanded(child: SizedBox.shrink()),
+          const Expanded(child: SizedBox.shrink()),
           //deleteProfilContainer(),
           //SizedBox(height: 10)
         ],

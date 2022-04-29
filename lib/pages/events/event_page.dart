@@ -1,6 +1,8 @@
+import 'package:familien_suche/auth/secrets.dart';
 import 'package:familien_suche/pages/events/events_suchen.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,6 +13,7 @@ import '../../../global/global_functions.dart' as global_functions;
 import '../../widgets/badge_icon.dart';
 import 'eventCard.dart';
 import 'events_erstellen.dart';
+
 
 class EventPage extends StatefulWidget{
   const EventPage({Key key}) : super(key: key);
@@ -72,63 +75,63 @@ class _EventPageState extends State<EventPage>{
 
     meineInteressiertenEventsBox(){
       return Container(
-        padding: const EdgeInsets.only(top: 10),
-        width: double.infinity,
-        decoration: BoxDecoration(
-            border: Border(
-                bottom: BorderSide(width: 1, color: global_var.borderColorGrey)
-            )
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-                margin: const EdgeInsets.only(left: 10),
-                child: Text(
-                  AppLocalizations.of(context).favoritenEvents,
-                  style: const TextStyle(fontSize: 20),
-                )
-            ),
-            FutureBuilder(
-              future: EventDatabase().getData("*",
-                "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
-                returnList: true
+          padding: const EdgeInsets.only(top: 10),
+          width: double.infinity,
+          decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(width: 1, color: global_var.borderColorGrey)
+              )
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                  margin: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    AppLocalizations.of(context).favoritenEvents,
+                    style: const TextStyle(fontSize: 20),
+                  )
               ),
-              builder: (context, snapshot){
-                var interestEventsBox = Hive.box('interestEventsBox');
-                dynamic data = interestEventsBox.get("list");
+              FutureBuilder(
+                  future: EventDatabase().getData("*",
+                      "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
+                      returnList: true
+                  ),
+                  builder: (context, snapshot){
+                    var interestEventsBox = Hive.box('interestEventsBox');
+                    dynamic data = interestEventsBox.get("list");
 
-                if(snapshot.hasData){
-                  data= snapshot.data == false ? [] : snapshot.data;
-                  interestEventsBox.put("list", data);
-                }
+                    if(snapshot.hasData){
+                      data= snapshot.data == false ? [] : snapshot.data;
+                      interestEventsBox.put("list", data);
+                    }
 
-                if(data != null && data.isNotEmpty){
+                    if(data != null && data.isNotEmpty){
 
-                  return Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Wrap(
-                          direction: Axis.vertical,
-                          children: createEventCards(data, true)
-                      ),
-                    ),
-                  );
-                }
+                      return Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Wrap(
+                              direction: Axis.vertical,
+                              children: createEventCards(data, true)
+                          ),
+                        ),
+                      );
+                    }
 
-                return Center(
-                  heightFactor: 5,
-                    child: Text(
-                      AppLocalizations.of(context).nochKeineEventsAusgewaehlt,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 20, color: Colors.grey),
-                    )
-                );
+                    return Center(
+                        heightFactor: 5,
+                        child: Text(
+                          AppLocalizations.of(context).nochKeineEventsAusgewaehlt,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20, color: Colors.grey),
+                        )
+                    );
 
-                }),
+                  }),
 
-          ],
-        )
+            ],
+          )
       );
     }
 
@@ -136,73 +139,73 @@ class _EventPageState extends State<EventPage>{
       return Container(
           padding: const EdgeInsets.only(top: 10),
           width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 10),
-              child: Text(
-                AppLocalizations.of(context).meineEvents,
-                style: const TextStyle(fontSize: 20),
-              )
-            ),
-            FutureBuilder(
-                future: EventDatabase().getData("*",
-                    "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC",
-                    returnList: true
-                ),
-                builder: (context, snapshot){
-                  var myEventsBox = Hive.box('myEventsBox');
-                  dynamic data = myEventsBox.get("list");
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                  margin: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    AppLocalizations.of(context).meineEvents,
+                    style: const TextStyle(fontSize: 20),
+                  )
+              ),
+              FutureBuilder(
+                  future: EventDatabase().getData("*",
+                      "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC",
+                      returnList: true
+                  ),
+                  builder: (context, snapshot){
+                    var myEventsBox = Hive.box('myEventsBox');
+                    dynamic data = myEventsBox.get("list");
 
-                  if(snapshot.hasData){
-                    data= snapshot.data == false ? [] : snapshot.data;
-                    myEventsBox.put("list", data);
-                  }
+                    if(snapshot.hasData){
+                      data= snapshot.data == false ? [] : snapshot.data;
+                      myEventsBox.put("list", data);
+                    }
 
-                  if(data != null && data.isNotEmpty){
+                    if(data != null && data.isNotEmpty){
 
-                    return Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Wrap(
-                            direction: Axis.vertical,
-                            children: createEventCards(data, false)
+                      return Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Wrap(
+                              direction: Axis.vertical,
+                              children: createEventCards(data, false)
+                          ),
                         ),
-                      ),
+                      );
+                    }
+
+                    return Center(
+                        heightFactor: 5,
+                        child: Text(
+                          AppLocalizations.of(context).nochKeineEventsErstellt,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20, color: Colors.grey),
+                        )
                     );
-                  }
 
-                  return Center(
-                      heightFactor: 5,
-                      child: Text(
-                        AppLocalizations.of(context).nochKeineEventsErstellt,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 20, color: Colors.grey),
-                      )
-                  );
-
-            }),
-          ],
-        )
+                  }),
+            ],
+          )
       );
     }
 
     return Scaffold(
-        body: Container(
+      body: Container(
           padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
           child: Column(
-            children: [
-              Expanded(child: meineInteressiertenEventsBox()),
-              Expanded(child: meineErstellenEventsBox()),
-              const SizedBox(height: 50)
-            ]
+              children: [
+                Expanded(child: meineInteressiertenEventsBox()),
+                Expanded(child: meineErstellenEventsBox()),
+                const SizedBox(height: 50)
+              ]
           )
-        ),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
               heroTag: "alleEvents",
               child: const Icon(Icons.search),
               onPressed: () => Navigator.push(
@@ -210,15 +213,15 @@ class _EventPageState extends State<EventPage>{
                   MaterialPageRoute(builder: (_) => const EventsSuchenPage()
                   )).whenComplete(() => setState(() {
               }))
-            ),
-            const SizedBox(width: 10),
-            FloatingActionButton(
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
               heroTag: "event hinzufügen",
               child: const Icon(Icons.add),
               onPressed: () => global_functions.changePage(context, const EventErstellen())
-            ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 }

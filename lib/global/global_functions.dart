@@ -110,10 +110,13 @@ changeGermanToEnglish(list){
     var reiseartenIndex = reisearten.indexOf(list);
     var eventIntervalIndex = eventInterval.indexOf(list);
     var eventArtIndex = eventArt.indexOf(list);
+    var aufreiseIndex = aufreise.indexOf(list);
 
     if(reiseartenIndex > -1) return reiseartenEnglisch[reiseartenIndex];
     if(eventIntervalIndex > -1) return eventIntervalEnglisch[eventIntervalIndex];
     if(eventArtIndex > -1) return eventArtEnglisch[eventArtIndex];
+    if(aufreiseIndex > -1) return aufreiseEnglisch[aufreiseIndex];
+
 
 
     return list;
@@ -147,10 +150,12 @@ changeEnglishToGerman(list){
     var reiseartenIndex = reiseartenEnglisch.indexOf(list);
     var eventIntervalIndex = eventIntervalEnglisch.indexOf(list);
     var eventArtIndex = eventArtEnglisch.indexOf(list);
+    var aufreiseIndex = aufreiseEnglisch.indexOf(list);
 
     if(reiseartenIndex > -1) return reisearten[reiseartenIndex];
     if(eventIntervalIndex > -1) return eventInterval[eventIntervalIndex];
     if(eventArtIndex > -1) return eventArt[eventArtIndex];
+    if(aufreiseIndex > -1) return aufreise[aufreiseIndex];
 
     return list;
   }

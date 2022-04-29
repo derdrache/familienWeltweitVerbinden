@@ -8,14 +8,13 @@ import '../global/custom_widgets.dart';
 import '../services/database.dart';
 import 'dialogWindow.dart';
 
-
-
 class ProfilImage extends StatefulWidget {
   var profil;
   var changeable;
   var fullScreenWindow;
 
-  ProfilImage(this.profil, {this.changeable = false, this.fullScreenWindow= false});
+  ProfilImage(this.profil,
+      {Key key, this.changeable = false, this.fullScreenWindow = false}) : super(key: key);
 
   @override
   _ProfilImageState createState() => _ProfilImageState();
@@ -24,14 +23,15 @@ class ProfilImage extends StatefulWidget {
 class _ProfilImageState extends State<ProfilImage> {
   var profilImageLinkKontroller = TextEditingController();
 
-  checkAndSaveImage(){
+  checkAndSaveImage() {
     dynamic newLink = profilImageLinkKontroller.text;
 
-    if(newLink.isEmpty){
+    if (newLink.isEmpty) {
       newLink = [];
-    } else if(newLink.substring(0,4) != "http" && newLink.substring(0,3) != "www") {
+    } else if (newLink.substring(0, 4) != "http" &&
+        newLink.substring(0, 3) != "www") {
       customSnackbar(context, "ungültiger Link");
-    } else{
+    } else {
       newLink = [newLink];
     }
 
@@ -39,43 +39,43 @@ class _ProfilImageState extends State<ProfilImage> {
       widget.profil["bild"] = newLink;
     });
 
-    ProfilDatabase().updateProfil(widget.profil["id"], "bild", json.encode(newLink));
+    ProfilDatabase().updateProfil("bild = '${json.encode(newLink)}'",
+        "WHERE id = '${widget.profil["id"]}'");
 
     Navigator.pop(context);
-
-
   }
 
   @override
   Widget build(BuildContext context) {
-    var profilImageWidget = widget.profil["bild"] == null || widget.profil["bild"].isEmpty  ?
-      DefaultProfilImage(widget.profil) :
-      OwnProfilImage(widget.profil, fullScreenWindow: widget.fullScreenWindow);
+    var profilImageWidget =
+        widget.profil["bild"] == null || widget.profil["bild"].isEmpty
+            ? DefaultProfilImage(widget.profil)
+            : OwnProfilImage(widget.profil,
+                fullScreenWindow: widget.fullScreenWindow);
 
-    changeImageWindow(){
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return CustomAlertDialog(
-                title: AppLocalizations.of(context).profilbildAendern,
-                children: [
-                  customTextInput(
-                      AppLocalizations.of(context).linkProfilbildEingeben,
-                      profilImageLinkKontroller
-                  )
-                ],
-                actions: [
-                  TextButton(
-                    child: Text(AppLocalizations.of(context).speichern),
-                    onPressed: () => checkAndSaveImage(),
-                  ),
-                  TextButton(
-                    child: Text(AppLocalizations.of(context).abbrechen),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              );
-            });
+    changeImageWindow() {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).profilbildAendern,
+              children: [
+                customTextInput(
+                    AppLocalizations.of(context).linkProfilbildEingeben,
+                    profilImageLinkKontroller)
+              ],
+              actions: [
+                TextButton(
+                  child: Text(AppLocalizations.of(context).speichern),
+                  onPressed: () => checkAndSaveImage(),
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context).abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            );
+          });
     }
 
     return Container(
@@ -86,68 +86,73 @@ class _ProfilImageState extends State<ProfilImage> {
         clipBehavior: Clip.none,
         children: [
           profilImageWidget,
-          if(widget.changeable) Positioned(
-            bottom: -3,
-            right: -3,
-            child: InkWell(
-              onTap: () => changeImageWindow(),
-              child: Icon(Icons.change_circle)
-            )
-          )
+          if (widget.changeable)
+            Positioned(
+                bottom: -3,
+                right: -3,
+                child: InkWell(
+                    onTap: () => changeImageWindow(),
+                    child: const Icon(Icons.change_circle)))
         ],
       ),
     );
   }
 }
 
-class DefaultProfilImage extends StatelessWidget{
+class DefaultProfilImage extends StatelessWidget {
   var profil;
 
-  DefaultProfilImage(this.profil);
-
-
+  DefaultProfilImage(this.profil, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var symbols = "QWERTZUIOPÜASDFGHJKLÖÄYXCVBNMqwertzuiopüasdfghjklöäyxcvbnm1234567890ß";
+    var symbols =
+        "QWERTZUIOPÜASDFGHJKLÖÄYXCVBNMqwertzuiopüasdfghjklöäyxcvbnm1234567890ß";
     var nameToList = profil["name"].split(" ");
     var imageText = "";
 
-    for(var letter in nameToList[0].split("")){
-      if(symbols.contains(letter)){
+    for (var letter in nameToList[0].split("")) {
+      if (symbols.contains(letter)) {
         imageText = letter;
         break;
       }
     }
 
-    if(nameToList.length > 1){
-      for(var letter in nameToList.last.split("")){
-        if(symbols.contains(letter)){
+    if (nameToList.length > 1) {
+      for (var letter in nameToList.last.split("")) {
+        if (symbols.contains(letter)) {
           imageText += letter;
           break;
         }
       }
     }
 
-    if(profil["bildStandardFarbe"] == null){
-      var colorList = [Colors.blue, Colors.red, Colors.orange, Colors.green,
-        Colors.purple, Colors.pink, Colors.greenAccent];
+    if (profil["bildStandardFarbe"] == null) {
+      var colorList = [
+        Colors.blue,
+        Colors.red,
+        Colors.orange,
+        Colors.green,
+        Colors.purple,
+        Colors.pink,
+        Colors.greenAccent
+      ];
       var selectColor = (colorList..shuffle()).first.value;
       profil["bildStandardFarbe"] = selectColor;
 
-      ProfilDatabase().updateProfil(profil["id"], "bildStandardFarbe", selectColor);
+      ProfilDatabase().updateProfil(
+          "bildStandardFarbe = '$selectColor'", "WHERE id = '${profil["id"]}'");
     }
-
 
     return CircleAvatar(
       radius: 30,
       backgroundColor: Color(profil["bildStandardFarbe"]),
-      child:  Center(
+      child: Center(
           child: Text(
-            imageText.toUpperCase(),
-            style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.white),
-          )
-      ),
+        imageText.toUpperCase(),
+        style: const TextStyle(
+            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+      )),
     );
   }
 }
@@ -156,36 +161,33 @@ class OwnProfilImage extends StatelessWidget {
   var profil;
   var fullScreenWindow;
 
-  OwnProfilImage(this.profil, {this.fullScreenWindow});
+  OwnProfilImage(this.profil, {Key key, this.fullScreenWindow}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-
     showBigImage() {
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              backgroundColor: Colors.transparent,
-              content: Image.network(profil["bild"][0])
-            );
+                backgroundColor: Colors.transparent,
+                content: Image.network(profil["bild"][0]));
           });
     }
 
-
     return InkWell(
-      onTap:fullScreenWindow? ()=> showBigImage() : null,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: CachedNetworkImage(
-          width: 60,
-          height: 60,
-          fit: BoxFit.cover,
-          imageUrl: profil["bild"][0],
-          placeholder: (context, url) => Container(color: Colors.black12,)
-            //Center(child: CircularProgressIndicator()),
-        )
-
-      )
-    );
+        onTap: fullScreenWindow ? () => showBigImage() : null,
+        child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: CachedNetworkImage(
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+                imageUrl: profil["bild"][0],
+                placeholder: (context, url) => Container(
+                      color: Colors.black12,
+                    )
+                //Center(child: CircularProgressIndicator()),
+                )));
   }
 }

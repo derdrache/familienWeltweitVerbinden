@@ -36,7 +36,8 @@ class ChangeReiseartPage extends StatelessWidget {
             customSnackbar(context, AppLocalizations.of(context).reiseartAuswaehlen);
           } else if(reiseArtInput.getSelected() != oldInput ){
             await ProfilDatabase().updateProfil(
-                userId, "reiseart", reiseArtInput.getSelected()
+              "reiseart = '${reiseArtInput.getSelected()}'",
+              "WHERE id = '$userId'"
             );
             customSnackbar(context,
                 AppLocalizations.of(context).artDerReise +" "+

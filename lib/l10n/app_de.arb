@@ -214,6 +214,11 @@
     "aboutusHintText": "Wir reisen weil... \nWir wollen uns vernetzen weil... \nWir suchen...\n",
     "eingebenBisTagEvent": "Eingeben bis zu welchem Tag das Event geht",
     "eingebenBisUhrzeitEvent": "Eingeben bis wieviel Uhr das Event geht",
-    "angemeldetBleiben": "Angemeldet bleiben?"
+    "angemeldetBleiben": "Angemeldet bleiben?",
+    "aufReise": "Auf Reise",
+    "aufReiseAendern": "Auf Reise ändern",
+    "seit": "Seit: ",
+    "bis": "Bis: ",
+    "offen": "offen"
 
 }

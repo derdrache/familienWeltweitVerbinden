@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -38,7 +40,8 @@ class ChangeSprachenPage extends StatelessWidget {
             customSnackbar(context, AppLocalizations.of(context).spracheAuswaehlen);
           } else {
             await ProfilDatabase().updateProfil(
-                userId, "sprachen", sprachenInputBox.getSelected());
+              "sprachen = '${jsonEncode(sprachenInputBox.getSelected())}'",
+              "WHERE id = '$userId'");
             customSnackbar(context,
                 AppLocalizations.of(context).sprachen +" "+
                     AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);

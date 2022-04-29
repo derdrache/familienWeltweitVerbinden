@@ -43,7 +43,7 @@ class AllgemeinDatabase{
       for(var key in responseBody[i].keys.toList()){
         try{
           responseBody[i][key] = jsonDecode(responseBody[i][key]);
-        }catch(error){
+        }catch(_){
 
         }
 
@@ -54,7 +54,7 @@ class AllgemeinDatabase{
       responseBody = responseBody[0];
       try{
         responseBody = jsonDecode(responseBody);
-      }catch(error){}
+      }catch(_){}
     }
 
     return responseBody;
@@ -90,19 +90,17 @@ class ProfilDatabase{
     FirebaseAuth.instance.currentUser.updateDisplayName(profilData["name"]);
   }
 
-  updateProfil(userId, change,  data) async {
-    var url = Uri.parse(databaseUrl + "database/profils/changeProfil.php");
-
-    if(data is List){
-      data = json.encode(data);
-    }
+  updateProfil(whatData, queryEnd) async {
+    var url = Uri.parse(databaseUrl + "database/update.php");
 
     await http.post(url, body: json.encode({
-      "id": userId,
-      "change": change,
-      "data": data
+      "table": "profils",
+      "whatData": whatData,
+      "queryEnd": queryEnd
     }));
+
   }
+
 
   getData(whatData, queryEnd, {returnList = false}) async{
     //sichere Datenbankabfrage
@@ -131,7 +129,7 @@ class ProfilDatabase{
       for(var key in responseBody[i].keys.toList()){
         try{
           responseBody[i][key] = jsonDecode(responseBody[i][key]);
-        }catch(error){
+        }catch(_){
 
         }
 
@@ -142,7 +140,7 @@ class ProfilDatabase{
       responseBody = responseBody[0];
       try{
         responseBody = jsonDecode(responseBody);
-      }catch(error){}
+      }catch(_){}
     }
 
     return responseBody;
@@ -152,7 +150,7 @@ class ProfilDatabase{
   updateProfilName(userId, oldName, newName) async{
     FirebaseAuth.instance.currentUser.updateDisplayName(newName);
 
-    updateProfil(userId, "name", newName);
+    updateProfil("name = '$newName'", "WHERE id = '$userId'");
   }
 
   updateProfilLocation(userId, locationDict) async {
@@ -248,7 +246,7 @@ class ChatDatabase{
 
         try{
           responseBody[i][key] = jsonDecode(responseBody[i][key]);
-        }catch(error){
+        }catch(_){
 
         }
 
@@ -259,7 +257,7 @@ class ChatDatabase{
       responseBody = responseBody[0];
       try{
         responseBody = jsonDecode(responseBody);
-      }catch(error){}
+      }catch(_){}
     }
 
     return responseBody;
@@ -328,7 +326,7 @@ class ChatDatabase{
 
 
     if(chatData["id"] != activeChat){
-      ProfilDatabase().updateProfil(chatPartnerId, "newMessages", allNewMessages +1);
+      ProfilDatabase().updateProfil("newMessages = '${allNewMessages +1}'", "WHERE id ='$chatPartnerId'");
 
       var chatId = chatData['id'];
       var oldChatNewMessages = await ChatDatabase().getChatData("users", "WHERE id = '$chatId'");
@@ -417,7 +415,7 @@ class EventDatabase{
 
         try{
           responseBody[i][key] = jsonDecode(responseBody[i][key]);
-        }catch(error){
+        }catch(_){
 
         }
 
@@ -428,7 +426,7 @@ class EventDatabase{
       responseBody = responseBody[0];
       try{
         responseBody = jsonDecode(responseBody);
-      }catch(error){}
+      }catch(_){}
     }
 
 
