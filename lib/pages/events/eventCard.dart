@@ -15,6 +15,7 @@ class EventCard extends StatefulWidget {
   var withInteresse;
   var afterPageVisit;
   var isCreator;
+  var big;
 
   EventCard({
     Key key,
@@ -22,6 +23,7 @@ class EventCard extends StatefulWidget {
     this.withInteresse = false,
     this.margin = const EdgeInsets.only(top:10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
+    this.big = false,
   }): isCreator = event["erstelltVon"] == userId, super(key: key);
 
   @override
@@ -32,6 +34,7 @@ class _EventCardState extends State<EventCard> {
   var onAbsageList;
   var onZusageList;
   var shadowColor = Colors.grey.withOpacity(0.8);
+
 
   @override
   void initState() {
@@ -98,8 +101,9 @@ class _EventCardState extends State<EventCard> {
 
   @override
   Widget build(BuildContext context) {
+    var bigMultiplikator = widget.big == true ? 1.4 : 1.0;
     double screenHeight = MediaQuery.of(context).size.height;
-    var fontSize = screenHeight / 55;
+    var fontSize = screenHeight / 55 * bigMultiplikator;
     var forTeilnahmeFreigegeben = (widget.event["art"] == "public" ||
         widget.event["art"] == "öffentlich") || widget.event["freigegeben"].contains(userId);
     var isAssetImage = widget.event["bild"].substring(0,5) == "asset" ? true : false;
@@ -156,8 +160,8 @@ class _EventCardState extends State<EventCard> {
             )).whenComplete(() => widget.afterPageVisit());
       },
       child: Container(
-          width: 130 + ((screenHeight-600)/5), //  Android 165
-          height: screenHeight / 3.2, // Android 220 ~3,4
+          width: (130 + ((screenHeight-600)/5)) * bigMultiplikator, //  Android 165
+          height: screenHeight / 3.2 * bigMultiplikator, // Android 220 ~3,4
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -186,13 +190,13 @@ class _EventCardState extends State<EventCard> {
                       ),
                       child: isAssetImage ? Image.asset(
                           widget.event["bild"],
-                          height: 70 + ((screenHeight-600)/4),
-                          width: 135 + ((screenHeight-600)/4),
+                          height: (70 + ((screenHeight-600)/4)) * bigMultiplikator,
+                          width: (135 + ((screenHeight-600)/4)) * bigMultiplikator,
                           fit: BoxFit.fill
                       ) : Image.network(
                           widget.event["bild"],
-                          height: 70 + ((screenHeight-600)/4),
-                          width: 130 + ((screenHeight-600)/4),
+                          height: (70 + ((screenHeight-600)/4)) * bigMultiplikator,
+                          width: (130 + ((screenHeight-600)/4)) * bigMultiplikator,
                           fit: BoxFit.fill
                       ),
                     ),

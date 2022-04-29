@@ -214,6 +214,11 @@
     "aboutusHintText": "We travel because... \nWe want to network because... \nWe search...\n",
     "eingebenBisTagEvent": "Enter until which day the event goes",
     "eingebenBisUhrzeitEvent": "Enter until what time the event goes",
-    "angemeldetBleiben": "Stay logged in?"
+    "angemeldetBleiben": "Stay logged in?",
+    "aufReise": "On travel",
+    "aufReiseAendern": "Change on travel",
+    "seit": "since: ",
+    "bis": "until: ",
+    "offen": "open"
 }
 

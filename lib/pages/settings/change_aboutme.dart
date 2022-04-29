@@ -19,7 +19,8 @@ class ChangeAboutmePage extends StatelessWidget {
       return TextButton(
         child: Icon(Icons.done),
         onPressed: () async {
-          await ProfilDatabase().updateProfil(userId, "aboutme", bioTextKontroller.text);
+          await ProfilDatabase().updateProfil("aboutme = '${bioTextKontroller.text}'",
+              "WHERE id = '$userId'");
           customSnackbar(context,
               AppLocalizations.of(context).ueberMich + " "+
                   AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);

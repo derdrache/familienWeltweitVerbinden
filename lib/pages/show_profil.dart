@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -33,6 +34,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
   var userFriendlist = [];
+  double columnAbstand = 15;
   double textSize = 16;
   double healineTextSize = 18;
   var monthsUntilInactive = 3;
@@ -56,13 +58,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     userFriendlist = dbFriendlist == "" ? [] : dbFriendlist;
   }
 
-  getMonthDifference(){
+  getMonthDifference() {
     widget.profil["lastLogin"] =
         widget.profil["lastLogin"] ?? DateTime.parse("2022-02-13");
     var timeDifference = Duration(
         microseconds: (DateTime.now().microsecondsSinceEpoch -
-            DateTime.parse(widget.profil["lastLogin"].toString())
-                .microsecondsSinceEpoch)
+                DateTime.parse(widget.profil["lastLogin"].toString())
+                    .microsecondsSinceEpoch)
             .abs());
     return timeDifference.inDays / 30.44;
   }
@@ -134,7 +136,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
             customSnackbar(context, snackbarText, color: Colors.green);
 
-            ProfilDatabase().updateProfil(userID, "friendlist", userFriendlist);
+            ProfilDatabase().updateProfil(
+                "friendlist = '${jsonEncode(userFriendlist)}'", "WHERE id = '$userID'");
 
             setState(() {});
           });
@@ -187,6 +190,32 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         Text(themaText,
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
         Text(inhaltText, style: TextStyle(fontSize: textSize))
+      ]);
+    }
+
+    aufreiseBox(){
+      var themenText = AppLocalizations.of(context).aufReise + ": ";
+      var inhaltText = "";
+
+
+      if(widget.profil["aufreiseSeit"] == null){
+        return const SizedBox.shrink();
+      } else if(widget.profil["aufreiseBis"] == null){
+        var seidText = widget.profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+        inhaltText = seidText + " - " + AppLocalizations.of(context).offen;
+      } else{
+        var seidText = widget.profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+        var bisText = widget.profil["aufreiseBis"].split("-").take(2).toList().reversed.join("-");
+        inhaltText = seidText + " - " + bisText;
+      }
+
+      return Column(children: [
+        Row(children: [
+          Text(themenText,
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+          Text(inhaltText, style: TextStyle(fontSize: textSize))
+        ]),
+        SizedBox(height: columnAbstand),
       ]);
     }
 
@@ -270,7 +299,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     infoProfil() {
-      double columnAbstand = 15;
 
       return Container(
           padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
@@ -297,6 +325,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               SizedBox(height: columnAbstand),
               travelTypBox(),
               SizedBox(height: columnAbstand),
+              aufreiseBox(),
               sprachenBox(),
               SizedBox(height: columnAbstand),
               kinderBox(),

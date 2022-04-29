@@ -14,10 +14,41 @@ double webWidth = 600;
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
   onSubmit, informationWindow, hintText}){
-  return Align(
-    child: Stack(
-      children: [
-        Container(
+
+  return Container(
+    width: webWidth,
+    margin: EdgeInsets.all(sideSpace),
+    child: TextFormField(
+        onFieldSubmitted: (string) {
+          if(onSubmit != null)onSubmit();
+        },
+        textInputAction: textInputAction,
+        textAlignVertical: TextAlignVertical.top,
+        maxLines: moreLines,
+        obscureText: passwort,
+        controller: controller,
+        decoration: InputDecoration(
+          isDense: true,
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
+          ),
+          border: const OutlineInputBorder(),
+          //alignLabelWithHint: true,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          hintText: hintText,
+          labelText: text,
+          labelStyle: const TextStyle(fontSize: 15, color: Colors.grey),
+          //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
+        ),
+        validator: validator
+    ),
+  );
+
+  return Stack(
+    children: [
+      Align(
+        alignment: Alignment.center,
+        child: Container(
             width: webWidth,
             margin: EdgeInsets.all(sideSpace),
             child: TextFormField(
@@ -45,25 +76,25 @@ Widget customTextInput(text, controller, {validator, passwort = false,
                 validator: validator
             ),
         ),
-        if (informationWindow != null) Positioned(
-            left:5,
-            top: 2,
-            child: Container(
-              alignment: Alignment.topCenter,
-              margin: const EdgeInsets.only(bottom: 10),
-              width: 20,
-              height: 20,
-              child: IconButton(
-                  padding: const EdgeInsets.all(0),
-                  alignment: Alignment.topCenter,
-                  iconSize: 20,
-                  icon: const Icon(Icons.info),
-                  onPressed: () => informationWindow()
-              ),
-            )
-        )
-      ]
-    ),
+      ),
+      if (informationWindow != null) Positioned(
+          left:5,
+          top: 2,
+          child: Container(
+            alignment: Alignment.topCenter,
+            margin: const EdgeInsets.only(bottom: 10),
+            width: 20,
+            height: 20,
+            child: IconButton(
+                padding: const EdgeInsets.all(0),
+                alignment: Alignment.topCenter,
+                iconSize: 20,
+                icon: const Icon(Icons.info),
+                onPressed: () => informationWindow()
+            ),
+          )
+      )
+    ]
   );
 }
 

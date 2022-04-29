@@ -30,7 +30,8 @@ class ChatDetailsPage extends StatefulWidget {
   _ChatDetailsPageState createState() => _ChatDetailsPageState();
 }
 
-class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingObserver{
+class _ChatDetailsPageState extends State<ChatDetailsPage>
+    with WidgetsBindingObserver {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser.displayName;
   bool newChat = false;
@@ -45,19 +46,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
 
   @override
   void dispose() {
-    ProfilDatabase().updateProfil(userId, "activeChat", "");
+    ProfilDatabase().updateProfil("activeChat = '""'", "WHERE id = '$userId'");
     WidgetsBinding.instance.removeObserver(this);
     timer.cancel();
     super.dispose();
   }
 
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if(state == AppLifecycleState.resumed){
-      ProfilDatabase().updateProfil(userId, "activeChat", widget.chatId);
-    }else{
-      ProfilDatabase().updateProfil(userId, "activeChat", "");
+    if (state == AppLifecycleState.resumed) {
+      ProfilDatabase().updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+    } else {
+      ProfilDatabase().updateProfil("activeChat = '""'", "WHERE id = '$userId'");
     }
   }
 
@@ -74,11 +74,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
     writeActiveChat();
     getChatPartnerProfil();
 
-    if(widget.groupChatData != false) resetNewMessageCounter();
+    if (widget.groupChatData != false) resetNewMessageCounter();
 
-    setState(() {
-
-    });
+    setState(() {});
 
     timer = Timer.periodic(
         const Duration(seconds: 10), (Timer t) => checkNewMessages());
@@ -90,7 +88,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
 
   getAndSetChatData() async {
     if (widget.groupChatData != null) {
-      if(widget.groupChatData["id"] == null) newChat = true;
+      if (widget.groupChatData["id"] == null) newChat = true;
 
       widget.chatId = widget.groupChatData["id"];
       var groupchatUsers = widget.groupChatData["users"];
@@ -106,19 +104,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
       return;
     }
 
-
     widget.chatPartnerId ??= await ProfilDatabase()
         .getData("id", "WHERE name = '${widget.chatPartnerName}'");
-
 
     widget.chatPartnerName ??= await ProfilDatabase()
         .getData("name", "WHERE id = '${widget.chatPartnerId}'");
 
-
     widget.chatId ??=
         global_functions.getChatID([userId, widget.chatPartnerId]);
 
-    widget.groupChatData ??= await ChatDatabase().getChatData("*", "WHERE id = '$widget.chatId'");
+    widget.groupChatData ??=
+        await ChatDatabase().getChatData("*", "WHERE id = '$widget.chatId'");
 
     if (widget.groupChatData == false) {
       newChat = true;
@@ -126,10 +122,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
   }
 
   writeActiveChat() {
-    ProfilDatabase().updateProfil(userId, "activeChat", widget.chatId);
+    ProfilDatabase().updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
   }
 
-  getChatPartnerProfil() async{
+  getChatPartnerProfil() async {
     chatPartnerProfil = await ProfilDatabase()
         .getData("*", "WHERE id = '${widget.chatPartnerId}'");
   }
@@ -141,16 +137,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
 
     if (usersChatNewMessages == 0) return;
 
-    var usersAllNewMessages = await ProfilDatabase()
-        .getData("newMessages", "WHERE id = '${userId}'");
-    usersAllNewMessages = usersAllNewMessages;
+    var usersAllNewMessages =
+        await ProfilDatabase().getData("newMessages", "WHERE id = '$userId'");
+    usersAllNewMessages = usersAllNewMessages - usersChatNewMessages < 0
+        ? 0
+        : usersAllNewMessages - usersChatNewMessages;
+
+
+
 
     ProfilDatabase().updateProfil(
-        userId,
-        "newMessages",
-        usersAllNewMessages - usersChatNewMessages < 0
-            ? 0
-            : usersAllNewMessages - usersChatNewMessages);
+        "newMessages = '$usersAllNewMessages'",
+        "WHERE id ='$userId'");
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
     ChatDatabase().updateChatGroup(
@@ -172,7 +170,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
       "zu": widget.chatPartnerId
     };
     if (newChat) {
-
       widget.groupChatData = await ChatDatabase().addNewChatGroup(
           {userID: userName, widget.chatPartnerId: widget.chatPartnerName},
           messageData);
@@ -185,7 +182,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
       await ChatDatabase()
           .addNewMessageAndSendNotification(widget.groupChatData, messageData);
 
-      if(messageData["message"].contains("</eventId=")){
+
+      if (messageData["message"].contains("</eventId=")) {
         messageData["message"] = "<Event Card>";
       }
       ChatDatabase().updateChatGroup(
@@ -212,8 +210,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
 
   openProfil() async {
     chatPartnerProfil ??= await ProfilDatabase()
-          .getData("*", "WHERE id = '${widget.chatPartnerId}'");
-
+        .getData("*", "WHERE id = '${widget.chatPartnerId}'");
 
     global_functions.changePage(
         context,
@@ -223,15 +220,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
         ));
   }
 
-
   @override
   Widget build(BuildContext context) {
-    messageList(messages){
+    messageList(messages) {
       List<Widget> messageBox = [];
 
-      for (var i = 0; i< messages.length; i++) {
+      for (var i = 0; i < messages.length; i++) {
         var message = messages[i];
-        var messageTime = DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
+        var messageTime =
+            DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
 
@@ -240,56 +237,47 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
           boxColor = Colors.greenAccent;
         }
 
-        if (message["message"] == "") {
+        if (message["message"] == "") continue;
+
+        if (message["message"].contains("</eventId=")) {
+          messageBox.add(Align(
+            alignment: textAlign,
+            child: FutureBuilder(
+                future: EventDatabase().getData(
+                    "*", "WHERE id = '${message["message"].substring(10)}'"),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data != false) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 25),
+                      child: Stack(clipBehavior: Clip.none, children: [
+                        EventCard(
+                          margin: const EdgeInsets.all(15),
+                          withInteresse: true,
+                          event: snapshot.data,
+                          afterPageVisit: () => setState(() {}),
+                        ),
+                        Positioned(
+                          bottom: -15,
+                          right: 0,
+                          child: Text(
+                              DateFormat('dd-MM HH:mm').format(messageTime),
+                              style: TextStyle(color: Colors.grey[600])),
+                        )
+                      ]),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+          ));
           continue;
         }
-
-        if(message["message"].contains("</eventId=")){
-            messageBox.add(
-                Align(
-                  alignment: textAlign,
-                  child: FutureBuilder(
-                    future: EventDatabase()
-                        .getData("*", "WHERE id = '${message["message"].substring(10)}'"),
-                    builder: (context, snapshot) {
-                      if(snapshot.hasData && snapshot.data != false) {
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 25),
-                          child: Stack(
-                            clipBehavior: Clip.none, children: [
-                            EventCard(
-                              margin: const EdgeInsets.all(15),
-                              withInteresse: true,
-                              event: snapshot.data,
-                              afterPageVisit: () => setState((){}),
-                            ),
-                            Positioned(
-                              bottom: -15,
-                              right: 0,
-                              child: Text(
-                                  DateFormat('dd-MM HH:mm').format(messageTime),
-                                  style: TextStyle(color: Colors.grey[600])
-                              ),
-                            )
-                            ]
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    }
-                  ),
-                )
-            );
-            continue;
-        }
-
 
         messageBox.add(
           Align(
             alignment: textAlign, //right and left
             child: Container(
                 constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.85),
+                    maxWidth: MediaQuery.of(context).size.width * 0.85),
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     color: boxColor,
@@ -307,8 +295,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
                     ),
                     Container(
                       padding: const EdgeInsets.only(bottom: 5, right: 10),
-                      child: Text(
-                          DateFormat('dd-MM HH:mm').format(messageTime),
+                      child: Text(DateFormat('dd-MM HH:mm').format(messageTime),
                           style: TextStyle(color: Colors.grey[600])),
                     )
                   ],
@@ -337,7 +324,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
             AsyncSnapshot snap,
           ) {
             if (snap.connectionState == ConnectionState.waiting) {
-              return pufferList ?? const Center(child: const CircularProgressIndicator());
+              return pufferList ??
+                  const Center(child: CircularProgressIndicator());
             } else if (snap.data != null) {
               List<dynamic> messages = snap.data;
 
@@ -349,7 +337,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
           });
     }
 
-    textEingabe(){
+    textEingabe() {
       var myFocusNode = FocusNode();
 
       return Stack(
@@ -368,19 +356,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
                   ),
                 ]),
             child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 200.0,
-                ),
-                child: TextField(
-                  maxLines: null,
-                  focusNode: myFocusNode,
-                  textInputAction: TextInputAction.newline,
-                  controller: nachrichtController,
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context).nachricht,
-                  ),
+              constraints: const BoxConstraints(
+                maxHeight: 200.0,
+              ),
+              child: TextField(
+                maxLines: null,
+                focusNode: myFocusNode,
+                textInputAction: TextInputAction.newline,
+                controller: nachrichtController,
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context).nachricht,
                 ),
               ),
+            ),
           ),
           Positioned(
             bottom: 0,
@@ -395,8 +383,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> with WidgetsBindingOb
                   });
                 },
                 icon: Icon(Icons.send,
-                    size: 30, color: Theme.of(context).colorScheme.secondary)
-            ),
+                    size: 30, color: Theme.of(context).colorScheme.secondary)),
           ),
         ],
       );

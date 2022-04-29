@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -29,7 +31,8 @@ class ChangeChildrenPage extends StatelessWidget {
             customSnackbar(context, AppLocalizations.of(context).geburtsdatumEingeben);
           } else{
             await ProfilDatabase().updateProfil(
-                userId, "kinder", childrenBirthdatePickerBox.getDates());
+              "kinder = '${jsonEncode(childrenBirthdatePickerBox.getDates())}'",
+              "WHERE id = '$userId'");
             customSnackbar(context,
                 AppLocalizations.of(context).anzahlUndAlterKinder +" "+
                     AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);

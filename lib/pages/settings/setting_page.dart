@@ -27,6 +27,7 @@ import '../../widgets/profil_image.dart';
 import '../../windows/upcoming_updates.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
+import 'change_aufreise.dart';
 import 'change_children.dart';
 import 'privacy_security_page.dart';
 import 'feedback_page.dart';
@@ -163,6 +164,23 @@ class _SettingPageState extends State<SettingPage> {
             ],
           );
         });
+  }
+
+  createAufreiseText(){
+    String text = "";
+    String seit = userProfil["aufreiseSeit"];
+    String bis = userProfil["aufreiseBis"];
+
+    if(seit == null) return " ";
+    text = seit.split(" ")[0].split("-").take(2).toList().reversed.join("-");
+
+    if(bis == null){
+      text += " - offen";
+    } else{
+      text += " - " + bis.split(" ")[0].split("-").take(2).toList().reversed.join("-");
+    }
+
+    return text;
   }
 
   @override
@@ -321,7 +339,15 @@ class _SettingPageState extends State<SettingPage> {
                         selected: sprachenInputBox.getSelected(),
                         isGerman: spracheIstDeutsch,
                       )
-
+                  ),
+                  profilThemeContainer(
+                      createAufreiseText(),
+                      AppLocalizations.of(context).aufReise,
+                      ChangeAufreisePage(
+                        aufreiseSeit: userProfil["aufreiseSeit"] == null ? null : DateTime.parse(userProfil["aufreiseSeit"]),
+                        aufreiseBis: userProfil["aufreiseBis"] == null ? null : DateTime.parse(userProfil["aufreiseBis"]),
+                        isGerman: spracheIstDeutsch
+                      )
                   )
 
                 ],

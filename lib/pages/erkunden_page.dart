@@ -99,15 +99,44 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   getProfilsDB() async {
-    var dbProfils = await ProfilDatabase().getData(
+    List<dynamic> dbProfils = await ProfilDatabase().getData(
         "id, name, land, interessen, kinder, latt, longt, ort, reiseart,"
           "sprachen, aboutme, friendlist, emailAnzeigen, bild, bildStandardFarbe,"
-          "lastLogin",
-        "ORDER BY land ASC, ort ASC");
+          "lastLogin, aufreiseSeit, aufreiseBis",
+        "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
+
+    dbProfils = sortProfils(dbProfils);
 
     profilBox.put("list", dbProfils);
     profils = dbProfils;
+  }
+
+  sortProfils(profils) {
+    var allCountries = LocationService().getAllCountries();
+
+    profils.sort((a, b) {
+      var profilALand = a['land'];
+      var profilBLand = b['land'];
+
+      if(allCountries["eng"].contains(profilALand)){
+        var index = allCountries["eng"].indexOf(profilALand);
+        profilALand = allCountries["ger"][index];
+      }
+      if(allCountries["eng"].contains(profilBLand)){
+        var index = allCountries["eng"].indexOf(profilBLand);
+        profilBLand = allCountries["ger"][index];
+      }
+
+      int compareCountry =  (profilBLand).compareTo(profilALand) as int;
+
+      if (compareCountry != 0) return compareCountry;
+
+      return b["ort"].compareTo(a["ort"]) as int;
+    });
+
+
+    return profils;
   }
 
   changeProfilList(){

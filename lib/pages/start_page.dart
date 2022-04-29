@@ -47,32 +47,31 @@ class _StartPageState extends State<StartPage> {
     checkAndUpdateProfil();
   }
 
-  setHiveBoxen() async{
+  setHiveBoxen() async {
     var ownProfilBox = Hive.box("ownProfilBox");
     if (ownProfilBox.get("list") == null) {
       var ownProfil =
-      await ProfilDatabase().getData("*", "WHERE id = '$userID'");
+          await ProfilDatabase().getData("*", "WHERE id = '$userID'");
       ownProfilBox.put("list", ownProfil);
     }
   }
 
-  checkFlexibleUpdate() async{
+  checkFlexibleUpdate() async {
     try {
       var updateInformation = await InAppUpdate.checkForUpdate();
       if (updateInformation.updateAvailability ==
-          UpdateAvailability.updateAvailable &&
+              UpdateAvailability.updateAvailable &&
           !kIsWeb) {
         InAppUpdate.startFlexibleUpdate();
       }
-    } catch (_) {
-
-    }
+    } catch (_) {}
   }
 
   checkAndUpdateProfil() async {
     if (userName == null) return;
 
-    var dbData = await ProfilDatabase().getData("email, token", "WHERE id = '$userID'");
+    var dbData =
+        await ProfilDatabase().getData("email, token", "WHERE id = '$userID'");
 
     var userDBEmail = dbData["email"];
     var userDeviceTokenDb = dbData["token"];
@@ -80,22 +79,24 @@ class _StartPageState extends State<StartPage> {
         kIsWeb ? null : await FirebaseMessaging.instance.getToken();
 
     if (userAuthEmail != userDBEmail) {
-      ProfilDatabase().updateProfil(userID, "email", userAuthEmail);
+      ProfilDatabase()
+          .updateProfil("email = '$userAuthEmail'", "WHERE id = '$userID'");
     }
 
     if (userDeviceTokenDb != userDeviceTokenReal) {
-      ProfilDatabase().updateProfil(userID, "token", userDeviceTokenReal);
+      ProfilDatabase().updateProfil(
+          "token = '$userDeviceTokenReal'", "WHERE id = '$userID'");
     }
 
-    ProfilDatabase()
-        .updateProfil(userID, "lastLogin", DateTime.now().toString());
+    ProfilDatabase().updateProfil(
+        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userID'");
   }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
       //BoardPage(),
-      ErkundenPage(),
+      const ErkundenPage(),
       const EventPage(),
       const ChatPage(),
       const SettingPage()
@@ -110,7 +111,8 @@ class _StartPageState extends State<StartPage> {
         hasInternet = true;
       } on SocketException catch (_) {
         hasInternet = false;
-        customSnackbar(context, "kein Internet", duration: const Duration(days: 365));
+        customSnackbar(context, "kein Internet",
+            duration: const Duration(days: 365));
       }
     }
 
@@ -122,10 +124,9 @@ class _StartPageState extends State<StartPage> {
 
     chatIcon() {
       return FutureBuilder(
-          future: ProfilDatabase()
-              .getData("newMessages", "WHERE id = '$userID'"),
-          builder: ( BuildContext context, AsyncSnapshot snap) {
-
+          future:
+              ProfilDatabase().getData("newMessages", "WHERE id = '$userID'"),
+          builder: (BuildContext context, AsyncSnapshot snap) {
             if (!snap.hasData) return const Icon(Icons.chat);
 
             var newMessages = snap.data;
@@ -134,7 +135,6 @@ class _StartPageState extends State<StartPage> {
             return BadgeIcon(
                 icon: Icons.chat,
                 text: newMessages > 0 ? newMessages.toString() : "");
-
           });
     }
 

@@ -22,13 +22,13 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   allNotificationSetting(){
     return Row(
       children: [
-        SizedBox(width: 20),
+        const SizedBox(width: 20),
         Text(
           kIsWeb? AppLocalizations.of(context).emailErhalten :
           AppLocalizations.of(context).benachrichtigungenErhalten, //email erhalten
-          style: TextStyle(fontSize: 20)
+          style: const TextStyle(fontSize: 20)
         ),
-        Expanded(child: SizedBox(width: 20)),
+        const Expanded(child: SizedBox(width: 20)),
         Switch(
             value: widget.profil["notificationstatus"] == 1 ? true : false,
             onChanged: (value){
@@ -36,8 +36,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
                 widget.profil["notificationstatus"] = value == true ? 1 : 0;
               });
 
-              ProfilDatabase().updateProfil(userId, "notificationstatus", value);
-
+              ProfilDatabase().updateProfil("notificationstatus = '$value'", "WHERE id = '$userId'");
             })
       ],
     );
@@ -46,21 +45,20 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   chatNotificationSetting(){
     return Row(
       children: [
-        SizedBox(width: 20),
+        const SizedBox(width: 20),
         Text(
             kIsWeb? AppLocalizations.of(context).chatEmailErhalten :
             AppLocalizations.of(context).chatNotificationErhalten,
-            style: TextStyle(fontSize: 20)
+            style: const TextStyle(fontSize: 20)
         ),
-        Expanded(child: SizedBox(width: 20)),
+        const Expanded(child: SizedBox(width: 20)),
         Switch(
             value: widget.profil["chatNotificationOn"] == 1 ? true : false,
             onChanged: (value){
               setState(() {
                 widget.profil["chatNotificationOn"] = value == true ? 1 : 0;
               });
-
-              ProfilDatabase().updateProfil(userId, "chatNotificationOn", value);
+              ProfilDatabase().updateProfil("chatNotificationOn = '$value'", "WHERE id = '$userId'");
 
             })
       ],
@@ -70,22 +68,20 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   eventNotificationSetting(){
     return Row(
       children: [
-        SizedBox(width: 20),
+        const SizedBox(width: 20),
         Text(
             kIsWeb? AppLocalizations.of(context).eventEmailErhalten :
             AppLocalizations.of(context).eventNotificationErhalten,
-            style: TextStyle(fontSize: 20)
+            style: const TextStyle(fontSize: 20)
         ),
-        Expanded(child: SizedBox(width: 20)),
+        const Expanded(child: SizedBox(width: 20)),
         Switch(
             value: widget.profil["eventNotificationOn"] == 1 ? true : false,
             onChanged: (value){
               setState(() {
                 widget.profil["eventNotificationOn"] = value == true ? 1 : 0;
               });
-
-              ProfilDatabase().updateProfil(userId, "eventNotificationOn", value);
-
+              ProfilDatabase().updateProfil("eventNotificationOn = '$value'", "WHERE id = '$userId'");
             })
       ],
     );
@@ -97,7 +93,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       appBar: customAppBar(title: AppLocalizations.of(context).benachrichtigungen),
       body: Column(
         children: [
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
           allNotificationSetting(),
           if(widget.profil["notificationstatus"] == 1) chatNotificationSetting(),
           if(widget.profil["notificationstatus"] == 1) eventNotificationSetting()

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -31,14 +33,15 @@ class ChangeInteressenPage extends StatelessWidget {
 
     saveButton(){
       return TextButton(
-        child: Icon(Icons.done),
+        child: const Icon(Icons.done),
         onPressed: ()async {
 
           if(interessenInputBox.getSelected() == null || interessenInputBox.getSelected().isEmpty){
             customSnackbar(context, AppLocalizations.of(context).interessenAuswaehlen);
           } else {
             await ProfilDatabase().updateProfil(
-                userId, "interessen", interessenInputBox.getSelected());
+              "interessen = '${jsonEncode(interessenInputBox.getSelected())}'",
+              "WHERE id = '$userId'" );
 
             customSnackbar(context,
                 AppLocalizations.of(context).interessen +" "+
