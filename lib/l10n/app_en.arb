@@ -219,6 +219,8 @@
     "aufReiseAendern": "Change on travel",
     "seit": "since: ",
     "bis": "until: ",
-    "offen": "open"
+    "offen": "open",
+    "eingebenSeitWannReise": "Please enter since when you have been traveling",
+    "eingebenBisWannReise": "Please enter until when you were traveling"
 }
 

@@ -219,6 +219,8 @@
     "aufReiseAendern": "Auf Reise ändern",
     "seit": "Seit: ",
     "bis": "Bis: ",
-    "offen": "offen"
+    "offen": "offen",
+    "eingebenSeitWannReise": "Bitte gib ein, seit wann ihr auf reisen seid/wart",
+    "eingebenBisWannReise": "Bitte gib ein, bis wann ihr auf reisen wart"
 
 }

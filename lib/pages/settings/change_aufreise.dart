@@ -2,7 +2,6 @@ import 'package:familien_suche/global/variablen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -10,7 +9,7 @@ import '../../global/custom_widgets.dart';
 
 
 class ChangeAufreisePage extends StatefulWidget {
-  var isGerman;
+  bool isGerman;
   var aufreiseSeit;
   var aufreiseBis;
 
@@ -48,28 +47,23 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
       reiseStatus = reiseStatus = widget.isGerman ? aufreise[0] : aufreiseEnglisch[0];
     } else if(widget.aufreiseBis == null){
       reiseStatus = reiseStatus = widget.isGerman ? aufreise[2] : aufreiseEnglisch[2];
+    } else{
+      reiseStatus = reiseStatus = widget.isGerman ? aufreise[1] : aufreiseEnglisch[1];
     }
-    reiseStatus = reiseStatus = widget.isGerman ? aufreise[1] : aufreiseEnglisch[1];
   }
 
   checkValidation(){
     if(aufreiseDropdownButton.selected == aufreise[0]
         || aufreiseDropdownButton.selected == aufreiseEnglisch[0]) return true;
 
-    if(widget.aufreiseSeit == null && widget.aufreiseBis == null &&
-        (aufreiseDropdownButton.selected != aufreise[0]
-            || aufreiseDropdownButton.selected != aufreiseEnglisch[0] )) {
-      customSnackbar(context, "Bitte gib ein, seit wann ihr auf reisen seid/wart");
+    if(widget.aufreiseSeit == null) {
+      customSnackbar(context, AppLocalizations.of(context).eingebenSeitWannReise);
       return false;
     }
 
-    if(widget.aufreiseSeit == null){
-      customSnackbar(context, "Bitte gib ein, seit wann ihr auf reisen seid/wart");
-      return false;
-    }
     if(widget.aufreiseBis == null && (aufreiseDropdownButton.selected == aufreise[1]
         || aufreiseDropdownButton.selected == aufreiseEnglisch[1] )){
-      customSnackbar(context, "Bitte gib ein, bis wann ihr auf reisen wart");
+      customSnackbar(context, AppLocalizations.of(context).eingebenBisWannReise);
       return false;
     }
 
