@@ -12,7 +12,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
 import '../widgets/badge_icon.dart';
-import 'erkunden_page.dart';
+import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
 

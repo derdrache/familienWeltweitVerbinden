@@ -8,14 +8,14 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../services/database.dart';
-import '../global/global_functions.dart' as global_functions;
-import '../global/variablen.dart' as global_var;
-import '../widgets/profil_image.dart';
-import '../widgets/search_autocomplete.dart';
-import '../services/locationsService.dart';
-import 'show_profil.dart';
-import 'events/eventCard.dart';
+import '../../services/database.dart';
+import '../../global/global_functions.dart' as global_functions;
+import '../../global/variablen.dart' as global_var;
+import '../../widgets/profil_image.dart';
+import '../../widgets/search_autocomplete.dart';
+import '../../services/locationsService.dart';
+import '../show_profil.dart';
+import '../events/eventCard.dart';
 
 class ErkundenPage extends StatefulWidget {
   const ErkundenPage({Key key}) : super(key: key);
