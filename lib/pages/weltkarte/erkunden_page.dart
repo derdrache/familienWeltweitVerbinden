@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:familien_suche/pages/weltkarte/ort_information.dart';
+import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -8,6 +10,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import 'create_ort_information.dart';
+import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_var;
@@ -31,10 +35,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
   Set<String> allUserName = {};
   var countriesList = {};
   List filterList = [];
-  List profilsBackup = [] , profils = [], aktiveProfils = [];
+  List profilsBackup = [], profils = [], aktiveProfils = [];
   List eventsBackup = [], events = [], aktiveEvents = [];
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
+  List selectUserProfils = [];
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxZoom = 9;
   double currentMapZoom = 1.6;
@@ -101,8 +106,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
   getProfilsDB() async {
     List<dynamic> dbProfils = await ProfilDatabase().getData(
         "id, name, land, interessen, kinder, latt, longt, ort, reiseart,"
-          "sprachen, aboutme, friendlist, emailAnzeigen, bild, bildStandardFarbe,"
-          "lastLogin, aufreiseSeit, aufreiseBis",
+            "sprachen, aboutme, friendlist, emailAnzeigen, bild, bildStandardFarbe,"
+            "lastLogin, aufreiseSeit, aufreiseBis",
         "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
 
@@ -119,35 +124,34 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var profilALand = a['land'];
       var profilBLand = b['land'];
 
-      if(allCountries["eng"].contains(profilALand)){
+      if (allCountries["eng"].contains(profilALand)) {
         var index = allCountries["eng"].indexOf(profilALand);
         profilALand = allCountries["ger"][index];
       }
-      if(allCountries["eng"].contains(profilBLand)){
+      if (allCountries["eng"].contains(profilBLand)) {
         var index = allCountries["eng"].indexOf(profilBLand);
         profilBLand = allCountries["ger"][index];
       }
 
-      int compareCountry =  (profilBLand).compareTo(profilALand) as int;
+      int compareCountry = (profilBLand).compareTo(profilALand) as int;
 
       if (compareCountry != 0) return compareCountry;
 
       return b["ort"].compareTo(a["ort"]) as int;
     });
 
-
     return profils;
   }
 
-  changeProfilList(){
+  changeProfilList() {
     var inactiveProfils = [];
 
     for (var profil in profils) {
       profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
       var timeDifference = Duration(
           microseconds: (DateTime.now().microsecondsSinceEpoch -
-              DateTime.parse(profil["lastLogin"].toString())
-                  .microsecondsSinceEpoch)
+                  DateTime.parse(profil["lastLogin"].toString())
+                      .microsecondsSinceEpoch)
               .abs());
       var monthDifference = timeDifference.inDays / 30.44;
 
@@ -499,18 +503,73 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     if (currentMapZoom > cityZoom + 1) {
       newZoom = cityZoom;
-    } else if (currentMapZoom > countryZoom ) {
+    } else if (currentMapZoom > countryZoom) {
       newZoom = countryZoom;
-    } else if(currentMapZoom > kontinentZoom) {
+    } else if (currentMapZoom > kontinentZoom) {
       newZoom = kontinentZoom;
-    } else{
-        newZoom = minMapZoom;
+    } else {
+      newZoom = minMapZoom;
     }
 
-      mapController.move(mapPosition, newZoom);
-      currentMapZoom = newZoom;
-      FocusScope.of(context).unfocus();
-      changeProfil(currentMapZoom);
+    mapController.move(mapPosition, newZoom);
+    currentMapZoom = newZoom;
+    FocusScope.of(context).unfocus();
+    changeProfil(currentMapZoom);
+  }
+
+  getAllCities(profils) {
+    var allCities = [];
+
+    for (var profil in selectUserProfils) {
+      var newCity = true;
+
+      for (var i = 0; i < allCities.length; i++) {
+        if (allCities[i]["names"].contains(profil["ort"])) {
+          newCity = false;
+          continue;
+        }
+
+        if (profil["latt"] == allCities[i]["latt"] &&
+            profil["longt"] == allCities[i]["longt"]) {
+          allCities[i]["names"].add(profil["ort"]);
+          newCity = false;
+          continue;
+        }
+      }
+
+      if (newCity) {
+        allCities.add({
+          "names": [profil["ort"]],
+          "latt": profil["latt"],
+          "longt": profil["longt"]
+        });
+      }
+    }
+
+    return allCities;
+  }
+
+  openSelectCityWindow() {
+    List allSelectedCities = getAllCities(selectUserProfils);
+    List<Widget> cityAuswahl = [];
+
+    for (var city in allSelectedCities) {
+      cityAuswahl.add(InkWell(
+        onTap: () => changePage(context, OrtInformationPage(ort: city)),
+        child: Container(
+            margin: EdgeInsets.all(10), child: Text(city["names"].join(" / "))),
+      ));
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomAlertDialog(
+          title: "Ort auswählen",
+          children: cityAuswahl,
+        );
+      },
+    );
   }
 
   @override
@@ -553,6 +612,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createPopupProfils(profil) {
       popupItems = [];
+      selectUserProfils = profil["profils"];
 
       popupItems.add(SliverAppBar(
         toolbarHeight: 30,
@@ -762,15 +822,34 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       },
                     ),
                   ),
+                  Positioned(
+                    left: 5,
+                    top: 65,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.feed,
+                        size: 30,
+                      ),
+                      onPressed: () => openSelectCityWindow(),
+                    ),
+                  ),
                   if (currentMapZoom > minMapZoom)
                     Positioned(
                       top: 0,
-                      right: 0,
+                      right: 80,
                       child: FloatingActionButton(
-                          heroTag: "zoom out",
+                          heroTag: "zoom out 2",
                           child: const Icon(Icons.zoom_out_map),
                           onPressed: () => zoomOut()),
                     ),
+                  Positioned(
+                      top: 0,
+                      right: 10,
+                      child: FloatingActionButton(
+                          heroTag: "create Stadtinformation 2",
+                          child: const Icon(Icons.create),
+                          onPressed: () => changePage(
+                              context, const CreateOrtInformationPage())))
                 ],
               );
             }),
@@ -873,22 +952,31 @@ class _ErkundenPageState extends State<ErkundenPage> {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
-      child: Stack(children: [
-        ownFlutterMap(),
-        searchAutocomplete,
-        if (popupActive) markerPopupContainer(),
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
+        child: Stack(children: [
+          ownFlutterMap(),
+          searchAutocomplete,
+          if (popupActive) markerPopupContainer(),
+        ]),
+      ),
+      floatingActionButton:
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         if (currentMapZoom > minMapZoom && !popupActive)
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: FloatingActionButton(
-                heroTag: "zoom out 1",
-                child: const Icon(Icons.zoom_out_map),
-                onPressed: () => zoomOut()),
-          ),
+          FloatingActionButton(
+              heroTag: "zoom out 1",
+              child: const Icon(Icons.zoom_out_map),
+              onPressed: () => zoomOut()),
+        const SizedBox(width: 10),
+        if (!popupActive)
+          FloatingActionButton(
+              heroTag: "create Stadtinformation 1",
+              child: const Icon(Icons.create),
+              onPressed: () =>
+                  changePage(context, const CreateOrtInformationPage())),
       ]),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
