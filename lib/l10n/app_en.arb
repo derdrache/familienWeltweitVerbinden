@@ -221,6 +221,11 @@
     "bis": "until: ",
     "offen": "open",
     "eingebenSeitWannReise": "Please enter since when you have been traveling",
-    "eingebenBisWannReise": "Please enter until when you were traveling"
+    "eingebenBisWannReise": "Please enter until when you were traveling",
+    "stadtinformationErstellen": "Create city information",
+    "beschreibung": "description",
+    "titel": "title",
+    "titelStadtinformationEingeben": "Enter title for city information",
+    "beschreibungStadtinformationEingeben": "Enter description for city information"
 }
 

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:familien_suche/pages/weltkarte/ort_information.dart';
+import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import 'create_ort_information.dart';
+import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -519,7 +519,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   getAllCities(profils) {
     var allCities = [];
-
+//profils gegen neue Tabellendata eintauschen
     for (var profil in selectUserProfils) {
       var newCity = true;
 
@@ -555,7 +555,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     for (var city in allSelectedCities) {
       cityAuswahl.add(InkWell(
-        onTap: () => changePage(context, OrtInformationPage(ort: city)),
+        onTap: () => changePage(context, StadtinformationsPage(ort: city)),
         child: Container(
             margin: EdgeInsets.all(10), child: Text(city["names"].join(" / "))),
       ));
@@ -849,7 +849,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                           heroTag: "create Stadtinformation 2",
                           child: const Icon(Icons.create),
                           onPressed: () => changePage(
-                              context, const CreateOrtInformationPage())))
+                              context, const CreateStadtinformationsPage())))
                 ],
               );
             }),
@@ -974,7 +974,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               heroTag: "create Stadtinformation 1",
               child: const Icon(Icons.create),
               onPressed: () =>
-                  changePage(context, const CreateOrtInformationPage())),
+                  changePage(context, const CreateStadtinformationsPage())),
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

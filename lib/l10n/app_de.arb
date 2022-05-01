@@ -221,6 +221,10 @@
     "bis": "Bis: ",
     "offen": "offen",
     "eingebenSeitWannReise": "Bitte gib ein, seit wann ihr auf reisen seid/wart",
-    "eingebenBisWannReise": "Bitte gib ein, bis wann ihr auf reisen wart"
-
+    "eingebenBisWannReise": "Bitte gib ein, bis wann ihr auf reisen wart",
+    "stadtinformationErstellen": "Stadtinformation erstellen",
+    "beschreibung": "Beschreibung",
+    "titel": "Titel",
+    "titelStadtinformationEingeben": "Titel für Stadtinformation eingeben",
+    "beschreibungStadtinformationEingeben": "Beschreibung für Stadtinformation eingeben"
 }
