@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 
 
-class OrtInformationPage extends StatefulWidget {
-  var ort; //{Names, latt, longt}
+class StadtinformationsPage extends StatefulWidget {
+  var ort;
 
-  OrtInformationPage({this.ort, Key key}) : super(key: key);
+  StadtinformationsPage({this.ort, Key key}) : super(key: key);
 
   @override
-  _OrtInformationPageState createState() => _OrtInformationPageState();
+  _StadtinformationsPageState createState() => _StadtinformationsPageState();
 }
 
-class _OrtInformationPageState extends State<OrtInformationPage> {
+class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
   @override
   Widget build(BuildContext context) {
