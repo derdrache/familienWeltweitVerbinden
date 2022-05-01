@@ -14,53 +14,7 @@ import '../global/global_functions.dart'as global_functions;
 var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
-class AllgemeinDatabase{
 
-  getData(whatData, queryEnd, {returnList = false}) async {
-    //sichere Datenbankabfrage
-    var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
-    var res = await http.post(url, body: json.encode({
-      "whatData": whatData,
-      "queryEnd": queryEnd,
-      "table": "allgemein"
-    }));
-
-    dynamic responseBody = res.body;
-    responseBody = decrypt(responseBody);
-
-    responseBody = jsonDecode(responseBody);
-    if(responseBody.isEmpty) return false;
-
-    for(var i = 0; i < responseBody.length; i++){
-
-      if(responseBody[i].keys.toList().length == 1){
-        var key = responseBody[i].keys.toList()[0];
-        responseBody[i] = responseBody[i][key];
-        continue;
-      }
-
-      for(var key in responseBody[i].keys.toList()){
-        try{
-          responseBody[i][key] = jsonDecode(responseBody[i][key]);
-        }catch(_){
-
-        }
-
-      }
-    }
-
-    if(responseBody.length == 1 && !returnList){
-      responseBody = responseBody[0];
-      try{
-        responseBody = jsonDecode(responseBody);
-      }catch(_){}
-    }
-
-    return responseBody;
-  }
-
-}
 
 class ProfilDatabase{
 
@@ -103,9 +57,7 @@ class ProfilDatabase{
 
 
   getData(whatData, queryEnd, {returnList = false}) async{
-    //sichere Datenbankabfrage
     var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
 
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
@@ -435,6 +387,110 @@ class EventDatabase{
 
   delete(eventId){
     _deleteInTable("events", eventId);
+  }
+
+}
+
+class CityInformationDatabase{
+
+  addNewInformation(stadtinformation) async {
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    var url = Uri.parse(databaseUrl + "database/stadtinformationen/newInformation.php");
+    stadtinformation["erstelltVon"] = userId;
+
+    await http.post(url, body: json.encode(stadtinformation));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "stadtinformationen"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+    return responseBody;
+  }
+
+
+}
+
+class AllgemeinDatabase{
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    //sichere Datenbankabfrage
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+    //queryEnd = Uri.encodeComponent(queryEnd);
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "allgemein"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+    return responseBody;
   }
 
 }

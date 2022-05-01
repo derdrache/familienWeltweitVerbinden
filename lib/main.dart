@@ -35,7 +35,6 @@ hiveInit() async {
   await Hive.initFlutter();
 
   await Hive.openBox("countryGeodataBox");
-
   var countryJsonText =
       await rootBundle.loadString('assets/countryGeodata.json');
   var geodata = json.decode(countryJsonText)["data"];
@@ -58,6 +57,8 @@ hiveInit() async {
   await Hive.openBox('interestEventsBox');
 
   await Hive.openBox('myChatBox');
+
+  await Hive.openBox('stadtinformationenBox');
 }
 
 void main() async {
