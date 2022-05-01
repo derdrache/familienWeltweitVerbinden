@@ -29,7 +29,7 @@ class ErkundenPage extends StatefulWidget {
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
-  Box profilBox, eventBox;
+  Box profilBox, eventBox, stadtinformationenBox;
   MapController mapController = MapController();
   var ownProfil;
   Set<String> allUserName = {};
@@ -39,6 +39,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   List eventsBackup = [], events = [], aktiveEvents = [];
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
+  List allCitiyInformations = [];
   List selectUserProfils = [];
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxZoom = 9;
@@ -58,7 +59,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
   void initState() {
     profilBox = Hive.box('profilBox');
     eventBox = Hive.box("eventBox");
+    stadtinformationenBox = Hive.box("stadtinformationenBox");
 
+    setCityInformations();
     setProfils();
     setEvents();
 
@@ -89,6 +92,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createAndSetZoomEvents();
   }
+
+  setCityInformations(){
+    var cityInformations = stadtinformationenBox.get("list") ?? [];
+
+    allCitiyInformations = cityInformations;
+  }
+
 
   _asyncMethod() async {
     await getProfilsDB();
@@ -327,6 +337,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if (kontinentGeodataListitem["kontinentGer"] ==
           kontinentGeodataProfil["kontinentGer"]) {
         newPoint = false;
+
+        if(profil["name"] == null) break;
+
         var addNumberName = int.parse(list[i]["name"]) + 1;
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
@@ -336,14 +349,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     if (newPoint) {
+
       list.add({
         "kontinentName": landGedataProfil["kontinentGer"],
         "kontinent":
             landGedataProfil["kontinentGer"] ?? landGedataProfil["land"],
-        "name": "1",
+        "name": profil["name"] == null ? "0" : "1",
         "latt": kontinentGeodataProfil["latt"] ?? landGedataProfil["latt"],
         "longt": kontinentGeodataProfil["longt"] ?? landGedataProfil["longt"],
-        "profils": [profil]
+        "profils": profil["name"] == null ? [] : [profil]
       });
     }
 
@@ -354,13 +368,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var pufferProfilCities = [];
     var pufferProfilBetween = [];
     var pufferProfilCountries = [];
-    var pufferProfilBetweenCountries = [];
+    var pufferProfilContinents = [];
+    profils = profils + allCitiyInformations;
 
     for (var i = 0; i < profils.length; i++) {
       pufferProfilCountries =
           await createCountries(pufferProfilCountries, profils[i]);
-      pufferProfilBetweenCountries =
-          await createContinents(pufferProfilBetweenCountries, profils[i]);
+      pufferProfilContinents =
+          await createContinents(pufferProfilContinents, profils[i]);
 
       pufferProfilBetween = createBetween(pufferProfilBetween, profils[i], 1);
 
@@ -370,7 +385,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     profilsCities = pufferProfilCities;
     profilsBetween = pufferProfilBetween;
     profilCountries = pufferProfilCountries;
-    profilBetweenCountries = pufferProfilBetweenCountries;
+    profilBetweenCountries = pufferProfilContinents;
 
     changeProfil(currentMapZoom);
   }
@@ -517,10 +532,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
     changeProfil(currentMapZoom);
   }
 
-  getAllCities(profils) {
+  getAllCities() {
     var allCities = [];
-//profils gegen neue Tabellendata eintauschen
-    for (var profil in selectUserProfils) {
+
+    for (var profil in allCitiyInformations) {
       var newCity = true;
 
       for (var i = 0; i < allCities.length; i++) {
@@ -550,14 +565,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   openSelectCityWindow() {
-    List allSelectedCities = getAllCities(selectUserProfils);
+    List allSelectedCities = getAllCities();
     List<Widget> cityAuswahl = [];
 
     for (var city in allSelectedCities) {
       cityAuswahl.add(InkWell(
         onTap: () => changePage(context, StadtinformationsPage(ort: city)),
         child: Container(
-            margin: EdgeInsets.all(10), child: Text(city["names"].join(" / "))),
+            margin: const EdgeInsets.all(10), child: Text(city["names"].join(" / "))),
       ));
     }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../services/database.dart';
 
 class CreateStadtinformationsPage extends StatefulWidget {
   const CreateStadtinformationsPage({Key key}) : super(key: key);
@@ -32,11 +33,22 @@ class _CreateStadtinformationsPageState extends State<CreateStadtinformationsPag
   }
 
   save(){
-    var ort = ortEingabe.getGoogleLocationData();
+    var ortData = ortEingabe.getGoogleLocationData();
     var titel = titleKontroller.text;
     var beschreibung = beschreibungKontroller.text;
 
     if(!checkValidation()) return;
+
+    CityInformationDatabase().addNewInformation({
+        "ort": ortData["city"],
+        "land": ortData["countryname"],
+        "latt": ortData["latt"],
+        "longt": ortData["longt"],
+        "title": titel,
+        "information": beschreibung,
+      });
+
+    Navigator.pop(context);
 
   }
 
