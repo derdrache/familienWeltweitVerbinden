@@ -40,7 +40,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
   List allCitiyInformations = [];
-  List selectUserProfils = [];
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxZoom = 9;
   double currentMapZoom = 1.6;
@@ -51,7 +50,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var mapPosition;
   bool buildLoaded = false;
   bool popupActive = false;
+  var popupTyp = "";
   List<Widget> popupItems = [];
+  List popupCities = [];
   var lastEventPopup;
   var monthsUntilInactive = 6;
 
@@ -93,12 +94,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomEvents();
   }
 
-  setCityInformations(){
+  setCityInformations() {
     var cityInformations = stadtinformationenBox.get("list") ?? [];
 
     allCitiyInformations = cityInformations;
   }
-
 
   _asyncMethod() async {
     await getProfilsDB();
@@ -230,7 +230,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       if (check) {
         newPoint = true;
-        var numberName = int.parse(list[i]["name"]) + 1;
+        var numberName = int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (numberName > 99) numberName = 99;
         list[i]["name"] = numberName.toString();
         list[i]["profils"].add(profil);
@@ -241,7 +241,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (!newPoint) {
       list.add({
         "ort": profil["ort"],
-        "name": "1",
+        "name": profil["name"] == null ? "0" : "1",
         "latt": profil["latt"],
         "longt": profil["longt"],
         "profils": [profil]
@@ -260,7 +260,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       if (profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"]) {
         newCity = true;
-        var addNumberName = int.parse(list[i]["name"]) + 1;
+        var addNumberName = int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -271,7 +271,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (!newCity) {
       list.add({
         "ort": profil["ort"],
-        "name": "1",
+        "name": profil["name"] == null ? "0" : "1",
         "latt": profil["latt"],
         "longt": profil["longt"],
         "profils": [profil]
@@ -293,7 +293,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if (listCountryLocation["latt"] == profilCountryLocation["latt"] &&
           listCountryLocation["longt"] == profilCountryLocation["longt"]) {
         checkNewCountry = false;
-        var addNumberName = int.parse(list[i]["name"]) + 1;
+        var addNumberName = int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -306,7 +306,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var position = LocationService().getCountryLocation(country);
 
       list.add({
-        "name": "1",
+        "name": profil["name"] == null ? "0" : "1",
         "countryname": country,
         "longt": position["longt"] ?? 0,
         "latt": position["latt"] ?? 0,
@@ -338,9 +338,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
           kontinentGeodataProfil["kontinentGer"]) {
         newPoint = false;
 
-        if(profil["name"] == null) break;
-
-        var addNumberName = int.parse(list[i]["name"]) + 1;
+        var addNumberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -349,7 +348,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     if (newPoint) {
-
       list.add({
         "kontinentName": landGedataProfil["kontinentGer"],
         "kontinent":
@@ -357,7 +355,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         "name": profil["name"] == null ? "0" : "1",
         "latt": kontinentGeodataProfil["latt"] ?? landGedataProfil["latt"],
         "longt": kontinentGeodataProfil["longt"] ?? landGedataProfil["longt"],
-        "profils": profil["name"] == null ? [] : [profil]
+        "profils": [profil]
       });
     }
 
@@ -532,48 +530,67 @@ class _ErkundenPageState extends State<ErkundenPage> {
     changeProfil(currentMapZoom);
   }
 
-  getAllCities() {
-    var allCities = [];
+  createPopupCityInfomrations(profils) {
+    var selectedCitiesData = [];
+    popupCities = [];
 
-    for (var profil in allCitiyInformations) {
+    for (var city in allCitiyInformations) {
+      for (var profil in profils["profils"]) {
+        if (city["ort"] == profil["ort"]) {
+          selectedCitiesData.add(city);
+          break;
+        }
+      }
+    }
+
+    for (var city in selectedCitiesData) {
       var newCity = true;
 
-      for (var i = 0; i < allCities.length; i++) {
-        if (allCities[i]["names"].contains(profil["ort"])) {
+      for (var i = 0; i < popupCities.length; i++) {
+        if (popupCities[i]["names"].contains(city["ort"])) {
           newCity = false;
-          continue;
         }
 
-        if (profil["latt"] == allCities[i]["latt"] &&
-            profil["longt"] == allCities[i]["longt"]) {
-          allCities[i]["names"].add(profil["ort"]);
+        if (popupCities[i]["latt"] == city["latt"] &&
+            popupCities[i]["longt"] == city["longt"]) {
+          popupCities[i]["names"].add(city["ort"]);
           newCity = false;
-          continue;
         }
       }
 
       if (newCity) {
-        allCities.add({
-          "names": [profil["ort"]],
-          "latt": profil["latt"],
-          "longt": profil["longt"]
+        popupCities.add({
+          "names": [city["ort"]],
+          "latt": city["latt"],
+          "longt": city["longt"]
         });
       }
     }
-
-    return allCities;
   }
 
   openSelectCityWindow() {
-    List allSelectedCities = getAllCities();
     List<Widget> cityAuswahl = [];
 
-    for (var city in allSelectedCities) {
+    for (var city in popupCities) {
       cityAuswahl.add(InkWell(
         onTap: () => changePage(context, StadtinformationsPage(ort: city)),
         child: Container(
-            margin: const EdgeInsets.all(10), child: Text(city["names"].join(" / "))),
+            margin: const EdgeInsets.all(10),
+            child: Text(city["names"].join(" / "))),
       ));
+    }
+
+    if (popupCities.isEmpty) {
+      cityAuswahl.add(Container(
+          margin: const EdgeInsets.all(10),
+          child: Text(
+              AppLocalizations.of(context).keineStadtinformationVorhanden,
+              style: const TextStyle(color: Colors.grey))));
+    }
+
+    if(popupCities.length == 1){
+      changePage(context, StadtinformationsPage(ort: popupCities[0]));
+      return;
     }
 
     showDialog(
@@ -610,6 +627,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
         if (!titleList.contains(item[filter])) titleList.add(item[filter]);
       }
 
+      if(titleList.isEmpty){
+        print(list);
+        print(filter);
+      }
+
       return titleList.join(" / ");
     }
 
@@ -627,7 +649,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createPopupProfils(profil) {
       popupItems = [];
-      selectUserProfils = profil["profils"];
+      popupTyp = "profils";
+      var selectUserProfils = [];
+
+      for (var profil in profil["profils"]) {
+        if (profil["name"] != null) selectUserProfils.add(profil);
+      }
+
 
       popupItems.add(SliverAppBar(
         toolbarHeight: 30,
@@ -655,7 +683,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       popupItems.add(SliverFixedExtentList(
         itemExtent: 80.0,
         delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-          var profilData = profil["profils"][index];
+          var profilData = selectUserProfils[index];
 
           return GestureDetector(
             onTap: () {
@@ -692,7 +720,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   ],
                 )),
           );
-        }, childCount: profil["profils"].length),
+        }, childCount: selectUserProfils.length),
       ));
 
       return popupItems;
@@ -700,6 +728,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createPopupEvents(event) {
       popupItems = [];
+      popupTyp = "events";
 
       popupItems.add(SliverAppBar(
         toolbarHeight: 30,
@@ -837,17 +866,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       },
                     ),
                   ),
-                  Positioned(
-                    left: 5,
-                    top: 65,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.feed,
-                        size: 30,
+                  if (popupTyp == "profils")
+                    Positioned(
+                      left: 5,
+                      top: 65,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.feed,
+                          size: 30,
+                        ),
+                        onPressed: () => openSelectCityWindow(),
                       ),
-                      onPressed: () => openSelectCityWindow(),
                     ),
-                  ),
                   if (currentMapZoom > minMapZoom)
                     Positioned(
                       top: 0,
@@ -898,6 +928,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         markerList.add(profilMarker(profil["name"], position, () {
           popupActive = true;
           createPopupProfils(profil);
+          createPopupCityInfomrations(profil);
           setState(() {});
         }));
       }
