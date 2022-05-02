@@ -226,5 +226,6 @@
     "beschreibung": "Beschreibung",
     "titel": "Titel",
     "titelStadtinformationEingeben": "Titel für Stadtinformation eingeben",
-    "beschreibungStadtinformationEingeben": "Beschreibung für Stadtinformation eingeben"
+    "beschreibungStadtinformationEingeben": "Beschreibung für Stadtinformation eingeben",
+    "keineStadtinformationVorhanden": "keine Stadtinformationen vorhanden"
 }
