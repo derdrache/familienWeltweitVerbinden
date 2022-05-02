@@ -58,7 +58,7 @@ hiveInit() async {
 
   await Hive.openBox('myChatBox');
 
-  await Hive.openBox('stadtinformationenBox');
+  await Hive.openBox('stadtinfoUserBox');
 }
 
 void main() async {

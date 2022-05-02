@@ -29,7 +29,7 @@ class ErkundenPage extends StatefulWidget {
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
-  Box profilBox, eventBox, stadtinformationenBox;
+  Box profilBox, eventBox, stadtinfoUserBox;
   MapController mapController = MapController();
   var ownProfil;
   Set<String> allUserName = {};
@@ -60,7 +60,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   void initState() {
     profilBox = Hive.box('profilBox');
     eventBox = Hive.box("eventBox");
-    stadtinformationenBox = Hive.box("stadtinformationenBox");
+    stadtinfoUserBox = Hive.box("stadtinfoUserBox");
 
     setCityInformations();
     setProfils();
@@ -95,7 +95,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   setCityInformations() {
-    var cityInformations = stadtinformationenBox.get("list") ?? [];
+    var cityInformations = stadtinfoUserBox.get("list") ?? [];
 
     allCitiyInformations = cityInformations;
   }
