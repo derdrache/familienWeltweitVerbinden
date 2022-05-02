@@ -408,7 +408,7 @@ class CityInformationDatabase{
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
       "queryEnd": queryEnd,
-      "table": "stadtinformationen"
+      "table": "stadtinfo_user"
     }));
     dynamic responseBody = res.body;
     responseBody = decrypt(responseBody);
@@ -557,12 +557,11 @@ sendNotification(notificationInformation) async {
           " hat dir eine Nachricht geschrieben": " has written you a message"),
           "inhalt": "Hi ${notificationInformation["toName"]},\n\n" +
               (spracheIstDeutsch ?
-              "du hast in der families worldwide App folgende Nachricht von "
-                  "${notificationInformation["title"]} erhalten: \n\n" :
-              "you have received the following message from "
-                  "${notificationInformation["title"]} in the families worldwide app: \n\n"
-              ) +
-              "${notificationInformation["inhalt"]}"
+              "du hast in der families worldwide App eine neue Nachricht von "
+                  "${notificationInformation["title"]} erhalten \n\n" :
+              "you have received a new message from "
+                  "${notificationInformation["title"]} in the families worldwide app \n\n"
+              )
         }));
       }else if(notificationInformation["typ"] == "event"){
         var url = Uri.parse(databaseUrl + "services/sendEmail.php");

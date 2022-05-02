@@ -56,7 +56,7 @@ class _StartPageState extends State<StartPage> {
     }
     var stadtinformationen = await CityInformationDatabase()
         .getData("*", "", returnList: true);
-    Hive.box("stadtinformationenBox").put("list",stadtinformationen);
+    Hive.box("stadtinfoUserBox").put("list",stadtinformationen);
 
   }
 
