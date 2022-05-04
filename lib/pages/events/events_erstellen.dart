@@ -128,6 +128,7 @@ class _EventErstellenState extends State<EventErstellen> {
     };
 
     await EventDatabase().addNewEvent(eventData);
+    StadtinfoDatabase().addNewCity(locationData);
     var dbEventData = await EventDatabase().getData("*", "WHERE id = '$eventId'");
 
     if(dbEventData == false) return;

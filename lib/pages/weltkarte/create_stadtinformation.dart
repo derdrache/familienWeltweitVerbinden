@@ -39,7 +39,7 @@ class _CreateStadtinformationsPageState extends State<CreateStadtinformationsPag
 
     if(!checkValidation()) return;
 
-    CityInformationDatabase().addNewInformation({
+    StadtinfoUserDatabase().addNewInformation({
         "ort": ortData["city"],
         "land": ortData["countryname"],
         "latt": ortData["latt"],

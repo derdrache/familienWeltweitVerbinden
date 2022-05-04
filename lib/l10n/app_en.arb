@@ -227,6 +227,9 @@
     "titel": "title",
     "titelStadtinformationEingeben": "Enter title for city information",
     "beschreibungStadtinformationEingeben": "Enter description for city information",
-    "keineStadtinformationVorhanden": "no city information available"
+    "keineStadtinformationVorhanden": "no city information available",
+    "allgemeineInformation": "General information",
+    "wetter": "weather: ",
+    "insiderInformation": "Inside information"
 }
 

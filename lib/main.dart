@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:familien_suche/pages/login_register_page/create_profil_page.dart';
 import 'package:familien_suche/pages/events/event_details.dart';
+import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -59,6 +60,8 @@ hiveInit() async {
   await Hive.openBox('myChatBox');
 
   await Hive.openBox('stadtinfoUserBox');
+
+  await Hive.openBox('stadtinfoBox');
 }
 
 void main() async {
@@ -241,7 +244,10 @@ class MyApp extends StatelessWidget {
                   ? const LoginPage()
                   : profilExist == false
                       ? const CreateProfilPage()
-                      : StartPage());
+                      : StartPage()
+          );
+
+
         });
   }
 }

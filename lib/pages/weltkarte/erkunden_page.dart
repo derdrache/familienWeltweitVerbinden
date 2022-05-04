@@ -111,6 +111,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
     setSearchAutocomplete();
 
     buildLoaded = true;
+
+    refreshHiveBox();
+  }
+
+  refreshHiveBox() async {
+    var stadtinfoUser = await StadtinfoUserDatabase()
+        .getData("*", "", returnList: true);
+    Hive.box("stadtinfoUserBox").put("list",stadtinfoUser);
   }
 
   getProfilsDB() async {
@@ -549,9 +557,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       for (var i = 0; i < popupCities.length; i++) {
         if (popupCities[i]["names"].contains(city["ort"])) {
           newCity = false;
-        }
-
-        if (popupCities[i]["latt"] == city["latt"] &&
+        }else if (popupCities[i]["latt"] == city["latt"] &&
             popupCities[i]["longt"] == city["longt"]) {
           popupCities[i]["names"].add(city["ort"]);
           newCity = false;
