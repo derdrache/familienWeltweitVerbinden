@@ -502,11 +502,12 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
 
     if(widget.databaseKennzeichnung == "location"){
       await EventDatabase().updateLocation(widget.eventId, data);
+      StadtinfoDatabase().addNewCity(data);
     } else{
       await EventDatabase().update(widget.eventId, "${widget.databaseKennzeichnung} = '$data'");
     }
 
-    widget.saveFunction();
+    if(widget.saveFunction != null) widget.saveFunction();
   }
 
 
