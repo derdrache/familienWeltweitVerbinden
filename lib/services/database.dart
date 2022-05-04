@@ -392,73 +392,6 @@ class EventDatabase{
 
 }
 
-class StadtinfoUserDatabase{
-
-  addNewInformation(stadtinformation) async {
-    var userId = FirebaseAuth.instance.currentUser.uid;
-
-    var url = Uri.parse(databaseUrl + "database/stadtinfoUser/newInformation.php");
-    stadtinformation["erstelltVon"] = userId;
-
-    await http.post(url, body: json.encode(stadtinformation));
-  }
-
-  getData(whatData, queryEnd, {returnList = false}) async {
-    var url = Uri.parse(databaseUrl + "database/getData2.php");
-
-    var res = await http.post(url, body: json.encode({
-      "whatData": whatData,
-      "queryEnd": queryEnd,
-      "table": "stadtinfo_user"
-    }));
-    dynamic responseBody = res.body;
-    responseBody = decrypt(responseBody);
-
-    responseBody = jsonDecode(responseBody);
-    if(responseBody.isEmpty) return false;
-
-    for(var i = 0; i < responseBody.length; i++){
-
-      if(responseBody[i].keys.toList().length == 1){
-        var key = responseBody[i].keys.toList()[0];
-        responseBody[i] = responseBody[i][key];
-        continue;
-      }
-
-      for(var key in responseBody[i].keys.toList()){
-        try{
-          responseBody[i][key] = jsonDecode(responseBody[i][key]);
-        }catch(_){
-
-        }
-
-      }
-    }
-
-    if(responseBody.length == 1 && !returnList){
-      responseBody = responseBody[0];
-      try{
-        responseBody = jsonDecode(responseBody);
-      }catch(_){}
-    }
-
-    return responseBody;
-  }
-
-  update(whatData, queryEnd) async  {
-    var url = Uri.parse(databaseUrl + "database/update.php");
-
-    await http.post(url, body: json.encode({
-      "table": "stadtinfo_user",
-      "whatData": whatData,
-      "queryEnd": queryEnd
-    }));
-
-  }
-
-
-}
-
 class StadtinfoDatabase{
   addNewCity(city) async {
     if(city["ort"] == null ){
@@ -545,6 +478,78 @@ class StadtinfoDatabase{
     return true;
 
   }
+}
+
+class StadtinfoUserDatabase{
+
+  addNewInformation(stadtinformation) async {
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    var url = Uri.parse(databaseUrl + "database/stadtinfoUser/newInformation.php");
+    stadtinformation["erstelltVon"] = userId;
+
+    await http.post(url, body: json.encode(stadtinformation));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "stadtinfo_user"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+    return responseBody;
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "stadtinfo_user",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+
+  delete(informationId){
+    _deleteInTable("stadtinfo_user", informationId);
+  }
+
+
 }
 
 class AllgemeinDatabase{

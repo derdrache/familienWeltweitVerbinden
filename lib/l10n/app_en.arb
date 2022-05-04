@@ -230,6 +230,16 @@
     "keineStadtinformationVorhanden": "no city information available",
     "allgemeineInformation": "General information",
     "wetter": "weather: ",
-    "insiderInformation": "Inside information"
+    "insiderInformation": "Inside information",
+    "besuchtVon": "visited by ",
+    "familien": " families",
+    "bearbeiten": "change",
+    "loeschen": "delete",
+    "melden": "report",
+    "informationLoeschen": "delete information",
+    "informationWirklichLoeschen": "Do you really want to delete the information?",
+    "informationMelden": "report information",
+    "informationMeldenFrage": "Why do you want to report the information?",
+    "informationAendern": "change information"
 }
 

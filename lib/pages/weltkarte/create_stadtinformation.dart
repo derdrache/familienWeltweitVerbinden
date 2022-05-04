@@ -71,7 +71,7 @@ class _CreateStadtinformationsPageState extends State<CreateStadtinformationsPag
         customTextInput(AppLocalizations.of(context).titel, titleKontroller),
         customTextInput(
           AppLocalizations.of(context).beschreibung,beschreibungKontroller,
-          moreLines: 6,
+          moreLines: 10,
           textInputAction: TextInputAction.newline
         ),
       ]),
