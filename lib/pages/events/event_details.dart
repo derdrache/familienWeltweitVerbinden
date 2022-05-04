@@ -273,7 +273,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                               "Melde Event id: " + widget.event["id"],
                               reportController.text
                           );
-                          // send to db
                         },
                         label: Text(AppLocalizations.of(context).senden)
                     ),

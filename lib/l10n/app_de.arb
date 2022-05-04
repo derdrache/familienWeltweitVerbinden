@@ -230,5 +230,16 @@
     "keineStadtinformationVorhanden": "keine Stadtinformationen vorhanden",
     "allgemeineInformation": "Allgemeine Information",
     "wetter": "Wetter: ",
-    "insiderInformation": "Insider-Informationen"
+    "insiderInformation": "Insider-Informationen",
+    "besuchtVon": "Besucht von ",
+    "familien": " Familien",
+    "bearbeiten": "bearbeiten",
+    "loeschen": "löschen",
+    "melden": "melden",
+    "informationLoeschen": "Information löschen",
+    "informationWirklichLoeschen": "Möchtest du die Information wirklich löschen?",
+    "informationMelden": "Information melden",
+    "informationMeldenFrage": "Warum möchtest du die Information melden?",
+    "informationAendern": "Information ändern"
+
 }
