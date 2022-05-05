@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
@@ -20,15 +21,20 @@ class LocationService {
 
     try{
 
-      var url = "https://families-worldwide.com/services/googleAutocomplete.php";
+      var url = "https://families-worldwide.com/services/googleAutocomplete2.php";
 
-      var zusatz = "?param1=$google_key&param2=$input&param3=$sprache&param4=$sessionToken";
+      var res = await http.post(Uri.parse(url), body: json.encode({
+        "googleKey": google_key,
+        "input": input,
+        "sprache": sprache,
+        "sessionToken": sessionToken
+      }));
+      dynamic responseBody = res.body;
 
-      var response = await http.get(Uri.parse(url + zusatz), headers: {"Accept": "application/json"});
+      var data = convert.jsonDecode(responseBody);
 
-      var json = convert.jsonDecode(response.body);
+      return data;
 
-      return json;
 
     } catch(error){
       return [];
@@ -38,18 +44,32 @@ class LocationService {
 
   getLocationdataFromGoogleID(id, sessionToken) async {
     try{
-      var url = "https://families-worldwide.com/services/googlePlaceDetails.php";
-      var zusatz = "?param1=$google_key&param2=$id&param3=$sessionToken";
+      var url = "https://families-worldwide.com/services/googlePlaceDetails2.php";
 
-      var response = await http.get(Uri.parse(url + zusatz), headers: {"Accept": "application/json"});
-      var json = convert.jsonDecode(response.body);
+      var res = await http.post(Uri.parse(url), body: json.encode({
+        "googleKey": google_key,
+        "id": id,
+        "sessionToken": sessionToken
+      }));
+      dynamic responseBody = res.body;
 
-      return json;
+
+      var data = convert.jsonDecode(responseBody);
+
+      return data;
 
     } catch(error){
       print(error);
       return [];
     }
+  }
+
+  getUserGeodata(){
+
+  }
+
+  getNearstCity(){
+
   }
 
 
