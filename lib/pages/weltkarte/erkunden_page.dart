@@ -55,7 +55,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   List popupCities = [];
   var lastEventPopup;
   var monthsUntilInactive = 6;
-  var friendMarkerOn = false;
+  bool friendMarkerOn = false, eventMarkerOn = false;
 
   @override
   void initState() {
@@ -1002,10 +1002,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAllMarker() async {
 
       createOwnMarker();
-      createProfilMarker();
-      if(!friendMarkerOn) createEventMarker();
-
-
+      if(!eventMarkerOn) createProfilMarker();
+      if(eventMarkerOn) createEventMarker();
 
     }
 
@@ -1076,6 +1074,34 @@ class _ErkundenPageState extends State<ErkundenPage> {
       ));
     }
 
+    eventButton(){
+      return Positioned(
+          right: 5,
+          top: 100,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            icon: Stack(
+              children: [
+                if(!eventMarkerOn) Icon(Icons.calendar_today_outlined,
+                    size: 32, color: Theme.of(context).colorScheme.primary
+                ),
+                if(eventMarkerOn) Icon(Icons.event_note,
+                    size: 32, color: Theme.of(context).colorScheme.primary
+                )
+              ],
+            ),
+            onPressed: (){
+              if(eventMarkerOn){
+                eventMarkerOn = false;
+              }else{
+                eventMarkerOn = true;
+              }
+
+              setState(() {});
+            },
+          ));
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
@@ -1083,7 +1109,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
           ownFlutterMap(),
           searchAutocomplete,
           if (popupActive) markerPopupContainer(),
-          friendButton()
+          friendButton(),
+          eventButton()
         ]),
       ),
       floatingActionButton:
