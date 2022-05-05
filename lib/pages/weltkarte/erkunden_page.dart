@@ -890,17 +890,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
           width: 30.0,
           height: 30.0,
           point: LatLng(ownProfil["latt"] + 0.07, ownProfil["longt"] + 0.02),
-          builder: (ctx) => FloatingActionButton(
-            heroTag: "ownMarker",
-            backgroundColor: Colors.transparent,
-            mini: true,
-            child: Icon(
-              Icons.flag,
-              color: Colors.green[900],
-              size: 30,
-            ),
-            onPressed: null,
-          ),
+          builder: (_) => Icon(
+            Icons.flag,
+            color: Colors.green[900],
+            size: 30,
+          )
         ));
       }
     }
