@@ -240,6 +240,8 @@
     "informationWirklichLoeschen": "Do you really want to delete the information?",
     "informationMelden": "report information",
     "informationMeldenFrage": "Why do you want to report the information?",
-    "informationAendern": "change information"
+    "informationAendern": "change information",
+    "ortAuswaehlen": "Select location",
+    "freundesListe": "friends list"
 }
 

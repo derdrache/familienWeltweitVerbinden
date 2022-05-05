@@ -31,7 +31,7 @@ class ErkundenPage extends StatefulWidget {
 class _ErkundenPageState extends State<ErkundenPage> {
   Box profilBox, eventBox, stadtinfoUserBox;
   MapController mapController = MapController();
-  var ownProfil;
+  var ownProfil = Hive.box("ownProfilBox").get("list");
   Set<String> allUserName = {};
   var countriesList = {};
   List filterList = [];
@@ -55,6 +55,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   List popupCities = [];
   var lastEventPopup;
   var monthsUntilInactive = 6;
+  var friendMarkerOn = false;
 
   @override
   void initState() {
@@ -71,17 +72,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   setProfils() {
+    var ownProfilPuffer;
     profils = profilBox.get("list") ?? [];
 
     for (var profil in profils) {
       if (profil["id"] == userId) {
-        ownProfil = profil;
+        ownProfilPuffer = profil;
       } else {
         allUserName.add(profil["name"]);
       }
     }
 
-    profils.remove(ownProfil);
+    profils.remove(ownProfilPuffer);
 
     profilsBackup = profils;
     createAndSetZoomProfils();
@@ -538,18 +540,21 @@ class _ErkundenPageState extends State<ErkundenPage> {
     changeProfil(currentMapZoom);
   }
 
-  createPopupCityInfomrations(profils) {
+  createPopupCityInformations(profils) {
     var selectedCitiesData = [];
     popupCities = [];
 
     for (var city in allCitiyInformations) {
-      for (var profil in profils["profils"]) {
-        if (city["ort"] == profil["ort"]) {
+      for (var profil in profils) {
+        if (city["ort"] == profil["ort"] ) {
+          if(profil["name"] == null && friendMarkerOn) break;
+
           selectedCitiesData.add(city);
           break;
         }
       }
     }
+
 
     for (var city in selectedCitiesData) {
       var newCity = true;
@@ -594,7 +599,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               style: const TextStyle(color: Colors.grey))));
     }
 
-    if(popupCities.length == 1){
+    if(popupCities.length == 1 && currentMapZoom >= cityZoom){
       changePage(context, StadtinformationsPage(ort: popupCities[0]));
       return;
     }
@@ -603,15 +608,32 @@ class _ErkundenPageState extends State<ErkundenPage> {
       context: context,
       builder: (BuildContext context) {
         return CustomAlertDialog(
-          title: "Ort auswählen",
+          title: AppLocalizations.of(context).ortAuswaehlen,
           children: cityAuswahl,
         );
       },
     );
   }
 
+  changeProfils(changeList) {
+    var newProfilList = [];
+
+    for (var profilId in changeList) {
+      for (var profil in profilBox.get("list") ?? []) {
+        if (profilId == profil["id"]) {
+          newProfilList.add(profil);
+          break;
+        }
+      }
+    }
+    profils = newProfilList;
+    createAndSetZoomProfils();
+
+  }
+
   @override
   Widget build(BuildContext context) {
+    ownProfil = Hive.box("ownProfilBox").get("list");
     double screenWidth = MediaQuery.of(context).size.width;
     var eventCrossAxisCount = screenWidth / 190;
     List<Marker> allMarker = [];
@@ -642,6 +664,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     selectPopupMenuText(profils) {
+      if(friendMarkerOn) return AppLocalizations.of(context).freundesListe;
+
       if (currentMapZoom < kontinentZoom) {
         return createPopupWindowTitle(profils, "kontinente");
       } else if (currentMapZoom < countryZoom) {
@@ -653,12 +677,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
     }
 
-    createPopupProfils(profil) {
+    createPopupProfils(profils) {
       popupItems = [];
       popupTyp = "profils";
       var selectUserProfils = [];
 
-      for (var profil in profil["profils"]) {
+      for (var profil in profils) {
         if (profil["name"] != null) selectUserProfils.add(profil);
       }
 
@@ -667,7 +691,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         toolbarHeight: 30,
         backgroundColor: Colors.white,
         flexibleSpace: Center(
-            child: Text(selectPopupMenuText(profil["profils"]),
+            child: Text(selectPopupMenuText(profils),
                 style: const TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold))),
         pinned: true,
@@ -783,53 +807,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
       return popupItems;
     }
 
-    Marker profilMarker(numberText, position, buttonFunction) {
-      return Marker(
-        width: 30.0,
-        height: 30.0,
-        point: position,
-        builder: (ctx) => FloatingActionButton(
-          heroTag: "MapMarker" + position.toString(),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          mini: true,
-          child: Text(numberText),
-          onPressed: buttonFunction,
-        ),
-      );
-    }
-
-    Marker eventMarker(numberText, position, buttonFunction) {
-      return Marker(
-        width: 32.0,
-        height: 32.0,
-        point: position,
-        builder: (ctx) => IconButton(
-          padding: EdgeInsets.zero,
-          icon: Stack(
-            children: [
-              Icon(Icons.calendar_today,
-                  size: 32, color: Theme.of(context).colorScheme.primary),
-              Positioned(
-                  top: 9.5,
-                  left: 5.5,
-                  child: Container(
-                      padding: const EdgeInsets.only(left: 2, top: 1),
-                      width: 21.5,
-                      height: 18,
-                      color: Colors.white,
-                      child: Center(
-                          child: Text(numberText,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.black)))))
-            ],
-          ),
-          onPressed: buttonFunction,
-        ),
-      );
-    }
-
     markerPopupContainer() {
       return Positioned.fill(
           child: ScrollConfiguration(
@@ -907,11 +884,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       ));
     }
 
-    createAllMarker() async {
-      List<Marker> markerList = [];
-
+    createOwnMarker(){
       if (ownProfil != null) {
-        markerList.add(Marker(
+        allMarker.add(Marker(
           width: 30.0,
           height: 30.0,
           point: LatLng(ownProfil["latt"] + 0.07, ownProfil["longt"] + 0.02),
@@ -928,17 +903,70 @@ class _ErkundenPageState extends State<ErkundenPage> {
           ),
         ));
       }
+    }
 
+    Marker profilMarker(numberText, position, buttonFunction) {
+      return Marker(
+        width: 30.0,
+        height: 30.0,
+        point: position,
+        builder: (ctx) => FloatingActionButton(
+          heroTag: "MapMarker" + position.toString(),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          mini: true,
+          child: Text(numberText),
+          onPressed: buttonFunction,
+        ),
+      );
+    }
+
+    createProfilMarker(){
       for (var profil in aktiveProfils) {
+        if(friendMarkerOn && profil["name"] == "0") continue;
+
         var position = LatLng(profil["latt"], profil["longt"]);
-        markerList.add(profilMarker(profil["name"], position, () {
+        allMarker.add(profilMarker(profil["name"], position, () {
           popupActive = true;
-          createPopupProfils(profil);
-          createPopupCityInfomrations(profil);
+          createPopupProfils(profil["profils"]);
+          createPopupCityInformations(profil["profils"]);
           setState(() {});
         }));
       }
+    }
 
+    Marker eventMarker(numberText, position, buttonFunction) {
+      return Marker(
+        width: 32.0,
+        height: 32.0,
+        point: position,
+        builder: (ctx) => IconButton(
+          padding: EdgeInsets.zero,
+          icon: Stack(
+            children: [
+              Icon(Icons.calendar_today,
+                  size: 32, color: Theme.of(context).colorScheme.primary),
+              Positioned(
+                  top: 9.5,
+                  left: 5.5,
+                  child: Container(
+                      padding: const EdgeInsets.only(left: 2, top: 1),
+                      width: 21.5,
+                      height: 18,
+                      color: Colors.white,
+                      child: Center(
+                          child: Text(numberText,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Colors.black)))))
+            ],
+          ),
+          onPressed: buttonFunction,
+        ),
+      );
+    }
+
+    createEventMarker(){
       for (var event in aktiveEvents) {
         double basisVerschiebung, anpassungsVerschiebung, geteiltDurch;
 
@@ -962,15 +990,23 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 basisVerschiebung -
                 (anpassungsVerschiebung / geteiltDurch));
 
-        markerList.add(eventMarker(event["name"], position, () {
+        allMarker.add(eventMarker(event["name"], position, () {
           lastEventPopup = event;
           popupActive = true;
           createPopupEvents(event);
           setState(() {});
         }));
       }
+    }
 
-      allMarker = markerList;
+    createAllMarker() async {
+
+      createOwnMarker();
+      createProfilMarker();
+      if(!friendMarkerOn) createEventMarker();
+
+
+
     }
 
     ownFlutterMap() {
@@ -1004,6 +1040,42 @@ class _ErkundenPageState extends State<ErkundenPage> {
       );
     }
 
+    friendButton(){
+      return Positioned(
+          right: 5,
+          top: 60,
+          child: IconButton(
+        padding: EdgeInsets.zero,
+        icon: Stack(
+          children: [
+            if(!friendMarkerOn) Icon(Icons.favorite_outline,
+                size: 32, color: Theme.of(context).colorScheme.primary
+            ),
+            if(friendMarkerOn) Icon(Icons.favorite,
+                size: 32, color: Theme.of(context).colorScheme.primary
+            )
+          ],
+        ),
+        onPressed: (){
+          if(friendMarkerOn){
+            friendMarkerOn = false;
+            popupActive = false;
+            profils = profilsBackup;
+            createAndSetZoomProfils();
+          }else{
+            friendMarkerOn = true;
+            changeProfils(ownProfil["friendlist"]);
+
+            popupActive = true;
+            createPopupProfils(profils);
+            createPopupCityInformations(profils);
+          }
+
+          setState(() {});
+        },
+      ));
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
@@ -1011,6 +1083,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           ownFlutterMap(),
           searchAutocomplete,
           if (popupActive) markerPopupContainer(),
+          friendButton()
         ]),
       ),
       floatingActionButton:

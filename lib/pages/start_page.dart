@@ -48,6 +48,8 @@ class _StartPageState extends State<StartPage> {
   }
 
   setHiveBoxen() async {
+
+
     var ownProfilBox = Hive.box("ownProfilBox");
     if (ownProfilBox.get("list") == null) {
       var ownProfil =
@@ -58,6 +60,7 @@ class _StartPageState extends State<StartPage> {
 
     var stadtinfo = await StadtinfoDatabase().getData("*", "", returnList: true);
     Hive.box("stadtinfoBox").put("list",stadtinfo);
+
   }
 
   checkFlexibleUpdate() async {
