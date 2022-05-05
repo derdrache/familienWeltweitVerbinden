@@ -240,6 +240,8 @@
     "informationWirklichLoeschen": "Möchtest du die Information wirklich löschen?",
     "informationMelden": "Information melden",
     "informationMeldenFrage": "Warum möchtest du die Information melden?",
-    "informationAendern": "Information ändern"
+    "informationAendern": "Information ändern",
+    "ortAuswaehlen": "Ort auswählen",
+    "freundesListe": "Freundesliste"
 
 }

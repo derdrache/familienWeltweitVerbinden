@@ -60,6 +60,12 @@ hiveInit() async {
   await Hive.openBox('myChatBox');
 
   await Hive.openBox('stadtinfoUserBox');
+  var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
+  if(stadtinfoUserBox.get("list") == null){
+    var stadtinfoUser = await StadtinfoUserDatabase()
+        .getData("*", "", returnList: true);
+    Hive.box("stadtinfoUserBox").put("list",stadtinfoUser);
+  }
 
   await Hive.openBox('stadtinfoBox');
 }

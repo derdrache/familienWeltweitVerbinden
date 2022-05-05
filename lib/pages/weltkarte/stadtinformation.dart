@@ -118,8 +118,6 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                       TextButton(
                         child: Text("speichern"),
                         onPressed: () {
-
-
                           if(titleTextKontroller.text.isEmpty){
                             customSnackbar(context, AppLocalizations.of(context).titelStadtinformationEingeben);
                             return;
@@ -229,6 +227,9 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
 
     allgemeineInfoBox() {
+      String internetSpeedText = cityInformation["internet"] == null ?
+      "?" : cityInformation["internet"].toString();
+
       return Container(
         margin: const EdgeInsets.all(10),
         width: double.infinity,
@@ -243,18 +244,18 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
               const Icon(Icons.network_check),
               const SizedBox(width: 5),
               const Text("Internet: "),
-              const SizedBox(width: 10),
-              Text(cityInformation["internet"].toString() + " Mbps")
+              const SizedBox(width: 5),
+              Text("Ø $internetSpeedText Mbps")
             ],
           ),
-          const SizedBox(height: 10),
-          Row(
+          if(cityInformation["wetter"] != null) const SizedBox(height: 10),
+          if(cityInformation["wetter"] != null) Row(
             children: [
               const Icon(Icons.thermostat),
               const SizedBox(width: 5),
               Text(AppLocalizations.of(context).wetter),
               const SizedBox(width: 10),
-              Flexible(
+               Flexible(
                   child: Container(
                       child: Text(cityInformation["wetter"],
                           overflow: TextOverflow.ellipsis)))
