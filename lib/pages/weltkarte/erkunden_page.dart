@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+
 import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
@@ -1096,6 +1097,41 @@ class _ErkundenPageState extends State<ErkundenPage> {
           ));
     }
 
+    testButton(){
+      return Positioned(
+        right: 5,
+        top: 140,
+        child: IconButton(
+          onPressed: () async {
+            var position = await LocationService().getCurrentUserLocation();
+
+            var nearstLocationData = await LocationService().getNearstLocationData(position);
+
+            var city = "";
+            var region = "";
+            var country = "";
+            //address_components:
+            //[
+            // {long_name: 2, short_name: 2, types: [street_number]},
+            // {long_name: Javier Rojo Gomez, short_name: Javier Rojo Gomez, types: [route]},
+            // {long_name: Centro, short_name: Centro, types: [neighborhood, political]},
+            // {long_name: Puerto Morelos, short_name: Puerto Morelos, types: [locality, political]},
+            // {long_name: Quintana Roo, short_name: Q.R., types: [administrative_area_level_1, political]},
+            // {long_name: Mexico, short_name: MX, types: [country, political]},
+            // {long_name: 77580, short_name: 77580, types: [postal_code]}
+            // ]
+
+            //formatted_address: Javier Rojo Gomez 2, Centro, 77580 Puerto Morelos, Q.R., Mexico
+
+            //optionen entscheiden was davon angezeigt wird
+
+            //await LocationService().getLocationGeoData("");
+          },
+          icon: Icon(Icons.telegram),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
@@ -1104,7 +1140,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
           searchAutocomplete,
           if (popupActive) markerPopupContainer(),
           friendButton(),
-          eventButton()
+          eventButton(),
+          testButton()
         ]),
       ),
       floatingActionButton:
