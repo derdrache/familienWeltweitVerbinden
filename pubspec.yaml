@@ -53,6 +53,7 @@ dependencies:
   cached_network_image: ^3.2.0
   encrypt: ^5.0.1
   crypto: ^3.0.1
+  geolocator: ^8.2.1
 
   flutter_localizations:
     sdk: flutter
