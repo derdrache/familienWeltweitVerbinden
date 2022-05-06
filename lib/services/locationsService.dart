@@ -80,9 +80,6 @@ class LocationService {
 
 
   getNearstLocationData(position) async  {
-    position = position.replaceAll(" ", "_");
-    position = Uri.encodeComponent(position);
-
     try{
 
       var url = "https://families-worldwide.com/services/googleGetNearstCity.php";
@@ -105,9 +102,48 @@ class LocationService {
 
   }
 
+  transformNearstLocation(nearstLocationData){
+    var city = "";
+    var region = "";
+    var country = "";
+
+
+    for(var item in nearstLocationData["address_components"]){
+      if(item["types"].contains("locality")){
+        city = item["long_name"];
+      }else if(item["types"].contains("administrative_area_level_1")){
+        region = item["long_name"];
+      } else if(item["types"].contains("country")){
+        country = item["long_name"];
+      }
+    }
+
+    return{
+      "city":city,
+      "region": region,
+      "country": country
+    };
+
+    //address_components:
+    //[
+    // {long_name: 2, short_name: 2, types: [street_number]},
+    // {long_name: Javier Rojo Gomez, short_name: Javier Rojo Gomez, types: [route]},
+    // {long_name: Centro, short_name: Centro, types: [neighborhood, political]},
+    // {long_name: Puerto Morelos, short_name: Puerto Morelos, types: [locality, political]},
+    // {long_name: Quintana Roo, short_name: Q.R., types: [administrative_area_level_1, political]},
+    // {long_name: Mexico, short_name: MX, types: [country, political]},
+    // {long_name: 77580, short_name: 77580, types: [postal_code]}
+    // ]
+
+    //formatted_address: Javier Rojo Gomez 2, Centro, 77580 Puerto Morelos, Q.R., Mexico
+
+    //optionen entscheiden was davon angezeigt wird
+  }
+
   getLocationGeoData(location) async {
     //location variable muss noch formatiert werden => irgendwo schonmal gemacht
-
+    location = location.replaceAll(" ", "_");
+    location = Uri.encodeComponent(location);
     try{
       var url = "https://families-worldwide.com/services/googlegetGeodataFromLocationName.php";
 
@@ -211,22 +247,6 @@ class LocationService {
 
 }
 
-
-class NearstLocationHelper{
-
-  getCity(){
-
-  }
-
-  getRegion(){
-
-  }
-
-  getCountry(){
-
-  }
-
-}
 
 
 
