@@ -1107,23 +1107,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
             var nearstLocationData = await LocationService().getNearstLocationData(position);
 
-            var city = "";
-            var region = "";
-            var country = "";
-            //address_components:
-            //[
-            // {long_name: 2, short_name: 2, types: [street_number]},
-            // {long_name: Javier Rojo Gomez, short_name: Javier Rojo Gomez, types: [route]},
-            // {long_name: Centro, short_name: Centro, types: [neighborhood, political]},
-            // {long_name: Puerto Morelos, short_name: Puerto Morelos, types: [locality, political]},
-            // {long_name: Quintana Roo, short_name: Q.R., types: [administrative_area_level_1, political]},
-            // {long_name: Mexico, short_name: MX, types: [country, political]},
-            // {long_name: 77580, short_name: 77580, types: [postal_code]}
-            // ]
-
-            //formatted_address: Javier Rojo Gomez 2, Centro, 77580 Puerto Morelos, Q.R., Mexico
-
-            //optionen entscheiden was davon angezeigt wird
+            LocationService().transformNearstLocation(nearstLocationData);
 
             //await LocationService().getLocationGeoData("");
           },
