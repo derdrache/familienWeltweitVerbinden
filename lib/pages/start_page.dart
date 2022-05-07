@@ -11,6 +11,8 @@ import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
+import '../global/variablen.dart';
+import '../services/locationsService.dart';
 import '../widgets/badge_icon.dart';
 import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
@@ -49,7 +51,6 @@ class _StartPageState extends State<StartPage> {
 
   setHiveBoxen() async {
 
-
     var ownProfilBox = Hive.box("ownProfilBox");
     if (ownProfilBox.get("list") == null) {
       var ownProfil =
@@ -78,7 +79,7 @@ class _StartPageState extends State<StartPage> {
     if (userName == null) return;
 
     var dbData =
-        await ProfilDatabase().getData("email, token", "WHERE id = '$userID'");
+        await ProfilDatabase().getData("email, token, automaticLocation", "WHERE id = '$userID'");
 
     var userDBEmail = dbData["email"];
     var userDeviceTokenDb = dbData["token"];
@@ -97,6 +98,49 @@ class _StartPageState extends State<StartPage> {
 
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userID'");
+
+    var automaticLocation = dbData["automaticLocation"];
+    if(automaticLocation != null && automaticLocation != standortbestimmung[0] &&
+        automaticLocation != standortbestimmungEnglisch[0]){
+      setAutomaticLoaction(automaticLocation);
+    }
+  }
+
+  setAutomaticLoaction(automaticLocationStatus) async{
+    var ownProfilBox = Hive.box("ownProfilBox");
+    var ownProfil = ownProfilBox.get("list");
+
+    if(DateTime.now().difference(DateTime.parse(ownProfil["lastLogin"])).inDays == 0 ){
+
+      var currentPosition = await LocationService().getCurrentUserLocation();
+      var newLocation = "";
+      var nearstLocationData = await LocationService().getNearstLocationData(currentPosition);
+      nearstLocationData = LocationService().transformNearstLocation(nearstLocationData);
+
+      if(automaticLocationStatus == standortbestimmung[1] ||
+          automaticLocationStatus == standortbestimmungEnglisch[1]){
+        // Current Position in Database
+        return;
+      }else if(automaticLocationStatus == standortbestimmung[2] ||
+          automaticLocationStatus == standortbestimmungEnglisch[2]){
+        newLocation = nearstLocationData["city"];
+      }else if(automaticLocationStatus == standortbestimmung[3] ||
+          automaticLocationStatus == standortbestimmungEnglisch[3]){
+        newLocation = nearstLocationData["region"];
+      }
+
+      if(newLocation == ownProfil["ort"]) return;
+
+      var geoData = await LocationService().getLocationGeoData(newLocation);
+      // => Update Profil in Database
+
+      print("test");
+      print(currentPosition);
+
+
+    }
+
+
   }
 
   @override
