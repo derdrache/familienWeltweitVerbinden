@@ -87,36 +87,8 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
 
   getGoogleSearchLocationData(placeId) async {
     var locationData = await LocationService().getLocationdataFromGoogleID(placeId, widget.sessionToken);
-
-    var formattedAddressList = locationData["result"]["formatted_address"].split(", ");
-    var formattedCity = formattedAddressList.first.split(" ");
-
-    var city = LocationService().isNumeric(formattedCity.first) ?
-    formattedCity.last : formattedCity.join(" ");
-    var cityList = [];
-    for(var item in city.split(" ")){
-      if(!LocationService().isNumeric(item)) cityList.add(item);
-    }
-    city = cityList.join(" ");
-
-
-    var country = formattedAddressList.last;
-    if(country.contains(" - ")){
-      city = city.split(" - ")[0];
-      country = country.split(" - ")[1];
-    }
-    if(LocationService().isNumeric(country)) country = formattedAddressList[formattedAddressList.length -2];
-
-    var locationDataMap = {
-      "city":city,
-      "countryname": country,
-      "longt": locationData["result"]["geometry"]["location"]["lng"],
-      "latt": locationData["result"]["geometry"]["location"]["lat"],
-      "adress": locationData["result"]["formatted_address"]
-    };
-
-    return locationDataMap;
-
+    var databaseLocationData = await LocationService().getDatabaseLocationdataFromGoogleResult(locationData);
+    return databaseLocationData;
   }
 
 
