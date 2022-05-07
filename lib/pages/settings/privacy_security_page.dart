@@ -45,7 +45,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
 
     emailSettingContainer(){
       return Container(
-        margin: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
         child: Row(
           children: [
             Text(AppLocalizations.of(context).emailAlleSichtbar, style: TextStyle(fontSize: fontsize),),
@@ -67,11 +67,11 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
 
     automaticLocationContainer(){
       return Container(
-        margin: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
         child: Row(
           children: [
-            SizedBox(width: 200,child: Text("Automatische Standortbestimmung", style: TextStyle(fontSize: fontsize),)),
-            Expanded(child: SizedBox()),
+            SizedBox(width: 200,child: Text(AppLocalizations.of(context).automatischeStandortbestimmung, style: TextStyle(fontSize: fontsize),)),
+            const Expanded(child: SizedBox()),
             SizedBox(width: 150, child: automaticLocationDropdown)
           ],
         ),
@@ -81,7 +81,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     deleteProfilContainer(){
       return FloatingActionButton.extended(
         backgroundColor: Colors.red,
-        label: const Text("Account löschen"),
+        label: Text(AppLocalizations.of(context).accountLoeschen),
         onPressed: () async {
           var userId = FirebaseAuth.instance.currentUser?.uid;
           ProfilDatabase().deleteProfil(userId);
@@ -98,8 +98,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           emailSettingContainer(),
           automaticLocationContainer(),
           const Expanded(child: SizedBox.shrink()),
-          //deleteProfilContainer(),
-          //SizedBox(height: 10)
+          deleteProfilContainer(),
+          const SizedBox(height: 10)
         ],
       ),
     );

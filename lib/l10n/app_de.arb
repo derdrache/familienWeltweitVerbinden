@@ -86,7 +86,6 @@
     "friendlistEntfernt" : " von der Freundesliste entfernt",
     "friendlistHinzugefuegt": " der Freundesliste hinzugefügt",
     "familienAnzeige" : "Familienanzeige - Mehrere Accounts verbinden",
-    "automatischerStandort": "Automatischer Standort Option",
     "nutzerBlockieren" : "Nutzer blockieren",
     "reisePlanung": "Reiseplanung/Reiseroute",
     "gemeinschaftenUpdate": "Gemeinschaften Eintragen/Anzeigen",
@@ -242,6 +241,8 @@
     "informationMeldenFrage": "Warum möchtest du die Information melden?",
     "informationAendern": "Information ändern",
     "ortAuswaehlen": "Ort auswählen",
-    "freundesListe": "Freundesliste"
+    "freundesListe": "Freundesliste",
+    "automatischeStandortbestimmung": "Automatische Standortbestimmung",
+    "accountLoeschen": "Account löschen"
 
 }

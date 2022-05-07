@@ -86,7 +86,6 @@
     "friendlistEntfernt" : " removed from friends list",
     "friendlistHinzugefuegt": " added to friends list",
     "familienAnzeige" : "Family display - Connect multiple Accounts",
-    "automatischerStandort": "Automatic location option",
     "nutzerBlockieren" : "Block users",
     "reisePlanung": "Travel planning / Travel route",
     "gemeinschaftenUpdate": "Register/Show communities",
@@ -242,6 +241,8 @@
     "informationMeldenFrage": "Why do you want to report the information?",
     "informationAendern": "change information",
     "ortAuswaehlen": "Select location",
-    "freundesListe": "friends list"
+    "freundesListe": "friends list",
+    "automatischeStandortbestimmung": "automatic location",
+    "accountLoeschen": "delete account"
 }
 

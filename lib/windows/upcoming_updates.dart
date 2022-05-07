@@ -31,7 +31,6 @@ class UmcomingUpdatesWindow{
           return CustomAlertDialog(
               title: patchnotesTitle,
               children: [
-                _update(AppLocalizations.of(context).automatischerStandort),
                 _update(AppLocalizations.of(context).familienAnzeige),
                 _update(AppLocalizations.of(context).nutzerBlockieren),
                 _update(AppLocalizations.of(context).onlineEvents),
