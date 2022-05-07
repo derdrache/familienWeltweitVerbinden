@@ -28,7 +28,7 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
-  var userID = FirebaseAuth.instance.currentUser?.uid;
+  var userId = FirebaseAuth.instance.currentUser?.uid;
   var userName = FirebaseAuth.instance.currentUser?.displayName;
   var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
   PackageInfo packageInfo;
@@ -50,18 +50,16 @@ class _StartPageState extends State<StartPage> {
   }
 
   setHiveBoxen() async {
-
     var ownProfilBox = Hive.box("ownProfilBox");
     if (ownProfilBox.get("list") == null) {
       var ownProfil =
-          await ProfilDatabase().getData("*", "WHERE id = '$userID'");
+          await ProfilDatabase().getData("*", "WHERE id = '$userId'");
       ownProfilBox.put("list", ownProfil);
     }
 
-
-    var stadtinfo = await StadtinfoDatabase().getData("*", "", returnList: true);
-    Hive.box("stadtinfoBox").put("list",stadtinfo);
-
+    var stadtinfo =
+        await StadtinfoDatabase().getData("*", "", returnList: true);
+    Hive.box("stadtinfoBox").put("list", stadtinfo);
   }
 
   checkFlexibleUpdate() async {
@@ -78,8 +76,8 @@ class _StartPageState extends State<StartPage> {
   checkAndUpdateProfil() async {
     if (userName == null) return;
 
-    var dbData =
-        await ProfilDatabase().getData("email, token, automaticLocation", "WHERE id = '$userID'");
+    var dbData = await ProfilDatabase()
+        .getData("email, token, automaticLocation", "WHERE id = '$userId'");
 
     var userDBEmail = dbData["email"];
     var userDeviceTokenDb = dbData["token"];
@@ -88,59 +86,69 @@ class _StartPageState extends State<StartPage> {
 
     if (userAuthEmail != userDBEmail) {
       ProfilDatabase()
-          .updateProfil("email = '$userAuthEmail'", "WHERE id = '$userID'");
+          .updateProfil("email = '$userAuthEmail'", "WHERE id = '$userId'");
     }
 
     if (userDeviceTokenDb != userDeviceTokenReal) {
       ProfilDatabase().updateProfil(
-          "token = '$userDeviceTokenReal'", "WHERE id = '$userID'");
+          "token = '$userDeviceTokenReal'", "WHERE id = '$userId'");
     }
 
     ProfilDatabase().updateProfil(
-        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userID'");
+        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
 
     var automaticLocation = dbData["automaticLocation"];
-    if(automaticLocation != null && automaticLocation != standortbestimmung[0] &&
-        automaticLocation != standortbestimmungEnglisch[0]){
+    if (automaticLocation != null &&
+        automaticLocation != standortbestimmung[0] &&
+        automaticLocation != standortbestimmungEnglisch[0]) {
       setAutomaticLoaction(automaticLocation);
     }
   }
 
-  setAutomaticLoaction(automaticLocationStatus) async{
+  setAutomaticLoaction(automaticLocationStatus) async {
     var ownProfilBox = Hive.box("ownProfilBox");
     var ownProfil = ownProfilBox.get("list");
 
-    if(DateTime.now().difference(DateTime.parse(ownProfil["lastLogin"])).inDays == 0 ){
-
-      var currentPosition = await LocationService().getCurrentUserLocation();
+    if (DateTime.now()
+            .difference(DateTime.parse(ownProfil["lastLogin"]))
+            .inDays >
+        0) {
       var newLocation = "";
-      var nearstLocationData = await LocationService().getNearstLocationData(currentPosition);
-      nearstLocationData = LocationService().transformNearstLocation(nearstLocationData);
+      var currentPosition = await LocationService().getCurrentUserLocation();
 
-      if(automaticLocationStatus == standortbestimmung[1] ||
-          automaticLocationStatus == standortbestimmungEnglisch[1]){
-        // Current Position in Database
+      var nearstLocationData =
+          await LocationService().getNearstLocationData(currentPosition);
+      nearstLocationData =
+          LocationService().transformNearstLocation(nearstLocationData);
+
+      if (automaticLocationStatus == standortbestimmung[1] ||
+          automaticLocationStatus == standortbestimmungEnglisch[1]) {
+        ProfilDatabase().updateProfilLocation(userId, {
+          "city": " ",
+          "countryname": nearstLocationData["country"],
+          "longt": currentPosition.longitude,
+          "latt": currentPosition.latitude,
+        });
         return;
-      }else if(automaticLocationStatus == standortbestimmung[2] ||
-          automaticLocationStatus == standortbestimmungEnglisch[2]){
+      } else if (automaticLocationStatus == standortbestimmung[2] ||
+          automaticLocationStatus == standortbestimmungEnglisch[2]) {
         newLocation = nearstLocationData["city"];
-      }else if(automaticLocationStatus == standortbestimmung[3] ||
-          automaticLocationStatus == standortbestimmungEnglisch[3]){
+      } else if (automaticLocationStatus == standortbestimmung[3] ||
+          automaticLocationStatus == standortbestimmungEnglisch[3]) {
         newLocation = nearstLocationData["region"];
       }
 
-      if(newLocation == ownProfil["ort"]) return;
+      if (newLocation == ownProfil["ort"]) return;
 
       var geoData = await LocationService().getLocationGeoData(newLocation);
-      // => Update Profil in Database
 
-      print("test");
-      print(currentPosition);
+      //var geoData = {"candidates": [{"formatted_address": "Calarreona, Spain", "geometry": {"location": {"lat": 37.3833412, "lng": -1.6211373}, "viewport": {"northeast": {"lat": 37.3848616, "lng": -1.61708}, "southwest": {"lat": 37.38210979999999, "lng": -1.622294}}}}, {"formatted_address": "30889 Calarreona, Murcia, Spain", "geometry": {"location": {"lat": 37.3870332, "lng": -1.6196208}, "viewport": {"northeast": {"lat": 37.3899129, "lng": -1.6161955}, "southwest": {"lat": 37.3838421, "lng": -1.6231069}}}}], "status": "OK"};
 
+      var locationData = await LocationService()
+          .getDatabaseLocationdataFromGoogleResult(geoData);
 
+      ProfilDatabase().updateProfilLocation(userId, locationData);
     }
-
-
   }
 
   @override
@@ -176,7 +184,7 @@ class _StartPageState extends State<StartPage> {
     chatIcon() {
       return FutureBuilder(
           future:
-              ProfilDatabase().getData("newMessages", "WHERE id = '$userID'"),
+              ProfilDatabase().getData("newMessages", "WHERE id = '$userId'"),
           builder: (BuildContext context, AsyncSnapshot snap) {
             if (!snap.hasData) return const Icon(Icons.chat);
 
