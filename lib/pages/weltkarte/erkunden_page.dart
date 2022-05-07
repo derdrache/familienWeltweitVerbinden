@@ -1097,25 +1097,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
           ));
     }
 
-    testButton(){
-      return Positioned(
-        right: 5,
-        top: 140,
-        child: IconButton(
-          onPressed: () async {
-            var position = await LocationService().getCurrentUserLocation();
-
-            var nearstLocationData = await LocationService().getNearstLocationData(position);
-
-            LocationService().transformNearstLocation(nearstLocationData);
-
-            //await LocationService().getLocationGeoData("");
-          },
-          icon: Icon(Icons.telegram),
-        ),
-      );
-    }
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
@@ -1125,7 +1106,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
           if (popupActive) markerPopupContainer(),
           friendButton(),
           eventButton(),
-          testButton()
         ]),
       ),
       floatingActionButton:
