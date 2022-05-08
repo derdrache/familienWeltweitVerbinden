@@ -80,13 +80,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     var freischaltenList = dbDaten["freischalten"];
     freischaltenList.remove(user);
-    EventDatabase().update(eventId, "freischalten = '${json.encode(freischaltenList)}'");
+    EventDatabase().update(
+        "freischalten = '${json.encode(freischaltenList)}'",
+        "WHERE id = '${eventId}'"
+    );
 
     if(!angenommen) return;
 
     var freigegebenListe = dbDaten["freigegeben"];
     freigegebenListe.add(user);
-    EventDatabase().update(eventId, "freigegeben = '${json.encode(freigegebenListe)}'");
+    EventDatabase().update(
+        "freigegeben = '${json.encode(freigegebenListe)}'",
+        "WHERE id = '${eventId}'"
+    );
 
     setState(() {
 
@@ -116,7 +122,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     var freigegebenList = await EventDatabase()
         .getData("freigegeben", "WHERE id = '$eventId");
     freigegebenList.remove(user);
-    EventDatabase().update(eventId, "freigegeben = '${json.encode(freigegebenList)}'");
+    EventDatabase().update(
+        "freigegeben = '${json.encode(freigegebenList)}'",
+        "WHERE id = '${eventId}'"
+    );
+
   }
 
   changeOrganisatorWindow(){
@@ -144,7 +154,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   label: Text(AppLocalizations.of(context).uebertragen),
                   onPressed: () async{
                     var selectedUserId = await ProfilDatabase().getData("id", "WHERE name = '${inputKontroller.text}'");
-                    await EventDatabase().update(widget.event["id"], "erstelltVon = '$selectedUserId'");
+                    await EventDatabase().update(
+                        "erstelltVon = '$selectedUserId'",
+                        "WHERE id = '${widget.event["id"]}'"
+                    );
                     setState(() {
                       widget.event["erstelltVon"] = selectedUserId;
                     });
@@ -206,8 +219,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     EventDatabase().update(
-        widget.event["id"], "absage = '${json.encode(absageList)}', "
-        "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'");
+        "absage = '${json.encode(absageList)}', "
+            "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'",
+        "WHERE id = '${widget.event["id"]}'"
+    );
   }
 
 
@@ -745,7 +760,7 @@ class _EventArtButtonState extends State<EventArtButton> {
     setState(() {});
     widget.pageState((){});
 
-    EventDatabase().update(widget.event["id"], "art = '$auswahl'");
+    EventDatabase().update("art = '$auswahl'", "WHERE id = '${widget.event["id"]}'");
 
     Navigator.pop(context);
 
