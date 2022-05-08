@@ -257,7 +257,7 @@ class _ChatPageState extends State<ChatPage> {
           }
         }
 
-        if (chatPartnerName.isEmpty) chatPartnerName = "gelöschter User";
+        if (chatPartnerName.isEmpty) chatPartnerName = AppLocalizations.of(context).geloeschterUser;
         chatPartnerProfil ??= {"bild": "assets/bilder/museum.jpg"};
 
         var lastMessage = cutMessage(group["lastMessage"]);

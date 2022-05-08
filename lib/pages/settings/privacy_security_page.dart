@@ -86,7 +86,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           var userId = FirebaseAuth.instance.currentUser?.uid;
           ProfilDatabase().deleteProfil(userId);
           setState(() {});
-          global_functions.changePageForever(context, const LoginPage());
+          //global_functions.changePageForever(context, const LoginPage());
         },
       );
     }

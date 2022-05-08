@@ -243,6 +243,7 @@
     "ortAuswaehlen": "Select location",
     "freundesListe": "friends list",
     "automatischeStandortbestimmung": "automatic location",
-    "accountLoeschen": "delete account"
+    "accountLoeschen": "delete account",
+    "geloeschterUser": "deleted user"
 }
 

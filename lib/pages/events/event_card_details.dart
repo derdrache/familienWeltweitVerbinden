@@ -324,9 +324,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                           if(!interessenList.contains(userId)) interessenList.add(userId);
 
                           EventDatabase().update(
-                              widget.event["id"],
                               "freischalten = '${json.encode(freischaltenList)}', "
-                                  "interesse = '${json.encode(interessenList)}'"
+                                  "interesse = '${json.encode(interessenList)}'",
+                              "WHERE id = '${widget.event["id"]}'"
                           );
                         }
                       } ,
@@ -504,7 +504,10 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       await EventDatabase().updateLocation(widget.eventId, data);
       StadtinfoDatabase().addNewCity(data);
     } else{
-      await EventDatabase().update(widget.eventId, "${widget.databaseKennzeichnung} = '$data'");
+      await EventDatabase().update(
+          "${widget.databaseKennzeichnung} = '$data'",
+          "WHERE id = '${widget.eventId}'"
+      );
     }
 
     if(widget.saveFunction != null) widget.saveFunction();
@@ -682,8 +685,11 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
       newBisDate = DateTime(bisDate.year, bisDate.month, bisDate.day,
           bisTime.hour, bisTime.minute).toString().substring(0,16);
     }
+    await EventDatabase().update(
+        "wann = '$newWannDate', bis = '$newBisDate'",
+        "WHERE id = '${widget.event["id"]}'"
+    );
 
-    await EventDatabase().update(widget.event["id"], "wann = '$newWannDate', bis = '$newBisDate'");
     setState(() {
       widget.event["wann"] = newWannDate;
       widget.event["bis"] = newBisDate;
@@ -1012,8 +1018,11 @@ class _InteresseButtonState extends State<InteresseButton> {
             interesseList.remove(userId);
           }
 
-          EventDatabase()
-              .update(widget.id, "interesse = '${json.encode(interesseList)}'");
+          EventDatabase().update(
+              "interesse = '${json.encode(interesseList)}'",
+              "WHERE id = '${widget.id}'"
+          );
+
         },
         child: Icon(
           Icons.favorite,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
@@ -152,7 +153,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
     ChatDatabase().updateChatGroup(
-        widget.groupChatData["id"], "users", widget.groupChatData["users"]);
+      "users = '${json.encode(widget.groupChatData["users"])}'",
+      "WHERE id = '${widget.groupChatData["id"]}'"
+    );
   }
 
   messageToDbAndClearMessageInput(message) async {
@@ -186,10 +189,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (messageData["message"].contains("</eventId=")) {
         messageData["message"] = "<Event Card>";
       }
+
       ChatDatabase().updateChatGroup(
-          widget.chatId, "lastMessage", messageData["message"]);
-      ChatDatabase().updateChatGroup(
-          widget.chatId, "lastMessageDate", messageData["date"]);
+          "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
+          "WHERE id = '${widget.chatId}'"
+      );
 
       setState(() {});
     }
