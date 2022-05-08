@@ -51,11 +51,9 @@ class _StartPageState extends State<StartPage> {
 
   setHiveBoxen() async {
     var ownProfilBox = Hive.box("ownProfilBox");
-    if (ownProfilBox.get("list") == null) {
-      var ownProfil =
-          await ProfilDatabase().getData("*", "WHERE id = '$userId'");
-      ownProfilBox.put("list", ownProfil);
-    }
+
+    var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
+    ownProfilBox.put("list", ownProfil);
 
     var stadtinfo =
         await StadtinfoDatabase().getData("*", "", returnList: true);
@@ -94,15 +92,15 @@ class _StartPageState extends State<StartPage> {
           "token = '$userDeviceTokenReal'", "WHERE id = '$userId'");
     }
 
-    ProfilDatabase().updateProfil(
-        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
-
     var automaticLocation = dbData["automaticLocation"];
     if (automaticLocation != null &&
         automaticLocation != standortbestimmung[0] &&
         automaticLocation != standortbestimmungEnglisch[0]) {
       setAutomaticLoaction(automaticLocation);
     }
+
+    ProfilDatabase().updateProfil(
+        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
   }
 
   setAutomaticLoaction(automaticLocationStatus) async {
@@ -110,9 +108,9 @@ class _StartPageState extends State<StartPage> {
     var ownProfil = ownProfilBox.get("list");
 
     if (DateTime.now()
-            .difference(DateTime.parse(ownProfil["lastLogin"]))
-            .inDays >
-        0) {
+            .difference(DateTime.parse(ownProfil["lastLogin"])).inDays > 0
+    ) {
+
       var newLocation = "";
       var currentPosition = await LocationService().getCurrentUserLocation();
 
@@ -123,9 +121,10 @@ class _StartPageState extends State<StartPage> {
 
       if (automaticLocationStatus == standortbestimmung[1] ||
           automaticLocationStatus == standortbestimmungEnglisch[1]) {
+
         ProfilDatabase().updateProfilLocation(userId, {
           "city": " ",
-          "countryname": nearstLocationData["country"],
+          "land": nearstLocationData["country"],
           "longt": currentPosition.longitude,
           "latt": currentPosition.latitude,
         });
@@ -148,6 +147,7 @@ class _StartPageState extends State<StartPage> {
           .getDatabaseLocationdataFromGoogleResult(geoData);
 
       ProfilDatabase().updateProfilLocation(userId, locationData);
+
     }
   }
 
@@ -179,6 +179,25 @@ class _StartPageState extends State<StartPage> {
       setState(() {
         widget.selectedIndex = index;
       });
+    }
+
+    eventIcon(){
+      return FutureBuilder(
+          future:
+          EventDatabase().getData(
+              "*",
+              "WHERE erstelltVon ='$userId' AND json_length(freischalten) > 0",
+              returnList: true),
+          builder: (BuildContext context, AsyncSnapshot snap) {
+            if (!snap.hasData) return const Icon(Icons.event);
+
+            var events = snap.data;
+            events = events == false ? 0 : events.length;
+
+            return BadgeIcon(
+                icon: Icons.event,
+                text: events > 0 ? events.toString() : "");
+          });
     }
 
     chatIcon() {
@@ -220,8 +239,8 @@ class _StartPageState extends State<StartPage> {
               icon: Icon(Icons.map),
               label: 'World',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.event),
+            BottomNavigationBarItem(
+              icon: eventIcon(),
               label: 'Events',
             ),
             BottomNavigationBarItem(

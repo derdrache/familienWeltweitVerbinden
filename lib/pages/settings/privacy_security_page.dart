@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../services/database.dart';
+import '../../widgets/dialogWindow.dart';
 import '../login_register_page/login_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
@@ -78,18 +79,47 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       );
     }
 
+    deleteProfilWindow() {
+      showDialog(
+          context: context,
+          builder: (BuildContext context){
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).accountLoeschen,
+              height: 90,
+              children: [
+                const SizedBox(height: 10),
+                Center(child: Text(AppLocalizations.of(context).accountWirklichLoeschen))
+              ],
+              actions: [
+                TextButton(
+                  child: const Text("Ok"),
+                  onPressed: (){
+                    var userId = FirebaseAuth.instance.currentUser?.uid;
+                    ProfilDatabase().deleteProfil(userId);
+                    setState(() {});
+                    //global_functions.changePageForever(context, const LoginPage());
+                  },
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context).abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            );
+          }
+      );
+    }
+
     deleteProfilContainer(){
       return FloatingActionButton.extended(
         backgroundColor: Colors.red,
         label: Text(AppLocalizations.of(context).accountLoeschen),
-        onPressed: () async {
-          var userId = FirebaseAuth.instance.currentUser?.uid;
-          ProfilDatabase().deleteProfil(userId);
-          setState(() {});
-          //global_functions.changePageForever(context, const LoginPage());
-        },
+        onPressed: () => deleteProfilWindow()
+
       );
     }
+
+
 
     return Scaffold(
       appBar: customAppBar(title: AppLocalizations.of(context).privatsphaereSicherheit),
