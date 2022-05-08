@@ -244,6 +244,7 @@
     "freundesListe": "Freundesliste",
     "automatischeStandortbestimmung": "Automatische Standortbestimmung",
     "accountLoeschen": "Account löschen",
-    "geloeschterUser": "Gelöschter User"
+    "geloeschterUser": "Gelöschter User",
+    "accountWirklichLoeschen": "Möchtest du den Account wirklich löschen?"
 
 }

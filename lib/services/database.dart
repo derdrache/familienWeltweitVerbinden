@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' hide Key;
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
@@ -116,7 +117,12 @@ class ProfilDatabase{
   }
 
   deleteProfil(userId) async {
-    FirebaseAuth.instance.currentUser.delete();
+    try{
+      FirebaseAuth.instance.currentUser.delete();
+    }catch(_){
+      return;
+    }
+
 
     _deleteInTable("profils", userId);
 
@@ -125,35 +131,45 @@ class ProfilDatabase{
         "WHERE JSON_CONTAINS(friendlist, '\"$userId\"') > 0"
     );
 
-  var userEvents = await EventDatabase().getData("id", "WHERE erstelltVon = '$userId'", returnList: true);
-  for(var eventId in userEvents){
-    _deleteInTable("events", eventId);
-  }
+    var userEvents = await EventDatabase().getData("id", "WHERE erstelltVon = '$userId'", returnList: true);
+    for(var eventId in userEvents){
+      _deleteInTable("events", eventId);
+    }
 
-  EventDatabase().update(
-      "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-      "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0"
-  );
+    EventDatabase().update(
+        "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0"
+    );
 
-  EventDatabase().update(
-      "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId')))",
-      "WHERE JSON_CONTAINS(zusage, '\"$userId\"') > 0"
-  );
+    EventDatabase().update(
+        "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(zusage, '\"$userId\"') > 0"
+    );
 
-  EventDatabase().update(
-      "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId')))",
-      "WHERE JSON_CONTAINS(absage, '\"$userId\"') > 0"
-  );
+    EventDatabase().update(
+        "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(absage, '\"$userId\"') > 0"
+    );
 
-  EventDatabase().update(
-      "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$userId')))",
-      "WHERE JSON_CONTAINS(freischalten, '\"$userId\"') > 0"
-  );
+    EventDatabase().update(
+        "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(freischalten, '\"$userId\"') > 0"
+    );
 
-  EventDatabase().update(
-      "freigegeben = JSON_REMOVE(freigegeben, JSON_UNQUOTE(JSON_SEARCH(freigegeben, 'one', '$userId')))",
-      "WHERE JSON_CONTAINS(freigegeben, '\"$userId\"') > 0"
-  );
+    EventDatabase().update(
+        "freigegeben = JSON_REMOVE(freigegeben, JSON_UNQUOTE(JSON_SEARCH(freigegeben, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(freigegeben, '\"$userId\"') > 0"
+    );
+
+
+    Hive.box("ownProfilBox").deleteFromDisk();
+    Hive.box("profilBox").deleteFromDisk();
+    Hive.box("eventBox").deleteFromDisk();
+    Hive.box("myEventsBox").deleteFromDisk();
+    Hive.box("interestEventsBox").deleteFromDisk();
+    Hive.box("myChatBox").deleteFromDisk();
+    Hive.box("stadtinfoUserBox").deleteFromDisk();
+    Hive.box("stadtinfoBox").deleteFromDisk();
 
 
   }
