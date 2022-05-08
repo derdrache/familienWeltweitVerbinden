@@ -43,7 +43,6 @@ class _ChatPageState extends State<ChatPage> {
 
   initilizeCreateChatData() {
     dynamic userFriendIdList = ownProfilBox.get("list")["friendlist"];
-    print(userFriendIdList);
     dbProfilData = profilBox.get("list");
     allName = [];
     userFriendlist = [];
@@ -258,7 +257,7 @@ class _ChatPageState extends State<ChatPage> {
         }
 
         if (chatPartnerName.isEmpty) chatPartnerName = AppLocalizations.of(context).geloeschterUser;
-        chatPartnerProfil ??= {"bild": "assets/bilder/museum.jpg"};
+        chatPartnerProfil ??= {"bild": ["assets/WeltFlugzeug.png"]};
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
