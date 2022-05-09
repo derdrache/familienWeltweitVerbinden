@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 
 class StadtinformationsPage extends StatefulWidget {
@@ -411,7 +412,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     }
 
     return Scaffold(
-        appBar: customAppBar(title: widget.ort["names"].join(" / ")),
+        appBar: CustomAppBar(title: widget.ort["names"].join(" / ")),
         body: Column(
           children: [
             allgemeineInfoBox(),

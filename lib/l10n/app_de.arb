@@ -147,7 +147,7 @@
     "eventIntervalAendern": "Event Interval ändern",
     "eventBeschreibungAendern": "Event Beschreibung ändern",
     "neueBeschreibungEingeben" : "neue Beschreibung eingeben",
-    "eventOrganisatorMussFreischalten" : "Der Organisator muss dich noch freischalten, bevor du die details vom Event sehen kannst",
+    "eventInteresseZurueckgenommen" : "Dein Interesse am Event wurde zurückgenommen",
     "eventInteresseMitgeteilt": "Dein Interesse am Event wurde dem Organisator mitgeteilt",
     "speichern": "Speichern",
     "abbrechen": "Abbrechen",

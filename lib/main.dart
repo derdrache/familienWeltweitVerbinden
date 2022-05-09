@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:familien_suche/pages/login_register_page/create_profil_page.dart';
 import 'package:familien_suche/pages/events/event_details.dart';
-import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -236,9 +235,12 @@ class MyApp extends StatelessWidget {
                   scaffoldBackgroundColor: Colors.white,
                   colorScheme: ColorScheme.fromSwatch().copyWith(
                     primary: const Color(0xFFBF1D53),
-                    secondary: const Color(0xFF3CB28F), //buttonColor?
+                    secondary: const Color(0xFF3CB28F),
+                    //buttonColor?
                   ),
-                  iconTheme: const IconThemeData(color: Color(0xFF3CB28F))),
+                  iconTheme: const IconThemeData(color: Color(0xFF3CB28F))
+              ),
+
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: const [
                 Locale('en', ''),
