@@ -13,6 +13,7 @@ import '../global/variablen.dart' as global_variablen;
 import '../global/style.dart' as global_style;
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
+import '../widgets/custom_appbar.dart';
 import '../widgets/profil_image.dart';
 
 // ignore: must_be_immutable
@@ -65,9 +66,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     var monthDifference = getMonthDifference();
 
     openChatButton() {
-      return TextButton(
-          style: global_style.textButtonStyle(),
-          child: const Icon(Icons.message),
+      return IconButton(
+          icon: const Icon(Icons.message),
           onPressed: () async {
             var profilId = await ProfilDatabase()
                 .getData("id", "WHERE name = '${widget.profil["name"]}'");
@@ -99,9 +99,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           ? userFriendlist.contains(widget.profil["id"])
           : false;
 
-      return TextButton(
-          style: global_style.textButtonStyle(),
-          child: onFriendlist
+      return IconButton(
+          icon: onFriendlist
               ? const Icon(Icons.person_remove)
               : const Icon(Icons.person_add),
           onPressed: () {
@@ -384,7 +383,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "", buttons: [
+      appBar: CustomAppBar(title: "", buttons: [
         widget.ownProfil ? const SizedBox.shrink() : openChatButton(),
         widget.ownProfil ? const SizedBox.shrink() : friendlistButton()
       ]),

@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
+import '../../widgets/custom_appbar.dart';
 
 class CreateStadtinformationsPage extends StatefulWidget {
   const CreateStadtinformationsPage({Key key}) : super(key: key);
@@ -57,7 +58,7 @@ class _CreateStadtinformationsPageState extends State<CreateStadtinformationsPag
     ortEingabe.hintText = AppLocalizations.of(context).stadtEingeben;
 
     return Scaffold(
-      appBar: customAppBar(
+      appBar: CustomAppBar(
         title: AppLocalizations.of(context).stadtinformationErstellen,
         buttons: [
           IconButton(

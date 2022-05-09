@@ -12,6 +12,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../widgets/custom_appbar.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   var chatPartnerId;
@@ -216,6 +217,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     chatPartnerProfil ??= await ProfilDatabase()
         .getData("*", "WHERE id = '${widget.chatPartnerId}'");
 
+    if(chatPartnerProfil == false) return;
+
     global_functions.changePage(
         context,
         ShowProfilPage(
@@ -394,7 +397,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     return Scaffold(
-        appBar: customAppBar(
+        appBar: CustomAppBar(
           title: widget.chatPartnerName ?? "",
           onTap: () => openProfil(),
         ),

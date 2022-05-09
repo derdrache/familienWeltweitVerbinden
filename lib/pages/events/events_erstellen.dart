@@ -14,6 +14,7 @@ import 'package:uuid/uuid.dart';
 import '../../services/database.dart';
 import '../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
@@ -350,7 +351,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
 
     return Scaffold(
-      appBar: customAppBar(
+      appBar: CustomAppBar(
         title: AppLocalizations.of(context).eventErstellen,
         buttons: [
           IconButton(

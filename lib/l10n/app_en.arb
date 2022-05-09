@@ -147,7 +147,7 @@
     "eventIntervalAendern": "Change event interval",
     "eventBeschreibungAendern": "Change event description",
     "neueBeschreibungEingeben" : "enter new description",
-    "eventOrganisatorMussFreischalten" : "The organizer still needs to unlock you before you can see the details of the event",
+    "eventInteresseZurueckgenommen" : "Your interest in the event has been withdrawn",
     "eventInteresseMitgeteilt": "Your interest in the event has been sended to the organizer",
     "speichern": "Save",
     "abbrechen": "Cancel",

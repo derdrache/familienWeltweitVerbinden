@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -54,8 +55,8 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   }
 
   saveButton(){
-    return TextButton(
-        child: Icon(Icons.done),
+    return IconButton(
+        icon: Icon(Icons.done),
         onPressed: () => saveLocation()
 
     );
@@ -66,7 +67,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     autoComplete.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
 
     return Scaffold(
-      appBar: customAppBar(
+      appBar: CustomAppBar(
           title: AppLocalizations.of(context).ortAendern,
           buttons: <Widget>[saveButton()]
       ),

@@ -8,13 +8,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../global/global_functions.dart';
 import '../../global/variablen.dart' as global_var;
 
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../services/database.dart';
-import '../../global/style.dart' as global_style;
 import '../../widgets/badge_icon.dart';
+import '../show_profil.dart';
 import '../start_page.dart';
 
 
@@ -82,7 +84,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     freischaltenList.remove(user);
     EventDatabase().update(
         "freischalten = '${json.encode(freischaltenList)}'",
-        "WHERE id = '${eventId}'"
+        "WHERE id = '$eventId'"
     );
 
     if(!angenommen) return;
@@ -91,7 +93,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     freigegebenListe.add(user);
     EventDatabase().update(
         "freigegeben = '${json.encode(freigegebenListe)}'",
-        "WHERE id = '${eventId}'"
+        "WHERE id = '$eventId'"
     );
 
     setState(() {
@@ -124,7 +126,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     freigegebenList.remove(user);
     EventDatabase().update(
         "freigegeben = '${json.encode(freigegebenList)}'",
-        "WHERE id = '${eventId}'"
+        "WHERE id = '$eventId'"
     );
 
   }
@@ -458,15 +460,22 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       List<Widget>freizugebenListe = [];
 
       for(var user in widget.event["freischalten"]){
-        var name = await ProfilDatabase().getData("name", "WHERE id = '$user'");
+        var profil = await ProfilDatabase().getData("*", "WHERE id = '$user'");
 
         freizugebenListe.add(
             Container(
                 margin: const EdgeInsets.only(left: 20),
                 child: Row(
                   children: [
-                    Text(name),
-                    const Expanded(child: SizedBox(width: 10)),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => changePage(context, ShowProfilPage(
+                          userName: profil["name"],
+                          profil: profil,
+                        )),
+                        child: Text(profil["name"])
+                      ),
+                    ),
                     IconButton(
                         onPressed: () => freischalten(user, true, windowSetState),
                         icon: const Icon(Icons.check_circle, size: 27)
@@ -506,14 +515,22 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       List<Widget>freigeschlatetList = [];
 
       for(var user in widget.event["freigegeben"]){
-        var name = await ProfilDatabase().getData("name", "WHERE id = '$user'");
+        var profil = await ProfilDatabase().getData("name", "WHERE id = '$user'");
 
         freigeschlatetList.add(
             Container(
                 margin: const EdgeInsets.only(left: 20),
                 child: Row(
                   children: [
-                    Text(name),
+                    Expanded(
+                      child: InkWell(
+                          onTap: () => changePage(context, ShowProfilPage(
+                            userName: profil["name"],
+                            profil: profil,
+                          )),
+                          child: Text(profil["name"])
+                      ),
+                    ),
                     const Expanded(child: SizedBox(width: 10)),
                     IconButton(
                         onPressed: () => freigegebenEntfernen(user, windowSetState),
@@ -670,7 +687,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               icon: const Icon(Icons.copy),
             ),
           ),
-          SizedBox(height: 10)
+          const SizedBox(height: 10)
         ]
       );
     });
@@ -678,8 +695,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
 
     return Scaffold(
-        appBar: customAppBar(
-          context: context,
+        appBar: CustomAppBar(
             title: "",
             buttons: [
               if(isCreator && isNotPublic) FutureBuilder(
@@ -688,9 +704,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   var data = snap.hasData ? snap.data.length.toString() : "";
                   if(data == "0") data = "";
 
-                  return TextButton(
-                    style: global_style.textButtonStyle(),
-                    child: BadgeIcon(
+                  return IconButton(
+                    icon: BadgeIcon(
                       icon: Icons.event_available,
                       text: data.toString()
                     ),//const Icon(Icons.event_available),
@@ -698,21 +713,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   );
                 }
               ),
-              TextButton(
-                style: global_style.textButtonStyle(),
-                child: const Icon(Icons.link),
+              IconButton(
+                icon: const Icon(Icons.link),
                 onPressed: () => linkTeilenWindow(),
               ),
-              if(!isCreator) TextButton(
-                style: global_style.textButtonStyle(),
-                child: const Icon(Icons.message),
+              if(!isCreator) IconButton(
+                icon: const Icon(Icons.message),
                 onPressed: () => global_func.changePage(context, ChatDetailsPage(
                   chatPartnerId: widget.event["erstelltVon"]
                 )),
               ),
-              TextButton(
-                style: global_style.textButtonStyle(),
-                child: const Icon(Icons.more_vert),
+              IconButton(
+                icon: const Icon(Icons.more_vert),
                 onPressed: () => moreMenu(),
               ),
 

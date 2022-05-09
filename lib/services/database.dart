@@ -359,11 +359,13 @@ class EventDatabase{
   update(whatData, queryEnd) async  {
     var url = Uri.parse(databaseUrl + "database/update.php");
 
-    await http.post(url, body: json.encode({
+    var test = await http.post(url, body: json.encode({
       "table": "events",
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
+
+    print(test.body);
 
   }
 

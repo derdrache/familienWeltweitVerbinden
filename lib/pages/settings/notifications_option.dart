@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
+import '../../widgets/custom_appbar.dart';
 
 
 class NotificationsOptionsPage extends StatefulWidget {
@@ -90,7 +90,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context).benachrichtigungen),
+      appBar: CustomAppBar(title: AppLocalizations.of(context).benachrichtigungen),
       body: Column(
         children: [
           const SizedBox(height: 20,),

@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../services/database.dart';
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../login_register_page/login_page.dart';
 
@@ -97,7 +98,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                     var userId = FirebaseAuth.instance.currentUser?.uid;
                     ProfilDatabase().deleteProfil(userId);
                     setState(() {});
-                    //global_functions.changePageForever(context, const LoginPage());
+                    global_functions.changePageForever(context, const LoginPage());
                   },
                 ),
                 TextButton(
@@ -122,7 +123,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
 
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context).privatsphaereSicherheit),
+      appBar: CustomAppBar(title: AppLocalizations.of(context).privatsphaereSicherheit),
       body: Column(
         children: [
           emailSettingContainer(),

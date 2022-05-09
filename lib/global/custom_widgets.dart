@@ -1,7 +1,3 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
@@ -98,42 +94,6 @@ customSnackbar(context, text, {color = Colors.red, duration = const Duration(sec
 
   ScaffoldMessenger.of(context).hideCurrentSnackBar();
   return ScaffoldMessenger.of(context).showSnackBar(snackbar);
-}
-
-customAppBar({title, buttons, elevation = 4.0, var onTap, context}){
-  buttons ??= <Widget>[];
-
-    return AppBar(
-      leading: null,
-      title: InkWell(
-          onTap: onTap,
-          child: Row(
-              children: [
-                Flexible(
-                  child: SizedBox(
-                      height: 50,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                            title,
-                            overflow: TextOverflow.fade,
-                            style: const TextStyle(color: Colors.black, fontSize: 20)
-                        ),
-                      )
-                  ),
-                )
-              ]
-          )
-      ),
-      backgroundColor: Colors.white,
-      elevation: elevation,
-      iconTheme: const IconThemeData(
-          color: Colors.black
-      ),
-      actions: buttons,
-    );
-
-
 }
 
 class CustomMultiTextForm extends StatefulWidget {
