@@ -56,7 +56,7 @@ class _StartPageState extends State<StartPage> {
     ownProfilBox.put("list", ownProfil);
 
     var stadtinfo =
-        await StadtinfoDatabase().getData("*", "", returnList: true);
+        await StadtinfoDatabase().getData("*", "ORDER BY ort ASC", returnList: true);
     Hive.box("stadtinfoBox").put("list", stadtinfo);
   }
 
