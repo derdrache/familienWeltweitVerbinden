@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../widgets/custom_appbar.dart';
@@ -108,16 +109,16 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                   title: AppLocalizations.of(context).informationAendern,
                   children: [
                     customTextInput(AppLocalizations.of(context).titel, titleTextKontroller),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     customTextInput(
                         AppLocalizations.of(context).beschreibung,
                         informationTextKontroller, moreLines: 10,
                         textInputAction: TextInputAction.newline
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                       TextButton(
-                        child: Text("speichern"),
+                        child: const Text("speichern"),
                         onPressed: () {
                           if(titleTextKontroller.text.isEmpty){
                             customSnackbar(context, AppLocalizations.of(context).titelStadtinformationEingeben);
@@ -140,7 +141,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                         },
                       ),
                       TextButton(
-                        child: Text("abbrechen"),
+                        child: const Text("abbrechen"),
                         onPressed: () => Navigator.pop(context),
                       )
                     ],)
@@ -257,9 +258,13 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
               Text(AppLocalizations.of(context).wetter),
               const SizedBox(width: 10),
                Flexible(
-                  child: Container(
+                  child: InkWell(
+                      onTap: () =>  launch(cityInformation["wetter"]),
                       child: Text(cityInformation["wetter"],
-                          overflow: TextOverflow.ellipsis)))
+                          style: const TextStyle(color: Colors.blue),
+                          overflow: TextOverflow.ellipsis)
+                  )
+               )
             ],
           ),
           const SizedBox(height: 10),
@@ -320,7 +325,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: EdgeInsets.only(top:5, bottom: 10),
+              margin: const EdgeInsets.only(top:5, bottom: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -336,7 +341,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                     onTapDown: (positionDetails) => openInformationMenu(positionDetails, information),
                     child: const Icon(Icons.more_horiz),
                   ),
-                  SizedBox(width:5)
+                  const SizedBox(width:5)
                 ],
               ),
             ),
