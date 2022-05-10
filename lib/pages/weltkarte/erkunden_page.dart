@@ -856,7 +856,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   ),
                   Positioned(
                     right: 0,
-                    top: 55,
+                    top: 60,
                     child: IconButton(
                       icon: const Icon(
                         Icons.close,
@@ -872,7 +872,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   if (popupTyp == "profils")
                     Positioned(
                       left: 5,
-                      top: 65,
+                      top: 60,
                       child: IconButton(
                         icon: const Icon(
                           Icons.feed,

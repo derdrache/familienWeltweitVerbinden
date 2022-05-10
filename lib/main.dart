@@ -1,25 +1,27 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
-import 'package:familien_suche/pages/login_register_page/create_profil_page.dart';
-import 'package:familien_suche/pages/events/event_details.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/start_page.dart';
-import 'package:familien_suche/services/database.dart';
-import 'package:familien_suche/services/local_notification.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'firebase_options.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import 'pages/chat/chat_details.dart';
+import 'pages/start_page.dart';
+import 'services/database.dart';
+import 'services/local_notification.dart';
+import 'pages/login_register_page/create_profil_page.dart';
+import 'pages/events/event_details.dart';
+import 'auth/secrets.dart';
+
 
 import 'pages/login_register_page/login_page.dart';
 
@@ -34,23 +36,23 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 hiveInit() async {
   await Hive.initFlutter();
 
-  await Hive.openBox("countryGeodataBox");
+  await Hive.openBox("countryGeodataBox", encryptionCipher: HiveAesCipher(boxEncrpytionKey));
   var countryJsonText =
       await rootBundle.loadString('assets/countryGeodata.json');
   var geodata = json.decode(countryJsonText)["data"];
   Hive.box('countryGeodataBox').put("list", geodata);
 
-  await Hive.openBox("kontinentGeodataBox");
+  await Hive.openBox("kontinentGeodataBox", encryptionCipher: HiveAesCipher(boxEncrpytionKey));
   var continentsJsonText =
       await rootBundle.loadString('assets/continentsGeodata.json');
   var continentsGeodata = json.decode(continentsJsonText)["data"];
   Hive.box('kontinentGeodataBox').put("list", continentsGeodata);
 
-  await Hive.openBox('profilBox');
+  await Hive.openBox('profilBox', encryptionCipher: HiveAesCipher(boxEncrpytionKey));
 
   await Hive.openBox('ownProfilBox');
 
-  await Hive.openBox('eventBox');
+  await Hive.openBox('eventBox', encryptionCipher: HiveAesCipher(boxEncrpytionKey));
 
   await Hive.openBox('myEventsBox');
 
@@ -58,7 +60,7 @@ hiveInit() async {
 
   await Hive.openBox('myChatBox');
 
-  await Hive.openBox('stadtinfoUserBox');
+  await Hive.openBox('stadtinfoUserBox', encryptionCipher: HiveAesCipher(boxEncrpytionKey));
   var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
   if(stadtinfoUserBox.get("list") == null){
     var stadtinfoUser = await StadtinfoUserDatabase()
@@ -66,7 +68,11 @@ hiveInit() async {
     Hive.box("stadtinfoUserBox").put("list",stadtinfoUser);
   }
 
-  await Hive.openBox('stadtinfoBox');
+  await Hive.openBox('stadtinfoBox', encryptionCipher: HiveAesCipher(boxEncrpytionKey));
+  var stadtinfo =
+    await StadtinfoDatabase().getData("*", "ORDER BY ort ASC", returnList: true);
+  Hive.box("stadtinfoBox").put("list", stadtinfo);
+
 }
 
 void main() async {
