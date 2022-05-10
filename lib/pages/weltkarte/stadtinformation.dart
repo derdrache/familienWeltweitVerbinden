@@ -228,9 +228,30 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     usersCityInformation = sortThumb(usersCityInformation);
 
 
+
     allgemeineInfoBox() {
       String internetSpeedText = cityInformation["internet"] == null ?
       "?" : cityInformation["internet"].toString();
+
+      setCostIconColor(indikator){
+        if(indikator <= 1) return Colors.green[800];
+        if(indikator <= 2) return Colors.green;
+        if(indikator <= 3) return Colors.yellow;
+        if(indikator <= 4) return Colors.orange;
+
+        return Colors.red;
+      }
+
+      setInternetIconColor(indikator){
+
+        if(indikator <= 20) return Colors.red;
+        if(indikator <= 40) return Colors.orange;
+        if(indikator <= 60) return Colors.yellow;
+        if(indikator <= 80) return Colors.green;
+
+        return Colors.green[800];
+      }
+
 
       return Container(
         margin: const EdgeInsets.all(10),
@@ -240,10 +261,26 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             AppLocalizations.of(context).allgemeineInformation,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
-          Row(
+          if(cityInformation["kosten"] != null) const SizedBox(height: 20),
+          if(cityInformation["kosten"] != null) Row(
             children: [
-              const Icon(Icons.network_check),
+              Icon(
+                Icons.monetization_on_outlined,
+                color: setCostIconColor(cityInformation["kosten"]),
+              ),
+              const SizedBox(width: 5),
+              const Text("Kosten: "),
+              const SizedBox(width: 5),
+              Text("\$ " * cityInformation["kosten"])
+            ],
+          ),
+          if(cityInformation["internet"] != null) const SizedBox(height: 10),
+          if(cityInformation["internet"] != null) Row(
+            children: [
+              Icon(
+                  Icons.network_check_outlined,
+                  color: setInternetIconColor(cityInformation["internet"])
+              ),
               const SizedBox(width: 5),
               const Text("Internet: "),
               const SizedBox(width: 5),

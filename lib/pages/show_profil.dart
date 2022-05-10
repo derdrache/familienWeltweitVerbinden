@@ -10,7 +10,6 @@ import 'package:hive/hive.dart';
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_variablen;
-import '../global/style.dart' as global_style;
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
 import '../widgets/custom_appbar.dart';
@@ -99,11 +98,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           ? userFriendlist.contains(widget.profil["id"])
           : false;
 
-      return IconButton(
-          icon: onFriendlist
-              ? const Icon(Icons.person_remove)
-              : const Icon(Icons.person_add),
-          onPressed: () {
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              onFriendlist ? const Icon(Icons.person_remove): const Icon(Icons.person_add),
+              SizedBox(width: 10),
+              onFriendlist ?
+              Text(AppLocalizations.of(context).freundEntfernen) :
+              Text(AppLocalizations.of(context).freundHinzufuegen),
+            ],
+          ),
+          onPressed: (){
             var snackbarText = "";
 
             if (onFriendlist) {
@@ -130,9 +135,43 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 "friendlist = '${jsonEncode(userFriendlist)}'",
                 "WHERE id = '$userID'");
 
+
+
+            Navigator.pop(context);
             setState(() {});
-          });
+          }
+      );
     }
+
+    moreMenuButton(){
+      return IconButton(
+        icon: Icon(Icons.more_vert),
+        onPressed: (){
+          showDialog(
+              context: context,
+              builder: (BuildContext context){
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: 220,
+                      child: SimpleDialog(
+                        contentPadding: EdgeInsets.zero,
+                        insetPadding: const EdgeInsets.only(top:40, left: 0, right:10),
+                        children: [
+                          friendlistButton()
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+          );
+        },
+      );
+    }
+
+
 
     titelBox() {
       return Container(
@@ -385,7 +424,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     return Scaffold(
       appBar: CustomAppBar(title: "", buttons: [
         widget.ownProfil ? const SizedBox.shrink() : openChatButton(),
-        widget.ownProfil ? const SizedBox.shrink() : friendlistButton()
+        widget.ownProfil ? const SizedBox.shrink() : moreMenuButton()
       ]),
       body: SizedBox(
         width: double.maxFinite,

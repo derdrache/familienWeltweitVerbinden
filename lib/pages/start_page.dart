@@ -54,10 +54,6 @@ class _StartPageState extends State<StartPage> {
 
     var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
     ownProfilBox.put("list", ownProfil);
-
-    var stadtinfo =
-        await StadtinfoDatabase().getData("*", "ORDER BY ort ASC", returnList: true);
-    Hive.box("stadtinfoBox").put("list", stadtinfo);
   }
 
   checkFlexibleUpdate() async {

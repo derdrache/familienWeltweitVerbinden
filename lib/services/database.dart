@@ -120,7 +120,7 @@ class ProfilDatabase{
     try{
       FirebaseAuth.instance.currentUser.delete();
     }catch(_){
-      return;
+      return false;
     }
 
 
@@ -597,9 +597,8 @@ class StadtinfoUserDatabase{
 class AllgemeinDatabase{
 
   getData(whatData, queryEnd, {returnList = false}) async {
-    //sichere Datenbankabfrage
     var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
+
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
       "queryEnd": queryEnd,

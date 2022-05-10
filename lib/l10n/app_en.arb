@@ -245,6 +245,8 @@
     "automatischeStandortbestimmung": "automatic location",
     "accountLoeschen": "delete account",
     "geloeschterUser": "deleted user",
-    "accountWirklichLoeschen": "Do you really want to delete the account?"
+    "accountWirklichLoeschen": "Do you really want to delete the account?",
+    "freundHinzufuegen": "add friend",
+    "freundEntfernen": "remove friend"
 }
 
