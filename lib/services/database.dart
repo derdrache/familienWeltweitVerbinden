@@ -9,6 +9,7 @@ import 'package:encrypt/encrypt.dart';
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
+import 'notification.dart';
 
 
 //var databaseUrl = "https://families-worldwide.com/";
@@ -282,7 +283,6 @@ class ChatDatabase{
       "queryEnd": queryEnd
     }));
   }
-  
 
   addNewMessageAndSendNotification(chatgroupData, messageData)async {
     var users = chatgroupData["users"];
@@ -305,7 +305,13 @@ class ChatDatabase{
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
-    sendChatNotification(chatID, messageData);
+    prepareChatNotification(
+      chatId: chatID,
+      vonId: messageData["von"],
+      toId: messageData["zu"],
+      title: messageData["title"],
+      inhalt: messageData["message"]
+    );
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
@@ -651,83 +657,6 @@ class ReportsDatabase{
       "beschreibung": beschreibung ,
     }));
   }
-
-}
-
-
-sendChatNotification(chatId, messageData) async {
-  var toActiveChat = await ProfilDatabase()
-      .getData("activeChat", "WHERE id = '${messageData["zu"]}'");
-
-  if(toActiveChat == chatId) return;
-
-
-  var fromName = await ProfilDatabase()
-      .getData("name", "WHERE id = '${messageData["von"]}'");
-  var toToken = await ProfilDatabase()
-      .getData("token", "WHERE id = '${messageData["zu"]}'");
-  var chatPartnerName = await ProfilDatabase()
-      .getData("name", "WHERE id = '${messageData["zu"]}'");
-
-
-  var notificationInformation = {
-    "toId": messageData["zu"],
-    "toName": chatPartnerName,
-    "typ" : "chat",
-    "title": fromName,
-    "inhalt": messageData["message"],
-    "changePageId": chatId,
-    "token": toToken,
-  };
-
-  sendNotification(notificationInformation);
-
-
-}
-
-sendNotification(notificationInformation) async {
-    var notificationsAllowed = await ProfilDatabase()
-        .getData("notificationstatus", "WHERE id = '${notificationInformation["toId"]}'");
-
-    if(notificationsAllowed == 0) return;
-
-    if(notificationInformation["token"] == "" || notificationInformation["token"] == null){
-      var emailAdresse = await ProfilDatabase()
-          .getData("email", "WHERE id = '${notificationInformation["toId"]}'");
-
-      if(notificationInformation["typ"] == "chat"){
-        var url = Uri.parse(databaseUrl + "services/sendEmail.php");
-        http.post(url, body: json.encode({
-          "to": emailAdresse,
-          "title": notificationInformation["title"] + (spracheIstDeutsch ?
-          " hat dir eine Nachricht geschrieben": " has written you a message"),
-          "inhalt": "Hi ${notificationInformation["toName"]},\n\n" +
-              (spracheIstDeutsch ?
-              "du hast in der families worldwide App eine neue Nachricht von "
-                  "${notificationInformation["title"]} erhalten \n\n" :
-              "you have received a new message from "
-                  "${notificationInformation["title"]} in the families worldwide app \n\n"
-              )
-        }));
-      }else if(notificationInformation["typ"] == "event"){
-        var url = Uri.parse(databaseUrl + "services/sendEmail.php");
-        http.post(url, body: json.encode({
-          "to": emailAdresse,
-          "title": notificationInformation["title"],
-          "inhalt": notificationInformation["inhalt"]
-        }));
-      }
-    }else{
-      var url = Uri.parse(databaseUrl + "services/sendNotification.php");
-      http.post(url, body: json.encode({
-        "to": notificationInformation["token"],
-        "title": notificationInformation["title"],
-        "inhalt": notificationInformation["inhalt"],
-        "changePageId": notificationInformation["changePageId"],
-        "apiKey": firebaseWebKey,
-        "typ": notificationInformation["typ"]
-      }));
-    }
 
 }
 

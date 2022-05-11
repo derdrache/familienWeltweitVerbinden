@@ -247,6 +247,10 @@
     "geloeschterUser": "Gelöschter User",
     "accountWirklichLoeschen": "Möchtest du den Account wirklich löschen?",
     "freundHinzufuegen": "Freund hinzufügen",
-    "freundEntfernen": "Freund entfernen"
+    "freundEntfernen": "Freund entfernen",
+    "newFriendTitle": "Neuer Freund",
+    "newFriendInhalt": " hat dich als Freund hinzugefügt.",
+    "friendEmailErhalten": "Neuer Freund Email erhalten",
+    "friendNotificationErhalten" : "Neuer Freund Notification erhalten"
 
 }
