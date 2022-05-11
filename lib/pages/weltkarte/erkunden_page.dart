@@ -708,7 +708,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
 
       popupItems.add(SliverAppBar(
-        toolbarHeight: 30,
+        toolbarHeight: kIsWeb ? 40 : 30,
         backgroundColor: Colors.white,
         flexibleSpace: Center(
             child: Text(selectPopupMenuText(profils),
@@ -731,7 +731,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
 
       popupItems.add(SliverFixedExtentList(
-        itemExtent: 80.0,
+        itemExtent: kIsWeb ? 90.0: 80.0,
         delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
           var profilData = selectUserProfils[index];
 
@@ -764,7 +764,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                           const SizedBox(height: 5),
                           Text(childrenAgeStringToStringAge(
                               profilData["kinder"])),
-                          const SizedBox(height: 5),
+                          //const SizedBox(height: 5),
                           Text(profilData["ort"] + ", " + profilData["land"])
                         ])
                   ],
@@ -1073,6 +1073,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 createAndSetZoomProfils();
               } else {
                 friendMarkerOn = true;
+                eventMarkerOn = false;
                 changeProfils(ownProfil["friendlist"]);
 
                 popupActive = true;
@@ -1098,7 +1099,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       size: 32, color: Theme.of(context).colorScheme.primary),
                 if (eventMarkerOn)
                   Icon(Icons.event_note,
-                      size: 32, color: Theme.of(context).colorScheme.primary)
+                      size: 36, color: Theme.of(context).colorScheme.primary)
               ],
             ),
             onPressed: () {
@@ -1106,6 +1107,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 eventMarkerOn = false;
               } else {
                 eventMarkerOn = true;
+                friendMarkerOn = false;
               }
 
               setState(() {});

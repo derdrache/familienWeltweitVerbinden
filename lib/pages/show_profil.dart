@@ -12,6 +12,7 @@ import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_variablen;
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
+import '../services/notification.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/profil_image.dart';
 
@@ -120,6 +121,14 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               userFriendlist.add(widget.profil["id"]);
               snackbarText = widget.profil["name"] +
                   AppLocalizations.of(context).friendlistHinzugefuegt;
+
+              prepareFriendNotification(
+                  newFriendId: userID,
+                  toId: widget.profil["id"],
+                  title: AppLocalizations.of(context).newFriendTitle,
+                  inhalt: FirebaseAuth.instance.currentUser.displayName +
+                      AppLocalizations.of(context).newFriendInhalt
+              );
             }
 
             var ownProfilBox = Hive.box("ownProfilBox");
