@@ -11,6 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../global/global_functions.dart';
 import '../../global/variablen.dart' as global_var;
 
+import '../../services/notification.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/search_autocomplete.dart';
@@ -99,18 +100,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     setState(() {
 
     });
-    var dbData = await ProfilDatabase().getData("name, token", "WHERE id = '$user'");
 
-    var notificationInformation = {
-      "toId": user,
-      "toName": dbData["name"],
-      "typ": "event",
-      "title": AppLocalizations.of(context).eventFreigeben,
-      "inhalt": AppLocalizations.of(context).zugriffFolgendesEvent + widget.event["name"],
-      "changePageId": eventId,
-      "token": dbData["token"]
-    };
-    sendNotification(notificationInformation);
+    prepareEventNotification(
+      toId: user,
+      eventId: eventId,
+      title: AppLocalizations.of(context).eventFreigeben,
+      inhalt: AppLocalizations.of(context).zugriffFolgendesEvent + widget.event["name"]
+    );
      
   }
 

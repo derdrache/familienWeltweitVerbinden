@@ -176,10 +176,10 @@
     "filterEventSuche": "Filter by languages, countries, cities",
     "filterErkunden": "Families, Languages, Travel Type, Interests, Countries",
     "emailErhalten" : "received E-mail",
-    "chatNotificationErhalten": "Receive chat notification",
-    "chatEmailErhalten": "Receive chat emails",
-    "eventNotificationErhalten": "Receive event notification",
-    "eventEmailErhalten": "Receive event emails",
+    "chatNotificationErhalten": "receive chat notification",
+    "chatEmailErhalten": "receive chat emails",
+    "eventNotificationErhalten": "receive event notification",
+    "eventEmailErhalten": "receive event emails",
     "eventUebergebenAn1": "the event was successfully handed over to ",
     "eventUebergebenAn2": " ",
     "uebertragen": "transfer",
@@ -247,6 +247,10 @@
     "geloeschterUser": "deleted user",
     "accountWirklichLoeschen": "Do you really want to delete the account?",
     "freundHinzufuegen": "add friend",
-    "freundEntfernen": "remove friend"
+    "freundEntfernen": "remove friend",
+    "newFriendTitle": "new friend",
+    "newFriendInhalt": " has added you as friend",
+    "friendEmailErhalten": "receive new friend email",
+    "friendNotificationErhalten" : "receive new friend notification"
 }
 

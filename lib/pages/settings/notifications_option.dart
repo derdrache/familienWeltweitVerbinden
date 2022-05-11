@@ -87,6 +87,28 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
     );
   }
 
+  newFriendNotificationSetting(){
+    return Row(
+      children: [
+        const SizedBox(width: 20),
+        Text(
+            kIsWeb? AppLocalizations.of(context).friendEmailErhalten :
+            AppLocalizations.of(context).friendNotificationErhalten,
+            style: const TextStyle(fontSize: 20)
+        ),
+        const Expanded(child: SizedBox(width: 20)),
+        Switch(
+            value: widget.profil["newFriendNotificationOn"] == 1 ? true : false,
+            onChanged: (value){
+              setState(() {
+                widget.profil["newFriendNotificationOn"] = value == true ? 1 : 0;
+              });
+              ProfilDatabase().updateProfil("newFriendNotificationOn = '$value'", "WHERE id = '$userId'");
+            })
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,7 +118,8 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
           const SizedBox(height: 20,),
           allNotificationSetting(),
           if(widget.profil["notificationstatus"] == 1) chatNotificationSetting(),
-          if(widget.profil["notificationstatus"] == 1) eventNotificationSetting()
+          if(widget.profil["notificationstatus"] == 1) eventNotificationSetting(),
+          if(widget.profil["notificationstatus"] == 1) newFriendNotificationSetting(),
         ],
       ),
     );
