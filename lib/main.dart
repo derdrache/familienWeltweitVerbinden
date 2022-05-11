@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -143,8 +144,9 @@ class MyApp extends StatelessWidget {
         onSelectNotification: (payload) async {
           final Map<String, dynamic> payLoadMap = json.decode(payload);
 
-          if (payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
-          if (payLoadMap["typ"] == "event") changeToEvent(payLoadMap["link"]);
+          if(payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
+          if(payLoadMap["typ"] == "event") changeToEvent(payLoadMap["link"]);
+          if(payLoadMap["typ"] == "newFriend") changeToProfil(payLoadMap["link"]);
         });
 
     FirebaseMessaging.instance.getInitialMessage().then((value) {
@@ -154,6 +156,7 @@ class MyApp extends StatelessWidget {
 
         if (notificationTyp == "chat") changeToChat(pageId);
         if (notificationTyp == "event") changeToEvent(pageId);
+        if(notificationTyp == "newFriend") changeToProfil(pageId);
       }
     });
 
@@ -169,6 +172,7 @@ class MyApp extends StatelessWidget {
       if (pageContext != null) {
         if (notificationTyp == "chat") changeToChat(pageId);
         if (notificationTyp == "chat") changeToEvent(pageId);
+        if(notificationTyp == "newFriend") changeToProfil(pageId);
       }
     });
   }
@@ -186,6 +190,18 @@ class MyApp extends StatelessWidget {
 
     navigatorKey.currentState?.push(
         MaterialPageRoute(builder: (_) => EventDetailsPage(event: eventData)));
+  }
+
+  changeToProfil(profilId) async {
+    var profilData = await EventDatabase().getData("*", "WHERE id = '$profilId'");
+    var ownName = FirebaseAuth.instance.currentUser.displayName;
+
+    navigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (_) => ShowProfilPage(
+          userName: ownName,
+          profil: profilData,
+        ))
+    );
   }
 
   @override
