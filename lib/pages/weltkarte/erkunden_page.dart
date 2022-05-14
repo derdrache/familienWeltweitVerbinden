@@ -606,7 +606,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     for (var city in popupCities) {
       cityAuswahl.add(InkWell(
-        onTap: () => changePage(context, StadtinformationsPage(ort: city)),
+        onTap: () => changePage(context, StadtinformationsPage(ortName: city["names"].join(" / "))),
         child: Container(
             margin: const EdgeInsets.all(10),
             child: Text(city["names"].join(" / "))),
@@ -622,7 +622,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     if (popupCities.length == 1 && currentMapZoom >= cityZoom) {
-      changePage(context, StadtinformationsPage(ort: popupCities[0]));
+      changePage(context, StadtinformationsPage(ortName: popupCities[0].join(" / ")));
       return;
     }
 

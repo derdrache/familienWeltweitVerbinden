@@ -441,6 +441,7 @@ class EventDatabase{
 }
 
 class StadtinfoDatabase{
+
   addNewCity(city) async {
     if(city["ort"] == null ){
       city["ort"] = city["city"];
