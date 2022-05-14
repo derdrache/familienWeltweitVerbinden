@@ -251,6 +251,9 @@
     "newFriendTitle": "Neuer Freund",
     "newFriendInhalt": " hat dich als Freund hinzugefügt.",
     "friendEmailErhalten": "Neuer Freund Email erhalten",
-    "friendNotificationErhalten" : "Neuer Freund Notification erhalten"
+    "friendNotificationErhalten" : "Neuer Freund Notification erhalten",
+    "titleZuLang": "Titel ist zu lang, maximal 100 Zeichen",
+    "automatischeUebersetzung": "Dieser Text wurde automatisch übersetzt",
+    "keineFamilieStadt": "In dieser Stadt waren noch keine Familien"
 
 }

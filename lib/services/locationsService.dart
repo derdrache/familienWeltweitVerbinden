@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 import 'dart:ui';
 import 'package:geolocator/geolocator.dart';
 
@@ -70,7 +69,7 @@ class LocationService {
           }));
       dynamic responseBody = res.body;
 
-      var data = convert.jsonDecode(responseBody);
+      var data = jsonDecode(responseBody);
 
       return data;
     } catch (error) {
@@ -91,7 +90,7 @@ class LocationService {
           }));
       dynamic responseBody = res.body;
 
-      var data = convert.jsonDecode(responseBody);
+      var data = jsonDecode(responseBody);
 
       return data;
     } catch (error) {
@@ -125,7 +124,7 @@ class LocationService {
             "lng": position.longitude.toString(),
           }));
       dynamic responseBody = res.body;
-      var data = convert.jsonDecode(responseBody);
+      var data = jsonDecode(responseBody);
 
       return data["results"][0];
     } catch (error) {
@@ -165,7 +164,7 @@ class LocationService {
           }));
       dynamic responseBody = res.body;
 
-      var data = convert.jsonDecode(responseBody);
+      var data = jsonDecode(responseBody);
 
       return data;
     } catch (error) {

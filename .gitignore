@@ -49,3 +49,4 @@ app.*.map.json
 /lib/firebase_options.dart
 /lib/services/database
 /lib/services/server
+/lib/services/google
