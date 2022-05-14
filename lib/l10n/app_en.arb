@@ -251,6 +251,9 @@
     "newFriendTitle": "new friend",
     "newFriendInhalt": " has added you as friend",
     "friendEmailErhalten": "receive new friend email",
-    "friendNotificationErhalten" : "receive new friend notification"
+    "friendNotificationErhalten" : "receive new friend notification",
+    "titleZuLang": "Title is too long, max 100 characters",
+    "automatischeUebersetzung": "This text has been automatically translated",
+    "keineFamilieStadt": "There weren't any families in this town yet"
 }
 
