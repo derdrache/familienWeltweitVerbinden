@@ -55,7 +55,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       "interessierte": widget.event["interesse"] == null ? [] :widget.event["interesse"].length,
       "freigegeben": widget.event["freigegeben"] == null ? [] :widget.event["freigegeben"].length
     };
-
     getDatabaseData();
 
     super.initState();
@@ -510,8 +509,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     freigeschalteteUser(windowSetState) async{
       List<Widget>freigeschlatetList = [];
 
+
       for(var user in widget.event["freigegeben"]){
-        var profil = await ProfilDatabase().getData("name", "WHERE id = '$user'");
+        var profil = await ProfilDatabase().getData("*", "WHERE id = '$user'");
 
         freigeschlatetList.add(
             Container(
@@ -539,7 +539,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       }
 
 
+
       if(widget.event["freigegeben"].length == 0) {
+
         freigeschlatetList.add(
             Padding(
               padding: const EdgeInsets.only(top:50),

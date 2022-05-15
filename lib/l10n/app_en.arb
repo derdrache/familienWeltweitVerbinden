@@ -254,6 +254,7 @@
     "friendNotificationErhalten" : "receive new friend notification",
     "titleZuLang": "Title is too long, max 100 characters",
     "automatischeUebersetzung": "This text has been automatically translated",
-    "keineFamilieStadt": "There weren't any families in this town yet"
+    "keineFamilieStadt": "There weren't any families in this town yet",
+    "besuchtVon": "Visited by: "
 }
 
