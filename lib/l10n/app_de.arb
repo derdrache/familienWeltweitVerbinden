@@ -254,6 +254,7 @@
     "friendNotificationErhalten" : "Neuer Freund Notification erhalten",
     "titleZuLang": "Titel ist zu lang, maximal 100 Zeichen",
     "automatischeUebersetzung": "Dieser Text wurde automatisch übersetzt",
-    "keineFamilieStadt": "In dieser Stadt waren noch keine Familien"
+    "keineFamilieStadt": "In dieser Stadt waren noch keine Familien",
+    "besuchtVon": "Besucht von: "
 
 }
