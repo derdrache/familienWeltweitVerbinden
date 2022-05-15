@@ -6,11 +6,11 @@ import 'database.dart';
 
 var databaseUrl = "https://families-worldwide.com/";
 
-_sendEmail(notificationInformation) async {
-  var url = Uri.parse(databaseUrl + "services/sendEmail.php");
+sendEmail(notificationInformation) async {
+  var url = Uri.parse(databaseUrl + "services/sendEmail2.php");
   var emailAdresse = await ProfilDatabase()
       .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
-
+  emailAdresse = "dominik.mast.11@gmail.com";
   http.post(url,
       body: json.encode({
         "to": emailAdresse,
@@ -18,6 +18,7 @@ _sendEmail(notificationInformation) async {
         "inhalt": notificationInformation["inhalt"]
       }));
 }
+
 
 _sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
@@ -35,7 +36,7 @@ _sendNotification(notificationInformation) async {
 
 prepareChatNotification({chatId, vonId, toId, title, inhalt}) async {
   var dbData = await ProfilDatabase().getData(
-      "activeChat, notificationstatus, chatNotificationOn, token,",
+      "activeChat, notificationstatus, chatNotificationOn, token",
       "WHERE id = '$toId'");
   var toActiveChat = dbData["activeChat"];
   var notificationsAllowed = dbData["notificationstatus"];
@@ -65,14 +66,17 @@ prepareChatNotification({chatId, vonId, toId, title, inhalt}) async {
         (spracheIstDeutsch
             ? " hat dir eine Nachricht geschrieben"
             : " has written you a message");
-    notificationInformation["inhalt"] = "Hi $chatPartnerName,\n\n" +
-        (spracheIstDeutsch
+    notificationInformation["inhalt"] = """
+      <p>Hi $chatPartnerName, </p>
+      <p> ${(spracheIstDeutsch
             ? "du hast in der families worldwide App eine neue Nachricht von "
-                "$title erhalten \n\n"
+                "$title erhalten"
             : "you have received a new message from "
-                "$title in the families worldwide app \n\n");
+                "$title in the families worldwide app")}</p>
+    """;
 
-    _sendEmail(notificationInformation);
+
+    sendEmail(notificationInformation);
   } else {
     _sendNotification(notificationInformation);
   }
@@ -101,7 +105,7 @@ prepareEventNotification({eventId, toId, title, inhalt}) async {
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
-    _sendEmail(notificationInformation);
+    sendEmail(notificationInformation);
   } else {
     _sendNotification(notificationInformation);
   }
@@ -128,7 +132,7 @@ prepareFriendNotification({newFriendId, toId, title, inhalt}) async {
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
-    _sendEmail(notificationInformation);
+    sendEmail(notificationInformation);
   } else {
     _sendNotification(notificationInformation);
   }

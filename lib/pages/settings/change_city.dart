@@ -37,15 +37,25 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
     await ProfilDatabase().updateProfilLocation(widget.userId, locationDict);
     StadtinfoDatabase().addNewCity(locationDict);
+    StadtinfoDatabase().update(
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '${widget.userId}')",
+        "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"${widget.userId}\"') < 1"
+    );
+
+
+
   }
 
   saveLocation() async {
     var locationData = autoComplete.getGoogleLocationData();
 
+
     if(locationData["city"] == null) {
       customSnackbar(context, AppLocalizations.of(context).ortEingeben);
       return;
     }
+
+
 
     await pushLocationDataToDB(locationData);
     customSnackbar(context,

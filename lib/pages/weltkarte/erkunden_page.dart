@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../services/notification.dart';
 import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
@@ -1138,8 +1139,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           FloatingActionButton(
               heroTag: "create Stadtinformation 1",
               child: const Icon(Icons.create),
-              onPressed: () =>
-                  changePage(context, const CreateStadtinformationsPage())),
+              onPressed: () => sendEmail({"title": "test", "inhalt": "Hi Test, \n wie geht es dir?"}))//changePage(context, const CreateStadtinformationsPage())),
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

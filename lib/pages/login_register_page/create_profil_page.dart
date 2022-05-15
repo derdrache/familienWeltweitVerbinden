@@ -112,6 +112,10 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
           ProfilDatabase().addNewProfil(data);
           StadtinfoDatabase().addNewCity(ortMapData);
+          StadtinfoDatabase().update(
+              "familien = JSON_ARRAY_APPEND(familien, '\$', '$userID')",
+              "WHERE ort LIKE '${ortMapData["city"]}' AND JSON_CONTAINS(familien, '\"$userID\"') < 1"
+          );
           global_functions.changePageForever(context, StartPage());
         } else {
           customSnackbar(context, AppLocalizations.of(context).ortEingeben);

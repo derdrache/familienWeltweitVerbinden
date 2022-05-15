@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,8 @@ import 'package:hive/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../global/global_functions.dart';
+import '../../global/variablen.dart';
 import '../../services/translation.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
@@ -99,38 +102,44 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     return data;
   }
 
-  showFamilyVisitWindow(){
+  showFamilyVisitWindow() {
     var allProfils = Hive.box("profilBox").get("list");
     List<Widget> familiesList = [];
 
-    if(cityInformation["familien"].length == 0){
-      familiesList.add(
-          Text(AppLocalizations.of(context).keineFamilieStadt)
-      );
-    } else{
-      for(var family in cityInformation["familien"]){
-        var name = "";
-        for(var profil in allProfils){
-
-          if(profil["id"] == family){
-            name = profil["name"];
-            familiesList.add(
-                Text(name)
-            );
-            break;
-          }
+    for (var family in cityInformation["familien"]) {
+      var name = "";
+      for (var profil in allProfils) {
+        if (profil["id"] == family) {
+          name = profil["name"];
+          familiesList.add(
+              InkWell(
+                onTap: () => changePage(context, ShowProfilPage(userName: name, profil: profil)),
+                child: Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(name, style: TextStyle(fontSize: 20),)
+                ),
+              )
+          );
+          break;
         }
-
       }
+    }
+
+    if (familiesList.isEmpty) {
+      familiesList.add(Container(
+          margin: const EdgeInsets.all(10),
+          child: Text(AppLocalizations.of(context).keineFamilieStadt)));
+    } else {
+      familiesList.add(SizedBox(height: 10));
     }
 
     Future<void>.delayed(
         const Duration(),
-            () => showDialog(
+        () => showDialog(
             context: context,
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
-                  title: "",
+                  title: AppLocalizations.of(context).besuchtVon,
                   children: familiesList);
             }));
   }
@@ -162,10 +171,9 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                         TextButton(
                           child: Text(AppLocalizations.of(context).speichern),
                           onPressed: () => changeInformation(
-                            information: information,
-                            newTitle: titleTextKontroller.text,
-                            newInformation: informationTextKontroller.text
-                          ),
+                              information: information,
+                              newTitle: titleTextKontroller.text,
+                              newInformation: informationTextKontroller.text),
                         ),
                         TextButton(
                           child: Text(AppLocalizations.of(context).abbrechen),
@@ -197,14 +205,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     Navigator.pop(context);
 
     setState(() {
-      usersCityInformation[information["index"]]["title"] =
-          newTitle;
+      usersCityInformation[information["index"]]["title"] = newTitle;
       usersCityInformation[information["index"]]["information"] =
           newInformation;
     });
 
-    var textLanguage =
-        await TranslationServices().getLanguage(newTitle.text);
+    var textLanguage = await TranslationServices().getLanguage(newTitle.text);
 
     if (textLanguage == "en") {
       titleEng = newTitle.text;
@@ -218,8 +224,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       informationGer = newInformation;
       titleEng = "";
       informationEng = "";
-      titleEng = await TranslationServices()
-          .getTextTranslation(newTitle, "de", "en");
+      titleEng =
+          await TranslationServices().getTextTranslation(newTitle, "de", "en");
       informationEng = await TranslationServices()
           .getTextTranslation(newInformation, "de", "en");
     }
@@ -309,10 +315,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     var showInformation = "";
     var tranlsationIn;
     var ownlanguages = Hive.box("ownProfilBox").get("list")["sprachen"];
-    var informationLanguage = information["sprache"] == "de" ?
-      ["Deutsch", "german"] : ["Englisch", "english"];
+    var informationLanguage = information["sprache"] == "de"
+        ? ["Deutsch", "german"]
+        : ["Englisch", "english"];
     bool canSpeakInformationLanguage =
-        ownlanguages.contains(informationLanguage[0]) || ownlanguages.contains(informationLanguage[1]);
+        ownlanguages.contains(informationLanguage[0]) ||
+            ownlanguages.contains(informationLanguage[1]);
 
     if (information["titleGer"].isEmpty) {
       return {
@@ -358,8 +366,6 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
   Widget build(BuildContext context) {
     usersCityInformation = sortThumb(usersCityInformation);
 
-
-
     allgemeineInfoBox() {
       String internetSpeedText = cityInformation["internet"] == null
           ? "?"
@@ -384,66 +390,74 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       }
 
       return Container(
-        margin: const EdgeInsets.all(10),
         width: double.infinity,
+        margin: const EdgeInsets.all(10),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             AppLocalizations.of(context).allgemeineInformation,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          if (cityInformation["kosten"] != null) const SizedBox(height: 20),
-          if (cityInformation["kosten"] != null)
-            Row(
-              children: [
-                Icon(
-                  Icons.monetization_on_outlined,
-                  color: setCostIconColor(cityInformation["kosten"]),
-                ),
-                const SizedBox(width: 5),
-                const Text("Kosten: "),
-                const SizedBox(width: 5),
-                Text("\$ " * cityInformation["kosten"])
-              ],
-            ),
-          if (cityInformation["internet"] != null) const SizedBox(height: 10),
-          if (cityInformation["internet"] != null)
-            Row(
-              children: [
-                Icon(Icons.network_check_outlined,
-                    color: setInternetIconColor(cityInformation["internet"])),
-                const SizedBox(width: 5),
-                const Text("Internet: "),
-                const SizedBox(width: 5),
-                Text("Ø $internetSpeedText Mbps")
-              ],
-            ),
-          if (cityInformation["wetter"] != null) const SizedBox(height: 10),
-          if (cityInformation["wetter"] != null)
-            Row(
-              children: [
-                const Icon(Icons.thermostat),
-                const SizedBox(width: 5),
-                Text(AppLocalizations.of(context).wetter),
-                const SizedBox(width: 10),
-                Flexible(
-                    child: InkWell(
-                        onTap: () => launch(cityInformation["wetter"]),
-                        child: Text(cityInformation["wetter"],
-                            style: const TextStyle(color: Colors.blue),
-                            overflow: TextOverflow.ellipsis)))
-              ],
-            ),
           const SizedBox(height: 10),
+          if (cityInformation["kosten"] != null)
+            Container(
+              margin: const EdgeInsets.all(5),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.monetization_on_outlined,
+                    color: setCostIconColor(cityInformation["kosten"]),
+                  ),
+                  const SizedBox(width: 5),
+                  const Text("Kosten: "),
+                  const SizedBox(width: 5),
+                  Text("\$ " * cityInformation["kosten"])
+                ],
+              ),
+            ),
+          if (cityInformation["internet"] != null)
+            Container(
+              margin: const EdgeInsets.all(5),
+              child: Row(
+                children: [
+                  Icon(Icons.network_check_outlined,
+                      color: setInternetIconColor(cityInformation["internet"])),
+                  const SizedBox(width: 5),
+                  const Text("Internet: "),
+                  const SizedBox(width: 5),
+                  Text("Ø $internetSpeedText Mbps")
+                ],
+              ),
+            ),
+          if (cityInformation["wetter"] != null)
+            Container(
+              margin: const EdgeInsets.all(5),
+              child: Row(
+                children: [
+                  const Icon(Icons.thermostat),
+                  const SizedBox(width: 5),
+                  Text(AppLocalizations.of(context).wetter),
+                  Flexible(
+                      child: InkWell(
+                          onTap: () => launch(cityInformation["wetter"]),
+                          child: Text(cityInformation["wetter"],
+                              style: const TextStyle(color: Colors.blue),
+                              overflow: TextOverflow.ellipsis)))
+                ],
+              ),
+            ),
           InkWell(
             onTap: () => showFamilyVisitWindow(),
-            child: Row(
-              children: [
-                const Icon(Icons.family_restroom),
-                const SizedBox(width: 5),
-                Text(AppLocalizations.of(context).besuchtVon +
-                    cityInformation["familien"].length.toString() +
-                    AppLocalizations.of(context).familien),
-              ],
+            child: Container(
+              margin: const EdgeInsets.all(5),
+              child: Row(
+                children: [
+                  const Icon(Icons.family_restroom),
+                  const SizedBox(width: 5),
+                  Text(AppLocalizations.of(context).besuchtVon +
+                      cityInformation["familien"].length.toString() +
+                      AppLocalizations.of(context).familien),
+                ],
+              ),
             ),
           ),
         ]),

@@ -143,6 +143,11 @@ class _StartPageState extends State<StartPage> {
           .getDatabaseLocationdataFromGoogleResult(geoData);
 
       ProfilDatabase().updateProfilLocation(userId, locationData);
+      StadtinfoDatabase().addNewCity(locationData);
+      StadtinfoDatabase().update(
+          "familien = JSON_ARRAY_APPEND(familien, '\$', '${userId}')",
+          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"${userId}\"') < 1"
+      );
 
     }
   }
