@@ -252,6 +252,9 @@
     "keineFamilieStadt": "There weren't any families in this town yet",
     "besuchtVon": "Visited by: ",
     "genauerStandort": "exact location",
-    "insiderInformationEingetragen": "Your city information has been entered"
+    "insiderInformationEingetragen": "Your city information has been entered",
+    "verkaufenTauschenSchenken": "Sell / Exchange / Give",
+    "tradeHintText": "We sell... \nWe trade... \nWe give away...\n",
+    "tradeVeraendern": "sell/trade/give away change"
 }
 
