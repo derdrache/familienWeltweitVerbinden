@@ -328,20 +328,40 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     aboutmeBox() {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context).ueberMich + ": ",
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
-          ),
-          Flexible(
-            child: Text(
+      return Container(
+        margin: EdgeInsets.only(bottom:10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).ueberMich + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            Text(
               widget.profil["aboutme"],
               style: TextStyle(fontSize: textSize),
+            )
+          ],
+        ),
+      );
+    }
+
+    tradeNotizeBox() {
+      return Container(
+        margin: EdgeInsets.only(bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).verkaufenTauschenSchenken + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
-          )
-        ],
+            Text(
+                widget.profil["tradeNotize"],
+                style: TextStyle(fontSize: textSize),
+              ),
+          ],
+        ),
       );
     }
 
@@ -378,7 +398,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               SizedBox(height: columnAbstand),
               interessenBox(),
               SizedBox(height: columnAbstand),
-              if (widget.profil["aboutme"].isNotEmpty) aboutmeBox()
+              if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
+              if(widget.profil["tradeNotize"].isNotEmpty) tradeNotizeBox()
             ],
           ));
     }
