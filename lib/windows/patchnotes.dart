@@ -19,11 +19,11 @@ class PatchnotesWindow{
     List<Widget> patchList = [];
 
     for(var inhalt in patch["inhalt"]){
-      patchList.add(SizedBox(height: 10));
+      patchList.add(const SizedBox(height: 10));
       patchList.add(Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("- "),
+          const Text("- "),
           Flexible(
               child: Text(inhalt,overflow: TextOverflow.visible,))
         ],
@@ -31,18 +31,18 @@ class PatchnotesWindow{
     }
 
     return Container(
-      margin: EdgeInsets.only(top: 15, left: 10, right: 5, bottom: 15),
+      margin: const EdgeInsets.only(top: 15, left: 10, right: 5, bottom: 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               patch["title"],
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             ...patchList
           ],
         )
@@ -58,6 +58,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch130D),
                 _patch(patch123D),
                 _patch(patch122D),
                 _patch(patch121D),
@@ -70,6 +71,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch130E),
                 _patch(patch123E),
                 _patch(patch122E),
                 _patch(patch121E),
@@ -92,6 +94,28 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch130E={
+  "title" : "1.3.0",
+  "inhalt": [
+
+  ]
+};
+var patch130D={
+  "title" : "1.3.0",
+  "inhalt": [
+    "Weltkarte - Stadtinformationen wurden eingebaut",
+    "Weltkarte - Es wurden neue Buttons eingebaut um Freunde und Events auf der Karte anzuzeigen",
+    "Weltkarte - Es kann jetzt auch noch Städte gefiltert werden",
+    "Weltkarte Fehlerbehebung - Das Filtern funktioniert jetzt auch bei der ersten Eingabe",
+    "Settings - Es gibt jetzt die Möglichkeit den Standort automatisch updaten zu lassen",
+    "Profil Sprachen erweiterung - Italienisch kann jetzt ausgewählt werden",
+    "Profil erweiterung - Neuer Reiter: Verkaufen / Tauschen / Verschenken"
+    "verschiedene kleine Style-Anpassungen",
+    "verschiedene kleine Fehlerbehebungen",
+    "verschiedene kleine Verbesserungen"
   ]
 };
 

@@ -102,14 +102,16 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return SimpleDialogOption(
           child: Row(
             children: [
-              onFriendlist ? const Icon(Icons.person_remove): const Icon(Icons.person_add),
+              onFriendlist
+                  ? const Icon(Icons.person_remove)
+                  : const Icon(Icons.person_add),
               SizedBox(width: 10),
-              onFriendlist ?
-              Text(AppLocalizations.of(context).freundEntfernen) :
-              Text(AppLocalizations.of(context).freundHinzufuegen),
+              onFriendlist
+                  ? Text(AppLocalizations.of(context).freundEntfernen)
+                  : Text(AppLocalizations.of(context).freundHinzufuegen),
             ],
           ),
-          onPressed: (){
+          onPressed: () {
             var snackbarText = "";
 
             if (onFriendlist) {
@@ -125,10 +127,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               prepareFriendNotification(
                   newFriendId: userID,
                   toId: widget.profil["id"],
-                  title: AppLocalizations.of(context).newFriendTitle,
-                  inhalt: FirebaseAuth.instance.currentUser.displayName +
-                      AppLocalizations.of(context).newFriendInhalt
-              );
+                  toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
+                      widget.profil["sprachen"].contains("german"));
             }
 
             var ownProfilBox = Hive.box("ownProfilBox");
@@ -144,21 +144,18 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 "friendlist = '${jsonEncode(userFriendlist)}'",
                 "WHERE id = '$userID'");
 
-
-
             Navigator.pop(context);
             setState(() {});
-          }
-      );
+          });
     }
 
-    moreMenuButton(){
+    moreMenuButton() {
       return IconButton(
         icon: Icon(Icons.more_vert),
-        onPressed: (){
+        onPressed: () {
           showDialog(
               context: context,
-              builder: (BuildContext context){
+              builder: (BuildContext context) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -166,21 +163,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                       width: 220,
                       child: SimpleDialog(
                         contentPadding: EdgeInsets.zero,
-                        insetPadding: const EdgeInsets.only(top:40, left: 0, right:10),
-                        children: [
-                          friendlistButton()
-                        ],
+                        insetPadding:
+                            const EdgeInsets.only(top: 40, left: 0, right: 10),
+                        children: [friendlistButton()],
                       ),
                     ),
                   ],
                 );
-              }
-          );
+              });
         },
       );
     }
-
-
 
     titelBox() {
       return Container(

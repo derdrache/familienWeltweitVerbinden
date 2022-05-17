@@ -10,7 +10,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../../services/notification.dart';
 import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
@@ -655,6 +654,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
+    var genauerStandortBezeichnung = AppLocalizations.of(context).genauerStandort;
     ownProfil = Hive.box("ownProfilBox").get("list");
     double screenWidth = MediaQuery.of(context).size.width;
     var eventCrossAxisCount = screenWidth / 190;
@@ -706,6 +706,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       for (var profil in profils) {
         if (profil["name"] != null) selectUserProfils.add(profil);
+        if(profil["ort"].isEmpty) profil["ort"] = genauerStandortBezeichnung;
       }
 
       popupItems.add(SliverAppBar(
@@ -1139,7 +1140,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
           FloatingActionButton(
               heroTag: "create Stadtinformation 1",
               child: const Icon(Icons.create),
-              onPressed: () => sendEmail({"title": "test", "inhalt": "Hi Test, \n wie geht es dir?"}))//changePage(context, const CreateStadtinformationsPage())),
+              onPressed: () => changePage(context, const CreateStadtinformationsPage())
+          ),
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
