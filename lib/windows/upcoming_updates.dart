@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../global/custom_widgets.dart';
 import '../widgets/dialogWindow.dart';
 
 class UmcomingUpdatesWindow{
@@ -37,7 +36,6 @@ class UmcomingUpdatesWindow{
                 _update(AppLocalizations.of(context).eventsOrganisationstools),
                 _update(AppLocalizations.of(context).reisePlanung),
                 _update(AppLocalizations.of(context).gemeinschaftenUpdate),
-                _update(AppLocalizations.of(context).freundeUpdate),
                 _update(AppLocalizations.of(context).chatgruppen),
                 _update(AppLocalizations.of(context).newsBoard),
                 _update(AppLocalizations.of(context).anonymeAnmelden),
