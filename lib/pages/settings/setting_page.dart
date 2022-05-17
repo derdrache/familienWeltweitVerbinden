@@ -29,6 +29,7 @@ import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
 import 'change_aufreise.dart';
 import 'change_children.dart';
+import 'change_trade.dart';
 import 'privacy_security_page.dart';
 import 'feedback_page.dart';
 import 'change_city.dart';
@@ -56,6 +57,7 @@ class _SettingPageState extends State<SettingPage> {
   var interessenInputBox = CustomMultiTextForm(
       auswahlList: global_variablen.interessenListe);
   var bioTextKontroller = TextEditingController();
+  var tradeTextKontroller = TextEditingController();
   var emailTextKontroller = TextEditingController();
   var emailNewTextKontroller = TextEditingController();
   var passwortTextKontroller1 = TextEditingController();
@@ -250,14 +252,16 @@ class _SettingPageState extends State<SettingPage> {
             MaterialPageRoute(builder: (_) => page)
         ).whenComplete(() => setState(() {})),
         child: Container(
-            padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
+            padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding, right: 10),
             width: fullWidth ? screenWidth :screenWidth /2 -20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 haupttext == ""? const CircularProgressIndicator() : Text(
                   haupttext,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(fontSize: fontSize-4),
                 ),
                 const SizedBox(height: 3),
@@ -349,15 +353,19 @@ class _SettingPageState extends State<SettingPage> {
                         aufreiseBis: userProfil["aufreiseBis"] == null ? null : DateTime.parse(userProfil["aufreiseBis"]),
                         isGerman: spracheIstDeutsch
                       )
+                  ),
+                  profilThemeContainer(bioTextKontroller.text== ""? " \n": bioTextKontroller.text,
+                      AppLocalizations.of(context).ueberMich,
+                      ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller)
+                  ),
+                  profilThemeContainer(tradeTextKontroller.text== ""? " \n": tradeTextKontroller.text,
+                      AppLocalizations.of(context).verkaufenTauschenSchenken,
+                      ChangeTradePage(textKontroller: tradeTextKontroller)
                   )
 
                 ],
               ),
-              profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
-                  AppLocalizations.of(context).ueberMich,
-                ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller),
-                true
-              )
+
             ],
           )
       );

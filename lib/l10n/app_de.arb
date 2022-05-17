@@ -252,5 +252,8 @@
     "keineFamilieStadt": "In dieser Stadt waren noch keine Familien",
     "besuchtVon": "Besucht von: ",
     "genauerStandort": "genauer Standort",
-    "insiderInformationEingetragen": "Deine Information zur Stadt wurde eingetragen"
+    "insiderInformationEingetragen": "Deine Information zur Stadt wurde eingetragen",
+    "verkaufenTauschenSchenken": "Verkaufen / Tauschen / Schenken",
+    "tradeHintText": "Wir verkaufen... \nWir tauschen... \nWir verschenken...\n",
+    "tradeVeraendern": "Verkaufen/tauschen/verschenken verändern"
 }
