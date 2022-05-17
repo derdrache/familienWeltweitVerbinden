@@ -309,7 +309,6 @@ class ChatDatabase{
       chatId: chatID,
       vonId: messageData["von"],
       toId: messageData["zu"],
-      title: messageData["title"],
       inhalt: messageData["message"]
     );
   }
@@ -449,7 +448,7 @@ class StadtinfoDatabase{
     if(! await _checkIfNew(city)) return;
 
     var url = Uri.parse(databaseUrl + "database/stadtinfo/newCity.php");
-    http.post(url, body: json.encode(city));
+    await http.post(url, body: json.encode(city));
   }
 
   getData(whatData, queryEnd, {returnList = false}) async {
@@ -498,13 +497,12 @@ class StadtinfoDatabase{
   update(whatData, queryEnd) async  {
     var url = Uri.parse(databaseUrl + "database/update.php");
 
-    var test = await http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "table": "stadtinfo",
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
 
-    print(test.body);
 
   }
 

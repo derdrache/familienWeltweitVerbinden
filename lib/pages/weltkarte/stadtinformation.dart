@@ -10,7 +10,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
-import '../../global/variablen.dart';
 import '../../services/translation.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
@@ -111,15 +110,16 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       for (var profil in allProfils) {
         if (profil["id"] == family) {
           name = profil["name"];
-          familiesList.add(
-              InkWell(
-                onTap: () => changePage(context, ShowProfilPage(userName: name, profil: profil)),
-                child: Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(name, style: TextStyle(fontSize: 20),)
-                ),
-              )
-          );
+          familiesList.add(InkWell(
+            onTap: () => changePage(
+                context, ShowProfilPage(userName: name, profil: profil)),
+            child: Container(
+                padding: const EdgeInsets.all(10),
+                child: Text(
+                  name,
+                  style: const TextStyle(fontSize: 20),
+                )),
+          ));
           break;
         }
       }
@@ -130,7 +130,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
           margin: const EdgeInsets.all(10),
           child: Text(AppLocalizations.of(context).keineFamilieStadt)));
     } else {
-      familiesList.add(SizedBox(height: 10));
+      familiesList.add(const SizedBox(height: 10));
     }
 
     Future<void>.delayed(

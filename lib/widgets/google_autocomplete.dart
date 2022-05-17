@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -15,7 +13,7 @@ class GoogleAutoComplete extends StatefulWidget {
   bool suche;
   String hintText;
   var googleSearchResult;
-  var sessionToken = Uuid().v4();
+  var sessionToken = const Uuid().v4();
 
   getGoogleLocationData(){
     return googleSearchResult ?? {
@@ -107,7 +105,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
             widget.googleSearchResult = await getGoogleSearchLocationData(item["place_id"]);
         },
         child: Container(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             height: 40,
             decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: global_var.borderColorGrey))
@@ -126,9 +124,9 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
 
       return Container(
         height: dropdownItemSumHeight,
-        margin: EdgeInsets.only(top: 0),
+        margin: const EdgeInsets.only(top: 0),
         child: ListView(
-          padding: EdgeInsets.only(top: 5),
+          padding: const EdgeInsets.only(top: 5),
           children: autoCompleteList,
         ),
       );
@@ -138,15 +136,14 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
       width: 600,
       decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5)),
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
           border: Border.all()
       ),
       height:  dropdownExtraBoxHeight + dropdownItemSumHeight,
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       //padding: EdgeInsets.only(left: 5),
       child:Stack(
-        overflow: Overflow.visible,
-        children: [
+        clipBehavior: Clip.none, children: [
           Column(
             children: [
               Padding(
@@ -158,7 +155,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                         isDense: widget.isDense,
                         border: InputBorder.none,
                         hintText: widget.hintText,
-                        hintStyle: TextStyle(fontSize: 13, color: Colors.grey)
+                        hintStyle: const TextStyle(fontSize: 13, color: Colors.grey)
                     ),
                     style: const TextStyle(),
                     onChanged: (value) async {
@@ -175,7 +172,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
 
             ],
           ),
-          Positioned(
+          const Positioned(
               right: 15,
               top: 12,
               child: Icon(Icons.search, size: 25, color: Colors.black,)

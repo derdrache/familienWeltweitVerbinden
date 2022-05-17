@@ -184,8 +184,6 @@
     "eventUebergebenAn2": " übergeben",
     "uebertragen": "Übertragen",
     "organisatorAbgeben": "Organisator abgeben",
-    "eventFreigeben": "Event Freigabe",
-    "zugriffFolgendesEvent": "Du hast jetzt Zugriff auf folgendes Event: ",
     "hatDirNachrichtGeschrieben": " hat dir eine Nachricht geschrieben",
     "eventZeitzoneAendern": "Event Zeitzone ändern",
     "zeitzone": "Zeitzone: ",
@@ -196,7 +194,6 @@
     "onlineEvents": "Online Events",
     "eventsOrganisationstools": "Events Organisationstools",
     "newsBoard": "News Board",
-    "freundeUpdate": "Freunde-Erweiterung",
     "loginMitGoogle": "Login mit Google",
     "alleEvents": "Alle Events",
     "ueber": "Über",
@@ -248,13 +245,12 @@
     "accountWirklichLoeschen": "Möchtest du den Account wirklich löschen?",
     "freundHinzufuegen": "Freund hinzufügen",
     "freundEntfernen": "Freund entfernen",
-    "newFriendTitle": "Neuer Freund",
-    "newFriendInhalt": " hat dich als Freund hinzugefügt.",
     "friendEmailErhalten": "Neuer Freund Email erhalten",
     "friendNotificationErhalten" : "Neuer Freund Notification erhalten",
     "titleZuLang": "Titel ist zu lang, maximal 100 Zeichen",
     "automatischeUebersetzung": "Dieser Text wurde automatisch übersetzt",
     "keineFamilieStadt": "In dieser Stadt waren noch keine Familien",
-    "besuchtVon": "Besucht von: "
-
+    "besuchtVon": "Besucht von: ",
+    "genauerStandort": "genauer Standort",
+    "insiderInformationEingetragen": "Deine Information zur Stadt wurde eingetragen"
 }
