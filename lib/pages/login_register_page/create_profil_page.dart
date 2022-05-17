@@ -111,8 +111,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           };
 
           ProfilDatabase().addNewProfil(data);
-          StadtinfoDatabase().addNewCity(ortMapData);
-          StadtinfoDatabase().update(
+          await StadtinfoDatabase().addNewCity(ortMapData);
+          await StadtinfoDatabase().update(
               "familien = JSON_ARRAY_APPEND(familien, '\$', '$userID')",
               "WHERE ort LIKE '${ortMapData["city"]}' AND JSON_CONTAINS(familien, '\"$userID\"') < 1"
           );

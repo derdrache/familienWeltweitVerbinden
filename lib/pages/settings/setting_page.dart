@@ -78,7 +78,8 @@ class _SettingPageState extends State<SettingPage> {
 
     nameTextKontroller.text = userProfil["name"];
     emailTextKontroller.text = userProfil["email"];
-    ortKontroller.text = userProfil["ort"];
+    ortKontroller.text = userProfil["ort"].isEmpty ?
+      AppLocalizations.of(context).genauerStandort : userProfil["ort"];
     interessenInputBox.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["interessen"]):
       global_func.changeGermanToEnglish(userProfil["interessen"]);

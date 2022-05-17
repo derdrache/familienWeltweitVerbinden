@@ -103,8 +103,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     prepareEventNotification(
       toId: user,
       eventId: eventId,
-      title: AppLocalizations.of(context).eventFreigeben,
-      inhalt: AppLocalizations.of(context).zugriffFolgendesEvent + widget.event["name"]
+      eventName: widget.event["name"],
     );
      
   }
@@ -117,7 +116,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     });
 
     var freigegebenList = await EventDatabase()
-        .getData("freigegeben", "WHERE id = '$eventId");
+        .getData("freigegeben", "WHERE id = '$eventId'");
     freigegebenList.remove(user);
     EventDatabase().update(
         "freigegeben = '${json.encode(freigegebenList)}'",
