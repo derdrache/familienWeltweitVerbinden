@@ -55,7 +55,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   List<Widget> popupItems = [];
   List popupCities = [];
   var lastEventPopup;
-  var monthsUntilInactive = 6;
+  var monthsUntilInactive = 3;
   bool friendMarkerOn = false, eventMarkerOn = false;
 
   @override
@@ -118,9 +118,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   getProfilsDB() async {
     List<dynamic> dbProfils = await ProfilDatabase().getData(
-        "id, name, land, interessen, kinder, latt, longt, ort, reiseart,"
-            "sprachen, aboutme, friendlist, emailAnzeigen, bild, bildStandardFarbe,"
-            "lastLogin, aufreiseSeit, aufreiseBis",
+        "*",
         "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
 

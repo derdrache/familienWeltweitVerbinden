@@ -9,11 +9,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:in_app_update/in_app_update.dart';
 
 import '../global/variablen.dart';
 import '../services/locationsService.dart';
 import '../widgets/badge_icon.dart';
+import '../windows/patchnotes.dart';
 import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
@@ -33,6 +33,7 @@ class _StartPageState extends State<StartPage> {
   var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
   PackageInfo packageInfo;
   var hasInternet = true;
+  var ownProfilBox = Hive.box("ownProfilBox");
 
   @override
   void initState() {
@@ -44,27 +45,15 @@ class _StartPageState extends State<StartPage> {
   _asyncMethod() async {
     await setHiveBoxen();
 
-    checkFlexibleUpdate();
-
     checkAndUpdateProfil();
+
+    showPatchnotes();
+
   }
 
   setHiveBoxen() async {
-    var ownProfilBox = Hive.box("ownProfilBox");
-
     var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
     ownProfilBox.put("list", ownProfil);
-  }
-
-  checkFlexibleUpdate() async {
-    try {
-      var updateInformation = await InAppUpdate.checkForUpdate();
-      if (updateInformation.updateAvailability ==
-              UpdateAvailability.updateAvailable &&
-          !kIsWeb) {
-        InAppUpdate.startFlexibleUpdate();
-      }
-    } catch (_) {}
   }
 
   checkAndUpdateProfil() async {
@@ -97,6 +86,16 @@ class _StartPageState extends State<StartPage> {
 
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
+  }
+
+  showPatchnotes() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var buildNumber = int.parse(packageInfo.buildNumber);
+
+    if(ownProfilBox.get("version") == null || buildNumber > ownProfilBox.get("version")){
+      PatchnotesWindow(context: context).openWindow();
+      ownProfilBox.put("version", buildNumber);
+    }
   }
 
   setAutomaticLoaction(automaticLocationStatus) async {
@@ -137,16 +136,14 @@ class _StartPageState extends State<StartPage> {
 
       var geoData = await LocationService().getLocationGeoData(newLocation);
 
-      //var geoData = {"candidates": [{"formatted_address": "Calarreona, Spain", "geometry": {"location": {"lat": 37.3833412, "lng": -1.6211373}, "viewport": {"northeast": {"lat": 37.3848616, "lng": -1.61708}, "southwest": {"lat": 37.38210979999999, "lng": -1.622294}}}}, {"formatted_address": "30889 Calarreona, Murcia, Spain", "geometry": {"location": {"lat": 37.3870332, "lng": -1.6196208}, "viewport": {"northeast": {"lat": 37.3899129, "lng": -1.6161955}, "southwest": {"lat": 37.3838421, "lng": -1.6231069}}}}], "status": "OK"};
-
       var locationData = await LocationService()
           .getDatabaseLocationdataFromGoogleResult(geoData);
 
       ProfilDatabase().updateProfilLocation(userId, locationData);
       StadtinfoDatabase().addNewCity(locationData);
       StadtinfoDatabase().update(
-          "familien = JSON_ARRAY_APPEND(familien, '\$', '${userId}')",
-          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"${userId}\"') < 1"
+          "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
+          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
       );
 
     }
