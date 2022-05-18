@@ -96,8 +96,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                   child: const Text("Ok"),
                   onPressed: (){
                     var userId = FirebaseAuth.instance.currentUser?.uid;
-                    var test = ProfilDatabase().deleteProfil(userId);
-                    if(test == false) customSnackbar(context, "Fehler aufgetreten");
+                    ProfilDatabase().deleteProfil(userId);
                     setState(() {});
                     global_functions.changePageForever(context, const LoginPage());
                   },
