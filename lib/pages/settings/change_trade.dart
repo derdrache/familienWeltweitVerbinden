@@ -14,41 +14,35 @@ class ChangeTradePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-
-    saveButton(){
+    saveButton() {
       return IconButton(
           icon: const Icon(Icons.done),
           onPressed: () async {
-            await ProfilDatabase().updateProfil("tradeNotize = '${textKontroller.text}'",
+            await ProfilDatabase().updateProfil(
+                "tradeNotize = '${textKontroller.text}'",
                 "WHERE id = '$userId'");
-            customSnackbar(context,
-                AppLocalizations.of(context).verkaufenTauschenSchenken + " "+
-                    AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+            customSnackbar(
+                context,
+                AppLocalizations.of(context).verkaufenTauschenSchenken +
+                    " " +
+                    AppLocalizations.of(context).erfolgreichGeaender,
+                color: Colors.green);
             Navigator.pop(context);
-          }
-      );
+          });
     }
 
     return Scaffold(
         appBar: CustomAppBar(
             title: AppLocalizations.of(context).tradeVeraendern,
-            buttons: [saveButton()]
-        ),
+            buttons: [saveButton()]),
         body: Column(
           children: [
             customTextInput(
                 AppLocalizations.of(context).verkaufenTauschenSchenken,
                 textKontroller,
                 moreLines: 10,
-                hintText: AppLocalizations.of(context).tradeHintText
-            )
+                hintText: AppLocalizations.of(context).tradeHintText)
           ],
-        )
-
-
-    );
+        ));
   }
 }
-
-

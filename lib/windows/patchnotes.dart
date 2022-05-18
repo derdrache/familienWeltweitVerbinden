@@ -100,7 +100,16 @@ var patchVorlage={
 var patch130E={
   "title" : "1.3.0",
   "inhalt": [
-
+    "World map - city information has been incorporated",
+    "World Map - new buttons have been added to show friends and events on the map",
+    "World Map - it is now possible to filter cities",
+    "World map bug fix - filtering now works on first entry",
+    "Settings - there is now an option to have the location updated automatically",
+    "Profile languages extension - italian can now be selected",
+    "Profile extension - new tab: sell / trade / give away",
+    "various small style adjustments",
+    "various small bug fixes",
+    "various small improvements"
   ]
 };
 var patch130D={
@@ -111,8 +120,8 @@ var patch130D={
     "Weltkarte - Es kann jetzt auch noch Städte gefiltert werden",
     "Weltkarte Fehlerbehebung - Das Filtern funktioniert jetzt auch bei der ersten Eingabe",
     "Settings - Es gibt jetzt die Möglichkeit den Standort automatisch updaten zu lassen",
-    "Profil Sprachen erweiterung - Italienisch kann jetzt ausgewählt werden",
-    "Profil erweiterung - Neuer Reiter: Verkaufen / Tauschen / Verschenken"
+    "Profil Sprachen Erweiterung - Italienisch kann jetzt ausgewählt werden",
+    "Profil Erweiterung - Neuer Reiter: Verkaufen / Tauschen / Verschenken"
     "verschiedene kleine Style-Anpassungen",
     "verschiedene kleine Fehlerbehebungen",
     "verschiedene kleine Verbesserungen"

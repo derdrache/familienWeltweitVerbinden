@@ -337,6 +337,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               AppLocalizations.of(context).ueberMich + ": ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 5),
             Text(
               widget.profil["aboutme"],
               style: TextStyle(fontSize: textSize),
@@ -356,6 +357,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               AppLocalizations.of(context).verkaufenTauschenSchenken + ": ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 5),
             Text(
                 widget.profil["tradeNotize"],
                 style: TextStyle(fontSize: textSize),
@@ -366,6 +368,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     infoProfil() {
+      print(widget.profil);
       return Container(
           padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
           decoration: BoxDecoration(
@@ -398,7 +401,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               SizedBox(height: columnAbstand),
               interessenBox(),
               SizedBox(height: columnAbstand),
-              if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
+              if(widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
               if(widget.profil["tradeNotize"].isNotEmpty) tradeNotizeBox()
             ],
           ));
