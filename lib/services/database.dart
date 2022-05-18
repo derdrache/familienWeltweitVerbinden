@@ -172,7 +172,6 @@ class ProfilDatabase{
     Hive.box("stadtinfoUserBox").deleteFromDisk();
     Hive.box("stadtinfoBox").deleteFromDisk();
 
-
   }
 
 }

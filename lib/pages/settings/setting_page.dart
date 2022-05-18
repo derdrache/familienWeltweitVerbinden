@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:familien_suche/widgets/dialogWindow.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
@@ -90,10 +89,10 @@ class _SettingPageState extends State<SettingPage> {
 
     reiseArtInput.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["reiseart"]):
-      global_func.changeGermanToEnglish(userProfil["reiseart"]);;
+      global_func.changeGermanToEnglish(userProfil["reiseart"]);
     sprachenInputBox.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["sprachen"]):
-      global_func.changeGermanToEnglish(userProfil["sprachen"]);;
+      global_func.changeGermanToEnglish(userProfil["sprachen"]);
 
     }
 
@@ -161,9 +160,9 @@ class _SettingPageState extends State<SettingPage> {
           return CustomAlertDialog(
             title: "families worldwide app",
             children: [
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text("Version: " +  packageInfo.version),
-              SizedBox(height: 20)
+              const SizedBox(height: 20)
             ],
           );
         });
@@ -193,7 +192,7 @@ class _SettingPageState extends State<SettingPage> {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
     menuBar(){
-      return Container(
+      return SizedBox(
         height: 70,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -228,7 +227,7 @@ class _SettingPageState extends State<SettingPage> {
                 Row(
                   children: [
                     ProfilImage(userProfil, changeable: true, fullScreenWindow: true),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Flexible(
                       child: Text(
                         nameTextKontroller.text,
@@ -304,7 +303,7 @@ class _SettingPageState extends State<SettingPage> {
                         ShowProfilPage(profil: userProfil, ownProfil: true)
                     );
                   },
-                  child: Icon(Icons.preview, size: 35,)
+                  child: const Icon(Icons.preview, size: 35,)
                 )
               ]),
               const SizedBox(height: 5),
@@ -354,11 +353,11 @@ class _SettingPageState extends State<SettingPage> {
                         isGerman: spracheIstDeutsch
                       )
                   ),
-                  profilThemeContainer(bioTextKontroller.text== ""? " \n": bioTextKontroller.text,
+                  profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
                       AppLocalizations.of(context).ueberMich,
                       ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller)
                   ),
-                  profilThemeContainer(tradeTextKontroller.text== ""? " \n": tradeTextKontroller.text,
+                  profilThemeContainer(tradeTextKontroller.text== ""? " ": tradeTextKontroller.text,
                       AppLocalizations.of(context).verkaufenTauschenSchenken,
                       ChangeTradePage(textKontroller: tradeTextKontroller)
                   )
