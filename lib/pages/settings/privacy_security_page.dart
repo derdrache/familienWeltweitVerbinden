@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -16,7 +17,7 @@ import '../login_register_page/login_page.dart';
 class PrivacySecurityPage extends StatefulWidget {
   var profil;
 
-  PrivacySecurityPage({Key key,this.profil}) : super(key: key);
+  PrivacySecurityPage({Key key, this.profil}) : super(key: key);
 
   @override
   _PrivacySecurityPageState createState() => _PrivacySecurityPageState();
@@ -26,53 +27,78 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   double fontsize = 20;
   var automaticLocationDropdown = CustomDropDownButton();
-  var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+  var spracheIstDeutsch = kIsWeb
+      ? window.locale.languageCode == "de"
+      : Platform.localeName == "de_DE";
 
-  saveAutomaticLocation(){
+  saveAutomaticLocation() async {
+    var locationAuswahl = automaticLocationDropdown.getSelected();
+
+
+
+
+    if (locationAuswahl != standortbestimmung[0] &&
+        locationAuswahl != standortbestimmungEnglisch[0]) {
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+    }
+
     ProfilDatabase().updateProfil(
-        "automaticLocation ='${automaticLocationDropdown.getSelected()}'",
-        "WHERE id ='$userId'"
-    );
+        "automaticLocation ='$locationAuswahl'", "WHERE id ='$userId'");
   }
 
   @override
   Widget build(BuildContext context) {
-    var locationList = spracheIstDeutsch ? standortbestimmung : standortbestimmungEnglisch;
+    var locationList =
+        spracheIstDeutsch ? standortbestimmung : standortbestimmungEnglisch;
     automaticLocationDropdown = CustomDropDownButton(
       items: locationList,
-      selected: widget.profil["automaticLocation"] ?? (spracheIstDeutsch ?
-        standortbestimmung[0] : standortbestimmungEnglisch[0]),
+      selected: widget.profil["automaticLocation"] ??
+          (spracheIstDeutsch
+              ? standortbestimmung[0]
+              : standortbestimmungEnglisch[0]),
       onChange: () => saveAutomaticLocation(),
     );
 
-    emailSettingContainer(){
+    emailSettingContainer() {
       return Container(
         margin: const EdgeInsets.all(10),
         child: Row(
           children: [
-            Text(AppLocalizations.of(context).emailAlleSichtbar, style: TextStyle(fontSize: fontsize),),
+            Text(
+              AppLocalizations.of(context).emailAlleSichtbar,
+              style: TextStyle(fontSize: fontsize),
+            ),
             const Expanded(child: SizedBox(width: 20)),
             Switch(
-                value: widget.profil["emailAnzeigen"] == 1 ? true: false,
-                onChanged: (value){
+                value: widget.profil["emailAnzeigen"] == 1 ? true : false,
+                onChanged: (value) {
                   setState(() {
                     widget.profil["emailAnzeigen"] = value == true ? 1 : 0;
                   });
                   ProfilDatabase().updateProfil(
-                    "emailAnzeigen = '${widget.profil["emailAnzeigen"]}'",
-                    "WHERE id = '$userId'");
+                      "emailAnzeigen = '${widget.profil["emailAnzeigen"]}'",
+                      "WHERE id = '$userId'");
                 })
           ],
         ),
       );
     }
 
-    automaticLocationContainer(){
+    automaticLocationContainer() {
       return Container(
         margin: const EdgeInsets.all(10),
         child: Row(
           children: [
-            SizedBox(width: 200,child: Text(AppLocalizations.of(context).automatischeStandortbestimmung, style: TextStyle(fontSize: fontsize),)),
+            SizedBox(
+                width: 200,
+                child: Text(
+                  AppLocalizations.of(context).automatischeStandortbestimmung,
+                  style: TextStyle(fontSize: fontsize),
+                )),
             const Expanded(child: SizedBox()),
             SizedBox(width: 150, child: automaticLocationDropdown)
           ],
@@ -83,22 +109,25 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     deleteProfilWindow() {
       showDialog(
           context: context,
-          builder: (BuildContext context){
+          builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context).accountLoeschen,
               height: 90,
               children: [
                 const SizedBox(height: 10),
-                Center(child: Text(AppLocalizations.of(context).accountWirklichLoeschen))
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context).accountWirklichLoeschen))
               ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
-                  onPressed: (){
+                  onPressed: () {
                     var userId = FirebaseAuth.instance.currentUser?.uid;
                     ProfilDatabase().deleteProfil(userId);
                     setState(() {});
-                    global_functions.changePageForever(context, const LoginPage());
+                    global_functions.changePageForever(
+                        context, const LoginPage());
                   },
                 ),
                 TextButton(
@@ -107,23 +136,19 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 )
               ],
             );
-          }
-      );
+          });
     }
 
-    deleteProfilContainer(){
+    deleteProfilContainer() {
       return FloatingActionButton.extended(
-        backgroundColor: Colors.red,
-        label: Text(AppLocalizations.of(context).accountLoeschen),
-        onPressed: () => deleteProfilWindow()
-
-      );
+          backgroundColor: Colors.red,
+          label: Text(AppLocalizations.of(context).accountLoeschen),
+          onPressed: () => deleteProfilWindow());
     }
-
-
 
     return Scaffold(
-      appBar: CustomAppBar(title: AppLocalizations.of(context).privatsphaereSicherheit),
+      appBar: CustomAppBar(
+          title: AppLocalizations.of(context).privatsphaereSicherheit),
       body: Column(
         children: [
           emailSettingContainer(),
