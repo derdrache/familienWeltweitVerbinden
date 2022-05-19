@@ -368,7 +368,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     infoProfil() {
-      print(widget.profil);
       return Container(
           padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
           decoration: BoxDecoration(
