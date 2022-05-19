@@ -370,7 +370,7 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
-    settingThemeContainer(title, icon, function){
+    settingThemeContainer(title, icon, function, {color = Colors.black}){
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
@@ -378,7 +378,7 @@ class _SettingPageState extends State<SettingPage> {
           children: [
             Icon(icon),
             const SizedBox(width: 20),
-            Text(title, style: TextStyle(fontSize: fontSize-4),)
+            Text(title, style: TextStyle(fontSize: fontSize-4, color: color),)
           ],
         ),
       );

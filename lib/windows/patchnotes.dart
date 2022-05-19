@@ -98,7 +98,7 @@ var patchVorlage={
 };
 
 var patch130E={
-  "title" : "1.3.0",
+  "title" : "1.3.0 - 25.05.2022",
   "inhalt": [
     "World map - city information has been incorporated",
     "World Map - new buttons have been added to show friends and events on the map",
@@ -113,7 +113,7 @@ var patch130E={
   ]
 };
 var patch130D={
-  "title" : "1.3.0",
+  "title" : "1.3.0 - 25.05.2022",
   "inhalt": [
     "Weltkarte - Stadtinformationen wurden eingebaut",
     "Weltkarte - Es wurden neue Buttons eingebaut um Freunde und Events auf der Karte anzuzeigen",
@@ -129,7 +129,7 @@ var patch130D={
 };
 
 var patch123E={
-  "title" : "1.2.3",
+  "title" : "1.2.3 - 31.03.2022",
   "inhalt": [
     "General - Fixed minor bugs when changing profile picture",
     "General - Profile picture in large is now displayed correctly",
@@ -142,7 +142,7 @@ var patch123E={
   ]
 };
 var patch123D={
-  "title" : "1.2.3",
+  "title" : "1.2.3 - 31.03.2022",
   "inhalt": [
     "Allgemein - Kleine Fehler beim Profilbild ändern behoben",
     "Allgemein - Profilbild in groß wird nun korrekt angezeigt",
