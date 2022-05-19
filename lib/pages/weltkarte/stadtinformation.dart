@@ -42,6 +42,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       }
     }
 
+    cityInformation["familien"].remove(userId);
+
     for (var city in stadtinfoUserData) {
       if (city["ort"] == widget.ortName) {
         usersCityInformation.add(city);
@@ -107,6 +109,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     for (var family in cityInformation["familien"]) {
       var name = "";
+
       for (var profil in allProfils) {
         if (profil["id"] == family) {
           name = profil["name"];
