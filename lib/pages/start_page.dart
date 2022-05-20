@@ -103,7 +103,7 @@ class _StartPageState extends State<StartPage> {
     var ownProfil = ownProfilBox.get("list");
 
     if (DateTime.now()
-            .difference(DateTime.parse(ownProfil["lastLogin"])).inDays == 0
+            .difference(DateTime.parse(ownProfil["lastLogin"])).inDays > 0
     ) {
 
       var newLocation = "";
