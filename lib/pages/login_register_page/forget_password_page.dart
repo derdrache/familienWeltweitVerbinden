@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as globa_functions;
+import '../../widgets/custom_appbar.dart';
 import 'login_page.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
@@ -39,7 +40,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: customAppBar(
+        appBar: CustomAppBar(
             title: AppLocalizations.of(context).passwortZuruecksetzen),
         body: Form(
           key: _formKey,
