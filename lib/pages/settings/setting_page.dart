@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:familien_suche/widgets/dialogWindow.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
@@ -29,6 +28,7 @@ import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
 import 'change_aufreise.dart';
 import 'change_children.dart';
+import 'change_trade.dart';
 import 'privacy_security_page.dart';
 import 'feedback_page.dart';
 import 'change_city.dart';
@@ -56,6 +56,7 @@ class _SettingPageState extends State<SettingPage> {
   var interessenInputBox = CustomMultiTextForm(
       auswahlList: global_variablen.interessenListe);
   var bioTextKontroller = TextEditingController();
+  var tradeTextKontroller = TextEditingController();
   var emailTextKontroller = TextEditingController();
   var emailNewTextKontroller = TextEditingController();
   var passwortTextKontroller1 = TextEditingController();
@@ -78,7 +79,8 @@ class _SettingPageState extends State<SettingPage> {
 
     nameTextKontroller.text = userProfil["name"];
     emailTextKontroller.text = userProfil["email"];
-    ortKontroller.text = userProfil["ort"];
+    ortKontroller.text = userProfil["ort"].isEmpty ?
+      AppLocalizations.of(context).genauerStandort : userProfil["ort"];
     interessenInputBox.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["interessen"]):
       global_func.changeGermanToEnglish(userProfil["interessen"]);
@@ -87,10 +89,10 @@ class _SettingPageState extends State<SettingPage> {
 
     reiseArtInput.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["reiseart"]):
-      global_func.changeGermanToEnglish(userProfil["reiseart"]);;
+      global_func.changeGermanToEnglish(userProfil["reiseart"]);
     sprachenInputBox.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["sprachen"]):
-      global_func.changeGermanToEnglish(userProfil["sprachen"]);;
+      global_func.changeGermanToEnglish(userProfil["sprachen"]);
 
     }
 
@@ -158,9 +160,9 @@ class _SettingPageState extends State<SettingPage> {
           return CustomAlertDialog(
             title: "families worldwide app",
             children: [
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text("Version: " +  packageInfo.version),
-              SizedBox(height: 20)
+              const SizedBox(height: 20)
             ],
           );
         });
@@ -190,7 +192,7 @@ class _SettingPageState extends State<SettingPage> {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
     menuBar(){
-      return Container(
+      return SizedBox(
         height: 70,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -225,7 +227,7 @@ class _SettingPageState extends State<SettingPage> {
                 Row(
                   children: [
                     ProfilImage(userProfil, changeable: true, fullScreenWindow: true),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Flexible(
                       child: Text(
                         nameTextKontroller.text,
@@ -249,14 +251,16 @@ class _SettingPageState extends State<SettingPage> {
             MaterialPageRoute(builder: (_) => page)
         ).whenComplete(() => setState(() {})),
         child: Container(
-            padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding),
+            padding: EdgeInsets.only(top: containerPadding, bottom: containerPadding, right: 10),
             width: fullWidth ? screenWidth :screenWidth /2 -20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 haupttext == ""? const CircularProgressIndicator() : Text(
                   haupttext,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(fontSize: fontSize-4),
                 ),
                 const SizedBox(height: 3),
@@ -299,7 +303,7 @@ class _SettingPageState extends State<SettingPage> {
                         ShowProfilPage(profil: userProfil, ownProfil: true)
                     );
                   },
-                  child: Icon(Icons.preview, size: 35,)
+                  child: const Icon(Icons.preview, size: 35,)
                 )
               ]),
               const SizedBox(height: 5),
@@ -348,21 +352,25 @@ class _SettingPageState extends State<SettingPage> {
                         aufreiseBis: userProfil["aufreiseBis"] == null ? null : DateTime.parse(userProfil["aufreiseBis"]),
                         isGerman: spracheIstDeutsch
                       )
+                  ),
+                  profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
+                      AppLocalizations.of(context).ueberMich,
+                      ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller)
+                  ),
+                  profilThemeContainer(tradeTextKontroller.text== ""? " ": tradeTextKontroller.text,
+                      AppLocalizations.of(context).verkaufenTauschenSchenken,
+                      ChangeTradePage(textKontroller: tradeTextKontroller)
                   )
 
                 ],
               ),
-              profilThemeContainer(bioTextKontroller.text== ""? " ": bioTextKontroller.text,
-                  AppLocalizations.of(context).ueberMich,
-                ChangeAboutmePage(userId: userID, bioTextKontroller: bioTextKontroller),
-                true
-              )
+
             ],
           )
       );
     }
 
-    settingThemeContainer(title, icon, function){
+    settingThemeContainer(title, icon, function, {color = Colors.black}){
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
@@ -370,7 +378,7 @@ class _SettingPageState extends State<SettingPage> {
           children: [
             Icon(icon),
             const SizedBox(width: 20),
-            Text(title, style: TextStyle(fontSize: fontSize-4),)
+            Text(title, style: TextStyle(fontSize: fontSize-4, color: color),)
           ],
         ),
       );

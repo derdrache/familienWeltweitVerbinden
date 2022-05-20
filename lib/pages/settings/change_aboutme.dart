@@ -3,6 +3,8 @@ import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../widgets/custom_appbar.dart';
+
 
 class ChangeAboutmePage extends StatelessWidget {
   var userId;
@@ -16,8 +18,8 @@ class ChangeAboutmePage extends StatelessWidget {
 
 
     saveButton(){
-      return TextButton(
-        child: Icon(Icons.done),
+      return IconButton(
+        icon: Icon(Icons.done),
         onPressed: () async {
           await ProfilDatabase().updateProfil("aboutme = '${bioTextKontroller.text}'",
               "WHERE id = '$userId'");
@@ -30,7 +32,10 @@ class ChangeAboutmePage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context).ueberMichVeraendern, buttons: [saveButton()]),
+      appBar: CustomAppBar(
+          title: AppLocalizations.of(context).ueberMichVeraendern,
+          buttons: [saveButton()]
+      ),
       body: Column(
         children: [
           customTextInput(
