@@ -128,7 +128,7 @@ class LocationService {
 
       return data["results"][0];
     } catch (error) {
-      return {};
+      return ;
     }
   }
 
@@ -136,7 +136,6 @@ class LocationService {
     var city = "";
     var region = "";
     var country = "";
-
     for (var item in nearstLocationData["address_components"]) {
       if (item["types"].contains("locality")) {
         city = item["long_name"];
