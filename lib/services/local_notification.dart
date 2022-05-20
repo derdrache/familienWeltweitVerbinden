@@ -31,17 +31,9 @@ class LocalNotificationService{
           message.notification.body,
           notificationDetails,
           payload: '{"typ": $typ, "link" : $link}'
-
-
-
-
-
-
-
-          //json.decode(message.data.values.last)["link"]
       );
-    } on Exception catch (e) {
-      // TODO
+    } on Exception catch (_) {
+
     }
     
     
