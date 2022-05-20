@@ -7,7 +7,7 @@ List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
   "Auto/Unterkünfte", "Wohnmobile/Camping", "Boot"];
 List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
   "Gemeinsame Aktivitäten", "Weltreise", "Langsam reisen", "Gemeinsam reisen",
-  "Gemeinsam wohnen", "Gemeinsame Kinderbetreuung", "Dauerhaft reisen"];
+  "Gemeinsam wohnen", "Gemeinsame Kinderbetreuung", "Dauerhaft reisen", "Kaffeetreff"];
 List<String> sprachenListe = ["Deutsch", "Englisch", "Spanisch", "Chinesisch",
   "Französisch", "Arabisch", "Russisch", "italienisch"];
 List<String> eventInterval = ["einmalig", "täglich", "mehrtägig", "wöchentlich", "monatlich"];
@@ -20,7 +20,7 @@ List<String> reiseartenEnglisch = ["fixed location", "airplane/housing",
   "car/housing","mobile home/camping", "boat"];
 List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldschooling",
   "joint activities", "world Travel", "travel slowly", "travel together",
-  "co-living", "shared child care", "open end travel"];
+  "co-living", "shared child care", "open end travel", "coffee meeting"];
 List<String> sprachenListeEnglisch = ["german", "english", "spanish", "chinese",
   "french", "arabic", "russian", "italian"];
 List<String> eventIntervalEnglisch = ["once", "daily", "several days", "weekly", "monthly"];

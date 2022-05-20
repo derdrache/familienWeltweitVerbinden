@@ -337,14 +337,17 @@ class _ErkundenPageState extends State<ErkundenPage> {
         .getKontinentLocation(landGedataProfil["kontinentGer"]);
     kontinentGeodataProfil ??= {"kontinentGer": landGedataProfil["nameGer"]};
     kontinentGeodataProfil ??= {"kontinentEng": landGedataProfil["nameEng"]};
-
     for (var i = 0; i < list.length; i++) {
       var kontinentGeodataListitem =
           LocationService().getKontinentLocation(list[i]["kontinent"]);
       kontinentGeodataListitem ??= {"kontinentGer": list[i]["kontinent"]};
 
-      if (kontinentGeodataListitem["kontinentGer"] ==
-          kontinentGeodataProfil["kontinentGer"]) {
+      if(list[i]["latt"] == profil["latt"] && list[i]["longt"] == profil["longt"]){
+        print("test");
+      }
+
+      if ((kontinentGeodataListitem["kontinentGer"] ==
+          kontinentGeodataProfil["kontinentGer"]) || (list[i]["latt"] == profil["latt"] && list[i]["longt"] == profil["longt"]) ){
         newPoint = false;
 
         var addNumberName =
