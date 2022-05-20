@@ -623,7 +623,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     if (popupCities.length == 1 && currentMapZoom >= cityZoom) {
-      changePage(context, StadtinformationsPage(ortName: popupCities[0].join(" / ")));
+      changePage(context, StadtinformationsPage(ortName: popupCities[0]["names"].join(" / ")));
       return;
     }
 
