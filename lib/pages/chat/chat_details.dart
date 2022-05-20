@@ -11,7 +11,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
-import '../../global/custom_widgets.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChatDetailsPage extends StatefulWidget {
@@ -39,7 +38,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   bool newChat = false;
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
-  var messageInputHeight = 50.0;
+  double messageInputHeight = 50.0;
   var messageRows = 0;
   Timer timer;
   var pufferList;
@@ -244,6 +243,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           boxColor = Colors.greenAccent;
         }
 
+
+        while(message["message"].endsWith('\n')){
+          message["message"] = message["message"].substring(0, message["message"].length - 1);
+        }
+
+
         if (message["message"] == "") continue;
 
         if (message["message"].contains("</eventId=")) {
@@ -278,6 +283,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ));
           continue;
         }
+
+
 
         messageBox.add(
           Align(
