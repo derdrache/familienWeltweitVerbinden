@@ -6,6 +6,7 @@ import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../widgets/custom_appbar.dart';
 
 
 class ChangeAufreisePage extends StatefulWidget {
@@ -98,8 +99,8 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
   }
 
   saveButton(){
-    return TextButton(
-        child: Icon(Icons.done),
+    return IconButton(
+        icon: Icon(Icons.done),
         onPressed: () => saveFunction()
     );
   }
@@ -149,7 +150,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
 
 
     return Scaffold(
-        appBar: customAppBar(
+        appBar: CustomAppBar(
             title: AppLocalizations.of(context).aufReiseAendern,
             buttons: <Widget>[saveButton()]
         ),

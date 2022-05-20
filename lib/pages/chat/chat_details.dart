@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
@@ -10,7 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
-import '../../global/custom_widgets.dart';
+import '../../widgets/custom_appbar.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   var chatPartnerId;
@@ -37,7 +38,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   bool newChat = false;
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
-  var messageInputHeight = 50.0;
+  double messageInputHeight = 50.0;
   var messageRows = 0;
   Timer timer;
   var pufferList;
@@ -152,7 +153,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
     ChatDatabase().updateChatGroup(
-        widget.groupChatData["id"], "users", widget.groupChatData["users"]);
+      "users = '${json.encode(widget.groupChatData["users"])}'",
+      "WHERE id = '${widget.groupChatData["id"]}'"
+    );
   }
 
   messageToDbAndClearMessageInput(message) async {
@@ -186,10 +189,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (messageData["message"].contains("</eventId=")) {
         messageData["message"] = "<Event Card>";
       }
+
       ChatDatabase().updateChatGroup(
-          widget.chatId, "lastMessage", messageData["message"]);
-      ChatDatabase().updateChatGroup(
-          widget.chatId, "lastMessageDate", messageData["date"]);
+          "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
+          "WHERE id = '${widget.chatId}'"
+      );
 
       setState(() {});
     }
@@ -211,6 +215,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   openProfil() async {
     chatPartnerProfil ??= await ProfilDatabase()
         .getData("*", "WHERE id = '${widget.chatPartnerId}'");
+
+    if(chatPartnerProfil == false) return;
 
     global_functions.changePage(
         context,
@@ -236,6 +242,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           textAlign = Alignment.centerRight;
           boxColor = Colors.greenAccent;
         }
+
+
+        while(message["message"].endsWith('\n')){
+          message["message"] = message["message"].substring(0, message["message"].length - 1);
+        }
+
 
         if (message["message"] == "") continue;
 
@@ -271,6 +283,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ));
           continue;
         }
+
+
 
         messageBox.add(
           Align(
@@ -390,7 +404,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     return Scaffold(
-        appBar: customAppBar(
+        appBar: CustomAppBar(
           title: widget.chatPartnerName ?? "",
           onTap: () => openProfil(),
         ),
