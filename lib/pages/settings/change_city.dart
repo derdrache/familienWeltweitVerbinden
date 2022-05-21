@@ -82,7 +82,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
           title: AppLocalizations.of(context).ortAendern,
           buttons: <Widget>[
             if(!isLoading) IconButton(
-                icon: const Icon(Icons.save),
+                icon: const Icon(Icons.done),
                 onPressed: () => saveLocation()
             ),
             if(isLoading) Container(

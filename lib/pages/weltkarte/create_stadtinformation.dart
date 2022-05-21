@@ -1,9 +1,12 @@
+import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/google_autocomplete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 
 import '../../global/custom_widgets.dart';
+import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import '../../services/translation.dart';
 import '../../widgets/custom_appbar.dart';
@@ -44,15 +47,17 @@ class _CreateStadtinformationsPageState
   }
 
   save() async {
+    var ortData = ortEingabe.getGoogleLocationData();
+    String titel = titleKontroller.text;
+    String beschreibung = beschreibungKontroller.text;
+    DateTime now = DateTime.now();
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    String nowFormatted = formatter.format(now);
+    String titleGer, informationGer, titleEng, informationEng;
+
     setState(() {
       onLoading = true;
     });
-
-    var ortData = ortEingabe.getGoogleLocationData();
-
-    var titel = titleKontroller.text;
-    var beschreibung = beschreibungKontroller.text;
-    String titleGer, informationGer, titleEng, informationEng;
 
     if (!checkValidation()) {
       setState(() {
@@ -68,7 +73,7 @@ class _CreateStadtinformationsPageState
       informationEng = beschreibung;
       titleGer =
           await TranslationServices().getTextTranslation(titel, "en", "de");
-      informationEng = await TranslationServices()
+      informationGer = await TranslationServices()
           .getTextTranslation(beschreibung, "en", "de");
     } else {
       titleGer = titel;
@@ -81,27 +86,32 @@ class _CreateStadtinformationsPageState
           .getTextTranslation(beschreibung, "de", "en");
     }
 
-    StadtinfoDatabase().addNewCity(ortData);
+    await StadtinfoDatabase().addNewCity(ortData);
+    var stadtInfo =
+        await StadtinfoDatabase().getData("*", "", returnList: true);
+    Hive.box("stadtinfoBox").put("list", stadtInfo);
 
-    StadtinfoUserDatabase().addNewInformation({
+    var newUserInformation = {
       "ort": ortData["city"],
-      "land": ortData["countryname"],
-      "latt": ortData["latt"],
-      "longt": ortData["longt"],
       "sprache": textLanguage,
       "titleGer": titleGer,
       "informationGer": informationGer,
       "titleEng": titleEng,
       "informationEng": informationEng,
-    });
+      "erstelltAm": nowFormatted,
+      "thumbUp": [],
+      "thumbDown": []
+    };
 
-    var stadtinfoUser =
-        StadtinfoUserDatabase().getData("*", "", returnList: true);
-    Hive.box("stadtinfoUserBox").put("list", stadtinfoUser);
+    StadtinfoUserDatabase().addNewInformation(newUserInformation);
+
+    var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
+    var allInformations = stadtinfoUserBox.get("list");
+    allInformations.add(newUserInformation);
+    stadtinfoUserBox.put("list", allInformations);
 
     Navigator.pop(context);
-    customSnackbar(
-        context, AppLocalizations.of(context).insiderInformationEingetragen, color: Colors.green);
+    changePage(context, StadtinformationsPage(ortName: ortData["city"]));
   }
 
   @override
@@ -113,13 +123,15 @@ class _CreateStadtinformationsPageState
       appBar: CustomAppBar(
         title: AppLocalizations.of(context).stadtinformationErstellen,
         buttons: [
-          if(!onLoading) IconButton(onPressed: () => save(), icon: const Icon(Icons.save)),
-          if(onLoading) Container(
-              width: 30,
-              padding: const EdgeInsets.only(top:20, right: 10, bottom: 20),
-              child: const CircularProgressIndicator(
-                color: Colors.white,
-              ))
+          if (!onLoading)
+            IconButton(onPressed: () => save(), icon: const Icon(Icons.done)),
+          if (onLoading)
+            Container(
+                width: 30,
+                padding: const EdgeInsets.only(top: 20, right: 10, bottom: 20),
+                child: const CircularProgressIndicator(
+                  color: Colors.white,
+                ))
         ],
       ),
       body: Column(children: [

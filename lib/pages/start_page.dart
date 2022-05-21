@@ -111,11 +111,15 @@ class _StartPageState extends State<StartPage> {
 
       var nearstLocationData =
           await LocationService().getNearstLocationData(currentPosition);
+
       nearstLocationData =
           LocationService().transformNearstLocation(nearstLocationData);
 
+      if(nearstLocationData["country"].isEmpty) return;
+
       if (automaticLocationStatus == standortbestimmung[1] ||
           automaticLocationStatus == standortbestimmungEnglisch[1]) {
+
 
         ProfilDatabase().updateProfilLocation(userId, {
           "city": " ",
