@@ -98,30 +98,30 @@ var patchVorlage={
 };
 
 var patch130E={
-  "title" : "1.3.0 - 25.05.2022",
+  "title" : "1.3.0 - 21.05.2022",
   "inhalt": [
     "World map - city information has been incorporated",
     "World Map - new buttons have been added to show friends and events on the map",
-    "World Map - it is now possible to filter cities",
+    "World Map - The world map can now be filtered by city",
     "World map bug fix - filtering now works on first entry",
     "Settings - there is now an option to have the location updated automatically",
-    "Profile languages extension - italian can now be selected",
-    "Profile extension - new tab: sell / trade / give away",
+    "Profile languages extension - Italian, Portuguese, Japanese and Turkish can now be selected",
+    "Profile extension - new tab: 'sell / trade / give away'",
     "various small style adjustments",
     "various small bug fixes",
     "various small improvements"
   ]
 };
 var patch130D={
-  "title" : "1.3.0 - 25.05.2022",
+  "title" : "1.3.0 - 21.05.2022",
   "inhalt": [
     "Weltkarte - Stadtinformationen wurden eingebaut",
     "Weltkarte - Es wurden neue Buttons eingebaut um Freunde und Events auf der Karte anzuzeigen",
-    "Weltkarte - Es kann jetzt auch noch Städte gefiltert werden",
-    "Weltkarte Fehlerbehebung - Das Filtern funktioniert jetzt auch bei der ersten Eingabe",
+    "Weltkarte - Die Weltkarte kann jetzt auch nach Städte gefiltert werden",
+    "Weltkarte Fehlerbehebung - Der Filter funktioniert jetzt auch bei der ersten Eingabe",
     "Settings - Es gibt jetzt die Möglichkeit den Standort automatisch updaten zu lassen",
-    "Profil Sprachen Erweiterung - Italienisch kann jetzt ausgewählt werden",
-    "Profil Erweiterung - Neuer Reiter: Verkaufen / Tauschen / Verschenken"
+    "Profil Sprachen Erweiterung - Italienisch, Portugiesisch, Japanisch und Türkisch können jetzt ausgewählt werden",
+    "Profil Erweiterung - Neuer Reiter: 'Verkaufen / Tauschen / Verschenken'"
     "verschiedene kleine Style-Anpassungen",
     "verschiedene kleine Fehlerbehebungen",
     "verschiedene kleine Verbesserungen"
