@@ -23,8 +23,9 @@ class LocationService {
     var formattedCity = formattedAddressList.first.split(" ");
 
     var city = LocationService().isNumeric(formattedCity.first)
-        ? formattedCity.last
+        ? formattedCity.sublist(1).join(" ")
         : formattedCity.join(" ");
+
     var cityList = [];
     for (var item in city.split(" ")) {
       if (!LocationService().isNumeric(item)) cityList.add(item);
@@ -78,6 +79,10 @@ class LocationService {
   }
 
   getLocationdataFromGoogleID(id, sessionToken) async {
+    var deviceLanguage =
+    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
+
     try {
       var url =
           "https://families-worldwide.com/services/googlePlaceDetails2.php";
@@ -86,7 +91,8 @@ class LocationService {
           body: json.encode({
             "googleKey": google_key,
             "id": id,
-            "sessionToken": sessionToken
+            "sessionToken": sessionToken,
+            "sprache": sprache
           }));
       dynamic responseBody = res.body;
 
@@ -128,7 +134,7 @@ class LocationService {
 
       return data["results"][0];
     } catch (error) {
-      return {};
+      return ;
     }
   }
 
@@ -136,7 +142,6 @@ class LocationService {
     var city = "";
     var region = "";
     var country = "";
-
     for (var item in nearstLocationData["address_components"]) {
       if (item["types"].contains("locality")) {
         city = item["long_name"];
