@@ -36,7 +36,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     var stadtinfoUserData = Hive.box("stadtinfoUserBox").get("list");
 
     for (var city in stadtinfoData) {
-      if (city["ort"] == widget.ortName) {
+      if (city["ort"].contains(widget.ortName)) {
         cityInformation = city;
         break;
       }
