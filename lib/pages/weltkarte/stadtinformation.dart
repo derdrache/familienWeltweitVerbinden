@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
@@ -33,7 +34,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
   @override
   void initState() {
     var stadtinfoData = Hive.box("stadtinfoBox").get("list");
-    var stadtinfoUserData = Hive.box("stadtinfoUserBox").get("list");
+
 
     for (var city in stadtinfoData) {
       if (city["ort"].contains(widget.ortName)) {
@@ -44,13 +45,23 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     cityInformation["familien"].remove(userId);
 
+    refreshCityUserInfo();
+
+
+    super.initState();
+  }
+
+  refreshCityUserInfo(){
+    usersCityInformation = [];
+    var stadtinfoUserData = Hive.box("stadtinfoUserBox").get("list");
+
     for (var city in stadtinfoUserData) {
-      if (city["ort"] == widget.ortName) {
+      if (widget.ortName.contains(city["ort"])) {
         usersCityInformation.add(city);
       }
     }
 
-    super.initState();
+
   }
 
   setThumb(thumb, index) async {
@@ -365,8 +376,71 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     };
   }
 
+  saveNewInformation({title,inhalt}) async{
+    DateTime now = DateTime.now();
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    String nowFormatted = formatter.format(now);
+    String titleGer, informationGer, titleEng, informationEng;
+
+    if (title.isEmpty) {
+      customSnackbar(
+          context, AppLocalizations.of(context).titelStadtinformationEingeben);
+      return;
+    } else if (title.length > 100) {
+      customSnackbar(context, AppLocalizations.of(context).titleZuLang);
+      return;
+    } else if (title.isEmpty) {
+      customSnackbar(context,
+          AppLocalizations.of(context).beschreibungStadtinformationEingeben);
+      return;
+    }
+
+    var textLanguage = await TranslationServices().getLanguage(title);
+
+    if (textLanguage == "en") {
+      titleEng = title;
+      informationEng = inhalt;
+      titleGer = await TranslationServices()
+          .getTextTranslation(title, "en", "de");
+      informationEng = await TranslationServices()
+          .getTextTranslation(inhalt, "en", "de");
+    } else {
+      titleGer = title;
+      informationGer = inhalt;
+      titleEng = "";
+      informationEng = "";
+      titleEng =
+          await TranslationServices().getTextTranslation(title, "de", "en");
+      informationEng = await TranslationServices()
+          .getTextTranslation(inhalt, "de", "en");
+    }
+
+    var newUserInformation = {
+      "ort": widget.ortName,
+      "sprache": textLanguage,
+      "titleGer": titleGer,
+      "informationGer": informationGer,
+      "titleEng": titleEng,
+      "informationEng": informationEng,
+      "erstelltAm": nowFormatted,
+      "thumbUp": [],
+      "thumbDown": []
+    };
+
+    StadtinfoUserDatabase().addNewInformation(newUserInformation);
+
+    var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
+    var allInformations = stadtinfoUserBox.get("list");
+    allInformations.add(newUserInformation);
+    stadtinfoUserBox.put("list", allInformations);
+
+    Navigator.pop(context);
+
+  }
+
   @override
   Widget build(BuildContext context) {
+
     usersCityInformation = sortThumb(usersCityInformation);
 
     allgemeineInfoBox() {
@@ -601,6 +675,21 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     }
 
     userInfoBox() {
+      List<Widget> userCityInfo = [];
+
+      for (var i = 0; i < usersCityInformation.length; i++){
+        userCityInfo.add(insiderInfoBox(usersCityInformation[i], i));
+      }
+
+      if(userCityInfo.isEmpty) {
+        userCityInfo.add(
+          Text(AppLocalizations.of(context).keineInsiderInformation,
+            style: TextStyle(color: Colors.grey),)
+      );
+      }
+
+
+
       return Container(
         margin: const EdgeInsets.all(10),
         width: double.infinity,
@@ -613,17 +702,62 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: ListView(shrinkWrap: true, children: [
-                for (var i = 0; i < usersCityInformation.length; i++)
-                  insiderInfoBox(usersCityInformation[i], i),
-              ]),
+              child: ListView(
+                  shrinkWrap: true,
+                  children: userCityInfo
+              ),
             )
           ],
         ),
       );
     }
 
+    addInformationWindow(){
+      var titleTextKontroller = TextEditingController();
+      var informationTextKontroller = TextEditingController();
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+                title: AppLocalizations.of(context).insiderInformationHinzufuegen,
+                children: [
+                  customTextInput(AppLocalizations.of(context).titel,
+                      titleTextKontroller),
+                  const SizedBox(height: 10),
+                  customTextInput(AppLocalizations.of(context).beschreibung,
+                      informationTextKontroller,
+                      moreLines: 10,
+                      textInputAction: TextInputAction.newline),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                          child: Text(AppLocalizations.of(context).speichern),
+                          onPressed: () => saveNewInformation(
+                            title: titleTextKontroller.text,
+                            inhalt: informationTextKontroller.text
+                          )
+                      ),
+                      TextButton(
+                        child: Text(AppLocalizations.of(context).abbrechen),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+
+                    ],
+                  ),
+                  const SizedBox(height: 20)
+                ]);
+          });
+    }
+
+
+
+    refreshCityUserInfo();
+
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: CustomAppBar(title: widget.ortName),
         body: Column(
           children: [
@@ -631,6 +765,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             const SizedBox(height: 10),
             Expanded(child: userInfoBox())
           ],
-        ));
+        ),
+      floatingActionButton: FloatingActionButton(
+          heroTag: "create Stadtinformation",
+          child: const Icon(Icons.create),
+          onPressed: () => addInformationWindow()
+      ),
+    );
   }
 }
