@@ -74,6 +74,7 @@ hiveInit() async {
     await StadtinfoDatabase().getData("*", "ORDER BY ort ASC", returnList: true);
   Hive.box("stadtinfoBox").put("list", stadtinfo);
 
+
 }
 
 void main() async {
