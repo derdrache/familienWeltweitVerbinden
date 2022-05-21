@@ -90,10 +90,8 @@ class _CreateStadtinformationsPageState
 
 
     var isNewCity = await StadtinfoDatabase().addNewCity(ortData);
-    if(isNewCity) {
-      var stadtInfo = await StadtinfoDatabase().getData("*", "", returnList: true);
-      Hive.box("stadtinfoBox").put("list", stadtInfo);
-    }
+    var stadtInfo = await StadtinfoDatabase().getData("*", "", returnList: true);
+    Hive.box("stadtinfoBox").put("list", stadtInfo);
 
     var newUserInformation = {
       "ort": ortData["city"],
