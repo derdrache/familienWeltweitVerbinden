@@ -79,6 +79,10 @@ class LocationService {
   }
 
   getLocationdataFromGoogleID(id, sessionToken) async {
+    var deviceLanguage =
+    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
+
     try {
       var url =
           "https://families-worldwide.com/services/googlePlaceDetails2.php";
@@ -87,7 +91,8 @@ class LocationService {
           body: json.encode({
             "googleKey": google_key,
             "id": id,
-            "sessionToken": sessionToken
+            "sessionToken": sessionToken,
+            "sprache": sprache
           }));
       dynamic responseBody = res.body;
 
