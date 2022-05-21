@@ -274,9 +274,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                     onPressed: () {
                       StadtinfoUserDatabase().delete(information["id"]);
 
-                      setState(() {
-                        usersCityInformation.remove(information);
-                      });
+                      var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
+                      var allInformations = stadtinfoUserBox.get("list");
+                      allInformations.remove(information);
+                      stadtinfoUserBox.put("list", allInformations);
+
+                      setState(() {});
 
                       Navigator.pop(context);
                     },
@@ -435,6 +438,10 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     stadtinfoUserBox.put("list", allInformations);
 
     Navigator.pop(context);
+
+    setState(() {
+
+    });
 
   }
 
