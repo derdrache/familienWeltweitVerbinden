@@ -12,8 +12,8 @@ import '../global/global_functions.dart'as global_functions;
 import 'notification.dart';
 
 
-//var databaseUrl = "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
 
@@ -444,10 +444,12 @@ class StadtinfoDatabase{
       city["land"] = city["countryname"];
     }
 
-    if(! await _checkIfNew(city)) return;
+    if(! await _checkIfNew(city)) return false;
 
     var url = Uri.parse(databaseUrl + "database/stadtinfo/newCity.php");
     await http.post(url, body: json.encode(city));
+
+    return true;
   }
 
   getData(whatData, queryEnd, {returnList = false}) async {

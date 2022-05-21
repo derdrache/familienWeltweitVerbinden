@@ -23,8 +23,9 @@ class LocationService {
     var formattedCity = formattedAddressList.first.split(" ");
 
     var city = LocationService().isNumeric(formattedCity.first)
-        ? formattedCity.last
+        ? formattedCity.sublist(1).join(" ")
         : formattedCity.join(" ");
+
     var cityList = [];
     for (var item in city.split(" ")) {
       if (!LocationService().isNumeric(item)) cityList.add(item);
