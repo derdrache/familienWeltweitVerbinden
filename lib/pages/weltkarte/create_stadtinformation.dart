@@ -93,9 +93,6 @@ class _CreateStadtinformationsPageState
 
     var newUserInformation = {
       "ort": ortData["city"],
-      "land": ortData["countryname"],
-      "latt": ortData["latt"],
-      "longt": ortData["longt"],
       "sprache": textLanguage,
       "titleGer": titleGer,
       "informationGer": informationGer,
