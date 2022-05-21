@@ -159,9 +159,10 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
   }
 
   changeInformationWindow(information) {
-    var titleTextKontroller = TextEditingController(text: information["title"]);
+    var informationData = getInsiderInfoText(information);
+    var titleTextKontroller = TextEditingController(text: informationData["title"]);
     var informationTextKontroller =
-        TextEditingController(text: information["information"]);
+        TextEditingController(text: informationData["information"]);
 
     Future<void>.delayed(
         const Duration(),
@@ -216,25 +217,19 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       return;
     }
 
-    Navigator.pop(context);
 
-    setState(() {
-      usersCityInformation[information["index"]]["title"] = newTitle;
-      usersCityInformation[information["index"]]["information"] =
-          newInformation;
-    });
 
-    var textLanguage = await TranslationServices().getLanguage(newTitle.text);
+    var textLanguage = await TranslationServices().getLanguage(newTitle);
 
     if (textLanguage == "en") {
-      titleEng = newTitle.text;
+      titleEng = newTitle;
       informationEng = newInformation;
       titleGer = await TranslationServices()
-          .getTextTranslation(newTitle.text, "en", "de");
+          .getTextTranslation(newTitle, "en", "de");
       informationEng = await TranslationServices()
           .getTextTranslation(newInformation, "en", "de");
     } else {
-      titleGer = newTitle.text;
+      titleGer = newTitle;
       informationGer = newInformation;
       titleEng = "";
       informationEng = "";
@@ -244,13 +239,34 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
           .getTextTranslation(newInformation, "de", "en");
     }
 
+    var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
+    var allInformations = stadtinfoUserBox.get("list");
+
+    for(var i = 0; i<allInformations.length; i++){
+      if(allInformations[i]["id"] == information["id"]){
+        allInformations[i]["sprache"] = textLanguage;
+        allInformations[i]["titleGer"] = titleGer;
+        allInformations[i]["informationGer"] = informationGer;
+        allInformations[i]["titleEng"] = titleEng;
+        allInformations[i]["informationEng"] = informationEng;
+        break;
+      }
+    }
+
+
+    stadtinfoUserBox.put("list", allInformations);
+
+    setState(() {});
+    Navigator.pop(context);
+
     StadtinfoUserDatabase().update(
         "sprache ='$textLanguage',  "
             "titleGer = '$titleGer', "
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
             "informationEng = '$informationEng'",
-        "WHERE id ='${information["id"]}'");
+        "WHERE id ='${information["id"]}'"
+    );
   }
 
   deleteInformation(information) async {
