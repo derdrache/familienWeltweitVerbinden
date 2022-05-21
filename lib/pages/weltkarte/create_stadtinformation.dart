@@ -48,17 +48,16 @@ class _CreateStadtinformationsPageState
 
   save() async {
     var ortData = ortEingabe.getGoogleLocationData();
-    var titel = titleKontroller.text;
-    var beschreibung = beschreibungKontroller.text;
-    final DateTime now = DateTime.now();
-    final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    final String formatted = formatter.format(now);
+    String titel = titleKontroller.text;
+    String beschreibung = beschreibungKontroller.text;
+    DateTime now = DateTime.now();
+    DateFormat formatter = DateFormat('yyyy-MM-dd');
+    String nowFormatted = formatter.format(now);
     String titleGer, informationGer, titleEng, informationEng;
 
     setState(() {
       onLoading = true;
     });
-
 
     if (!checkValidation()) {
       setState(() {
@@ -66,7 +65,6 @@ class _CreateStadtinformationsPageState
       });
       return;
     }
-
 
     var textLanguage = await TranslationServices().getLanguage(titel);
 
@@ -88,9 +86,9 @@ class _CreateStadtinformationsPageState
           .getTextTranslation(beschreibung, "de", "en");
     }
 
-
-    var isNewCity = await StadtinfoDatabase().addNewCity(ortData);
-    var stadtInfo = await StadtinfoDatabase().getData("*", "", returnList: true);
+    await StadtinfoDatabase().addNewCity(ortData);
+    var stadtInfo =
+        await StadtinfoDatabase().getData("*", "", returnList: true);
     Hive.box("stadtinfoBox").put("list", stadtInfo);
 
     var newUserInformation = {
@@ -103,24 +101,20 @@ class _CreateStadtinformationsPageState
       "informationGer": informationGer,
       "titleEng": titleEng,
       "informationEng": informationEng,
-      "erstelltAm": formatted,
+      "erstelltAm": nowFormatted,
       "thumbUp": [],
-      "thumbDown" : []
+      "thumbDown": []
     };
-
 
     StadtinfoUserDatabase().addNewInformation(newUserInformation);
 
-    var stadtinfoUserBox =  Hive.box("stadtinfoUserBox");
+    var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
     var allInformations = stadtinfoUserBox.get("list");
     allInformations.add(newUserInformation);
     stadtinfoUserBox.put("list", allInformations);
 
     Navigator.pop(context);
     changePage(context, StadtinformationsPage(ortName: ortData["city"]));
-
-
-
   }
 
   @override
@@ -132,13 +126,15 @@ class _CreateStadtinformationsPageState
       appBar: CustomAppBar(
         title: AppLocalizations.of(context).stadtinformationErstellen,
         buttons: [
-          if(!onLoading) IconButton(onPressed: () => save(), icon: const Icon(Icons.done)),
-          if(onLoading) Container(
-              width: 30,
-              padding: const EdgeInsets.only(top:20, right: 10, bottom: 20),
-              child: const CircularProgressIndicator(
-                color: Colors.white,
-              ))
+          if (!onLoading)
+            IconButton(onPressed: () => save(), icon: const Icon(Icons.done)),
+          if (onLoading)
+            Container(
+                width: 30,
+                padding: const EdgeInsets.only(top: 20, right: 10, bottom: 20),
+                child: const CircularProgressIndicator(
+                  color: Colors.white,
+                ))
         ],
       ),
       body: Column(children: [
