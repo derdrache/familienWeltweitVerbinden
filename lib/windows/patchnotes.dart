@@ -117,7 +117,7 @@ var patch130D={
   "inhalt": [
     "Weltkarte - Stadtinformationen wurden eingebaut. Teile deine Informationen über die Stadt mit anderen",
     "Weltkarte - Es wurden neue Buttons eingebaut um Freunde und Events auf der Karte anzuzeigen",
-    "Weltkarte - Die Weltkarte kann jetzt auch nach Städte gefiltert werden",
+    "Weltkarte - Die Weltkarte kann jetzt auch nach Städten gefiltert werden",
     "Weltkarte Fehlerbehebung - Der Filter funktioniert jetzt auch bei der ersten Eingabe",
     "Settings - Es gibt jetzt die Möglichkeit den Standort automatisch updaten zu lassen",
     "Profil Sprachen Erweiterung - Italienisch, Portugiesisch, Japanisch und Türkisch können jetzt ausgewählt werden",
