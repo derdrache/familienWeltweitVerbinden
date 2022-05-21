@@ -9,7 +9,7 @@ List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
   "Gemeinsame Aktivitäten", "Weltreise", "Langsam reisen", "Gemeinsam reisen",
   "Gemeinsam wohnen", "Gemeinsame Kinderbetreuung", "Dauerhaft reisen", "Kaffeetreff"];
 List<String> sprachenListe = ["Deutsch", "Englisch", "Spanisch", "Chinesisch",
-  "Französisch", "Arabisch", "Russisch", "italienisch"];
+  "Französisch", "Arabisch", "Russisch", "Italienisch", "Portugiesisch", "Japanisch", "Türkisch"];
 List<String> eventInterval = ["einmalig", "täglich", "mehrtägig", "wöchentlich", "monatlich"];
 List<String> eventTyp = ["offline", "online"];
 List<String> eventArt = ["privat", "halb-öffentlich", "öffentlich"];
@@ -22,7 +22,7 @@ List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldsc
   "joint activities", "world Travel", "travel slowly", "travel together",
   "co-living", "shared child care", "open end travel", "coffee meeting"];
 List<String> sprachenListeEnglisch = ["german", "english", "spanish", "chinese",
-  "french", "arabic", "russian", "italian"];
+  "french", "arabic", "russian", "italian", "portuguese", "japanese", "turkish"];
 List<String> eventIntervalEnglisch = ["once", "daily", "several days", "weekly", "monthly"];
 List<String> eventTypEnglisch = ["offline", "online"];
 List<String> eventArtEnglisch = ["private", "semi-public", "public"];
