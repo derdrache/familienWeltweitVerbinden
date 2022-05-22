@@ -107,6 +107,7 @@ var patch130E={
     "Settings - there is now an option to have the location updated automatically",
     "Profile languages extension - Italian, Portuguese, Japanese and Turkish can now be selected",
     "Profile extension - new tab: 'sell / trade / give away'",
+    "Button to delete account added in Settings -> Privacy and Security",
     "various small style adjustments",
     "various small bug fixes",
     "various small improvements"
@@ -121,7 +122,8 @@ var patch130D={
     "Weltkarte Fehlerbehebung - Der Filter funktioniert jetzt auch bei der ersten Eingabe",
     "Settings - Es gibt jetzt die Möglichkeit den Standort automatisch updaten zu lassen",
     "Profil Sprachen Erweiterung - Italienisch, Portugiesisch, Japanisch und Türkisch können jetzt ausgewählt werden",
-    "Profil Erweiterung - Neuer Reiter: 'Verkaufen / Tauschen / Verschenken'"
+    "Profil Erweiterung - Neues Feld: 'Verkaufen / Tauschen / Verschenken'",
+    "Button zum Accountlöschen in Settings -> Privatspähre und Sicherheit eingebaut",
     "verschiedene kleine Style-Anpassungen",
     "verschiedene kleine Fehlerbehebungen",
     "verschiedene kleine Verbesserungen"

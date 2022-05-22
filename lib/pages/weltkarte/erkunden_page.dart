@@ -64,11 +64,30 @@ class _ErkundenPageState extends State<ErkundenPage> {
     eventBox = Hive.box("eventBox");
     stadtinfoUserBox = Hive.box("stadtinfoUserBox");
 
+    removeCitiesWithoutInformation();
     setProfils();
     setEvents();
 
+
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
+  }
+
+  removeCitiesWithoutInformation(){
+    var newAllCities = [];
+
+    // city["isCity"] != 0 ||
+    for(var city in allCities){
+      var condition = city["kosten"] != null ||
+        city["wetter"] != null || city["kosten"] != null ||
+        city["internet"] != null || city["familien"].isNotEmpty;
+
+      if(condition){
+        newAllCities.add(city);
+      }
+    }
+
+    allCities = newAllCities;
   }
 
   setProfils() {
@@ -380,7 +399,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var pufferProfilCountries = [];
     var pufferProfilContinents = [];
 
-    addCityUserInformation();
+    addCityProfils();
 
     for (var i = 0; i < profils.length; i++) {
       pufferProfilCountries =
@@ -401,7 +420,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     changeProfil(currentMapZoom);
   }
 
-  addCityUserInformation() {
+  addCityProfils() {
     if (filterList.isEmpty) {
       profils = profils + allCities;
 
