@@ -7,6 +7,7 @@ import '../global/variablen.dart' as global_var;
 class GoogleAutoComplete extends StatefulWidget {
   List searchableItems = [];
   List autoCompleteItems = [];
+  double width;
   var isDense = false;
   var searchKontroller = TextEditingController();
   bool isSearching = false;
@@ -38,8 +39,8 @@ class GoogleAutoComplete extends StatefulWidget {
 
 
   GoogleAutoComplete({Key key,
-    this.searchableItems,
     this.hintText,
+    this.width,
     this.suche = true,
   });
 
@@ -134,7 +135,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
     }
 
     return Container(
-      width: 600,
+      width: widget.width ?? 600,
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.all(Radius.circular(5)),

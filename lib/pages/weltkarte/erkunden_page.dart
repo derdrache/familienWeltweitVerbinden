@@ -76,7 +76,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   removeCitiesWithoutInformation(){
     var newAllCities = [];
 
-    // city["isCity"] != 0 ||
     for(var city in allCities){
       var condition = city["kosten"] != null ||
         city["wetter"] != null || city["kosten"] != null ||
