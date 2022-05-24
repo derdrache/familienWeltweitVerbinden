@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 double sideSpace = 10;
 
 
-class _CustomDatePicker extends StatefulWidget {
+class CustomDatePicker extends StatefulWidget {
   var pickedDate;
   var hintText;
   var deleteFunction;
@@ -18,7 +18,7 @@ class _CustomDatePicker extends StatefulWidget {
     pickedDate = date;
   }
 
-  _CustomDatePicker({
+  CustomDatePicker({
     Key key,
     this.hintText,
     this.pickedDate,
@@ -27,10 +27,10 @@ class _CustomDatePicker extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CustomDatePickerState createState() => _CustomDatePickerState();
+  CustomDatePickerState createState() => CustomDatePickerState();
 }
 
-class _CustomDatePickerState extends State<_CustomDatePicker> {
+class CustomDatePickerState extends State<CustomDatePicker> {
   double boxHeight = 50;
   double borderRounding = 5;
 
@@ -154,7 +154,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
       birthDate.removeLast();
 
       childrensBirthDatePickerList.add(
-          _CustomDatePicker(
+          CustomDatePicker(
               hintText: birthDate.reversed.join("-"),
               pickedDate: date,
               dateIsSelected: true
@@ -178,7 +178,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
   void initState() {
     if(widget.childrensBirthDatePickerList.isEmpty){
       widget.childrensBirthDatePickerList.add(
-          _CustomDatePicker(hintText: widget.hintText)
+          CustomDatePicker(hintText: widget.hintText)
       );
     }
 
@@ -197,7 +197,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
   addChildrensBirthDatePickerList(childrenCount){
     if(childrenCount <=8){
       widget.childrensBirthDatePickerList.add(
-          _CustomDatePicker(
+          CustomDatePicker(
               hintText: widget.hintText,
               deleteFunction: deleteFunction()
           )
@@ -237,7 +237,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
         hintText = date.join("-");
 
         newPicker.add(
-            _CustomDatePicker(
+            CustomDatePicker(
                 hintText: hintText.split(" ")[0].split("-")[0],
                 pickedDate: dates[i],
                 dateIsSelected: dates[i] != null
@@ -245,7 +245,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
         );
       } else{
         newPicker.add(
-            _CustomDatePicker(
+            CustomDatePicker(
                 hintText: hintText.split(" ")[0].split("-")[0],
                 pickedDate: dates[i],
                 deleteFunction: deleteFunction(),
