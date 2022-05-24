@@ -254,8 +254,17 @@
     "genauerStandort": "exact location",
     "verkaufenTauschenSchenken": "Sell / Exchange / Give",
     "tradeHintText": "We sell... \nWe trade... \nWe give away...\n",
-    "tradeVeraendern": "sell/trade/give away change",
+    "tradeVeraendern": "change sell/trade/give away",
     "keineInsiderInformation": "There is no insider information entered yet",
-    "insiderInformationHinzufuegen": "add insider information"
+    "insiderInformationHinzufuegen": "add insider information",
+    "reisePlanung": "travel planning",
+    "besuchteLaender": "visited countries",
+    "besucheLaenderVeraendern": "change countries visited",
+    "reisePlanungVeraendern":"Change travel planning",
+    "laenderAuswahl": "select countries",
+    "besuchteLaenderUpdate": "visited countries has been updated",
+    "vollstaendigeDatenZukunftsOrtEingeben": "enter complete data for your future location",
+    "von": "from",
+    "bis": "until"
 }
 

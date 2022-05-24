@@ -3,6 +3,78 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+
+class MonthPickerBox extends StatefulWidget {
+  String hintText;
+  DateTime selectedDate;
+
+  MonthPickerBox({Key key, this.hintText}) : super(key: key);
+
+  getDate(){
+    return selectedDate;
+  }
+
+  deleteInput(){
+    selectedDate = null;
+  }
+
+  @override
+  State<MonthPickerBox> createState() => _MonthPickerBoxState();
+}
+
+class _MonthPickerBoxState extends State<MonthPickerBox> {
+
+
+
+  createText(){
+    if(widget.selectedDate == null) return widget.hintText;
+
+    return widget.selectedDate.month.toString() + " - " + widget.selectedDate.year.toString();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+
+
+    return InkWell(
+      onTap: () async  {
+        widget.selectedDate = await showMonthPicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime.now(),
+            lastDate: DateTime(DateTime.now().year + 5, DateTime.now().month)
+        );
+
+        setState(() {});
+      } ,
+      child: Container(
+        padding: EdgeInsets.all(5),
+        width: 80,
+        height: 50,
+          decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.all(
+                  Radius.circular(5.0)
+              )
+          ),
+        child: Center(
+            child: Text(
+              createText(),
+              style: TextStyle(color: widget.selectedDate == null ? Colors.grey :Colors.black),
+            )
+        ),
+      ),
+    );
+
+
+
+  }
+}
+
+
+
+
 Future<DateTime> showMonthPicker({
   BuildContext context,
   DateTime initialDate,

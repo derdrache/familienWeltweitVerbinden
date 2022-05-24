@@ -12,8 +12,8 @@ import '../global/global_functions.dart'as global_functions;
 import 'notification.dart';
 
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
 

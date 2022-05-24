@@ -256,5 +256,14 @@
     "tradeHintText": "Wir verkaufen... \nWir tauschen... \nWir verschenken...\n",
     "tradeVeraendern": "Verkaufen/tauschen/verschenken verändern",
     "keineInsiderInformation": "Es sind noch keine Insider Informationen eingetragen",
-    "insiderInformationHinzufuegen": "Insider-Information hinzufügen"
+    "insiderInformationHinzufuegen": "Insider-Information hinzufügen",
+    "reisePlanung": "Reiseplanung",
+    "besuchteLaender": "Besuchte Länder",
+    "besucheLaenderVeraendern": "Besuchte Länder verändern",
+    "reisePlanungVeraendern":"Reiseplanung verändern",
+    "laenderAuswahl": "Länder auswählen",
+    "besuchteLaenderUpdate": "Besuchte Länder wurde upgedatet",
+    "vollstaendigeDatenZukunftsOrtEingeben": "Vollständige Daten für dein zukünftigen Ort eingeben",
+    "von": "von",
+    "bis": "bis"
 }
