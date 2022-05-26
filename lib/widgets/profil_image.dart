@@ -165,13 +165,15 @@ class OwnProfilImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     showBigImage() {
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
                 backgroundColor: Colors.transparent,
-                content: Image.network(profil["bild"][0]));
+                content: Image.network(profil["bild"][0])
+            );
           });
     }
 
@@ -179,7 +181,7 @@ class OwnProfilImage extends StatelessWidget {
         onTap: fullScreenWindow ? () => showBigImage() : null,
         child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
-            child: CachedNetworkImage(
+            child: profil["bild"][0].contains("http") ? CachedNetworkImage(
                 width: 60,
                 height: 60,
                 fit: BoxFit.cover,
@@ -187,7 +189,13 @@ class OwnProfilImage extends StatelessWidget {
                 placeholder: (context, url) => Container(
                       color: Colors.black12,
                     )
-                //Center(child: CircularProgressIndicator()),
-                )));
+                ) : Image.asset(
+                profil["bild"][0],
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover
+            )
+        )
+    );
   }
 }

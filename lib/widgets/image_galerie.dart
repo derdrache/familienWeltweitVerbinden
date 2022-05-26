@@ -72,7 +72,7 @@ class _ImageGalerieState extends State<ImageGalerie> {
     }
 
     setState(() {});
-    EventDatabase().update(widget.id, "bild = '$selected'");
+    EventDatabase().update("bild = '$selected'", "WHERE id = '${widget.id}'");
     Navigator.pop(context);
 
   }

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' hide Key;
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
@@ -8,59 +9,14 @@ import 'package:encrypt/encrypt.dart';
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
+import 'notification.dart';
 
 
 var databaseUrl = "https://families-worldwide.com/";
 //var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
-class AllgemeinDatabase{
 
-  getData(whatData, queryEnd, {returnList = false}) async {
-    //sichere Datenbankabfrage
-    var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
-    var res = await http.post(url, body: json.encode({
-      "whatData": whatData,
-      "queryEnd": queryEnd,
-      "table": "allgemein"
-    }));
-
-    dynamic responseBody = res.body;
-    responseBody = decrypt(responseBody);
-
-    responseBody = jsonDecode(responseBody);
-    if(responseBody.isEmpty) return false;
-
-    for(var i = 0; i < responseBody.length; i++){
-
-      if(responseBody[i].keys.toList().length == 1){
-        var key = responseBody[i].keys.toList()[0];
-        responseBody[i] = responseBody[i][key];
-        continue;
-      }
-
-      for(var key in responseBody[i].keys.toList()){
-        try{
-          responseBody[i][key] = jsonDecode(responseBody[i][key]);
-        }catch(_){
-
-        }
-
-      }
-    }
-
-    if(responseBody.length == 1 && !returnList){
-      responseBody = responseBody[0];
-      try{
-        responseBody = jsonDecode(responseBody);
-      }catch(_){}
-    }
-
-    return responseBody;
-  }
-
-}
 
 class ProfilDatabase{
 
@@ -98,14 +54,10 @@ class ProfilDatabase{
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
-
   }
 
-
   getData(whatData, queryEnd, {returnList = false}) async{
-    //sichere Datenbankabfrage
     var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
 
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
@@ -166,19 +118,59 @@ class ProfilDatabase{
   }
 
   deleteProfil(userId) async {
-    FirebaseAuth.instance.currentUser.delete();
+    try{
+      FirebaseAuth.instance.currentUser.delete();
+    }catch(_){
+      return false;
+    }
+
 
     _deleteInTable("profils", userId);
 
-    /*
-    var allChatGroups = await ChatDatabase().getChatData("*", "WHERE id like '%$userId%'");
-    for (var chat in allChatGroups){
-      var chatId = chat["id"];
-      _deleteInTable("messages", chatId);
-      _deleteInTable("chats", chatId);
+    updateProfil(
+        "friendlist = JSON_REMOVE(friendlist, JSON_UNQUOTE(JSON_SEARCH(friendlist, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(friendlist, '\"$userId\"') > 0"
+    );
+
+    var userEvents = await EventDatabase().getData("id", "WHERE erstelltVon = '$userId'", returnList: true);
+    for(var eventId in userEvents){
+      _deleteInTable("events", eventId);
     }
 
-     */
+    EventDatabase().update(
+        "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0"
+    );
+
+    EventDatabase().update(
+        "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(zusage, '\"$userId\"') > 0"
+    );
+
+    EventDatabase().update(
+        "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(absage, '\"$userId\"') > 0"
+    );
+
+    EventDatabase().update(
+        "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(freischalten, '\"$userId\"') > 0"
+    );
+
+    EventDatabase().update(
+        "freigegeben = JSON_REMOVE(freigegeben, JSON_UNQUOTE(JSON_SEARCH(freigegeben, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(freigegeben, '\"$userId\"') > 0"
+    );
+
+
+    Hive.box("ownProfilBox").deleteFromDisk();
+    Hive.box("profilBox").deleteFromDisk();
+    Hive.box("eventBox").deleteFromDisk();
+    Hive.box("myEventsBox").deleteFromDisk();
+    Hive.box("interestEventsBox").deleteFromDisk();
+    Hive.box("myChatBox").deleteFromDisk();
+    Hive.box("stadtinfoUserBox").deleteFromDisk();
+    Hive.box("stadtinfoBox").deleteFromDisk();
 
   }
 
@@ -229,6 +221,7 @@ class ChatDatabase{
       "table": "chats"
     }));
     dynamic responseBody = res.body;
+
     responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
@@ -280,19 +273,14 @@ class ChatDatabase{
 
   }
 
-  updateChatGroup(chatId, change, data)async{
-    var url = Uri.parse(databaseUrl + "database/chats/updateChat.php");
-
-    if(data is Map){
-      data = json.encode(data);
-    }
+  updateChatGroup(whatData,queryEnd ) async {
+    var url = Uri.parse(databaseUrl + "database/update.php");
 
     await http.post(url, body: json.encode({
-      "id": chatId,
-      "change": change,
-      "data": data
+      "table": "chats",
+      "whatData": whatData,
+      "queryEnd": queryEnd
     }));
-
   }
 
   addNewMessageAndSendNotification(chatgroupData, messageData)async {
@@ -316,7 +304,12 @@ class ChatDatabase{
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
-    sendChatNotification(chatID, messageData);
+    prepareChatNotification(
+      chatId: chatID,
+      vonId: messageData["von"],
+      toId: messageData["zu"],
+      inhalt: messageData["message"]
+    );
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
@@ -333,7 +326,10 @@ class ChatDatabase{
 
       oldChatNewMessages[chatPartnerId]["newMessages"] = oldChatNewMessages[chatPartnerId]["newMessages"] +1;
 
-      ChatDatabase().updateChatGroup(chatData["id"], "users", oldChatNewMessages);
+      ChatDatabase().updateChatGroup(
+          "users = '${json.encode(oldChatNewMessages)}'",
+          "WHERE id = '${chatData["id"]}'"
+      );
 
     }
 
@@ -364,12 +360,13 @@ class EventDatabase{
     await http.post(url, body: json.encode(eventData));
   }
 
-  update(id, changes) async  {
-    var url = Uri.parse(databaseUrl + "database/events/updateEvent.php");
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
 
     await http.post(url, body: json.encode({
-      "id": id,
-      "changes": changes
+      "table": "events",
+      "whatData": whatData,
+      "queryEnd": queryEnd
     }));
 
   }
@@ -439,6 +436,217 @@ class EventDatabase{
 
 }
 
+class StadtinfoDatabase{
+
+  addNewCity(city) async {
+    if(city["ort"] == null ){
+      city["ort"] = city["city"];
+      city["land"] = city["countryname"];
+    }
+
+    if(! await _checkIfNew(city)) return false;
+
+    var url = Uri.parse(databaseUrl + "database/stadtinfo/newCity.php");
+    await http.post(url, body: json.encode(city));
+
+    return true;
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "stadtinfo"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+    return responseBody;
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "stadtinfo",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+
+  }
+
+  _checkIfNew(city) async {
+    var allCities = await getData("*", "", returnList: true);
+
+    for(var cityDB in allCities){
+      if(cityDB["ort"].contains(city["ort"])) return false;
+
+      if(cityDB["latt"] == city["latt"] && cityDB["longt"] == city["longt"]){
+        var name = cityDB["ort"] + " / " + city["ort"];
+        var id = cityDB["id"];
+
+        update("ort = '$name'", "WHERE id = '$id'");
+        return false;
+      }
+    }
+
+
+    return true;
+
+  }
+}
+
+class StadtinfoUserDatabase{
+
+  addNewInformation(stadtinformation) async {
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    var url = Uri.parse(databaseUrl + "database/stadtinfoUser/newInformation.php");
+    stadtinformation["erstelltVon"] = userId;
+
+    await http.post(url, body: json.encode(stadtinformation));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "stadtinfo_user"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+    return responseBody;
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "stadtinfo_user",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+
+  delete(informationId){
+    _deleteInTable("stadtinfo_user", informationId);
+  }
+
+
+}
+
+class AllgemeinDatabase{
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "allgemein"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+    return responseBody;
+  }
+
+}
+
 class ReportsDatabase{
 
   add(von, title, beschreibung){
@@ -449,84 +657,6 @@ class ReportsDatabase{
       "beschreibung": beschreibung ,
     }));
   }
-
-}
-
-
-sendChatNotification(chatId, messageData) async {
-  var toActiveChat = await ProfilDatabase()
-      .getData("activeChat", "WHERE id = '${messageData["zu"]}'");
-
-  if(toActiveChat == chatId) return;
-
-
-  var fromName = await ProfilDatabase()
-      .getData("name", "WHERE id = '${messageData["von"]}'");
-  var toToken = await ProfilDatabase()
-      .getData("token", "WHERE id = '${messageData["zu"]}'");
-  var chatPartnerName = await ProfilDatabase()
-      .getData("name", "WHERE id = '${messageData["zu"]}'");
-
-
-  var notificationInformation = {
-    "toId": messageData["zu"],
-    "toName": chatPartnerName,
-    "typ" : "chat",
-    "title": fromName,
-    "inhalt": messageData["message"],
-    "changePageId": chatId,
-    "token": toToken,
-  };
-
-  sendNotification(notificationInformation);
-
-
-}
-
-sendNotification(notificationInformation) async {
-    var notificationsAllowed = await ProfilDatabase()
-        .getData("notificationstatus", "WHERE id = '${notificationInformation["toId"]}'");
-
-    if(notificationsAllowed == 0) return;
-
-    if(notificationInformation["token"] == "" || notificationInformation["token"] == null){
-      var emailAdresse = await ProfilDatabase()
-          .getData("email", "WHERE id = '${notificationInformation["toId"]}'");
-
-      if(notificationInformation["typ"] == "chat"){
-        var url = Uri.parse(databaseUrl + "services/sendEmail.php");
-        http.post(url, body: json.encode({
-          "to": emailAdresse,
-          "title": notificationInformation["title"] + (spracheIstDeutsch ?
-          " hat dir eine Nachricht geschrieben": " has written you a message"),
-          "inhalt": "Hi ${notificationInformation["toName"]},\n\n" +
-              (spracheIstDeutsch ?
-              "du hast in der families worldwide App folgende Nachricht von "
-                  "${notificationInformation["title"]} erhalten: \n\n" :
-              "you have received the following message from "
-                  "${notificationInformation["title"]} in the families worldwide app: \n\n"
-              ) +
-              "${notificationInformation["inhalt"]}"
-        }));
-      }else if(notificationInformation["typ"] == "event"){
-        var url = Uri.parse(databaseUrl + "services/sendEmail.php");
-        http.post(url, body: json.encode({
-          "to": emailAdresse,
-          "title": notificationInformation["title"],
-          "inhalt": notificationInformation["inhalt"]
-        }));
-      }
-    }else{
-      var url = Uri.parse(databaseUrl + "services/sendNotification.php");
-      http.post(url, body: json.encode({
-        "to": notificationInformation["token"],
-        "title": notificationInformation["title"],
-        "inhalt": notificationInformation["inhalt"],
-        "changePageId": notificationInformation["changePageId"],
-        "apiKey": firebaseWebKey,
-        "typ": notificationInformation["typ"]
-      }));
-    }
 
 }
 
