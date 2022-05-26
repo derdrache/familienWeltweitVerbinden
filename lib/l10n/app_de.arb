@@ -86,7 +86,6 @@
     "friendlistEntfernt" : " von der Freundesliste entfernt",
     "friendlistHinzugefuegt": " der Freundesliste hinzugefügt",
     "familienAnzeige" : "Familienanzeige - Mehrere Accounts verbinden",
-    "nutzerBlockieren" : "Nutzer blockieren",
     "reisePlanung": "Reiseplanung/Reiseroute",
     "gemeinschaftenUpdate": "Gemeinschaften Eintragen/Anzeigen",
     "chatgruppen": "Chatgruppen",
@@ -265,5 +264,10 @@
     "besuchteLaenderUpdate": "Besuchte Länder wurde upgedatet",
     "vollstaendigeDatenZukunftsOrtEingeben": "Vollständige Daten für dein zukünftigen Ort eingeben",
     "von": "von",
-    "bis": "bis"
+    "bis": "bis",
+    "jetzt": "jetzt",
+    "vonKleinerAlsBis": "von-Datum muss kleiner als bis-Datum sein",
+    "zeitraumUeberschneidetSich": "Zeitraum überschneidet sich mit einem anderen Eintrag",
+    "reiseplanungSichtbarFuer": "Reiseplanung sichtbar für ",
+    "fuer": "Für "
 }

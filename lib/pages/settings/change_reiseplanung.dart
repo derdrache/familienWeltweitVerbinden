@@ -25,25 +25,29 @@ class ChangeReiseplanungPage extends StatefulWidget {
 class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   var vonDate = MonthPickerBox();
   var bisDate = MonthPickerBox();
-  var ortInput = GoogleAutoComplete(width: 160);
+  var ortInput = GoogleAutoComplete(width: 180);
 
-  saveButton() {
-    return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () async {
+  saveInDatabase() {
+    ProfilDatabase().updateProfil(
+        "reisePlanung = '${jsonEncode(widget.reiseplanung)}'",
+        "WHERE id = '${widget.userId}'");
+  }
 
-          ProfilDatabase().updateProfil(
-              "reisePlanung = '${jsonEncode(widget.reiseplanung)}'",
-              "WHERE id = '${widget.userId}'"
-          );
+  checkOverlappingPeriods(newPlan) {
+    var vonDateNewPlan = DateTime.parse(newPlan["von"]);
+    var bisDateNewPlan = DateTime.parse(newPlan["bis"]);
 
-          Navigator.pop(context);
-          customSnackbar(
-              context, AppLocalizations.of(context).besuchteLaenderUpdate,
-              color: Colors.green);
+    for (var plan in widget.reiseplanung) {
+      var vonDatePlan = DateTime.parse(plan["von"]);
+      var bisDatePlan = DateTime.parse(plan["bis"]);
 
+      if(vonDateNewPlan.isBefore(bisDatePlan) && vonDateNewPlan.isAfter(vonDatePlan)) return true;
 
-        });
+      if(bisDateNewPlan.isBefore(bisDatePlan) && bisDateNewPlan.isAfter(vonDatePlan)) return true;
+
+    }
+
+    return false;
   }
 
   addNewTravelPlan() {
@@ -55,24 +59,57 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
       "latt": 50.73743,
     };
 
+/*
+    var ortData = {
+      "city": "Puerto Morelos",
+      "countryname": "Mexiko",
+      "longt": -86.8755342,
+      "latt": 20.8478084,
+    };
+
+ */
+
     if (vonDate.getDate() == null ||
         bisDate.getDate() == null ||
         ortData["city"] == null) {
-      customSnackbar(context, AppLocalizations.of(context).vollstaendigeDatenZukunftsOrtEingeben);
+      customSnackbar(context,
+          AppLocalizations.of(context).vollstaendigeDatenZukunftsOrtEingeben);
       return;
     }
 
-    widget.reiseplanung.add({
+    if (bisDate.getDate().isBefore(vonDate.getDate())) {
+      customSnackbar(context, AppLocalizations.of(context).vonKleinerAlsBis);
+      return;
+    }
+
+    var newReiseplan = {
       "von": vonDate.getDate().toString(),
       "bis": bisDate.getDate().toString(),
       "ortData": ortData
-    });
+    };
 
+    if (checkOverlappingPeriods(newReiseplan)) {
+      customSnackbar(
+          context, AppLocalizations.of(context).zeitraumUeberschneidetSich);
+      return;
+    }
+
+    widget.reiseplanung.add(newReiseplan);
+
+    saveInDatabase();
 
     setState(() {
       vonDate = MonthPickerBox();
       bisDate = MonthPickerBox();
     });
+  }
+
+  deleteReiseplan(reiseplan) {
+    widget.reiseplanung.remove(reiseplan);
+
+    saveInDatabase();
+
+    setState(() {});
   }
 
   @override
@@ -81,9 +118,21 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     bisDate.hintText = AppLocalizations.of(context).bis;
     ortInput.hintText = AppLocalizations.of(context).ort;
 
+    transformDateToText(dateString) {
+      DateTime date = DateTime.parse(dateString);
+
+      if ((date.month > DateTime.now().month &&
+              date.year == DateTime.now().year) ||
+          date.year > DateTime.now().year) {
+        return date.month.toString() + "." + date.year.toString();
+      } else {
+        return AppLocalizations.of(context).jetzt;
+      }
+    }
+
     addNewPlanBox() {
       return Container(
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
           width: 800,
           child: Column(
             children: [
@@ -91,15 +140,14 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   vonDate,
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   bisDate,
-                  SizedBox(width: 10),
                   ortInput,
                 ],
               ),
               IconButton(
                   onPressed: () => addNewTravelPlan(),
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.add_circle,
                     size: 40,
                   ))
@@ -107,21 +155,57 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
           ));
     }
 
-    showReiseplanung(){
-      return Container(
-        child: ListView(
-          children: [
+    showReiseplanung() {
+      List<Widget> reiseplanungBox = [];
 
-          ],
+      widget.reiseplanung.sort((a, b) => a["von"].compareTo(b["von"]) as int );
+
+      for (var planung in widget.reiseplanung) {
+        String ortText = planung["ortData"]["city"];
+
+        if (planung["ortData"]["city"] != planung["ortData"]["countryname"]) {
+          ortText += " / " + planung["ortData"]["countryname"];
+        }
+
+        reiseplanungBox.add(Container(
+            margin: const EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    transformDateToText(planung["von"]) +
+                        " - " +
+                        transformDateToText(planung["bis"]) +
+                        " in " +
+                        ortText,
+                    style: const TextStyle(fontSize: 18),
+                    maxLines: 2,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.cancel,
+                    color: Colors.red,
+                  ),
+                  onPressed: () => deleteReiseplan(planung),
+                )
+              ],
+            )));
+      }
+
+      return Expanded(
+        child: ListView(
+          children: reiseplanungBox,
         ),
       );
     }
 
     return Scaffold(
         appBar: CustomAppBar(
-            title: AppLocalizations.of(context).reisePlanungVeraendern,
-            buttons: <Widget>[saveButton()]),
-        body: ListView(
+          title: AppLocalizations.of(context).reisePlanungVeraendern,
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             addNewPlanBox(),
             Container(
@@ -131,6 +215,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold),
                 )),
+            showReiseplanung()
           ],
         ));
   }
