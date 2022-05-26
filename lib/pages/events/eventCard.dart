@@ -83,8 +83,9 @@ class _EventCardState extends State<EventCard> {
       absageList.add(userId);
     }
 
-    EventDatabase().update(widget.event["id"], "absage = '${json.encode(absageList)}', "
-        "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'");
+    EventDatabase().update("absage = '${json.encode(absageList)}', "
+        "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'",
+        "WHERE id = '${widget.event["id"]}'");
   }
 
   createDatetimeText(){
@@ -286,7 +287,10 @@ class _InteresseButtonState extends State<InteresseButton> {
       interesseList.remove(userId);
     }
 
-    EventDatabase().update(widget.id, "interesse = '${json.encode(interesseList)}'");
+
+    EventDatabase().update(
+      "interesse = '${json.encode(interesseList)}'",
+      "WHERE id ='${widget.id}'");
 
   }
 

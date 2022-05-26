@@ -5,6 +5,8 @@ import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../widgets/custom_appbar.dart';
+
 class ChangeChildrenPage extends StatelessWidget {
   var userId;
   var childrenBirthdatePickerBox;
@@ -16,8 +18,8 @@ class ChangeChildrenPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     saveButton(){
-      return TextButton(
-        child: Icon(Icons.done),
+      return IconButton(
+        icon: Icon(Icons.done),
         onPressed: () async{
           bool allFilled = true;
 
@@ -44,7 +46,7 @@ class ChangeChildrenPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context).kinderAendern, buttons: [saveButton()]),
+      appBar: CustomAppBar(title: AppLocalizations.of(context).kinderAendern, buttons: [saveButton()]),
       body: childrenBirthdatePickerBox,
     );
   }
