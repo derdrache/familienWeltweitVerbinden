@@ -10,9 +10,10 @@ import 'package:hive/hive.dart';
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/variablen.dart' as global_variablen;
-import '../global/style.dart' as global_style;
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
+import '../services/notification.dart';
+import '../widgets/custom_appbar.dart';
 import '../widgets/profil_image.dart';
 
 // ignore: must_be_immutable
@@ -33,7 +34,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  var userFriendlist = [];
+  var userFriendlist = Hive.box("ownProfilBox").get("list")["friendlist"];
   double columnAbstand = 15;
   double textSize = 16;
   double healineTextSize = 18;
@@ -41,21 +42,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   @override
   void initState() {
-    setFriendList();
     checkOwnProfil();
     super.initState();
   }
 
   checkOwnProfil() {
     if (widget.profil["id"] == userID) widget.ownProfil = true;
-  }
-
-  setFriendList() async {
-    if (widget.userName.isEmpty) return;
-
-    var dbFriendlist = await ProfilDatabase()
-        .getData("friendlist", "WHERE name = '${widget.userName}'");
-    userFriendlist = dbFriendlist == "" ? [] : dbFriendlist;
   }
 
   getMonthDifference() {
@@ -74,9 +66,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     var monthDifference = getMonthDifference();
 
     openChatButton() {
-      return TextButton(
-          style: global_style.textButtonStyle(),
-          child: const Icon(Icons.message),
+      return IconButton(
+          icon: const Icon(Icons.message),
           onPressed: () async {
             var profilId = await ProfilDatabase()
                 .getData("id", "WHERE name = '${widget.profil["name"]}'");
@@ -108,11 +99,18 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           ? userFriendlist.contains(widget.profil["id"])
           : false;
 
-      return TextButton(
-          style: global_style.textButtonStyle(),
-          child: onFriendlist
-              ? const Icon(Icons.person_remove)
-              : const Icon(Icons.person_add),
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              onFriendlist
+                  ? const Icon(Icons.person_remove)
+                  : const Icon(Icons.person_add),
+              SizedBox(width: 10),
+              onFriendlist
+                  ? Text(AppLocalizations.of(context).freundEntfernen)
+                  : Text(AppLocalizations.of(context).freundHinzufuegen),
+            ],
+          ),
           onPressed: () {
             var snackbarText = "";
 
@@ -125,6 +123,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               userFriendlist.add(widget.profil["id"]);
               snackbarText = widget.profil["name"] +
                   AppLocalizations.of(context).friendlistHinzugefuegt;
+
+              prepareFriendNotification(
+                  newFriendId: userID,
+                  toId: widget.profil["id"],
+                  toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
+                      widget.profil["sprachen"].contains("german"));
             }
 
             var ownProfilBox = Hive.box("ownProfilBox");
@@ -137,10 +141,38 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             customSnackbar(context, snackbarText, color: Colors.green);
 
             ProfilDatabase().updateProfil(
-                "friendlist = '${jsonEncode(userFriendlist)}'", "WHERE id = '$userID'");
+                "friendlist = '${jsonEncode(userFriendlist)}'",
+                "WHERE id = '$userID'");
 
+            Navigator.pop(context);
             setState(() {});
           });
+    }
+
+    moreMenuButton() {
+      return IconButton(
+        icon: Icon(Icons.more_vert),
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: 220,
+                      child: SimpleDialog(
+                        contentPadding: EdgeInsets.zero,
+                        insetPadding:
+                            const EdgeInsets.only(top: 40, left: 0, right: 10),
+                        children: [friendlistButton()],
+                      ),
+                    ),
+                  ],
+                );
+              });
+        },
+      );
     }
 
     titelBox() {
@@ -193,26 +225,41 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       ]);
     }
 
-    aufreiseBox(){
+    aufreiseBox() {
       var themenText = AppLocalizations.of(context).aufReise + ": ";
       var inhaltText = "";
 
-
-      if(widget.profil["aufreiseSeit"] == null){
+      if (widget.profil["aufreiseSeit"] == null) {
         return const SizedBox.shrink();
-      } else if(widget.profil["aufreiseBis"] == null){
-        var seidText = widget.profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+      } else if (widget.profil["aufreiseBis"] == null) {
+        var seidText = widget.profil["aufreiseSeit"]
+            .split("-")
+            .take(2)
+            .toList()
+            .reversed
+            .join("-");
         inhaltText = seidText + " - " + AppLocalizations.of(context).offen;
-      } else{
-        var seidText = widget.profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
-        var bisText = widget.profil["aufreiseBis"].split("-").take(2).toList().reversed.join("-");
+      } else {
+        var seidText = widget.profil["aufreiseSeit"]
+            .split("-")
+            .take(2)
+            .toList()
+            .reversed
+            .join("-");
+        var bisText = widget.profil["aufreiseBis"]
+            .split("-")
+            .take(2)
+            .toList()
+            .reversed
+            .join("-");
         inhaltText = seidText + " - " + bisText;
       }
 
       return Column(children: [
         Row(children: [
           Text(themenText,
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+              style:
+                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
           Text(inhaltText, style: TextStyle(fontSize: textSize))
         ]),
         SizedBox(height: columnAbstand),
@@ -281,25 +328,46 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     aboutmeBox() {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context).ueberMich + ": ",
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
-          ),
-          Flexible(
-            child: Text(
+      return Container(
+        margin: EdgeInsets.only(bottom:10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).ueberMich + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 5),
+            Text(
               widget.profil["aboutme"],
               style: TextStyle(fontSize: textSize),
+            )
+          ],
+        ),
+      );
+    }
+
+    tradeNotizeBox() {
+      return Container(
+        margin: EdgeInsets.only(bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).verkaufenTauschenSchenken + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
-          )
-        ],
+            SizedBox(height: 5),
+            Text(
+                widget.profil["tradeNotize"],
+                style: TextStyle(fontSize: textSize),
+              ),
+          ],
+        ),
       );
     }
 
     infoProfil() {
-
       return Container(
           padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
           decoration: BoxDecoration(
@@ -332,7 +400,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               SizedBox(height: columnAbstand),
               interessenBox(),
               SizedBox(height: columnAbstand),
-              if (widget.profil["aboutme"].isNotEmpty) aboutmeBox()
+              if(widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
+              if(widget.profil["tradeNotize"].isNotEmpty) tradeNotizeBox()
             ],
           ));
     }
@@ -378,9 +447,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     return Scaffold(
-      appBar: customAppBar(title: "", buttons: [
+      appBar: CustomAppBar(title: "", buttons: [
         widget.ownProfil ? const SizedBox.shrink() : openChatButton(),
-        widget.ownProfil ? const SizedBox.shrink() : friendlistButton()
+        widget.ownProfil ? const SizedBox.shrink() : moreMenuButton()
       ]),
       body: SizedBox(
         width: double.maxFinite,

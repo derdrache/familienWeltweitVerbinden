@@ -1,69 +1,168 @@
+import 'dart:io';
+import 'dart:ui';
+import 'package:familien_suche/global/variablen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../global/global_functions.dart' as global_func;
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../services/database.dart';
+import '../../widgets/custom_appbar.dart';
+import '../../widgets/dialogWindow.dart';
 import '../login_register_page/login_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
   var profil;
 
-  PrivacySecurityPage({Key key,this.profil}) : super(key: key);
+  PrivacySecurityPage({Key key, this.profil}) : super(key: key);
 
   @override
   _PrivacySecurityPageState createState() => _PrivacySecurityPageState();
 }
 
 class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
-  var userID = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser.uid;
+  double fontsize = 20;
+  var automaticLocationDropdown = CustomDropDownButton();
+  var spracheIstDeutsch = kIsWeb
+      ? window.locale.languageCode == "de"
+      : Platform.localeName == "de_DE";
+
+  saveAutomaticLocation() async {
+    var locationAuswahl = automaticLocationDropdown.getSelected();
+
+
+
+
+    if (locationAuswahl != standortbestimmung[0] &&
+        locationAuswahl != standortbestimmungEnglisch[0]) {
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+    }
+
+    ProfilDatabase().updateProfil(
+        "automaticLocation ='$locationAuswahl'", "WHERE id ='$userId'");
+  }
 
   @override
   Widget build(BuildContext context) {
+    var locationList =
+        spracheIstDeutsch ? standortbestimmung : standortbestimmungEnglisch;
+    var selected = widget.profil["automaticLocation"] != null ?
+    (spracheIstDeutsch ?
+        global_func.changeEnglishToGerman(widget.profil["automaticLocation"]) :
+        global_func.changeGermanToEnglish(widget.profil["automaticLocation"])) :
+    (spracheIstDeutsch
+        ? standortbestimmung[0]
+        : standortbestimmungEnglisch[0]);
 
-    emailSettingContainer(){
-      return Row(
-        children: [
-          const SizedBox(width: 20),
-          Text(AppLocalizations.of(context).emailAlleSichtbar, style: const TextStyle(fontSize: 20),),
-          const Expanded(child: SizedBox(width: 20)),
-          Switch(
-              value: widget.profil["emailAnzeigen"] == 1 ? true: false,
-              onChanged: (value){
-                setState(() {
-                  widget.profil["emailAnzeigen"] = value == true ? 1 : 0;
-                });
-                ProfilDatabase().updateProfil(
-                  "emailAnzeigen = '${widget.profil["emailAnzeigen"]}'",
-                  "WHERE id = '$userID'");
-              })
-        ],
+
+    automaticLocationDropdown = CustomDropDownButton(
+      items: locationList,
+      selected: selected,
+      onChange: () => saveAutomaticLocation(),
+    );
+
+    emailSettingContainer() {
+      return Container(
+        margin: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Text(
+              AppLocalizations.of(context).emailAlleSichtbar,
+              style: TextStyle(fontSize: fontsize),
+            ),
+            const Expanded(child: SizedBox(width: 20)),
+            Switch(
+                value: widget.profil["emailAnzeigen"] == 1 ? true : false,
+                onChanged: (value) {
+                  setState(() {
+                    widget.profil["emailAnzeigen"] = value == true ? 1 : 0;
+                  });
+                  ProfilDatabase().updateProfil(
+                      "emailAnzeigen = '${widget.profil["emailAnzeigen"]}'",
+                      "WHERE id = '$userId'");
+                })
+          ],
+        ),
       );
     }
 
-    deleteProfilContainer(){
-      return FloatingActionButton.extended(
-        backgroundColor: Colors.red,
-        label: const Text("Account löschen"),
-        onPressed: () async {
-          var userId = FirebaseAuth.instance.currentUser?.uid;
-          ProfilDatabase().deleteProfil(userId);
-          setState(() {});
-          global_functions.changePageForever(context, const LoginPage());
-        },
+    automaticLocationContainer() {
+      return Container(
+        margin: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            SizedBox(
+                width: 200,
+                child: Text(
+                  AppLocalizations.of(context).automatischeStandortbestimmung,
+                  style: TextStyle(fontSize: fontsize),
+                )),
+            const Expanded(child: SizedBox()),
+            SizedBox(width: 150, child: automaticLocationDropdown)
+          ],
+        ),
       );
+    }
+
+    deleteProfilWindow() {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).accountLoeschen,
+              height: 90,
+              children: [
+                const SizedBox(height: 10),
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context).accountWirklichLoeschen))
+              ],
+              actions: [
+                TextButton(
+                  child: const Text("Ok"),
+                  onPressed: () {
+                    var userId = FirebaseAuth.instance.currentUser?.uid;
+                    ProfilDatabase().deleteProfil(userId);
+                    setState(() {});
+                    global_functions.changePageForever(
+                        context, const LoginPage());
+                  },
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context).abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            );
+          });
+    }
+
+    deleteProfilContainer() {
+      return FloatingActionButton.extended(
+          backgroundColor: Colors.red,
+          label: Text(AppLocalizations.of(context).accountLoeschen),
+          onPressed: () => deleteProfilWindow());
     }
 
     return Scaffold(
-      appBar: customAppBar(title: AppLocalizations.of(context).privatsphaereSicherheit),
+      appBar: CustomAppBar(
+          title: AppLocalizations.of(context).privatsphaereSicherheit),
       body: Column(
         children: [
-          const SizedBox(height: 20,),
           emailSettingContainer(),
+          automaticLocationContainer(),
           const Expanded(child: SizedBox.shrink()),
-          //deleteProfilContainer(),
-          //SizedBox(height: 10)
+          deleteProfilContainer(),
+          const SizedBox(height: 10)
         ],
       ),
     );

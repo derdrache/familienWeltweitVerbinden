@@ -9,10 +9,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:in_app_update/in_app_update.dart';
 
+import '../global/variablen.dart';
+import '../services/locationsService.dart';
 import '../widgets/badge_icon.dart';
-import 'erkunden_page.dart';
+import '../windows/patchnotes.dart';
+import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
 
@@ -26,11 +28,12 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
-  var userID = FirebaseAuth.instance.currentUser?.uid;
+  var userId = FirebaseAuth.instance.currentUser?.uid;
   var userName = FirebaseAuth.instance.currentUser?.displayName;
   var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
   PackageInfo packageInfo;
   var hasInternet = true;
+  var ownProfilBox = Hive.box("ownProfilBox");
 
   @override
   void initState() {
@@ -42,36 +45,22 @@ class _StartPageState extends State<StartPage> {
   _asyncMethod() async {
     await setHiveBoxen();
 
-    checkFlexibleUpdate();
-
     checkAndUpdateProfil();
+
+    showPatchnotes();
+
   }
 
   setHiveBoxen() async {
-    var ownProfilBox = Hive.box("ownProfilBox");
-    if (ownProfilBox.get("list") == null) {
-      var ownProfil =
-          await ProfilDatabase().getData("*", "WHERE id = '$userID'");
-      ownProfilBox.put("list", ownProfil);
-    }
-  }
-
-  checkFlexibleUpdate() async {
-    try {
-      var updateInformation = await InAppUpdate.checkForUpdate();
-      if (updateInformation.updateAvailability ==
-              UpdateAvailability.updateAvailable &&
-          !kIsWeb) {
-        InAppUpdate.startFlexibleUpdate();
-      }
-    } catch (_) {}
+    var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
+    ownProfilBox.put("list", ownProfil);
   }
 
   checkAndUpdateProfil() async {
     if (userName == null) return;
 
-    var dbData =
-        await ProfilDatabase().getData("email, token", "WHERE id = '$userID'");
+    var dbData = await ProfilDatabase()
+        .getData("email, token, automaticLocation", "WHERE id = '$userId'");
 
     var userDBEmail = dbData["email"];
     var userDeviceTokenDb = dbData["token"];
@@ -80,16 +69,88 @@ class _StartPageState extends State<StartPage> {
 
     if (userAuthEmail != userDBEmail) {
       ProfilDatabase()
-          .updateProfil("email = '$userAuthEmail'", "WHERE id = '$userID'");
+          .updateProfil("email = '$userAuthEmail'", "WHERE id = '$userId'");
     }
 
     if (userDeviceTokenDb != userDeviceTokenReal) {
       ProfilDatabase().updateProfil(
-          "token = '$userDeviceTokenReal'", "WHERE id = '$userID'");
+          "token = '$userDeviceTokenReal'", "WHERE id = '$userId'");
+    }
+
+    var automaticLocation = dbData["automaticLocation"];
+    if (automaticLocation != null &&
+        automaticLocation != standortbestimmung[0] &&
+        automaticLocation != standortbestimmungEnglisch[0]) {
+      setAutomaticLoaction(automaticLocation);
     }
 
     ProfilDatabase().updateProfil(
-        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userID'");
+        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
+  }
+
+  showPatchnotes() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var buildNumber = int.parse(packageInfo.buildNumber);
+
+    if(ownProfilBox.get("version") == null || buildNumber > ownProfilBox.get("version")){
+      PatchnotesWindow(context: context).openWindow();
+      ownProfilBox.put("version", buildNumber);
+    }
+  }
+
+  setAutomaticLoaction(automaticLocationStatus) async {
+    var ownProfilBox = Hive.box("ownProfilBox");
+    var ownProfil = ownProfilBox.get("list");
+
+    if (DateTime.now()
+            .difference(DateTime.parse(ownProfil["lastLogin"])).inDays > 0
+    ) {
+
+      var newLocation = "";
+      var currentPosition = await LocationService().getCurrentUserLocation();
+
+      var nearstLocationData =
+          await LocationService().getNearstLocationData(currentPosition);
+
+      nearstLocationData =
+          LocationService().transformNearstLocation(nearstLocationData);
+
+      if(nearstLocationData["country"].isEmpty) return;
+
+      if (automaticLocationStatus == standortbestimmung[1] ||
+          automaticLocationStatus == standortbestimmungEnglisch[1]) {
+
+
+        ProfilDatabase().updateProfilLocation(userId, {
+          "city": " ",
+          "land": nearstLocationData["country"],
+          "longt": currentPosition.longitude,
+          "latt": currentPosition.latitude,
+        });
+        return;
+      } else if (automaticLocationStatus == standortbestimmung[2] ||
+          automaticLocationStatus == standortbestimmungEnglisch[2]) {
+        newLocation = nearstLocationData["city"];
+      } else if (automaticLocationStatus == standortbestimmung[3] ||
+          automaticLocationStatus == standortbestimmungEnglisch[3]) {
+        newLocation = nearstLocationData["region"];
+      }
+
+      if (newLocation == ownProfil["ort"]) return;
+
+      var geoData = await LocationService().getLocationGeoData(newLocation);
+
+      var locationData = await LocationService()
+          .getDatabaseLocationdataFromGoogleResult(geoData);
+
+      ProfilDatabase().updateProfilLocation(userId, locationData);
+      StadtinfoDatabase().addNewCity(locationData);
+      StadtinfoDatabase().update(
+          "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
+          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
+      );
+
+    }
   }
 
   @override
@@ -122,10 +183,29 @@ class _StartPageState extends State<StartPage> {
       });
     }
 
+    eventIcon(){
+      return FutureBuilder(
+          future:
+          EventDatabase().getData(
+              "*",
+              "WHERE erstelltVon ='$userId' AND json_length(freischalten) > 0",
+              returnList: true),
+          builder: (BuildContext context, AsyncSnapshot snap) {
+            if (!snap.hasData) return const Icon(Icons.event);
+
+            var events = snap.data;
+            events = events == false ? 0 : events.length;
+
+            return BadgeIcon(
+                icon: Icons.event,
+                text: events > 0 ? events.toString() : "");
+          });
+    }
+
     chatIcon() {
       return FutureBuilder(
           future:
-              ProfilDatabase().getData("newMessages", "WHERE id = '$userID'"),
+              ProfilDatabase().getData("newMessages", "WHERE id = '$userId'"),
           builder: (BuildContext context, AsyncSnapshot snap) {
             if (!snap.hasData) return const Icon(Icons.chat);
 
@@ -161,8 +241,8 @@ class _StartPageState extends State<StartPage> {
               icon: Icon(Icons.map),
               label: 'World',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.event),
+            BottomNavigationBarItem(
+              icon: eventIcon(),
               label: 'Events',
             ),
             BottomNavigationBarItem(
