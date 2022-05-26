@@ -684,7 +684,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                         }
 
                         return Text(
-                          name + " 02.05.2022",
+                          name + " " +information["erstelltAm"].split("-").reversed.join("-"),
                           style: const TextStyle(color: Colors.black),
                         );
                       }),
