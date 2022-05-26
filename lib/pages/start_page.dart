@@ -103,7 +103,7 @@ class _StartPageState extends State<StartPage> {
     var ownProfil = ownProfilBox.get("list");
 
     if (DateTime.now()
-            .difference(DateTime.parse(ownProfil["lastLogin"])).inDays > 0
+            .difference(DateTime.parse(ownProfil["lastLogin"])).inDays == 0
     ) {
 
       var newLocation = "";
@@ -144,7 +144,7 @@ class _StartPageState extends State<StartPage> {
           .getDatabaseLocationdataFromGoogleResult(geoData);
 
       ProfilDatabase().updateProfilLocation(userId, locationData);
-      StadtinfoDatabase().addNewCity(locationData);
+      await StadtinfoDatabase().addNewCity(locationData);
       StadtinfoDatabase().update(
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
           "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
