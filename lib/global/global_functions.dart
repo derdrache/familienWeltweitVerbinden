@@ -112,12 +112,14 @@ changeGermanToEnglish(list){
     var eventArtIndex = eventArt.indexOf(list);
     var aufreiseIndex = aufreise.indexOf(list);
     var standortBestimmungIndex = standortbestimmung.indexOf(list);
+    var reiseplanungPrivacyIndex = privacySetting.indexOf(list);
 
     if(reiseartenIndex > -1) return reiseartenEnglisch[reiseartenIndex];
     if(eventIntervalIndex > -1) return eventIntervalEnglisch[eventIntervalIndex];
     if(eventArtIndex > -1) return eventArtEnglisch[eventArtIndex];
     if(aufreiseIndex > -1) return aufreiseEnglisch[aufreiseIndex];
     if(standortBestimmungIndex > -1) return standortbestimmungEnglisch[standortBestimmungIndex];
+    if(reiseplanungPrivacyIndex > -1) return privacySettingEnglisch[reiseplanungPrivacyIndex];
 
 
 
@@ -154,12 +156,14 @@ changeEnglishToGerman(list){
     var eventArtIndex = eventArtEnglisch.indexOf(list);
     var aufreiseIndex = aufreiseEnglisch.indexOf(list);
     var standortBestimmungIndex = standortbestimmungEnglisch.indexOf(list);
+    var reiseplanungPrivacyIndex = privacySettingEnglisch.indexOf(list);
 
     if(reiseartenIndex > -1) return reisearten[reiseartenIndex];
     if(eventIntervalIndex > -1) return eventInterval[eventIntervalIndex];
     if(eventArtIndex > -1) return eventArt[eventArtIndex];
     if(aufreiseIndex > -1) return aufreise[aufreiseIndex];
     if(standortBestimmungIndex > -1) return standortbestimmung[standortBestimmungIndex];
+    if(reiseplanungPrivacyIndex > -1) return privacySetting[reiseplanungPrivacyIndex];
 
     return list;
   }

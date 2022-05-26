@@ -86,7 +86,6 @@
     "friendlistEntfernt" : " removed from friends list",
     "friendlistHinzugefuegt": " added to friends list",
     "familienAnzeige" : "Family display - Connect multiple Accounts",
-    "nutzerBlockieren" : "Block users",
     "reisePlanung": "Travel planning / Travel route",
     "gemeinschaftenUpdate": "Register/Show communities",
     "chatgruppen": "Chat groups",
@@ -265,6 +264,11 @@
     "besuchteLaenderUpdate": "visited countries has been updated",
     "vollstaendigeDatenZukunftsOrtEingeben": "enter complete data for your future location",
     "von": "from",
-    "bis": "until"
+    "bis": "until",
+    "jetzt": "now",
+    "vonKleinerAlsBis": "from-date must be smaller than until-date",
+    "zeitraumUeberschneidetSich": "period overlaps with another entry",
+    "reiseplanungSichtbarFuer": "Travel planning visible to ",
+    "fuer": "for "
 }
 

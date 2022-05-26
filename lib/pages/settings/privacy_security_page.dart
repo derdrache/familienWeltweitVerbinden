@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hive/hive.dart';
 import '../../global/global_functions.dart' as global_func;
 
 import '../../global/custom_widgets.dart';
@@ -28,15 +29,15 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   double fontsize = 20;
   var automaticLocationDropdown = CustomDropDownButton();
+  var reiseplanungDropdown = CustomDropDownButton();
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
+
+
   saveAutomaticLocation() async {
     var locationAuswahl = automaticLocationDropdown.getSelected();
-
-
-
 
     if (locationAuswahl != standortbestimmung[0] &&
         locationAuswahl != standortbestimmungEnglisch[0]) {
@@ -51,24 +52,58 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         "automaticLocation ='$locationAuswahl'", "WHERE id ='$userId'");
   }
 
-  @override
-  Widget build(BuildContext context) {
-    var locationList =
-        spracheIstDeutsch ? standortbestimmung : standortbestimmungEnglisch;
-    var selected = widget.profil["automaticLocation"] != null ?
-    (spracheIstDeutsch ?
-        global_func.changeEnglishToGerman(widget.profil["automaticLocation"]) :
-        global_func.changeGermanToEnglish(widget.profil["automaticLocation"])) :
-    (spracheIstDeutsch
-        ? standortbestimmung[0]
-        : standortbestimmungEnglisch[0]);
+  saveReiseplanung() async{
+    var reiseplanungPrivacyAuswahl = reiseplanungDropdown.getSelected();
 
+    var ownProfilBox = Hive.box("ownProfilBox");
+    var ownProfil = ownProfilBox.get("list");
+    ownProfil["reiseplanungPrivacy"] = reiseplanungPrivacyAuswahl;
+    ownProfilBox.put("list", ownProfil);
+
+
+    ProfilDatabase().updateProfil(
+        "reiseplanungPrivacy = '$reiseplanungPrivacyAuswahl'",
+        "WHERE id = '$userId'"
+    );
+  }
+
+  setAutomaticLocationDropdown(){
+    var locationList = spracheIstDeutsch ?
+      standortbestimmung : standortbestimmungEnglisch;
+    var selected = widget.profil["automaticLocation"] != null ?
+      (spracheIstDeutsch ?
+      global_func.changeEnglishToGerman(widget.profil["automaticLocation"]) :
+      global_func.changeGermanToEnglish(widget.profil["automaticLocation"])) :
+      (spracheIstDeutsch
+          ? standortbestimmung[0]
+          : standortbestimmungEnglisch[0]);
 
     automaticLocationDropdown = CustomDropDownButton(
       items: locationList,
       selected: selected,
       onChange: () => saveAutomaticLocation(),
     );
+  }
+
+  setReiseplanungDropdown(){
+    var items = spracheIstDeutsch ? privacySetting : privacySettingEnglisch;
+    var selected = spracheIstDeutsch ?
+    global_func.changeEnglishToGerman(widget.profil["reiseplanungPrivacy"]) :
+    global_func.changeGermanToEnglish(widget.profil["reiseplanungPrivacy"]);
+
+    reiseplanungDropdown = CustomDropDownButton(
+        items: items,
+        selected: selected,
+        onChange: () => saveReiseplanung(),
+    );
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    setAutomaticLocationDropdown();
+    setReiseplanungDropdown();
+
 
     emailSettingContainer() {
       return Container(
@@ -100,16 +135,30 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         margin: const EdgeInsets.all(10),
         child: Row(
           children: [
-            SizedBox(
-                width: 200,
-                child: Text(
-                  AppLocalizations.of(context).automatischeStandortbestimmung,
-                  style: TextStyle(fontSize: fontsize),
-                )),
-            const Expanded(child: SizedBox()),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context).automatischeStandortbestimmung,
+                style: TextStyle(fontSize: fontsize),
+              ),
+            ),
             SizedBox(width: 150, child: automaticLocationDropdown)
           ],
         ),
+      );
+    }
+
+    reiseplanungBox(){
+      return Container(
+        margin: const EdgeInsets.all(10),
+        child: Row(children: [
+          Expanded(
+            child: Text(
+              AppLocalizations.of(context).reiseplanungSichtbarFuer,
+              style: TextStyle(fontSize: fontsize),
+            ),
+          ),
+          SizedBox(width: 150,child: reiseplanungDropdown)
+        ],)
       );
     }
 
@@ -160,6 +209,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         children: [
           emailSettingContainer(),
           automaticLocationContainer(),
+          reiseplanungBox(),
           const Expanded(child: SizedBox.shrink()),
           deleteProfilContainer(),
           const SizedBox(height: 10)
