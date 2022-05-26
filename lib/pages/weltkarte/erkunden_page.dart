@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
+import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -8,14 +10,16 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../services/database.dart';
-import '../global/global_functions.dart' as global_functions;
-import '../global/variablen.dart' as global_var;
-import '../widgets/profil_image.dart';
-import '../widgets/search_autocomplete.dart';
-import '../services/locationsService.dart';
-import 'show_profil.dart';
-import 'events/eventCard.dart';
+import 'create_stadtinformation.dart';
+import '../../global/global_functions.dart';
+import '../../services/database.dart';
+import '../../global/global_functions.dart' as global_functions;
+import '../../global/variablen.dart' as global_var;
+import '../../widgets/profil_image.dart';
+import '../../widgets/search_autocomplete.dart';
+import '../../services/locationsService.dart';
+import '../show_profil.dart';
+import '../events/eventCard.dart';
 
 class ErkundenPage extends StatefulWidget {
   const ErkundenPage({Key key}) : super(key: key);
@@ -25,13 +29,15 @@ class ErkundenPage extends StatefulWidget {
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
-  Box profilBox, eventBox;
+  Box profilBox, eventBox, stadtinfoUserBox;
   MapController mapController = MapController();
-  var ownProfil;
+  var ownProfil = Hive.box("ownProfilBox").get("list");
   Set<String> allUserName = {};
+  List allCities =  Hive.box("stadtinfoBox").get("list");
   var countriesList = {};
+  List<String> citiesList = [];
   List filterList = [];
-  List profilsBackup = [] , profils = [], aktiveProfils = [];
+  List profilsBackup = [], profils = [], aktiveProfils = [];
   List eventsBackup = [], events = [], aktiveEvents = [];
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
@@ -45,14 +51,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var mapPosition;
   bool buildLoaded = false;
   bool popupActive = false;
+  var popupTyp = "";
   List<Widget> popupItems = [];
+  List popupCities = [];
   var lastEventPopup;
-  var monthsUntilInactive = 6;
+  var monthsUntilInactive = 3;
+  bool friendMarkerOn = false, eventMarkerOn = false;
 
   @override
   void initState() {
     profilBox = Hive.box('profilBox');
     eventBox = Hive.box("eventBox");
+    stadtinfoUserBox = Hive.box("stadtinfoUserBox");
 
     setProfils();
     setEvents();
@@ -62,18 +72,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   setProfils() {
+    var ownProfilPuffer;
     profils = profilBox.get("list") ?? [];
 
     for (var profil in profils) {
       if (profil["id"] == userId) {
-        ownProfil = profil;
+        ownProfilPuffer = profil;
       } else {
         allUserName.add(profil["name"]);
       }
     }
 
-    profils.remove(ownProfil);
-
+    profils.remove(ownProfilPuffer);
     profilsBackup = profils;
     createAndSetZoomProfils();
   }
@@ -96,13 +106,19 @@ class _ErkundenPageState extends State<ErkundenPage> {
     setSearchAutocomplete();
 
     buildLoaded = true;
+
+    refreshHiveBox();
+  }
+
+  refreshHiveBox() async {
+    var stadtinfoUser =
+        await StadtinfoUserDatabase().getData("*", "", returnList: true);
+    Hive.box("stadtinfoUserBox").put("list", stadtinfoUser);
   }
 
   getProfilsDB() async {
     List<dynamic> dbProfils = await ProfilDatabase().getData(
-        "id, name, land, interessen, kinder, latt, longt, ort, reiseart,"
-          "sprachen, aboutme, friendlist, emailAnzeigen, bild, bildStandardFarbe,"
-          "lastLogin, aufreiseSeit, aufreiseBis",
+        "*",
         "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
 
@@ -119,35 +135,34 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var profilALand = a['land'];
       var profilBLand = b['land'];
 
-      if(allCountries["eng"].contains(profilALand)){
+      if (allCountries["eng"].contains(profilALand)) {
         var index = allCountries["eng"].indexOf(profilALand);
         profilALand = allCountries["ger"][index];
       }
-      if(allCountries["eng"].contains(profilBLand)){
+      if (allCountries["eng"].contains(profilBLand)) {
         var index = allCountries["eng"].indexOf(profilBLand);
         profilBLand = allCountries["ger"][index];
       }
 
-      int compareCountry =  (profilBLand).compareTo(profilALand) as int;
+      int compareCountry = (profilBLand).compareTo(profilALand) as int;
 
       if (compareCountry != 0) return compareCountry;
 
       return b["ort"].compareTo(a["ort"]) as int;
     });
 
-
     return profils;
   }
 
-  changeProfilList(){
+  changeProfilList() {
     var inactiveProfils = [];
 
     for (var profil in profils) {
       profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
       var timeDifference = Duration(
           microseconds: (DateTime.now().microsecondsSinceEpoch -
-              DateTime.parse(profil["lastLogin"].toString())
-                  .microsecondsSinceEpoch)
+                  DateTime.parse(profil["lastLogin"].toString())
+                      .microsecondsSinceEpoch)
               .abs());
       var monthDifference = timeDifference.inDays / 30.44;
 
@@ -189,13 +204,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var countryDropDownList =
         spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
+    for (var city in allCities) {
+      if (city["isCity"] == 1) citiesList.add(city["ort"]);
+    }
+
     searchAutocomplete = SearchAutocomplete(
       hintText: AppLocalizations.of(context).filterErkunden,
       searchableItems: global_var.reisearten +
           global_var.interessenListe +
           global_var.sprachenListe +
           allUserName.toList() +
-          countryDropDownList,
+          countryDropDownList +
+          citiesList,
       onConfirm: () => changeMapFilter(),
       onDelete: () => changeMapFilter(),
     );
@@ -216,7 +236,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       if (check) {
         newPoint = true;
-        var numberName = int.parse(list[i]["name"]) + 1;
+        var numberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (numberName > 99) numberName = 99;
         list[i]["name"] = numberName.toString();
         list[i]["profils"].add(profil);
@@ -227,7 +248,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (!newPoint) {
       list.add({
         "ort": profil["ort"],
-        "name": "1",
+        "name": profil["name"] == null ? "0" : "1",
         "latt": profil["latt"],
         "longt": profil["longt"],
         "profils": [profil]
@@ -246,7 +267,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       if (profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"]) {
         newCity = true;
-        var addNumberName = int.parse(list[i]["name"]) + 1;
+        var addNumberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -257,7 +279,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (!newCity) {
       list.add({
         "ort": profil["ort"],
-        "name": "1",
+        "name": profil["name"] == null ? "0" : "1",
         "latt": profil["latt"],
         "longt": profil["longt"],
         "profils": [profil]
@@ -279,7 +301,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if (listCountryLocation["latt"] == profilCountryLocation["latt"] &&
           listCountryLocation["longt"] == profilCountryLocation["longt"]) {
         checkNewCountry = false;
-        var addNumberName = int.parse(list[i]["name"]) + 1;
+        var addNumberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -292,7 +315,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var position = LocationService().getCountryLocation(country);
 
       list.add({
-        "name": "1",
+        "name": profil["name"] == null ? "0" : "1",
         "countryname": country,
         "longt": position["longt"] ?? 0,
         "latt": position["latt"] ?? 0,
@@ -314,16 +337,21 @@ class _ErkundenPageState extends State<ErkundenPage> {
         .getKontinentLocation(landGedataProfil["kontinentGer"]);
     kontinentGeodataProfil ??= {"kontinentGer": landGedataProfil["nameGer"]};
     kontinentGeodataProfil ??= {"kontinentEng": landGedataProfil["nameEng"]};
-
     for (var i = 0; i < list.length; i++) {
       var kontinentGeodataListitem =
           LocationService().getKontinentLocation(list[i]["kontinent"]);
       kontinentGeodataListitem ??= {"kontinentGer": list[i]["kontinent"]};
 
-      if (kontinentGeodataListitem["kontinentGer"] ==
-          kontinentGeodataProfil["kontinentGer"]) {
+      if(list[i]["latt"] == profil["latt"] && list[i]["longt"] == profil["longt"]){
+        print("test");
+      }
+
+      if ((kontinentGeodataListitem["kontinentGer"] ==
+          kontinentGeodataProfil["kontinentGer"]) || (list[i]["latt"] == profil["latt"] && list[i]["longt"] == profil["longt"]) ){
         newPoint = false;
-        var addNumberName = int.parse(list[i]["name"]) + 1;
+
+        var addNumberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (addNumberName > 99) addNumberName = 99;
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -336,7 +364,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         "kontinentName": landGedataProfil["kontinentGer"],
         "kontinent":
             landGedataProfil["kontinentGer"] ?? landGedataProfil["land"],
-        "name": "1",
+        "name": profil["name"] == null ? "0" : "1",
         "latt": kontinentGeodataProfil["latt"] ?? landGedataProfil["latt"],
         "longt": kontinentGeodataProfil["longt"] ?? landGedataProfil["longt"],
         "profils": [profil]
@@ -350,13 +378,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var pufferProfilCities = [];
     var pufferProfilBetween = [];
     var pufferProfilCountries = [];
-    var pufferProfilBetweenCountries = [];
+    var pufferProfilContinents = [];
+
+    addCityUserInformation();
 
     for (var i = 0; i < profils.length; i++) {
       pufferProfilCountries =
           await createCountries(pufferProfilCountries, profils[i]);
-      pufferProfilBetweenCountries =
-          await createContinents(pufferProfilBetweenCountries, profils[i]);
+      pufferProfilContinents =
+          await createContinents(pufferProfilContinents, profils[i]);
 
       pufferProfilBetween = createBetween(pufferProfilBetween, profils[i], 1);
 
@@ -366,9 +396,27 @@ class _ErkundenPageState extends State<ErkundenPage> {
     profilsCities = pufferProfilCities;
     profilsBetween = pufferProfilBetween;
     profilCountries = pufferProfilCountries;
-    profilBetweenCountries = pufferProfilBetweenCountries;
+    profilBetweenCountries = pufferProfilContinents;
 
     changeProfil(currentMapZoom);
+  }
+
+  addCityUserInformation() {
+    if (filterList.isEmpty) {
+      profils = profils + allCities;
+
+    } else {
+      var matchFilter = [];
+
+      for (var city in allCities) {
+        if (filterList.contains(city["ort"]) ||
+            filterList.contains(city["land"])) {
+          matchFilter.add(city);
+        }
+      }
+
+      profils = profils + matchFilter;
+    }
   }
 
   createAndSetZoomEvents() async {
@@ -428,6 +476,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var profilSprachen = profil["sprachen"];
     var profilName = profil["name"];
     var profilLand = profil["land"];
+    var profilOrt = profil["ort"];
 
     if (filterList.isEmpty) return true;
 
@@ -441,12 +490,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
         checkMatch(filterList, [profilName], allUserName, userSearch: true);
     var countryMatch = checkMatch(
         filterList, [profilLand], countriesList["ger"] + countriesList["eng"]);
+    var cityMatch = checkMatch(filterList, [profilOrt], citiesList);
 
     if (spracheMatch &&
         reiseartMatch &&
         interesseMatch &&
         userMatch &&
-        countryMatch) return true;
+        countryMatch &&
+        cityMatch) return true;
 
     return false;
   }
@@ -482,13 +533,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   changeMapFilter() {
     var filterProfils = [];
+    filterList = searchAutocomplete.getSelected();
 
     for (var profil in profilsBackup) {
       if (checkFilter(profil)) filterProfils.add(profil);
     }
 
     setState(() {
-      filterList = searchAutocomplete.getSelected();
       profils = filterProfils;
       createAndSetZoomProfils();
     });
@@ -499,22 +550,113 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     if (currentMapZoom > cityZoom + 1) {
       newZoom = cityZoom;
-    } else if (currentMapZoom > countryZoom ) {
+    } else if (currentMapZoom > countryZoom) {
       newZoom = countryZoom;
-    } else if(currentMapZoom > kontinentZoom) {
+    } else if (currentMapZoom > kontinentZoom) {
       newZoom = kontinentZoom;
-    } else{
-        newZoom = minMapZoom;
+    } else {
+      newZoom = minMapZoom;
     }
 
-      mapController.move(mapPosition, newZoom);
-      currentMapZoom = newZoom;
-      FocusScope.of(context).unfocus();
-      changeProfil(currentMapZoom);
+    mapController.move(mapPosition, newZoom);
+    currentMapZoom = newZoom;
+    FocusScope.of(context).unfocus();
+    changeProfil(currentMapZoom);
+  }
+
+  createPopupCityInformations(profils) {
+    var selectedCitiesData = [];
+    popupCities = [];
+
+    for (var city in allCities) {
+      for (var profil in profils) {
+        if (city["ort"] == profil["ort"]) {
+          if (profil["name"] == null && friendMarkerOn) break;
+
+          selectedCitiesData.add(city);
+          break;
+        }
+      }
+    }
+
+    for (var city in selectedCitiesData) {
+      var newCity = true;
+
+      for (var i = 0; i < popupCities.length; i++) {
+        if (popupCities[i]["names"].contains(city["ort"])) {
+          newCity = false;
+        } else if (popupCities[i]["latt"] == city["latt"] &&
+            popupCities[i]["longt"] == city["longt"]) {
+          popupCities[i]["names"].add(city["ort"]);
+          newCity = false;
+        }
+      }
+
+      if (newCity) {
+        popupCities.add({
+          "names": [city["ort"]],
+          "latt": city["latt"],
+          "longt": city["longt"]
+        });
+      }
+    }
+  }
+
+  openSelectCityWindow() {
+    List<Widget> cityAuswahl = [];
+
+    for (var city in popupCities) {
+      cityAuswahl.add(InkWell(
+        onTap: () => changePage(context, StadtinformationsPage(ortName: city["names"].join(" / "))),
+        child: Container(
+            margin: const EdgeInsets.all(10),
+            child: Text(city["names"].join(" / "))),
+      ));
+    }
+
+    if (popupCities.isEmpty) {
+      cityAuswahl.add(Container(
+          margin: const EdgeInsets.all(10),
+          child: Text(
+              AppLocalizations.of(context).keineStadtinformationVorhanden,
+              style: const TextStyle(color: Colors.grey))));
+    }
+
+    if (popupCities.length == 1 && currentMapZoom >= cityZoom) {
+      changePage(context, StadtinformationsPage(ortName: popupCities[0]["names"].join(" / ")));
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomAlertDialog(
+          title: AppLocalizations.of(context).ortAuswaehlen,
+          children: cityAuswahl,
+        );
+      },
+    );
+  }
+
+  changeProfils(changeList) {
+    var newProfilList = [];
+
+    for (var profilId in changeList) {
+      for (var profil in profilBox.get("list") ?? []) {
+        if (profilId == profil["id"]) {
+          newProfilList.add(profil);
+          break;
+        }
+      }
+    }
+    profils = newProfilList;
+    createAndSetZoomProfils();
   }
 
   @override
   Widget build(BuildContext context) {
+    var genauerStandortBezeichnung = AppLocalizations.of(context).genauerStandort;
+    ownProfil = Hive.box("ownProfilBox").get("list");
     double screenWidth = MediaQuery.of(context).size.width;
     var eventCrossAxisCount = screenWidth / 190;
     List<Marker> allMarker = [];
@@ -536,10 +678,17 @@ class _ErkundenPageState extends State<ErkundenPage> {
         if (!titleList.contains(item[filter])) titleList.add(item[filter]);
       }
 
+      if (titleList.isEmpty) {
+        print(list);
+        print(filter);
+      }
+
       return titleList.join(" / ");
     }
 
     selectPopupMenuText(profils) {
+      if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
+
       if (currentMapZoom < kontinentZoom) {
         return createPopupWindowTitle(profils, "kontinente");
       } else if (currentMapZoom < countryZoom) {
@@ -551,14 +700,21 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
     }
 
-    createPopupProfils(profil) {
+    createPopupProfils(profils) {
       popupItems = [];
+      popupTyp = "profils";
+      var selectUserProfils = [];
+
+      for (var profil in profils) {
+        if (profil["name"] != null) selectUserProfils.add(profil);
+        if(profil["ort"].isEmpty) profil["ort"] = genauerStandortBezeichnung;
+      }
 
       popupItems.add(SliverAppBar(
-        toolbarHeight: 30,
+        toolbarHeight: kIsWeb ? 40 : 30,
         backgroundColor: Colors.white,
         flexibleSpace: Center(
-            child: Text(selectPopupMenuText(profil["profils"]),
+            child: Text(selectPopupMenuText(profils),
                 style: const TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold))),
         pinned: true,
@@ -578,9 +734,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
 
       popupItems.add(SliverFixedExtentList(
-        itemExtent: 80.0,
+        itemExtent: kIsWeb ? 90.0: 80.0,
         delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-          var profilData = profil["profils"][index];
+          var profilData = selectUserProfils[index];
 
           return GestureDetector(
             onTap: () {
@@ -611,13 +767,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
                           const SizedBox(height: 5),
                           Text(childrenAgeStringToStringAge(
                               profilData["kinder"])),
-                          const SizedBox(height: 5),
+                          //const SizedBox(height: 5),
                           Text(profilData["ort"] + ", " + profilData["land"])
                         ])
                   ],
                 )),
           );
-        }, childCount: profil["profils"].length),
+        }, childCount: selectUserProfils.length),
       ));
 
       return popupItems;
@@ -625,6 +781,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createPopupEvents(event) {
       popupItems = [];
+      popupTyp = "events";
 
       popupItems.add(SliverAppBar(
         toolbarHeight: 30,
@@ -673,6 +830,97 @@ class _ErkundenPageState extends State<ErkundenPage> {
       return popupItems;
     }
 
+    markerPopupContainer() {
+      return Positioned.fill(
+          child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+        }),
+        child: DraggableScrollableSheet(
+            initialChildSize: 0.5,
+            minChildSize: 0.3,
+            maxChildSize: 0.8,
+            builder: (context, controller) {
+              return Stack(
+                alignment: Alignment.topCenter,
+                clipBehavior: Clip.none,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 60),
+                    child: ClipRRect(
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(20)),
+                      child: Container(
+                          color: Colors.white,
+                          child: CustomScrollView(
+                              controller: controller, slivers: popupItems)),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 60,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.red,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          popupActive = false;
+                        });
+                      },
+                    ),
+                  ),
+                  if (popupTyp == "profils")
+                    Positioned(
+                      left: 5,
+                      top: 60,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.feed,
+                          size: 30,
+                        ),
+                        onPressed: () => openSelectCityWindow(),
+                      ),
+                    ),
+                  if (currentMapZoom > minMapZoom)
+                    Positioned(
+                      top: 0,
+                      right: 80,
+                      child: FloatingActionButton(
+                          heroTag: "zoom out 2",
+                          child: const Icon(Icons.zoom_out_map),
+                          onPressed: () => zoomOut()),
+                    ),
+                  Positioned(
+                      top: 0,
+                      right: 10,
+                      child: FloatingActionButton(
+                          heroTag: "create Stadtinformation 2",
+                          child: const Icon(Icons.create),
+                          onPressed: () => changePage(
+                              context, const CreateStadtinformationsPage())))
+                ],
+              );
+            }),
+      ));
+    }
+
+    createOwnMarker() {
+      if (ownProfil != null) {
+        allMarker.add(Marker(
+            width: 30.0,
+            height: 30.0,
+            point: LatLng(ownProfil["latt"] + 0.07, ownProfil["longt"] + 0.02),
+            builder: (_) => Icon(
+                  Icons.flag,
+                  color: Colors.green[900],
+                  size: 30,
+                )));
+      }
+    }
+
     Marker profilMarker(numberText, position, buttonFunction) {
       return Marker(
         width: 30.0,
@@ -686,6 +934,20 @@ class _ErkundenPageState extends State<ErkundenPage> {
           onPressed: buttonFunction,
         ),
       );
+    }
+
+    createProfilMarker() {
+      for (var profil in aktiveProfils) {
+        if (friendMarkerOn && profil["name"] == "0") continue;
+
+        var position = LatLng(profil["latt"], profil["longt"]);
+        allMarker.add(profilMarker(profil["name"], position, () {
+          popupActive = true;
+          createPopupProfils(profil["profils"]);
+          createPopupCityInformations(profil["profils"]);
+          setState(() {});
+        }));
+      }
     }
 
     Marker eventMarker(numberText, position, buttonFunction) {
@@ -720,94 +982,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       );
     }
 
-    markerPopupContainer() {
-      return Positioned.fill(
-          child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-          PointerDeviceKind.touch,
-          PointerDeviceKind.mouse,
-        }),
-        child: DraggableScrollableSheet(
-            initialChildSize: 0.5,
-            minChildSize: 0.3,
-            maxChildSize: 0.8,
-            builder: (context, controller) {
-              return Stack(
-                alignment: Alignment.topCenter,
-                clipBehavior: Clip.none,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 60),
-                    child: ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(20)),
-                      child: Container(
-                          color: Colors.white,
-                          child: CustomScrollView(
-                              controller: controller, slivers: popupItems)),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 55,
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.close,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          popupActive = false;
-                        });
-                      },
-                    ),
-                  ),
-                  if (currentMapZoom > minMapZoom)
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: FloatingActionButton(
-                          heroTag: "zoom out",
-                          child: const Icon(Icons.zoom_out_map),
-                          onPressed: () => zoomOut()),
-                    ),
-                ],
-              );
-            }),
-      ));
-    }
-
-    createAllMarker() async {
-      List<Marker> markerList = [];
-
-      if (ownProfil != null) {
-        markerList.add(Marker(
-          width: 30.0,
-          height: 30.0,
-          point: LatLng(ownProfil["latt"] + 0.07, ownProfil["longt"] + 0.02),
-          builder: (ctx) => FloatingActionButton(
-            heroTag: "ownMarker",
-            backgroundColor: Colors.transparent,
-            mini: true,
-            child: Icon(
-              Icons.flag,
-              color: Colors.green[900],
-              size: 30,
-            ),
-            onPressed: null,
-          ),
-        ));
-      }
-
-      for (var profil in aktiveProfils) {
-        var position = LatLng(profil["latt"], profil["longt"]);
-        markerList.add(profilMarker(profil["name"], position, () {
-          popupActive = true;
-          createPopupProfils(profil);
-          setState(() {});
-        }));
-      }
-
+    createEventMarker() {
       for (var event in aktiveEvents) {
         double basisVerschiebung, anpassungsVerschiebung, geteiltDurch;
 
@@ -831,15 +1006,19 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 basisVerschiebung -
                 (anpassungsVerschiebung / geteiltDurch));
 
-        markerList.add(eventMarker(event["name"], position, () {
+        allMarker.add(eventMarker(event["name"], position, () {
           lastEventPopup = event;
           popupActive = true;
           createPopupEvents(event);
           setState(() {});
         }));
       }
+    }
 
-      allMarker = markerList;
+    createAllMarker() async {
+      createOwnMarker();
+      if (!eventMarkerOn) createProfilMarker();
+      if (eventMarkerOn) createEventMarker();
     }
 
     ownFlutterMap() {
@@ -873,22 +1052,99 @@ class _ErkundenPageState extends State<ErkundenPage> {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
-      child: Stack(children: [
-        ownFlutterMap(),
-        searchAutocomplete,
-        if (popupActive) markerPopupContainer(),
+    friendButton() {
+      return Positioned(
+          right: 5,
+          top: 60,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            icon: Stack(
+              children: [
+                if (!friendMarkerOn)
+                  Icon(Icons.favorite_outline,
+                      size: 32, color: Theme.of(context).colorScheme.primary),
+                if (friendMarkerOn)
+                  Icon(Icons.favorite,
+                      size: 32, color: Theme.of(context).colorScheme.primary)
+              ],
+            ),
+            onPressed: () {
+              if (friendMarkerOn) {
+                friendMarkerOn = false;
+                popupActive = false;
+                profils = profilsBackup;
+                createAndSetZoomProfils();
+              } else {
+                friendMarkerOn = true;
+                eventMarkerOn = false;
+                changeProfils(ownProfil["friendlist"]);
+
+                popupActive = true;
+                createPopupProfils(profils);
+                createPopupCityInformations(profils);
+              }
+
+              setState(() {});
+            },
+          ));
+    }
+
+    eventButton() {
+      return Positioned(
+          right: 5,
+          top: 100,
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            icon: Stack(
+              children: [
+                if (!eventMarkerOn)
+                  Icon(Icons.calendar_today_outlined,
+                      size: 32, color: Theme.of(context).colorScheme.primary),
+                if (eventMarkerOn)
+                  Icon(Icons.event_note,
+                      size: 36, color: Theme.of(context).colorScheme.primary)
+              ],
+            ),
+            onPressed: () {
+              if (eventMarkerOn) {
+                eventMarkerOn = false;
+              } else {
+                eventMarkerOn = true;
+                friendMarkerOn = false;
+              }
+
+              setState(() {});
+            },
+          ));
+    }
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
+        child: Stack(children: [
+          ownFlutterMap(),
+          searchAutocomplete,
+          if (popupActive) markerPopupContainer(),
+          friendButton(),
+          eventButton(),
+        ]),
+      ),
+      floatingActionButton:
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         if (currentMapZoom > minMapZoom && !popupActive)
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: FloatingActionButton(
-                heroTag: "zoom out 1",
-                child: const Icon(Icons.zoom_out_map),
-                onPressed: () => zoomOut()),
+          FloatingActionButton(
+              heroTag: "zoom out 1",
+              child: const Icon(Icons.zoom_out_map),
+              onPressed: () => zoomOut()),
+        const SizedBox(width: 10),
+        if (!popupActive)
+          FloatingActionButton(
+              heroTag: "create Stadtinformation 1",
+              child: const Icon(Icons.create),
+              onPressed: () => changePage(context, const CreateStadtinformationsPage())
           ),
       ]),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
