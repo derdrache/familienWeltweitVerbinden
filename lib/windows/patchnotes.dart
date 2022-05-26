@@ -19,11 +19,11 @@ class PatchnotesWindow{
     List<Widget> patchList = [];
 
     for(var inhalt in patch["inhalt"]){
-      patchList.add(SizedBox(height: 10));
+      patchList.add(const SizedBox(height: 10));
       patchList.add(Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("- "),
+          const Text("- "),
           Flexible(
               child: Text(inhalt,overflow: TextOverflow.visible,))
         ],
@@ -31,18 +31,18 @@ class PatchnotesWindow{
     }
 
     return Container(
-      margin: EdgeInsets.only(top: 15, left: 10, right: 5, bottom: 15),
+      margin: const EdgeInsets.only(top: 15, left: 10, right: 5, bottom: 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               patch["title"],
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             ...patchList
           ],
         )
@@ -58,6 +58,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch130D),
                 _patch(patch123D),
                 _patch(patch122D),
                 _patch(patch121D),
@@ -70,6 +71,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch130E),
                 _patch(patch123E),
                 _patch(patch122E),
                 _patch(patch121E),
@@ -95,8 +97,39 @@ var patchVorlage={
   ]
 };
 
+var patch130E={
+  "title" : "1.3.0 - 21.05.2022",
+  "inhalt": [
+    "World map - city information has been implemented.\nShare your information about the city with others"
+    "World Map - new buttons have been added to show friends and events on the map",
+    "World Map - the world map can now be filtered by city",
+    "World map bug fix - filtering now works on first entry",
+    "Settings - there is now an option to have the location updated automatically",
+    "Profile languages extension - Italian, Portuguese, Japanese and Turkish can now be selected",
+    "Profile extension - new tab: 'sell / trade / give away'",
+    "various small style adjustments",
+    "various small bug fixes",
+    "various small improvements"
+  ]
+};
+var patch130D={
+  "title" : "1.3.0 - 21.05.2022",
+  "inhalt": [
+    "Weltkarte - Stadtinformationen wurden eingebaut. Teile deine Informationen über die Stadt mit anderen",
+    "Weltkarte - Es wurden neue Buttons eingebaut um Freunde und Events auf der Karte anzuzeigen",
+    "Weltkarte - Die Weltkarte kann jetzt auch nach Städten gefiltert werden",
+    "Weltkarte Fehlerbehebung - Der Filter funktioniert jetzt auch bei der ersten Eingabe",
+    "Settings - Es gibt jetzt die Möglichkeit den Standort automatisch updaten zu lassen",
+    "Profil Sprachen Erweiterung - Italienisch, Portugiesisch, Japanisch und Türkisch können jetzt ausgewählt werden",
+    "Profil Erweiterung - Neuer Reiter: 'Verkaufen / Tauschen / Verschenken'"
+    "verschiedene kleine Style-Anpassungen",
+    "verschiedene kleine Fehlerbehebungen",
+    "verschiedene kleine Verbesserungen"
+  ]
+};
+
 var patch123E={
-  "title" : "1.2.3",
+  "title" : "1.2.3 - 31.03.2022",
   "inhalt": [
     "General - Fixed minor bugs when changing profile picture",
     "General - Profile picture in large is now displayed correctly",
@@ -109,7 +142,7 @@ var patch123E={
   ]
 };
 var patch123D={
-  "title" : "1.2.3",
+  "title" : "1.2.3 - 31.03.2022",
   "inhalt": [
     "Allgemein - Kleine Fehler beim Profilbild ändern behoben",
     "Allgemein - Profilbild in groß wird nun korrekt angezeigt",

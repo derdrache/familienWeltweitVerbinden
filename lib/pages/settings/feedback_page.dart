@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:familien_suche/global/custom_widgets.dart';
 import '../../global/global_functions.dart';
+import '../../widgets/custom_appbar.dart';
 
 class FeedbackPage extends StatelessWidget {
   var feedbackTextKontroller = TextEditingController();
@@ -65,7 +66,7 @@ class FeedbackPage extends StatelessWidget {
 
 
     return Scaffold(
-      appBar: customAppBar(title: "Feedback"),
+      appBar: CustomAppBar(title: "Feedback"),
       body: Form(
         key: formKey,
         child: ListView(

@@ -43,7 +43,6 @@ class _ChatPageState extends State<ChatPage> {
 
   initilizeCreateChatData() {
     dynamic userFriendIdList = ownProfilBox.get("list")["friendlist"];
-    print(userFriendIdList);
     dbProfilData = profilBox.get("list");
     allName = [];
     userFriendlist = [];
@@ -257,8 +256,8 @@ class _ChatPageState extends State<ChatPage> {
           }
         }
 
-        if (chatPartnerName.isEmpty) chatPartnerName = "gelöschter User";
-        chatPartnerProfil ??= {"bild": "assets/bilder/museum.jpg"};
+        if (chatPartnerName.isEmpty) chatPartnerName = AppLocalizations.of(context).geloeschterUser;
+        chatPartnerProfil ??= {"bild": ["assets/WeltFlugzeug.png"]};
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
@@ -276,7 +275,6 @@ class _ChatPageState extends State<ChatPage> {
           child: Container(
               padding: const EdgeInsets.only(
                   left: 10, right: 10, top: 15, bottom: 15),
-              width: double.infinity,
               decoration: BoxDecoration(
                   border: Border(
                 bottom: BorderSide(width: 1, color: global_var.borderColorGrey),
@@ -285,18 +283,23 @@ class _ChatPageState extends State<ChatPage> {
                 children: [
                   ProfilImage(chatPartnerProfil),
                   const SizedBox(width: 10),
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(chatPartnerName,
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 10),
-                        Text(lastMessage,
-                            style: TextStyle(
-                                fontSize: 16, color: Colors.grey[600]))
-                      ]),
-                  const Expanded(child: SizedBox.shrink()),
+                  Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(chatPartnerName,
+
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 10),
+                          Text(lastMessage,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              style: TextStyle(
+                                  fontSize: 16, color: Colors.grey[600]))
+                        ]),
+                  ),
+                  //const Expanded(child: SizedBox.shrink()),
                   Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.end,
