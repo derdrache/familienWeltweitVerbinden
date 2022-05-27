@@ -114,7 +114,7 @@ class _StartPageState extends State<StartPage> {
       nearstLocationData =
           LocationService().transformNearstLocation(nearstLocationData);
 
-      if(nearstLocationData["country"].isEmpty) return;
+      if(nearstLocationData["country"].isEmpty || nearstLocationData["city"].isEmpty) return;
 
       if (automaticLocationStatus == standortbestimmung[1] ||
           automaticLocationStatus == standortbestimmungEnglisch[1]) {

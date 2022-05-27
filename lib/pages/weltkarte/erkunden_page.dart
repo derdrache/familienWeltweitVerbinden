@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../global/variablen.dart';
 import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
@@ -42,7 +43,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
-  double maxZoom = 10;
+  double maxZoom = 14;
   double currentMapZoom = 1.6;
   double cityZoom = 6.5;
   double countryZoom = 4.0;
@@ -139,7 +140,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var checkedProfils = [];
 
     for(var profil in dbProfils){
-      if(profil["land"].isNotEmpty) checkedProfils.add(profil);
+      if(profil["land"].isNotEmpty || profil["land"].isNotEmpty) checkedProfils.add(profil);
     }
 
 
@@ -286,9 +287,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       var geodataCondition = profilLongt == list[i]["longt"] &&
           profilLatt == list[i]["latt"];
-      var sameCityCOndition = list[i]["ort"] == null ? false: list[i]["ort"].contains(profil["ort"]);
+      var sameCityCondition = list[i]["ort"] == null ? false :
+        list[i]["ort"].contains(profil["ort"])  && currentMapZoom < 11;
 
-      if (geodataCondition || sameCityCOndition) {
+      if (geodataCondition || sameCityCondition) {
         newCity = false;
         var addNumberName =
             int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
@@ -364,10 +366,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var kontinentGeodataListitem =
           LocationService().getKontinentLocation(list[i]["kontinent"]);
       kontinentGeodataListitem ??= {"kontinentGer": list[i]["kontinent"]};
-
-      if(list[i]["latt"] == profil["latt"] && list[i]["longt"] == profil["longt"]){
-        print("test");
-      }
 
       if ((kontinentGeodataListitem["kontinentGer"] ==
           kontinentGeodataProfil["kontinentGer"]) || (list[i]["latt"] == profil["latt"] && list[i]["longt"] == profil["longt"]) ){
@@ -678,7 +676,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
-    var genauerStandortBezeichnung = AppLocalizations.of(context).genauerStandort;
     ownProfil = Hive.box("ownProfilBox").get("list");
     double screenWidth = MediaQuery.of(context).size.width;
     var eventCrossAxisCount = screenWidth / 190;
@@ -730,7 +727,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       for (var profil in profils) {
         if (profil["name"] != null) selectUserProfils.add(profil);
-        if(profil["ort"].isEmpty) profil["ort"] = genauerStandortBezeichnung;
       }
 
       popupItems.add(SliverAppBar(
@@ -790,8 +786,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
                           const SizedBox(height: 5),
                           Text(childrenAgeStringToStringAge(
                               profilData["kinder"])),
-                          //const SizedBox(height: 5),
-                          Text(profilData["ort"] + ", " + profilData["land"])
+                          const SizedBox(height: 5),
+                          profilData["automaticLocation"] == standortbestimmung[1] || profilData["automaticLocation"] == global_var.standortbestimmungEnglisch[1] ?
+                            Text("📍 "+ profilData["ort"] + ", " + profilData["land"]) :
+                            Text(profilData["ort"] + ", " + profilData["land"])
                         ])
                   ],
                 )),
