@@ -100,6 +100,7 @@ var patch131E={
   "title" : "1.3.1 - 27.05.2022",
   "inhalt": [
     "World map - bug that leads to crash has been fixed",
+    "World map - zoom level extended. It is now possible to zoom deeper into the world map to see the families with exact location",
     "Automatic location - fixed a bug that caused incorrect entries on the world map",
     "City information - city insider information now shows the correct date",
     "City Information - fixed a bug with the automatic entry in 'visited by'"
@@ -109,6 +110,7 @@ var patch131D={
   "title" : "1.3.1 - 27.05.2022",
   "inhalt": [
     "Weltkarte - Fehler der zum Crash führt wurde behoben",
+    "Weltkarte - Zoomstufe erweitert. Es kann jetzt tiefer in die Weltkarte reingezoomt werden, um die Familien mit genauen Standort zu sehen",
     "Automatischer Standort - Es wurde ein Fehler behoben der auf der Weltkarte zu falschen Einträgen geführt hat",
     "Stadtinformationen - Stadt Insider-Information zeigt jetzt das richtige Datum",
     "Stadtinformationen - Fehler beim automatischen Eintrag in 'besucht von' wurde behoben"
