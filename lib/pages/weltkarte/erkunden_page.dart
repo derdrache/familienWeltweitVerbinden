@@ -42,7 +42,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
-  double maxZoom = 9;
+  double maxZoom = 10;
   double currentMapZoom = 1.6;
   double cityZoom = 6.5;
   double countryZoom = 4.0;
@@ -64,11 +64,22 @@ class _ErkundenPageState extends State<ErkundenPage> {
     eventBox = Hive.box("eventBox");
     stadtinfoUserBox = Hive.box("stadtinfoUserBox");
 
+    removeNoCities();
     setProfils();
     setEvents();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
+  }
+
+  removeNoCities(){
+    var newAllCities = [];
+
+    for(var city in allCities){
+      if(city["isCity"] == 1) newAllCities.add(city);
+    }
+
+    allCities = newAllCities;
   }
 
   setProfils() {
@@ -81,6 +92,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
       } else {
         allUserName.add(profil["name"]);
       }
+
+
     }
 
     profils.remove(ownProfilPuffer);
@@ -123,9 +136,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (dbProfils == false) dbProfils = [];
 
     dbProfils = sortProfils(dbProfils);
+    var checkedProfils = [];
 
-    profilBox.put("list", dbProfils);
-    profils = dbProfils;
+    for(var profil in dbProfils){
+      if(profil["land"].isNotEmpty) checkedProfils.add(profil);
+    }
+
+
+    profilBox.put("list", checkedProfils);
+    profils = checkedProfils;
   }
 
   sortProfils(profils) {
@@ -259,14 +278,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   createCities(list, profil) {
-    var newCity = false;
+    var newCity = true;
 
     for (var i = 0; i < list.length; i++) {
       double profilLongt = profil["longt"];
       double profilLatt = profil["latt"];
 
-      if (profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"]) {
-        newCity = true;
+      var geodataCondition = profilLongt == list[i]["longt"] &&
+          profilLatt == list[i]["latt"];
+      var sameCityCOndition = list[i]["ort"] == null ? false: list[i]["ort"].contains(profil["ort"]);
+
+      if (geodataCondition || sameCityCOndition) {
+        newCity = false;
         var addNumberName =
             int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
         if (addNumberName > 99) addNumberName = 99;
@@ -276,7 +299,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
     }
 
-    if (!newCity) {
+    if (newCity) {
       list.add({
         "ort": profil["ort"],
         "name": profil["name"] == null ? "0" : "1",
@@ -403,7 +426,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   addCityUserInformation() {
     if (filterList.isEmpty) {
-      profils = profils + allCities;
+      profils =  profils + allCities;
 
     } else {
       var matchFilter = [];
