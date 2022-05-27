@@ -36,15 +36,16 @@ class _ErkundenPageState extends State<ErkundenPage> {
   Set<String> allUserName = {};
   List allCities =  Hive.box("stadtinfoBox").get("list");
   var countriesList = {};
-  List<String> citiesList = [];
+  List<String> allCitiesNames = [];
   List filterList = [];
   List profilsBackup = [], profils = [], aktiveProfils = [];
   List eventsBackup = [], events = [], aktiveEvents = [];
-  List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
+  List profilBetweenCountries, profilCountries, profilsBetween, profilsCities, profilExact;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxZoom = 14;
   double currentMapZoom = 1.6;
+  double exactZoom = 10;
   double cityZoom = 6.5;
   double countryZoom = 4.0;
   double kontinentZoom = 2.5;
@@ -225,7 +226,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
     for (var city in allCities) {
-      if (city["isCity"] == 1) citiesList.add(city["ort"]);
+      if (city["isCity"] == 1) allCitiesNames.add(city["ort"]);
     }
 
     searchAutocomplete = SearchAutocomplete(
@@ -235,7 +236,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           global_var.sprachenListe +
           allUserName.toList() +
           countryDropDownList +
-          citiesList,
+          allCitiesNames,
       onConfirm: () => changeMapFilter(),
       onDelete: () => changeMapFilter(),
     );
@@ -278,19 +279,25 @@ class _ErkundenPageState extends State<ErkundenPage> {
     return list;
   }
 
-  createCities(list, profil) {
+  createExactLocation(){
+
+  }
+
+  createCities(list, profil, {exactLocation = false}) {
     var newCity = true;
 
     for (var i = 0; i < list.length; i++) {
       double profilLongt = profil["longt"];
       double profilLatt = profil["latt"];
 
+
       var geodataCondition = profilLongt == list[i]["longt"] &&
           profilLatt == list[i]["latt"];
       var sameCityCondition = list[i]["ort"] == null ? false :
-        list[i]["ort"].contains(profil["ort"])  && currentMapZoom < 11;
+        list[i]["ort"].contains(profil["ort"]);
+      var zoomCondition = exactLocation ? false :  true;
 
-      if (geodataCondition || sameCityCondition) {
+      if (geodataCondition || (sameCityCondition && zoomCondition)) {
         newCity = false;
         var addNumberName =
             int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
@@ -396,6 +403,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   createAndSetZoomProfils() async {
+    var pufferProfilExact = [];
     var pufferProfilCities = [];
     var pufferProfilBetween = [];
     var pufferProfilCountries = [];
@@ -412,8 +420,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
       pufferProfilBetween = createBetween(pufferProfilBetween, profils[i], 1);
 
       pufferProfilCities = createCities(pufferProfilCities, profils[i]);
+
+      pufferProfilExact = createCities(pufferProfilExact, profils[i], exactLocation: true);
     }
 
+    profilExact = pufferProfilExact;
     profilsCities = pufferProfilCities;
     profilsBetween = pufferProfilBetween;
     profilCountries = pufferProfilCountries;
@@ -424,7 +435,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   addCityUserInformation() {
     if (filterList.isEmpty) {
-      profils =  profils + allCities;
+      profils =  allCities + profils;
 
     } else {
       var matchFilter = [];
@@ -469,7 +480,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var choosenProfils = [];
     var selectedEventList = [];
 
-    if (zoom > cityZoom) {
+    if(zoom > exactZoom){
+      choosenProfils = profilExact;
+      selectedEventList = eventsCities;
+    } else if (zoom > cityZoom) {
       choosenProfils = profilsCities;
       selectedEventList = eventsCities;
     } else if (zoom > countryZoom) {
@@ -511,7 +525,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         checkMatch(filterList, [profilName], allUserName, userSearch: true);
     var countryMatch = checkMatch(
         filterList, [profilLand], countriesList["ger"] + countriesList["eng"]);
-    var cityMatch = checkMatch(filterList, [profilOrt], citiesList);
+    var cityMatch = checkMatch(filterList, [profilOrt], allCitiesNames);
 
     if (spracheMatch &&
         reiseartMatch &&
