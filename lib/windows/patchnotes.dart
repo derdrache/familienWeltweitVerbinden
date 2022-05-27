@@ -96,6 +96,24 @@ var patchVorlage={
 
   ]
 };
+var patch131E={
+  "title" : "1.3.1 - 27.05.2022",
+  "inhalt": [
+    "World map - bug that leads to crash has been fixed",
+    "Automatic location - fixed a bug that caused incorrect entries on the world map",
+    "City information - city insider information now shows the correct date",
+    "City Information - fixed a bug with the automatic entry in 'visited by'"
+  ]
+};
+var patch131D={
+  "title" : "1.3.1 - 27.05.2022",
+  "inhalt": [
+    "Weltkarte - Fehler der zum Crash führt wurde behoben",
+    "Automatischer Standort - Es wurde ein Fehler behoben der auf der Weltkarte zu falschen Einträgen geführt hat",
+    "Stadtinformationen - Stadt Insider-Information zeigt jetzt das richtige Datum",
+    "Stadtinformationen - Fehler beim automatischen Eintrag in 'besucht von' wurde behoben"
+  ]
+};
 
 var patch130E={
   "title" : "1.3.0 - 21.05.2022",
