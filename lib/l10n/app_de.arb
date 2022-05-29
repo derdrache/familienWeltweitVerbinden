@@ -269,5 +269,7 @@
     "vonKleinerAlsBis": "von-Datum muss kleiner als bis-Datum sein",
     "zeitraumUeberschneidetSich": "Zeitraum überschneidet sich mit einem anderen Eintrag",
     "reiseplanungSichtbarFuer": "Reiseplanung sichtbar für ",
-    "fuer": "Für "
+    "fuer": "Für ",
+    "weltkarteReiseplanungSuchen": "Für welchen Zeitraum suchst du andere Familien?",
+    "anzeigen": "Anzeigen"
 }

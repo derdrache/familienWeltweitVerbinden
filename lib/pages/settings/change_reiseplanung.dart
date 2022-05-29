@@ -59,15 +59,6 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
       "latt": 50.73743,
     };
 
-/*
-    var ortData = {
-      "city": "Puerto Morelos",
-      "countryname": "Mexiko",
-      "longt": -86.8755342,
-      "latt": 20.8478084,
-    };
-
- */
 
     if (vonDate.getDate() == null ||
         bisDate.getDate() == null ||
