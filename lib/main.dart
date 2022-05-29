@@ -229,11 +229,7 @@ class MyApp extends StatelessWidget {
           Text(
             spracheIstDeutsch
                 ? "Bitte im Playstore die neuste Version runterladen. "
-                  "\n\nDa es sich um eine Beta Version handelt, muss das Update "
-                  "manuell über den PlayStore installiert werden"
-                : "Please download the latest version from the Playstore. "
-                  "\n\nSince this is a beta version, the update must be "
-                  "installed manually via the PlayStore.",
+                : "Please download the latest version from the Playstore. ",
             style: const TextStyle(fontSize: 16),
           ),
         ])),
@@ -247,6 +243,7 @@ class MyApp extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (buildNumber < importantUpdateNumber) {
+
             InAppUpdate.performImmediateUpdate();
             return MaterialApp(
               home: Scaffold(body: importantUpdateScreen()),
