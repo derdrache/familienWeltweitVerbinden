@@ -269,6 +269,8 @@
     "vonKleinerAlsBis": "from-date must be smaller than until-date",
     "zeitraumUeberschneidetSich": "period overlaps with another entry",
     "reiseplanungSichtbarFuer": "Travel planning visible to ",
-    "fuer": "for "
+    "fuer": "for ",
+    "weltkarteReiseplanungSuchen": "for what period are you looking for other families?",
+    "anzeigen": "Show"
 }
 

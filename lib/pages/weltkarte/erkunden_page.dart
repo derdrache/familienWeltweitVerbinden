@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../widgets/month_picker.dart';
 import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
@@ -33,7 +35,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   MapController mapController = MapController();
   var ownProfil = Hive.box("ownProfilBox").get("list");
   Set<String> allUserName = {};
-  List allCities =  Hive.box("stadtinfoBox").get("list");
+  List allCities = Hive.box("stadtinfoBox").get("list");
   var countriesList = {};
   List<String> citiesList = [];
   List filterList = [];
@@ -56,7 +58,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   List popupCities = [];
   var lastEventPopup;
   var monthsUntilInactive = 3;
-  bool friendMarkerOn = false, eventMarkerOn = false;
+  bool friendMarkerOn = false, eventMarkerOn = false, reiseplanungOn = false;
 
   @override
   void initState() {
@@ -68,20 +70,21 @@ class _ErkundenPageState extends State<ErkundenPage> {
     setProfils();
     setEvents();
 
-
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
 
-  removeCitiesWithoutInformation(){
+  removeCitiesWithoutInformation() {
     var newAllCities = [];
 
-    for(var city in allCities){
+    for (var city in allCities) {
       var condition = city["kosten"] != null ||
-        city["wetter"] != null || city["kosten"] != null ||
-        city["internet"] != null || city["familien"].isNotEmpty;
+          city["wetter"] != null ||
+          city["kosten"] != null ||
+          city["internet"] != null ||
+          city["familien"].isNotEmpty;
 
-      if(condition){
+      if (condition) {
         newAllCities.add(city);
       }
     }
@@ -135,9 +138,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   getProfilsDB() async {
-    List<dynamic> dbProfils = await ProfilDatabase().getData(
-        "*",
-        "ORDER BY ort ASC");
+    List<dynamic> dbProfils =
+        await ProfilDatabase().getData("*", "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
 
     dbProfils = sortProfils(dbProfils);
@@ -360,12 +362,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
           LocationService().getKontinentLocation(list[i]["kontinent"]);
       kontinentGeodataListitem ??= {"kontinentGer": list[i]["kontinent"]};
 
-      if(list[i]["latt"] == profil["latt"] && list[i]["longt"] == profil["longt"]){
-        print("test");
-      }
-
       if ((kontinentGeodataListitem["kontinentGer"] ==
-          kontinentGeodataProfil["kontinentGer"]) || (list[i]["latt"] == profil["latt"] && list[i]["longt"] == profil["longt"]) ){
+              kontinentGeodataProfil["kontinentGer"]) ||
+          (list[i]["latt"] == profil["latt"] &&
+              list[i]["longt"] == profil["longt"])) {
         newPoint = false;
 
         var addNumberName =
@@ -422,7 +422,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   addCityProfils() {
     if (filterList.isEmpty) {
       profils = profils + allCities;
-
     } else {
       var matchFilter = [];
 
@@ -625,7 +624,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     for (var city in popupCities) {
       cityAuswahl.add(InkWell(
-        onTap: () => changePage(context, StadtinformationsPage(ortName: city["names"].join(" / "))),
+        onTap: () => changePage(
+            context, StadtinformationsPage(ortName: city["names"].join(" / "))),
         child: Container(
             margin: const EdgeInsets.all(10),
             child: Text(city["names"].join(" / "))),
@@ -641,7 +641,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     if (popupCities.length == 1 && currentMapZoom >= cityZoom) {
-      changePage(context, StadtinformationsPage(ortName: popupCities[0]["names"].join(" / ")));
+      changePage(context,
+          StadtinformationsPage(ortName: popupCities[0]["names"].join(" / ")));
       return;
     }
 
@@ -654,6 +655,113 @@ class _ErkundenPageState extends State<ErkundenPage> {
         );
       },
     );
+  }
+
+  openSelectReiseplanungsDateWindow() {
+    var vonDate = MonthPickerBox(hintText: AppLocalizations.of(context).von);
+    var bisDate = MonthPickerBox(hintText: AppLocalizations.of(context).bis);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+            title: "",
+            children: [
+              Container(
+                  margin: const EdgeInsets.all(20),
+                  child:
+                      Text(
+                        AppLocalizations.of(context).weltkarteReiseplanungSuchen,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      )
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  vonDate,
+                  const SizedBox(
+                    width: 30,
+                  ),
+                  bisDate
+                ],
+              ),
+              Container(
+                margin: const EdgeInsets.all(30),
+                child: FloatingActionButton.extended(
+                    onPressed: () {
+                      if (vonDate.getDate() == null ){
+                        customSnackbar(context, AppLocalizations.of(context).datumEingeben);
+                        return;
+                      }
+
+                      reiseplanungOn = true;
+                      eventMarkerOn = false;
+                      friendMarkerOn = false;
+                      setState(() {});
+
+                      Navigator.pop(context);
+
+                      showReiseplaungMatchedProfils(vonDate.getDate(), bisDate.getDate());
+                    },
+                    label: Text(AppLocalizations.of(context).anzeigen)),
+              )
+            ],
+          );
+        });
+  }
+
+  showReiseplaungMatchedProfils(von, bis){
+    von = von;
+    bis = bis?? von;
+    var selectDates = [von];
+    var selectedProfils = [];
+
+    while(von != bis){
+      von = DateTime(von.year, von.month + 1, von.day);
+      selectDates.add(von);
+    }
+
+    for(var profil in profils){
+      var reiseplanung = profil["reisePlanung"];
+
+      if(reiseplanung == null) continue;
+
+      reiseplanungLoop:
+      for(var planung in reiseplanung){
+        var planungVon = DateTime.parse(planung["von"]);
+        var planungBis = DateTime.parse(planung["bis"]);
+
+        if(selectDates.contains(planungVon)){
+          profil["ort"] = planung["ortData"]["city"];
+          profil["land"] = planung["ortData"]["countryname"];
+          profil["latt"] = planung["ortData"]["latt"];
+          profil["longt"] = planung["ortData"]["longt"];
+
+          selectedProfils.add(profil);
+          continue reiseplanungLoop;
+        }
+
+        while(planungVon != planungBis){
+          planungVon = DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
+          if(selectDates.contains(planungVon)){
+            profil["ort"] = planung["ortData"]["city"];
+            profil["land"] = planung["ortData"]["countryname"];
+            profil["latt"] = planung["ortData"]["latt"];
+            profil["longt"] = planung["ortData"]["longt"];
+
+            selectedProfils.add(profil);
+            continue reiseplanungLoop;
+          }
+        }
+      }
+
+
+    }
+
+    profils = selectedProfils;
+    createAndSetZoomProfils();
+
   }
 
   changeProfils(changeList) {
@@ -673,7 +781,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
-    var genauerStandortBezeichnung = AppLocalizations.of(context).genauerStandort;
+    var genauerStandortBezeichnung =
+        AppLocalizations.of(context).genauerStandort;
     ownProfil = Hive.box("ownProfilBox").get("list");
     double screenWidth = MediaQuery.of(context).size.width;
     var eventCrossAxisCount = screenWidth / 190;
@@ -694,11 +803,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       for (var item in list) {
         if (!titleList.contains(item[filter])) titleList.add(item[filter]);
-      }
-
-      if (titleList.isEmpty) {
-        print(list);
-        print(filter);
       }
 
       return titleList.join(" / ");
@@ -725,7 +829,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       for (var profil in profils) {
         if (profil["name"] != null) selectUserProfils.add(profil);
-        if(profil["ort"].isEmpty) profil["ort"] = genauerStandortBezeichnung;
+        if (profil["ort"].isEmpty) profil["ort"] = genauerStandortBezeichnung;
       }
 
       popupItems.add(SliverAppBar(
@@ -752,7 +856,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
 
       popupItems.add(SliverFixedExtentList(
-        itemExtent: kIsWeb ? 90.0: 80.0,
+        itemExtent: kIsWeb ? 90.0 : 80.0,
         delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
           var profilData = selectUserProfils[index];
 
@@ -1095,6 +1199,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               } else {
                 friendMarkerOn = true;
                 eventMarkerOn = false;
+                reiseplanungOn = false;
                 changeProfils(ownProfil["friendlist"]);
 
                 popupActive = true;
@@ -1110,7 +1215,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     eventButton() {
       return Positioned(
           right: 5,
-          top: 100,
+          top: 110,
           child: IconButton(
             padding: EdgeInsets.zero,
             icon: Stack(
@@ -1129,11 +1234,35 @@ class _ErkundenPageState extends State<ErkundenPage> {
               } else {
                 eventMarkerOn = true;
                 friendMarkerOn = false;
+                reiseplanungOn = false;
               }
 
               setState(() {});
             },
           ));
+    }
+
+    reiseplanungButton() {
+      return Positioned(
+          right: 5,
+          top: 165,
+          child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: reiseplanungOn
+                  ? Icon(Icons.schedule,
+                      size: 32, color: Theme.of(context).colorScheme.primary)
+                  : Icon(Icons.update,
+                      size: 36, color: Theme.of(context).colorScheme.primary),
+              onPressed: () {
+                if (reiseplanungOn) {
+                  reiseplanungOn = false;
+                  profils = profilsBackup;
+                  createAndSetZoomProfils();
+                  setState(() {});
+                } else {
+                  openSelectReiseplanungsDateWindow();
+                }
+              }));
     }
 
     return Scaffold(
@@ -1145,6 +1274,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           if (popupActive) markerPopupContainer(),
           friendButton(),
           eventButton(),
+          reiseplanungButton()
         ]),
       ),
       floatingActionButton:
@@ -1159,8 +1289,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
           FloatingActionButton(
               heroTag: "create Stadtinformation 1",
               child: const Icon(Icons.create),
-              onPressed: () => changePage(context, const CreateStadtinformationsPage())
-          ),
+              onPressed: () =>
+                  changePage(context, const CreateStadtinformationsPage())),
       ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
