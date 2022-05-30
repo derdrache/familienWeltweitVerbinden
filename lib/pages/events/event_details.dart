@@ -82,7 +82,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     var freischaltenList = dbDaten["freischalten"];
     freischaltenList.remove(user);
-    EventDatabase().update(
+    await EventDatabase().update(
         "freischalten = '${json.encode(freischaltenList)}'",
         "WHERE id = '$eventId'"
     );
@@ -91,7 +91,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     var freigegebenListe = dbDaten["freigegeben"];
     freigegebenListe.add(user);
-    EventDatabase().update(
+    await EventDatabase().update(
         "freigegeben = '${json.encode(freigegebenListe)}'",
         "WHERE id = '$eventId'"
     );

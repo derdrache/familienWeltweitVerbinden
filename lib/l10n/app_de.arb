@@ -271,5 +271,9 @@
     "reiseplanungSichtbarFuer": "Reiseplanung sichtbar für ",
     "fuer": "Für ",
     "weltkarteReiseplanungSuchen": "Für welchen Zeitraum suchst du andere Familien?",
-    "anzeigen": "Anzeigen"
+    "anzeigen": "Anzeigen",
+    "benutzerMelden": "Benutzer melden",
+    "benutzerMeldenFrage": "Warum möchtest du den Benutzer melden?",
+    "benutzerGemeldet": "Benutzer wurde gemeldet",
+    "verifizierungsEmailNochmalSenden": "Verifizierungs Email nochmal senden"
 }
