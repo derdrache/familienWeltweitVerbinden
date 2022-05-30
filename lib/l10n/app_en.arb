@@ -271,6 +271,10 @@
     "reiseplanungSichtbarFuer": "Travel planning visible to ",
     "fuer": "for ",
     "weltkarteReiseplanungSuchen": "for what period are you looking for other families?",
-    "anzeigen": "Show"
+    "anzeigen": "Show",
+    "benutzerMelden": "report user",
+    "benutzerMeldenFrage": "why do you want to report the user?",
+    "benutzerGemeldet": "user was reported",
+    "verifizierungsEmailNochmalSenden": "Resend verification email"
 }
 

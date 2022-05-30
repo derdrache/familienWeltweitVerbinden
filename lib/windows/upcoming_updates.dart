@@ -37,7 +37,6 @@ class UmcomingUpdatesWindow{
                 _update(AppLocalizations.of(context).newsBoard),
                 _update(AppLocalizations.of(context).anonymeAnmelden),
                 _update(AppLocalizations.of(context).chatErweiterung),
-                _update(AppLocalizations.of(context).accountLoeschen),
                 _update(AppLocalizations.of(context).layoutVerbessern),
               ]
           );

@@ -12,7 +12,7 @@ import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
-import 'package:url_launcher/link.dart' as url_luncher;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -480,20 +480,12 @@ class _SettingPageState extends State<SettingPage> {
                */
 
               const SizedBox(height: 20),
-              url_luncher.Link(
-                target: url_luncher.LinkTarget.blank,
-                uri: Uri.parse("https://www.paypal.com/paypalme/DominikMast"),
-                builder: (context, followLink) => GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: followLink,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.card_giftcard),
-                      const SizedBox(width: 20),
-                      Text(AppLocalizations.of(context).spenden, style: TextStyle(fontSize: fontSize-4))
-                    ],
-                  ),
-                ),
+              settingThemeContainer(AppLocalizations.of(context).spenden,  Icons.card_giftcard,
+                      () async {
+                        final url = "https://www.paypal.com/paypalme/DominikMast";
+
+                        await launch(url);
+                      }
               ),
               const SizedBox(height: 20),
               settingThemeContainer(AppLocalizations.of(context).ueber, Icons.info,

@@ -205,6 +205,49 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           });
     }
 
+    meldeButton() {
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              const Icon(Icons.report),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).melden),
+            ],
+          ),
+          onPressed: () {
+            var meldeText = TextEditingController();
+            Navigator.pop(context);
+
+            showDialog(
+                context: context,
+                builder: (BuildContext buildContext) {
+                  return CustomAlertDialog(
+                    height: 380,
+                    title: AppLocalizations.of(context).benutzerMelden,
+                    children: [
+                      customTextInput(
+                          AppLocalizations.of(context).benutzerMeldenFrage,
+                          meldeText,
+                          moreLines: 10),
+                      const SizedBox(height: 20),
+                      FloatingActionButton.extended(
+                          onPressed: () {
+                            ReportsDatabase().add(
+                                userID,
+                                "Melde User id: " + widget.profil["id"],
+                                meldeText.text);
+                            Navigator.pop(context);
+                            customSnackbar(context,
+                                AppLocalizations.of(context).benutzerGemeldet,
+                                color: Colors.green);
+                          },
+                          label: Text(AppLocalizations.of(context).senden))
+                    ],
+                  );
+                });
+          });
+    }
+
     moreMenuButton() {
       return IconButton(
         icon: const Icon(Icons.more_vert),
@@ -221,7 +264,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                         contentPadding: EdgeInsets.zero,
                         insetPadding:
                             const EdgeInsets.only(top: 40, left: 0, right: 10),
-                        children: [friendlistButton()],
+                        children: [friendlistButton(), meldeButton()],
                       ),
                     ),
                   ],

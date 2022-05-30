@@ -258,7 +258,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         newPoint = true;
         var numberName =
             int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
-        if (numberName > 99) numberName = 99;
+
         list[i]["name"] = numberName.toString();
         list[i]["profils"].add(profil);
         break;
@@ -289,7 +289,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         newCity = true;
         var addNumberName =
             int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
-        if (addNumberName > 99) addNumberName = 99;
+
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
         break;
@@ -323,7 +323,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         checkNewCountry = false;
         var addNumberName =
             int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
-        if (addNumberName > 99) addNumberName = 99;
+
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
         break;
@@ -370,7 +370,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
         var addNumberName =
             int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
-        if (addNumberName > 99) addNumberName = 99;
+
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
         break;
@@ -1044,15 +1044,23 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     Marker profilMarker(numberText, position, buttonFunction) {
+      double size = 30;
+
+      if(numberText.length == 1){
+        size -= 5;
+      } else if(numberText.length == 3){
+        size += 5;
+      }
+
       return Marker(
-        width: 30.0,
-        height: 30.0,
+        width: size,
+        height: size,
         point: position,
         builder: (ctx) => FloatingActionButton(
           heroTag: "MapMarker" + position.toString(),
           backgroundColor: Theme.of(context).colorScheme.primary,
           mini: true,
-          child: Text(numberText),
+          child: Center(child: Text(numberText)),
           onPressed: buttonFunction,
         ),
       );
