@@ -159,21 +159,28 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
+    Widget resendVerificationEmailButton(){
+      return TextButton(
+          style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.all(Colors.black)),
+          child: Text(AppLocalizations.of(context).verifizierungsEmailNochmalSenden),
+          onPressed: () {
+            if(FirebaseAuth.instance.currentUser?.emailVerified ?? false) return;
+
+            FirebaseAuth.instance.currentUser?.sendEmailVerification();
+          });
+    }
+
     Widget forgetPassButton() {
-      return Align(
-        child: SizedBox(
-          width: 200,
-          child: TextButton(
-              style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all(Colors.black)),
-              child: Text(AppLocalizations.of(context).passwortVergessen),
-              onPressed: () {
-                passwortController.text = "";
-                global_functions.changePage(
-                    context, const ForgetPasswordPage());
-              }),
-        ),
-      );
+      return TextButton(
+          style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.all(Colors.black)),
+          child: Text(AppLocalizations.of(context).passwortVergessen),
+          onPressed: () {
+            passwortController.text = "";
+            global_functions.changePage(
+                context, const ForgetPasswordPage());
+          });
     }
 
     doLogin() {
@@ -203,7 +210,11 @@ class _LoginPageState extends State<LoginPage> {
                     textInputAction: TextInputAction.done,
                     onSubmit: () => doLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
-                forgetPassButton(),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  resendVerificationEmailButton(),
+                  const SizedBox(width: 30),
+                  forgetPassButton(),
+                ],),
                 isLoading
                     ? loadingBox()
                     : customFloatbuttonExtended("Login", () => doLogin()),
