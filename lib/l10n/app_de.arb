@@ -89,7 +89,7 @@
     "reisePlanung": "Reiseplanung/Reiseroute",
     "gemeinschaftenUpdate": "Gemeinschaften Eintragen/Anzeigen",
     "chatgruppen": "Chatgruppen",
-    "anonymeAnmelden": "Anonyme Anmelden",
+    "weitereAnemdlungsMoeglichkeiten": "Weitere Anmeldungs-/Registrierungsmöglichkeiten",
     "chatErweiterung": "Chat erweiterungen",
     "accountLoeschen": "Account löschen",
     "layoutVerbessern": "Layout verbessern",
@@ -275,5 +275,8 @@
     "benutzerMelden": "Benutzer melden",
     "benutzerMeldenFrage": "Warum möchtest du den Benutzer melden?",
     "benutzerGemeldet": "Benutzer wurde gemeldet",
-    "verifizierungsEmailNochmalSenden": "Verifizierungs Email nochmal senden"
+    "verifizierungsEmailNochmalSenden": "Verifizierungs Email nochmal senden",
+    "eventErweiterung": "Event Erweiterung",
+    "immerDabei": "Immer Teilnehmen",
+    "eventOptionen": "Event optionen"
 }

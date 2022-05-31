@@ -117,6 +117,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             const Expanded(child: SizedBox(width: 20)),
             Switch(
                 value: widget.profil["emailAnzeigen"] == 1 ? true : false,
+                inactiveThumbColor: Colors.grey[700],
+                activeColor: Theme.of(context).colorScheme.primary,
                 onChanged: (value) {
                   setState(() {
                     widget.profil["emailAnzeigen"] = value == true ? 1 : 0;

@@ -669,12 +669,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
             children: [
               Container(
                   margin: const EdgeInsets.all(20),
-                  child:
-                      Text(
-                        AppLocalizations.of(context).weltkarteReiseplanungSuchen,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      )
-              ),
+                  child: Text(
+                    AppLocalizations.of(context).weltkarteReiseplanungSuchen,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  )),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -690,8 +689,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 margin: const EdgeInsets.all(30),
                 child: FloatingActionButton.extended(
                     onPressed: () {
-                      if (vonDate.getDate() == null ){
-                        customSnackbar(context, AppLocalizations.of(context).datumEingeben);
+                      if (vonDate.getDate() == null) {
+                        customSnackbar(context,
+                            AppLocalizations.of(context).datumEingeben);
                         return;
                       }
 
@@ -702,7 +702,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
                       Navigator.pop(context);
 
-                      showReiseplaungMatchedProfils(vonDate.getDate(), bisDate.getDate());
+                      showReiseplaungMatchedProfils(
+                          vonDate.getDate(), bisDate.getDate());
                     },
                     label: Text(AppLocalizations.of(context).anzeigen)),
               )
@@ -711,28 +712,28 @@ class _ErkundenPageState extends State<ErkundenPage> {
         });
   }
 
-  showReiseplaungMatchedProfils(von, bis){
+  showReiseplaungMatchedProfils(von, bis) {
     von = von;
-    bis = bis?? von;
+    bis = bis ?? von;
     var selectDates = [von];
     var selectedProfils = [];
 
-    while(von != bis){
+    while (von != bis) {
       von = DateTime(von.year, von.month + 1, von.day);
       selectDates.add(von);
     }
 
-    for(var profil in profils){
+    for (var profil in profils) {
       var reiseplanung = profil["reisePlanung"];
 
-      if(reiseplanung == null) continue;
+      if (reiseplanung == null) continue;
 
       reiseplanungLoop:
-      for(var planung in reiseplanung){
+      for (var planung in reiseplanung) {
         var planungVon = DateTime.parse(planung["von"]);
         var planungBis = DateTime.parse(planung["bis"]);
 
-        if(selectDates.contains(planungVon)){
+        if (selectDates.contains(planungVon)) {
           profil["ort"] = planung["ortData"]["city"];
           profil["land"] = planung["ortData"]["countryname"];
           profil["latt"] = planung["ortData"]["latt"];
@@ -742,9 +743,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
           continue reiseplanungLoop;
         }
 
-        while(planungVon != planungBis){
-          planungVon = DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
-          if(selectDates.contains(planungVon)){
+        while (planungVon != planungBis) {
+          planungVon =
+              DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
+          if (selectDates.contains(planungVon)) {
             profil["ort"] = planung["ortData"]["city"];
             profil["land"] = planung["ortData"]["countryname"];
             profil["latt"] = planung["ortData"]["latt"];
@@ -755,13 +757,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
           }
         }
       }
-
-
     }
 
     profils = selectedProfils;
     createAndSetZoomProfils();
-
   }
 
   changeProfils(changeList) {
@@ -1046,23 +1045,29 @@ class _ErkundenPageState extends State<ErkundenPage> {
     Marker profilMarker(numberText, position, buttonFunction) {
       double size = 30;
 
-      if(numberText.length == 1){
+      if (numberText.length == 1) {
         size -= 5;
-      } else if(numberText.length == 3){
+      } else if (numberText.length == 3) {
         size += 5;
       }
 
       return Marker(
-        width: size,
-        height: size,
-        point: position,
-        builder: (ctx) => FloatingActionButton(
-          heroTag: "MapMarker" + position.toString(),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          mini: true,
-          child: Center(child: Text(numberText)),
-          onPressed: buttonFunction,
-        ),
+          width: size,
+          height: size,
+          point: position,
+          builder: (ctx) => numberText != "0"
+              ? FloatingActionButton(
+                  heroTag: "MapMarker" + position.toString(),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  mini: true,
+                  child: Center(child: Text(numberText)),
+                  onPressed: buttonFunction)
+              : FloatingActionButton(
+                  heroTag: "MapMarker" + position.toString(),
+                  mini: true,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  child: Center(child: Icon(Icons.info)),
+                  onPressed: buttonFunction)
       );
     }
 
