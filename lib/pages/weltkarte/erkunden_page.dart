@@ -31,16 +31,19 @@ class ErkundenPage extends StatefulWidget {
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
-  Box profilBox, eventBox, stadtinfoUserBox;
+  Box secureBox = Hive.box('secureBox');
+  var localProfils = Hive.box('secureBox').get("profils") ?? [];
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
+  var allCities = Hive.box('secureBox').get("stadtinfo");
+  var events = Hive.box('secureBox').get("events") ?? [];
+
   MapController mapController = MapController();
-  var ownProfil = Hive.box("ownProfilBox").get("list");
   Set<String> allUserName = {};
-  List allCities = Hive.box("stadtinfoBox").get("list");
   var countriesList = {};
   List<String> citiesList = [];
   List filterList = [];
-  List profilsBackup = [], profils = [], aktiveProfils = [];
-  List eventsBackup = [], events = [], aktiveEvents = [];
+  List profils = [], aktiveProfils = [];
+  List aktiveEvents = [];
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
@@ -62,10 +65,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   void initState() {
-    profilBox = Hive.box('profilBox');
-    eventBox = Hive.box("eventBox");
-    stadtinfoUserBox = Hive.box("stadtinfoUserBox");
-
     removeCitiesWithoutInformation();
     setProfils();
     setEvents();
@@ -94,7 +93,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   setProfils() {
     var ownProfilPuffer;
-    profils = profilBox.get("list") ?? [];
+    profils = localProfils ?? [];
 
     for (var profil in profils) {
       if (profil["id"] == userId) {
@@ -105,14 +104,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     profils.remove(ownProfilPuffer);
-    profilsBackup = profils;
+    localProfils = profils;
     createAndSetZoomProfils();
   }
 
   setEvents() {
-    events = eventBox.get("list") ?? [];
-    eventsBackup = events;
-
     createAndSetZoomEvents();
   }
 
@@ -134,7 +130,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   refreshHiveBox() async {
     var stadtinfoUser =
         await StadtinfoUserDatabase().getData("*", "", returnList: true);
-    Hive.box("stadtinfoUserBox").put("list", stadtinfoUser);
+    Hive.box('secureBox').put("stadtinfoUser", stadtinfoUser);
   }
 
   getProfilsDB() async {
@@ -144,7 +140,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     dbProfils = sortProfils(dbProfils);
 
-    profilBox.put("list", dbProfils);
+    secureBox.put("profils", dbProfils);
     profils = dbProfils;
   }
 
@@ -200,8 +196,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     profils.remove(ownProfil);
-
-    profilsBackup = profils;
+    localProfils = profils;
   }
 
   getEventsDB() async {
@@ -210,10 +205,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
         returnList: true);
     if (dbEvents == false) dbEvents = [];
 
-    eventBox.put("list", dbEvents);
+    Hive.box('secureBox').put("events", dbEvents);
     events = dbEvents;
 
-    eventsBackup = events;
   }
 
   setSearchAutocomplete() {
@@ -552,7 +546,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var filterProfils = [];
     filterList = searchAutocomplete.getSelected();
 
-    for (var profil in profilsBackup) {
+    for (var profil in localProfils) {
       if (checkFilter(profil)) filterProfils.add(profil);
     }
 
@@ -767,7 +761,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var newProfilList = [];
 
     for (var profilId in changeList) {
-      for (var profil in profilBox.get("list") ?? []) {
+      for (var profil in localProfils ?? []) {
         if (profilId == profil["id"]) {
           newProfilList.add(profil);
           break;
@@ -782,7 +776,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   Widget build(BuildContext context) {
     var genauerStandortBezeichnung =
         AppLocalizations.of(context).genauerStandort;
-    ownProfil = Hive.box("ownProfilBox").get("list");
+    ownProfil = Hive.box('secureBox').get("ownProfil");
     double screenWidth = MediaQuery.of(context).size.width;
     var eventCrossAxisCount = screenWidth / 190;
     List<Marker> allMarker = [];
@@ -888,7 +882,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                           const SizedBox(height: 5),
                           Text(childrenAgeStringToStringAge(
                               profilData["kinder"])),
-                          //const SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(profilData["ort"] + ", " + profilData["land"])
                         ])
                   ],
@@ -1207,7 +1201,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               if (friendMarkerOn) {
                 friendMarkerOn = false;
                 popupActive = false;
-                profils = profilsBackup;
+                profils = localProfils;
                 createAndSetZoomProfils();
               } else {
                 friendMarkerOn = true;
@@ -1269,7 +1263,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               onPressed: () {
                 if (reiseplanungOn) {
                   reiseplanungOn = false;
-                  profils = profilsBackup;
+                  profils = localProfils;
                   createAndSetZoomProfils();
                   setState(() {});
                 } else {
