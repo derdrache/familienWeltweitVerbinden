@@ -89,7 +89,7 @@ class _CreateStadtinformationsPageState
     await StadtinfoDatabase().addNewCity(ortData);
     var stadtInfo =
         await StadtinfoDatabase().getData("*", "", returnList: true);
-    Hive.box("stadtinfoBox").put("list", stadtInfo);
+    Hive.box("secureBox").put("stadtinfo", stadtInfo);
 
     var newUserInformation = {
       "ort": ortData["city"],
@@ -105,10 +105,10 @@ class _CreateStadtinformationsPageState
 
     StadtinfoUserDatabase().addNewInformation(newUserInformation);
 
-    var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
-    var allInformations = stadtinfoUserBox.get("list");
+    var secureBox =Hive.box("secureBox");
+    var allInformations = secureBox.get("stadtinfoUser");
     allInformations.add(newUserInformation);
-    stadtinfoUserBox.put("list", allInformations);
+    secureBox.put("stadtinfoUser", allInformations);
 
     Navigator.pop(context);
     changePage(context, StadtinformationsPage(ortName: ortData["city"]));
