@@ -38,7 +38,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  var userFriendlist = Hive.box("ownProfilBox").get("list")["friendlist"];
+  var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
   double columnAbstand = 15;
   double textSize = 16;
   double healineTextSize = 18;
@@ -187,12 +187,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                       widget.profil["sprachen"].contains("german"));
             }
 
-            var ownProfilBox = Hive.box("ownProfilBox");
-            var ownProfil = ownProfilBox.get("list");
+            var localBox = Hive.box('secureBox');
+            var ownProfil = localBox.get("ownProfil");
 
             ownProfil["friendlist"] = userFriendlist;
 
-            ownProfilBox.put("list", ownProfil);
+            localBox.put("ownProfil", ownProfil);
 
             customSnackbar(context, snackbarText, color: Colors.green);
 

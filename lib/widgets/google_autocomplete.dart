@@ -42,7 +42,7 @@ class GoogleAutoComplete extends StatefulWidget {
     this.hintText,
     this.width,
     this.suche = true,
-  });
+  }) : super(key: key);
 
   @override
   _GoogleAutoCompleteState createState() => _GoogleAutoCompleteState();
@@ -92,28 +92,26 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   }
 
 
-
-
   @override
   Widget build(BuildContext context) {
     double dropdownItemSumHeight = widget.autoCompleteItems.length * 38.0;
     if(widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = 152;
 
-    dropDownItem(item){
+    dropDownItem(item) {
       return GestureDetector(
         onTapUp: (details) async {
-            widget.searchKontroller.text = item["description"];
-            resetSearchBar();
-            widget.googleSearchResult = await getGoogleSearchLocationData(item["place_id"]);
+          widget.searchKontroller.text = item["description"];
+          resetSearchBar();
+          widget.googleSearchResult =
+              await getGoogleSearchLocationData(item["place_id"]);
         },
         child: Container(
             padding: const EdgeInsets.all(10),
             height: 40,
             decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: global_var.borderColorGrey))
-            ),
-            child: Text(item["description"])
-        ),
+                border: Border(
+                    bottom: BorderSide(color: global_var.borderColorGrey))),
+            child: Text(item["description"])),
       );
     }
 
