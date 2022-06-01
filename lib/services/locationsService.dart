@@ -9,8 +9,8 @@ import 'package:geolocator/geolocator.dart';
 import '../auth/secrets.dart';
 
 class LocationService {
-  var countryGeodata = Hive.box('countryGeodataBox').get("list");
-  var kontinentGeodata = Hive.box("kontinentGeodataBox").get("list");
+  var countryGeodata = Hive.box('secureBox').get("countryGeodata");
+  var kontinentGeodata = Hive.box('secureBox').get("kontinentGeodata");
 
   getDatabaseLocationdataFromGoogleResult(googleResult) {
     if (googleResult["result"] != null) {

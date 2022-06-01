@@ -162,15 +162,7 @@ class ProfilDatabase{
         "WHERE JSON_CONTAINS(freigegeben, '\"$userId\"') > 0"
     );
 
-
-    Hive.box("ownProfilBox").deleteFromDisk();
-    Hive.box("profilBox").deleteFromDisk();
-    Hive.box("eventBox").deleteFromDisk();
-    Hive.box("myEventsBox").deleteFromDisk();
-    Hive.box("interestEventsBox").deleteFromDisk();
-    Hive.box("myChatBox").deleteFromDisk();
-    Hive.box("stadtinfoUserBox").deleteFromDisk();
-    Hive.box("stadtinfoBox").deleteFromDisk();
+    Hive.box("secureBox").deleteFromDisk();
 
   }
 

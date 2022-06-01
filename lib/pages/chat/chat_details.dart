@@ -38,8 +38,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   bool newChat = false;
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
-  double messageInputHeight = 50.0;
-  var messageRows = 0;
   Timer timer;
   var pufferList;
   var eventCardList = [];
@@ -371,6 +369,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 ]),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
+                minHeight: 60,
                 maxHeight: 200.0,
               ),
               child: TextField(
@@ -379,13 +378,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 textInputAction: TextInputAction.newline,
                 controller: nachrichtController,
                 decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
                   hintText: AppLocalizations.of(context).nachricht,
+                  hintStyle: const TextStyle(fontSize: 20),
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
                 ),
               ),
             ),
           ),
           Positioned(
-            bottom: 0,
+            bottom: 4,
             right: 2,
             child: IconButton(
                 padding: EdgeInsets.zero,
@@ -397,7 +403,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   });
                 },
                 icon: Icon(Icons.send,
-                    size: 30, color: Theme.of(context).colorScheme.secondary)),
+                    size: 34, color: Theme.of(context).colorScheme.secondary)),
           ),
         ],
       );
