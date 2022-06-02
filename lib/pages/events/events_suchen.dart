@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/variablen.dart' as global_var;
-import '../../global/custom_widgets.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/search_autocomplete.dart';
 import 'eventCard.dart';

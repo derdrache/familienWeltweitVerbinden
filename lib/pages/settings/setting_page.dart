@@ -505,12 +505,12 @@ class _SettingPageState extends State<SettingPage> {
                 BuildContext context,
                 AsyncSnapshot snapshot,
                 ){
-              var ownProfilBox = Hive.box("ownProfilBox");
-              var data = ownProfilBox.get("list");
+              var secureBox = Hive.box("secureBox");
+              var data = secureBox.get("ownProfil");
 
               if(snapshot.hasData){
                 data= snapshot.data;
-                ownProfilBox.put("list", data);
+                secureBox.put("ownProfil", data);
               }
 
               if(data != null){

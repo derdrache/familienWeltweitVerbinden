@@ -278,6 +278,10 @@
     "verifizierungsEmailNochmalSenden": "Resend verification email",
     "eventErweiterung": "Event expansion",
     "immerDabei": "always take part",
-    "eventOptionen": "event options"
+    "eventOptionen": "event options",
+    "blockieren": "block",
+    "freigeben": "release",
+    "benutzerFreigegeben": "user is released again",
+    "benutzerBlockieren": "user is blocked"
 }
 
