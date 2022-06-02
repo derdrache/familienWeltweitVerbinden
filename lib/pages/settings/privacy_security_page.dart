@@ -55,10 +55,10 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   saveReiseplanung() async{
     var reiseplanungPrivacyAuswahl = reiseplanungDropdown.getSelected();
 
-    var ownProfilBox = Hive.box("ownProfilBox");
-    var ownProfil = ownProfilBox.get("list");
+    var secureBox = Hive.box("secureBox");
+    var ownProfil = secureBox.get("ownProfil");
     ownProfil["reiseplanungPrivacy"] = reiseplanungPrivacyAuswahl;
-    ownProfilBox.put("list", ownProfil);
+    secureBox.put("ownProfil", ownProfil);
 
 
     ProfilDatabase().updateProfil(

@@ -22,7 +22,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  Box profilBox, ownProfilBox, myChatBox;
   var userId = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser.displayName;
   var userEmail = FirebaseAuth.instance.currentUser.email;
@@ -31,10 +30,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
-    profilBox = Hive.box('profilBox');
-    ownProfilBox = Hive.box("ownProfilBox");
-    myChatBox = Hive.box('myChatBox');
-
     checkNewMessageCounter();
     initilizeCreateChatData();
 
@@ -42,16 +37,18 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   initilizeCreateChatData() {
-    dynamic userFriendIdList = ownProfilBox.get("list")["friendlist"];
-    dbProfilData = profilBox.get("list");
+    dynamic userFriendIdList = Hive.box("secureBox").get("ownProfil")["friendlist"];
+    dbProfilData =Hive.box("secureBox").get("profils");
     allName = [];
     userFriendlist = [];
+    var ownProfil = Hive.box('secureBox').get("ownProfil");
+
 
     for (var data in dbProfilData) {
       allName.add(data["name"]);
 
       for (var user in userFriendIdList) {
-        if (data["id"] == user) {
+        if (data["id"] == user && !ownProfil["geblocktVon"].contains(data["id"])) {
           userFriendlist.add(data["name"]);
           break;
         }
@@ -130,6 +127,7 @@ class _ChatPageState extends State<ChatPage> {
     List<Widget> friendsBoxen = [];
 
     for (var friend in userFriendlist) {
+
       friendsBoxen.add(GestureDetector(
         onTap: () => validCheckAndOpenChatgroup(name: friend),
         child: Container(
@@ -248,10 +246,10 @@ class _ChatPageState extends State<ChatPage> {
           }
         });
 
-        for (var data in dbProfilData) {
-          if (data["id"] == chatPartnerId) {
-            chatPartnerName = data["name"];
-            chatPartnerProfil = data;
+        for (var profil in dbProfilData) {
+          if (profil["id"] == chatPartnerId) {
+            chatPartnerName = profil["name"];
+            chatPartnerProfil = profil;
             break;
           }
         }
@@ -353,16 +351,33 @@ class _ChatPageState extends State<ChatPage> {
                   "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
                   returnList: true),
               builder: (context, snapshot) {
-                var myChatBox = Hive.box('myChatBox');
-                dynamic data = myChatBox.get("list");
+                var myChatBox = Hive.box("secureBox");
+                dynamic data = myChatBox.get("myChats");
 
                 if (snapshot.hasData) {
                   data = snapshot.data == false ? [] : snapshot.data;
-                  myChatBox.put("list", data);
+                  myChatBox.put("myChats", data);
                 }
 
                 if (data != null && data.isNotEmpty) {
-                  return chatUserList(data);
+
+                  var selectedChats = [];
+                  var blockedVonList = Hive.box('secureBox').get("ownProfil")["geblocktVon"];
+
+                  for(var chat in data){
+                    var isBlocked = false;
+
+                    for(var user in chat["users"].keys){
+                      if(user == userId) continue;
+
+                      if(blockedVonList.contains(user)){
+                        isBlocked = true;
+                      }
+                    }
+                    if(!isBlocked) selectedChats.add(chat);
+                  }
+
+                  return chatUserList(selectedChats);
                 }
 
                 return Center(
