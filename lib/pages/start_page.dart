@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:in_app_update/in_app_update.dart';
 
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
@@ -47,6 +48,8 @@ class _StartPageState extends State<StartPage> {
   _asyncMethod() async {
     await setHiveBoxen();
 
+    checkNewVersion();
+
     checkAndUpdateProfil();
 
     showPatchnotes();
@@ -55,6 +58,20 @@ class _StartPageState extends State<StartPage> {
   setHiveBoxen() async {
     var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
     Hive.box('secureBox').put("ownProfil", ownProfil);
+  }
+
+  checkNewVersion() async{
+    if(kIsWeb) return;
+
+
+    var updateInfo = await InAppUpdate.checkForUpdate();
+
+    if(updateInfo?.updateAvailability ==
+        UpdateAvailability.updateAvailable){
+      await InAppUpdate.startFlexibleUpdate();
+      await InAppUpdate.completeFlexibleUpdate();
+    }
+
   }
 
   checkAndUpdateProfil() async {
