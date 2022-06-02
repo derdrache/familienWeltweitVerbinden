@@ -278,5 +278,9 @@
     "verifizierungsEmailNochmalSenden": "Verifizierungs Email nochmal senden",
     "eventErweiterung": "Event Erweiterung",
     "immerDabei": "Immer Teilnehmen",
-    "eventOptionen": "Event optionen"
+    "eventOptionen": "Event optionen",
+    "blockieren": "blockieren",
+    "freigeben": "freigeben",
+    "benutzerFreigegeben": "Benutzer ist wieder freigegeben",
+    "benutzerBlockieren": "Benutzer wird blockiert"
 }

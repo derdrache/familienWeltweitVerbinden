@@ -205,6 +205,59 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           });
     }
 
+    blockierenButton() {
+      var ownId = FirebaseAuth.instance.currentUser.uid;
+      var onBlockList =
+          widget.profil["geblocktVon"].contains(ownId);
+
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              onBlockList
+                  ? const Icon(Icons.do_not_touch)
+                  : const Icon(Icons.back_hand),
+              const SizedBox(width: 10),
+              onBlockList
+                  ? Text(AppLocalizations.of(context).freigeben)
+                  : Text(AppLocalizations.of(context).blockieren),
+            ],
+          ),
+          onPressed: () {
+            var snackbarText = "";
+            var allProfils = Hive.box('secureBox').get("profils");
+            var databaseQuery = "";
+
+            if (onBlockList) {
+              widget.profil["geblocktVon"].remove(ownId);
+              databaseQuery =
+                  "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
+              snackbarText = AppLocalizations.of(context).benutzerFreigegeben;
+            } else {
+              widget.profil["geblocktVon"].add(ownId);
+              databaseQuery =
+                  "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
+              snackbarText = AppLocalizations.of(context).benutzerBlockieren;
+            }
+
+            for (var profil in allProfils) {
+              if (widget.profil["id"] == profil["id"]) {
+                profil["blockiertVon"] = widget.profil["geblocktVon"];
+              }
+            }
+
+            Hive.box('secureBox').put("profils", allProfils);
+
+            customSnackbar(context, snackbarText, color: Colors.green);
+
+            ProfilDatabase().updateProfil(
+                databaseQuery,
+                "WHERE id = '${widget.profil["id"]}'");
+
+            Navigator.pop(context);
+            setState(() {});
+          });
+    }
+
     meldeButton() {
       return SimpleDialogOption(
           child: Row(
@@ -264,7 +317,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                         contentPadding: EdgeInsets.zero,
                         insetPadding:
                             const EdgeInsets.only(top: 40, left: 0, right: 10),
-                        children: [friendlistButton(), meldeButton()],
+                        children: [
+                          friendlistButton(),
+                          blockierenButton(),
+                          meldeButton()
+                        ],
                       ),
                     ),
                   ],

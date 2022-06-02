@@ -29,9 +29,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 hiveInit() async {
-  await Hive.initFlutter();
+  await Hive.initFlutter("test");
 
-  await Hive.openBox("secureBox" ,encryptionCipher: HiveAesCipher(boxEncrpytionKey), crashRecovery: false);
+  await Hive.openBox("secureBox", encryptionCipher: HiveAesCipher(boxEncrpytionKey), crashRecovery: false);
+
+
 
   var countryJsonText =
   await rootBundle.loadString('assets/countryGeodata.json');
@@ -114,7 +116,7 @@ void main() async {
   if (!kIsWeb) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
-
+  print("newVersion");
   await hiveInit();
 
   runApp(MyApp());

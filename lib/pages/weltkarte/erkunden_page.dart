@@ -33,16 +33,16 @@ class ErkundenPage extends StatefulWidget {
 class _ErkundenPageState extends State<ErkundenPage> {
   Box secureBox = Hive.box('secureBox');
   var localProfils = Hive.box('secureBox').get("profils") ?? [];
+  List profils = Hive.box('secureBox').get("profils") ?? [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   var allCities = Hive.box('secureBox').get("stadtinfo");
   var events = Hive.box('secureBox').get("events") ?? [];
-
   MapController mapController = MapController();
   Set<String> allUserName = {};
   var countriesList = {};
   List<String> citiesList = [];
   List filterList = [];
-  List profils = [], aktiveProfils = [];
+  List aktiveProfils = [];
   List aktiveEvents = [];
   List profilBetweenCountries, profilCountries, profilsBetween, profilsCities;
   List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
@@ -92,19 +92,20 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   setProfils() {
-    var ownProfilPuffer;
-    profils = localProfils ?? [];
+    var removeProfils = [];
 
     for (var profil in profils) {
-      if (profil["id"] == userId) {
-        ownProfilPuffer = profil;
+      if (profil["id"] == userId || ownProfil["geblocktVon"].contains(profil["id"])) {
+        removeProfils.add(profil);
       } else {
         allUserName.add(profil["name"]);
       }
     }
 
-    profils.remove(ownProfilPuffer);
-    localProfils = profils;
+    for(var profil in removeProfils){
+      profils.remove(profil);
+    }
+
     createAndSetZoomProfils();
   }
 
@@ -113,7 +114,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   _asyncMethod() async {
-    await getProfilsDB();
+    getProfilsDB();
     changeProfilList();
     createAndSetZoomProfils();
 
@@ -139,9 +140,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (dbProfils == false) dbProfils = [];
 
     dbProfils = sortProfils(dbProfils);
-
     secureBox.put("profils", dbProfils);
-    profils = dbProfils;
+    profils = List.from(dbProfils);
   }
 
   sortProfils(profils) {
@@ -184,7 +184,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       if (profil["id"] == userId) {
         ownProfil = profil;
-      } else if (monthDifference >= monthsUntilInactive) {
+      } else if (monthDifference >= monthsUntilInactive ) {
         inactiveProfils.add(profil);
       } else {
         allUserName.add(profil["name"]);
@@ -196,7 +196,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     profils.remove(ownProfil);
-    localProfils = profils;
   }
 
   getEventsDB() async {
