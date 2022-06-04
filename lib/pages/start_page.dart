@@ -63,7 +63,6 @@ class _StartPageState extends State<StartPage> {
   checkNewVersion() async{
     if(kIsWeb) return;
 
-
     var updateInfo = await InAppUpdate.checkForUpdate();
 
     if(updateInfo?.updateAvailability ==
