@@ -182,3 +182,30 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
     );
   }
 }
+
+/*
+class GoogleAutocomplete2 extends StatelessWidget {
+  const GoogleAutocomplete2({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Autocomplete(
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text == '') {
+            return const Iterable<User>.empty();
+          }
+          return _userOptions.where((User option) {
+            return option
+                .toString()
+                .contains(textEditingValue.text.toLowerCase());
+          });
+        },
+        onSelected: (User selection) {
+          debugPrint('You just selected ${_displayStringForOption(selection)}');
+        }
+    );
+  }
+}
+
+
+ */

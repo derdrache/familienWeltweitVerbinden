@@ -12,6 +12,7 @@ class LocationService {
   var countryGeodata = Hive.box('secureBox').get("countryGeodata");
   var kontinentGeodata = Hive.box('secureBox').get("kontinentGeodata");
 
+
   getDatabaseLocationdataFromGoogleResult(googleResult) {
     if (googleResult["result"] != null) {
       googleResult = googleResult["result"];
