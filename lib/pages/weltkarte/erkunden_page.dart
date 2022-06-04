@@ -52,7 +52,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double cityZoom = 6.5;
   double countryZoom = 4.0;
   double kontinentZoom = 2.5;
-  var searchAutocomplete = SearchAutocomplete();
+  var searchAutocomplete = SearchAutocomplete(
+  );
   var mapPosition;
   bool buildLoaded = false;
   bool popupActive = false;
@@ -142,6 +143,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
     dbProfils = sortProfils(dbProfils);
     secureBox.put("profils", dbProfils);
     profils = List.from(dbProfils);
+    setState(() {
+
+    });
   }
 
   sortProfils(profils) {
@@ -827,10 +831,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
       popupItems.add(SliverAppBar(
         toolbarHeight: kIsWeb ? 40 : 30,
         backgroundColor: Colors.white,
-        flexibleSpace: Center(
-            child: Text(selectPopupMenuText(profils),
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold))),
+        flexibleSpace: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.only(left: 50, right: 20, top: 5, bottom: 5),
+          child: Text(selectPopupMenuText(profils),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: const TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.bold)),
+        ),
         pinned: true,
       ));
 
@@ -845,6 +854,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
         });
 
         return yearChildrenAgeList.reversed.join(" , ");
+      }
+
+      changeTextLength(string){
+        if(string.length > 40){
+          return string.replaceRange(20, string.length, '...');
+        }
+
+        return string;
       }
 
       popupItems.add(SliverFixedExtentList(
@@ -871,19 +888,23 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   children: [
                     ProfilImage(profilData),
                     const SizedBox(width: 10),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            profilData["name"],
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(childrenAgeStringToStringAge(
-                              profilData["kinder"])),
-                          const SizedBox(height: 5),
-                          Text(profilData["ort"] + ", " + profilData["land"])
-                        ])
+                    Expanded(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              profilData["name"],
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(childrenAgeStringToStringAge(
+                                profilData["kinder"])),
+                            const SizedBox(height: 5),
+                            Text(
+                              changeTextLength(profilData["ort"]) + ", " + profilData["land"],
+                            )
+                          ]),
+                    )
                   ],
                 )),
           );
@@ -1059,7 +1080,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   heroTag: "MapMarker" + position.toString(),
                   mini: true,
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: Center(child: Icon(Icons.info)),
+                  child: const Center(child: Icon(Icons.info)),
                   onPressed: buttonFunction)
       );
     }
