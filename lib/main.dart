@@ -55,53 +55,6 @@ hiveInit() async {
     Hive.box("secureBox").put("stadtinfoUser", stadtinfoUser);
   }
 
-
-
-/*
-  await Hive.openBox("countryGeodataBox",
-      encryptionCipher: HiveAesCipher(boxEncrpytionKey));
-  countryJsonText =
-      await rootBundle.loadString('assets/countryGeodata.json');
-  geodata = json.decode(countryJsonText)["data"];
-  Hive.box('countryGeodataBox').put("list", geodata);
-
-  await Hive.openBox("kontinentGeodataBox",
-      encryptionCipher: HiveAesCipher(boxEncrpytionKey));
-  continentsJsonText =
-      await rootBundle.loadString('assets/continentsGeodata.json');
-  continentsGeodata = json.decode(continentsJsonText)["data"];
-  Hive.box('kontinentGeodataBox').put("list", continentsGeodata);
-
-  await Hive.openBox('profilBox',
-      encryptionCipher: HiveAesCipher(boxEncrpytionKey));
-
-  await Hive.openBox('ownProfilBox');
-
-  await Hive.openBox('eventBox',
-      encryptionCipher: HiveAesCipher(boxEncrpytionKey));
-
-  await Hive.openBox('myEventsBox');
-
-  await Hive.openBox('interestEventsBox');
-
-  await Hive.openBox('myChatBox');
-
-  await Hive.openBox('stadtinfoUserBox',
-      encryptionCipher: HiveAesCipher(boxEncrpytionKey));
-  var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
-  if (stadtinfoUserBox.get("list") == null) {
-    var stadtinfoUser =
-        await StadtinfoUserDatabase().getData("*", "", returnList: true);
-    Hive.box("stadtinfoUserBox").put("list", stadtinfoUser);
-  }
-
-  await Hive.openBox('stadtinfoBox',
-      encryptionCipher: HiveAesCipher(boxEncrpytionKey));
-  stadtinfo = await StadtinfoDatabase()
-      .getData("*", "ORDER BY ort ASC", returnList: true);
-  Hive.box("stadtinfoBox").put("list", stadtinfo);
-*/
-
 }
 
 void main() async {
@@ -116,7 +69,7 @@ void main() async {
   if (!kIsWeb) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
-  print("newVersion");
+
   await hiveInit();
 
   runApp(MyApp());
