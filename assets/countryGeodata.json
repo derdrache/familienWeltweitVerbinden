@@ -450,5 +450,7 @@
   {
     "nameGer": "Sambia", "nameEng": "Zambia", "latt": -15.0, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
   {
-    "nameGer": "Simbabwe", "nameEng": "Zimbabwe", "latt": -20.0, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"}
+    "nameGer": "Simbabwe", "nameEng": "Zimbabwe", "latt": -20.0, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
+  {
+    "nameGer": "Online", "nameEng": "Online", "latt": 30.1, "longt": -50.1, "kontinentGer": "Online", "kontinentEng": "Online"}
 ]}

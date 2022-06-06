@@ -37,7 +37,7 @@ var isGerman = kIsWeb
 
 class EventCardDetails extends StatefulWidget {
   var event;
-  var offlineEvent;
+  bool offlineEvent;
   bool isCreator;
   bool isApproved;
   bool isPublic;
@@ -83,12 +83,30 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     }
   }
 
+  convertIntoMyDate() {
+    var eventZeitzone = widget.event["zeitzone"];
+    var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
+    var eventBeginn = widget.event["wann"];
+
+    eventBeginn = DateTime.parse(eventBeginn)
+        .add(Duration(hours: eventZeitzone - deviceZeitzone));
+
+    var ownDate =
+        eventBeginn.toString().split(" ")[0].split("-").reversed.join(".");
+    var ownTime =
+        eventBeginn.toString().split(" ")[1].toString().substring(0, 5);
+
+    return ownDate + " " + ownTime;
+  }
+
   @override
   Widget build(BuildContext context) {
     var isAssetImage =
         widget.event["bild"].substring(0, 5) == "asset" ? true : false;
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    bool isOffline = widget.event["typ"] == global_var.eventTyp[0] ||
+        widget.event["typ"] == global_var.eventTypEnglisch[0];
 
     if (screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
@@ -188,21 +206,33 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                 databaseKennzeichnung: "zeitzone",
                 items: global_var.eventZeitzonen),
             const SizedBox(height: 5),
-            ShowDataAndChangeWindow(
-                eventId: widget.event["id"],
-                windowTitle: AppLocalizations.of(context).eventStadtAendern,
-                rowTitle: AppLocalizations.of(context).ort,
-                rowData: widget.event["stadt"] + ", " + widget.event["land"],
-                inputHintText: AppLocalizations.of(context).neueStadtEingeben,
-                isCreator: widget.isCreator,
-                modus: "googleAutoComplete",
-                databaseKennzeichnung: "location"),
+            if (isOffline)
+              ShowDataAndChangeWindow(
+                  eventId: widget.event["id"],
+                  windowTitle: AppLocalizations.of(context).eventStadtAendern,
+                  rowTitle: AppLocalizations.of(context).ort,
+                  rowData: widget.event["stadt"] + ", " + widget.event["land"],
+                  inputHintText: AppLocalizations.of(context).neueStadtEingeben,
+                  isCreator: widget.isCreator,
+                  modus: "googleAutoComplete",
+                  databaseKennzeichnung: "location"),
+            if (!isOffline)
+              Row(
+                children: [
+                  Text(AppLocalizations.of(context).meinDatum,
+                      style: TextStyle(
+                          fontSize: fontsize, fontWeight: FontWeight.bold)),
+                  const Expanded(child: SizedBox.shrink()),
+                  Text(convertIntoMyDate(),
+                      style: TextStyle(fontSize: fontsize))
+                ],
+              ),
             const SizedBox(height: 5),
             if (widget.isApproved || widget.isPublic)
               ShowDataAndChangeWindow(
                   eventId: widget.event["id"],
                   windowTitle: AppLocalizations.of(context).eventMapLinkAendern,
-                  rowTitle: "Map: ",
+                  rowTitle: isOffline ? "Map: " : "Link: ",
                   rowData: widget.event["link"],
                   inputHintText:
                       AppLocalizations.of(context).neuenKartenlinkEingeben,
@@ -361,19 +391,19 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 }
 
 class ShowDataAndChangeWindow extends StatefulWidget {
-  var windowTitle;
-  var rowTitle;
+  String windowTitle;
+  String rowTitle;
   var rowData;
-  var inputHintText;
-  var isCreator;
-  var items;
-  var modus;
-  var singleShow;
-  var multiLines;
-  var databaseKennzeichnung;
+  String inputHintText;
+  bool isCreator;
+  List items;
+  String modus;
+  bool singleShow;
+  bool multiLines;
+  String databaseKennzeichnung;
   var oldDate;
-  var eventId;
-  var saveFunction;
+  String eventId;
+  Function saveFunction;
 
   ShowDataAndChangeWindow(
       {Key key,
@@ -599,7 +629,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                       width: 200,
                       child: Text(
                         widget.databaseKennzeichnung == "zeitzone"
-                            ? "UTC " + widget.rowData.toString()
+                            ? "GMT " + widget.rowData.toString()
                             : widget.rowData,
                         style: TextStyle(
                             fontSize: fontsize,
@@ -842,9 +872,9 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 }
 
 class CardFeed extends StatefulWidget {
-  var organisator;
-  var eventId;
-  var width;
+  String organisator;
+  String eventId;
+  double width;
   var eventZusage;
 
   CardFeed(
@@ -857,7 +887,7 @@ class CardFeed extends StatefulWidget {
 
 class _CardFeedState extends State<CardFeed> {
   var organisatorText = const Text("");
-  var organisatorProfil;
+  Map organisatorProfil;
   var ownName = FirebaseAuth.instance.currentUser.displayName;
   var teilnehmerAnzahl = "";
 
@@ -972,8 +1002,8 @@ class _DateButtonState extends State<DateButton> {
 }
 
 class InteresseButton extends StatefulWidget {
-  var hasIntereset;
-  var id;
+  bool hasIntereset;
+  String id;
 
   InteresseButton({Key key, this.hasIntereset, this.id}) : super(key: key);
 

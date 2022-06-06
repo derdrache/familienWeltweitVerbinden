@@ -30,10 +30,10 @@ class EventErstellen extends StatefulWidget {
 class _EventErstellenState extends State<EventErstellen> {
   var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
   var eventNameKontroller = TextEditingController();
-  var eventWannDatum;
-  var eventBisDatum;
-  var eventWannUhrzeit;
-  var eventBisUhrzeit;
+  DateTime eventWannDatum;
+  DateTime eventBisDatum;
+  TimeOfDay eventWannUhrzeit;
+  TimeOfDay eventBisUhrzeit;
   var eventBeschreibungKontroller = TextEditingController();
   var eventOrtKontroller = TextEditingController();
   var sprachenAuswahlBox = CustomMultiTextForm();
@@ -90,7 +90,7 @@ class _EventErstellenState extends State<EventErstellen> {
     var userID = FirebaseAuth.instance.currentUser?.uid;
     var allFilled = checkAllValidations(locationData);
     var interval = eventIntervalDropdown.getSelected();
-    var bisDate;
+    DateTime bisDate;
 
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -194,7 +194,7 @@ class _EventErstellenState extends State<EventErstellen> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Event start: "),
+          const Text("Event start: "),
           const SizedBox(width: 20),
           ElevatedButton(
             child: Text(dateString),
@@ -235,7 +235,7 @@ class _EventErstellenState extends State<EventErstellen> {
         dateString = dateFormat.format(dateTime);
       }
 
-      return !isSeveralDays(eventIntervalDropdown.getSelected()) ? SizedBox.shrink(): Row(
+      return !isSeveralDays(eventIntervalDropdown.getSelected()) ? const SizedBox.shrink(): Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(AppLocalizations.of(context).eventEnde),
@@ -371,7 +371,7 @@ class _EventErstellenState extends State<EventErstellen> {
               eventArtInformation()
             ],
           ),
-          //ortTypDropdown,
+          ortTypDropdown,
           Align(child: ortEingabeBox()),
           sprachenAuswahlBox,
           eventIntervalDropdown,

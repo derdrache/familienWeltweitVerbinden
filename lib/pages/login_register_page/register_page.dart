@@ -45,6 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
             .createUserWithEmailAndPassword(email: email, password: password);
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
+
         FirebaseAuth.instance.currentUser?.sendEmailVerification();
 
         return true;
