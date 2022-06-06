@@ -440,6 +440,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var pufferEventsBetweenCountries = [];
 
     for (var i = 0; i < events.length; i++) {
+
       pufferEventsCountries =
           await createCountries(pufferEventsCountries, events[i]);
       pufferEventsBetweenCountries =
@@ -785,11 +786,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
     List<Marker> allMarker = [];
 
     createPopupWindowTitle(list, filter) {
-      var titleList = [];
+      Set<String> titleList = {};
 
       if (filter == "kontinente") {
         var locationData =
             LocationService().getCountryLocation(list[0]["land"]);
+        if(locationData["kontinentGer"] == locationData["kontinentEng"]) return locationData["kontinentEng"];
         return locationData["kontinentGer"] +
             " / " +
             locationData["kontinentEng"];
@@ -1099,17 +1101,20 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
     }
 
-    Marker eventMarker(numberText, position, buttonFunction) {
+    Marker eventMarker(numberText, position, buttonFunction, isOnline) {
+      double markerSize = 32;
+
+
       return Marker(
-        width: 32.0,
-        height: 32.0,
+        width: markerSize,
+        height: markerSize,
         point: position,
         builder: (ctx) => IconButton(
           padding: EdgeInsets.zero,
           icon: Stack(
-            children: [
+            clipBehavior: Clip.none, children: [
               Icon(Icons.calendar_today,
-                  size: 32, color: Theme.of(context).colorScheme.primary),
+                  size: markerSize, color: Theme.of(context).colorScheme.primary),
               Positioned(
                   top: 9.5,
                   left: 5.5,
@@ -1123,7 +1128,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
-                                  color: Colors.black)))))
+                                  color: Colors.black))))
+              ),
+              if(isOnline) Positioned(top: -20, left: 4, child: Icon(Icons.wifi, color: Theme.of(context).colorScheme.primary,))
             ],
           ),
           onPressed: buttonFunction,
@@ -1134,6 +1141,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createEventMarker() {
       for (var event in aktiveEvents) {
         double basisVerschiebung, anpassungsVerschiebung, geteiltDurch;
+        bool isOnline = event["profils"][0]["typ"] == global_var.eventTyp[1] || event["profils"][0]["typ"] == global_var.eventTypEnglisch[1];
 
         if (currentMapZoom > cityZoom) {
           basisVerschiebung = 0.35;
@@ -1160,7 +1168,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
           popupActive = true;
           createPopupEvents(event);
           setState(() {});
-        }));
+        },
+        isOnline
+        ));
       }
     }
 

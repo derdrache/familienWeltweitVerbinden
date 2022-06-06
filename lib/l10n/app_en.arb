@@ -282,6 +282,7 @@
     "blockieren": "block",
     "freigeben": "release",
     "benutzerFreigegeben": "user is released again",
-    "benutzerBlockieren": "user is blocked"
+    "benutzerBlockieren": "user is blocked",
+    "meinDatum": "My Date"
 }
 
