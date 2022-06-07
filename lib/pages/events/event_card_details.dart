@@ -110,18 +110,25 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                 hint: Center(
                     child: Text(AppLocalizations.of(context).tagHinzufuegen)),
                 isExpanded: true,
-                items: ["items"].map((String items) {
-                  return DropdownMenuItem(
-                    value: isGerman
+                items: (isGerman
                         ? global_var.reisearten + global_var.interessenListe
                         : global_var.reiseartenEnglisch +
-                            global_var.interessenListeEnglisch,
-                    child: Text(items),
+                            global_var.interessenListeEnglisch)
+                    .map((String item) {
+                  return DropdownMenuItem(
+                    value: item,
+                    child: Text(item),
                   );
                 }).toList(),
-                onChanged: (newValue) {
+                onChanged: (newValue) async {
+                  if(widget.event["tags"].contains(global_func.changeGermanToEnglish(newValue)) ||
+                      widget.event["tags"].contains(global_func.changeEnglishToGerman(newValue))) return;
+
                   widget.event["tags"].add(newValue);
                   changeState(() {});
+
+                  await EventDatabase().update("tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')", "WHERE id = '${widget.event["id"]}'");
+                  setState(() {});
                 })),
       )
     ]);
@@ -132,27 +139,32 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
     for (var tag in widget.event["tags"]) {
       eventTags.add(InkWell(
-        onTap: () {
+        onTap: () async {
           widget.event["tags"].remove(tag);
           changeState(() {});
+
+          await EventDatabase().update("tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))", "WHERE id = '${widget.event["id"]}'");
+          setState(() {});
         },
         child: Stack(
           children: [
             Container(
-                margin: const EdgeInsets.only(right: 10, top: 10),
+                margin: const EdgeInsets.only(right: 5, top: 10),
                 padding: const EdgeInsets.only(
-                    left: 5, top: 5, bottom: 5, right: 17),
+                    left: 5, top: 5, bottom: 5, right: 22),
                 decoration: BoxDecoration(
                   border: Border.all(
                       color: Theme.of(context).colorScheme.primary, width: 2),
                   borderRadius: const BorderRadius.all(Radius.circular(10.0)),
                 ),
                 child: Text(
-                  tag,
+                  isGerman
+                      ? global_func.changeEnglishToGerman(tag)
+                      : global_func.changeGermanToEnglish(tag),
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 )),
-            Positioned(
+            const Positioned(
                 top: 20,
                 right: 14,
                 child: Icon(Icons.cancel, color: Colors.red, size: 15))
@@ -172,11 +184,11 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             return CustomAlertDialog(
                 title: AppLocalizations.of(context).tagsChange,
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   addTag(setStateEventTagWindow),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
-                      margin: EdgeInsets.all(5),
+                      margin: const EdgeInsets.all(5),
                       child: Wrap(
                         children:
                             createChangeableEventTags(setStateEventTagWindow),
@@ -435,7 +447,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
       for (var tag in widget.event["tags"]) {
         eventTags.add(Container(
-            margin: const EdgeInsets.only(right: 10, top: 5),
+            margin: const EdgeInsets.only(right: 5, top: 5),
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               border: Border.all(
@@ -443,7 +455,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               borderRadius: const BorderRadius.all(Radius.circular(10.0)),
             ),
             child: Text(
-              tag,
+              isGerman
+                  ? global_func.changeEnglishToGerman(tag)
+                  : global_func.changeGermanToEnglish(tag),
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             )));
       }
@@ -451,7 +465,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       return InkWell(
         onTap: () => widget.isCreator ? changeEventTagsWindow() : null,
         child: Container(
-            margin: EdgeInsets.only(left: 10, right: 10),
+            margin: const EdgeInsets.only(left: 10, right: 10),
             child: Wrap(children: eventTags)),
       );
     }
