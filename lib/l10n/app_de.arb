@@ -283,5 +283,7 @@
     "freigeben": "freigeben",
     "benutzerFreigegeben": "Benutzer ist wieder freigegeben",
     "benutzerBlockieren": "Benutzer wird blockiert",
-    "meinDatum": "Mein Datum"
+    "meinDatum": "Mein Datum",
+    "tagsChange": "Tags verändern",
+    "tagHinzufuegen": "Label hinzufügen"
 }

@@ -283,6 +283,8 @@
     "freigeben": "release",
     "benutzerFreigegeben": "user is released again",
     "benutzerBlockieren": "user is blocked",
-    "meinDatum": "My Date"
+    "meinDatum": "My Date",
+    "tagsChange": "change tags",
+    "tagHinzufuegen": "add tag"
 }
 
