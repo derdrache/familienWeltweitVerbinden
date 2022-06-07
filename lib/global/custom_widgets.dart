@@ -207,13 +207,15 @@ class CustomDropDownButton extends StatefulWidget {
   List<String> items;
   String hintText;
   String selected;
+  double width;
   var onChange;
 
   CustomDropDownButton({Key key,
     this.items,
     this.hintText = "",
     this.selected = "",
-    this.onChange
+    this.onChange,
+    this.width
   }) : super(key: key);
 
 
@@ -241,7 +243,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
     return Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
         Container(
-          width: webWidth,
+          width: widget.width ?? webWidth,
           margin: const EdgeInsets.all(10),
           padding: const EdgeInsets.only(left: 10, right: 10),
           decoration: BoxDecoration(

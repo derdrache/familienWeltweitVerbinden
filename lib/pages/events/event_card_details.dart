@@ -99,6 +99,93 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     return ownDate + " " + ownTime;
   }
 
+  addTag(changeState) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Container(
+        width: 250,
+        height: 50,
+        decoration: BoxDecoration(border: Border.all()),
+        child: DropdownButtonHideUnderline(
+            child: DropdownButton(
+                hint: Center(
+                    child: Text(AppLocalizations.of(context).tagHinzufuegen)),
+                isExpanded: true,
+                items: ["items"].map((String items) {
+                  return DropdownMenuItem(
+                    value: isGerman
+                        ? global_var.reisearten + global_var.interessenListe
+                        : global_var.reiseartenEnglisch +
+                            global_var.interessenListeEnglisch,
+                    child: Text(items),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  widget.event["tags"].add(newValue);
+                  changeState(() {});
+                })),
+      )
+    ]);
+  }
+
+  createChangeableEventTags(changeState) {
+    List<Widget> eventTags = [];
+
+    for (var tag in widget.event["tags"]) {
+      eventTags.add(InkWell(
+        onTap: () {
+          widget.event["tags"].remove(tag);
+          changeState(() {});
+        },
+        child: Stack(
+          children: [
+            Container(
+                margin: const EdgeInsets.only(right: 10, top: 10),
+                padding: const EdgeInsets.only(
+                    left: 5, top: 5, bottom: 5, right: 17),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: Theme.of(context).colorScheme.primary, width: 2),
+                  borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                ),
+                child: Text(
+                  tag,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                )),
+            Positioned(
+                top: 20,
+                right: 14,
+                child: Icon(Icons.cancel, color: Colors.red, size: 15))
+          ],
+        ),
+      ));
+    }
+
+    return eventTags;
+  }
+
+  changeEventTagsWindow() {
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return StatefulBuilder(builder: (context, setStateEventTagWindow) {
+            return CustomAlertDialog(
+                title: AppLocalizations.of(context).tagsChange,
+                children: [
+                  SizedBox(height: 20),
+                  addTag(setStateEventTagWindow),
+                  SizedBox(height: 20),
+                  Container(
+                      margin: EdgeInsets.all(5),
+                      child: Wrap(
+                        children:
+                            createChangeableEventTags(setStateEventTagWindow),
+                      ))
+                ]);
+          });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     var isAssetImage =
@@ -343,6 +430,32 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           ));
     }
 
+    eventTags() {
+      List<Widget> eventTags = [];
+
+      for (var tag in widget.event["tags"]) {
+        eventTags.add(Container(
+            margin: const EdgeInsets.only(right: 10, top: 5),
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.primary, width: 2),
+              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            ),
+            child: Text(
+              tag,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            )));
+      }
+
+      return InkWell(
+        onTap: () => widget.isCreator ? changeEventTagsWindow() : null,
+        child: Container(
+            margin: EdgeInsets.only(left: 10, right: 10),
+            child: Wrap(children: eventTags)),
+      );
+    }
+
     return Center(
       child: Stack(
         children: [
@@ -370,6 +483,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                 creatorChangeHintBox(),
                 eventInformationBox(),
                 if (widget.isApproved || widget.isPublic) eventBeschreibung(),
+                eventTags()
               ],
             ),
           ),
