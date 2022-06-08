@@ -178,14 +178,14 @@ class _ChatPageState extends State<ChatPage> {
               builder: (_) => ChatDetailsPage(
                     chatPartnerId: chatPartnerID,
                     chatPartnerName: name,
-                  )));
+                  ))).whenComplete(() => setState(() {}));
     } else {
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => ChatDetailsPage(
                     groupChatData: globalChatGroups[checkAndIndex[1]],
-                  )));
+                  ))).whenComplete(() => setState(() {}));
     }
   }
 
