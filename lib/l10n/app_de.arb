@@ -285,5 +285,6 @@
     "benutzerBlockieren": "Benutzer wird blockiert",
     "meinDatum": "Mein Datum",
     "tagsChange": "Tags verändern",
-    "tagHinzufuegen": "Label hinzufügen"
+    "tagHinzufuegen": "Label hinzufügen",
+    "nochKeineNachrichtVorhanden": "noch keine Nachrichten Vorhanden"
 }

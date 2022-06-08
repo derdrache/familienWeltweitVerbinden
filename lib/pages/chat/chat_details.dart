@@ -14,9 +14,9 @@ import 'package:intl/intl.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChatDetailsPage extends StatefulWidget {
-  var chatPartnerId;
-  var chatPartnerName;
-  var chatId;
+  String chatPartnerId;
+  String chatPartnerName;
+  String chatId;
   var groupChatData;
 
   ChatDetailsPage({
@@ -39,13 +39,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
   Timer timer;
-  var pufferList;
+  Widget pufferList;
   var eventCardList = [];
   var chatPartnerProfil;
 
   @override
   void dispose() {
-    ProfilDatabase().updateProfil("activeChat = '""'", "WHERE id = '$userId'");
+    ProfilDatabase().updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
     WidgetsBinding.instance.removeObserver(this);
     timer.cancel();
     super.dispose();
@@ -54,9 +54,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      ProfilDatabase().updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+      ProfilDatabase().updateProfil(
+          "activeChat = '$widget.chatId'", "WHERE id = '$userId'");
     } else {
-      ProfilDatabase().updateProfil("activeChat = '""'", "WHERE id = '$userId'");
+      ProfilDatabase()
+          .updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
     }
   }
 
@@ -121,7 +123,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   writeActiveChat() {
-    ProfilDatabase().updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+    ProfilDatabase()
+        .updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
   }
 
   getChatPartnerProfil() async {
@@ -142,18 +145,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ? 0
         : usersAllNewMessages - usersChatNewMessages;
 
-
-
-
     ProfilDatabase().updateProfil(
-        "newMessages = '$usersAllNewMessages'",
-        "WHERE id ='$userId'");
+        "newMessages = '$usersAllNewMessages'", "WHERE id ='$userId'");
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
     ChatDatabase().updateChatGroup(
-      "users = '${json.encode(widget.groupChatData["users"])}'",
-      "WHERE id = '${widget.groupChatData["id"]}'"
-    );
+        "users = '${json.encode(widget.groupChatData["users"])}'",
+        "WHERE id = '${widget.groupChatData["id"]}'");
   }
 
   messageToDbAndClearMessageInput(message) async {
@@ -183,16 +181,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       await ChatDatabase()
           .addNewMessageAndSendNotification(widget.groupChatData, messageData);
 
-
       if (messageData["message"].contains("</eventId=")) {
         messageData["message"] = "<Event Card>";
       }
 
+      /*
       ChatDatabase().updateChatGroup(
           "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.chatId}'"
-      );
+          "WHERE id = '${widget.chatId}'");
 
+
+       */
       setState(() {});
     }
   }
@@ -214,7 +213,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     chatPartnerProfil ??= await ProfilDatabase()
         .getData("*", "WHERE id = '${widget.chatPartnerId}'");
 
-    if(chatPartnerProfil == false) return;
+    if (chatPartnerProfil == false) return;
 
     global_functions.changePage(
         context,
@@ -241,11 +240,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           boxColor = Colors.greenAccent;
         }
 
-
-        while(message["message"].endsWith('\n')){
-          message["message"] = message["message"].substring(0, message["message"].length - 1);
+        while (message["message"].endsWith('\n')) {
+          message["message"] =
+              message["message"].substring(0, message["message"].length - 1);
         }
-
 
         if (message["message"] == "") continue;
 
@@ -281,8 +279,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ));
           continue;
         }
-
-
 
         messageBox.add(
           Align(
@@ -341,9 +337,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             } else if (snap.data != null) {
               List<dynamic> messages = snap.data;
 
-              messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
-              pufferList = messageList(messages);
-              return pufferList;
+              if (messages.isEmpty) {
+                pufferList = Center(
+                    child: Text(
+                  AppLocalizations.of(context).nochKeineNachrichtVorhanden,
+                  style: const TextStyle(fontSize: 20),
+                ));
+
+                return pufferList;
+              } else {
+                messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
+
+                pufferList = messageList(messages);
+                return pufferList;
+              }
             }
             return Container();
           });
