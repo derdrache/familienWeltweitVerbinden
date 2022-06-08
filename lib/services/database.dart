@@ -198,6 +198,8 @@ class ChatDatabase{
       "zu": messageData["zu"]
     };
 
+
+
     await addNewMessageAndSendNotification(newChatGroup, messageData);
 
     return newChatGroup;
