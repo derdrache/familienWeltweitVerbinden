@@ -51,14 +51,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   }
 
   addNewTravelPlan() {
-    //var ortData = ortInput.getGoogleLocationData();
-    var ortData = {
-      "city": "Bonn",
-      "countryname": "Germany",
-      "longt": 7.0982068,
-      "latt": 50.73743,
-    };
-
+    var ortData = ortInput.getGoogleLocationData();
 
     if (vonDate.getDate() == null ||
         bisDate.getDate() == null ||

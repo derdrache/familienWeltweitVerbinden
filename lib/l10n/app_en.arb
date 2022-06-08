@@ -285,6 +285,7 @@
     "benutzerBlockieren": "user is blocked",
     "meinDatum": "My Date",
     "tagsChange": "change tags",
-    "tagHinzufuegen": "add tag"
+    "tagHinzufuegen": "add tag",
+    "nochKeineNachrichtVorhanden": "no messages available yet"
 }
 
