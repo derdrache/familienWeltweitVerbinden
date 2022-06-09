@@ -122,11 +122,11 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
             children: [
               Column(
                 children: [
-                  Container(width: 300,child: ortInput),
+                  SizedBox(width: 300,child: ortInput),
                   Row(
                     children: [
                       vonDate,
-                      SizedBox(width: 40),
+                      const SizedBox(width: 40),
                       bisDate,
                     ],
                   ),
@@ -186,31 +186,31 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
             )));
       }
 
-      return Expanded(
-        child: ListView(
-          children: reiseplanungBox,
-        ),
+      return ListView(
+        children: reiseplanungBox,
       );
     }
 
+
     return Scaffold(
-        appBar: CustomAppBar(
-          title: AppLocalizations.of(context).reisePlanungVeraendern,
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            addNewPlanBox(),
-            SizedBox(height: 10),
-            Container(
-                margin: const EdgeInsets.all(10),
-                child: Text(
-                  AppLocalizations.of(context).reisePlanung + ": ",
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                )),
-            showReiseplanung()
-          ],
-        ));
+      appBar: CustomAppBar(
+        title: AppLocalizations.of(context).reisePlanungVeraendern,
+      ),
+      body: Stack(children: [
+        Container(margin:const EdgeInsets.only(top: 200), child: showReiseplanung()),
+        Positioned(child: Column(children: [
+          addNewPlanBox(),
+          const SizedBox(height: 10),
+          Container(
+              margin: const EdgeInsets.all(10),
+              child: Text(
+                AppLocalizations.of(context).reisePlanung + ": ",
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              )),
+        ],))
+      ],),
+    );
+
   }
 }
