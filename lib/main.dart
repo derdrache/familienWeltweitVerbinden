@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:hive_flutter/hive_flutter.dart';
@@ -57,6 +58,33 @@ hiveInit() async {
 
 }
 
+sortProfils(profils) {
+  var allCountries = LocationService().getAllCountries();
+
+  profils.sort((a, b) {
+    var profilALand = a['land'];
+    var profilBLand = b['land'];
+
+    if (allCountries["eng"].contains(profilALand)) {
+      var index = allCountries["eng"].indexOf(profilALand);
+      profilALand = allCountries["ger"][index];
+    }
+    if (allCountries["eng"].contains(profilBLand)) {
+      var index = allCountries["eng"].indexOf(profilBLand);
+      profilBLand = allCountries["ger"][index];
+    }
+
+    int compareCountry = (profilBLand).compareTo(profilALand) as int;
+
+    if (compareCountry != 0) return compareCountry;
+
+    return b["ort"].compareTo(a["ort"]) as int;
+  });
+
+  return profils;
+}
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
@@ -77,6 +105,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   String userId = FirebaseAuth.instance.currentUser?.uid;
+  bool emailVerified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
   BuildContext pageContext;
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -196,7 +225,8 @@ class MyApp extends StatelessWidget {
               ],
               navigatorKey: navigatorKey,
               debugShowCheckedModeBanner: false,
-              home: userId == null ? const LoginPage() : StartPage());
+              home: emailVerified ? StartPage() : const LoginPage()
+          );
         });
   }
 }

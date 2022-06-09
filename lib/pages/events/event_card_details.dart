@@ -315,7 +315,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   isCreator: widget.isCreator,
                   modus: "googleAutoComplete",
                   databaseKennzeichnung: "location"),
-            if (!isOffline)
+            if (!isOffline && !widget.isCreator)
               Row(
                 children: [
                   Text(AppLocalizations.of(context).meinDatum,
@@ -390,7 +390,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               child: Container(
             width: double.infinity,
             constraints: const BoxConstraints(
-              minHeight: 25.0,
+              minHeight: 50.0,
             ),
             child: ShowDataAndChangeWindow(
                 eventId: widget.event["id"],
@@ -461,6 +461,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             )));
       }
+
+      if(eventTags.isEmpty && widget.isCreator) eventTags.add(
+        Container(margin: EdgeInsets.all(10), child: Text("Hier klicken um Eventlabel hinzuzufügen", style: TextStyle(color: Colors.grey)))
+      );
 
       return InkWell(
         onTap: () => widget.isCreator ? changeEventTagsWindow() : null,

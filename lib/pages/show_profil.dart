@@ -55,7 +55,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   checkAccessReiseplanung() {
     var reiseplanungSetting = widget.profil["reiseplanungPrivacy"];
 
-    if (widget.profil["reisePlanung"].isNotEmpty) return false;
+    if (widget.profil["reisePlanung"].isEmpty) return false;
 
     if (reiseplanungSetting == privacySetting[0] ||
         reiseplanungSetting == privacySettingEnglisch[0]) {
@@ -547,7 +547,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         }
 
         reiseplanung.add(Container(
-          margin: const EdgeInsets.only(bottom: 10),
+          margin: const EdgeInsets.only(bottom: 5),
           child: Row(
             children: [
               Expanded(
@@ -562,7 +562,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             ],
           ),
         ));
-        reiseplanung.add(const SizedBox(height: 5));
       }
 
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -580,7 +579,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           ],
         ),
         const SizedBox(height: 5),
-        ...reiseplanung
+        ...reiseplanung,
+        const SizedBox(height: 5)
       ]);
     }
 

@@ -13,6 +13,8 @@ sendEmail(notificationInformation) async {
   var emailAdresse = await ProfilDatabase()
       .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
 
+  if(emailAdresse == false) emailAdresse = "dominik.mast.11@gmail.com";
+
   http.post(url,
       body: json.encode({
         "to": emailAdresse,

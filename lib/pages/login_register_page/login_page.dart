@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
+import '../../services/notification.dart';
 import 'create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
@@ -164,10 +165,21 @@ class _LoginPageState extends State<LoginPage> {
           style: ButtonStyle(
               foregroundColor: MaterialStateProperty.all(Colors.black)),
           child: Text(AppLocalizations.of(context).verifizierungsEmailNochmalSenden),
-          onPressed: () {
+          onPressed: () async{
             if(FirebaseAuth.instance.currentUser?.emailVerified ?? false) return;
+            try{
+              await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+              customSnackbar(context, AppLocalizations.of(context).emailErneutVersendet);
+            }catch(error){
+              sendEmail({
+                "title": "Firebase auth Problem",
+                "inhalt": """
+                              Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
+                              Folgendes Problem ist aufgetaucht: $error
+                          """
+              });
+            }
 
-            FirebaseAuth.instance.currentUser?.sendEmailVerification();
           });
     }
 
