@@ -52,8 +52,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double cityZoom = 6.5;
   double countryZoom = 4.0;
   double kontinentZoom = 2.5;
-  var searchAutocomplete = SearchAutocomplete(
-  );
+  var searchAutocomplete = SearchAutocomplete();
   var mapPosition;
   bool buildLoaded = false;
   bool popupActive = false;
@@ -142,10 +141,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     dbProfils = sortProfils(dbProfils);
     secureBox.put("profils", dbProfils);
-    profils = List.from(dbProfils);
-    setState(() {
-
-    });
+    profils = dbProfils;
+    changeProfilList();
+    createAndSetZoomProfils();
   }
 
   sortProfils(profils) {
@@ -724,7 +722,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     for (var profil in profils) {
       var reiseplanung = profil["reisePlanung"];
 
-      if (reiseplanung == null) continue;
+      if (reiseplanung == null || profil["id"] == userId) continue;
 
       reiseplanungLoop:
       for (var planung in reiseplanung) {
