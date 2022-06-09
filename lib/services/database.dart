@@ -642,7 +642,6 @@ class AllgemeinDatabase{
 }
 
 class ReportsDatabase{
-
   add(von, title, beschreibung){
     var url = Uri.parse(databaseUrl + "database/reports/addReport.php");
     http.post(url, body: json.encode({
@@ -650,7 +649,16 @@ class ReportsDatabase{
       "title": title,
       "beschreibung": beschreibung ,
     }));
+
+    sendEmail({
+      "title": "Eine Meldung ist eingegangen",
+      "inhalt": """
+      $title \n
+      $beschreibung
+      """
+    });
   }
+
 
 }
 

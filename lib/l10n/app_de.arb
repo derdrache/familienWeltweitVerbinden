@@ -69,7 +69,7 @@
     "privatsphaereSicherheit":"Privatsphäre und Sicherheit",
     "abmelden": "Abmelden",
     "antippenZumAendern": "Antippen, um Einträge zu ändern",
-    "aktuelleOrt": "Aktuelle Ort",
+    "aktuelleOrt": "Aktueller Ort",
     "artDerReise": "Art der Reise",
     "alterDerKinder": "Alter der Kinder",
     "interessen": "Interessen",
@@ -286,5 +286,6 @@
     "meinDatum": "Mein Datum",
     "tagsChange": "Tags verändern",
     "tagHinzufuegen": "Label hinzufügen",
-    "nochKeineNachrichtVorhanden": "noch keine Nachrichten Vorhanden"
+    "nochKeineNachrichtVorhanden": "noch keine Nachrichten Vorhanden",
+    "emailErneutVersendet": "Email wurde erneut versendet"
 }
