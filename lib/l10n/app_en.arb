@@ -264,7 +264,7 @@
     "besuchteLaenderUpdate": "visited countries has been updated",
     "vollstaendigeDatenZukunftsOrtEingeben": "enter complete data for your future location",
     "von": "from",
-    "bis": "until",
+    "bis": "until: ",
     "jetzt": "now",
     "vonKleinerAlsBis": "from-date must be smaller than until-date",
     "zeitraumUeberschneidetSich": "period overlaps with another entry",
@@ -286,6 +286,7 @@
     "meinDatum": "My Date",
     "tagsChange": "change tags",
     "tagHinzufuegen": "add tag",
-    "nochKeineNachrichtVorhanden": "no messages available yet"
+    "nochKeineNachrichtVorhanden": "no messages available yet",
+    "emailErneutVersendet": "e-mail has been sent again"
 }
 

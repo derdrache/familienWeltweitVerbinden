@@ -106,6 +106,16 @@ class _EventErstellenState extends State<EventErstellen> {
         eventBisUhrzeit.hour, eventBisUhrzeit.minute);
     }
 
+
+    if(locationData["latt"] == null){
+      locationData = {
+        "longt": -50.1,
+        "latt": 30.1,
+        "countryname": "Online",
+        "city": "Online"
+      };
+    }
+
     var eventData = {
       "id": eventId,
       "name" : eventNameKontroller.text,

@@ -25,7 +25,7 @@ class ChangeReiseplanungPage extends StatefulWidget {
 class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   var vonDate = MonthPickerBox();
   var bisDate = MonthPickerBox();
-  var ortInput = GoogleAutoComplete(width: 180);
+  var ortInput = GoogleAutoComplete();
 
   saveInDatabase() {
     ProfilDatabase().updateProfil(
@@ -118,23 +118,31 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
       return Container(
           margin: const EdgeInsets.all(10),
           width: 800,
-          child: Column(
+          child: Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Column(
                 children: [
-                  vonDate,
-                  const SizedBox(width: 10),
-                  bisDate,
-                  ortInput,
+                  Container(width: 300,child: ortInput),
+                  Row(
+                    children: [
+                      vonDate,
+                      SizedBox(width: 40),
+                      bisDate,
+                    ],
+                  ),
+
                 ],
+
               ),
-              IconButton(
-                  onPressed: () => addNewTravelPlan(),
-                  icon: const Icon(
-                    Icons.add_circle,
-                    size: 40,
-                  ))
+              Expanded(
+                child: IconButton(
+                    onPressed: () => addNewTravelPlan(),
+                    icon: const Icon(
+                      Icons.add_circle,
+                      size: 50,
+                    )
+                ),
+              )
             ],
           ));
     }
@@ -170,6 +178,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
                   icon: const Icon(
                     Icons.cancel,
                     color: Colors.red,
+                    size: 28,
                   ),
                   onPressed: () => deleteReiseplan(planung),
                 )
@@ -192,6 +201,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             addNewPlanBox(),
+            SizedBox(height: 10),
             Container(
                 margin: const EdgeInsets.all(10),
                 child: Text(
