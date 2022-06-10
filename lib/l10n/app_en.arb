@@ -287,6 +287,7 @@
     "tagsChange": "change tags",
     "tagHinzufuegen": "add tag",
     "nochKeineNachrichtVorhanden": "no messages available yet",
-    "emailErneutVersendet": "e-mail has been sent again"
+    "emailErneutVersendet": "e-mail has been sent again",
+    "reisearten": "Travel type"
 }
 
