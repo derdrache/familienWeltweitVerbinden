@@ -287,5 +287,6 @@
     "tagsChange": "Tags verändern",
     "tagHinzufuegen": "Label hinzufügen",
     "nochKeineNachrichtVorhanden": "noch keine Nachrichten Vorhanden",
-    "emailErneutVersendet": "Email wurde erneut versendet"
+    "emailErneutVersendet": "Email wurde erneut versendet",
+    "reisearten": "Reisearten"
 }
