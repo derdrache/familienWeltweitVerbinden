@@ -174,7 +174,7 @@ class ChatDatabase{
     var userKeysList = users.keys.toList();
     var usersList = users.values.toList();
     var chatID = global_functions.getChatID(userKeysList);
-    var date = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+    var date = DateTime.now().millisecondsSinceEpoch;
 
     var newChatGroup = {
       "id": chatID,

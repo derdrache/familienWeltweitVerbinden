@@ -185,13 +185,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         messageData["message"] = "<Event Card>";
       }
 
-      /*
       ChatDatabase().updateChatGroup(
           "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.chatId}'");
 
-
-       */
       setState(() {});
     }
   }
