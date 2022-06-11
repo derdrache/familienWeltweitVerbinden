@@ -359,7 +359,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             AppLocalizations.of(context).aktuelleOrt + ": ",
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
           ),
-          Text(widget.profil["ort"], style: TextStyle(fontSize: textSize))
+          Flexible(child: Text(widget.profil["ort"], style: TextStyle(fontSize: textSize), maxLines: 2,))
         ],
       );
     }

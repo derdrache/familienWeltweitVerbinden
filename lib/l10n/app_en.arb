@@ -65,7 +65,7 @@
     "senden": "send",
     "benachrichtigungenErhalten":"receive notifications",
     "benachrichtigungen": "Notifications",
-    "emailAlleSichtbar": "E-mail visible to all",
+    "emailAlleSichtbar": "e-mail visible to all",
     "privatsphaereSicherheit":"Privacy and security",
     "abmelden": "Log off",
     "antippenZumAendern": "Tap to change entries",
@@ -173,7 +173,7 @@
     "freigegeben" : "Shared: ",
     "freigegebeneFamilien": "Shared Families",
     "filterEventSuche": "Filter by languages, countries, cities",
-    "filterErkunden": "Families, Languages, Travel Type, Interests, Countries",
+    "filterErkunden": "Families, Cities and Countries",
     "emailErhalten" : "receive e-mail",
     "chatNotificationErhalten": "receive chat notification",
     "chatEmailErhalten": "receive chat e-mails",
@@ -268,7 +268,7 @@
     "jetzt": "now",
     "vonKleinerAlsBis": "from-date must be smaller than until-date",
     "zeitraumUeberschneidetSich": "period overlaps with another entry",
-    "reiseplanungSichtbarFuer": "Travel planning visible to ",
+    "reiseplanungSichtbarFuer": "travel planning visible to ",
     "fuer": "for ",
     "weltkarteReiseplanungSuchen": "for what period are you looking for other families?",
     "anzeigen": "Show",
@@ -288,6 +288,7 @@
     "tagHinzufuegen": "add tag",
     "nochKeineNachrichtVorhanden": "no messages available yet",
     "emailErneutVersendet": "e-mail has been sent again",
-    "reisearten": "Travel type"
+    "reisearten": "Travel type",
+    "genauerStandortSichtbarFuer": "exact location visible for "
 }
 
