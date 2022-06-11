@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:familien_suche/global/variablen.dart';
+
+import '../../global/variablen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +36,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
-
-
+  
   saveAutomaticLocation() async {
     var locationAuswahl = automaticLocationDropdown.getSelected();
 
