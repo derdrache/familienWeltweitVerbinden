@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
@@ -11,7 +12,7 @@ import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
-import 'package:url_launcher/link.dart' as url_luncher;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -27,6 +28,7 @@ import '../../windows/upcoming_updates.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
 import 'change_aufreise.dart';
+import 'change_besuchte_laender.dart';
 import 'change_children.dart';
 import 'change_trade.dart';
 import 'privacy_security_page.dart';
@@ -56,7 +58,6 @@ class _SettingPageState extends State<SettingPage> {
   var interessenInputBox = CustomMultiTextForm(
       auswahlList: global_variablen.interessenListe);
   var bioTextKontroller = TextEditingController();
-  var tradeTextKontroller = TextEditingController();
   var emailTextKontroller = TextEditingController();
   var emailNewTextKontroller = TextEditingController();
   var passwortTextKontroller1 = TextEditingController();
@@ -66,6 +67,9 @@ class _SettingPageState extends State<SettingPage> {
   var sprachenInputBox = CustomMultiTextForm(
       auswahlList: global_variablen.sprachenListe);
   var ortKontroller = TextEditingController();
+  var tradeTextKontroller = TextEditingController();
+  var reisePlanung = [];
+  var besuchteLaender = [];
 
 
 
@@ -79,17 +83,25 @@ class _SettingPageState extends State<SettingPage> {
 
     nameTextKontroller.text = userProfil["name"];
     emailTextKontroller.text = userProfil["email"];
+    bioTextKontroller.text = userProfil["aboutme"];
+    tradeTextKontroller.text = userProfil["tradeNotize"];
+    reisePlanung = userProfil["reisePlanung"];
+    besuchteLaender = userProfil["besuchteLaender"] ?? [];
+
+
     ortKontroller.text = userProfil["ort"].isEmpty ?
       AppLocalizations.of(context).genauerStandort : userProfil["ort"];
+
     interessenInputBox.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["interessen"]):
       global_func.changeGermanToEnglish(userProfil["interessen"]);
+
     kinderAgeBox.setSelected(childrenAgeTimestamp);
-    bioTextKontroller.text = userProfil["aboutme"];
 
     reiseArtInput.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["reiseart"]):
       global_func.changeGermanToEnglish(userProfil["reiseart"]);
+
     sprachenInputBox.selected = spracheIstDeutsch ?
       global_func.changeEnglishToGerman(userProfil["sprachen"]):
       global_func.changeGermanToEnglish(userProfil["sprachen"]);
@@ -360,7 +372,23 @@ class _SettingPageState extends State<SettingPage> {
                   profilThemeContainer(tradeTextKontroller.text== ""? " ": tradeTextKontroller.text,
                       AppLocalizations.of(context).verkaufenTauschenSchenken,
                       ChangeTradePage(textKontroller: tradeTextKontroller)
-                  )
+                  ),
+                  profilThemeContainer(reisePlanung.length.toString(),
+                      AppLocalizations.of(context).reisePlanung,
+                      ChangeReiseplanungPage(
+                          userId: userID,
+                          reiseplanung: reisePlanung,
+                          isGerman: spracheIstDeutsch
+                      )
+                  ),
+                  profilThemeContainer(besuchteLaender.length.toString(),
+                      AppLocalizations.of(context).besuchteLaender,
+                      ChangeBesuchteLaenderPage(
+                        userId: userID,
+                        selected: besuchteLaender,
+                        isGerman: spracheIstDeutsch
+                      )
+                  ),
 
                 ],
               ),
@@ -452,20 +480,12 @@ class _SettingPageState extends State<SettingPage> {
                */
 
               const SizedBox(height: 20),
-              url_luncher.Link(
-                target: url_luncher.LinkTarget.blank,
-                uri: Uri.parse("https://www.paypal.com/paypalme/DominikMast"),
-                builder: (context, followLink) => GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: followLink,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.card_giftcard),
-                      const SizedBox(width: 20),
-                      Text(AppLocalizations.of(context).spenden, style: TextStyle(fontSize: fontSize-4))
-                    ],
-                  ),
-                ),
+              settingThemeContainer(AppLocalizations.of(context).spenden,  Icons.card_giftcard,
+                      () async {
+                        final url = "https://www.paypal.com/paypalme/DominikMast";
+
+                        await launch(url);
+                      }
               ),
               const SizedBox(height: 20),
               settingThemeContainer(AppLocalizations.of(context).ueber, Icons.info,
@@ -485,12 +505,12 @@ class _SettingPageState extends State<SettingPage> {
                 BuildContext context,
                 AsyncSnapshot snapshot,
                 ){
-              var ownProfilBox = Hive.box("ownProfilBox");
-              var data = ownProfilBox.get("list");
+              var secureBox = Hive.box("secureBox");
+              var data = secureBox.get("ownProfil");
 
               if(snapshot.hasData){
                 data= snapshot.data;
-                ownProfilBox.put("list", data);
+                secureBox.put("ownProfil", data);
               }
 
               if(data != null){

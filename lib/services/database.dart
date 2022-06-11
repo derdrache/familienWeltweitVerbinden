@@ -12,8 +12,8 @@ import '../global/global_functions.dart'as global_functions;
 import 'notification.dart';
 
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
 
@@ -162,15 +162,7 @@ class ProfilDatabase{
         "WHERE JSON_CONTAINS(freigegeben, '\"$userId\"') > 0"
     );
 
-
-    Hive.box("ownProfilBox").deleteFromDisk();
-    Hive.box("profilBox").deleteFromDisk();
-    Hive.box("eventBox").deleteFromDisk();
-    Hive.box("myEventsBox").deleteFromDisk();
-    Hive.box("interestEventsBox").deleteFromDisk();
-    Hive.box("myChatBox").deleteFromDisk();
-    Hive.box("stadtinfoUserBox").deleteFromDisk();
-    Hive.box("stadtinfoBox").deleteFromDisk();
+    Hive.box("secureBox").deleteFromDisk();
 
   }
 
@@ -182,7 +174,7 @@ class ChatDatabase{
     var userKeysList = users.keys.toList();
     var usersList = users.values.toList();
     var chatID = global_functions.getChatID(userKeysList);
-    var date = (DateTime.now().millisecondsSinceEpoch / 1000).round();
+    var date = DateTime.now().millisecondsSinceEpoch;
 
     var newChatGroup = {
       "id": chatID,
@@ -205,6 +197,8 @@ class ChatDatabase{
       "von": messageData["von"],
       "zu": messageData["zu"]
     };
+
+
 
     await addNewMessageAndSendNotification(newChatGroup, messageData);
 
@@ -648,7 +642,6 @@ class AllgemeinDatabase{
 }
 
 class ReportsDatabase{
-
   add(von, title, beschreibung){
     var url = Uri.parse(databaseUrl + "database/reports/addReport.php");
     http.post(url, body: json.encode({
@@ -656,7 +649,16 @@ class ReportsDatabase{
       "title": title,
       "beschreibung": beschreibung ,
     }));
+
+    sendEmail({
+      "title": "Eine Meldung ist eingegangen",
+      "inhalt": """
+      $title \n
+      $beschreibung
+      """
+    });
   }
+
 
 }
 
