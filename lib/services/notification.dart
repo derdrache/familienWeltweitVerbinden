@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 import '../auth/secrets.dart';
@@ -11,6 +12,9 @@ sendEmail(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendEmail2.php");
   var emailAdresse = await ProfilDatabase()
       .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
+  emailAdresse = "dominik.mast.11@gmail.com";
+
+  if(emailAdresse == false) emailAdresse = "dominik.mast.11@gmail.com";
 
   http.post(url,
       body: json.encode({
@@ -22,6 +26,8 @@ sendEmail(notificationInformation) async {
 
 _sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
+
+  notificationInformation["token"] = "e1ioeMDiSLCun8z5gySlg0:APA91bFZIrlxd8BC-AB-hpHh327-hzZZzVsqDPW9T5SkhKY_B-uu1kc9byX5d5AmTfPrStAYEjvTP2uQFOKaCZBtB_ZHlK9kDtP8deRInPXqE6__liXq2EAeLzLfONIx11WXmv5Zb4Ut";
 
   http.post(url,
       body: json.encode({
@@ -38,13 +44,14 @@ prepareChatNotification({chatId, vonId, toId, inhalt}) async {
   var dbData = await ProfilDatabase().getData(
       "activeChat, notificationstatus, chatNotificationOn, token",
       "WHERE id = '$toId'");
+  var blockList = Hive.box('secureBox').get("ownProfil")["geblocktVon"];
   var toActiveChat = dbData["activeChat"];
   var notificationsAllowed = dbData["notificationstatus"];
   var chatNotificationOn = dbData["chatNotificationOn"];
 
   if (notificationsAllowed == 0 ||
       chatNotificationOn == 0 ||
-      toActiveChat == chatId) return;
+      toActiveChat == chatId || blockList.contains(toId)) return;
 
 
 
