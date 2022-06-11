@@ -146,9 +146,16 @@ class LocationService {
     for (var item in nearstLocationData["address_components"]) {
       if (item["types"].contains("locality")) {
         city = item["long_name"];
-      } else if (item["types"].contains("administrative_area_level_1")) {
+      }
+      else if(item["types"].contains("administrative_area_level_3")){ ///!!!!
+        city = item["long_name"];
+      }
+
+      if (item["types"].contains("administrative_area_level_1")) {
         region = item["long_name"];
-      } else if (item["types"].contains("country")) {
+      }
+
+      if (item["types"].contains("country")) {
         country = item["long_name"];
       }
     }
