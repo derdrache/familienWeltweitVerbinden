@@ -128,14 +128,14 @@ class _StartPageState extends State<StartPage> {
 
       var nearstLocationData =
           await LocationService().getNearstLocationData(currentPosition);
-
       nearstLocationData =
           LocationService().transformNearstLocation(nearstLocationData);
 
-      if (nearstLocationData["country"].isEmpty) return;
+      if(nearstLocationData["country"].isEmpty || nearstLocationData["city"].isEmpty) return;
 
       if (automaticLocationStatus == standortbestimmung[1] ||
           automaticLocationStatus == standortbestimmungEnglisch[1]) {
+
         ProfilDatabase().updateProfilLocation(userId, {
           "city": nearstLocationData["city"],
           "land": nearstLocationData["country"],
@@ -159,7 +159,7 @@ class _StartPageState extends State<StartPage> {
           .getDatabaseLocationdataFromGoogleResult(geoData);
 
       ProfilDatabase().updateProfilLocation(userId, locationData);
-      StadtinfoDatabase().addNewCity(locationData);
+      await StadtinfoDatabase().addNewCity(locationData);
       StadtinfoDatabase().update(
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
           "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
