@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,7 +10,9 @@ import 'package:hive/hive.dart';
 
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart' as global_functions;
+import '../global/global_functions.dart';
 import '../global/variablen.dart' as global_variablen;
+import '../global/variablen.dart';
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
 import '../services/notification.dart';
@@ -31,10 +34,11 @@ class ShowProfilPage extends StatefulWidget {
 
 class _ShowProfilPageState extends State<ShowProfilPage> {
   var userID = FirebaseAuth.instance.currentUser.uid;
+  var hasReiseplanungAccess = false;
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  var userFriendlist = Hive.box("ownProfilBox").get("list")["friendlist"];
+  var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
   double columnAbstand = 15;
   double textSize = 16;
   double healineTextSize = 18;
@@ -43,7 +47,29 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   @override
   void initState() {
     checkOwnProfil();
+    checkAccessReiseplanung();
+
     super.initState();
+  }
+
+  checkAccessReiseplanung() {
+    var reiseplanungSetting = widget.profil["reiseplanungPrivacy"];
+
+    if (widget.profil["reisePlanung"].isEmpty) return false;
+
+    if (reiseplanungSetting == privacySetting[0] ||
+        reiseplanungSetting == privacySettingEnglisch[0]) {
+      hasReiseplanungAccess = true;
+    } else if ((reiseplanungSetting == privacySetting[1] ||
+            reiseplanungSetting == privacySettingEnglisch[1]) &&
+        (widget.ownProfil["friendlist"].contains(widget.profil["id"]))) {
+      hasReiseplanungAccess = true;
+    } else if ((reiseplanungSetting == privacySetting[2] ||
+            reiseplanungSetting == privacySettingEnglisch[2]) &&
+        (widget.ownProfil["friendlist"].contains(widget.profil["id"])) &&
+        (widget.profil["friendlist"].contains(widget.ownProfil["id"]))) {
+      hasReiseplanungAccess = true;
+    }
   }
 
   checkOwnProfil() {
@@ -59,6 +85,36 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                     .microsecondsSinceEpoch)
             .abs());
     return timeDifference.inDays / 30.44;
+  }
+
+  transformDateToText(dateString) {
+    DateTime date = DateTime.parse(dateString);
+
+    if ((date.month > DateTime.now().month &&
+            date.year == DateTime.now().year) ||
+        date.year > DateTime.now().year) {
+      return date.month.toString() + "." + date.year.toString();
+    } else {
+      return AppLocalizations.of(context).jetzt;
+    }
+  }
+
+  openBesuchteLaenderWindow() {
+    List<Widget> besuchteLaenderList = [];
+
+    for (var land in widget.profil["besuchteLaender"]) {
+      besuchteLaenderList
+          .add(Container(margin: const EdgeInsets.all(10), child: Text(land)));
+    }
+
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+            title: AppLocalizations.of(context).besuchteLaender,
+            children: besuchteLaenderList,
+          );
+        });
   }
 
   @override
@@ -105,7 +161,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               onFriendlist
                   ? const Icon(Icons.person_remove)
                   : const Icon(Icons.person_add),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               onFriendlist
                   ? Text(AppLocalizations.of(context).freundEntfernen)
                   : Text(AppLocalizations.of(context).freundHinzufuegen),
@@ -131,12 +187,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                       widget.profil["sprachen"].contains("german"));
             }
 
-            var ownProfilBox = Hive.box("ownProfilBox");
-            var ownProfil = ownProfilBox.get("list");
+            var localBox = Hive.box('secureBox');
+            var ownProfil = localBox.get("ownProfil");
 
             ownProfil["friendlist"] = userFriendlist;
 
-            ownProfilBox.put("list", ownProfil);
+            localBox.put("ownProfil", ownProfil);
 
             customSnackbar(context, snackbarText, color: Colors.green);
 
@@ -149,9 +205,105 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           });
     }
 
+    blockierenButton() {
+      var ownId = FirebaseAuth.instance.currentUser.uid;
+      var onBlockList =
+          widget.profil["geblocktVon"].contains(ownId);
+
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              onBlockList
+                  ? const Icon(Icons.do_not_touch)
+                  : const Icon(Icons.back_hand),
+              const SizedBox(width: 10),
+              onBlockList
+                  ? Text(AppLocalizations.of(context).freigeben)
+                  : Text(AppLocalizations.of(context).blockieren),
+            ],
+          ),
+          onPressed: () {
+            var snackbarText = "";
+            var allProfils = Hive.box('secureBox').get("profils");
+            var databaseQuery = "";
+
+            if (onBlockList) {
+              widget.profil["geblocktVon"].remove(ownId);
+              databaseQuery =
+                  "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
+              snackbarText = AppLocalizations.of(context).benutzerFreigegeben;
+            } else {
+              widget.profil["geblocktVon"].add(ownId);
+              databaseQuery =
+                  "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
+              snackbarText = AppLocalizations.of(context).benutzerBlockieren;
+            }
+
+            for (var profil in allProfils) {
+              if (widget.profil["id"] == profil["id"]) {
+                profil["blockiertVon"] = widget.profil["geblocktVon"];
+              }
+            }
+
+            Hive.box('secureBox').put("profils", allProfils);
+
+            customSnackbar(context, snackbarText, color: Colors.green);
+
+            ProfilDatabase().updateProfil(
+                databaseQuery,
+                "WHERE id = '${widget.profil["id"]}'");
+
+            Navigator.pop(context);
+            setState(() {});
+          });
+    }
+
+    meldeButton() {
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              const Icon(Icons.report),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).melden),
+            ],
+          ),
+          onPressed: () {
+            var meldeText = TextEditingController();
+            Navigator.pop(context);
+
+            showDialog(
+                context: context,
+                builder: (BuildContext buildContext) {
+                  return CustomAlertDialog(
+                    height: 380,
+                    title: AppLocalizations.of(context).benutzerMelden,
+                    children: [
+                      customTextInput(
+                          AppLocalizations.of(context).benutzerMeldenFrage,
+                          meldeText,
+                          moreLines: 10),
+                      const SizedBox(height: 20),
+                      FloatingActionButton.extended(
+                          onPressed: () {
+                            ReportsDatabase().add(
+                                userID,
+                                "Melde User id: " + widget.profil["id"],
+                                meldeText.text);
+                            Navigator.pop(context);
+                            customSnackbar(context,
+                                AppLocalizations.of(context).benutzerGemeldet,
+                                color: Colors.green);
+                          },
+                          label: Text(AppLocalizations.of(context).senden))
+                    ],
+                  );
+                });
+          });
+    }
+
     moreMenuButton() {
       return IconButton(
-        icon: Icon(Icons.more_vert),
+        icon: const Icon(Icons.more_vert),
         onPressed: () {
           showDialog(
               context: context,
@@ -165,7 +317,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                         contentPadding: EdgeInsets.zero,
                         insetPadding:
                             const EdgeInsets.only(top: 40, left: 0, right: 10),
-                        children: [friendlistButton()],
+                        children: [
+                          friendlistButton(),
+                          blockierenButton(),
+                          meldeButton()
+                        ],
                       ),
                     ),
                   ],
@@ -203,7 +359,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             AppLocalizations.of(context).aktuelleOrt + ": ",
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
           ),
-          Text(widget.profil["ort"], style: TextStyle(fontSize: textSize))
+          Flexible(child: Text(widget.profil["ort"], style: TextStyle(fontSize: textSize), maxLines: 2,))
         ],
       );
     }
@@ -320,16 +476,22 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             .join(", ");
       }
 
-      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(themenText,
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-        Flexible(child: Text(inhaltText, style: TextStyle(fontSize: textSize)))
+        const SizedBox(height: 5),
+        Text(
+          inhaltText,
+          style: TextStyle(fontSize: textSize),
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+        )
       ]);
     }
 
     aboutmeBox() {
       return Container(
-        margin: EdgeInsets.only(bottom:10),
+        margin: const EdgeInsets.only(bottom: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -337,7 +499,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               AppLocalizations.of(context).ueberMich + ": ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
               widget.profil["aboutme"],
               style: TextStyle(fontSize: textSize),
@@ -349,7 +511,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     tradeNotizeBox() {
       return Container(
-        margin: EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -357,12 +519,83 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               AppLocalizations.of(context).verkaufenTauschenSchenken + ": ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Text(
-                widget.profil["tradeNotize"],
-                style: TextStyle(fontSize: textSize),
-              ),
+              widget.profil["tradeNotize"],
+              style: TextStyle(fontSize: textSize),
+            ),
           ],
+        ),
+      );
+    }
+
+    reisePlanungBox() {
+      var reiseplanung = [];
+      var reiseplanungPrivacy = spracheIstDeutsch
+          ? changeEnglishToGerman(widget.profil["reiseplanungPrivacy"])
+          : changeGermanToEnglish(widget.profil["reiseplanungPrivacy"]);
+
+      widget.profil["reisePlanung"]
+          .sort((a, b) => a["von"].compareTo(b["von"]) as int);
+
+      for (var reiseplan in widget.profil["reisePlanung"]) {
+        String ortText = reiseplan["ortData"]["city"];
+
+        if (reiseplan["ortData"]["city"] !=
+            reiseplan["ortData"]["countryname"]) {
+          ortText += " / " + reiseplan["ortData"]["countryname"];
+        }
+
+        reiseplanung.add(Container(
+          margin: const EdgeInsets.only(bottom: 5),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                    transformDateToText(reiseplan["von"]) +
+                        " - " +
+                        transformDateToText(reiseplan["bis"]) +
+                        " in " +
+                        ortText,
+                    style: TextStyle(fontSize: textSize)),
+              ),
+            ],
+          ),
+        ));
+      }
+
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(
+          children: [
+            Text(
+              AppLocalizations.of(context).reisePlanung + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            if (widget.ownProfil)
+              Text("(" +
+                  AppLocalizations.of(context).fuer +
+                  reiseplanungPrivacy +
+                  ")")
+          ],
+        ),
+        const SizedBox(height: 5),
+        ...reiseplanung,
+        const SizedBox(height: 5)
+      ]);
+    }
+
+    besuchteLaenderBox() {
+      return InkWell(
+        onTap: () => openBesuchteLaenderWindow(),
+        child: Container(
+          margin: EdgeInsets.only(top: columnAbstand, bottom: columnAbstand),
+          child: Row(children: [
+            Text(AppLocalizations.of(context).besuchteLaender + ": ",
+                style:
+                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+            Text(widget.profil["besuchteLaender"].length.toString(),
+                style: TextStyle(fontSize: textSize))
+          ]),
         ),
       );
     }
@@ -397,11 +630,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               sprachenBox(),
               SizedBox(height: columnAbstand),
               kinderBox(),
-              SizedBox(height: columnAbstand),
+              besuchteLaenderBox(),
+              if (hasReiseplanungAccess || widget.ownProfil) reisePlanungBox(),
+              if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
+              if (widget.profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
               interessenBox(),
               SizedBox(height: columnAbstand),
-              if(widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
-              if(widget.profil["tradeNotize"].isNotEmpty) tradeNotizeBox()
             ],
           ));
     }
@@ -417,7 +651,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               AppLocalizations.of(context).kontakt,
               style: TextStyle(
                   fontSize: healineTextSize,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -440,7 +674,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                       }
                       return Container();
                     })
-                : const SizedBox.shrink()
+                : const SizedBox.shrink(),
+            SizedBox(height: columnAbstand)
           ],
         ),
       );
@@ -461,7 +696,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             }),
             child: ListView(children: [
               titelBox(),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               infoProfil(),
               const SizedBox(height: 15),
               if (widget.profil["emailAnzeigen"] == 1) kontaktProfil(),
