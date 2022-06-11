@@ -33,8 +33,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
   @override
   void initState() {
-    var stadtinfoData = Hive.box("stadtinfoBox").get("list");
-
+    var stadtinfoData = Hive.box("secureBox").get("stadtinfo");
 
     for (var city in stadtinfoData) {
       if (city["ort"].contains(widget.ortName)) {
@@ -47,21 +46,18 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     refreshCityUserInfo();
 
-
     super.initState();
   }
 
-  refreshCityUserInfo(){
+  refreshCityUserInfo() {
     usersCityInformation = [];
-    var stadtinfoUserData = Hive.box("stadtinfoUserBox").get("list");
+    var stadtinfoUserData = Hive.box("secureBox").get("stadtinfoUser");
 
     for (var city in stadtinfoUserData) {
       if (widget.ortName.contains(city["ort"])) {
         usersCityInformation.add(city);
       }
     }
-
-
   }
 
   setThumb(thumb, index) async {
@@ -115,7 +111,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
   }
 
   showFamilyVisitWindow() {
-    var allProfils = Hive.box("profilBox").get("list");
+    var allProfils = Hive.box("secureBox").get("profils");
     List<Widget> familiesList = [];
 
     for (var family in cityInformation["familien"]) {
@@ -160,7 +156,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
   changeInformationWindow(information) {
     var informationData = getInsiderInfoText(information);
-    var titleTextKontroller = TextEditingController(text: informationData["title"]);
+    var titleTextKontroller =
+        TextEditingController(text: informationData["title"]);
     var informationTextKontroller =
         TextEditingController(text: informationData["information"]);
 
@@ -217,15 +214,13 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       return;
     }
 
-
-
     var textLanguage = await TranslationServices().getLanguage(newTitle);
 
     if (textLanguage == "en") {
       titleEng = newTitle;
       informationEng = newInformation;
-      titleGer = await TranslationServices()
-          .getTextTranslation(newTitle, "en", "de");
+      titleGer =
+          await TranslationServices().getTextTranslation(newTitle, "en", "de");
       informationEng = await TranslationServices()
           .getTextTranslation(newInformation, "en", "de");
     } else {
@@ -239,11 +234,11 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
           .getTextTranslation(newInformation, "de", "en");
     }
 
-    var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
-    var allInformations = stadtinfoUserBox.get("list");
+    var secureBox = Hive.box("secureBox");
+    var allInformations = secureBox.get("stadtinfoUser");
 
-    for(var i = 0; i<allInformations.length; i++){
-      if(allInformations[i]["id"] == information["id"]){
+    for (var i = 0; i < allInformations.length; i++) {
+      if (allInformations[i]["id"] == information["id"]) {
         allInformations[i]["sprache"] = textLanguage;
         allInformations[i]["titleGer"] = titleGer;
         allInformations[i]["informationGer"] = informationGer;
@@ -253,8 +248,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       }
     }
 
-
-    stadtinfoUserBox.put("list", allInformations);
+    secureBox.put("stadtinfoUser", allInformations);
 
     setState(() {});
     Navigator.pop(context);
@@ -265,8 +259,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
             "informationEng = '$informationEng'",
-        "WHERE id ='${information["id"]}'"
-    );
+        "WHERE id ='${information["id"]}'");
   }
 
   deleteInformation(information) async {
@@ -290,10 +283,10 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                     onPressed: () {
                       StadtinfoUserDatabase().delete(information["id"]);
 
-                      var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
-                      var allInformations = stadtinfoUserBox.get("list");
+                      var secureBox = Hive.box("secureBox");
+                      var allInformations = secureBox.get("stadtinfoUser");
                       allInformations.remove(information);
-                      stadtinfoUserBox.put("list", allInformations);
+                      secureBox.put("stadtinfoUser", allInformations);
 
                       setState(() {});
 
@@ -347,7 +340,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     var showTitle = "";
     var showInformation = "";
     var tranlsationIn;
-    var ownlanguages = Hive.box("ownProfilBox").get("list")["sprachen"];
+    var ownlanguages = Hive.box("secureBox").get("ownProfil")["sprachen"];
     var informationLanguage = information["sprache"] == "de"
         ? ["Deutsch", "german"]
         : ["Englisch", "english"];
@@ -395,7 +388,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     };
   }
 
-  saveNewInformation({title,inhalt}) async{
+  saveNewInformation({title, inhalt}) async {
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('yyyy-MM-dd');
     String nowFormatted = formatter.format(now);
@@ -419,10 +412,10 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     if (textLanguage == "en") {
       titleEng = title;
       informationEng = inhalt;
-      titleGer = await TranslationServices()
-          .getTextTranslation(title, "en", "de");
-      informationEng = await TranslationServices()
-          .getTextTranslation(inhalt, "en", "de");
+      titleGer =
+          await TranslationServices().getTextTranslation(title, "en", "de");
+      informationEng =
+          await TranslationServices().getTextTranslation(inhalt, "en", "de");
     } else {
       titleGer = title;
       informationGer = inhalt;
@@ -430,8 +423,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       informationEng = "";
       titleEng =
           await TranslationServices().getTextTranslation(title, "de", "en");
-      informationEng = await TranslationServices()
-          .getTextTranslation(inhalt, "de", "en");
+      informationEng =
+          await TranslationServices().getTextTranslation(inhalt, "de", "en");
     }
 
     var newUserInformation = {
@@ -448,22 +441,18 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     StadtinfoUserDatabase().addNewInformation(newUserInformation);
 
-    var stadtinfoUserBox = Hive.box("stadtinfoUserBox");
-    var allInformations = stadtinfoUserBox.get("list");
+    var secureBox = Hive.box("secureBox");
+    var allInformations = secureBox.get("stadtinfoUser");
     allInformations.add(newUserInformation);
-    stadtinfoUserBox.put("list", allInformations);
+    secureBox.put("stadtinfoUser", allInformations);
 
     Navigator.pop(context);
 
-    setState(() {
-
-    });
-
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-
     usersCityInformation = sortThumb(usersCityInformation);
 
     allgemeineInfoBox() {
@@ -700,18 +689,16 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     userInfoBox() {
       List<Widget> userCityInfo = [];
 
-      for (var i = 0; i < usersCityInformation.length; i++){
+      for (var i = 0; i < usersCityInformation.length; i++) {
         userCityInfo.add(insiderInfoBox(usersCityInformation[i], i));
       }
 
-      if(userCityInfo.isEmpty) {
-        userCityInfo.add(
-          Text(AppLocalizations.of(context).keineInsiderInformation,
-            style: TextStyle(color: Colors.grey),)
-      );
+      if (userCityInfo.isEmpty) {
+        userCityInfo.add(Text(
+          AppLocalizations.of(context).keineInsiderInformation,
+          style: const TextStyle(color: Colors.grey),
+        ));
       }
-
-
 
       return Container(
         margin: const EdgeInsets.all(10),
@@ -725,17 +712,14 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: ListView(
-                  shrinkWrap: true,
-                  children: userCityInfo
-              ),
+              child: ListView(shrinkWrap: true, children: userCityInfo),
             )
           ],
         ),
       );
     }
 
-    addInformationWindow(){
+    addInformationWindow() {
       var titleTextKontroller = TextEditingController();
       var informationTextKontroller = TextEditingController();
 
@@ -743,15 +727,15 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-                title: AppLocalizations.of(context).insiderInformationHinzufuegen,
+                title:
+                    AppLocalizations.of(context).insiderInformationHinzufuegen,
                 children: [
-                  customTextInput(AppLocalizations.of(context).titel,
-                      titleTextKontroller),
+                  customTextInput(
+                      AppLocalizations.of(context).titel, titleTextKontroller),
                   const SizedBox(height: 10),
                   customTextInput(AppLocalizations.of(context).beschreibung,
                       informationTextKontroller,
-                      moreLines: 10,
-                      textInputAction: TextInputAction.newline),
+                      moreLines: 10, textInputAction: TextInputAction.newline),
                   const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -759,15 +743,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                       TextButton(
                           child: Text(AppLocalizations.of(context).speichern),
                           onPressed: () => saveNewInformation(
-                            title: titleTextKontroller.text,
-                            inhalt: informationTextKontroller.text
-                          )
-                      ),
+                              title: titleTextKontroller.text,
+                              inhalt: informationTextKontroller.text)),
                       TextButton(
                         child: Text(AppLocalizations.of(context).abbrechen),
                         onPressed: () => Navigator.pop(context),
                       ),
-
                     ],
                   ),
                   const SizedBox(height: 20)
@@ -775,25 +756,22 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
           });
     }
 
-
-
     refreshCityUserInfo();
 
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: CustomAppBar(title: widget.ortName),
-        body: Column(
-          children: [
-            allgemeineInfoBox(),
-            const SizedBox(height: 10),
-            Expanded(child: userInfoBox())
-          ],
-        ),
+      resizeToAvoidBottomInset: false,
+      appBar: CustomAppBar(title: widget.ortName),
+      body: Column(
+        children: [
+          allgemeineInfoBox(),
+          const SizedBox(height: 10),
+          Expanded(child: userInfoBox())
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
           heroTag: "create Stadtinformation",
           child: const Icon(Icons.create),
-          onPressed: () => addInformationWindow()
-      ),
+          onPressed: () => addInformationWindow()),
     );
   }
 }

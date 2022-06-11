@@ -7,6 +7,7 @@ import '../global/variablen.dart' as global_var;
 class GoogleAutoComplete extends StatefulWidget {
   List searchableItems = [];
   List autoCompleteItems = [];
+  double width;
   var isDense = false;
   var searchKontroller = TextEditingController();
   bool isSearching = false;
@@ -38,10 +39,10 @@ class GoogleAutoComplete extends StatefulWidget {
 
 
   GoogleAutoComplete({Key key,
-    this.searchableItems,
     this.hintText,
+    this.width,
     this.suche = true,
-  });
+  }) : super(key: key);
 
   @override
   _GoogleAutoCompleteState createState() => _GoogleAutoCompleteState();
@@ -91,28 +92,26 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   }
 
 
-
-
   @override
   Widget build(BuildContext context) {
     double dropdownItemSumHeight = widget.autoCompleteItems.length * 38.0;
     if(widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = 152;
 
-    dropDownItem(item){
+    dropDownItem(item) {
       return GestureDetector(
         onTapUp: (details) async {
-            widget.searchKontroller.text = item["description"];
-            resetSearchBar();
-            widget.googleSearchResult = await getGoogleSearchLocationData(item["place_id"]);
+          widget.searchKontroller.text = item["description"];
+          resetSearchBar();
+          widget.googleSearchResult =
+              await getGoogleSearchLocationData(item["place_id"]);
         },
         child: Container(
             padding: const EdgeInsets.all(10),
             height: 40,
             decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: global_var.borderColorGrey))
-            ),
-            child: Text(item["description"])
-        ),
+                border: Border(
+                    bottom: BorderSide(color: global_var.borderColorGrey))),
+            child: Text(item["description"])),
       );
     }
 
@@ -134,7 +133,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
     }
 
     return Container(
-      width: 600,
+      width: widget.width ?? 600,
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -183,3 +182,30 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
     );
   }
 }
+
+/*
+class GoogleAutocomplete2 extends StatelessWidget {
+  const GoogleAutocomplete2({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Autocomplete(
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text == '') {
+            return const Iterable<User>.empty();
+          }
+          return _userOptions.where((User option) {
+            return option
+                .toString()
+                .contains(textEditingValue.text.toLowerCase());
+          });
+        },
+        onSelected: (User selection) {
+          debugPrint('You just selected ${_displayStringForOption(selection)}');
+        }
+    );
+  }
+}
+
+
+ */
