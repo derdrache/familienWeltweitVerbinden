@@ -30,6 +30,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   double fontsize = 20;
   var automaticLocationDropdown = CustomDropDownButton();
   var reiseplanungDropdown = CustomDropDownButton();
+  var exactLocationDropdown = CustomDropDownButton();
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
@@ -67,6 +68,21 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     );
   }
 
+  saveExactLocation() async{
+    var exactLocationPrivacyAuswahl = exactLocationDropdown.getSelected();
+
+    var secureBox = Hive.box("secureBox");
+    var ownProfil = secureBox.get("ownProfil");
+    ownProfil["genauerStandortPrivacy"] = exactLocationPrivacyAuswahl;
+    secureBox.put("ownProfil", ownProfil);
+
+
+    ProfilDatabase().updateProfil(
+        "genauerStandortPrivacy = '$exactLocationPrivacyAuswahl'",
+        "WHERE id = '$userId'"
+    );
+  }
+
   setAutomaticLocationDropdown(){
     var locationList = spracheIstDeutsch ?
       standortbestimmung : standortbestimmungEnglisch;
@@ -82,6 +98,19 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       items: locationList,
       selected: selected,
       onChange: () => saveAutomaticLocation(),
+    );
+  }
+
+  setExactLocationDropdown(){
+    var items = spracheIstDeutsch ? privacySetting : privacySettingEnglisch;
+    var selected = spracheIstDeutsch ?
+    global_func.changeEnglishToGerman(widget.profil["genauerStandortPrivacy"]) :
+    global_func.changeGermanToEnglish(widget.profil["genauerStandortPrivacy"]);
+
+    exactLocationDropdown = CustomDropDownButton(
+      items: items,
+      selected: selected,
+      onChange: () => saveExactLocation(),
     );
   }
 
@@ -149,6 +178,21 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       );
     }
 
+    exactLocationBox(){
+      return Container(
+          margin: const EdgeInsets.all(10),
+          child: Row(children: [
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context).genauerStandortSichtbarFuer,
+                style: TextStyle(fontSize: fontsize),
+              ),
+            ),
+            SizedBox(width: 150,child: exactLocationDropdown)
+          ],)
+      );
+    }
+
     reiseplanungBox(){
       return Container(
         margin: const EdgeInsets.all(10),
@@ -211,6 +255,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         children: [
           emailSettingContainer(),
           automaticLocationContainer(),
+          exactLocationBox(),
           reiseplanungBox(),
           const Expanded(child: SizedBox.shrink()),
           deleteProfilContainer(),

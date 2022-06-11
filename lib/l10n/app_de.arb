@@ -173,7 +173,7 @@
     "freigegeben" : "Freigegeben: ",
     "freigegebeneFamilien": "Freigegebene Familien",
     "filterEventSuche": "Filtern nach Sprachen, Länder, Städte",
-    "filterErkunden": "Familien, Sprachen, Reiseart, Interessen, Länder",
+    "filterErkunden": "Familien, Städte und Länder",
     "emailErhalten" : "Email erhalten",
     "chatNotificationErhalten": "Chat-Notification erhalten",
     "chatEmailErhalten": "Chat-Emails erhalten",
@@ -288,5 +288,6 @@
     "tagHinzufuegen": "Label hinzufügen",
     "nochKeineNachrichtVorhanden": "noch keine Nachrichten Vorhanden",
     "emailErneutVersendet": "Email wurde erneut versendet",
-    "reisearten": "Reisearten"
+    "reisearten": "Reisearten",
+    "genauerStandortSichtbarFuer": "Genauer Standort sichtbar für "
 }
