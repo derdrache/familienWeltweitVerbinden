@@ -30,11 +30,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 hiveInit() async {
-  await Hive.initFlutter("test");
+  await Hive.initFlutter();
 
   await Hive.openBox("secureBox", encryptionCipher: HiveAesCipher(boxEncrpytionKey), crashRecovery: false);
-
-
 
   var countryJsonText =
   await rootBundle.loadString('assets/countryGeodata.json');

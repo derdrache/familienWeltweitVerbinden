@@ -104,6 +104,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       } else {
         allUserName.add(profil["name"]);
       }
+
+      profil = checkGenauerStandortPrivacy(profil);
+
     }
 
     for (var profil in removeProfils) {
@@ -111,6 +114,31 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     createAndSetZoomProfils();
+  }
+
+  checkGenauerStandortPrivacy(profil){
+    var iamFollower = ownProfil["friendlist"].contains(profil["id"]);
+    var followsMe = profil["friendlist"].contains(ownProfil["id"]);
+
+    var allCondition = profil["genauerStandortPrivacy"] == "Alle" || profil["genauerStandortPrivacy"] == "all";
+    var follwerCondition = profil["genauerStandortPrivacy"] == "Follower" || profil["genauerStandortPrivacy"] == "follower";
+    var friendCondition = profil["genauerStandortPrivacy"] == "Freunde" || profil["genauerStandortPrivacy"] == "friends";
+
+
+
+    var accessCondition = allCondition || (follwerCondition && iamFollower) ||
+        (friendCondition && iamFollower && followsMe);
+
+    if(accessCondition){
+      profil["ort"] = " ";
+    }else{
+      /// woher gibt es latt und longt von der Stadt?
+      profil["latt"] = 0.0;
+      profil["longt"] = 0.0;
+    }
+
+    return profil;
+
   }
 
   setEvents() {
