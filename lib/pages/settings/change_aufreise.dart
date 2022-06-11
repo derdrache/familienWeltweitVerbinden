@@ -89,7 +89,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
           "WHERE id = '$userId'");
     } else{
       ProfilDatabase().updateProfil(
-          "aufreiseSeit = '${widget.aufreiseSeit.toString()}',"
+          "aufreiseSeit = '${widget.aufreiseSeit.toString()}'"
               "aufreiseBis = '${widget.aufreiseBis.toString()}'",
           "WHERE id = '$userId'");
     }
@@ -164,6 +164,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
             aufreiseBox(AppLocalizations.of(context).bis, widget.aufreiseBis, "bis"),
           if(aufreiseDropdownButton.selected == aufreise[2]
           || aufreiseDropdownButton.selected == aufreiseEnglisch[2]) Container(
+            margin: EdgeInsets.only(left: 10),
             width: 600,
             child: Row(children: [
               Text(AppLocalizations.of(context).bis, style: TextStyle(fontSize: 20)),

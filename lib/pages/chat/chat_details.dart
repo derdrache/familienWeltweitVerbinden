@@ -14,9 +14,9 @@ import 'package:intl/intl.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChatDetailsPage extends StatefulWidget {
-  var chatPartnerId;
-  var chatPartnerName;
-  var chatId;
+  String chatPartnerId;
+  String chatPartnerName;
+  String chatId;
   var groupChatData;
 
   ChatDetailsPage({
@@ -38,16 +38,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   bool newChat = false;
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
-  double messageInputHeight = 50.0;
-  var messageRows = 0;
   Timer timer;
-  var pufferList;
+  Widget pufferList;
   var eventCardList = [];
   var chatPartnerProfil;
 
   @override
   void dispose() {
-    ProfilDatabase().updateProfil("activeChat = '""'", "WHERE id = '$userId'");
+    ProfilDatabase().updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
     WidgetsBinding.instance.removeObserver(this);
     timer.cancel();
     super.dispose();
@@ -56,9 +54,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      ProfilDatabase().updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+      ProfilDatabase().updateProfil(
+          "activeChat = '$widget.chatId'", "WHERE id = '$userId'");
     } else {
-      ProfilDatabase().updateProfil("activeChat = '""'", "WHERE id = '$userId'");
+      ProfilDatabase()
+          .updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
     }
   }
 
@@ -123,7 +123,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   writeActiveChat() {
-    ProfilDatabase().updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+    ProfilDatabase()
+        .updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
   }
 
   getChatPartnerProfil() async {
@@ -144,18 +145,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ? 0
         : usersAllNewMessages - usersChatNewMessages;
 
-
-
-
     ProfilDatabase().updateProfil(
-        "newMessages = '$usersAllNewMessages'",
-        "WHERE id ='$userId'");
+        "newMessages = '$usersAllNewMessages'", "WHERE id ='$userId'");
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
     ChatDatabase().updateChatGroup(
-      "users = '${json.encode(widget.groupChatData["users"])}'",
-      "WHERE id = '${widget.groupChatData["id"]}'"
-    );
+        "users = '${json.encode(widget.groupChatData["users"])}'",
+        "WHERE id = '${widget.groupChatData["id"]}'");
   }
 
   messageToDbAndClearMessageInput(message) async {
@@ -185,15 +181,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       await ChatDatabase()
           .addNewMessageAndSendNotification(widget.groupChatData, messageData);
 
-
       if (messageData["message"].contains("</eventId=")) {
         messageData["message"] = "<Event Card>";
       }
 
       ChatDatabase().updateChatGroup(
           "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.chatId}'"
-      );
+          "WHERE id = '${widget.chatId}'");
 
       setState(() {});
     }
@@ -216,7 +210,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     chatPartnerProfil ??= await ProfilDatabase()
         .getData("*", "WHERE id = '${widget.chatPartnerId}'");
 
-    if(chatPartnerProfil == false) return;
+    if (chatPartnerProfil == false) return;
 
     global_functions.changePage(
         context,
@@ -243,11 +237,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           boxColor = Colors.greenAccent;
         }
 
-
-        while(message["message"].endsWith('\n')){
-          message["message"] = message["message"].substring(0, message["message"].length - 1);
+        while (message["message"].endsWith('\n')) {
+          message["message"] =
+              message["message"].substring(0, message["message"].length - 1);
         }
-
 
         if (message["message"] == "") continue;
 
@@ -283,8 +276,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ));
           continue;
         }
-
-
 
         messageBox.add(
           Align(
@@ -343,9 +334,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             } else if (snap.data != null) {
               List<dynamic> messages = snap.data;
 
-              messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
-              pufferList = messageList(messages);
-              return pufferList;
+              if (messages.isEmpty) {
+                pufferList = Center(
+                    child: Text(
+                  AppLocalizations.of(context).nochKeineNachrichtVorhanden,
+                  style: const TextStyle(fontSize: 20),
+                ));
+
+                return pufferList;
+              } else {
+                messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
+
+                pufferList = messageList(messages);
+                return pufferList;
+              }
             }
             return Container();
           });
@@ -371,6 +373,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 ]),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
+                minHeight: 60,
                 maxHeight: 200.0,
               ),
               child: TextField(
@@ -379,13 +382,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 textInputAction: TextInputAction.newline,
                 controller: nachrichtController,
                 decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
                   hintText: AppLocalizations.of(context).nachricht,
+                  hintStyle: const TextStyle(fontSize: 20),
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
                 ),
               ),
             ),
           ),
           Positioned(
-            bottom: 0,
+            bottom: 4,
             right: 2,
             child: IconButton(
                 padding: EdgeInsets.zero,
@@ -397,7 +407,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   });
                 },
                 icon: Icon(Icons.send,
-                    size: 30, color: Theme.of(context).colorScheme.secondary)),
+                    size: 34, color: Theme.of(context).colorScheme.secondary)),
           ),
         ],
       );

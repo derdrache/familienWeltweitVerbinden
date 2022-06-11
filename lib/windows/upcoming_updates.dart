@@ -31,16 +31,13 @@ class UmcomingUpdatesWindow{
               title: patchnotesTitle,
               children: [
                 _update(AppLocalizations.of(context).familienAnzeige),
-                _update(AppLocalizations.of(context).nutzerBlockieren),
-                _update(AppLocalizations.of(context).onlineEvents),
-                _update(AppLocalizations.of(context).eventsOrganisationstools),
-                _update(AppLocalizations.of(context).reisePlanung),
-                _update(AppLocalizations.of(context).gemeinschaftenUpdate),
-                _update(AppLocalizations.of(context).chatgruppen),
                 _update(AppLocalizations.of(context).newsBoard),
-                _update(AppLocalizations.of(context).anonymeAnmelden),
+                _update(AppLocalizations.of(context).weitereAnemdlungsMoeglichkeiten),
+                _update(AppLocalizations.of(context).eventErweiterung),
+                _update(AppLocalizations.of(context).eventsOrganisationstools),
                 _update(AppLocalizations.of(context).chatErweiterung),
-                _update(AppLocalizations.of(context).accountLoeschen),
+                _update(AppLocalizations.of(context).chatgruppen),
+                _update(AppLocalizations.of(context).gemeinschaftenUpdate),
                 _update(AppLocalizations.of(context).layoutVerbessern),
               ]
           );

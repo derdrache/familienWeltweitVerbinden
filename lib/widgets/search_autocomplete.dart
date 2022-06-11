@@ -174,7 +174,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
         height:  dropdownExtraBoxHeight + dropdownItemSumHeight,
         margin: EdgeInsets.all(5),
         child:Stack(
-          clipBehavior: Clip.none, children: [
+          children: [
             Column(
               children: [
                 Padding(
@@ -219,3 +219,8 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     );
   }
 }
+
+
+
+
+

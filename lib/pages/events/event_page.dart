@@ -1,5 +1,5 @@
-import 'package:familien_suche/auth/secrets.dart';
 import 'package:familien_suche/pages/events/events_suchen.dart';
+import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +10,7 @@ import 'package:hive/hive.dart';
 
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
+import '../../global/global_functions.dart';
 import '../../widgets/badge_icon.dart';
 import 'eventCard.dart';
 import 'events_erstellen.dart';
@@ -24,17 +25,9 @@ class EventPage extends StatefulWidget{
 
 class _EventPageState extends State<EventPage>{
   var userId = FirebaseAuth.instance.currentUser.uid;
-  var myEventsBox;
-  var interestEventsBox;
   dynamic myEvents = [];
   dynamic interestEvents = [];
 
-  @override
-  void initState() {
-    myEventsBox = Hive.box('myEventsBox');
-    interestEventsBox = Hive.box('interestEventsBox');
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context){
@@ -48,7 +41,7 @@ class _EventPageState extends State<EventPage>{
               EventCard(
                   event: event,
                   withInteresse: withInteresse,
-                  afterPageVisit: ()=> setState(() {})
+                  afterPageVisit: ()=> changePage(context, StartPage(selectedIndex: 1,))
               ),
               if(event["erstelltVon"] == userId) Positioned(
                 right: 10,
@@ -98,12 +91,12 @@ class _EventPageState extends State<EventPage>{
                       returnList: true
                   ),
                   builder: (context, snapshot){
-                    var interestEventsBox = Hive.box('interestEventsBox');
-                    dynamic data = interestEventsBox.get("list");
+                    var secureBox = Hive.box('secureBox');
+                    dynamic data = secureBox.get("interestEvents");
 
                     if(snapshot.hasData){
                       data= snapshot.data == false ? [] : snapshot.data;
-                      interestEventsBox.put("list", data);
+                      secureBox.put("interestEvents", data);
                     }
 
                     if(data != null && data.isNotEmpty){
@@ -155,12 +148,12 @@ class _EventPageState extends State<EventPage>{
                       returnList: true
                   ),
                   builder: (context, snapshot){
-                    var myEventsBox = Hive.box('myEventsBox');
-                    dynamic data = myEventsBox.get("list");
+                    var secureBox = Hive.box('secureBox');
+                    dynamic data = secureBox.get("myEvents");
 
                     if(snapshot.hasData){
                       data= snapshot.data == false ? [] : snapshot.data;
-                      myEventsBox.put("list", data);
+                      secureBox.put("myEvents", data);
                     }
 
                     if(data != null && data.isNotEmpty){

@@ -37,7 +37,7 @@ var isGerman = kIsWeb
 
 class EventCardDetails extends StatefulWidget {
   var event;
-  var offlineEvent;
+  bool offlineEvent;
   bool isCreator;
   bool isApproved;
   bool isPublic;
@@ -83,12 +83,129 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     }
   }
 
+  convertIntoMyDate() {
+    var eventZeitzone = widget.event["zeitzone"];
+    var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
+    var eventBeginn = widget.event["wann"];
+
+    eventBeginn = DateTime.parse(eventBeginn)
+        .add(Duration(hours: eventZeitzone - deviceZeitzone));
+
+    var ownDate =
+        eventBeginn.toString().split(" ")[0].split("-").reversed.join(".");
+    var ownTime =
+        eventBeginn.toString().split(" ")[1].toString().substring(0, 5);
+
+    return ownDate + " " + ownTime;
+  }
+
+  addTag(changeState) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Container(
+        width: 250,
+        height: 50,
+        decoration: BoxDecoration(border: Border.all()),
+        child: DropdownButtonHideUnderline(
+            child: DropdownButton(
+                hint: Center(
+                    child: Text(AppLocalizations.of(context).tagHinzufuegen)),
+                isExpanded: true,
+                items: (isGerman
+                        ? global_var.reisearten + global_var.interessenListe
+                        : global_var.reiseartenEnglisch +
+                            global_var.interessenListeEnglisch)
+                    .map((String item) {
+                  return DropdownMenuItem(
+                    value: item,
+                    child: Text(item),
+                  );
+                }).toList(),
+                onChanged: (newValue) async {
+                  if(widget.event["tags"].contains(global_func.changeGermanToEnglish(newValue)) ||
+                      widget.event["tags"].contains(global_func.changeEnglishToGerman(newValue))) return;
+
+                  widget.event["tags"].add(newValue);
+                  changeState(() {});
+
+                  await EventDatabase().update("tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')", "WHERE id = '${widget.event["id"]}'");
+                  setState(() {});
+                })),
+      )
+    ]);
+  }
+
+  createChangeableEventTags(changeState) {
+    List<Widget> eventTags = [];
+
+    for (var tag in widget.event["tags"]) {
+      eventTags.add(InkWell(
+        onTap: () async {
+          widget.event["tags"].remove(tag);
+          changeState(() {});
+
+          await EventDatabase().update("tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))", "WHERE id = '${widget.event["id"]}'");
+          setState(() {});
+        },
+        child: Stack(
+          children: [
+            Container(
+                margin: const EdgeInsets.only(right: 5, top: 10),
+                padding: const EdgeInsets.only(
+                    left: 5, top: 5, bottom: 5, right: 22),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: Theme.of(context).colorScheme.primary, width: 2),
+                  borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                ),
+                child: Text(
+                  isGerman
+                      ? global_func.changeEnglishToGerman(tag)
+                      : global_func.changeGermanToEnglish(tag),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                )),
+            const Positioned(
+                top: 20,
+                right: 14,
+                child: Icon(Icons.cancel, color: Colors.red, size: 15))
+          ],
+        ),
+      ));
+    }
+
+    return eventTags;
+  }
+
+  changeEventTagsWindow() {
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return StatefulBuilder(builder: (context, setStateEventTagWindow) {
+            return CustomAlertDialog(
+                title: AppLocalizations.of(context).tagsChange,
+                children: [
+                  const SizedBox(height: 20),
+                  addTag(setStateEventTagWindow),
+                  const SizedBox(height: 20),
+                  Container(
+                      margin: const EdgeInsets.all(5),
+                      child: Wrap(
+                        children:
+                            createChangeableEventTags(setStateEventTagWindow),
+                      ))
+                ]);
+          });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     var isAssetImage =
         widget.event["bild"].substring(0, 5) == "asset" ? true : false;
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    bool isOffline = widget.event["typ"] == global_var.eventTyp[0] ||
+        widget.event["typ"] == global_var.eventTypEnglisch[0];
 
     if (screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
@@ -188,21 +305,33 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                 databaseKennzeichnung: "zeitzone",
                 items: global_var.eventZeitzonen),
             const SizedBox(height: 5),
-            ShowDataAndChangeWindow(
-                eventId: widget.event["id"],
-                windowTitle: AppLocalizations.of(context).eventStadtAendern,
-                rowTitle: AppLocalizations.of(context).ort,
-                rowData: widget.event["stadt"] + ", " + widget.event["land"],
-                inputHintText: AppLocalizations.of(context).neueStadtEingeben,
-                isCreator: widget.isCreator,
-                modus: "googleAutoComplete",
-                databaseKennzeichnung: "location"),
+            if (isOffline)
+              ShowDataAndChangeWindow(
+                  eventId: widget.event["id"],
+                  windowTitle: AppLocalizations.of(context).eventStadtAendern,
+                  rowTitle: AppLocalizations.of(context).ort,
+                  rowData: widget.event["stadt"] + ", " + widget.event["land"],
+                  inputHintText: AppLocalizations.of(context).neueStadtEingeben,
+                  isCreator: widget.isCreator,
+                  modus: "googleAutoComplete",
+                  databaseKennzeichnung: "location"),
+            if (!isOffline && !widget.isCreator)
+              Row(
+                children: [
+                  Text(AppLocalizations.of(context).meinDatum,
+                      style: TextStyle(
+                          fontSize: fontsize, fontWeight: FontWeight.bold)),
+                  const Expanded(child: SizedBox.shrink()),
+                  Text(convertIntoMyDate(),
+                      style: TextStyle(fontSize: fontsize))
+                ],
+              ),
             const SizedBox(height: 5),
             if (widget.isApproved || widget.isPublic)
               ShowDataAndChangeWindow(
                   eventId: widget.event["id"],
                   windowTitle: AppLocalizations.of(context).eventMapLinkAendern,
-                  rowTitle: "Map: ",
+                  rowTitle: isOffline ? "Map: " : "Link: ",
                   rowData: widget.event["link"],
                   inputHintText:
                       AppLocalizations.of(context).neuenKartenlinkEingeben,
@@ -261,7 +390,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               child: Container(
             width: double.infinity,
             constraints: const BoxConstraints(
-              minHeight: 25.0,
+              minHeight: 50.0,
             ),
             child: ShowDataAndChangeWindow(
                 eventId: widget.event["id"],
@@ -313,6 +442,38 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           ));
     }
 
+    eventTags() {
+      List<Widget> eventTags = [];
+
+      for (var tag in widget.event["tags"]) {
+        eventTags.add(Container(
+            margin: const EdgeInsets.only(right: 5, top: 5),
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              border: Border.all(
+                  color: Theme.of(context).colorScheme.primary, width: 2),
+              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            ),
+            child: Text(
+              isGerman
+                  ? global_func.changeEnglishToGerman(tag)
+                  : global_func.changeGermanToEnglish(tag),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            )));
+      }
+
+      if(eventTags.isEmpty && widget.isCreator) eventTags.add(
+        Container(margin: EdgeInsets.all(10), child: Text("Hier klicken um Eventlabel hinzuzufügen", style: TextStyle(color: Colors.grey)))
+      );
+
+      return InkWell(
+        onTap: () => widget.isCreator ? changeEventTagsWindow() : null,
+        child: Container(
+            margin: const EdgeInsets.only(left: 10, right: 10),
+            child: Wrap(children: eventTags)),
+      );
+    }
+
     return Center(
       child: Stack(
         children: [
@@ -340,6 +501,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                 creatorChangeHintBox(),
                 eventInformationBox(),
                 if (widget.isApproved || widget.isPublic) eventBeschreibung(),
+                eventTags()
               ],
             ),
           ),
@@ -361,19 +523,19 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 }
 
 class ShowDataAndChangeWindow extends StatefulWidget {
-  var windowTitle;
-  var rowTitle;
+  String windowTitle;
+  String rowTitle;
   var rowData;
-  var inputHintText;
-  var isCreator;
-  var items;
-  var modus;
-  var singleShow;
-  var multiLines;
-  var databaseKennzeichnung;
+  String inputHintText;
+  bool isCreator;
+  List items;
+  String modus;
+  bool singleShow;
+  bool multiLines;
+  String databaseKennzeichnung;
   var oldDate;
-  var eventId;
-  var saveFunction;
+  String eventId;
+  Function saveFunction;
 
   ShowDataAndChangeWindow(
       {Key key,
@@ -599,7 +761,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                       width: 200,
                       child: Text(
                         widget.databaseKennzeichnung == "zeitzone"
-                            ? "UTC " + widget.rowData.toString()
+                            ? "GMT " + widget.rowData.toString()
                             : widget.rowData,
                         style: TextStyle(
                             fontSize: fontsize,
@@ -842,9 +1004,9 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 }
 
 class CardFeed extends StatefulWidget {
-  var organisator;
-  var eventId;
-  var width;
+  String organisator;
+  String eventId;
+  double width;
   var eventZusage;
 
   CardFeed(
@@ -857,7 +1019,7 @@ class CardFeed extends StatefulWidget {
 
 class _CardFeedState extends State<CardFeed> {
   var organisatorText = const Text("");
-  var organisatorProfil;
+  Map organisatorProfil;
   var ownName = FirebaseAuth.instance.currentUser.displayName;
   var teilnehmerAnzahl = "";
 
@@ -972,8 +1134,8 @@ class _DateButtonState extends State<DateButton> {
 }
 
 class InteresseButton extends StatefulWidget {
-  var hasIntereset;
-  var id;
+  bool hasIntereset;
+  String id;
 
   InteresseButton({Key key, this.hasIntereset, this.id}) : super(key: key);
 
