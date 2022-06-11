@@ -132,6 +132,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   Widget build(BuildContext context) {
     setAutomaticLocationDropdown();
     setReiseplanungDropdown();
+    setExactLocationDropdown();
 
 
     emailSettingContainer() {
