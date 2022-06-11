@@ -234,8 +234,22 @@ class _ErkundenPageState extends State<ErkundenPage> {
           allUserName.toList() +
           countryDropDownList +
           citiesList,
-      onConfirm: () => changeMapFilter(),
-      onDelete: () => changeMapFilter(),
+      onConfirm: () {
+        filterList = searchAutocomplete.getSelected();
+        friendMarkerOn = false;
+        eventMarkerOn = false;
+        reiseplanungOn = false;
+        filterOn = false;
+        changeMapFilter();
+      },
+      onDelete: () {
+        filterList = searchAutocomplete.getSelected();
+        friendMarkerOn = false;
+        eventMarkerOn = false;
+        reiseplanungOn = false;
+        filterOn = false;
+        changeMapFilter();
+      }
     );
   }
 
@@ -561,7 +575,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   changeMapFilter() {
     var filterProfils = [];
-    filterList = searchAutocomplete.getSelected();
 
     for (var profil in localProfils) {
       if (checkFilter(profil)) filterProfils.add(profil);
@@ -572,6 +585,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       createAndSetZoomProfils();
     });
   }
+
 
   zoomOut() {
     double newZoom;
@@ -774,6 +788,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomProfils();
   }
 
+  changeCheckboxState(selection){
+
+  }
+
   createCheckBoxen(windowSetState, selectionList, title) {
     List<Widget> checkBoxWidget = [];
 
@@ -798,15 +816,23 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       filterList.remove(selection);
                     }
                     windowSetState(() {});
+
+                    friendMarkerOn = false;
+                    eventMarkerOn = false;
+                    reiseplanungOn = false;
+
                     changeMapFilter();
                   }),
             ),
             Expanded(
-                child: Text(
+                child: InkWell(
+                  onTap: changeCheckboxState(selection),
+                  child: Text(
               selection,
               style: const TextStyle(fontSize: 13),
               maxLines: 2,
-            ))
+            ),
+                ))
           ],
         ),
       ));
@@ -857,6 +883,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     if (filterList.isNotEmpty) filterOn = true;
     if (filterList.isEmpty) filterOn = false;
+    setState(() {
+
+    });
+
   }
 
   changeProfils(changeList) {
