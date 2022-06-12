@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +9,6 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../../services/database.dart';
-import '../../widgets/Window_topbar.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
@@ -45,7 +45,7 @@ class _ChatPageState extends State<ChatPage> {
 
 
     for (var data in dbProfilData) {
-      allName.add(data["name"]);
+      if(!ownProfil["geblocktVon"].contains(data["id"])) allName.add(data["name"]);
 
       for (var user in userFriendIdList) {
         if (data["id"] == user && !ownProfil["geblocktVon"].contains(data["id"])) {
@@ -62,44 +62,18 @@ class _ChatPageState extends State<ChatPage> {
     return showDialog(
         context: context,
         builder: (BuildContext buildContext) {
-          return AlertDialog(
-            contentPadding: EdgeInsets.zero,
-            content: Scaffold(
-              body: SizedBox(
-                height: double.maxFinite,
-                width: double.maxFinite,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    ListView(children: [
-                      WindowTopbar(
-                          title:
-                              AppLocalizations.of(context).neuenChatEroeffnen),
-                      const SizedBox(height: 10),
-                      personenSuchBox(buildContext, allName),
-                      const SizedBox(height: 10),
-                      ...createFriendlistBox(userFriendlist)
-                    ]),
-                    Positioned(
-                      height: 30,
-                      right: -13,
-                      top: -7,
-                      child: InkResponse(
-                          onTap: () => Navigator.pop(context),
-                          child: const CircleAvatar(
-                            child: Icon(
-                              Icons.close,
-                              size: 16,
-                            ),
-                            backgroundColor: Colors.red,
-                          )),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          return CustomAlertDialog(
+            title: AppLocalizations.of(context).neuenChatEroeffnen,
+            children: [
+              const SizedBox(height: 10),
+              personenSuchBox(buildContext, allName),
+              const SizedBox(height: 10),
+              ...createFriendlistBox(userFriendlist)
+            ],
           );
-        });
+        }
+    );
+
   }
 
   searchUser() async {
