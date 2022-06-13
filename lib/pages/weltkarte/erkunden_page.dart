@@ -123,6 +123,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               .abs());
       var monthDifference = timeDifference.inDays / 30.44;
 
+
       if (profil["id"] == userId ||
           ownProfil["geblocktVon"].contains(profil["id"]) ||
           monthDifference >= monthsUntilInactive) {
