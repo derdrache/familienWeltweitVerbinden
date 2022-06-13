@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
 
@@ -6,10 +7,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/global_functions.dart';
+import '../../services/notification.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_variablen;
@@ -29,7 +32,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var userNameKontroller = TextEditingController();
   var aboutusKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
-  var ortMapData = {};
   var isGerman = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
@@ -70,59 +72,84 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   saveFunction() async {
     setLoading();
 
-    var children = childrenAgePickerBox.getDates();
+    if (!_formKey.currentState.validate()) {
+      setLoading();
+      return;
+    }
 
-    ortMapData = ortAuswahlBox.getGoogleLocationData();
+    var userName = userNameKontroller.text;
+    userName = userName.replaceAll("'", "\\'");
+    var userExist = true;
 
-    if (_formKey.currentState.validate()) {
-      var userName = userNameKontroller.text;
-      userName = userName.replaceAll("'", "\\'");
-      var userExist =
+    try{
+      userExist =
           await ProfilDatabase().getData("id", "WHERE name = '$userName'") !=
               false;
+    }catch(_){
+      customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
+      setLoading();
+      return;
+    }
 
-      if (userName.length > 40) {
+
+    if (checkAllValidation(userExist, userName)) {
+      var userID = FirebaseAuth.instance.currentUser?.uid;
+      var email = FirebaseAuth.instance.currentUser?.email;
+      var children = childrenAgePickerBox.getDates();
+      var ortMapData = ortAuswahlBox.getGoogleLocationData();
+
+      //if (ortMapData["city"] == null) customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+
+      var data = {
+        "id": userID,
+        "email": email,
+        "name": userName,
+        "ort": ortMapData["city"],
+        "interessen": interessenAuswahlBox.getSelected(),
+        "kinder": children,
+        "land": ortMapData["countryname"],
+        "longt": ortMapData["longt"],
+        "latt": ortMapData["latt"],
+        "reiseart": reiseArtenAuswahlBox.getSelected(),
+        "sprachen": sprachenAuswahlBox.getSelected(),
+        "token": !kIsWeb ? await FirebaseMessaging.instance.getToken() : null,
+        "lastLogin": DateTime.now().toString(),
+        "aboutme": aboutusKontroller.text
+      };
+
+      print("done");
+
+      try{
+        await ProfilDatabase().addNewProfil(data);
+        var ownProfil =
+        await ProfilDatabase().getData("*", "WHERE id = '$userID'");
+        Hive.box('secureBox').put("ownProfil", ownProfil);
+
+        global_functions.changePageForever(context, StartPage());
+      }catch(_){
+        customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
+        sendEmail({
+          "title": "User hat beim Profil erstellen ein Problem",
+          "inhalt": jsonEncode(data)
+        });
         setLoading();
-        customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
         return;
       }
 
-      if (checkAllValidation(userExist)) {
-        var userID = FirebaseAuth.instance.currentUser?.uid;
-        var email = FirebaseAuth.instance.currentUser?.email;
+      updateStadtInfoDatabase(ortMapData, userID);
 
-        if (ortMapData["city"] != null) {
-          var data = {
-            "id": userID,
-            "email": email,
-            "name": userName,
-            "ort": ortMapData["city"],
-            "interessen": interessenAuswahlBox.getSelected(),
-            "kinder": children,
-            "land": ortMapData["countryname"],
-            "longt": ortMapData["longt"],
-            "latt": ortMapData["latt"],
-            "reiseart": reiseArtenAuswahlBox.getSelected(),
-            "sprachen": sprachenAuswahlBox.getSelected(),
-            "token":
-                !kIsWeb ? await FirebaseMessaging.instance.getToken() : null,
-            "lastLogin": DateTime.now().toString(),
-            "aboutme": aboutusKontroller.text
-          };
-
-          ProfilDatabase().addNewProfil(data);
-          await StadtinfoDatabase().addNewCity(ortMapData);
-          await StadtinfoDatabase().update(
-              "familien = JSON_ARRAY_APPEND(familien, '\$', '$userID')",
-              "WHERE ort LIKE '${ortMapData["city"]}' AND JSON_CONTAINS(familien, '\"$userID\"') < 1"
-          );
-          global_functions.changePageForever(context, StartPage());
-        } else {
-          customSnackbar(context, AppLocalizations.of(context).ortEingeben);
-        }
-      }
     }
+
+
+
     setLoading();
+  }
+
+  updateStadtInfoDatabase(ortMapData, userId) async {
+    await StadtinfoDatabase().addNewCity(ortMapData);
+    await StadtinfoDatabase().update(
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
+        "WHERE ort LIKE '${ortMapData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
   }
 
   childrenInputValidation() {
@@ -136,7 +163,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     return allFilled;
   }
 
-  checkAllValidation(userExist) {
+  checkAllValidation(userExist, userName) {
     bool noError = true;
     String errorString =
         AppLocalizations.of(context).bitteEingabeKorrigieren + "\n";
@@ -153,6 +180,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         !childrenInputValidation()) {
       errorString +=
           "- " + AppLocalizations.of(context).geburtsdatumEingeben + "\n";
+    }
+    if (userName.length > 40) {
+      errorString += "- " + AppLocalizations.of(context).usernameZuLang;
     }
 
     if (errorString.length > 29) {

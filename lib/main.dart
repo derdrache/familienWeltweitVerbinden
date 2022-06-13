@@ -44,16 +44,6 @@ hiveInit() async {
   var continentsGeodata = json.decode(continentsJsonText)["data"];
   Hive.box('secureBox').put("kontinentGeodata", continentsGeodata);
 
-  var stadtinfo = await StadtinfoDatabase()
-      .getData("*", "ORDER BY ort ASC", returnList: true);
-  Hive.box("secureBox").put("stadtinfo", stadtinfo);
-
-  if (Hive.box('secureBox').get("stadtinfoUser") == null) {
-    var stadtinfoUser =
-    await StadtinfoUserDatabase().getData("*", "", returnList: true);
-    Hive.box("secureBox").put("stadtinfoUser", stadtinfoUser);
-  }
-
 }
 
 sortProfils(profils) {
@@ -82,6 +72,16 @@ sortProfils(profils) {
   return profils;
 }
 
+refreshHiveData() async {
+  var stadtinfo = await StadtinfoDatabase()
+      .getData("*", "ORDER BY ort ASC", returnList: true);
+  Hive.box("secureBox").put("stadtinfo", stadtinfo);
+
+  var stadtinfoUser =
+  await StadtinfoUserDatabase().getData("*", "", returnList: true);
+  Hive.box("secureBox").put("stadtinfoUser", stadtinfoUser);
+}
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -97,6 +97,7 @@ void main() async {
   }
 
   await hiveInit();
+  refreshHiveData();
 
   runApp(MyApp());
 }
@@ -114,6 +115,7 @@ class MyApp extends StatelessWidget {
     if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
       userId = FirebaseAuth.instance.currentUser.uid;
+      emailVerified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
     }
 
     if (kIsWeb) return;
@@ -202,6 +204,7 @@ class MyApp extends StatelessWidget {
     return FutureBuilder(
         future: initialization(),
         builder: (context, snapshot) {
+          print(Hive.box('secureBox').get("ownProfil") == false);
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
