@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -52,10 +53,10 @@ class _LoginPageState extends State<LoginPage> {
 
       if (emailVerified) {
         var userId = FirebaseAuth.instance.currentUser.uid;
-        var profilName =
-            await ProfilDatabase().getData("name", "WHERE id = '$userId'");
+        var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
+        Hive.box('secureBox').put("ownProfil", ownProfil);
 
-        if (profilName != false) {
+        if (ownProfil != false) {
           global_functions.changePageForever(context, StartPage());
         } else {
           global_functions.changePageForever(context, const CreateProfilPage());
@@ -81,6 +82,8 @@ class _LoginPageState extends State<LoginPage> {
             context, AppLocalizations.of(context).keineVerbindungInternet);
       }
     }
+
+
   }
 
   signInWithGoogleWeb() async {
@@ -203,6 +206,7 @@ class _LoginPageState extends State<LoginPage> {
           passwort = passwortController.text;
         });
         userLogin();
+
       }
     }
 
