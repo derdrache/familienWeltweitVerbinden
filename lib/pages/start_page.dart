@@ -46,8 +46,6 @@ class _StartPageState extends State<StartPage> {
   }
 
   _asyncMethod() async {
-    await setHiveBoxen();
-
     checkNewVersion();
 
     checkAndUpdateProfil();
@@ -55,10 +53,6 @@ class _StartPageState extends State<StartPage> {
     showPatchnotes();
   }
 
-  setHiveBoxen() async {
-    var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
-    Hive.box('secureBox').put("ownProfil", ownProfil);
-  }
 
   checkNewVersion() async{
     if(kIsWeb) return;
