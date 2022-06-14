@@ -126,9 +126,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     var inputKontroller = TextEditingController();
 
     searchAutocomplete = SearchAutocomplete(
-      searchKontroller: inputKontroller,
       searchableItems: allName,
-      withFilter: false,
       onConfirm: () {
         inputKontroller.text = searchAutocomplete.getSelected()[0];
       },
