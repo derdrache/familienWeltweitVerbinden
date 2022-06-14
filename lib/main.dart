@@ -204,7 +204,6 @@ class MyApp extends StatelessWidget {
     return FutureBuilder(
         future: initialization(),
         builder: (context, snapshot) {
-          print(Hive.box('secureBox').get("ownProfil") == false);
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }

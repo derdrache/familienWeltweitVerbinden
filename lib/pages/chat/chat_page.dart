@@ -63,11 +63,10 @@ class _ChatPageState extends State<ChatPage> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
+            height: 800,
             title: AppLocalizations.of(context).neuenChatEroeffnen,
             children: [
-              const SizedBox(height: 10),
               personenSuchBox(buildContext, allName),
-              const SizedBox(height: 10),
               ...createFriendlistBox(userFriendlist)
             ],
           );
@@ -88,7 +87,6 @@ class _ChatPageState extends State<ChatPage> {
     searchAutocomplete = SearchAutocomplete(
       hintText: AppLocalizations.of(context).personSuchen,
       searchableItems: allName,
-      withFilter: false,
       onConfirm: () {
         searchUser();
       },
@@ -99,7 +97,6 @@ class _ChatPageState extends State<ChatPage> {
 
   List<Widget> createFriendlistBox(userFriendlist) {
     List<Widget> friendsBoxen = [];
-
     for (var friend in userFriendlist) {
 
       friendsBoxen.add(GestureDetector(

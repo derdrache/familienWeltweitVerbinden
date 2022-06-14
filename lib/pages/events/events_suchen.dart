@@ -54,13 +54,12 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
     searchAutocomplete = SearchAutocomplete(
       hintText: AppLocalizations.of(context).filterEventSuche,
-      withFilter: true,
       searchableItems: allEventCities.toList() +
           allEventSprachen +
           allEventCountries.toList()+
           ["online", "offline"],
       onConfirm: () => filterShowEvents(),
-      onDelete: () => filterShowEvents(),
+      onRemove: () => filterShowEvents(),
     );
 
     setState(() {});

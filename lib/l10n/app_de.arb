@@ -289,5 +289,6 @@
     "nochKeineNachrichtVorhanden": "noch keine Nachrichten Vorhanden",
     "emailErneutVersendet": "Email wurde erneut versendet",
     "reisearten": "Reisearten",
-    "genauerStandortSichtbarFuer": "Genauer Standort sichtbar für "
+    "genauerStandortSichtbarFuer": "Genauer Standort sichtbar für ",
+    "filterErgebnisse": "Alle Filter Ergebnisse"
 }
