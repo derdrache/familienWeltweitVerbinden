@@ -81,16 +81,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     userName = userName.replaceAll("'", "\\'");
     var userExist = true;
 
-    try{
+    try {
       userExist =
           await ProfilDatabase().getData("id", "WHERE name = '$userName'") !=
               false;
-    }catch(_){
-      customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
+    } catch (_) {
+      customSnackbar(
+          context, AppLocalizations.of(context).keineVerbindungInternet);
       setLoading();
       return;
     }
-
 
     if (checkAllValidation(userExist, userName)) {
       var userID = FirebaseAuth.instance.currentUser?.uid;
@@ -98,7 +98,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var children = childrenAgePickerBox.getDates();
       var ortMapData = ortAuswahlBox.getGoogleLocationData();
 
-      //if (ortMapData["city"] == null) customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+      if (ortMapData["city"] == null) {
+        customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+      }
 
       var data = {
         "id": userID,
@@ -117,17 +119,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "aboutme": aboutusKontroller.text
       };
 
-      print("done");
-
-      try{
+      try {
         await ProfilDatabase().addNewProfil(data);
         var ownProfil =
-        await ProfilDatabase().getData("*", "WHERE id = '$userID'");
+            await ProfilDatabase().getData("*", "WHERE id = '$userID'");
         Hive.box('secureBox').put("ownProfil", ownProfil);
 
         global_functions.changePageForever(context, StartPage());
-      }catch(_){
-        customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet);
+      } catch (_) {
+        customSnackbar(
+            context, AppLocalizations.of(context).keineVerbindungInternet) + "?";
         sendEmail({
           "title": "User hat beim Profil erstellen ein Problem",
           "inhalt": jsonEncode(data)
@@ -137,10 +138,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       }
 
       updateStadtInfoDatabase(ortMapData, userID);
-
     }
-
-
 
     setLoading();
   }
