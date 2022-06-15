@@ -844,7 +844,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomProfils();
   }
 
-  changeCheckboxState(selection) {}
+  changeCheckboxState(selection, windowSetState) {
+    if(filterList.contains(selection)){
+      filterList.remove(selection);
+    }else{
+      filterList.add(selection);
+    }
+    windowSetState(() {});
+  }
 
   createCheckBoxen(windowSetState, selectionList, title) {
     List<Widget> checkBoxWidget = [];
@@ -880,7 +887,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ),
             Expanded(
                 child: InkWell(
-              onTap: changeCheckboxState(selection),
+              onTap: () => changeCheckboxState(selection, windowSetState),
               child: Text(
                 selection,
                 style: const TextStyle(fontSize: 13),
