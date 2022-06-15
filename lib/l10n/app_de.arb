@@ -172,7 +172,7 @@
     "absagen": "Absagen: ",
     "freigegeben" : "Freigegeben: ",
     "freigegebeneFamilien": "Freigegebene Familien",
-    "filterEventSuche": "Filtern nach Sprachen, Länder, Städte",
+    "filterEventSuche": "Filtern nach Länder und Städte",
     "filterErkunden": "Familien, Städte und Länder",
     "emailErhalten" : "Email erhalten",
     "chatNotificationErhalten": "Chat-Notification erhalten",
@@ -290,5 +290,6 @@
     "emailErneutVersendet": "Email wurde erneut versendet",
     "reisearten": "Reisearten",
     "genauerStandortSichtbarFuer": "Genauer Standort sichtbar für ",
-    "filterErgebnisse": "Alle Filter Ergebnisse"
+    "filterErgebnisse": "Alle Filter Ergebnisse",
+    "keineEventsVorhanden": "keine Events vorhanden"
 }

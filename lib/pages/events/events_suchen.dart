@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/dialogWindow.dart';
 import '../../widgets/search_autocomplete.dart';
 import 'eventCard.dart';
 import '../../services/database.dart';
@@ -24,7 +25,8 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
   var allEventCountries = <dynamic>{};
   var allEventSprachen =
       global_var.sprachenListe + global_var.sprachenListeEnglisch;
-  var keineEventsText = "";
+  bool filterOn = false;
+  var filterList = [];
 
   @override
   void initState() {
@@ -41,10 +43,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
             "' ORDER BY wann ASC",
         returnList: true);
 
-    if (eventsBackup == false) {
-      eventsBackup = [];
-      keineEventsText = "keine Events vorhanden";
-    }
+    if (eventsBackup == false) eventsBackup = [];
     allEvents = eventsBackup;
 
     for (var event in eventsBackup) {
@@ -53,22 +52,24 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     }
 
     searchAutocomplete = SearchAutocomplete(
-      hintText: AppLocalizations.of(context).filterEventSuche,
-      searchableItems: allEventCities.toList() +
-          allEventSprachen +
-          allEventCountries.toList()+
-          ["online", "offline"],
-      onConfirm: () => filterShowEvents(),
-      onRemove: () => filterShowEvents(),
-    );
+        hintText: AppLocalizations.of(context).filterEventSuche,
+        searchableItems: allEventCities.toList() + allEventCountries.toList(),
+        onConfirm: () => filterShowEvents(),
+        onRemove: () {
+          filterList = [];
+          filterShowEvents();
+        });
 
     setState(() {});
   }
 
   filterShowEvents() {
     var filterProfils = [];
-    var filterList = searchAutocomplete.getSelected();
-
+    filterList = filterList.isNotEmpty
+        ? filterList
+        : searchAutocomplete.getSelected().isEmpty
+            ? []
+            : searchAutocomplete.getSelected();
     for (var event in eventsBackup) {
       if (checkIfInFilter(event, filterList)) filterProfils.add(event);
     }
@@ -91,7 +92,8 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     var stadtMatch =
         checkMatch(filterList, [eventStadt], allEventCities, userSearch: true);
     var countryMatch = checkMatch(filterList, [eventLand], allEventCountries);
-    var typMatch = checkMatch(filterList, [eventTyp], global_var.eventTyp + global_var.eventTypEnglisch);
+    var typMatch = checkMatch(filterList, [eventTyp],
+        global_var.eventTyp + global_var.eventTypEnglisch);
 
     if (spracheMatch && stadtMatch && countryMatch && typMatch) return true;
 
@@ -127,6 +129,100 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     return false;
   }
 
+  openFilterWindow() async {
+    var sprachenSelection = spracheIstDeutsch
+        ? global_var.sprachenListe
+        : global_var.sprachenListeEnglisch;
+    var typSelection =
+        spracheIstDeutsch ? global_var.eventTyp : global_var.eventTypEnglisch;
+
+    await showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return StatefulBuilder(builder: (context, windowSetState) {
+            return CustomAlertDialog(
+              title: "",
+              children: [
+                createCheckBoxen(windowSetState, sprachenSelection,
+                    AppLocalizations.of(context).sprachen),
+                createCheckBoxen(windowSetState, typSelection, "Event typ"),
+              ],
+            );
+          });
+        });
+
+    if (filterList.isNotEmpty) {
+      filterOn = true;
+    } else {
+      filterOn = false;
+    }
+
+    setState(() {});
+  }
+
+  createCheckBoxen(windowSetState, selectionList, title) {
+    List<Widget> checkBoxWidget = [];
+
+    for (var selection in selectionList) {
+      var widthFactor = 0.5;
+
+      if (selection.length < 3) widthFactor = 0.2;
+
+      checkBoxWidget.add(FractionallySizedBox(
+        widthFactor: widthFactor,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 25,
+              height: 25,
+              child: Checkbox(
+                  value: filterList.contains(selection),
+                  onChanged: (newValue) {
+                    if (newValue == true) {
+                      filterList.add(selection);
+                    } else {
+                      filterList.remove(selection);
+                    }
+                    windowSetState(() {});
+
+                    filterShowEvents();
+                  }),
+            ),
+            Expanded(
+                child: InkWell(
+              onTap: () => changeCheckboxState(selection, windowSetState),
+              child: Text(
+                selection,
+                style: const TextStyle(fontSize: 13),
+                maxLines: 2,
+              ),
+            ))
+          ],
+        ),
+      ));
+    }
+
+    return Column(
+      children: [
+        Text(title),
+        const SizedBox(height: 5),
+        Wrap(children: [...checkBoxWidget]),
+        const SizedBox(height: 10)
+      ],
+    );
+  }
+
+  changeCheckboxState(selection, windowSetState) {
+    if (filterList.contains(selection)) {
+      filterList.remove(selection);
+    } else {
+      filterList.add(selection);
+    }
+    windowSetState(() {});
+
+    filterShowEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
     showEvents() {
@@ -153,6 +249,19 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
       return meineEvents;
     }
 
+    filterButton() {
+      return IconButton(
+          padding: EdgeInsets.zero,
+          icon: filterOn
+              ? Icon(Icons.filter_list_off,
+                  size: 32, color: Theme.of(context).colorScheme.primary)
+              : Icon(Icons.filter_list,
+                  size: 32, color: Theme.of(context).colorScheme.primary),
+          onPressed: () {
+            openFilterWindow();
+          });
+    }
+
     return Scaffold(
         appBar: CustomAppBar(title: AppLocalizations.of(context).alleEvents),
         body: Container(
@@ -161,20 +270,26 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
             height: double.infinity,
             child: Stack(children: [
               Container(
-                margin: const EdgeInsets.only(top: 60),
+                margin: const EdgeInsets.only(top: 80),
                 child: SingleChildScrollView(
                   child: Center(
                     child: allEvents.isEmpty
                         ? Container(
                             margin: const EdgeInsets.only(top: 50),
-                            child: keineEventsText.isEmpty
-                                ? const CircularProgressIndicator()
-                                : Text(keineEventsText))
+                            child: Text(
+                              AppLocalizations.of(context).keineEventsVorhanden,
+                              style: const TextStyle(fontSize: 30),
+                            ))
                         : Wrap(children: showEvents()),
                   ),
                 ),
               ),
               searchAutocomplete,
+              Positioned(
+                top: 10,
+                right: 10,
+                child: filterButton(),
+              )
             ])));
   }
 }

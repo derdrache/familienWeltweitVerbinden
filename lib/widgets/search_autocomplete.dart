@@ -17,6 +17,8 @@ class SearchAutocomplete extends StatelessWidget {
 
 
   getSelected() {
+    if (selected.isEmpty) return [];
+
     return [selected];
   }
 
