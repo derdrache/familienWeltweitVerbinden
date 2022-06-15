@@ -172,7 +172,7 @@
     "absagen": "Cancellations: ",
     "freigegeben" : "Shared: ",
     "freigegebeneFamilien": "Shared Families",
-    "filterEventSuche": "Filter by languages, countries, cities",
+    "filterEventSuche": "Filter by countries and cities",
     "filterErkunden": "Families, Cities and Countries",
     "emailErhalten" : "receive e-mail",
     "chatNotificationErhalten": "receive chat notification",
@@ -290,6 +290,7 @@
     "emailErneutVersendet": "e-mail has been sent again",
     "reisearten": "Travel type",
     "genauerStandortSichtbarFuer": "exact location visible for ",
-    "filterErgebnisse": "all filters results"
+    "filterErgebnisse": "all filters results",
+    "keineEventsVorhanden": "no events available"
 }
 
