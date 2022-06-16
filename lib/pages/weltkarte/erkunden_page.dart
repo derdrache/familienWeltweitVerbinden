@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:familien_suche/global/custom_widgets.dart';
@@ -39,11 +38,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var events = Hive.box('secureBox').get("events") ?? [];
   MapController mapController = MapController();
   Set<String> allUserName = {};
-  var countriesList = {};
+  var countriesList = LocationService().getAllCountries();
   List<String> allCitiesNames = [];
   List filterList = [];
-  List profilsBackup = [], aktiveProfils = [];
-  List eventsBackup = [], aktiveEvents = [];
+  List aktiveProfils = [];
+  List aktiveEvents = [];
   List profilBetweenCountries,
       profilCountries,
       profilsBetween,
@@ -54,7 +53,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double maxZoom = 14;
   double currentMapZoom = 1.6;
   double exactZoom = 10;
-  double cityZoom = 6.5;
+  double cityZoom = 7.5;
   double countryZoom = 4.0;
   double kontinentZoom = 2.5;
   var searchAutocomplete = SearchAutocomplete();
@@ -74,45 +73,34 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   void initState() {
-    removeCitiesWithoutInformation();
-
-    removeNoCities();
-
-    changeProfilsList();
-    setEvents();
+    removeCitiesAndCreateCityNames();
+    removeProfilsAndCreateAllUserName();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
 
-  removeCitiesWithoutInformation() {
+  removeCitiesAndCreateCityNames() {
     var newAllCities = [];
 
     for (var city in allCities) {
-      var condition = city["kosten"] != null ||
+      var condition = city["isCity"] == 1 &&
+          city["kosten"] != null ||
           city["wetter"] != null ||
           city["kosten"] != null ||
           city["internet"] != null ||
           city["familien"].isNotEmpty;
 
-      if (condition) {
+      if (condition){
+        allCitiesNames.add(city["ort"]);
         newAllCities.add(city);
       }
     }
-    allCities = newAllCities;
-  }
-
-  removeNoCities() {
-    var newAllCities = [];
-
-    for (var city in allCities) {
-      if (city["isCity"] == 1) newAllCities.add(city);
-    }
 
     allCities = newAllCities;
   }
 
-  changeProfilsList() {
+  removeProfilsAndCreateAllUserName() {
     var removeProfils = [];
 
     for (var profil in profils) {
@@ -124,7 +112,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
               .abs());
       var monthDifference = timeDifference.inDays / 30.44;
 
-
       if (profil["id"] == userId ||
           ownProfil["geblocktVon"].contains(profil["id"]) ||
           monthDifference >= monthsUntilInactive) {
@@ -132,8 +119,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
       } else {
         allUserName.add(profil["name"]);
       }
-
-      profil = checkGenauerStandortPrivacy(profil);
     }
 
     for (var profil in removeProfils) {
@@ -144,63 +129,25 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomProfils();
   }
 
-  checkGenauerStandortPrivacy(profil) {
-    bool genauerStandortIsActiv =
-        profil["automaticLocation"] == "genauer Standort" ||
-            profil["automaticLocation"] == "exact location";
-
-    if (!genauerStandortIsActiv) return false;
-
-    var iamFollower = ownProfil["friendlist"].contains(profil["id"]);
-    var followsMe = profil["friendlist"].contains(ownProfil["id"]);
-
-    var allCondition = profil["genauerStandortPrivacy"] == "Alle" ||
-        profil["genauerStandortPrivacy"] == "all";
-    var follwerCondition = profil["genauerStandortPrivacy"] == "Follower" ||
-        profil["genauerStandortPrivacy"] == "follower";
-    var friendCondition = profil["genauerStandortPrivacy"] == "Freunde" ||
-        profil["genauerStandortPrivacy"] == "friends";
-
-    var accessCondition = allCondition ||
-        (follwerCondition && iamFollower) ||
-        (friendCondition && iamFollower && followsMe);
-
-    if (accessCondition) true;
-
-    return false;
-  }
-
-  setEvents() {
-    createAndSetZoomEvents();
-  }
-
   _asyncMethod() async {
-    getProfilsDB();
+    getProfilsFromDB();
     createAndSetZoomProfils();
 
-    getEventsDB();
-
+    getEventsFromDB();
+    createAndSetZoomEvents();
     setSearchAutocomplete();
 
     buildLoaded = true;
 
-    refreshHiveBox();
+    refreshStadtinfoUser();
   }
 
-  refreshHiveBox() async {
-    var stadtinfoUser =
-        await StadtinfoUserDatabase().getData("*", "", returnList: true);
-    Hive.box('secureBox').put("stadtinfoUser", stadtinfoUser);
-  }
-
-  getProfilsDB() async {
+  getProfilsFromDB() async {
     List<dynamic> dbProfils =
-        await ProfilDatabase().getData("*", "ORDER BY ort ASC");
+      await ProfilDatabase().getData("*", "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
 
     dbProfils = sortProfils(dbProfils);
-
-    secureBox.put("profils", dbProfils);
 
     var checkedProfils = [];
 
@@ -210,8 +157,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
     }
 
+    secureBox.put("profils", checkedProfils);
+
     profils = checkedProfils;
-    changeProfilsList();
+    removeProfilsAndCreateAllUserName();
   }
 
   sortProfils(profils) {
@@ -240,35 +189,26 @@ class _ErkundenPageState extends State<ErkundenPage> {
     return profils;
   }
 
-  getEventsDB() async {
+  getEventsFromDB() async {
     dynamic dbEvents = await EventDatabase().getData(
         "*", "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC",
         returnList: true);
     if (dbEvents == false) dbEvents = [];
 
     Hive.box('secureBox').put("events", dbEvents);
+
     events = dbEvents;
     createAndSetZoomEvents();
   }
 
   setSearchAutocomplete() {
-    countriesList = LocationService().getAllCountries();
-    var spracheIstDeutsch = kIsWeb
-        ? window.locale.languageCode == "de"
-        : Platform.localeName == "de_DE";
     var countryDropDownList =
-        spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
-
-    for (var city in allCities) {
-      if (city["isCity"] == 1) allCitiesNames.add(city["ort"]);
-    }
+      spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
     searchAutocomplete = SearchAutocomplete(
         hintText: AppLocalizations.of(context).filterErkunden,
         searchableItems:
-            allUserName.toList() +
-            countryDropDownList +
-            allCitiesNames,
+        allUserName.toList() + countryDropDownList + allCitiesNames,
         onConfirm: () {
           filterList = searchAutocomplete.getSelected();
           friendMarkerOn = false;
@@ -276,7 +216,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           reiseplanungOn = false;
           filterOn = false;
 
-          changeMapFilter();
+          filterProfils();
           popupActive = true;
           createPopupProfils(profils);
           createPopupCityInformations(profils);
@@ -288,276 +228,24 @@ class _ErkundenPageState extends State<ErkundenPage> {
           reiseplanungOn = false;
           filterOn = false;
           popupActive = false;
-          changeMapFilter();
-        }
-
-
-        );
-
+          filterProfils();
+        });
   }
 
-  createBetween(list, profil, abstand) {
-    var newPoint = false;
+  filterProfils() {
+    var filterProfils = [];
 
-    for (var i = 0; i < list.length; i++) {
-      double originalLatt = profil["latt"];
-      double newLatt = list[i]["latt"];
-      double originalLongth = profil["longt"];
-      double newLongth = list[i]["longt"];
-      bool check = (newLatt + abstand >= originalLatt &&
-              newLatt - abstand <= originalLatt) &&
-          (newLongth + abstand >= originalLongth &&
-              newLongth - abstand <= originalLongth);
-
-      if (check) {
-        newPoint = true;
-        var numberName =
-            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
-
-        list[i]["name"] = numberName.toString();
-        list[i]["profils"].add(profil);
-        break;
-      }
+    for (var profil in localProfils) {
+      if (checkIfInFilter(profil)) filterProfils.add(profil);
     }
 
-    if (!newPoint) {
-      list.add({
-        "ort": profil["ort"],
-        "name": profil["name"] == null ? "0" : "1",
-        "latt": profil["latt"],
-        "longt": profil["longt"],
-        "profils": [profil]
-      });
-    }
-
-    return list;
+    setState(() {
+      profils = filterProfils;
+      createAndSetZoomProfils();
+    });
   }
 
-  createCities(list, profil, {exactLocation = false}) {
-    var newCity = true;
-
-    for (var i = 0; i < list.length; i++) {
-      double profilLongt = profil["longt"];
-      double profilLatt = profil["latt"];
-
-      var geodataCondition =
-          profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"];
-      var sameCityCondition = list[i]["ort"] == null
-          ? false
-          : list[i]["ort"].contains(profil["ort"]);
-
-      if (geodataCondition || (sameCityCondition && !exactLocation) ||
-          (sameCityCondition && exactLocation) && !checkGenauerStandortPrivacy(profil)) {
-        newCity = false;
-        var addNumberName =
-            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
-
-        list[i]["name"] = addNumberName.toString();
-        list[i]["profils"].add(profil);
-        break;
-      }
-    }
-
-    if (newCity) {
-      list.add({
-        "ort": profil["ort"],
-        "name": profil["name"] == null ? "0" : "1",
-        "latt": profil["latt"],
-        "longt": profil["longt"],
-        "profils": [profil]
-      });
-    }
-
-    return list;
-  }
-
-  createCountries(list, profil) {
-    var checkNewCountry = true;
-
-    for (var i = 0; i < list.length; i++) {
-      var listCountryLocation =
-          LocationService().getCountryLocation(list[i]["countryname"]);
-      var profilCountryLocation =
-          LocationService().getCountryLocation(profil["land"]);
-
-      if (listCountryLocation["latt"] == profilCountryLocation["latt"] &&
-          listCountryLocation["longt"] == profilCountryLocation["longt"]) {
-        checkNewCountry = false;
-        var addNumberName =
-            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
-
-        list[i]["name"] = addNumberName.toString();
-        list[i]["profils"].add(profil);
-        break;
-      }
-    }
-
-    if (checkNewCountry) {
-      var country = profil["land"];
-      var position = LocationService().getCountryLocation(country);
-
-      list.add({
-        "name": profil["name"] == null ? "0" : "1",
-        "countryname": country,
-        "longt": position["longt"] ?? 0,
-        "latt": position["latt"] ?? 0,
-        "profils": [profil]
-      });
-    }
-
-    return list;
-  }
-
-  createContinents(list, profil) {
-    var newPoint = true;
-
-    var landGedataProfil = LocationService().getCountryLocation(profil["land"]);
-    landGedataProfil["kontinentGer"] ??= landGedataProfil["nameGer"];
-    landGedataProfil["kontinentEng"] ??= landGedataProfil["nameEng"];
-
-    var kontinentGeodataProfil = LocationService()
-        .getKontinentLocation(landGedataProfil["kontinentGer"]);
-    kontinentGeodataProfil ??= {"kontinentGer": landGedataProfil["nameGer"]};
-    kontinentGeodataProfil ??= {"kontinentEng": landGedataProfil["nameEng"]};
-    for (var i = 0; i < list.length; i++) {
-      var kontinentGeodataListitem =
-          LocationService().getKontinentLocation(list[i]["kontinent"]);
-      kontinentGeodataListitem ??= {"kontinentGer": list[i]["kontinent"]};
-
-      if ((kontinentGeodataListitem["kontinentGer"] ==
-              kontinentGeodataProfil["kontinentGer"]) ||
-          (list[i]["latt"] == profil["latt"] &&
-              list[i]["longt"] == profil["longt"])) {
-        newPoint = false;
-
-        var addNumberName =
-            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
-
-        list[i]["name"] = addNumberName.toString();
-        list[i]["profils"].add(profil);
-        break;
-      }
-    }
-
-    if (newPoint) {
-      list.add({
-        "kontinentName": landGedataProfil["kontinentGer"],
-        "kontinent":
-            landGedataProfil["kontinentGer"] ?? landGedataProfil["land"],
-        "name": profil["name"] == null ? "0" : "1",
-        "latt": kontinentGeodataProfil["latt"] ?? landGedataProfil["latt"],
-        "longt": kontinentGeodataProfil["longt"] ?? landGedataProfil["longt"],
-        "profils": [profil]
-      });
-    }
-
-    return list;
-  }
-
-  createAndSetZoomProfils() async {
-    var pufferProfilExact = [];
-    var pufferProfilCities = [];
-    var pufferProfilBetween = [];
-    var pufferProfilCountries = [];
-    var pufferProfilContinents = [];
-
-    addCityProfils();
-
-    for (var i = 0; i < profils.length; i++) {
-      pufferProfilCountries =
-          await createCountries(pufferProfilCountries, profils[i]);
-      pufferProfilContinents =
-          await createContinents(pufferProfilContinents, profils[i]);
-
-      pufferProfilBetween = createBetween(pufferProfilBetween, profils[i], 1);
-
-      pufferProfilCities = createCities(pufferProfilCities, profils[i]);
-
-      pufferProfilExact =
-          createCities(pufferProfilExact, profils[i], exactLocation: true);
-    }
-
-    profilExact = pufferProfilExact;
-    profilsCities = pufferProfilCities;
-    profilsBetween = pufferProfilBetween;
-    profilCountries = pufferProfilCountries;
-    profilBetweenCountries = pufferProfilContinents;
-
-    changeProfil(currentMapZoom);
-  }
-
-  addCityProfils() {
-    if (filterList.isEmpty) {
-      profils = allCities + profils;
-    } else {
-      var matchFilter = [];
-
-      for (var city in allCities) {
-        if (filterList.contains(city["ort"]) ||
-            filterList.contains(city["land"])) {
-          matchFilter.add(city);
-        }
-      }
-
-      profils = profils + matchFilter;
-    }
-  }
-
-  createAndSetZoomEvents() async {
-    var pufferEventsCities = [];
-    var pufferEventsBetween = [];
-    var pufferEventsCountries = [];
-    var pufferEventsBetweenCountries = [];
-
-    for (var i = 0; i < events.length; i++) {
-      pufferEventsCountries =
-          await createCountries(pufferEventsCountries, events[i]);
-      pufferEventsBetweenCountries =
-          await createContinents(pufferEventsBetweenCountries, events[i]);
-
-      pufferEventsBetween = createBetween(pufferEventsBetween, events[i], 1);
-
-      pufferEventsCities = createCities(pufferEventsCities, events[i]);
-    }
-
-    eventsCities = pufferEventsCities;
-    eventsBetween = pufferEventsBetween;
-    eventsCountries = pufferEventsCountries;
-    eventsKontinente = pufferEventsBetweenCountries;
-
-    changeProfil(currentMapZoom);
-  }
-
-  changeProfil(zoom) {
-    var choosenProfils = [];
-    var selectedEventList = [];
-
-    if (zoom > exactZoom) {
-      choosenProfils = profilExact;
-      selectedEventList = eventsCities;
-    } else if (zoom > cityZoom) {
-      choosenProfils = profilsCities;
-      selectedEventList = eventsCities;
-    } else if (zoom > countryZoom) {
-      choosenProfils = profilsBetween;
-      selectedEventList = eventsBetween;
-    } else if (zoom > kontinentZoom) {
-      choosenProfils = profilCountries;
-      selectedEventList = eventsCountries;
-    } else {
-      choosenProfils = profilBetweenCountries;
-      selectedEventList = eventsKontinente;
-    }
-
-    if (mounted) {
-      setState(() {
-        aktiveProfils = choosenProfils ?? [];
-        aktiveEvents = selectedEventList ?? [];
-      });
-    }
-  }
-
-  checkFilter(profil) {
+  checkIfInFilter(profil) {
     var profilInteressen = profil["interessen"];
     var profilReiseart = profil["reiseart"];
     var profilSprachen = profil["sprachen"];
@@ -581,7 +269,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var interesseMatch = checkMatch(filterList, profilInteressen,
         global_var.interessenListe + global_var.interessenListeEnglisch);
     var userMatch =
-        checkMatch(filterList, [profilName], allUserName, simpleSearch: true);
+    checkMatch(filterList, [profilName], allUserName, simpleSearch: true);
     var countryMatch = checkMatch(
         filterList, [profilLand], countriesList["ger"] + countriesList["eng"]);
     var cityMatch = checkMatch(filterList, [profilOrt], allCitiesNames);
@@ -630,38 +318,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     return false;
   }
 
-  changeMapFilter() {
-    var filterProfils = [];
-
-    for (var profil in localProfils) {
-      if (checkFilter(profil)) filterProfils.add(profil);
-    }
-
-    setState(() {
-      profils = filterProfils;
-      createAndSetZoomProfils();
-    });
-  }
-
-  zoomOut() {
-    double newZoom;
-
-    if (currentMapZoom > cityZoom + 1) {
-      newZoom = cityZoom;
-    } else if (currentMapZoom > countryZoom) {
-      newZoom = countryZoom;
-    } else if (currentMapZoom > kontinentZoom) {
-      newZoom = kontinentZoom;
-    } else {
-      newZoom = minMapZoom;
-    }
-
-    mapController.move(mapPosition, newZoom);
-    currentMapZoom = newZoom;
-    FocusScope.of(context).unfocus();
-    changeProfil(currentMapZoom);
-  }
-
   createPopupCityInformations(profils) {
     var selectedCitiesData = [];
     popupCities = [];
@@ -698,6 +354,324 @@ class _ErkundenPageState extends State<ErkundenPage> {
         });
       }
     }
+  }
+
+  refreshStadtinfoUser() async {
+    var stadtinfoUser =
+      await StadtinfoUserDatabase().getData("*", "", returnList: true);
+    Hive.box('secureBox').put("stadtinfoUser", stadtinfoUser);
+  }
+
+
+
+  createAndSetZoomProfils() async {
+    var pufferProfilExact = [];
+    var pufferProfilCities = [];
+    var pufferProfilBetween = [];
+    var pufferProfilCountries = [];
+    var pufferProfilContinents = [];
+
+    addCityProfils();
+
+    for (var i = 0; i < profils.length; i++) {
+      pufferProfilCountries =
+      await createCountriesZoomLevel(pufferProfilCountries, profils[i]);
+      pufferProfilContinents =
+      await createContinentsZoomLevel(pufferProfilContinents, profils[i]);
+
+      pufferProfilBetween = createBetweenZoomLevel(pufferProfilBetween, profils[i], 1);
+
+      pufferProfilCities = createCitiesZoomLevel(pufferProfilCities, profils[i]);
+
+      pufferProfilExact =
+          createCitiesZoomLevel(pufferProfilExact, profils[i], exactLocation: true);
+    }
+
+    profilExact = pufferProfilExact;
+    profilsCities = pufferProfilCities;
+    profilsBetween = pufferProfilBetween;
+    profilCountries = pufferProfilCountries;
+    profilBetweenCountries = pufferProfilContinents;
+
+    changeProfil(currentMapZoom);
+  }
+
+  addCityProfils() {
+    if (filterList.isEmpty) {
+      profils = allCities + profils;
+    } else {
+      var matchFilter = [];
+
+      for (var city in allCities) {
+        if (filterList.contains(city["ort"]) ||
+            filterList.contains(city["land"])) {
+          matchFilter.add(city);
+        }
+      }
+
+      profils = profils + matchFilter;
+    }
+  }
+
+  createBetweenZoomLevel(list, profil, abstand) {
+    var newPoint = false;
+
+    for (var i = 0; i < list.length; i++) {
+      double originalLatt = profil["latt"];
+      double newLatt = list[i]["latt"];
+      double originalLongth = profil["longt"];
+      double newLongth = list[i]["longt"];
+      bool check = (newLatt + abstand >= originalLatt &&
+              newLatt - abstand <= originalLatt) &&
+          (newLongth + abstand >= originalLongth &&
+              newLongth - abstand <= originalLongth);
+
+      if (check) {
+        newPoint = true;
+        var numberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
+
+        list[i]["name"] = numberName.toString();
+        list[i]["profils"].add(profil);
+        break;
+      }
+    }
+
+    if (!newPoint) {
+      list.add({
+        "ort": profil["ort"],
+        "name": profil["name"] == null ? "0" : "1",
+        "latt": profil["latt"],
+        "longt": profil["longt"],
+        "profils": [profil]
+      });
+    }
+
+    return list;
+  }
+
+  createCitiesZoomLevel(list, profil, {exactLocation = false}) {
+    var newCity = true;
+
+    for (var i = 0; i < list.length; i++) {
+      double profilLongt = profil["longt"];
+      double profilLatt = profil["latt"];
+
+      var geodataCondition =
+          profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"];
+      var sameCityCondition = list[i]["ort"] == null
+          ? false
+          : list[i]["ort"].contains(profil["ort"]);
+
+      if (geodataCondition ||
+          (sameCityCondition && !exactLocation) ||
+          (sameCityCondition && exactLocation) &&
+              !checkGenauerStandortPrivacy(profil)) {
+        newCity = false;
+        var addNumberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
+
+        list[i]["name"] = addNumberName.toString();
+        list[i]["profils"].add(profil);
+        break;
+      }
+    }
+
+    if (newCity) {
+      list.add({
+        "ort": profil["ort"],
+        "name": profil["name"] == null ? "0" : "1",
+        "latt": profil["latt"],
+        "longt": profil["longt"],
+        "profils": [profil]
+      });
+    }
+
+    return list;
+  }
+
+  checkGenauerStandortPrivacy(profil) {
+    bool genauerStandortIsActiv =
+        profil["automaticLocation"] == "genauer Standort" ||
+            profil["automaticLocation"] == "exact location";
+
+    if (!genauerStandortIsActiv) return false;
+
+    var iamFollower = ownProfil["friendlist"].contains(profil["id"]);
+    var followsMe = profil["friendlist"].contains(ownProfil["id"]);
+
+    var allCondition = profil["genauerStandortPrivacy"] == "Alle" ||
+        profil["genauerStandortPrivacy"] == "all";
+    var follwerCondition = profil["genauerStandortPrivacy"] == "Follower" ||
+        profil["genauerStandortPrivacy"] == "follower";
+    var friendCondition = profil["genauerStandortPrivacy"] == "Freunde" ||
+        profil["genauerStandortPrivacy"] == "friends";
+
+    var accessCondition = allCondition ||
+        (follwerCondition && iamFollower) ||
+        (friendCondition && iamFollower && followsMe);
+
+    if (accessCondition) true;
+
+    return false;
+  }
+
+  createCountriesZoomLevel(list, profil) {
+    var checkNewCountry = true;
+
+    for (var i = 0; i < list.length; i++) {
+      var listCountryLocation =
+          LocationService().getCountryLocation(list[i]["countryname"]);
+      var profilCountryLocation =
+          LocationService().getCountryLocation(profil["land"]);
+
+      if (listCountryLocation["latt"] == profilCountryLocation["latt"] &&
+          listCountryLocation["longt"] == profilCountryLocation["longt"]) {
+        checkNewCountry = false;
+        var addNumberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
+
+        list[i]["name"] = addNumberName.toString();
+        list[i]["profils"].add(profil);
+        break;
+      }
+    }
+
+    if (checkNewCountry) {
+      var country = profil["land"];
+      var position = LocationService().getCountryLocation(country);
+
+      list.add({
+        "name": profil["name"] == null ? "0" : "1",
+        "countryname": country,
+        "longt": position["longt"] ?? 0,
+        "latt": position["latt"] ?? 0,
+        "profils": [profil]
+      });
+    }
+
+    return list;
+  }
+
+  createContinentsZoomLevel(list, profil) {
+    var newPoint = true;
+
+    var landGedataProfil = LocationService().getCountryLocation(profil["land"]);
+    landGedataProfil["kontinentGer"] ??= landGedataProfil["nameGer"];
+    landGedataProfil["kontinentEng"] ??= landGedataProfil["nameEng"];
+
+    var kontinentGeodataProfil = LocationService()
+        .getKontinentLocation(landGedataProfil["kontinentGer"]);
+    kontinentGeodataProfil ??= {"kontinentGer": landGedataProfil["nameGer"]};
+    kontinentGeodataProfil ??= {"kontinentEng": landGedataProfil["nameEng"]};
+    for (var i = 0; i < list.length; i++) {
+      var kontinentGeodataListitem =
+          LocationService().getKontinentLocation(list[i]["kontinent"]);
+      kontinentGeodataListitem ??= {"kontinentGer": list[i]["kontinent"]};
+
+      if ((kontinentGeodataListitem["kontinentGer"] ==
+              kontinentGeodataProfil["kontinentGer"]) ||
+          (list[i]["latt"] == profil["latt"] &&
+              list[i]["longt"] == profil["longt"])) {
+        newPoint = false;
+
+        var addNumberName =
+            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
+
+        list[i]["name"] = addNumberName.toString();
+        list[i]["profils"].add(profil);
+        break;
+      }
+    }
+
+    if (newPoint) {
+      list.add({
+        "kontinentName": landGedataProfil["kontinentGer"],
+        "kontinent":
+            landGedataProfil["kontinentGer"] ?? landGedataProfil["land"],
+        "name": profil["name"] == null ? "0" : "1",
+        "latt": kontinentGeodataProfil["latt"] ?? landGedataProfil["latt"],
+        "longt": kontinentGeodataProfil["longt"] ?? landGedataProfil["longt"],
+        "profils": [profil]
+      });
+    }
+
+    return list;
+  }
+
+  createAndSetZoomEvents() async {
+    var pufferEventsCities = [];
+    var pufferEventsBetween = [];
+    var pufferEventsCountries = [];
+    var pufferEventsBetweenCountries = [];
+
+    for (var i = 0; i < events.length; i++) {
+      pufferEventsCountries =
+          await createCountriesZoomLevel(pufferEventsCountries, events[i]);
+      pufferEventsBetweenCountries =
+          await createContinentsZoomLevel(pufferEventsBetweenCountries, events[i]);
+
+      pufferEventsBetween = createBetweenZoomLevel(pufferEventsBetween, events[i], 1);
+
+      pufferEventsCities = createCitiesZoomLevel(pufferEventsCities, events[i]);
+    }
+
+    eventsCities = pufferEventsCities;
+    eventsBetween = pufferEventsBetween;
+    eventsCountries = pufferEventsCountries;
+    eventsKontinente = pufferEventsBetweenCountries;
+
+    changeProfil(currentMapZoom);
+  }
+
+  changeProfil(zoom) {
+    var choosenProfils = [];
+    var selectedEventList = [];
+
+    if (zoom > exactZoom) {
+      choosenProfils = profilExact;
+      selectedEventList = eventsCities;
+    } else if (zoom > cityZoom) {
+      choosenProfils = profilsCities;
+      selectedEventList = eventsCities;
+    } else if (zoom > countryZoom) {
+      choosenProfils = profilsBetween;
+      selectedEventList = eventsBetween;
+    } else if (zoom > kontinentZoom) {
+      choosenProfils = profilCountries;
+      selectedEventList = eventsCountries;
+    } else {
+      choosenProfils = profilBetweenCountries;
+      selectedEventList = eventsKontinente;
+    }
+
+    if (mounted) {
+      setState(() {
+        aktiveProfils = choosenProfils ?? [];
+        aktiveEvents = selectedEventList ?? [];
+      });
+    }
+
+  }
+
+
+  zoomOut() {
+    double newZoom;
+
+    if (currentMapZoom > cityZoom) {
+      newZoom = cityZoom;
+    } else if (currentMapZoom > countryZoom) {
+      newZoom = countryZoom;
+    } else if (currentMapZoom > kontinentZoom) {
+      newZoom = kontinentZoom;
+    } else {
+      newZoom = minMapZoom;
+    }
+
+    mapController.move(mapPosition, newZoom);
+    currentMapZoom = newZoom;
+    FocusScope.of(context).unfocus();
+    changeProfil(currentMapZoom);
   }
 
   openSelectCityWindow() {
@@ -844,71 +818,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomProfils();
   }
 
-  changeCheckboxState(selection, windowSetState) {
-    if(filterList.contains(selection)){
-      filterList.remove(selection);
-    }else{
-      filterList.add(selection);
-    }
-    windowSetState(() {});
-  }
-
-  createCheckBoxen(windowSetState, selectionList, title) {
-    List<Widget> checkBoxWidget = [];
-
-    for (var selection in selectionList) {
-      var widthFactor = 0.5;
-
-      if (selection.length < 3) widthFactor = 0.2;
-
-      checkBoxWidget.add(FractionallySizedBox(
-        widthFactor: widthFactor,
-        child: Row(
-          children: [
-            SizedBox(
-              width: 25,
-              height: 25,
-              child: Checkbox(
-                  value: filterList.contains(selection),
-                  onChanged: (newValue) {
-                    if (newValue == true) {
-                      filterList.add(selection);
-                    } else {
-                      filterList.remove(selection);
-                    }
-                    windowSetState(() {});
-
-                    friendMarkerOn = false;
-                    eventMarkerOn = false;
-                    reiseplanungOn = false;
-
-                    changeMapFilter();
-                  }),
-            ),
-            Expanded(
-                child: InkWell(
-              onTap: () => changeCheckboxState(selection, windowSetState),
-              child: Text(
-                selection,
-                style: const TextStyle(fontSize: 13),
-                maxLines: 2,
-              ),
-            ))
-          ],
-        ),
-      ));
-    }
-
-    return Column(
-      children: [
-        Text(title),
-        const SizedBox(height: 5),
-        Wrap(children: [...checkBoxWidget]),
-        const SizedBox(height: 10)
-      ],
-    );
-  }
-
   openFilterWindow() async {
     var sprachenSelection = spracheIstDeutsch
         ? global_var.sprachenListe
@@ -942,18 +851,82 @@ class _ErkundenPageState extends State<ErkundenPage> {
           });
         });
 
-    if (filterList.isNotEmpty){
+    if (filterList.isNotEmpty) {
       filterOn = true;
       popupActive = true;
       createPopupProfils(profils);
       createPopupCityInformations(profils);
-    } else{
+    } else {
       filterOn = false;
       popupActive = false;
     }
 
-
     setState(() {});
+  }
+
+  createCheckBoxen(windowSetState, selectionList, title) {
+    List<Widget> checkBoxWidget = [];
+
+    for (var selection in selectionList) {
+      var widthFactor = 0.5;
+
+      if (selection.length < 3) widthFactor = 0.2;
+
+      checkBoxWidget.add(FractionallySizedBox(
+        widthFactor: widthFactor,
+        child: Row(
+          children: [
+            SizedBox(
+              width: 25,
+              height: 25,
+              child: Checkbox(
+                  value: filterList.contains(selection),
+                  onChanged: (newValue) {
+                    if (newValue == true) {
+                      filterList.add(selection);
+                    } else {
+                      filterList.remove(selection);
+                    }
+                    windowSetState(() {});
+
+                    friendMarkerOn = false;
+                    eventMarkerOn = false;
+                    reiseplanungOn = false;
+
+                    filterProfils();
+                  }),
+            ),
+            Expanded(
+                child: InkWell(
+                  onTap: () => changeCheckboxState(selection, windowSetState),
+                  child: Text(
+                    selection,
+                    style: const TextStyle(fontSize: 13),
+                    maxLines: 2,
+                  ),
+                ))
+          ],
+        ),
+      ));
+    }
+
+    return Column(
+      children: [
+        Text(title),
+        const SizedBox(height: 5),
+        Wrap(children: [...checkBoxWidget]),
+        const SizedBox(height: 10)
+      ],
+    );
+  }
+
+  changeCheckboxState(selection, windowSetState) {
+    if (filterList.contains(selection)) {
+      filterList.remove(selection);
+    } else {
+      filterList.add(selection);
+    }
+    windowSetState(() {});
   }
 
   createPopupProfils(profils) {
@@ -972,13 +945,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
       backgroundColor: Colors.white,
       flexibleSpace: Container(
         alignment: Alignment.center,
-        padding:
-        const EdgeInsets.only(left: 50, right: 20, top: 5, bottom: 5),
+        padding: const EdgeInsets.only(left: 50, right: 20, top: 5, bottom: 5),
         child: Text(selectPopupMenuText(profils),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
-            style:
-            const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       ),
       pinned: true,
     ));
@@ -1009,9 +980,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         var profilData = selectUserProfils[index];
         var genauerStandortKondition = (profilData["automaticLocation"] ==
-            global_var.standortbestimmung[1] ||
+                global_var.standortbestimmung[1] ||
             profilData["automaticLocation"] ==
-                global_var.standortbestimmungEnglisch[1] &&
+                    global_var.standortbestimmungEnglisch[1] &&
                 checkGenauerStandortPrivacy(profilData));
 
         return GestureDetector(
@@ -1041,17 +1012,17 @@ class _ErkundenPageState extends State<ErkundenPage> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 5),
-                        Text(childrenAgeStringToStringAge(
-                            profilData["kinder"])),
+                        Text(
+                            childrenAgeStringToStringAge(profilData["kinder"])),
                         const SizedBox(height: 5),
                         genauerStandortKondition
                             ? Text("📍 " +
-                            changeTextLength(profilData["ort"]) +
-                            ", " +
-                            changeTextLength(profilData["land"]))
+                                changeTextLength(profilData["ort"]) +
+                                ", " +
+                                changeTextLength(profilData["land"]))
                             : Text(changeTextLength(profilData["ort"]) +
-                            ", " +
-                            changeTextLength(profilData["land"]))
+                                ", " +
+                                changeTextLength(profilData["land"]))
                       ])
                 ],
               )),
@@ -1064,7 +1035,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   selectPopupMenuText(profils) {
     if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
-    if(filterOn) return AppLocalizations.of(context).filterErgebnisse;
+    if (filterOn) return AppLocalizations.of(context).filterErgebnisse;
 
     if (currentMapZoom < kontinentZoom) {
       return createPopupWindowTitle(profils, "kontinente");
@@ -1081,8 +1052,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     Set<String> titleList = {};
 
     if (filter == "kontinente") {
-      var locationData =
-      LocationService().getCountryLocation(list[0]["land"]);
+      var locationData = LocationService().getCountryLocation(list[0]["land"]);
       if (locationData["kontinentGer"] == locationData["kontinentEng"]) {
         return locationData["kontinentEng"];
       }
@@ -1100,7 +1070,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     return titleList.join(" / ");
   }
 
-  changeProfils(changeList) {
+  activateFriendlistProfils(changeList) {
     var newProfilList = [];
 
     for (var profilId in changeList) {
@@ -1117,12 +1087,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
-    genauerStandortBezeichnung =
-        AppLocalizations.of(context).genauerStandort;
-
+    genauerStandortBezeichnung = AppLocalizations.of(context).genauerStandort;
     double screenWidth = MediaQuery.of(context).size.width;
     var eventCrossAxisCount = screenWidth / 190;
     List<Marker> allMarker = [];
+
 
     createPopupEvents(event) {
       popupItems = [];
@@ -1450,7 +1419,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 friendMarkerOn = true;
                 eventMarkerOn = false;
                 reiseplanungOn = false;
-                changeProfils(ownProfil["friendlist"]);
+                activateFriendlistProfils(ownProfil["friendlist"]);
 
                 popupActive = true;
                 createPopupProfils(profils);
