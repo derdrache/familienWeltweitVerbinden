@@ -223,9 +223,14 @@ class LocationService {
     List<String> countriesListEng = [];
 
     for (var country in countryGeodata) {
+      if(country["nameGer"] == "Online") continue;
+
       countriesListGer.add(country["nameGer"]);
       countriesListEng.add(country["nameEng"]);
     }
+
+    countriesListGer.sort();
+    countriesListEng.sort();
 
     return {"ger": countriesListGer, "eng": countriesListEng};
   }
