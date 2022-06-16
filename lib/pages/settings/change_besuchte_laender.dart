@@ -31,6 +31,7 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
         auswahlList: widget.isGerman ? allCountries["ger"] : allCountries["eng"],
         selected: widget.selected,
         onConfirm: (value) {
+          saveInDB();
           setState(() {});
         }
     );
@@ -39,21 +40,17 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
 
   var allCountries = LocationService().getAllCountries();
 
-  saveButton() {
-    return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () async {
-          var selectedCountries = besuchteLaenderDropdown.getSelected();
 
-          ProfilDatabase().updateProfil(
-              "besuchteLaender = '${jsonEncode(selectedCountries)}'",
-              "WHERE id = '${widget.userId}'");
+  saveInDB(){
+    var selectedCountries = besuchteLaenderDropdown.getSelected();
 
-          Navigator.pop(context);
-          customSnackbar(
-              context, AppLocalizations.of(context).besuchteLaenderUpdate,
-              color: Colors.green);
-        });
+    ProfilDatabase().updateProfil(
+        "besuchteLaender = '${jsonEncode(selectedCountries)}'",
+        "WHERE id = '${widget.userId}'");
+
+    customSnackbar(
+        context, AppLocalizations.of(context).besuchteLaenderUpdate,
+        color: Colors.green);
   }
 
 
@@ -79,7 +76,7 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
     return Scaffold(
         appBar: CustomAppBar(
             title: AppLocalizations.of(context).besucheLaenderVeraendern,
-            buttons: <Widget>[saveButton()]),
+            buttons: <Widget>[]),
         body: ListView(
           children: [
             besuchteLaenderDropdown,
