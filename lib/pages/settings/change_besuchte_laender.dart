@@ -27,37 +27,33 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
 
   @override
   void initState() {
+    var allCountries = LocationService().getAllCountries();
     besuchteLaenderDropdown = CustomMultiTextForm(
-        auswahlList: widget.isGerman ? allCountries["ger"] : allCountries["eng"],
+        auswahlList:
+            widget.isGerman ? allCountries["ger"] : allCountries["eng"],
         selected: widget.selected,
         onConfirm: (value) {
           saveInDB();
           setState(() {});
-        }
-    );
+        });
     super.initState();
   }
 
-  var allCountries = LocationService().getAllCountries();
-
-
-  saveInDB(){
+  saveInDB() {
     var selectedCountries = besuchteLaenderDropdown.getSelected();
 
     ProfilDatabase().updateProfil(
         "besuchteLaender = '${jsonEncode(selectedCountries)}'",
         "WHERE id = '${widget.userId}'");
 
-    customSnackbar(
-        context, AppLocalizations.of(context).besuchteLaenderUpdate,
+    customSnackbar(context, AppLocalizations.of(context).besuchteLaenderUpdate,
         color: Colors.green);
   }
 
-
   @override
   Widget build(BuildContext context) {
-    besuchteLaenderDropdown.hintText = AppLocalizations.of(context).laenderAuswahl;
-
+    besuchteLaenderDropdown.hintText =
+        AppLocalizations.of(context).laenderAuswahl;
 
     besuchteLaenderBox() {
       var visitedCountriesWidgetlist = [];
@@ -75,8 +71,8 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
 
     return Scaffold(
         appBar: CustomAppBar(
-            title: AppLocalizations.of(context).besucheLaenderVeraendern,
-            buttons: <Widget>[]),
+          title: AppLocalizations.of(context).besucheLaenderVeraendern,
+        ),
         body: ListView(
           children: [
             besuchteLaenderDropdown,
