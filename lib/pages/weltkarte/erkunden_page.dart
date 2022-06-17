@@ -1088,12 +1088,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
   @override
   Widget build(BuildContext context) {
     genauerStandortBezeichnung = AppLocalizations.of(context).genauerStandort;
-    double screenWidth = MediaQuery.of(context).size.width;
-    var eventCrossAxisCount = screenWidth / 190;
     List<Marker> allMarker = [];
 
 
     createPopupEvents(event) {
+      double screenWidth = MediaQuery.of(context).size.width;
+      var eventCrossAxisCount = screenWidth / 190;
       popupItems = [];
       popupTyp = "events";
 
@@ -1222,11 +1222,23 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     createOwnMarker() {
+      double lattShift = 0.002;// = 14 => 7.5 = 0.07;
+      double longtShift = 0.001;// = 14 => 7.5 = 0.02;
+
+      if(currentMapZoom > cityZoom && currentMapZoom < 10 ){
+        lattShift = 0.07;
+        longtShift = 0.02;
+      } else if (currentMapZoom > 10 && currentMapZoom < 12.5 ){
+        lattShift = 0.02;
+        longtShift = 0.01;
+      }
+
+
       if (ownProfil != null) {
         allMarker.add(Marker(
             width: 30.0,
             height: 30.0,
-            point: LatLng(ownProfil["latt"] + 0.07, ownProfil["longt"] + 0.02),
+            point: LatLng(ownProfil["latt"] + lattShift, ownProfil["longt"] + longtShift), // 0.07 => 0.02
             builder: (_) => Icon(
                   Icons.flag,
                   color: Colors.green[900],
