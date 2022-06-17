@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:familien_suche/services/database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -274,11 +275,12 @@ class _EventCardState extends State<EventCard> {
                         const SizedBox(height: 2.5),
                         if (isOffline)
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(AppLocalizations.of(context).stadt,
+                             /* Text(AppLocalizations.of(context).stadt,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: fontSize)),
+                                      fontSize: fontSize)),*/
                               Text(widget.event["stadt"],
                                   style: TextStyle(fontSize: fontSize))
                             ],
@@ -286,11 +288,12 @@ class _EventCardState extends State<EventCard> {
                         if (isOffline) const SizedBox(height: 2.5),
                         if (isOffline)
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(AppLocalizations.of(context).land,
+                              /*Text(AppLocalizations.of(context).land,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: fontSize)),
+                                      fontSize: fontSize)),*/
                               Text(widget.event["land"],
                                   style: TextStyle(fontSize: fontSize))
                             ],

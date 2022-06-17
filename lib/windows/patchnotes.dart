@@ -58,6 +58,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch140D),
                 _patch(patch131D),
                 _patch(patch130D),
                 _patch(patch123D),
@@ -72,6 +73,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch140E),
                 _patch(patch131E),
                 _patch(patch130E),
                 _patch(patch123E),
@@ -98,6 +100,32 @@ var patchVorlage={
 
   ]
 };
+
+var patch140E={
+  "title" : "1.4.0 - 01.07.2022",
+  "inhalt": [
+
+  ]
+};
+var patch140D={
+  "title" : "1.4.0 - 01.07.2022",
+  "inhalt": [
+    "Erweiterung Reiseplanung - Es ist jetzt möglich unter Settings seine Reiseplanung einzutragen. Die Weltkarte kann nun, per Klick auf das Uhr-Icon, anzeigen welche Familien sich wo in einem bestimmten Zeitraum aufhalten werden",
+    "Allgemein - Benutzer können jetzt gemeldet werden",
+    "Allgemein - Benutzer können jetzt geblockt werden. Geblockte Bneutzer können dich auf der Weltkarte nicht mehr sehen",
+    "Registrierung - Im Login Bildschirm gibt es jetzt die Möglichkeit sich die Bestätigungsmail noch einmal senden zu lassen, falls diese nicht angekommen ist",
+    "Weltkarte - die 0er Marker wurden gegen i-Marker ausgetauscht, damit besser klar wird, dass dort keine Familien zu sehen sind",
+    "Android - Neuer Freund notifikation fürt jetzt beim klick direkt zum Profil",
+    "Chat - Nachrichten Eingabebox wurde vergrößert",
+    "Events - Es ist ist möglich sich für ein wiederholendes Event als 'immer zusagen' zu markieren",
+    "Weltkarte - Filtersystem wurde komplett überarbeitet",
+    "Privatsphäre Einstellung - Für den genauen Standort gibt es jetzt Möglichkeiten für wen es angezeigt wird",
+    "verschiedene kleine Style-Anpassungen",
+    "verschiedene kleine Fehlerbehebungen",
+    "verschiedene kleine Verbesserungen"
+  ]
+};
+
 var patch131E={
   "title" : "1.3.1 - 27.05.2022",
   "inhalt": [
