@@ -34,7 +34,6 @@ class ShowProfilPage extends StatefulWidget {
 
 class _ShowProfilPageState extends State<ShowProfilPage> {
   var userID = FirebaseAuth.instance.currentUser.uid;
-  var hasReiseplanungAccess = false;
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
@@ -46,13 +45,14 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   @override
   void initState() {
-    checkOwnProfil();
+    checkIsOwnProfil();
     checkAccessReiseplanung();
 
     super.initState();
   }
 
   checkAccessReiseplanung() {
+    var hasReiseplanungAccess = false;
     var reiseplanungSetting = widget.profil["reiseplanungPrivacy"];
 
     if (widget.profil["reisePlanung"].isEmpty) return false;
@@ -70,9 +70,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         (widget.profil["friendlist"].contains(widget.ownProfil["id"]))) {
       hasReiseplanungAccess = true;
     }
+
+    return hasReiseplanungAccess;
   }
 
-  checkOwnProfil() {
+  checkIsOwnProfil() {
     if (widget.profil["id"] == userID) widget.ownProfil = true;
   }
 
@@ -151,20 +153,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     friendlistButton() {
-      var onFriendlist = userFriendlist.isNotEmpty
-          ? userFriendlist.contains(widget.profil["id"])
-          : false;
+      var onFriendlist = userFriendlist.contains(widget.profil["id"]);
 
       return SimpleDialogOption(
           child: Row(
             children: [
-              onFriendlist
-                  ? const Icon(Icons.person_remove)
-                  : const Icon(Icons.person_add),
+              Icon(onFriendlist ? Icons.person_remove : Icons.person_add),
               const SizedBox(width: 10),
-              onFriendlist
-                  ? Text(AppLocalizations.of(context).freundEntfernen)
-                  : Text(AppLocalizations.of(context).freundHinzufuegen),
+              Text(onFriendlist
+                  ? AppLocalizations.of(context).freundEntfernen
+                  : AppLocalizations.of(context).freundHinzufuegen
+              )
             ],
           ),
           onPressed: () {
@@ -174,7 +173,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               userFriendlist.remove(widget.profil["id"]);
               snackbarText = widget.profil["name"] +
                   AppLocalizations.of(context).friendlistEntfernt;
-              if (userFriendlist.isEmpty) userFriendlist = [];
             } else {
               userFriendlist.add(widget.profil["id"]);
               snackbarText = widget.profil["name"] +
@@ -191,7 +189,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             var ownProfil = localBox.get("ownProfil");
 
             ownProfil["friendlist"] = userFriendlist;
-
             localBox.put("ownProfil", ownProfil);
 
             customSnackbar(context, snackbarText, color: Colors.green);
@@ -205,27 +202,22 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           });
     }
 
-    blockierenButton() {
+    userBlockierenButton() {
       var ownId = FirebaseAuth.instance.currentUser.uid;
-      var onBlockList =
-          widget.profil["geblocktVon"].contains(ownId);
+      var onBlockList = widget.profil["geblocktVon"].contains(ownId);
 
       return SimpleDialogOption(
           child: Row(
             children: [
-              onBlockList
-                  ? const Icon(Icons.do_not_touch)
-                  : const Icon(Icons.back_hand),
+              Icon(onBlockList ? Icons.do_not_touch : Icons.back_hand),
               const SizedBox(width: 10),
-              onBlockList
-                  ? Text(AppLocalizations.of(context).freigeben)
-                  : Text(AppLocalizations.of(context).blockieren),
+              Text(onBlockList ? AppLocalizations.of(context).freigeben : AppLocalizations.of(context).blockieren)
             ],
           ),
           onPressed: () {
-            var snackbarText = "";
+            String snackbarText = "";
             var allProfils = Hive.box('secureBox').get("profils");
-            var databaseQuery = "";
+            String databaseQuery = "";
 
             if (onBlockList) {
               widget.profil["geblocktVon"].remove(ownId);
@@ -250,15 +242,14 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             customSnackbar(context, snackbarText, color: Colors.green);
 
             ProfilDatabase().updateProfil(
-                databaseQuery,
-                "WHERE id = '${widget.profil["id"]}'");
+                databaseQuery, "WHERE id = '${widget.profil["id"]}'");
 
             Navigator.pop(context);
             setState(() {});
           });
     }
 
-    meldeButton() {
+    meldeUserButton() {
       return SimpleDialogOption(
           child: Row(
             children: [
@@ -268,7 +259,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             ],
           ),
           onPressed: () {
-            var meldeText = TextEditingController();
+            var meldeTextKontroller = TextEditingController();
             Navigator.pop(context);
 
             showDialog(
@@ -280,7 +271,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                     children: [
                       customTextInput(
                           AppLocalizations.of(context).benutzerMeldenFrage,
-                          meldeText,
+                          meldeTextKontroller,
                           moreLines: 10),
                       const SizedBox(height: 20),
                       FloatingActionButton.extended(
@@ -288,7 +279,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                             ReportsDatabase().add(
                                 userID,
                                 "Melde User id: " + widget.profil["id"],
-                                meldeText.text);
+                                meldeTextKontroller.text);
                             Navigator.pop(context);
                             customSnackbar(context,
                                 AppLocalizations.of(context).benutzerGemeldet,
@@ -319,8 +310,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                             const EdgeInsets.only(top: 40, left: 0, right: 10),
                         children: [
                           friendlistButton(),
-                          blockierenButton(),
-                          meldeButton()
+                          userBlockierenButton(),
+                          meldeUserButton()
                         ],
                       ),
                     ),
@@ -359,7 +350,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             AppLocalizations.of(context).aktuelleOrt + ": ",
             style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
           ),
-          Flexible(child: Text(widget.profil["ort"], style: TextStyle(fontSize: textSize), maxLines: 2,))
+          Flexible(
+              child: Text(
+            widget.profil["ort"],
+            style: TextStyle(fontSize: textSize),
+            maxLines: 2,
+          ))
         ],
       );
     }
@@ -382,40 +378,34 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     aufreiseBox() {
+      if (widget.profil["aufreiseSeit"] == null) return const SizedBox.shrink();
+
       var themenText = AppLocalizations.of(context).aufReise + ": ";
+      var seitText = widget.profil["aufreiseSeit"].split("-").take(2)
+          .toList().reversed.join("-");
       var inhaltText = "";
 
-      if (widget.profil["aufreiseSeit"] == null) {
-        return const SizedBox.shrink();
-      } else if (widget.profil["aufreiseBis"] == null) {
-        var seidText = widget.profil["aufreiseSeit"]
-            .split("-")
-            .take(2)
-            .toList()
-            .reversed
-            .join("-");
-        inhaltText = seidText + " - " + AppLocalizations.of(context).offen;
+
+      if (widget.profil["aufreiseBis"] == null) {
+        inhaltText = seitText + " - " + AppLocalizations.of(context).offen;
       } else {
-        var seidText = widget.profil["aufreiseSeit"]
-            .split("-")
-            .take(2)
-            .toList()
-            .reversed
-            .join("-");
         var bisText = widget.profil["aufreiseBis"]
             .split("-")
             .take(2)
             .toList()
             .reversed
             .join("-");
-        inhaltText = seidText + " - " + bisText;
+        inhaltText = seitText + " - " + bisText;
       }
 
       return Column(children: [
         Row(children: [
           Text(themenText,
-              style:
-                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+              style: TextStyle(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.bold
+              )
+          ),
           Text(inhaltText, style: TextStyle(fontSize: textSize))
         ]),
         SizedBox(height: columnAbstand),
@@ -600,6 +590,36 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       );
     }
 
+    createZuletztOnlineText(){
+      var text = "";
+      var color = Colors.grey;
+      var size = textSize - 2;
+      var timeDifference = Duration(
+          microseconds: (DateTime.now().microsecondsSinceEpoch -
+              DateTime.parse(widget.profil["lastLogin"].toString())
+                  .microsecondsSinceEpoch)
+              .abs());
+      var daysOffline = timeDifference.inDays;
+
+
+      if(monthDifference >= monthsUntilInactive){
+        text = AppLocalizations.of(context).inaktiv;
+        size = healineTextSize;
+      } else if(daysOffline > 30){
+        text = AppLocalizations.of(context).langeZeitNichtGesehen;
+      } else if(daysOffline > 7){
+        text = AppLocalizations.of(context).innerhalbMonatsGesehen;
+      } else if(daysOffline > 1){
+        text = AppLocalizations.of(context).innerhalbWocheGesehen;
+      } else{
+        text = AppLocalizations.of(context).kuerzlichGesehen;
+      }
+
+      return Text(text,
+          style: TextStyle(
+              color: color, fontSize: size));
+    }
+
     infoProfil() {
       return Container(
           padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
@@ -616,10 +636,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold)),
                 const Expanded(child: SizedBox.shrink()),
-                if (monthDifference >= monthsUntilInactive)
-                  Text(AppLocalizations.of(context).inaktiv,
-                      style: TextStyle(
-                          color: Colors.red, fontSize: healineTextSize))
+                createZuletztOnlineText()
               ]),
               SizedBox(height: columnAbstand),
               locationBox(),
@@ -631,7 +648,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               SizedBox(height: columnAbstand),
               kinderBox(),
               besuchteLaenderBox(),
-              if (hasReiseplanungAccess || widget.ownProfil) reisePlanungBox(),
+              if (checkAccessReiseplanung() || widget.ownProfil)
+                reisePlanungBox(),
               if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
               if (widget.profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
               interessenBox(),
@@ -680,6 +698,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         ),
       );
     }
+
+
 
     return Scaffold(
       appBar: CustomAppBar(title: "", buttons: [
