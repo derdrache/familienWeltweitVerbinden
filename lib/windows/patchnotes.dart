@@ -120,6 +120,8 @@ var patch140D={
     "Events - Es ist ist möglich sich für ein wiederholendes Event als 'immer zusagen' zu markieren",
     "Weltkarte - Filtersystem wurde komplett überarbeitet",
     "Privatsphäre Einstellung - Für den genauen Standort gibt es jetzt Möglichkeiten für wen es angezeigt wird",
+    "Profil - Sprachen wurde um 'Polnisch' und 'Niederländisch' erweitert",
+    "Profil - Interessen wurde um 'online Treffen' erweitert",
     "verschiedene kleine Style-Anpassungen",
     "verschiedene kleine Fehlerbehebungen",
     "verschiedene kleine Verbesserungen"
