@@ -753,6 +753,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       reiseplanungOn = true;
                       eventMarkerOn = false;
                       friendMarkerOn = false;
+                      filterOn = false;
+                      filterList = [];
+
                       setState(() {});
 
                       Navigator.pop(context);
@@ -854,7 +857,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (filterList.isNotEmpty) {
       filterOn = true;
       popupActive = true;
-      createPopupProfils(profils);
+      createPopupProfils(profils, spezialActivation: true);
       createPopupCityInformations(profils);
     } else {
       filterOn = false;
@@ -929,7 +932,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     windowSetState(() {});
   }
 
-  createPopupProfils(profils) {
+  createPopupProfils(profils, {spezialActivation = false}) {
     popupItems = [];
     popupTyp = "profils";
     var selectUserProfils = [];
@@ -946,7 +949,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       flexibleSpace: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.only(left: 50, right: 20, top: 5, bottom: 5),
-        child: Text(selectPopupMenuText(profils),
+        child: Text(selectPopupMenuText(profils, spezialActivation),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -1033,9 +1036,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
     return popupItems;
   }
 
-  selectPopupMenuText(profils) {
-    if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
-    if (filterOn) return AppLocalizations.of(context).filterErgebnisse;
+  selectPopupMenuText(profils, spezialActivation) {
+    if(spezialActivation){
+      if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
+      if (filterOn) return AppLocalizations.of(context).filterErgebnisse;
+    }
+
 
     if (currentMapZoom < kontinentZoom) {
       return createPopupWindowTitle(profils, "kontinente");
@@ -1101,7 +1107,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         toolbarHeight: 30,
         backgroundColor: Colors.white,
         flexibleSpace: Center(
-            child: Text(selectPopupMenuText(event["profils"]),
+            child: Text(selectPopupMenuText(event["profils"], false),
                 style: const TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold))),
         pinned: true,
@@ -1225,7 +1231,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
       double lattShift = 0.002;// = 14 => 7.5 = 0.07;
       double longtShift = 0.001;// = 14 => 7.5 = 0.02;
 
-      if(currentMapZoom > cityZoom && currentMapZoom < 10 ){
+      if (currentMapZoom > countryZoom && currentMapZoom < cityZoom){
+        lattShift = 0.4;
+        longtShift = 0.2;
+      }
+      else if(currentMapZoom > cityZoom && currentMapZoom < 10 ){
         lattShift = 0.07;
         longtShift = 0.02;
       } else if (currentMapZoom > 10 && currentMapZoom < 12.5 ){
@@ -1431,10 +1441,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 friendMarkerOn = true;
                 eventMarkerOn = false;
                 reiseplanungOn = false;
+                filterOn = false;
+                filterList = [];
+
                 activateFriendlistProfils(ownProfil["friendlist"]);
 
                 popupActive = true;
-                createPopupProfils(profils);
+                createPopupProfils(profils, spezialActivation: true);
                 createPopupCityInformations(profils);
               }
 
@@ -1466,6 +1479,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 eventMarkerOn = true;
                 friendMarkerOn = false;
                 reiseplanungOn = false;
+                filterOn = false;
+                filterList = [];
+                popupActive = false;
               }
 
               setState(() {});
