@@ -59,10 +59,6 @@ class _SettingPageState extends State<SettingPage> {
       auswahlList: global_variablen.interessenListe);
   var bioTextKontroller = TextEditingController();
   var emailTextKontroller = TextEditingController();
-  var emailNewTextKontroller = TextEditingController();
-  var passwortTextKontroller1 = TextEditingController();
-  var passwortTextKontroller2 = TextEditingController();
-  var passwortCheckKontroller = TextEditingController();
   var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
   var sprachenInputBox = CustomMultiTextForm(
       auswahlList: global_variablen.sprachenListe);
@@ -482,7 +478,7 @@ class _SettingPageState extends State<SettingPage> {
               const SizedBox(height: 20),
               settingThemeContainer(AppLocalizations.of(context).spenden,  Icons.card_giftcard,
                       () async {
-                        final url = "https://www.paypal.com/paypalme/DominikMast";
+                        const url = "https://www.paypal.com/paypalme/DominikMast";
 
                         await launch(url);
                       }

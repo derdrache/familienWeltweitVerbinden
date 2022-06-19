@@ -291,5 +291,9 @@
     "reisearten": "Reisearten",
     "genauerStandortSichtbarFuer": "Genauer Standort sichtbar für ",
     "filterErgebnisse": "Alle Filter Ergebnisse",
-    "keineEventsVorhanden": "keine Events vorhanden"
+    "keineEventsVorhanden": "keine Events vorhanden",
+    "langeZeitNichtGesehen": "lange Zeit nicht mehr gesehen",
+    "innerhalbMonatsGesehen": "innerhalb eines Monats gesehen",
+    "innerhalbWocheGesehen": "innerhalb einer Woche gesehen",
+    "kuerzlichGesehen": "kürzlich gesehen"
 }
