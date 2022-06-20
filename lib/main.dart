@@ -111,7 +111,7 @@ class MyApp extends StatelessWidget {
 
   MyApp({Key key}) : super(key: key);
 
-  initialization() async {
+  _initialization() async {
     if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
       userId = FirebaseAuth.instance.currentUser.uid;
@@ -120,10 +120,10 @@ class MyApp extends StatelessWidget {
 
     if (kIsWeb) return;
 
-    setFirebaseNotifications();
+    _setFirebaseNotifications();
   }
 
-  setFirebaseNotifications() {
+  _setFirebaseNotifications() {
     final FlutterLocalNotificationsPlugin _notificationsPlugin =
         FlutterLocalNotificationsPlugin();
     var initializationSettings = const InitializationSettings(
@@ -133,9 +133,9 @@ class MyApp extends StatelessWidget {
         onSelectNotification: (payload) async {
       final Map<String, dynamic> payLoadMap = json.decode(payload);
 
-      if (payLoadMap["typ"] == "chat") changeToChat(payLoadMap["link"]);
-      if (payLoadMap["typ"] == "event") changeToEvent(payLoadMap["link"]);
-      if (payLoadMap["typ"] == "newFriend") changeToProfil(payLoadMap["link"]);
+      if (payLoadMap["typ"] == "chat") _changeToChat(payLoadMap["link"]);
+      if (payLoadMap["typ"] == "event") _changeToEvent(payLoadMap["link"]);
+      if (payLoadMap["typ"] == "newFriend") _changeToProfil(payLoadMap["link"]);
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((value) {
@@ -143,9 +143,9 @@ class MyApp extends StatelessWidget {
         var notificationTyp = json.decode(value.data.values.last)["typ"];
         var pageId = json.decode(value.data.values.last)["link"];
 
-        if (notificationTyp == "chat") changeToChat(pageId);
-        if (notificationTyp == "event") changeToEvent(pageId);
-        if (notificationTyp == "newFriend") changeToProfil(pageId);
+        if (notificationTyp == "chat") _changeToChat(pageId);
+        if (notificationTyp == "event") _changeToEvent(pageId);
+        if (notificationTyp == "newFriend") _changeToProfil(pageId);
       }
     });
 
@@ -159,14 +159,14 @@ class MyApp extends StatelessWidget {
       var notificationTyp = json.decode(message.data.values.last)["typ"];
       var pageId = json.decode(message.data.values.last)["link"];
       if (pageContext != null) {
-        if (notificationTyp == "chat") changeToChat(pageId);
-        if (notificationTyp == "chat") changeToEvent(pageId);
-        if (notificationTyp == "newFriend") changeToProfil(pageId);
+        if (notificationTyp == "chat") _changeToChat(pageId);
+        if (notificationTyp == "chat") _changeToEvent(pageId);
+        if (notificationTyp == "newFriend") _changeToProfil(pageId);
       }
     });
   }
 
-  changeToChat(chatId) async {
+  _changeToChat(chatId) async {
     var groupChatData =
         await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
@@ -174,14 +174,14 @@ class MyApp extends StatelessWidget {
         builder: (_) => ChatDetailsPage(groupChatData: groupChatData)));
   }
 
-  changeToEvent(eventId) async {
+  _changeToEvent(eventId) async {
     var eventData = await EventDatabase().getData("*", "WHERE id = '$eventId'");
 
     navigatorKey.currentState?.push(
         MaterialPageRoute(builder: (_) => EventDetailsPage(event: eventData)));
   }
 
-  changeToProfil(profilId) async {
+  _changeToProfil(profilId) async {
     var profilData =
         await ProfilDatabase().getData("*", "WHERE id = '$profilId'");
     var ownName = FirebaseAuth.instance.currentUser.displayName;
@@ -202,7 +202,7 @@ class MyApp extends StatelessWidget {
     ));
 
     return FutureBuilder(
-        future: initialization(),
+        future: _initialization(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

@@ -42,11 +42,18 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   double textSize = 16;
   double healineTextSize = 18;
   var monthsUntilInactive = 3;
+  var timeDifferenceLastLogin;
+
 
   @override
   void initState() {
     checkIsOwnProfil();
     checkAccessReiseplanung();
+    timeDifferenceLastLogin = Duration(
+        microseconds: (DateTime.now().microsecondsSinceEpoch -
+            DateTime.parse(widget.profil["lastLogin"].toString())
+                .microsecondsSinceEpoch)
+            .abs());
 
     super.initState();
   }
@@ -81,12 +88,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   getMonthDifference() {
     widget.profil["lastLogin"] =
         widget.profil["lastLogin"] ?? DateTime.parse("2022-02-13");
-    var timeDifference = Duration(
-        microseconds: (DateTime.now().microsecondsSinceEpoch -
-                DateTime.parse(widget.profil["lastLogin"].toString())
-                    .microsecondsSinceEpoch)
-            .abs());
-    return timeDifference.inDays / 30.44;
+    return timeDifferenceLastLogin.inDays / 30.44;
   }
 
   transformDateToText(dateString) {
@@ -122,6 +124,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   @override
   Widget build(BuildContext context) {
     var monthDifference = getMonthDifference();
+
 
     openChatButton() {
       return IconButton(
@@ -594,12 +597,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       var text = "";
       var color = Colors.grey;
       var size = textSize - 2;
-      var timeDifference = Duration(
-          microseconds: (DateTime.now().microsecondsSinceEpoch -
-              DateTime.parse(widget.profil["lastLogin"].toString())
-                  .microsecondsSinceEpoch)
-              .abs());
-      var daysOffline = timeDifference.inDays;
+      var daysOffline = timeDifferenceLastLogin.inDays;
 
 
       if(monthDifference >= monthsUntilInactive){

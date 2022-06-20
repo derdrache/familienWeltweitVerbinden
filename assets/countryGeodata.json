@@ -452,5 +452,7 @@
   {
     "nameGer": "Simbabwe", "nameEng": "Zimbabwe", "latt": -20.0, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
   {
+    "nameGer": "Brunei", "nameEng": "Brunei", "latt": 4.535277, "longt": 114.727669, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
+  {
     "nameGer": "Online", "nameEng": "Online", "latt": 30.1, "longt": -50.1, "kontinentGer": "Online", "kontinentEng": "Online"}
 ]}
