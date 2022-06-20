@@ -53,7 +53,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double maxZoom = 14;
   double currentMapZoom = 1.6;
   double exactZoom = 10;
-  double cityZoom = 7.5;
+  double cityZoom = 8.5;
   double countryZoom = 4.0;
   double kontinentZoom = 2.5;
   var searchAutocomplete = SearchAutocomplete();
@@ -453,6 +453,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
   createCitiesZoomLevel(list, profil, {exactLocation = false}) {
     var newCity = true;
 
+    if(exactLocation && !checkGenauerStandortPrivacy(profil)) return list;
+
     for (var i = 0; i < list.length; i++) {
       double profilLongt = profil["longt"];
       double profilLatt = profil["latt"];
@@ -511,7 +513,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         (follwerCondition && iamFollower) ||
         (friendCondition && iamFollower && followsMe);
 
-    if (accessCondition) true;
+    if (accessCondition) return true;
 
     return false;
   }
@@ -982,11 +984,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
       itemExtent: kIsWeb ? 90.0 : 80.0,
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         var profilData = selectUserProfils[index];
-        var genauerStandortKondition = (profilData["automaticLocation"] ==
+        var genauerStandortKondition = profilData["automaticLocation"] ==
                 global_var.standortbestimmung[1] ||
             profilData["automaticLocation"] ==
                     global_var.standortbestimmungEnglisch[1] &&
-                checkGenauerStandortPrivacy(profilData));
+                checkGenauerStandortPrivacy(profilData);
 
         return GestureDetector(
           onTap: () {
@@ -1095,7 +1097,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   Widget build(BuildContext context) {
     genauerStandortBezeichnung = AppLocalizations.of(context).genauerStandort;
     List<Marker> allMarker = [];
-
 
     createPopupEvents(event) {
       double screenWidth = MediaQuery.of(context).size.width;
@@ -1228,8 +1229,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     createOwnMarker() {
-      double lattShift = 0.002;// = 14 => 7.5 = 0.07;
-      double longtShift = 0.001;// = 14 => 7.5 = 0.02;
+      double lattShift = 0.002;
+      double longtShift = 0.001;
 
       if (currentMapZoom > countryZoom && currentMapZoom < cityZoom){
         lattShift = 0.4;

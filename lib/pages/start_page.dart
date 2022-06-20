@@ -46,15 +46,14 @@ class _StartPageState extends State<StartPage> {
   }
 
   _asyncMethod() async {
-    checkNewVersion();
+    _checkNewVersion();
 
-    checkAndUpdateProfil();
+    _checkAndUpdateProfil();
 
-    showPatchnotes();
+    _showPatchnotes();
   }
 
-
-  checkNewVersion() async{
+  void _checkNewVersion() async{
     if(kIsWeb) return;
 
     var updateInfo = await InAppUpdate.checkForUpdate();
@@ -67,7 +66,7 @@ class _StartPageState extends State<StartPage> {
 
   }
 
-  checkAndUpdateProfil() async {
+  void _checkAndUpdateProfil() async {
     if (userName == null) return;
 
     var dbData = await ProfilDatabase()
@@ -92,14 +91,14 @@ class _StartPageState extends State<StartPage> {
     if (automaticLocation != null &&
         automaticLocation != standortbestimmung[0] &&
         automaticLocation != standortbestimmungEnglisch[0]) {
-      setAutomaticLoaction(automaticLocation);
+      _setAutomaticLoaction(automaticLocation);
     }
 
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
   }
 
-  showPatchnotes() async {
+  void _showPatchnotes() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var buildNumber = int.parse(packageInfo.buildNumber);
 
@@ -110,7 +109,7 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
-  setAutomaticLoaction(automaticLocationStatus) async {
+  void _setAutomaticLoaction(automaticLocationStatus) async {
     var ownProfil = Hive.box('secureBox').get("ownProfil");
 
     if (DateTime.now()
@@ -131,7 +130,7 @@ class _StartPageState extends State<StartPage> {
           automaticLocationStatus == standortbestimmungEnglisch[1]) {
 
         ProfilDatabase().updateProfilLocation(userId, {
-          "city": nearstLocationData["city"],
+          "ort": nearstLocationData["city"],
           "land": nearstLocationData["country"],
           "longt": currentPosition.longitude,
           "latt": currentPosition.latitude,
