@@ -38,6 +38,11 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
 
   
   saveAutomaticLocation() async {
+    if(widget.profil["reiseart"] == "fixed location" || widget.profil["reiseart"] == "Fester Standort"){
+      customSnackbar(context, AppLocalizations.of(context).automatischerStandortNichtMoeglich);
+      return;
+    }
+
     var locationAuswahl = automaticLocationDropdown.getSelected();
 
     if (locationAuswahl != standortbestimmung[0] &&

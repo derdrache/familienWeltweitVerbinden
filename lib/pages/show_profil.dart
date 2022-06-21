@@ -22,7 +22,7 @@ import '../widgets/profil_image.dart';
 // ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
   String userName;
-  var profil;
+  Map profil;
   var ownProfil;
 
   ShowProfilPage({Key key, this.userName, this.profil, this.ownProfil = false})
@@ -58,6 +58,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     super.initState();
   }
 
+  checkIsOwnProfil() {
+    if (widget.profil["id"] == userID) widget.ownProfil = true;
+  }
+
   checkAccessReiseplanung() {
     var hasReiseplanungAccess = false;
     var reiseplanungSetting = widget.profil["reiseplanungPrivacy"];
@@ -79,10 +83,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     return hasReiseplanungAccess;
-  }
-
-  checkIsOwnProfil() {
-    if (widget.profil["id"] == userID) widget.ownProfil = true;
   }
 
   getMonthDifference() {
