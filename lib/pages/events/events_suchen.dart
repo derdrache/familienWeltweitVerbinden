@@ -1,6 +1,10 @@
+import 'package:familien_suche/services/locationsService.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
+import 'dart:ui';
 
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/custom_appbar.dart';
@@ -21,12 +25,11 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
   var searchAutocomplete = SearchAutocomplete();
   dynamic eventsBackup = [];
   var allEvents = [];
-  var allEventCities = <dynamic>{};
-  var allEventCountries = <dynamic>{};
-  var allEventSprachen =
-      global_var.sprachenListe + global_var.sprachenListeEnglisch;
+  var allEventCities = [];
+  var allEventCountries = [];
   bool filterOn = false;
   var filterList = [];
+  var isLoading = true;
 
   @override
   void initState() {
@@ -36,6 +39,10 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
   }
 
   initialize() async {
+    var spracheIstDeutsch = kIsWeb
+        ? window.locale.languageCode == "de"
+        : Platform.localeName == "de_DE";
+
     eventsBackup = await EventDatabase().getData(
         "*",
         "WHERE art != 'privat' AND art != 'private' AND erstelltVon != '" +
@@ -46,9 +53,17 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     if (eventsBackup == false) eventsBackup = [];
     allEvents = eventsBackup;
 
+    isLoading = false;
+
     for (var event in eventsBackup) {
-      allEventCities.add(event["stadt"]);
-      allEventCountries.add(event["land"]);
+      if (event["stadt"] != "Online") allEventCities.add(event["stadt"]);
+      if (event["land"] != "Online") {
+        var countryData = LocationService().getCountryLocation(event["land"]);
+
+        allEventCountries.add(spracheIstDeutsch
+            ? countryData["nameGer"]
+            : countryData["nameEng"]);
+      }
     }
 
     searchAutocomplete = SearchAutocomplete(
@@ -65,11 +80,11 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
   filterShowEvents() {
     var filterProfils = [];
-    filterList = filterList.isNotEmpty
-        ? filterList
-        : searchAutocomplete.getSelected().isEmpty
-            ? []
-            : searchAutocomplete.getSelected();
+
+    if (filterList.isEmpty && searchAutocomplete.getSelected().isNotEmpty) {
+      filterList = searchAutocomplete.getSelected();
+    }
+
     for (var event in eventsBackup) {
       if (checkIfInFilter(event, filterList)) filterProfils.add(event);
     }
@@ -89,9 +104,10 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
     var spracheMatch = checkMatch(filterList, eventSprache,
         global_var.sprachenListe + global_var.sprachenListeEnglisch);
-    var stadtMatch =
-        checkMatch(filterList, [eventStadt], allEventCities, userSearch: true);
-    var countryMatch = checkMatch(filterList, [eventLand], allEventCountries);
+    var stadtMatch = checkMatch(filterList, [eventStadt], allEventCities,
+        simpleSearch: true);
+    var countryMatch = checkMatch(filterList, [eventLand], allEventCountries,
+        simpleSearch: true);
     var typMatch = checkMatch(filterList, [eventTyp],
         global_var.eventTyp + global_var.eventTypEnglisch);
 
@@ -100,7 +116,8 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     return false;
   }
 
-  checkMatch(List selected, List checkList, globalList, {userSearch = false}) {
+  checkMatch(List selected, List checkList, globalList,
+      {simpleSearch = false}) {
     bool globalMatch = false;
     bool match = false;
 
@@ -109,10 +126,11 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
       if (checkList.contains(select)) match = true;
 
-      if (userSearch) continue;
+      if (simpleSearch) continue;
 
       if (globalMatch && !match) {
         int halfListNumber = (globalList.length / 2).toInt();
+
         var positionGlobal = globalList.indexOf(select);
         var calculatePosition = positionGlobal < halfListNumber
             ? positionGlobal + halfListNumber
@@ -252,11 +270,8 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     filterButton() {
       return IconButton(
           padding: EdgeInsets.zero,
-          icon: filterOn
-              ? Icon(Icons.filter_list_off,
-                  size: 32, color: Theme.of(context).colorScheme.primary)
-              : Icon(Icons.filter_list,
-                  size: 32, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(filterOn ? Icons.filter_list_off : Icons.filter_list,
+              size: 32, color: Theme.of(context).colorScheme.primary),
           onPressed: () {
             openFilterWindow();
           });
@@ -276,10 +291,13 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
                     child: allEvents.isEmpty
                         ? Container(
                             margin: const EdgeInsets.only(top: 50),
-                            child: Text(
-                              AppLocalizations.of(context).keineEventsVorhanden,
-                              style: const TextStyle(fontSize: 30),
-                            ))
+                            child: isLoading
+                                ? const CircularProgressIndicator()
+                                : Text(
+                                    AppLocalizations.of(context)
+                                        .keineEventsVorhanden,
+                                    style: const TextStyle(fontSize: 30),
+                                  ))
                         : Wrap(children: showEvents()),
                   ),
                 ),

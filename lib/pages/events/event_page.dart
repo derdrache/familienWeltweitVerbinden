@@ -2,7 +2,6 @@ import 'package:familien_suche/pages/events/events_suchen.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -27,6 +26,7 @@ class _EventPageState extends State<EventPage>{
   var userId = FirebaseAuth.instance.currentUser.uid;
   dynamic myEvents = [];
   dynamic interestEvents = [];
+  double textSizeHeadline = 20.0;
 
 
   @override
@@ -36,6 +36,8 @@ class _EventPageState extends State<EventPage>{
       List<Widget> eventCards = [];
 
       for(var event in events){
+        bool isOwner = event["erstelltVon"] == userId;
+
         eventCards.add(
             Stack(children: [
               EventCard(
@@ -43,7 +45,7 @@ class _EventPageState extends State<EventPage>{
                   withInteresse: withInteresse,
                   afterPageVisit: ()=> changePage(context, StartPage(selectedIndex: 1,))
               ),
-              if(event["erstelltVon"] == userId) Positioned(
+              if(isOwner) Positioned(
                 right: 10,
                 top:10,
                 child: FutureBuilder(
@@ -82,7 +84,7 @@ class _EventPageState extends State<EventPage>{
                   margin: const EdgeInsets.only(left: 10),
                   child: Text(
                     AppLocalizations.of(context).favoritenEvents,
-                    style: const TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: textSizeHeadline),
                   )
               ),
               FutureBuilder(
@@ -100,7 +102,6 @@ class _EventPageState extends State<EventPage>{
                     }
 
                     if(data != null && data.isNotEmpty){
-
                       return Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -117,7 +118,7 @@ class _EventPageState extends State<EventPage>{
                         child: Text(
                           AppLocalizations.of(context).nochKeineEventsAusgewaehlt,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 20, color: Colors.grey),
+                          style: TextStyle(fontSize: textSizeHeadline, color: Colors.grey),
                         )
                     );
 
@@ -139,7 +140,7 @@ class _EventPageState extends State<EventPage>{
                   margin: const EdgeInsets.only(left: 10),
                   child: Text(
                     AppLocalizations.of(context).meineEvents,
-                    style: const TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: textSizeHeadline),
                   )
               ),
               FutureBuilder(
@@ -157,7 +158,6 @@ class _EventPageState extends State<EventPage>{
                     }
 
                     if(data != null && data.isNotEmpty){
-
                       return Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -174,7 +174,7 @@ class _EventPageState extends State<EventPage>{
                         child: Text(
                           AppLocalizations.of(context).nochKeineEventsErstellt,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 20, color: Colors.grey),
+                          style: TextStyle(fontSize: textSizeHeadline, color: Colors.grey),
                         )
                     );
 
