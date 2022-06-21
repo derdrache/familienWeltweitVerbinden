@@ -30,7 +30,6 @@ class ErkundenPage extends StatefulWidget {
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
-  Box secureBox = Hive.box('secureBox');
   var localProfils = Hive.box('secureBox').get("profils") ?? [];
   List profils = Hive.box('secureBox').get("profils") ?? [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
@@ -69,7 +68,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       eventMarkerOn = false,
       reiseplanungOn = false,
       filterOn = false;
-  var genauerStandortBezeichnung = "";
+
 
   @override
   void initState() {
@@ -157,7 +156,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
     }
 
-    secureBox.put("profils", checkedProfils);
+    Hive.box('secureBox').put("profils", checkedProfils);
 
     profils = checkedProfils;
     removeProfilsAndCreateAllUserName();
@@ -941,8 +940,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     for (var profil in profils) {
       if (profil["name"] != null) selectUserProfils.add(profil);
-
-      if (profil["ort"].isEmpty) profil["ort"] = genauerStandortBezeichnung;
     }
 
     popupItems.add(SliverAppBar(
@@ -1095,7 +1092,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
-    genauerStandortBezeichnung = AppLocalizations.of(context).genauerStandort;
     List<Marker> allMarker = [];
 
     createPopupEvents(event) {
