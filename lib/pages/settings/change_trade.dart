@@ -8,12 +8,15 @@ import '../../widgets/custom_appbar.dart';
 
 class ChangeTradePage extends StatelessWidget {
   var userId = FirebaseAuth.instance.currentUser.uid;
-  var textKontroller;
+  var oldText;
+  var textKontroller = TextEditingController();
 
-  ChangeTradePage({Key key, this.textKontroller}) : super(key: key);
+  ChangeTradePage({Key key, this.oldText}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    textKontroller.text = oldText;
+
     saveButton() {
       return IconButton(
           icon: const Icon(Icons.done),

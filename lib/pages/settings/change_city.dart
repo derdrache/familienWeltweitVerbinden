@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../widgets/custom_appbar.dart';
@@ -6,9 +7,9 @@ import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeCityPage extends StatefulWidget {
-  var userId;
+  var userId = FirebaseAuth.instance.currentUser.uid;
 
-  ChangeCityPage({Key key, this.userId}) : super(key: key);
+  ChangeCityPage({Key key}) : super(key: key);
 
   @override
   _ChangeCityPageState createState() => _ChangeCityPageState();

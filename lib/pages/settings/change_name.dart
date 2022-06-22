@@ -7,10 +7,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeNamePage extends StatelessWidget {
-  var userId;
+  var userId = FirebaseAuth.instance.currentUser.uid;
   var oldName;
 
-  ChangeNamePage({Key key, this.userId, this.oldName})
+  ChangeNamePage({Key key, this.oldName})
       : nameKontroller = TextEditingController(text: oldName);
   var nameKontroller;
 
