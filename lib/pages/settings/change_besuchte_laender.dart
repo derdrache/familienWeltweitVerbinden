@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -9,12 +10,12 @@ import '../../services/locationsService.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeBesuchteLaenderPage extends StatefulWidget {
-  String userId;
+  var userId = FirebaseAuth.instance.currentUser.uid;
   List selected;
   bool isGerman;
 
   ChangeBesuchteLaenderPage(
-      {Key key, this.userId, this.selected, this.isGerman})
+      {Key key, this.selected, this.isGerman})
       : super(key: key);
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -9,12 +10,12 @@ import '../../global/variablen.dart' as global_variablen;
 import '../../widgets/custom_appbar.dart';
 
 class ChangeInteressenPage extends StatelessWidget {
-  var userId;
+  var userId = FirebaseAuth.instance.currentUser.uid;
   var selected;
   var interessenInputBox;
   var isGerman;
 
-  ChangeInteressenPage({Key key, this.userId, this.selected, this.isGerman})
+  ChangeInteressenPage({Key key, this.selected, this.isGerman})
       : interessenInputBox = CustomMultiTextForm(
           auswahlList: isGerman
               ? global_variablen.interessenListe
