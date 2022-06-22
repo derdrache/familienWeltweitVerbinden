@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -8,10 +9,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeChildrenPage extends StatelessWidget {
-  var userId;
+  var userId = FirebaseAuth.instance.currentUser.uid;
   var childrenBirthdatePickerBox;
 
-  ChangeChildrenPage({Key key,this.userId,this.childrenBirthdatePickerBox}) : super(key: key);
+  ChangeChildrenPage({Key key,this.childrenBirthdatePickerBox}) : super(key: key);
 
 
   @override

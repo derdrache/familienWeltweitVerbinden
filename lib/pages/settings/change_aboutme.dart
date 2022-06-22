@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -7,21 +8,21 @@ import '../../widgets/custom_appbar.dart';
 
 
 class ChangeAboutmePage extends StatelessWidget {
-  var userId;
-  var bioTextKontroller;
+  var userId = FirebaseAuth.instance.currentUser.uid;
+  var oldText;
+  var textKontroller = TextEditingController();
 
-
-  ChangeAboutmePage({Key key,this.userId,this.bioTextKontroller}) : super(key: key);
+  ChangeAboutmePage({Key key,this.oldText}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
+    textKontroller.text = oldText;
 
     saveButton(){
       return IconButton(
         icon: Icon(Icons.done),
         onPressed: () async {
-          await ProfilDatabase().updateProfil("aboutme = '${bioTextKontroller.text}'",
+          await ProfilDatabase().updateProfil("aboutme = '${textKontroller.text}'",
               "WHERE id = '$userId'");
           customSnackbar(context,
               AppLocalizations.of(context).ueberMich + " "+
@@ -40,7 +41,7 @@ class ChangeAboutmePage extends StatelessWidget {
         children: [
           customTextInput(
             AppLocalizations.of(context).ueberMich,
-            bioTextKontroller,
+              textKontroller,
             moreLines: 10,
             hintText: AppLocalizations.of(context).aboutusHintText
           )
