@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -10,12 +11,12 @@ import '../../widgets/google_autocomplete.dart';
 import '../../widgets/month_picker.dart';
 
 class ChangeReiseplanungPage extends StatefulWidget {
-  String userId;
+  var userId = FirebaseAuth.instance.currentUser.uid;
   List reiseplanung;
   bool isGerman;
 
   ChangeReiseplanungPage(
-      {Key key, this.userId, this.reiseplanung, this.isGerman})
+      {Key key,this.reiseplanung, this.isGerman})
       : super(key: key);
 
   @override

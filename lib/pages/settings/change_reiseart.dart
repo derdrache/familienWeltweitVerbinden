@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -7,13 +8,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeReiseartPage extends StatelessWidget {
-  var userId;
+  var userId = FirebaseAuth.instance.currentUser.uid;
   var oldInput;
   var reiseArtInput;
   var selected;
   var isGerman;
 
-  ChangeReiseartPage({Key key, this.userId, this.oldInput, this.isGerman})
+  ChangeReiseartPage({Key key, this.oldInput, this.isGerman})
       : reiseArtInput = CustomDropDownButton(
           items: isGerman
               ? global_variablen.reisearten
