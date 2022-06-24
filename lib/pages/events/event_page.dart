@@ -14,69 +14,68 @@ import '../../widgets/badge_icon.dart';
 import 'eventCard.dart';
 import 'events_erstellen.dart';
 
-
-class EventPage extends StatefulWidget{
+class EventPage extends StatefulWidget {
   const EventPage({Key key}) : super(key: key);
 
   @override
   _EventPageState createState() => _EventPageState();
 }
 
-class _EventPageState extends State<EventPage>{
+class _EventPageState extends State<EventPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
-  dynamic myEvents = [];
-  dynamic interestEvents = [];
   double textSizeHeadline = 20.0;
 
-
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
 
-    createEventCards(events, withInteresse){
+    createEventCards(events, withInteresse) {
       List<Widget> eventCards = [];
 
-      for(var event in events){
+      for (var event in events) {
         bool isOwner = event["erstelltVon"] == userId;
 
-        eventCards.add(
-            Stack(children: [
-              EventCard(
-                  event: event,
-                  withInteresse: withInteresse,
-                  afterPageVisit: ()=> changePage(context, StartPage(selectedIndex: 1,))
-              ),
-              if(isOwner) Positioned(
+        eventCards.add(Stack(
+          children: [
+            EventCard(
+                event: event,
+                withInteresse: withInteresse,
+                afterPageVisit: () => changePage(
+                    context,
+                    StartPage(
+                      selectedIndex: 1,
+                    ))),
+            if (isOwner)
+              Positioned(
                 right: 10,
-                top:10,
+                top: 10,
                 child: FutureBuilder(
-                    future: EventDatabase().getData("freischalten", "WHERE id = '${event["id"]}'"),
+                    future: EventDatabase()
+                        .getData("freischalten", "WHERE id = '${event["id"]}'"),
                     builder: (context, snap) {
-                      var data = snap.hasData ? snap.data.length.toString() : "";
-                      if(data == "0") data = "";
+                      var data =
+                          snap.hasData ? snap.data.length.toString() : "";
+                      if (data == "0") data = "";
 
                       return BadgeIcon(
                         text: data.toString(),
                       );
-                    }
-                ),
+                    }),
               )
-            ],)
-
-        );
+          ],
+        ));
       }
 
       return eventCards;
     }
 
-    meineInteressiertenEventsBox(){
+    meineInteressiertenEventsBox() {
       return Container(
           padding: const EdgeInsets.only(top: 10),
           width: double.infinity,
           decoration: BoxDecoration(
               border: Border(
-                  bottom: BorderSide(width: 1, color: global_var.borderColorGrey)
-              )
-          ),
+                  bottom:
+                      BorderSide(width: 1, color: global_var.borderColorGrey))),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -85,30 +84,27 @@ class _EventPageState extends State<EventPage>{
                   child: Text(
                     AppLocalizations.of(context).favoritenEvents,
                     style: TextStyle(fontSize: textSizeHeadline),
-                  )
-              ),
+                  )),
               FutureBuilder(
                   future: EventDatabase().getData("*",
                       "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
-                      returnList: true
-                  ),
-                  builder: (context, snapshot){
+                      returnList: true),
+                  builder: (context, snapshot) {
                     var secureBox = Hive.box('secureBox');
                     dynamic data = secureBox.get("interestEvents");
 
-                    if(snapshot.hasData){
-                      data= snapshot.data == false ? [] : snapshot.data;
+                    if (snapshot.hasData) {
+                      data = snapshot.data == false ? [] : snapshot.data;
                       secureBox.put("interestEvents", data);
                     }
 
-                    if(data != null && data.isNotEmpty){
+                    if (data != null && data.isNotEmpty) {
                       return Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
                               direction: Axis.vertical,
-                              children: createEventCards(data, true)
-                          ),
+                              children: createEventCards(data, true)),
                         ),
                       );
                     }
@@ -116,20 +112,18 @@ class _EventPageState extends State<EventPage>{
                     return Center(
                         heightFactor: 5,
                         child: Text(
-                          AppLocalizations.of(context).nochKeineEventsAusgewaehlt,
+                          AppLocalizations.of(context)
+                              .nochKeineEventsAusgewaehlt,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: textSizeHeadline, color: Colors.grey),
-                        )
-                    );
-
+                          style: TextStyle(
+                              fontSize: textSizeHeadline, color: Colors.grey),
+                        ));
                   }),
-
             ],
-          )
-      );
+          ));
     }
 
-    meineErstellenEventsBox(){
+    meineErstellenEventsBox() {
       return Container(
           padding: const EdgeInsets.only(top: 10),
           width: double.infinity,
@@ -141,30 +135,27 @@ class _EventPageState extends State<EventPage>{
                   child: Text(
                     AppLocalizations.of(context).meineEvents,
                     style: TextStyle(fontSize: textSizeHeadline),
-                  )
-              ),
+                  )),
               FutureBuilder(
                   future: EventDatabase().getData("*",
-                      "WHERE erstelltVon = '"+userId+"' ORDER BY wann ASC",
-                      returnList: true
-                  ),
-                  builder: (context, snapshot){
+                      "WHERE erstelltVon = '" + userId + "' ORDER BY wann ASC",
+                      returnList: true),
+                  builder: (context, snapshot) {
                     var secureBox = Hive.box('secureBox');
                     dynamic data = secureBox.get("myEvents");
 
-                    if(snapshot.hasData){
-                      data= snapshot.data == false ? [] : snapshot.data;
+                    if (snapshot.hasData) {
+                      data = snapshot.data == false ? [] : snapshot.data;
                       secureBox.put("myEvents", data);
                     }
 
-                    if(data != null && data.isNotEmpty){
+                    if (data != null && data.isNotEmpty) {
                       return Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
                               direction: Axis.vertical,
-                              children: createEventCards(data, false)
-                          ),
+                              children: createEventCards(data, false)),
                         ),
                       );
                     }
@@ -174,27 +165,22 @@ class _EventPageState extends State<EventPage>{
                         child: Text(
                           AppLocalizations.of(context).nochKeineEventsErstellt,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: textSizeHeadline, color: Colors.grey),
-                        )
-                    );
-
+                          style: TextStyle(
+                              fontSize: textSizeHeadline, color: Colors.grey),
+                        ));
                   }),
             ],
-          )
-      );
+          ));
     }
 
     return Scaffold(
       body: Container(
-          padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
-          child: Column(
-              children: [
-                Expanded(child: meineInteressiertenEventsBox()),
-                Expanded(child: meineErstellenEventsBox()),
-                const SizedBox(height: 50)
-              ]
-          )
-      ),
+          padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
+          child: Column(children: [
+            Expanded(child: meineInteressiertenEventsBox()),
+            Expanded(child: meineErstellenEventsBox()),
+            const SizedBox(height: 50)
+          ])),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -202,17 +188,16 @@ class _EventPageState extends State<EventPage>{
               heroTag: "alleEvents",
               child: const Icon(Icons.search),
               onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const EventsSuchenPage()
-                  )).whenComplete(() => setState(() {
-              }))
-          ),
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const EventsSuchenPage()))
+                  .whenComplete(() => setState(() {}))),
           const SizedBox(width: 10),
           FloatingActionButton(
               heroTag: "event hinzufügen",
               child: const Icon(Icons.add),
-              onPressed: () => global_functions.changePage(context, const EventErstellen())
-          ),
+              onPressed: () =>
+                  global_functions.changePage(context, const EventErstellen())),
         ],
       ),
     );

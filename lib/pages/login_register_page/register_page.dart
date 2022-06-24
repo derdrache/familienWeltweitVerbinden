@@ -64,13 +64,12 @@ class _RegisterPageState extends State<RegisterPage> {
         } else if (error.code == "network-request-failed") {
           customSnackbar(
               context, AppLocalizations.of(context).keineVerbindungInternet);
-        } else{
+        } else {
           sendEmail({
             "title": "Registrierungs Problem",
             "inhalt": """
-                              Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
-                              Folgendes Problem ist aufgetaucht: $error
-                          """
+             Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
+             Folgendes Problem ist aufgetaucht: $error"""
           });
         }
 

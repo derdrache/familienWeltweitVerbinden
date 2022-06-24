@@ -36,19 +36,38 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
   }
 
+  checkNewMessageCounter() async {
+    var dbNewMessages =
+        await ProfilDatabase().getData("newMessages", "WHERE id = '$userId'");
+    num realNewMessages = 0;
+
+    for (var group in globalChatGroups) {
+      var users = group["users"];
+      realNewMessages += users[userId]["newMessages"];
+    }
+
+    if (dbNewMessages != realNewMessages) {
+      ProfilDatabase().updateProfil(
+          "newMessages = '$realNewMessages'", "WHERE id = '$userId'");
+    }
+  }
+
   initilizeCreateChatData() {
-    dynamic userFriendIdList = Hive.box("secureBox").get("ownProfil")["friendlist"];
-    dbProfilData =Hive.box("secureBox").get("profils");
+    dynamic userFriendIdList =
+        Hive.box("secureBox").get("ownProfil")["friendlist"];
+    dbProfilData = Hive.box("secureBox").get("profils");
     allName = [];
     userFriendlist = [];
     var ownProfil = Hive.box('secureBox').get("ownProfil");
 
-
     for (var data in dbProfilData) {
-      if(!ownProfil["geblocktVon"].contains(data["id"])) allName.add(data["name"]);
+      if (!ownProfil["geblocktVon"].contains(data["id"])) {
+        allName.add(data["name"]);
+      }
 
       for (var user in userFriendIdList) {
-        if (data["id"] == user && !ownProfil["geblocktVon"].contains(data["id"])) {
+        if (data["id"] == user &&
+            !ownProfil["geblocktVon"].contains(data["id"])) {
           userFriendlist.add(data["name"]);
           break;
         }
@@ -58,32 +77,6 @@ class _ChatPageState extends State<ChatPage> {
 
   selectChatpartnerWindow() async {
     userFriendlist ??= [];
-
-    return showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            height: 800,
-            title: AppLocalizations.of(context).neuenChatEroeffnen,
-            children: [
-              personenSuchBox(buildContext, allName),
-              ...createFriendlistBox(userFriendlist)
-            ],
-          );
-        }
-    );
-
-  }
-
-  searchUser() async {
-    var chatPartner = searchAutocomplete.getSelected()[0];
-    var chatPartnerId =
-        await ProfilDatabase().getData("id", "WHERE name = '$chatPartner'");
-
-    validCheckAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
-  }
-
-  Widget personenSuchBox(buildContext, allName) {
     searchAutocomplete = SearchAutocomplete(
       hintText: AppLocalizations.of(context).personSuchen,
       searchableItems: allName,
@@ -92,15 +85,33 @@ class _ChatPageState extends State<ChatPage> {
       },
     );
 
-    return Center(child: SizedBox(width: 300, child: searchAutocomplete));
+    return showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+            height: 800,
+            title: AppLocalizations.of(context).neuenChatEroeffnen,
+            children: [
+              Center(child: SizedBox(width: 300, child: searchAutocomplete)),
+              ...createFriendlistBox(userFriendlist)
+            ],
+          );
+        });
+  }
+
+  searchUser() async {
+    var chatPartner = searchAutocomplete.getSelected()[0];
+    var chatPartnerId =
+        await ProfilDatabase().getData("id", "WHERE name = '$chatPartner'");
+
+    checkValidAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
   }
 
   List<Widget> createFriendlistBox(userFriendlist) {
     List<Widget> friendsBoxen = [];
     for (var friend in userFriendlist) {
-
       friendsBoxen.add(GestureDetector(
-        onTap: () => validCheckAndOpenChatgroup(name: friend),
+        onTap: () => checkValidAndOpenChatgroup(name: friend),
         child: Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
@@ -123,19 +134,7 @@ class _ChatPageState extends State<ChatPage> {
     return friendsBoxen;
   }
 
-  findUserGetId(user) async {
-    var foundOnName =
-        await ProfilDatabase().getData("id", "WHERE name = '$user'");
-    var foundOnEmail =
-        await ProfilDatabase().getData("id", "WHERE email = '$user'");
-
-    if (foundOnName != null) return foundOnName;
-    if (foundOnEmail != null) return foundOnEmail;
-
-    return null;
-  }
-
-  validCheckAndOpenChatgroup({chatPartnerID, name}) async {
+  checkValidAndOpenChatgroup({chatPartnerID, name}) async {
     chatPartnerID ??=
         await ProfilDatabase().getData("id", "WHERE name = '$name'");
     var checkAndIndex = checkNewChatGroup(chatPartnerID);
@@ -161,31 +160,18 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   checkNewChatGroup(chatPartnerId) {
-    var check = [true, -1];
+    var isNewChat = true;
+    var chatIndex = -1;
 
     for (var i = 0; i < globalChatGroups.length; i++) {
       var users = globalChatGroups[i]["users"];
       if (users[chatPartnerId] != null) {
-        check = [false, i];
+        isNewChat = false;
+        chatIndex = i;
       }
     }
 
-    return check;
-  }
-
-  checkNewMessageCounter() async {
-    var dbNewMessages =
-        await ProfilDatabase().getData("newMessages", "WHERE id = '$userId'");
-    num realNewMessages = 0;
-
-    for (var group in globalChatGroups) {
-      var users = group["users"];
-      realNewMessages += users[userId]["newMessages"];
-    }
-
-    if (dbNewMessages != realNewMessages) {
-      ProfilDatabase().updateProfil("newMessages = '$realNewMessages'", "WHERE id = '$userId'");
-    }
+    return [isNewChat, chatIndex];
   }
 
   cutMessage(message) {
@@ -200,11 +186,32 @@ class _ChatPageState extends State<ChatPage> {
     return message;
   }
 
+  removeBlockedChats(chats){
+    var newChatList = [];
+    var blockedVonList = Hive.box('secureBox').get("ownProfil")["geblocktVon"];
+
+    for (var chat in chats) {
+      var isBlocked = false;
+
+      for (var user in chat["users"].keys) {
+        if (user == userId) continue;
+
+        if (blockedVonList.contains(user)) {
+          isBlocked = true;
+        }
+      }
+      if (!isBlocked) newChatList.add(chat);
+    }
+
+    return newChatList;
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    chatUserList(groupdata) {
-      List<Widget> groupContainer = [];
+    createChatGroupContainers(groupdata) {
+      List<Widget> chatGroupContainers = [];
+
       for (dynamic group in groupdata) {
         String chatPartnerName = "";
         Map chatPartnerProfil;
@@ -225,15 +232,19 @@ class _ChatPageState extends State<ChatPage> {
           }
         }
 
-        if (chatPartnerName.isEmpty) chatPartnerName = AppLocalizations.of(context).geloeschterUser;
-        chatPartnerProfil ??= {"bild": ["assets/WeltFlugzeug.png"]};
+        if (chatPartnerName.isEmpty) {
+          chatPartnerName = AppLocalizations.of(context).geloeschterUser;
+        }
+        chatPartnerProfil ??= {
+          "bild": ["assets/WeltFlugzeug.png"]
+        };
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
         var lastMessageTime =
             DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
 
-        groupContainer.add(InkWell(
+        chatGroupContainers.add(InkWell(
           onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -257,7 +268,6 @@ class _ChatPageState extends State<ChatPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(chatPartnerName,
-
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 10),
@@ -301,17 +311,7 @@ class _ChatPageState extends State<ChatPage> {
         ));
       }
 
-      return MediaQuery.removePadding(
-        removeTop: true,
-        context: context,
-        child: ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-          }),
-          child: ListView(shrinkWrap: true, children: groupContainer),
-        ),
-      );
+      return chatGroupContainers;
     }
 
     return Scaffold(
@@ -323,32 +323,27 @@ class _ChatPageState extends State<ChatPage> {
                   returnList: true),
               builder: (context, snapshot) {
                 var myChatBox = Hive.box("secureBox");
-                dynamic data = myChatBox.get("myChats");
+                dynamic myChats = myChatBox.get("myChats");
 
                 if (snapshot.hasData) {
-                  data = snapshot.data == false ? [] : snapshot.data;
-                  myChatBox.put("myChats", data);
+                  myChats = snapshot.data == false ? [] : snapshot.data;
+                  myChatBox.put("myChats", myChats);
                 }
 
-                if (data != null && data.isNotEmpty) {
+                if (myChats != null && myChats.isNotEmpty) {
+                  myChats = removeBlockedChats(myChats);
 
-                  var selectedChats = [];
-                  var blockedVonList = Hive.box('secureBox').get("ownProfil")["geblocktVon"];
-
-                  for(var chat in data){
-                    var isBlocked = false;
-
-                    for(var user in chat["users"].keys){
-                      if(user == userId) continue;
-
-                      if(blockedVonList.contains(user)){
-                        isBlocked = true;
-                      }
-                    }
-                    if(!isBlocked) selectedChats.add(chat);
-                  }
-
-                  return chatUserList(selectedChats);
+                  return MediaQuery.removePadding(
+                    removeTop: true,
+                    context: context,
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                        PointerDeviceKind.touch,
+                        PointerDeviceKind.mouse,
+                      }),
+                      child: ListView(shrinkWrap: true, children: createChatGroupContainers(myChats)),
+                    ),
+                  );
                 }
 
                 return Center(
