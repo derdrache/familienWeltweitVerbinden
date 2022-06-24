@@ -41,25 +41,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
   bool isLoading = false;
 
-  @override
-  void initState() {
-    sprachenAuswahlBox = CustomMultiTextForm(
-        auswahlList: isGerman
-            ? global_variablen.sprachenListe
-            : global_variablen.sprachenListeEnglisch);
-    reiseArtenAuswahlBox = CustomDropDownButton(
-      items: isGerman
-          ? global_variablen.reisearten
-          : global_variablen.reiseartenEnglisch,
-    );
-    interessenAuswahlBox = CustomMultiTextForm(
-        auswahlList: isGerman
-            ? global_variablen.interessenListe
-            : global_variablen.interessenListeEnglisch);
-    super.initState();
-  }
-
-  setLoading() {
+  changeLoading() {
     if (isLoading) {
       isLoading = false;
     } else {
@@ -70,10 +52,10 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   saveFunction() async {
-    setLoading();
+    changeLoading();
 
     if (!_formKey.currentState.validate()) {
-      setLoading();
+      changeLoading();
       return;
     }
 
@@ -88,7 +70,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     } catch (_) {
       customSnackbar(
           context, AppLocalizations.of(context).keineVerbindungInternet);
-      setLoading();
+      changeLoading();
       return;
     }
 
@@ -128,19 +110,20 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         global_functions.changePageForever(context, StartPage());
       } catch (_) {
         customSnackbar(
-            context, AppLocalizations.of(context).keineVerbindungInternet) + "?";
+                context, AppLocalizations.of(context).keineVerbindungInternet) +
+            "?";
         sendEmail({
           "title": "User hat beim Profil erstellen ein Problem",
           "inhalt": jsonEncode(data)
         });
-        setLoading();
+        changeLoading();
         return;
       }
 
       updateStadtInfoDatabase(ortMapData, userID);
     }
 
-    setLoading();
+    changeLoading();
   }
 
   updateStadtInfoDatabase(ortMapData, userId) async {
@@ -194,16 +177,24 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-    sprachenAuswahlBox.validator =
-        global_functions.checkValidationMultiTextForm(context);
-    sprachenAuswahlBox.hintText =
-        AppLocalizations.of(context).spracheAuswaehlen;
-    interessenAuswahlBox.validator =
-        global_functions.checkValidationMultiTextForm(context);
-    interessenAuswahlBox.hintText =
-        AppLocalizations.of(context).interessenAuswaehlen;
-    reiseArtenAuswahlBox.hintText =
-        AppLocalizations.of(context).artDerReiseAuswaehlen;
+    sprachenAuswahlBox = CustomMultiTextForm(
+        hintText: AppLocalizations.of(context).spracheAuswaehlen,
+        validator: global_functions.checkValidationMultiTextForm(context),
+        auswahlList: isGerman
+            ? global_variablen.sprachenListe
+            : global_variablen.sprachenListeEnglisch);
+    reiseArtenAuswahlBox = CustomDropDownButton(
+      hintText: AppLocalizations.of(context).artDerReiseAuswaehlen,
+      items: isGerman
+          ? global_variablen.reisearten
+          : global_variablen.reiseartenEnglisch,
+    );
+    interessenAuswahlBox = CustomMultiTextForm(
+        hintText: AppLocalizations.of(context).interessenAuswaehlen,
+        validator: global_functions.checkValidationMultiTextForm(context),
+        auswahlList: isGerman
+            ? global_variablen.interessenListe
+            : global_variablen.interessenListeEnglisch);
     childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
     ortAuswahlBox.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
 
@@ -274,7 +265,10 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                       )),
                 ),
                 childrenAgePickerBox,
-                customTextInput("Über uns *optional*", aboutusKontroller,
+                customTextInput(
+                    AppLocalizations.of(context).aboutusHintText +
+                        " *optional*",
+                    aboutusKontroller,
                     moreLines: 4)
               ],
             ),
