@@ -39,7 +39,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
   Timer timer;
-  Widget pufferList;
+  Widget pufferList = const Center(child: CircularProgressIndicator());
   var eventCardList = [];
   var chatPartnerProfil;
 
@@ -73,7 +73,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   _asyncMethod() async {
     await getAndSetChatData();
     writeActiveChat();
-    getChatPartnerProfil();
+    await getChatPartnerProfil();
 
     if (widget.groupChatData != false) resetNewMessageCounter();
 
@@ -81,10 +81,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     timer = Timer.periodic(
         const Duration(seconds: 10), (Timer t) => checkNewMessages());
-  }
-
-  checkNewMessages() {
-    setState(() {});
   }
 
   getAndSetChatData() async {
@@ -120,6 +116,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (widget.groupChatData == false) {
       newChat = true;
     }
+
+    setState(() {});
   }
 
   writeActiveChat() {
@@ -154,11 +152,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "WHERE id = '${widget.groupChatData["id"]}'");
   }
 
+  checkNewMessages() {
+    setState(() {});
+  }
+
   messageToDbAndClearMessageInput(message) async {
     var userID = FirebaseAuth.instance.currentUser.uid;
-
-    var messageList = nachrichtController.text.split("\n");
-    var checkMessage = messageList.join();
+    var checkMessage = nachrichtController.text.split("\n").join();
 
     if (checkMessage == "") return;
 
@@ -193,19 +193,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  countItemsInList(list, search) {
-    var count = 0;
-
-    for (var i = 0; i < list.length - search.length; i++) {
-      if ((list[i] + list[i + 1] + list[i + 1]).contains(search)) {
-        count += 1;
-        i += 1;
-      }
-    }
-
-    return count;
-  }
-
   openProfil() async {
     chatPartnerProfil ??= await ProfilDatabase()
         .getData("*", "WHERE id = '${widget.chatPartnerId}'");
@@ -220,6 +207,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ));
   }
 
+  removeAllNewLineAtTheEnd(message) {
+    while (message.endsWith('\n')) {
+      message = message.substring(0, message.length - 1);
+    }
+
+    return message;
+  }
+
   @override
   Widget build(BuildContext context) {
     messageList(messages) {
@@ -232,17 +227,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
 
+        if (message["message"] == "") continue;
+
+        message["message"] = removeAllNewLineAtTheEnd(message["message"]);
+
         if (message["von"] == userId) {
           textAlign = Alignment.centerRight;
           boxColor = Colors.greenAccent;
         }
-
-        while (message["message"].endsWith('\n')) {
-          message["message"] =
-              message["message"].substring(0, message["message"].length - 1);
-        }
-
-        if (message["message"] == "") continue;
 
         if (message["message"].contains("</eventId=")) {
           messageBox.add(Align(
@@ -321,39 +313,35 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    showMessages() {
+    messageAnzeige() {
       return FutureBuilder(
           future: ChatDatabase().getAllMessages(widget.chatId),
           builder: (
             BuildContext context,
             AsyncSnapshot snap,
           ) {
-            if (snap.connectionState == ConnectionState.waiting) {
-              return pufferList ??
-                  const Center(child: CircularProgressIndicator());
-            } else if (snap.data != null) {
+            if (snap.data != null) {
               List<dynamic> messages = snap.data;
 
               if (messages.isEmpty) {
-                pufferList = Center(
+                return Center(
                     child: Text(
                   AppLocalizations.of(context).nochKeineNachrichtVorhanden,
                   style: const TextStyle(fontSize: 20),
                 ));
-
-                return pufferList;
-              } else {
-                messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
-
-                pufferList = messageList(messages);
-                return pufferList;
               }
+
+              messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
+
+              pufferList = messageList(messages);
+              return pufferList;
             }
-            return Container();
+
+            return pufferList;
           });
     }
 
-    textEingabe() {
+    textEingabeFeld() {
       var myFocusNode = FocusNode();
 
       return Stack(
@@ -421,8 +409,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         body: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Expanded(child: showMessages()),
-            textEingabe(),
+            Expanded(child: messageAnzeige()),
+            textEingabeFeld(),
           ],
         ));
   }
