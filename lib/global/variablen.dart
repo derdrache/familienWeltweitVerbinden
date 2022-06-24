@@ -10,7 +10,7 @@ List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
   "Gemeinsam wohnen", "Gemeinsame Kinderbetreuung", "Dauerhaft reisen", "Kaffeetreff", "Online kennenlernen"];
 List<String> sprachenListe = ["Deutsch", "Englisch", "Spanisch", "Chinesisch",
   "Französisch", "Arabisch", "Russisch", "Italienisch", "Portugiesisch", "Japanisch", "Türkisch", "Polnisch", "Niederländisch"];
-List<String> eventInterval = ["einmalig", "täglich", "mehrtägig", "wöchentlich", "alle 2 Wochen" "monatlich"];
+List<String> eventInterval = ["einmalig", "täglich", "mehrtägig", "wöchentlich", "alle 2 Wochen", "monatlich"];
 List<String> eventTyp = ["offline", "online"];
 List<String> eventArt = ["privat", "halb-öffentlich", "öffentlich"];
 List<String> aufreise = ["nein", "vergangen", "aktiv"];

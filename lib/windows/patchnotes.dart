@@ -111,17 +111,21 @@ var patch140D={
   "title" : "1.4.0 - 01.07.2022",
   "inhalt": [
     "Erweiterung Reiseplanung - Es ist jetzt möglich unter Settings seine Reiseplanung einzutragen. Die Weltkarte kann nun, per Klick auf das Uhr-Icon, anzeigen welche Familien sich wo in einem bestimmten Zeitraum aufhalten werden",
+    "Android - Neuer Freund notifikation fürt jetzt beim klick direkt zum Profil",
+    "Android - Start der App wurde stark beschleunigt (ausgenommen der erste Start nach dem installieren der App)"
+    "Android - Externe Verlinkungen funktionieren nun bei Android 10 oder höher",
     "Allgemein - Benutzer können jetzt gemeldet werden",
     "Allgemein - Benutzer können jetzt geblockt werden. Geblockte Bneutzer können dich auf der Weltkarte nicht mehr sehen",
     "Registrierung - Im Login Bildschirm gibt es jetzt die Möglichkeit sich die Bestätigungsmail noch einmal senden zu lassen, falls diese nicht angekommen ist",
     "Weltkarte - die 0er Marker wurden gegen i-Marker ausgetauscht, damit besser klar wird, dass dort keine Familien zu sehen sind",
-    "Android - Neuer Freund notifikation fürt jetzt beim klick direkt zum Profil",
+    "Profil anzeigen - Im Anzeige Profil von anderen Familien wird jetzt grob angezeigt, wann diese zuletzt Online waren",
     "Chat - Nachrichten Eingabebox wurde vergrößert",
     "Events - Es ist ist möglich sich für ein wiederholendes Event als 'immer zusagen' zu markieren",
     "Weltkarte - Filtersystem wurde komplett überarbeitet",
     "Privatsphäre Einstellung - Für den genauen Standort gibt es jetzt Möglichkeiten für wen es angezeigt wird",
     "Profil - Sprachen wurde um 'Polnisch' und 'Niederländisch' erweitert",
     "Profil - Interessen wurde um 'online Treffen' erweitert",
+    "Automatischer Standort - Automatischer Standort kann nicht mehr bei Reiseart 'Fester Standort' aktiviert werden",
     "verschiedene kleine Style-Anpassungen",
     "verschiedene kleine Fehlerbehebungen",
     "verschiedene kleine Verbesserungen"

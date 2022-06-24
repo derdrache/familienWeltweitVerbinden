@@ -793,12 +793,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
         var planungBis = DateTime.parse(planung["bis"]);
 
         if (selectDates.contains(planungVon)) {
-          profil["ort"] = planung["ortData"]["city"];
-          profil["land"] = planung["ortData"]["countryname"];
-          profil["latt"] = planung["ortData"]["latt"];
-          profil["longt"] = planung["ortData"]["longt"];
+          var newProfil = Map.from(profil);
+          newProfil["ort"] = planung["ortData"]["city"];
+          newProfil["land"] = planung["ortData"]["countryname"];
+          newProfil["latt"] = planung["ortData"]["latt"];
+          newProfil["longt"] = planung["ortData"]["longt"];
 
-          selectedProfils.add(profil);
+          selectedProfils.add(newProfil);
           continue reiseplanungLoop;
         }
 
@@ -1465,7 +1466,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   Icon(Icons.calendar_today_outlined,
                       size: 32, color: Theme.of(context).colorScheme.primary),
                 if (eventMarkerOn)
-                  Icon(Icons.event_note,
+                  Icon(Icons.event_busy,
                       size: 36, color: Theme.of(context).colorScheme.primary)
               ],
             ),
@@ -1493,7 +1494,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           child: IconButton(
               padding: EdgeInsets.zero,
               icon: reiseplanungOn
-                  ? Icon(Icons.schedule,
+                  ? Icon(Icons.update_disabled,
                       size: 32, color: Theme.of(context).colorScheme.primary)
                   : Icon(Icons.update,
                       size: 36, color: Theme.of(context).colorScheme.primary),
