@@ -225,7 +225,9 @@ class MyApp extends StatelessWidget {
               ],
               navigatorKey: navigatorKey,
               debugShowCheckedModeBanner: false,
-              home: emailVerified ? StartPage() : const LoginPage()
+              home: FirebaseAuth.instance.currentUser != null && emailVerified
+                  ? StartPage()
+                  : const LoginPage()
           );
         });
   }

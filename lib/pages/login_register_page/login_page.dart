@@ -39,6 +39,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   userLogin() async {
+    if (!_formKey.currentState.validate()) return;
+
+    setState(() {
+      isLoading = true;
+      email = emailController.text;
+      passwort = passwortController.text;
+    });
+
     if (kIsWeb && angemeldetBleiben) {
       FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
     }
@@ -53,7 +61,8 @@ class _LoginPageState extends State<LoginPage> {
 
       if (emailVerified) {
         var userId = FirebaseAuth.instance.currentUser.uid;
-        var ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
+        var ownProfil =
+            await ProfilDatabase().getData("*", "WHERE id = '$userId'");
         Hive.box('secureBox').put("ownProfil", ownProfil);
 
         if (ownProfil != false) {
@@ -82,8 +91,6 @@ class _LoginPageState extends State<LoginPage> {
             context, AppLocalizations.of(context).keineVerbindungInternet);
       }
     }
-
-
   }
 
   signInWithGoogleWeb() async {
@@ -163,26 +170,28 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget resendVerificationEmailButton(){
+    Widget resendVerificationEmailButton() {
       return TextButton(
           style: ButtonStyle(
               foregroundColor: MaterialStateProperty.all(Colors.black)),
-          child: Text(AppLocalizations.of(context).verifizierungsEmailNochmalSenden),
-          onPressed: () async{
-            if(FirebaseAuth.instance.currentUser?.emailVerified ?? false) return;
-            try{
+          child: Text(
+              AppLocalizations.of(context).verifizierungsEmailNochmalSenden),
+          onPressed: () async {
+            if (FirebaseAuth.instance.currentUser?.emailVerified ?? false) {
+              return;
+            }
+            try {
               await FirebaseAuth.instance.currentUser?.sendEmailVerification();
-              customSnackbar(context, AppLocalizations.of(context).emailErneutVersendet);
-            }catch(error){
+              customSnackbar(
+                  context, AppLocalizations.of(context).emailErneutVersendet);
+            } catch (error) {
               sendEmail({
                 "title": "Firebase auth Problem",
                 "inhalt": """
-                              Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
-                              Folgendes Problem ist aufgetaucht: $error
-                          """
+                  Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
+                  Folgendes Problem ist aufgetaucht: $error"""
               });
             }
-
           });
     }
 
@@ -193,21 +202,65 @@ class _LoginPageState extends State<LoginPage> {
           child: Text(AppLocalizations.of(context).passwortVergessen),
           onPressed: () {
             passwortController.text = "";
-            global_functions.changePage(
-                context, const ForgetPasswordPage());
+            global_functions.changePage(context, const ForgetPasswordPage());
           });
     }
 
-    doLogin() {
-      if (_formKey.currentState.validate()) {
-        setState(() {
-          isLoading = true;
-          email = emailController.text;
-          passwort = passwortController.text;
-        });
-        userLogin();
+    Widget googleLoginButton() {
+      return Align(
+        child: InkWell(
+          onTap: () async {
+            if (kIsWeb) {
+              await signInWithGoogleWeb();
+            } else {
+              await signInWithGoogleAndroid();
+            }
+            var userId = FirebaseAuth.instance.currentUser.uid;
 
-      }
+            if (userId == null) return;
+            var userExist =
+                await ProfilDatabase().getData("name", "WHERE id = '$userId'");
+
+            if (userExist == false) {
+              global_functions.changePageForever(
+                  context, const CreateProfilPage());
+            } else {
+              global_functions.changePageForever(context, StartPage());
+            }
+          },
+          child: Container(
+              height: 50,
+              width: 280,
+              margin: const EdgeInsets.only(
+                  top: 10, bottom: 10, right: 55, left: 55),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary,
+                  borderRadius: const BorderRadius.all(Radius.circular(30))),
+              child: Center(
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    height: 30.0,
+                    width: 30.0,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/googleGIcon.jpg'),
+                          fit: BoxFit.cover),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Text(
+                    AppLocalizations.of(context).loginMitGoogle,
+                    style: const TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  )
+                ],
+              ))),
+        ),
+      );
     }
 
     return Scaffold(
@@ -224,76 +277,24 @@ class _LoginPageState extends State<LoginPage> {
                     validator: global_functions.checkValidatorPassword(context),
                     passwort: true,
                     textInputAction: TextInputAction.done,
-                    onSubmit: () => doLogin()),
+                    onSubmit: () => userLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  resendVerificationEmailButton(),
-                  const SizedBox(width: 30),
-                  forgetPassButton(),
-                ],),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    resendVerificationEmailButton(),
+                    const SizedBox(width: 30),
+                    forgetPassButton(),
+                  ],
+                ),
                 isLoading
                     ? loadingBox()
-                    : customFloatbuttonExtended("Login", () => doLogin()),
+                    : customFloatbuttonExtended("Login", () => userLogin()),
                 customFloatbuttonExtended(
                     AppLocalizations.of(context).registrieren, () {
                   global_functions.changePage(context, const RegisterPage());
                 }),
-                Align(
-                  child: InkWell(
-                    onTap: () async {
-                      if (kIsWeb) {
-                        await signInWithGoogleWeb();
-                      } else {
-                        await signInWithGoogleAndroid();
-                      }
-                      var userId = FirebaseAuth.instance.currentUser.uid;
-
-                      if (userId == null) return;
-                      var userExist = await ProfilDatabase()
-                          .getData("name", "WHERE id = '$userId'");
-
-                      if (userExist == false) {
-                        global_functions.changePageForever(
-                            context, const CreateProfilPage());
-                      } else {
-                        global_functions.changePageForever(
-                            context, StartPage());
-                      }
-                    },
-                    child: Container(
-                        height: 50,
-                        width: 280,
-                        margin: const EdgeInsets.only(
-                            top: 10, bottom: 10, right: 55, left: 55),
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondary,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(30))),
-                        child: Center(
-                            child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Container(
-                              height: 30.0,
-                              width: 30.0,
-                              decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage('assets/googleGIcon.jpg'),
-                                    fit: BoxFit.cover),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            Text(
-                              AppLocalizations.of(context).loginMitGoogle,
-                              style: const TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            )
-                          ],
-                        ))),
-                  ),
-                ),
+                googleLoginButton(),
               ],
             )));
   }
