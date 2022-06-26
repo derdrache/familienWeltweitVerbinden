@@ -150,6 +150,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             global_functions.changePage(
                 context,
                 ChatDetailsPage(
+                  chatPartnerName: widget.profil["name"],
+                  chatPartnerId: widget.profil["id"],
                   groupChatData: groupChatData,
                 ));
           });
