@@ -102,7 +102,7 @@ var patchVorlage={
 };
 
 var patch140E={
-  "title" : "1.4.0 - 01.07.2022",
+  "title" : "1.4.0 - 26.06.2022",
   "inhalt": [
     "Expansion Travel Planning - It is now possible to enter your travel plans under Settings. The world map can now show, by clicking on the clock icon, which families will be where in a certain period of time",
     "Android - New friend notification now goes directly to the profile when clicked",
@@ -112,6 +112,7 @@ var patch140E={
     "General - Users can now be blocked. Blocked users can no longer see you on the world map",
     "Registration - In the login screen there is now the possibility to have the confirmation mail sent again if it did not arrive",
     "World map - the 0 markers have been replaced with i markers to make it clearer that there are no families there",
+    "World Map - The icon to switch to the events now shows if there are new events",
     "Show Profile - The display profile of other families now roughly shows when they were last online",
     "Chat - Messages input box has been enlarged",
     "Events - It is possible to mark yourself as 'always agree' for a repeating event",
@@ -127,7 +128,7 @@ var patch140E={
   ]
 };
 var patch140D={
-  "title" : "1.4.0 - 01.07.2022",
+  "title" : "1.4.0 - 26.06.2022",
   "inhalt": [
     "Erweiterung Reiseplanung - Es ist jetzt möglich unter Settings seine Reiseplanung einzutragen. Die Weltkarte kann nun, per Klick auf das Uhr-Icon, anzeigen welche Familien sich wo in einem bestimmten Zeitraum aufhalten werden",
     "Android - Neuer Freund Notifikation fürt jetzt beim klick direkt zum Profil",
@@ -137,6 +138,7 @@ var patch140D={
     "Allgemein - Benutzer können jetzt geblockt werden. Geblockte Bneutzer können dich auf der Weltkarte nicht mehr sehen",
     "Registrierung - Im Login Bildschirm gibt es jetzt die Möglichkeit sich die Bestätigungsmail noch einmal senden zu lassen, falls diese nicht angekommen ist",
     "Weltkarte - die 0er Marker wurden gegen i-Marker ausgetauscht, damit besser klar wird, dass dort keine Familien zu sehen sind",
+    "Weltkarte - Das Icon zum wechseln auf die Events zeigt jetzt an ob es neue Events gibt",
     "Profil anzeigen - Im Anzeige Profil von anderen Familien wird jetzt grob angezeigt, wann diese zuletzt Online waren",
     "Chat - Nachrichten Eingabebox wurde vergrößert",
     "Events - Es ist ist möglich sich für ein wiederholendes Event als 'immer zusagen' zu markieren",
