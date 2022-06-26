@@ -104,15 +104,34 @@ var patchVorlage={
 var patch140E={
   "title" : "1.4.0 - 01.07.2022",
   "inhalt": [
-
+    "Expansion Travel Planning - It is now possible to enter your travel plans under Settings. The world map can now show, by clicking on the clock icon, which families will be where in a certain period of time",
+    "Android - New friend notification now goes directly to the profile when clicked",
+    "Android - App startup has been greatly accelerated (except the first startup after installing the app)",
+    "Android - External linking now works on Android 10 or higher",
+    "General - Users can now be reported",
+    "General - Users can now be blocked. Blocked users can no longer see you on the world map",
+    "Registration - In the login screen there is now the possibility to have the confirmation mail sent again if it did not arrive",
+    "World map - the 0 markers have been replaced with i markers to make it clearer that there are no families there",
+    "Show Profile - The display profile of other families now roughly shows when they were last online",
+    "Chat - Messages input box has been enlarged",
+    "Events - It is possible to mark yourself as 'always agree' for a repeating event",
+    "World map - filter system has been completely revised",
+    "Privacy setting - For the exact location there are now options for whom it will be displayed",
+    "Profile - There is now a field to enter your visited countries. At the same time, this field is also automatically filled by Trip Planning after the stay time has expired."
+    "Profile - Languages has been extended by 'Polish' and 'Dutch'",
+    "Profile - Interests has been extended by 'online meetings'",
+    "Automatic location - Automatic location can no longer be activated for trip type 'Fixed location'",
+    "various small style adjustments",
+    "various small bug fixes",
+    "various small improvements"
   ]
 };
 var patch140D={
   "title" : "1.4.0 - 01.07.2022",
   "inhalt": [
     "Erweiterung Reiseplanung - Es ist jetzt möglich unter Settings seine Reiseplanung einzutragen. Die Weltkarte kann nun, per Klick auf das Uhr-Icon, anzeigen welche Familien sich wo in einem bestimmten Zeitraum aufhalten werden",
-    "Android - Neuer Freund notifikation fürt jetzt beim klick direkt zum Profil",
-    "Android - Start der App wurde stark beschleunigt (ausgenommen der erste Start nach dem installieren der App)"
+    "Android - Neuer Freund Notifikation fürt jetzt beim klick direkt zum Profil",
+    "Android - Start der App wurde stark beschleunigt (ausgenommen der erste Start nach dem installieren der App)",
     "Android - Externe Verlinkungen funktionieren nun bei Android 10 oder höher",
     "Allgemein - Benutzer können jetzt gemeldet werden",
     "Allgemein - Benutzer können jetzt geblockt werden. Geblockte Bneutzer können dich auf der Weltkarte nicht mehr sehen",
@@ -123,6 +142,7 @@ var patch140D={
     "Events - Es ist ist möglich sich für ein wiederholendes Event als 'immer zusagen' zu markieren",
     "Weltkarte - Filtersystem wurde komplett überarbeitet",
     "Privatsphäre Einstellung - Für den genauen Standort gibt es jetzt Möglichkeiten für wen es angezeigt wird",
+    "Profil - Es gibt jetzt ein Feld um seine besuchten Länder einzutragen. Dieses Feld wird gleichzeitig auch automatisch durch die Reiseplanung gefüllt, nachdem die Aufenthaltszeit abgelaufen ist"
     "Profil - Sprachen wurde um 'Polnisch' und 'Niederländisch' erweitert",
     "Profil - Interessen wurde um 'online Treffen' erweitert",
     "Automatischer Standort - Automatischer Standort kann nicht mehr bei Reiseart 'Fester Standort' aktiviert werden",
