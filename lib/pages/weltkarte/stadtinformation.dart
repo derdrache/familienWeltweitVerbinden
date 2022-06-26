@@ -121,7 +121,9 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       var name = "";
 
       for (var profil in allProfils) {
-        if (profil["id"] == family) {
+        if(profil["name"] == "Likes2travel") print("good");
+
+        if (profil["id"] == family){
           name = profil["name"];
           familiesList.add(InkWell(
             onTap: () => changePage(

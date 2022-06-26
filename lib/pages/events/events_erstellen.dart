@@ -206,58 +206,67 @@ class _EventErstellenState extends State<EventErstellen> {
       var dateString = AppLocalizations.of(context).datumAuswaehlen;
       if (eventDatum != null) {
         var dateFormat = DateFormat('dd-MM-yyyy');
-        var dateTime = DateTime(
-            eventDatum.year, eventDatum.month, eventDatum.day);
+        var dateTime =
+            DateTime(eventDatum.year, eventDatum.month, eventDatum.day);
         dateString = dateFormat.format(dateTime);
       }
 
-      return !isMultiDayEvent(eventIntervalDropdown.getSelected()) && dateTimeTyp == "bis"
+      return !isMultiDayEvent(eventIntervalDropdown.getSelected()) &&
+              dateTimeTyp == "bis"
           ? const SizedBox.shrink()
-          : Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text( dateTimeTyp == "wann"? "Event start: " : AppLocalizations.of(context).eventEnde),
-          const SizedBox(width: 20),
-          ElevatedButton(
-            child: Text(dateString),
-            onPressed: () async {
-              var pickedDate = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(DateTime.now().year + 1));
+          : Container(
+              margin: const EdgeInsets.only(left: 10, right: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    dateTimeTyp == "wann"
+                        ? "Event start: "
+                        : AppLocalizations.of(context).eventEnde,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    child: Text(dateString),
+                    onPressed: () async {
+                      var pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(DateTime.now().year + 1));
 
-              if(dateTimeTyp == "wann"){
-                eventWannDatum = pickedDate;
-              } else{
-                eventBisDatum = pickedDate;
-              }
+                      if (dateTimeTyp == "wann") {
+                        eventWannDatum = pickedDate;
+                      } else {
+                        eventBisDatum = pickedDate;
+                      }
 
-              setState(() {});
-            },
-          ),
-          const SizedBox(width: 20),
-          ElevatedButton(
-            child: Text(eventUhrzeit == null
-                ? AppLocalizations.of(context).uhrzeitAuswaehlen
-                : eventUhrzeit.format(context)),
-            onPressed: () async {
-              var pickedTime = await showTimePicker(
-                context: context,
-                initialTime: const TimeOfDay(hour: 12, minute: 00),
-              );
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    child: Text(eventUhrzeit == null
+                        ? AppLocalizations.of(context).uhrzeitAuswaehlen
+                        : eventUhrzeit.format(context)),
+                    onPressed: () async {
+                      var pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: const TimeOfDay(hour: 12, minute: 00),
+                      );
 
-              if(dateTimeTyp == "wann"){
-                eventWannUhrzeit = pickedTime;
-              } else{
-                eventBisUhrzeit = pickedTime;
-              }
+                      if (dateTimeTyp == "wann") {
+                        eventWannUhrzeit = pickedTime;
+                      } else {
+                        eventBisUhrzeit = pickedTime;
+                      }
 
-              setState(() {});
-            },
-          )
-        ],
-      );
+                      setState(() {});
+                    },
+                  )
+                ],
+              ),
+            );
     }
 
     ortEingabeBox() {
@@ -372,8 +381,8 @@ class _EventErstellenState extends State<EventErstellen> {
           Align(child: ortEingabeBox()),
           sprachenAuswahlBox,
           eventIntervalDropdown,
-          dateTimeBox(eventWannDatum,eventWannUhrzeit,"wann"),
-          dateTimeBox(eventBisDatum,eventBisUhrzeit,"bis"),
+          dateTimeBox(eventWannDatum, eventWannUhrzeit, "wann"),
+          dateTimeBox(eventBisDatum, eventBisUhrzeit, "bis"),
           customTextInput(AppLocalizations.of(context).eventBeschreibung,
               eventBeschreibungKontroller,
               moreLines: 8, textInputAction: TextInputAction.newline),
