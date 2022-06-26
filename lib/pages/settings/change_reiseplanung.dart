@@ -197,9 +197,9 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context).reisePlanungVeraendern,
       ),
-      body: Stack(children: [
+      body: Stack(alignment: Alignment.center,children: [
         Container(margin:const EdgeInsets.only(top: 200), child: showReiseplanung()),
-        Positioned(child: Column(children: [
+        Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
           addNewPlanBox(),
           const SizedBox(height: 10),
           Container(
@@ -209,7 +209,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
                 style: const TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold),
               )),
-        ],))
+        ],)
       ],),
     );
 
