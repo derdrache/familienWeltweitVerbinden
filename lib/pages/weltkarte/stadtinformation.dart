@@ -14,11 +14,13 @@ import '../../global/global_functions.dart';
 import '../../services/translation.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
+import '../start_page.dart';
 
 class StadtinformationsPage extends StatefulWidget {
   var ortName;
+  var newEntry;
 
-  StadtinformationsPage({this.ortName, Key key}) : super(key: key);
+  StadtinformationsPage({this.ortName, this.newEntry, Key key}) : super(key: key);
 
   @override
   _StadtinformationsPageState createState() => _StadtinformationsPageState();
@@ -30,6 +32,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
   bool canEnglish = false;
   var cityInformation = {};
   var usersCityInformation = [];
+
 
   @override
   void initState() {
@@ -556,11 +559,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     openInformationMenu(positionDetails, information) async {
       double left = positionDetails.globalPosition.dx;
       double top = positionDetails.globalPosition.dy;
-      bool canChange = information["erstelltVon"] == userId &&
+      bool canChange = information["erstelltVon"] == userId; /*&&
           DateTime.now()
                   .difference(DateTime.parse(information["erstelltAm"]))
                   .inDays <=
               1;
+              */
 
       await showMenu(
           context: context,
@@ -760,7 +764,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: CustomAppBar(title: widget.ortName),
+      appBar: CustomAppBar(title: widget.ortName, leading: widget.newEntry != null ? StartPage() : null),
       body: Column(
         children: [
           allgemeineInfoBox(),

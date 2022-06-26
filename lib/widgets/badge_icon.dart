@@ -3,15 +3,20 @@ import 'package:flutter/material.dart';
 class BadgeIcon extends StatelessWidget {
   var icon;
   var text;
+  var color;
+  double size;
 
-  BadgeIcon({Key key, this.icon, this.text}) : super(key: key);
+  BadgeIcon({Key key, this.icon, this.text, this.color, this.size}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Icon(icon),
+        Icon(icon,
+          size: size,
+          color: color
+        ),
         if(text.length > 0) Positioned(
           top: -10,
           right: -10,

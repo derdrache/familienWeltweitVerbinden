@@ -137,7 +137,6 @@ changeGermanToEnglish(list){
 }
 
 changeEnglishToGerman(list){
-  print(list);
   var germanOutputList = [];
   var checkList = [];
   var germanList = [];
