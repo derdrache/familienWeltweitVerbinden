@@ -1,3 +1,4 @@
+import 'package:familien_suche/global/global_functions.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -5,13 +6,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   var buttons;
   var elevation;
   var onTap;
+  var leading;
 
   CustomAppBar({
     Key key,
     this.title,
     this.buttons,
     this.elevation = 4.0,
-    this.onTap
+    this.onTap,
+    this.leading
   }) : super(key: key);
 
   @override
@@ -22,7 +25,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     buttons ??= <Widget>[];
 
     return AppBar(
-      leading: null,
+      leading: leading == null ? null : Builder(
+        builder: (BuildContext context) {
+          return IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () { changePage(context, leading); },
+            tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+          );
+        },
+      ),
       title: InkWell(
           onTap: onTap,
           child: Row(

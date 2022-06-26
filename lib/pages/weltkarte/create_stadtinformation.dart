@@ -108,10 +108,10 @@ class _CreateStadtinformationsPageState
     var secureBox =Hive.box("secureBox");
     var allInformations = secureBox.get("stadtinfoUser");
     allInformations.add(newUserInformation);
-    secureBox.put("stadtinfoUser", allInformations);
+    await secureBox.put("stadtinfoUser", allInformations);
 
     Navigator.pop(context);
-    changePage(context, StadtinformationsPage(ortName: ortData["city"]));
+    changePage(context, StadtinformationsPage(ortName: ortData["city"], newEntry: true,));
   }
 
   @override

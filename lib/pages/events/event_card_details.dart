@@ -511,7 +511,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               hasIntereset: widget.event["interesse"].contains(userId),
               id: widget.event["id"],
             ),
-          CardFeed(
+          CardFeet(
               organisator: widget.event["erstelltVon"],
               eventId: widget.event["id"],
               eventZusage: widget.event["zusage"],
@@ -1003,21 +1003,21 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
   }
 }
 
-class CardFeed extends StatefulWidget {
+class CardFeet extends StatefulWidget {
   String organisator;
   String eventId;
   double width;
   var eventZusage;
 
-  CardFeed(
+  CardFeet(
       {Key key, this.organisator, this.width, this.eventId, this.eventZusage})
       : super(key: key);
 
   @override
-  _CardFeedState createState() => _CardFeedState();
+  _CardFeetState createState() => _CardFeetState();
 }
 
-class _CardFeedState extends State<CardFeed> {
+class _CardFeetState extends State<CardFeet> {
   var organisatorText = const Text("");
   Map organisatorProfil;
   var ownName = FirebaseAuth.instance.currentUser.displayName;

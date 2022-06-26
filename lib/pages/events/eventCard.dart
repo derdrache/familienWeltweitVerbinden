@@ -277,10 +277,6 @@ class _EventCardState extends State<EventCard> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                             /* Text(AppLocalizations.of(context).stadt,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: fontSize)),*/
                               Text(widget.event["stadt"],
                                   style: TextStyle(fontSize: fontSize))
                             ],
@@ -290,10 +286,6 @@ class _EventCardState extends State<EventCard> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              /*Text(AppLocalizations.of(context).land,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: fontSize)),*/
                               Text(widget.event["land"],
                                   style: TextStyle(fontSize: fontSize))
                             ],
@@ -305,7 +297,7 @@ class _EventCardState extends State<EventCard> {
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: fontSize)),
-                              Text(createOnlineEventTime() + " " + DateTime.now().timeZoneName,
+                              Text(createOnlineEventTime() + " GMT " + DateTime.now().timeZoneOffset.inHours.toString(),
                                   style: TextStyle(fontSize: fontSize))
                             ],
                           ),
