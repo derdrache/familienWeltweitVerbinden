@@ -44,6 +44,7 @@ class ChangeTradePage extends StatelessWidget {
                 AppLocalizations.of(context).verkaufenTauschenSchenken,
                 textKontroller,
                 moreLines: 10,
+                textInputAction: TextInputAction.newline,
                 hintText: AppLocalizations.of(context).tradeHintText)
           ],
         ));

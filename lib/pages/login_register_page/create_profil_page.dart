@@ -41,6 +41,32 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
   bool isLoading = false;
 
+  @override
+  void initState() {
+    sprachenAuswahlBox = CustomMultiTextForm(
+        validator: global_functions.checkValidationMultiTextForm(context),
+        auswahlList: isGerman
+            ? global_variablen.sprachenListe
+            : global_variablen.sprachenListeEnglisch);
+
+    reiseArtenAuswahlBox = CustomDropDownButton(
+      items: isGerman
+          ? global_variablen.reisearten
+          : global_variablen.reiseartenEnglisch,
+    );
+
+    interessenAuswahlBox = CustomMultiTextForm(
+        validator: global_functions.checkValidationMultiTextForm(context),
+        auswahlList: isGerman
+            ? global_variablen.interessenListe
+            : global_variablen.interessenListeEnglisch);
+
+
+
+    super.initState();
+  }
+
+
   changeLoading() {
     if (isLoading) {
       isLoading = false;
@@ -175,26 +201,13 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     return noError;
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-    sprachenAuswahlBox = CustomMultiTextForm(
-        hintText: AppLocalizations.of(context).spracheAuswaehlen,
-        validator: global_functions.checkValidationMultiTextForm(context),
-        auswahlList: isGerman
-            ? global_variablen.sprachenListe
-            : global_variablen.sprachenListeEnglisch);
-    reiseArtenAuswahlBox = CustomDropDownButton(
-      hintText: AppLocalizations.of(context).artDerReiseAuswaehlen,
-      items: isGerman
-          ? global_variablen.reisearten
-          : global_variablen.reiseartenEnglisch,
-    );
-    interessenAuswahlBox = CustomMultiTextForm(
-        hintText: AppLocalizations.of(context).interessenAuswaehlen,
-        validator: global_functions.checkValidationMultiTextForm(context),
-        auswahlList: isGerman
-            ? global_variablen.interessenListe
-            : global_variablen.interessenListeEnglisch);
+    sprachenAuswahlBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
+    reiseArtenAuswahlBox.hintText = AppLocalizations.of(context).artDerReiseAuswaehlen;
+    interessenAuswahlBox.hintText = AppLocalizations.of(context).interessenAuswaehlen;
     childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
     ortAuswahlBox.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
 
