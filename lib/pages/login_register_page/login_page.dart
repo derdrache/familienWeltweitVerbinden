@@ -115,7 +115,8 @@ class _LoginPageState extends State<LoginPage> {
 
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
-
+    print("googletoken");
+    print(googleAuth.accessToken);
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
