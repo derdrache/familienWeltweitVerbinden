@@ -165,14 +165,14 @@ class OwnProfilImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    var token = "ya29.a0ARrdaM-DpxHFhDI4_1Buv6IyyjibHUIqxKmA3eChLJo-14iAKGMZbYTkadEql-P-wwQa7CDpm-4cc9UINPfOAG0xXf276XCLIwbBksQEoyKaF1RcB7-DFiC4fhpznSvLZHWHbqtwbR5Wqvjza7payAm8tIgg";
     showBigImage() {
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
                 backgroundColor: Colors.transparent,
-                content: Image.network(profil["bild"][0])
+                content: Image.network(profil["bild"][0], headers: {"Authorization": "Bearer $token"})
             );
           });
     }
