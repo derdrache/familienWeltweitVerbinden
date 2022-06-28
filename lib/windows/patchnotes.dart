@@ -58,6 +58,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch141D),
                 _patch(patch140D),
                 _patch(patch131D),
                 _patch(patch130D),
@@ -73,6 +74,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch141E),
                 _patch(patch140E),
                 _patch(patch131E),
                 _patch(patch130E),
@@ -98,6 +100,21 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch141E={
+  "title" : "1.4.1 - 27.06.2022",
+  "inhalt": [
+    "A profile creation bug has been fixed",
+    "various small bug fixes"
+  ]
+};
+var patch141D={
+  "title" : "1.4.1 - 27.06.2022",
+  "inhalt": [
+    "Ein Fehler beim Profil erstellen wurde behoben",
+    "verschiedene kleine Fehlerbehebungen"
   ]
 };
 
