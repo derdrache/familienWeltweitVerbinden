@@ -144,9 +144,7 @@
   {
     "nameGer": "Gabun", "nameEng": "Gabon", "latt": -1.0, "longt": 11.75, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
   {
-    "nameGer": "UK", "nameEng": "UK", "latt": 54.0, "longt": -2.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Vereinigtes Königreich", "nameEng": "United Kingdom", "latt": 54.0, "longt": -2.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
+    "nameGer": "Vereinigtes Königreich", "nameEng": "UK", "latt": 54.0, "longt": -2.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
   {
     "nameGer": "Grenada", "nameEng": "Grenada", "latt": 12.12, "longt": -61.67, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
   {
