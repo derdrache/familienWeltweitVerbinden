@@ -279,14 +279,8 @@ class _LoginPageState extends State<LoginPage> {
                     textInputAction: TextInputAction.done,
                     onSubmit: () => userLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    resendVerificationEmailButton(),
-                    const SizedBox(width: 30),
-                    forgetPassButton(),
-                  ],
-                ),
+                forgetPassButton(),
+                resendVerificationEmailButton(),
                 isLoading
                     ? loadingBox()
                     : customFloatbuttonExtended("Login", () => userLogin()),

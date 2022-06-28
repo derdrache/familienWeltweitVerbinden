@@ -1052,7 +1052,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (spezialActivation) {
       if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
       if (filterOn) return AppLocalizations.of(context).filterErgebnisse;
-      if (eventMarkerOn) return "neu";
+      if (eventMarkerOn) return AppLocalizations.of(context).neueEvents;
     }
 
     if (currentMapZoom < kontinentZoom) {
