@@ -20,7 +20,7 @@ class ChangeAboutmePage extends StatelessWidget {
 
     saveButton(){
       return IconButton(
-        icon: Icon(Icons.done),
+        icon: const Icon(Icons.done),
         onPressed: () async {
           await ProfilDatabase().updateProfil("aboutme = '${textKontroller.text}'",
               "WHERE id = '$userId'");
@@ -43,7 +43,8 @@ class ChangeAboutmePage extends StatelessWidget {
             AppLocalizations.of(context).ueberMich,
               textKontroller,
             moreLines: 10,
-            hintText: AppLocalizations.of(context).aboutusHintText
+            hintText: AppLocalizations.of(context).aboutusHintText,
+            textInputAction: TextInputAction.newline
           )
         ],
       )

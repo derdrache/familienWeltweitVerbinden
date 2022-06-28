@@ -294,5 +294,7 @@
     "innerhalbMonatsGesehen": "innerhalb eines Monats gesehen",
     "innerhalbWocheGesehen": "innerhalb einer Woche gesehen",
     "kuerzlichGesehen": "kürzlich gesehen",
-    "automatischerStandortNichtMoeglich": "Automatischer Standort kann nicht mit der Reiseart 'Fester Standort' kombiniert werden"
+    "automatischerStandortNichtMoeglich": "Automatischer Standort kann nicht mit der Reiseart 'Fester Standort' kombiniert werden",
+    "neueEvents": "neue Events"
+
 }
