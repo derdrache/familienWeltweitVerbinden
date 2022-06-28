@@ -165,7 +165,6 @@ class OwnProfilImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     showBigImage() {
       showDialog(
           context: context,
