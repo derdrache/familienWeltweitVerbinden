@@ -296,6 +296,7 @@
     "innerhalbMonatsGesehen": "seen within one month",
     "innerhalbWocheGesehen": "seen within one week",
     "kuerzlichGesehen": "seen recently",
-    "automatischerStandortNichtMoeglich": "automatic location cannot be combined with 'fixed location' travel type"
+    "automatischerStandortNichtMoeglich": "automatic location cannot be combined with 'fixed location' travel type",
+    "neueEvents": "new events"
 }
 

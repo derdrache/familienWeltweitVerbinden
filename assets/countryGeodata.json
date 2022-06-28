@@ -144,9 +144,7 @@
   {
     "nameGer": "Gabun", "nameEng": "Gabon", "latt": -1.0, "longt": 11.75, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
   {
-    "nameGer": "UK", "nameEng": "UK", "latt": 54.0, "longt": -2.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Vereinigtes Königreich", "nameEng": "United Kingdom", "latt": 54.0, "longt": -2.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
+    "nameGer": "Vereinigtes Königreich", "nameEng": "UK", "latt": 54.0, "longt": -2.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
   {
     "nameGer": "Grenada", "nameEng": "Grenada", "latt": 12.12, "longt": -61.67, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
   {
@@ -348,7 +346,7 @@
   {
     "nameGer": "Katar", "nameEng": "Qatar", "latt": 25.5, "longt": 51.25, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
   {
-    "nameGer": "Wiedervereinigung", "nameEng": "Reunion", "latt": -21.1, "longt": 55.6, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
+    "nameGer": "Réunion", "nameEng": "Reunion", "latt": -21.1, "longt": 55.6, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
   {
     "nameGer": "Rumänien", "nameEng": "Romania", "latt": 46.0, "longt": 25.0, "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe"},
   {

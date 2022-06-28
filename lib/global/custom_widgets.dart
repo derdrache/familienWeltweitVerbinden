@@ -129,7 +129,6 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
   void initState() {
     widget.onConfirm ??= (selected){};
     widget.selected ??= [];
-
     super.initState();
   }
 
