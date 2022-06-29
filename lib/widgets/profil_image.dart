@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../global/custom_widgets.dart';
 import '../services/database.dart';
@@ -43,6 +45,17 @@ class _ProfilImageState extends State<ProfilImage> {
         "WHERE id = '${widget.profil["id"]}'");
 
     Navigator.pop(context);
+  }
+
+  pickAndUploadImage() async {
+    var userName = FirebaseAuth.instance.currentUser.displayName;
+    var pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    var imageByte = await pickedImage.readAsBytes();
+    var imageNameEndung = pickedImage.name.split(".").last;
+
+    uploadImage(userName+"." + imageNameEndung, imageByte);
+
+
   }
 
   @override
