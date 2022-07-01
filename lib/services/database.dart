@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart' hide Key;
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'dart:ui';
+import 'dart:io' as io;
+import 'dart:ui' as ui;
 import 'package:encrypt/encrypt.dart';
 
 import '../auth/secrets.dart';
@@ -14,7 +14,7 @@ import 'notification.dart';
 
 //var databaseUrl = "https://families-worldwide.com/";
 var databaseUrl = "http://test.families-worldwide.com/";
-var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 
 
@@ -662,6 +662,33 @@ class ReportsDatabase{
 
 }
 
+uploadImage(imagePath, imageName, image) async{
+  var url = Uri.parse("https://families-worldwide.com/database/uploadImage.php");
+  var data = {
+    "imagePath": imagePath,
+    "imageName": imageName,
+    "image": base64Encode(image),
+  };
+
+  try{
+    //Web Version wirft nach vollendung ein Fehler auf => funktioniert aber ohne Probleme
+    await http.post(url, body: json.encode(data));
+  }catch(_){
+
+  }
+
+}
+
+deleteImage(imageName) async{
+  var url = Uri.parse("https://families-worldwide.com/database/deleteImage.php");
+  imageName = imageName.split("/").last;
+  var data = {
+    "imageName": imageName,
+  };
+
+  await http.post(url, body: json.encode(data));
+}
+
 _deleteInTable(table, id) {
   var url = Uri.parse(databaseUrl + "database/deleteAll.php");
 
@@ -670,7 +697,6 @@ _deleteInTable(table, id) {
     "table": table
   }));
 }
-
 
 String decrypt(String encrypted) {
   final key = Key.fromUtf8(phpCryptoKey);
@@ -681,4 +707,6 @@ String decrypt(String encrypted) {
   final decrypted = encrypter.decrypt(enBase64, iv: iv);
   return decrypted;
 }
+
+
 
