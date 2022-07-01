@@ -121,13 +121,17 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   );
                 }).toList(),
                 onChanged: (newValue) async {
-                  if(widget.event["tags"].contains(global_func.changeGermanToEnglish(newValue)) ||
-                      widget.event["tags"].contains(global_func.changeEnglishToGerman(newValue))) return;
+                  if (widget.event["tags"].contains(
+                          global_func.changeGermanToEnglish(newValue)) ||
+                      widget.event["tags"].contains(
+                          global_func.changeEnglishToGerman(newValue))) return;
 
                   widget.event["tags"].add(newValue);
                   changeState(() {});
 
-                  await EventDatabase().update("tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')", "WHERE id = '${widget.event["id"]}'");
+                  await EventDatabase().update(
+                      "tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')",
+                      "WHERE id = '${widget.event["id"]}'");
                   setState(() {});
                 })),
       )
@@ -143,7 +147,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           widget.event["tags"].remove(tag);
           changeState(() {});
 
-          await EventDatabase().update("tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))", "WHERE id = '${widget.event["id"]}'");
+          await EventDatabase().update(
+              "tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))",
+              "WHERE id = '${widget.event["id"]}'");
           setState(() {});
         },
         child: Stack(
@@ -462,9 +468,11 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             )));
       }
 
-      if(eventTags.isEmpty && widget.isCreator) eventTags.add(
-        Container(margin: EdgeInsets.all(10), child: Text("Hier klicken um Eventlabel hinzuzufügen", style: TextStyle(color: Colors.grey)))
-      );
+      if (eventTags.isEmpty && widget.isCreator)
+        eventTags.add(Container(
+            margin: EdgeInsets.all(10),
+            child: Text("Hier klicken um Eventlabel hinzuzufügen",
+                style: TextStyle(color: Colors.grey))));
 
       return InkWell(
         onTap: () => widget.isCreator ? changeEventTagsWindow() : null,

@@ -196,15 +196,10 @@ class _ImageGalerieState extends State<ImageGalerie> {
       );
     }
 
-    return InkWell(
-      child: Container(
-        constraints: BoxConstraints(
-            minHeight: 200,
-        ),
-        width: double.infinity,
-        child:widget.child,
-      ),
-      onTap:!widget.isCreator ? null :   () => showDialog(
+
+
+    windowChangeImageToLinkAndPredetermined(){
+      showDialog(
           context: context,
           builder: (BuildContext buildContext){
             return StatefulBuilder(
@@ -220,28 +215,28 @@ class _ImageGalerieState extends State<ImageGalerie> {
                       width: 600,
                       child: Stack(
                         clipBehavior: Clip.none, children: [
-                          ScrollConfiguration(
-                            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                              PointerDeviceKind.touch,
-                              PointerDeviceKind.mouse,
-                            }),
-                            child: Container(
-                              margin: EdgeInsets.only(left: 10),
-                              child: ListView(
-                                children: [
-                                  windowHeader(),
-                                  SizedBox(height: 10),
-                                  showImages(),
-                                  SizedBox(height: 20),
-                                  ownLinkInput(),
-                                  SizedBox(height: 20),
-                                  windowOptions()
-                                ],
-                              ),
+                        ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                            PointerDeviceKind.touch,
+                            PointerDeviceKind.mouse,
+                          }),
+                          child: Container(
+                            margin: EdgeInsets.only(left: 10),
+                            child: ListView(
+                              children: [
+                                windowHeader(),
+                                SizedBox(height: 10),
+                                showImages(),
+                                SizedBox(height: 20),
+                                ownLinkInput(),
+                                SizedBox(height: 20),
+                                windowOptions()
+                              ],
                             ),
                           ),
-                          windowCloseButton()
-                        ] ,
+                        ),
+                        windowCloseButton()
+                      ] ,
                       ),
                     ),
 
@@ -249,7 +244,18 @@ class _ImageGalerieState extends State<ImageGalerie> {
                 }
             );
           }
+      );
+    }
+
+    return InkWell(
+      child: Container(
+        constraints: BoxConstraints(
+            minHeight: 200,
+        ),
+        width: double.infinity,
+        child:widget.child,
       ),
+      onTap:!widget.isCreator ? null :   () => windowChangeImageToLinkAndPredetermined(),
     );
 
   }
