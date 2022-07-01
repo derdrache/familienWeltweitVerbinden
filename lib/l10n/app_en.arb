@@ -289,7 +289,7 @@
     "nochKeineNachrichtVorhanden": "no messages available yet",
     "emailErneutVersendet": "e-mail has been sent again",
     "reisearten": "Travel type",
-    "genauerStandortSichtbarFuer": "exact location visible for ",
+    "genauerStandortSichtbarFuer": "exact locfation visible for ",
     "filterErgebnisse": "all filters results",
     "keineEventsVorhanden": "no events available",
     "langeZeitNichtGesehen": "long time not seen",
@@ -297,6 +297,8 @@
     "innerhalbWocheGesehen": "seen within one week",
     "kuerzlichGesehen": "seen recently",
     "automatischerStandortNichtMoeglich": "automatic location cannot be combined with 'fixed location' travel type",
-    "neueEvents": "new events"
+    "neueEvents": "new events",
+    "link": "link",
+    "hochladen": "upload"
 }
 
