@@ -662,15 +662,26 @@ class ReportsDatabase{
 
 }
 
-uploadImage(imageName, image) async{
-  var url = Uri.parse("https://families-worldwide.com/bilder/uploadImage.php");
+uploadImage(imagePath, imageName, image) async{
+  var url = Uri.parse("https://families-worldwide.com/database/uploadImage.php");
   var data = {
+    "imagePath": imagePath,
     "imageName": imageName,
     "image": base64Encode(image),
   };
 
-  await http.post(url, body: json.encode(data));
+  var test = await http.post(url, body: json.encode(data));
+  print(test.body);
+}
 
+deleteImage(imageName) async{
+  var url = Uri.parse("https://families-worldwide.com/database/deleteImage.php");
+  imageName = imageName.split("/").last;
+  var data = {
+    "imageName": imageName,
+  };
+
+  await http.post(url, body: json.encode(data));
 }
 
 _deleteInTable(table, id) {
