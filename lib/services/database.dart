@@ -670,8 +670,13 @@ uploadImage(imagePath, imageName, image) async{
     "image": base64Encode(image),
   };
 
-  var test = await http.post(url, body: json.encode(data));
-  print(test.body);
+  try{
+    //Web Version wirft nach vollendung ein Fehler auf => funktioniert aber ohne Probleme
+    await http.post(url, body: json.encode(data));
+  }catch(_){
+
+  }
+
 }
 
 deleteImage(imageName) async{

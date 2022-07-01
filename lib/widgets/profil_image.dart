@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
@@ -61,8 +62,8 @@ class _ProfilImageState extends State<ProfilImage> {
     var userName = FirebaseAuth.instance.currentUser.displayName;
     var pickedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 50);
-    var imageName = userName + pickedImage.name.substring(12);
 
+    var imageName = userName + pickedImage.name;
 
     if (pickedImage == null) {
       customSnackbar(context, "Datei ist beschädigt");
@@ -73,13 +74,30 @@ class _ProfilImageState extends State<ProfilImage> {
 
     await uploadImage(pickedImage.path, imageName, imageByte);
 
+
     return imageName;
+
   }
 
   changeImageSize(pickedImage) async{
     var imageByte = imagePack.decodeImage(await pickedImage.readAsBytes());
-    var ImageResizeThumbnail = imagePack.copyResize(imageByte, width: 400, height: 400);
-    var imageJpgByte = imagePack.encodeJpg(ImageResizeThumbnail, quality: 25);
+    var originalWidth = imageByte.width;
+    var originalHeight = imageByte.height;
+    var newWidth = 0;
+    var newHeight = 0;
+
+    if(originalWidth > originalHeight){
+      var factor = originalWidth / originalHeight;
+      newHeight = 400;
+      newWidth = (400 * factor).round();
+    }else{
+      var factor = originalHeight / originalWidth;
+      newWidth = 400;
+      newHeight = (400 * factor).round();
+    }
+
+    var imageResizeThumbnail = imagePack.copyResize(imageByte, width: newWidth, height: newHeight);
+    var imageJpgByte = imagePack.encodeJpg(imageResizeThumbnail, quality: 25);
 
     return imageJpgByte;
   }
@@ -169,10 +187,13 @@ class _ProfilImageState extends State<ProfilImage> {
             child: Text(AppLocalizations.of(context).hochladen),
             onTap: () async {
               var imageName = await pickAndUploadImage();
+
               if (imageName == false) return;
               profilImageLinkKontroller.text =
                   "https://families-worldwide.com/bilder/" + imageName;
               checkAndSaveImage();
+
+
             },
           ),
           if(widget.profil["bild"].isNotEmpty) PopupMenuItem(
