@@ -136,18 +136,6 @@ class _ImageGalerieState extends State<ImageGalerie> {
     saveChanges();
   }
 
-  deleteEventImage() async{
-    deleteImage(widget.event["bild"]);
-
-    ProfilDatabase().updateProfil("bild = 'assets/bilder/strand.jpg'",
-        "WHERE id = '${widget.event["id"]}'");
-
-    setState(() {
-      widget.event["bild"] = "assets/bilder/strand.jpg";
-      widget.child = Image.asset(widget.event["bild"], fit: BoxFit.fitWidth);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     showImages() {
@@ -270,12 +258,6 @@ class _ImageGalerieState extends State<ImageGalerie> {
             child: Text(AppLocalizations.of(context).hochladen),
             onTap: () => selectAndUploadImage()
           ),
-          if(widget.event["bild"].contains("http")) PopupMenuItem(
-              child: Text(AppLocalizations.of(context).loeschen),
-              onTap: () {
-                deleteEventImage();
-              }
-          )
         ],
         elevation: 8.0,
       );
