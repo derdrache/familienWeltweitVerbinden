@@ -253,6 +253,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   child: const Text("Ok"),
                   onPressed: () {
                     EventDatabase().delete(widget.event["id"]);
+                    deleteImage(widget.event["bild"]);
                     global_func.changePageForever(
                         context, StartPage(selectedIndex: 1));
                   },
@@ -390,7 +391,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             showDialog(
                 context: context,
                 builder: (BuildContext buildContext) {
-                  return StatefulBuilder(builder: (buildContext, dialogSetState) {
+                  return StatefulBuilder(
+                      builder: (buildContext, dialogSetState) {
                     return CustomAlertDialog(
                         title: AppLocalizations.of(context).eventOptionen,
                         children: [
@@ -419,9 +421,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                       widget.teilnahme = true;
                                       EventDatabase().update(
                                           "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
-                                          "WHERE id= '${widget.event["id"]}'"
-                                      );
-
+                                          "WHERE id= '${widget.event["id"]}'");
                                     }
                                   } else {
                                     widget.event["immerZusagen"].remove(userId);
@@ -432,9 +432,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
                                   dialogSetState(() {});
 
-                                  setState(() {
-
-                                  });
+                                  setState(() {});
                                 },
                               )
                             ],
