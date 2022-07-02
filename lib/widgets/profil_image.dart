@@ -83,17 +83,18 @@ class _ProfilImageState extends State<ProfilImage> {
     var imageByte = imagePack.decodeImage(await pickedImage.readAsBytes());
     var originalWidth = imageByte.width;
     var originalHeight = imageByte.height;
+    var minPixel = 400;
     var newWidth = 0;
     var newHeight = 0;
 
     if(originalWidth > originalHeight){
       var factor = originalWidth / originalHeight;
-      newHeight = 400;
-      newWidth = (400 * factor).round();
+      newHeight = minPixel;
+      newWidth = (minPixel * factor).round();
     }else{
       var factor = originalHeight / originalWidth;
-      newWidth = 400;
-      newHeight = (400 * factor).round();
+      newWidth = minPixel;
+      newHeight = (minPixel * factor).round();
     }
 
     var imageResizeThumbnail = imagePack.copyResize(imageByte, width: newWidth, height: newHeight);
