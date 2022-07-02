@@ -231,8 +231,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () {
-                    var userId = FirebaseAuth.instance.currentUser?.uid;
-                    ProfilDatabase().deleteProfil(userId);
+                    ProfilDatabase().deleteProfil(widget.profil["id"]);
+                    deleteImage(widget.profil["bild"]);
                     setState(() {});
                     global_functions.changePageForever(
                         context, const LoginPage());
