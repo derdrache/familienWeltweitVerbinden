@@ -297,6 +297,8 @@
     "automatischerStandortNichtMoeglich": "Automatischer Standort kann nicht mit der Reiseart 'Fester Standort' kombiniert werden",
     "neueEvents": "neue Events",
     "link": "Link",
-    "hochladen": "Hochladen"
+    "hochladen": "Hochladen",
+    "bilderauswahl": "Bilderauswahl",
+    "eigenesBildLinkEingeben": "Eigenes Bild - Link eingeben"
 
 }
