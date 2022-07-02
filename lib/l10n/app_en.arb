@@ -299,6 +299,8 @@
     "automatischerStandortNichtMoeglich": "automatic location cannot be combined with 'fixed location' travel type",
     "neueEvents": "new events",
     "link": "link",
-    "hochladen": "upload"
+    "hochladen": "upload",
+    "bilderauswahl": "image selection",
+    "eigenesBildLinkEingeben": "own picture - enter link"
 }
 

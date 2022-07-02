@@ -227,8 +227,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           Stack(
             children: [
               ImageGalerie(
-                id: widget.event["id"],
                 isCreator: widget.isCreator,
+                event: widget.event,
                 child: ClipRRect(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20.0),
