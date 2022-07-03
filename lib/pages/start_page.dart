@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
+
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
 import '../global/variablen.dart';
@@ -15,6 +16,7 @@ import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../widgets/badge_icon.dart';
 import '../windows/patchnotes.dart';
+import 'community/community_page.dart';
 import 'force_update.dart';
 import 'events/event_page.dart';
 import 'login_register_page/create_profil_page.dart';
@@ -162,9 +164,9 @@ class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
-      //BoardPage(),
       const ErkundenPage(),
       const EventPage(),
+      const CommunityPage(),
       const ChatPage(),
       const SettingPage()
     ];
@@ -256,12 +258,13 @@ class _StartPageState extends State<StartPage> {
           selectedItemColor: Colors.white,
           onTap: _onItemTapped,
           items: <BottomNavigationBarItem>[
-            /*
-              BottomNavigationBarItem(
-                icon: Icon(Icons.feed),
-                label: 'News',
-              ),
+/*
+            BottomNavigationBarItem(
+              icon: Icon(Icons.feed),
+              label: 'News',
+            ),
 */
+
             const BottomNavigationBarItem(
               icon: Icon(Icons.map),
               label: 'World',
@@ -269,6 +272,10 @@ class _StartPageState extends State<StartPage> {
             BottomNavigationBarItem(
               icon: eventIcon(),
               label: 'Events',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.cottage),
+              label: 'Community',
             ),
             BottomNavigationBarItem(
               icon: chatIcon(),
