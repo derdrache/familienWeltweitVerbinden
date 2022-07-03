@@ -430,6 +430,86 @@ class EventDatabase{
 
 }
 
+class CommunityDatabase{
+  addNewCommunity(communityData) async {
+    var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
+    await http.post(url, body: json.encode(communityData));
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "communities",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+  updateLocation(id, locationData) async {
+    var url = Uri.parse(databaseUrl + "database/communities/changeLocation.php");
+
+    await http.post(url, body: json.encode({
+      "id": id,
+      "ort": locationData["city"],
+      "land": locationData["countryname"],
+      "latt": locationData["latt"],
+      "longt": locationData["longt"]
+    }));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "communities"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+
+    return responseBody;
+  }
+
+  delete(communityId){
+    _deleteInTable("communities", communityId);
+  }
+}
+
 class StadtinfoDatabase{
 
   addNewCity(city) async {
