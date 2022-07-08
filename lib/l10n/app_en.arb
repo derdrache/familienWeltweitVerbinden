@@ -301,6 +301,11 @@
     "link": "link",
     "hochladen": "upload",
     "bilderauswahl": "image selection",
-    "eigenesBildLinkEingeben": "own picture - enter link"
+    "eigenesBildLinkEingeben": "own picture - enter link",
+    "communityErstellen": "create community",
+    "communityName": "community name",
+    "beschreibungCommunity": "community description",
+    "bitteCommunityBeschreibungEingeben": "Please enter community description",
+    "linkEingebenOptional": "enter link *optional*"
 }
 

@@ -299,6 +299,11 @@
     "link": "Link",
     "hochladen": "Hochladen",
     "bilderauswahl": "Bilderauswahl",
-    "eigenesBildLinkEingeben": "Eigenes Bild - Link eingeben"
+    "eigenesBildLinkEingeben": "Eigenes Bild - Link eingeben",
+    "communityErstellen": "Community erstellen",
+    "communityName": "Name der Community",
+    "beschreibungCommunity": "Beschreibung der Community",
+    "bitteCommunityBeschreibungEingeben": "Bitte Community Beschreibung eingeben",
+    "linkEingebenOptional": "Link eingeben *optional*"
 
 }

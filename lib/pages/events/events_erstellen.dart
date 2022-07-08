@@ -368,7 +368,7 @@ class _EventErstellenState extends State<EventErstellen> {
           buttons: [
             IconButton(
                 onPressed: () => saveEvent(),
-                icon: const Icon(Icons.done, color: Colors.green))
+                icon: const Icon(Icons.done, size: 30))
           ]),
       body: ListView(
         children: [
