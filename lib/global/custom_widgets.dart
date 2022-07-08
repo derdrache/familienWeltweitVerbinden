@@ -38,7 +38,6 @@ Widget customTextInput(text, controller, {validator, passwort = false,
                   hintText: hintText,
                   labelText: text,
                   labelStyle: const TextStyle(fontSize: 15, color: Colors.grey),
-                  //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
                 ),
                 validator: validator
             ),

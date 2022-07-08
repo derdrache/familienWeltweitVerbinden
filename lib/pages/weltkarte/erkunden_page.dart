@@ -12,6 +12,8 @@ import 'package:hive/hive.dart';
 
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';
+import '../community/community_erstellen.dart';
+import '../events/events_erstellen.dart';
 import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
@@ -79,6 +81,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       reiseplanungOn = false,
       communityMarkerOn = false,
       filterOn = false;
+  bool createMenuIsOpen = false;
 
   @override
   void initState() {
@@ -1182,6 +1185,57 @@ class _ErkundenPageState extends State<ErkundenPage> {
       return popupItems;
     }
 
+    createMenuButtons(){
+      return Row(mainAxisAlignment: MainAxisAlignment.end,children: [
+        if (currentMapZoom > minMapZoom) FloatingActionButton(
+            heroTag: "zoom out 1",
+            child: const Icon(Icons.zoom_out_map),
+            onPressed: () => zoomOut()),
+        SizedBox(width: createMenuIsOpen ? 20 : 10),
+        if(createMenuIsOpen) Row(mainAxisAlignment: MainAxisAlignment.end,children: [
+          FloatingActionButton(
+              heroTag: "create community",
+              child: const Icon(Icons.cottage),
+              onPressed: () =>
+                  changePage(context, const CommunityErstellen())
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
+              heroTag: "create event",
+              child: const Icon(Icons.calendar_today),
+              onPressed: () =>
+                  changePage(context, const EventErstellen())
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
+              heroTag: "create cityInformation 1",
+              child: const Icon(Icons.location_city),
+              onPressed: () =>
+                  changePage(context, const CreateStadtinformationsPage())
+          ),
+          const SizedBox(width: 10),
+        ]),
+        if(!createMenuIsOpen) FloatingActionButton(
+            heroTag: "open menu",
+            child: const Icon(Icons.create),
+            onPressed: () {
+              createMenuIsOpen = true;
+              setState(() {});
+            }
+        ),
+        if(createMenuIsOpen) FloatingActionButton(
+            mini: true,
+            backgroundColor: Colors.red,
+            heroTag: "close menu",
+            child: const Icon(Icons.close, size: 20),
+            onPressed: () {
+              createMenuIsOpen = false;
+              setState(() {});
+            }
+        ),
+      ],);
+    }
+
     markerPopupContainer() {
       return Positioned.fill(
           child: ScrollConfiguration(
@@ -1236,23 +1290,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                         onPressed: () => openSelectCityWindow(),
                       ),
                     ),
-                  if (currentMapZoom > minMapZoom)
-                    Positioned(
-                      top: 0,
-                      right: 80,
-                      child: FloatingActionButton(
-                          heroTag: "zoom out 2",
-                          child: const Icon(Icons.zoom_out_map),
-                          onPressed: () => zoomOut()),
-                    ),
-                  Positioned(
-                      top: 0,
-                      right: 10,
-                      child: FloatingActionButton(
-                          heroTag: "create Stadtinformation 2",
-                          child: const Icon(Icons.create),
-                          onPressed: () => changePage(
-                              context, const CreateStadtinformationsPage())))
+              Positioned(top: -10, right: 10,child: createMenuButtons())
                 ],
               );
             }),
@@ -1556,7 +1594,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   ),
                 if (eventMarkerOn)
                   Icon(Icons.event_busy,
-                      size: 32, color: Theme.of(context).colorScheme.primary)
+                      size: 36, color: Theme.of(context).colorScheme.primary)
               ],
             ),
             onPressed: () {
@@ -1681,7 +1719,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   ? Icon(Icons.filter_list_off,
                       size: 32, color: Theme.of(context).colorScheme.primary)
                   : Icon(Icons.filter_list,
-                      size: 32, color: Theme.of(context).colorScheme.primary),
+                      size: 34, color: Theme.of(context).colorScheme.primary),
               onPressed: () {
                 openFilterWindow();
               }));
@@ -1702,21 +1740,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           filterButton()
         ]),
       ),
-      floatingActionButton:
-          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-        if (currentMapZoom > minMapZoom && !popupActive)
-          FloatingActionButton(
-              heroTag: "zoom out 1",
-              child: const Icon(Icons.zoom_out_map),
-              onPressed: () => zoomOut()),
-        const SizedBox(width: 10),
-        if (!popupActive)
-          FloatingActionButton(
-              heroTag: "create Stadtinformation 1",
-              child: const Icon(Icons.create),
-              onPressed: () =>
-                  changePage(context, const CreateStadtinformationsPage())),
-      ]),
+      floatingActionButton: popupActive ? null : createMenuButtons(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
