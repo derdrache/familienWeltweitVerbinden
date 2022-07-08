@@ -155,7 +155,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                         isDense: widget.isDense,
                         border: InputBorder.none,
                         hintText: widget.hintText,
-                        hintStyle: const TextStyle(fontSize: 13, color: Colors.grey)
+                        hintStyle: const TextStyle(fontSize: 15, color: Colors.grey)
                     ),
                     style: const TextStyle(),
                     onChanged: (value) async {
