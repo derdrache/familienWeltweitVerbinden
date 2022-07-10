@@ -304,6 +304,10 @@
     "communityName": "Name der Community",
     "beschreibungCommunity": "Beschreibung der Community",
     "bitteCommunityBeschreibungEingeben": "Bitte Community Beschreibung eingeben",
-    "linkEingebenOptional": "Link eingeben *optional*"
+    "linkEingebenOptional": "Link eingeben *optional*",
+    "communityWirklichLoeschen": "Möchtest du die Community wirklich löschen?",
+    "communityMelden": "Community melden",
+    "communityMeldenFrage": "Warum möchtest du die Community melden?",
+    "beschreibungAendern": "Beschreibung ändern"
 
 }
