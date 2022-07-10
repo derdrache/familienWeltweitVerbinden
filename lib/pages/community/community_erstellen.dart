@@ -35,7 +35,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       "latt": locationData["latt"],
       "longt": locationData["longt"],
       "erstelltAm": DateTime.now().toString(),
-      "erstelltVon": FirebaseAuth.instance.currentUser.displayName
+      "erstelltVon": FirebaseAuth.instance.currentUser.uid
     };
 
     if(!checkValidationAndSendError(communityData)) return false;

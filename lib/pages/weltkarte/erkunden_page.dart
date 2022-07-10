@@ -1,8 +1,10 @@
 import 'dart:ui';
 
 import 'package:familien_suche/global/custom_widgets.dart';
+import 'package:familien_suche/pages/community/community_card.dart';
 import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -33,6 +35,7 @@ class ErkundenPage extends StatefulWidget {
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
+  var userId = FirebaseAuth.instance.currentUser.uid;
   var localProfils = Hive.box('secureBox').get("profils") ?? [];
   List profils = Hive.box('secureBox').get("profils") ?? [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
@@ -52,10 +55,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       profilsBetween,
       profilsCities,
       profilsExact;
-  List eventsKontinente,
-      eventsCountries,
-      eventsBetween,
-      eventsCities;
+  List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
   List communitiesContinents,
       communitiesCountries,
       communitiesBetween,
@@ -162,8 +162,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomLevels(events, "events");
     setSearchAutocomplete();
 
-    //getCommunitiesFromDB();
-    //createAndSetZoomLevels(events, "communities");
+    getCommunitiesFromDB();
+    createAndSetZoomLevels(communities, "communities");
 
     buildLoaded = true;
 
@@ -230,9 +230,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   getCommunitiesFromDB() async {
-    dynamic dbCommunities = await CommunityDatabase().getData(
-        "*", "ORDER BY ort ASC",
-        returnList: true);
+    dynamic dbCommunities = await CommunityDatabase()
+        .getData("*", "ORDER BY ort ASC", returnList: true);
     if (dbCommunities == false) dbCommunities = [];
 
     Hive.box('secureBox').put("communities", dbCommunities);
@@ -240,7 +239,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     communities = dbCommunities;
     createAndSetZoomLevels(communities, "communities");
   }
-
 
   setSearchAutocomplete() {
     var countryDropDownList =
@@ -410,40 +408,39 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var pufferContinents = [];
     var pufferExact = [];
 
-    if(typ == "profils") addCityProfils();
+    if (typ == "profils") addCityProfils();
 
-    for(var mainItem in mainList){
-      pufferCountries = await createCountriesZoomLevel(pufferCountries, mainItem);
-      pufferContinents = await createContinentsZoomLevel(
-          pufferContinents, mainItem);
-      pufferBetween =
-          createBetweenZoomLevel(pufferBetween, mainItem, 1);
+    for (var mainItem in mainList) {
+      pufferCountries =
+          await createCountriesZoomLevel(pufferCountries, mainItem);
+      pufferContinents =
+          await createContinentsZoomLevel(pufferContinents, mainItem);
+      pufferBetween = createBetweenZoomLevel(pufferBetween, mainItem, 1);
 
       pufferCities = createCitiesZoomLevel(pufferCities, mainItem);
-      if(typ == "profils") {
-        pufferExact = createCitiesZoomLevel(pufferExact, mainItem,
-            exactLocation: true);
+      if (typ == "profils") {
+        pufferExact =
+            createCitiesZoomLevel(pufferExact, mainItem, exactLocation: true);
       }
     }
 
-    if(typ == "profils"){
+    if (typ == "profils") {
       profilsCities = pufferCities;
       profilsBetween = pufferBetween;
       profilsCountries = pufferCountries;
       profilsContinents = pufferContinents;
       profilsExact = pufferExact;
-    } else if(typ == "events"){
+    } else if (typ == "events") {
       eventsCities = pufferCities;
       eventsBetween = pufferBetween;
       eventsCountries = pufferCountries;
       eventsKontinente = pufferContinents;
-    } else if (typ == "communities"){
+    } else if (typ == "communities") {
       communitiesCities = pufferCities;
       communitiesBetween = pufferBetween;
       communitiesCountries = pufferCountries;
       communitiesContinents = pufferContinents;
     }
-
 
     changeProfil(currentMapZoom);
   }
@@ -517,8 +514,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           ? false
           : list[i]["ort"].contains(profil["ort"]);
 
-        if (geodataCondition ||
-          (sameCityCondition && !exactLocation)){
+      if (geodataCondition || (sameCityCondition && !exactLocation)) {
         newCity = false;
         var addNumberName =
             int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
@@ -650,8 +646,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     return list;
   }
-
-
 
   changeProfil(zoom) {
     var choosenProfils = [];
@@ -1128,21 +1122,22 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
-
     List<Marker> allMarker = [];
 
-    createPopupEvents(event, {spezialActivation = false}) {
+    //ändern in createPopupCards // typ = "event" || "community"
+    createPopupEvents({event, community, spezialActivation = false}) {
       double screenWidth = MediaQuery.of(context).size.width;
       var eventCrossAxisCount = screenWidth / 190;
       popupItems = [];
-      popupTyp = "events";
+      popupTyp = event != null ? "events" : "community";
+      var showItems = event ?? community;
 
       popupItems.add(SliverAppBar(
         toolbarHeight: 30,
         backgroundColor: Colors.white,
         flexibleSpace: Center(
             child: Text(
-                selectPopupMenuText(event["profils"], spezialActivation),
+                selectPopupMenuText(showItems["profils"], spezialActivation),
                 style: const TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold))),
         pinned: true,
@@ -1155,85 +1150,97 @@ class _ErkundenPageState extends State<ErkundenPage> {
           ),
           delegate:
               SliverChildBuilderDelegate((BuildContext context, int index) {
-            var eventData = event["profils"][index];
+            var itemData = showItems["profils"][index];
 
-            return EventCard(
-                margin: const EdgeInsets.only(
-                    top: 15, bottom: 15, left: 25, right: 25),
-                event: eventData,
-                withInteresse: true,
-                afterPageVisit: () async {
-                  events = await EventDatabase().getData("*",
-                      "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC");
+            if(event != null){
+              return EventCard(
+                  margin: const EdgeInsets.only(
+                      top: 15, bottom: 15, left: 25, right: 25),
+                  event: itemData,
+                  withInteresse: true,
+                  afterPageVisit: () async {
+                    events = await EventDatabase().getData("*",
+                        "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC");
 
-                  var refreshEvents = [];
+                    var refreshEvents = [];
 
-                  for (var oldEvent in lastEventPopup["profils"]) {
-                    for (var newEvents in events) {
-                      if (oldEvent["id"] == newEvents["id"]) {
-                        refreshEvents.add(newEvents);
+                    for (var oldEvent in lastEventPopup["profils"]) {
+                      for (var newEvents in events) {
+                        if (oldEvent["id"] == newEvents["id"]) {
+                          refreshEvents.add(newEvents);
+                        }
                       }
                     }
-                  }
 
-                  lastEventPopup["profils"] = refreshEvents;
-                  createPopupEvents(lastEventPopup);
-                  setState(() {});
-                });
-          }, childCount: event["profils"].length)));
+                    lastEventPopup["profils"] = refreshEvents;
+                    createPopupEvents(event: lastEventPopup);
+                    setState(() {});
+                  });
+            } else {
+              return CommunityCard(
+                  community: itemData,
+                  margin: const EdgeInsets.only(
+                      top: 15, bottom: 15, left: 25, right: 25
+                  ),
+                withFavorite: true,
+              );
+            }
+
+          }, childCount: showItems["profils"].length)));
 
       return popupItems;
     }
 
-    createMenuButtons(){
-      return Row(mainAxisAlignment: MainAxisAlignment.end,children: [
-        if (currentMapZoom > minMapZoom) FloatingActionButton(
-            heroTag: "zoom out 1",
-            child: const Icon(Icons.zoom_out_map),
-            onPressed: () => zoomOut()),
-        SizedBox(width: createMenuIsOpen ? 20 : 10),
-        if(createMenuIsOpen) Row(mainAxisAlignment: MainAxisAlignment.end,children: [
-          FloatingActionButton(
-              heroTag: "create community",
-              child: const Icon(Icons.cottage),
-              onPressed: () =>
-                  changePage(context, const CommunityErstellen())
-          ),
-          const SizedBox(width: 10),
-          FloatingActionButton(
-              heroTag: "create event",
-              child: const Icon(Icons.calendar_today),
-              onPressed: () =>
-                  changePage(context, const EventErstellen())
-          ),
-          const SizedBox(width: 10),
-          FloatingActionButton(
-              heroTag: "create cityInformation 1",
-              child: const Icon(Icons.location_city),
-              onPressed: () =>
-                  changePage(context, const CreateStadtinformationsPage())
-          ),
-          const SizedBox(width: 10),
-        ]),
-        if(!createMenuIsOpen) FloatingActionButton(
-            heroTag: "open menu",
-            child: const Icon(Icons.create),
-            onPressed: () {
-              createMenuIsOpen = true;
-              setState(() {});
-            }
-        ),
-        if(createMenuIsOpen) FloatingActionButton(
-            mini: true,
-            backgroundColor: Colors.red,
-            heroTag: "close menu",
-            child: const Icon(Icons.close, size: 20),
-            onPressed: () {
-              createMenuIsOpen = false;
-              setState(() {});
-            }
-        ),
-      ],);
+    createMenuButtons() {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (currentMapZoom > minMapZoom)
+            FloatingActionButton(
+                heroTag: "zoom out 1",
+                child: const Icon(Icons.zoom_out_map),
+                onPressed: () => zoomOut()),
+          SizedBox(width: createMenuIsOpen ? 20 : 10),
+          if (createMenuIsOpen)
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              FloatingActionButton(
+                  heroTag: "create community",
+                  child: const Icon(Icons.cottage),
+                  onPressed: () =>
+                      changePage(context, const CommunityErstellen())),
+              const SizedBox(width: 10),
+              FloatingActionButton(
+                  heroTag: "create event",
+                  child: const Icon(Icons.calendar_today),
+                  onPressed: () => changePage(context, const EventErstellen())),
+              const SizedBox(width: 10),
+              FloatingActionButton(
+                  heroTag: "create cityInformation 1",
+                  child: const Icon(Icons.location_city),
+                  onPressed: () =>
+                      changePage(context, const CreateStadtinformationsPage())),
+              const SizedBox(width: 10),
+            ]),
+          if (!createMenuIsOpen)
+            FloatingActionButton(
+                heroTag: "open menu",
+                child: const Icon(Icons.create),
+                onPressed: () {
+                  createMenuIsOpen = true;
+                  setState(() {});
+                }),
+          if (createMenuIsOpen)
+            FloatingActionButton(
+                mini: true,
+                backgroundColor: Colors.red,
+                heroTag: "close menu",
+                child: const Icon(Icons.close, size: 20),
+                onPressed: () {
+                  createMenuIsOpen = false;
+                  setState(() {});
+                }),
+        ],
+      );
     }
 
     markerPopupContainer() {
@@ -1290,7 +1297,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                         onPressed: () => openSelectCityWindow(),
                       ),
                     ),
-              Positioned(top: -10, right: 10,child: createMenuButtons())
+                  Positioned(top: -10, right: 10, child: createMenuButtons())
                 ],
               );
             }),
@@ -1422,13 +1429,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
         allMarker.add(eventMarker(event["name"], position, () {
           lastEventPopup = event;
           popupActive = true;
-          createPopupEvents(event);
+          createPopupEvents(event: event);
           setState(() {});
         }, isOnline));
       }
     }
 
-    communityMarker(numberText, position, buttonFunction){
+    communityMarker(numberText, position, buttonFunction) {
       double markerSize = 32;
 
       return Marker(
@@ -1440,17 +1447,21 @@ class _ErkundenPageState extends State<ErkundenPage> {
           icon: Stack(
             clipBehavior: Clip.none,
             children: [
-              Icon(Icons.cottage,
+              Icon(Icons.cottage_outlined,
                   size: markerSize,
                   color: Theme.of(context).colorScheme.primary),
               Positioned(
-                  top: 9.5,
-                  left: 5.5,
+                  top: 12,
+                  left: 8.5,
                   child: Container(
-                      padding: const EdgeInsets.only(left: 2, top: 1),
-                      width: 21.5,
-                      height: 18,
-                      color: Colors.white,
+                      padding: const EdgeInsets.only(left: 2, bottom: 2),
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(3.0),
+                              topRight: Radius.circular(3.0))),
+                      width: 15,
+                      height: 14,
                       child: Center(
                           child: Text(numberText,
                               style: const TextStyle(
@@ -1468,15 +1479,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
       for (var community in aktiveCommunities) {
         var position = LatLng(community["latt"], community["longt"]);
 
-        allMarker.add(
-            communityMarker(
-                community["name"],
-                position,
-                () {
-                  print("buttonfunction");
-                }
-            )
-        );
+        allMarker.add(communityMarker(community["name"], position, () {
+          popupActive = true;
+          createPopupEvents(community: community);
+          setState(() {});
+        }));
       }
     }
 
@@ -1484,7 +1491,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       createOwnMarker();
       if (!eventMarkerOn && !communityMarkerOn) createProfilMarker();
       if (eventMarkerOn) createEventMarker();
-      if(communityMarkerOn) createCommunityMarker();
+      if (communityMarkerOn) createCommunityMarker();
     }
 
     ownFlutterMap() {
@@ -1612,7 +1619,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
                 if (newEvents.isNotEmpty) {
                   popupActive = true;
-                  createPopupEvents({"profils": newEvents},
+                  createPopupEvents(event: {"profils": newEvents},
                       spezialActivation: true);
                   Hive.box('secureBox').put("lastLoginEvents", events);
                 }
@@ -1625,7 +1632,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     communityButton() {
       var newCommunity = [];
-      var lastLoginCommunites = Hive.box('secureBox').get("lastLoginCommunity") ?? [];
+      var lastLoginCommunites =
+          Hive.box('secureBox').get("lastLoginCommunity") ?? [];
 
       for (var community in communities) {
         var isNew = true;
@@ -1653,7 +1661,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
                     icon: Icons.cottage_outlined,
                     size: 36,
                     color: Theme.of(context).colorScheme.primary,
-                    text: newCommunity.isEmpty ? "" : newCommunity.length.toString(),
+                    text: newCommunity.isEmpty
+                        ? ""
+                        : newCommunity.length.toString(),
                   ),
                 if (communityMarkerOn)
                   Icon(Icons.cottage,
@@ -1675,7 +1685,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
                 if (newCommunity.isNotEmpty) {
                   popupActive = true;
-                  createPopupEvents({"profils": newCommunity},
+                  createPopupEvents(community: {"profils": newCommunity},
                       spezialActivation: true);
                   Hive.box('secureBox').put("lastLoginCommunity", communities);
                 }
@@ -1724,7 +1734,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 openFilterWindow();
               }));
     }
-
 
     return Scaffold(
       body: Padding(

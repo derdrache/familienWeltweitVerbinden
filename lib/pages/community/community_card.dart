@@ -53,9 +53,7 @@ class _CommunityCardState extends State<CommunityCard> {
       },
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
-          //  Android 165
           height: screenHeight / 3.2 * bigMultiplikator,
-          // Android 220 ~3,4
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -91,7 +89,7 @@ class _CommunityCardState extends State<CommunityCard> {
                           : Image.network(widget.community["bild"],
                               height: (70 + ((screenHeight - 600) / 4)) *
                                   bigMultiplikator,
-                              width: (130 + ((screenHeight - 600) / 4)) *
+                              width: (135 + ((screenHeight - 600) / 4)) *
                                   bigMultiplikator,
                               fit: BoxFit.fill),
                     ),

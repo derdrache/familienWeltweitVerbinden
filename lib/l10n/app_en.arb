@@ -306,6 +306,10 @@
     "communityName": "community name",
     "beschreibungCommunity": "community description",
     "bitteCommunityBeschreibungEingeben": "Please enter community description",
-    "linkEingebenOptional": "enter link *optional*"
+    "linkEingebenOptional": "enter link *optional*",
+    "communityWirklichLoeschen": "Do you really want to delete the community?",
+    "communityMelden": "report community",
+    "communityMeldenFrage": "why do you want to report the community?",
+    "beschreibungAendern": "change description"
 }
 
