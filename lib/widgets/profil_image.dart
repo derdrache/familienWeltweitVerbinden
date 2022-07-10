@@ -59,8 +59,8 @@ class _ProfilImageState extends State<ProfilImage> {
 
   pickAndUploadImage() async {
     var userName = FirebaseAuth.instance.currentUser.displayName;
-    var pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 50);
+    var pickedImage = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
     var imageName = userName + pickedImage.name;
 
@@ -73,12 +73,10 @@ class _ProfilImageState extends State<ProfilImage> {
 
     await uploadImage(pickedImage.path, imageName, imageByte);
 
-
     return imageName;
-
   }
 
-  changeImageSize(pickedImage) async{
+  changeImageSize(pickedImage) async {
     var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
     var originalWidth = imageByte.width;
     var originalHeight = imageByte.height;
@@ -86,27 +84,28 @@ class _ProfilImageState extends State<ProfilImage> {
     var newWidth = 0;
     var newHeight = 0;
 
-    if(originalWidth > originalHeight){
+    if (originalWidth > originalHeight) {
       var factor = originalWidth / originalHeight;
       newHeight = minPixel;
       newWidth = (minPixel * factor).round();
-    }else{
+    } else {
       var factor = originalHeight / originalWidth;
       newWidth = minPixel;
       newHeight = (minPixel * factor).round();
     }
 
-    var imageResizeThumbnail = image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
+    var imageResizeThumbnail =
+        image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
     var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 25);
 
     return imageJpgByte;
   }
 
-  deleteProfilImage() async{
+  deleteProfilImage() async {
     deleteOldImage(widget.profil["bild"][0]);
 
-    ProfilDatabase().updateProfil("bild = '${json.encode([])}'",
-        "WHERE id = '${widget.profil["id"]}'");
+    ProfilDatabase().updateProfil(
+        "bild = '${json.encode([])}'", "WHERE id = '${widget.profil["id"]}'");
 
     setState(() {
       widget.profil["bild"] = [];
@@ -144,29 +143,6 @@ class _ProfilImageState extends State<ProfilImage> {
               ],
             );
           });
-
-      await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CustomAlertDialog(
-              title: AppLocalizations.of(context).profilbildAendern,
-              children: [
-                customTextInput(
-                    AppLocalizations.of(context).linkProfilbildEingeben,
-                    profilImageLinkKontroller),
-              ],
-              actions: [
-                TextButton(
-                  child: Text(AppLocalizations.of(context).speichern),
-                  onPressed: () => checkAndSaveImage(),
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
-                  onPressed: () => Navigator.pop(context),
-                )
-              ],
-            );
-          });
     }
 
     _showPopupMenu(tabPosition) async {
@@ -180,9 +156,9 @@ class _ProfilImageState extends State<ProfilImage> {
             ),
         items: [
           PopupMenuItem(
-            child: Text(AppLocalizations.of(context).link),
-            onTap: () => changeImageWindow(),
-          ),
+              child: Text(AppLocalizations.of(context).link),
+              onTap: () => Future.delayed(
+                  const Duration(seconds: 0), () => changeImageWindow())),
           PopupMenuItem(
             child: Text(AppLocalizations.of(context).hochladen),
             onTap: () async {
@@ -192,16 +168,14 @@ class _ProfilImageState extends State<ProfilImage> {
               profilImageLinkKontroller.text =
                   "https://families-worldwide.com/bilder/" + imageName;
               checkAndSaveImage();
-
-
             },
           ),
-          if(widget.profil["bild"].isNotEmpty) PopupMenuItem(
-            child: Text(AppLocalizations.of(context).loeschen),
-            onTap: () {
-              deleteProfilImage();
-      }
-          )
+          if (widget.profil["bild"].isNotEmpty)
+            PopupMenuItem(
+                child: Text(AppLocalizations.of(context).loeschen),
+                onTap: () {
+                  deleteProfilImage();
+                })
         ],
         elevation: 8.0,
       );
