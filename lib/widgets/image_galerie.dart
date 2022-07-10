@@ -30,7 +30,7 @@ class _ImageGalerieState extends State<ImageGalerie> {
   double fontsize;
   List<Widget> allImages = [];
   var ownPictureKontroller = TextEditingController();
-  var selected = "";
+  var selectedImage = "";
   var windowSetState;
   var imagePaths;
   var imageLoading = false;
@@ -58,22 +58,22 @@ class _ImageGalerieState extends State<ImageGalerie> {
   }
 
   saveChanges() {
-    if (selected == "" && ownPictureKontroller.text == "") {
+    if (selectedImage == "" && ownPictureKontroller.text == "") {
       customSnackbar(context, AppLocalizations.of(context).bitteBildAussuchen);
       return;
     }
 
-    if (selected == "") {
-      selected = ownPictureKontroller.text;
-      widget.child = Image.network(selected, fit: BoxFit.fitWidth);
+    if (selectedImage == "") {
+      selectedImage = ownPictureKontroller.text;
+      widget.child = Image.network(selectedImage, fit: BoxFit.fitWidth);
     } else {
-      widget.child = Image.asset(selected, fit: BoxFit.fitWidth);
+      widget.child = Image.asset(selectedImage, fit: BoxFit.fitWidth);
     }
 
     setState(() {
       imageLoading = false;
     });
-    EventDatabase().update("bild = '$selected'", "WHERE id = '${widget.event["id"]}'");
+    EventDatabase().update("bild = '$selectedImage'", "WHERE id = '${widget.event["id"]}'");
   }
 
   pickAndUploadImage() async {
@@ -149,14 +149,14 @@ class _ImageGalerieState extends State<ImageGalerie> {
               margin: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                   border: Border.all(
-                      width: selected == imageDecode ? 3 : 1,
-                      color: selected == imageDecode
+                      width: selectedImage == imageDecode ? 3 : 1,
+                      color: selectedImage == imageDecode
                           ? Colors.green
                           : Colors.black)),
               child: Image.asset(imageDecode,
                   fit: BoxFit.fill, width: 80, height: 60)),
           onTap: () {
-            selected = imageDecode;
+            selectedImage = imageDecode;
             windowSetState(() {});
           },
         ));
