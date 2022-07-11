@@ -130,8 +130,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return IconButton(
           icon: const Icon(Icons.message),
           onPressed: () async {
+            var name = widget.profil["name"].replaceAll("'", "\\'");
             var profilId = await ProfilDatabase()
-                .getData("id", "WHERE name = '${widget.profil["name"]}'");
+                .getData("id", "WHERE name = '${name}'");
             var users = [userID, profilId];
             var chatId = global_functions.getChatID(users);
 
