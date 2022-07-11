@@ -308,6 +308,11 @@
     "communityWirklichLoeschen": "Möchtest du die Community wirklich löschen?",
     "communityMelden": "Community melden",
     "communityMeldenFrage": "Warum möchtest du die Community melden?",
-    "beschreibungAendern": "Beschreibung ändern"
+    "beschreibungAendern": "Beschreibung ändern",
+    "linkAendern": "Link ändern",
+    "neuenLinkEingeben": "neuen Link eingeben",
+    "bildAendern": "Bild ändern",
+    "mitgliedHinzufuegen": "Mitglied hinzufügen",
+    "member": "Mitglieder"
 
 }
