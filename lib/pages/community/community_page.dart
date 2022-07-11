@@ -1,4 +1,5 @@
 import 'package:familien_suche/global/global_functions.dart';
+import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -139,6 +140,7 @@ class _CommunityPageState extends State<CommunityPage> {
         allfavorites.add(CommunityCard(
           community: community,
           margin: const EdgeInsets.only(top: 10, bottom: 10, left: 70, right: 70),
+          afterPageVisit: () => changePage(context, StartPage(selectedIndex: 2,))
         ));
       }
     }
@@ -164,6 +166,7 @@ class _CommunityPageState extends State<CommunityPage> {
         communities.add(CommunityCard(
           community: community,
           withFavorite: true,
+            afterPageVisit: () => changePage(context, StartPage(selectedIndex: 2,))
         ));
       }
 
