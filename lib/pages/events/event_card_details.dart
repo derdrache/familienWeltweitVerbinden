@@ -775,7 +775,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                             fontSize: fontsize,
                             color: widget.databaseKennzeichnung != "link"
                                 ? Colors.black
-                                : Colors.blue),
+                                : Theme.of(context).colorScheme.secondary),
                         softWrap: false,
                         overflow: TextOverflow.fade,
                         textAlign: TextAlign.end,
@@ -1042,7 +1042,9 @@ class _CardFeetState extends State<CardFeet> {
         .getData("*", "WHERE id = '${widget.organisator}'");
 
     organisatorText = Text(organisatorProfil["name"],
-        style: TextStyle(color: Colors.blue, fontSize: fontsize));
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.secondary,
+            fontSize: fontsize));
 
     setState(() {});
   }
