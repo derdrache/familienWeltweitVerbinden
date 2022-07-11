@@ -86,7 +86,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     }
 
     var userName = userNameKontroller.text;
-    userName = userName.replaceAll("'", "\\'");
+    userName = userName.replaceAll("'", "''");
     var userExist = true;
 
     try {

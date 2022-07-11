@@ -176,19 +176,19 @@ class ChatDatabase{
     var chatID = global_functions.getChatID(userKeysList);
     var date = DateTime.now().millisecondsSinceEpoch;
 
+
     var newChatGroup = {
       "id": chatID,
       "date": date,
       "users": json.encode({
-        userKeysList[0] : {"name": usersList[0], "newMessages": 0},
-        userKeysList[1] : {"name": usersList[1], "newMessages": 0},
+        userKeysList[0] : {"name": usersList[0].replaceAll("'", "''"), "newMessages": 0},
+        userKeysList[1] : {"name": usersList[1].replaceAll("'", "''"), "newMessages": 0},
       }),
       "lastMessage": messageData["message"],
     };
 
     var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
     await http.post(url, body: json.encode(newChatGroup));
-
 
     messageData = {
       "id": chatID,
@@ -200,7 +200,7 @@ class ChatDatabase{
 
 
 
-    await addNewMessageAndSendNotification(newChatGroup, messageData);
+    //await addNewMessageAndSendNotification(newChatGroup, messageData);
 
     return newChatGroup;
   }
