@@ -310,6 +310,11 @@
     "communityWirklichLoeschen": "Do you really want to delete the community?",
     "communityMelden": "report community",
     "communityMeldenFrage": "why do you want to report the community?",
-    "beschreibungAendern": "change description"
+    "beschreibungAendern": "change description",
+    "linkAendern": "change link",
+    "neuenLinkEingeben": "enter new link",
+    "bildAendern": "change image",
+    "mitgliedHinzufuegen": "add member",
+    "member": "members"
 }
 

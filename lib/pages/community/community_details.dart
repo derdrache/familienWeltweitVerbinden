@@ -8,13 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/google_autocomplete.dart';
+import '../../widgets/search_autocomplete.dart';
 import '../start_page.dart';
 
 class CommunityDetails extends StatefulWidget {
@@ -38,13 +41,21 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var windowSetState;
   var imagePaths;
   var selectedImage;
+  var allUserNames;
+  var searchAutocomplete = SearchAutocomplete();
 
   @override
   void initState() {
     setCreatorText();
     _initImages();
+    getDBDataSetAllUserNames();
 
     super.initState();
+  }
+
+  getDBDataSetAllUserNames() async {
+    allUserNames = await ProfilDatabase().getData("name", "");
+
   }
 
   setCreatorText() async {
@@ -106,7 +117,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           return StatefulBuilder(builder: (context, setState) {
             windowSetState = setState;
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).eventBildAendern,
+              title: AppLocalizations.of(context).bildAendern,
               children: [
                 showImages(),
                 const SizedBox(height: 20),
@@ -206,7 +217,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).eventBildAendern,
+            title: AppLocalizations.of(context).bildAendern,
             children: [
               SizedBox(
                   width: 200,
@@ -254,7 +265,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         "bild = '$selectedImage'", "WHERE id = '${widget.community["id"]}'");
   }
 
-  changeNameWindow(){
+  changeNameWindow() {
     var newNameKontroller = TextEditingController();
 
     showDialog(
@@ -263,17 +274,17 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           return CustomAlertDialog(
             title: AppLocalizations.of(context).nameAendern,
             children: [
-              customTextInput(AppLocalizations.of(context).neuenNamenEingeben, newNameKontroller),
+              customTextInput(AppLocalizations.of(context).neuenNamenEingeben,
+                  newNameKontroller),
               SizedBox(height: 15),
               windowOptions(() => saveChangeName(newNameKontroller.text))
             ],
           );
-        }
-    );
+        });
   }
 
-  saveChangeName(newName){
-    if(newName.isEmpty) {
+  saveChangeName(newName) {
+    if (newName.isEmpty) {
       customSnackbar(context, AppLocalizations.of(context).bitteNameEingeben);
       return;
     }
@@ -284,11 +295,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     Navigator.pop(context);
 
-    CommunityDatabase().update("name = '$newName'", "WHERE id = '${widget.community["id"]}'");
+    CommunityDatabase()
+        .update("name = '$newName'", "WHERE id = '${widget.community["id"]}'");
   }
 
-  changeOrtWindow(){
-    var ortAuswahlBox = GoogleAutoComplete();
+  changeOrtWindow() {
+    var ortAuswahlBox = GoogleAutoComplete(
+      hintText: AppLocalizations.of(context).ortEingeben,
+    );
 
     showDialog(
         context: context,
@@ -298,22 +312,99 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             children: [
               ortAuswahlBox,
               SizedBox(height: 15),
-              windowOptions(() => saveChangeLocation(ortAuswahlBox.getGoogleLocationData()))
+              windowOptions(() =>
+                  saveChangeLocation(ortAuswahlBox.getGoogleLocationData()))
             ],
           );
-        }
+        });
+  }
+
+  saveChangeLocation(newLocationData) {
+    if (newLocationData["city"].isEmpty) {
+      customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+      return;
+    }
+
+    setState(() {
+      widget.community["ort"] = newLocationData["city"];
+      widget.community["land"] = newLocationData["land"];
+      widget.community["latt"] = newLocationData["latt"];
+      widget.community["longt"] = newLocationData["longt"];
+    });
+
+    Navigator.pop(context);
+
+    CommunityDatabase().updateLocation(widget.community["id"], newLocationData);
+  }
+
+  changeOrOpenLinkWindow(tabPosition) async {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+
+    await showMenu(
+      context: context,
+      position: RelativeRect.fromRect(
+          tabPosition & const Size(40, 40), // smaller rect, the touch area
+          Offset.zero & overlay.size // Bigger rect, the entire screen
+          ),
+      items: [
+        PopupMenuItem(
+            child: Text(AppLocalizations.of(context).linkBearbeiten),
+            onTap: () {
+              Future.delayed(
+                  const Duration(seconds: 0), () => changeLinkWindow());
+            }),
+        PopupMenuItem(
+          child: Text(AppLocalizations.of(context).linkOeffnen),
+          onTap: () {
+            Navigator.pop(context);
+            launch(widget.community["link"]);
+          },
+        ),
+      ],
+      elevation: 8.0,
     );
   }
 
-  saveChangeLocation(newLocationData){
+  changeLinkWindow() {
+    var newLinkKontroller = TextEditingController();
 
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+            title: AppLocalizations.of(context).linkAendern,
+            children: [
+              customTextInput(AppLocalizations.of(context).neuenLinkEingeben,
+                  newLinkKontroller),
+              SizedBox(height: 15),
+              windowOptions(() => saveChangeLink(newLinkKontroller.text))
+            ],
+          );
+        });
   }
 
-  changeOrOpenLinkWindow(){
+  saveChangeLink(newLink) {
+    if (newLink.isEmpty) {
+      customSnackbar(context, AppLocalizations.of(context).neuenLinkEingeben);
+      return;
+    }
 
+    if (!newLink.contains("http") && !newLink.contains("www")) {
+      customSnackbar(context, AppLocalizations.of(context).eingabeKeinLink);
+      return;
+    }
+
+    setState(() {
+      widget.community["link"] = newLink;
+    });
+
+    Navigator.pop(context);
+
+    CommunityDatabase()
+        .update("link = '$newLink'", "WHERE id = '${widget.community["id"]}'");
   }
 
-  changeBeschreibungWindow(){
+  changeBeschreibungWindow() {
     var newBeschreibungKontroller = TextEditingController();
 
     showDialog(
@@ -322,23 +413,119 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           return CustomAlertDialog(
             title: AppLocalizations.of(context).beschreibungAendern,
             children: [
-              customTextInput(AppLocalizations.of(context).neueBeschreibungEingeben, newBeschreibungKontroller, moreLines: 5, textInputAction: TextInputAction.newline),
+              customTextInput(
+                  AppLocalizations.of(context).neueBeschreibungEingeben,
+                  newBeschreibungKontroller,
+                  moreLines: 5,
+                  textInputAction: TextInputAction.newline),
               SizedBox(height: 15),
-              windowOptions(() => saveChangeBeschreibung(newBeschreibungKontroller.text))
+              windowOptions(
+                  () => saveChangeBeschreibung(newBeschreibungKontroller.text))
             ],
           );
-        }
-    );
+        });
   }
 
-  saveChangeBeschreibung(newBeschreibung){
+  saveChangeBeschreibung(newBeschreibung) {
+    if (newBeschreibung.isEmpty) {
+      customSnackbar(context,
+          AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
+      return;
+    }
 
+    setState(() {
+      widget.community["beschreibung"] = newBeschreibung;
+    });
+
+    Navigator.pop(context);
+
+    CommunityDatabase().update("beschreibung = '$newBeschreibung'",
+        "WHERE id = '${widget.community["id"]}'");
+  }
+
+  _addMemberWindow() {
+    var newUser = "";
+
+    searchAutocomplete = SearchAutocomplete(
+      searchableItems: allUserNames,
+      onConfirm: () {
+        newUser = searchAutocomplete.getSelected()[0];
+      },
+    );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+            title: AppLocalizations.of(context).mitgliedHinzufuegen,
+            children: [
+              searchAutocomplete,
+              SizedBox(height: 15),
+              windowOptions(() => saveNewMember(newUser))
+            ],
+          );
+        });
+  }
+
+  saveNewMember(newMember) {
+    if (widget.community["members"].contains(newMember)) {
+      return;
+    }
+
+    setState(() {
+      widget.community["members"].add(newMember);
+    });
+
+    CommunityDatabase()
+        .update("members = ''", "WHERE id = '${widget.community["id"]}'");
+  }
+
+  _showMembersWindow() async {
+    var membersID = widget.community["members"];
+    var allProfils = Hive.box("secureBox").get("profils");
+    var membersProfils = [];
+    List<Widget> membersBoxes = [];
+
+    for (var memberId in membersID) {
+      for (var profil in allProfils) {
+        if (profil["id"] == memberId) {
+          membersProfils.add(profil);
+          break;
+        }
+      }
+    }
+
+    for (var member in membersProfils) {
+      membersBoxes.add(InkWell(
+          onTap: () {
+            global_func.changePage(context, ShowProfilPage(
+              userName: member["name"],
+              profil: member,
+            ));
+          },
+          child: Container(
+            margin: EdgeInsets.all(10),
+              child: Text(
+            member["name"],
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+          ))));
+    }
+
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+            title: AppLocalizations.of(context).member,
+            children: membersBoxes,
+          );
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     fontsize = isWebDesktop ? 12 : 16;
+    var isCreator = widget.community["erstelltVon"].contains(userId);
 
     _deleteWindow() {
       showDialog(
@@ -418,6 +605,22 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
+    _addMemberDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.person_add),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).mitgliedHinzufuegen),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          _addMemberWindow();
+        },
+      );
+    }
+
     _deleteDialog() {
       return SimpleDialogOption(
         child: Row(
@@ -435,8 +638,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     }
 
     moreMenu() {
-      var isCreator = widget.community["erstelltVon"] == userId;
-
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -451,6 +652,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
                       if (!isCreator) _reportDialog(),
+                      if (isCreator) _addMemberDialog(),
                       if (isCreator) _deleteDialog(),
                     ],
                   ),
@@ -463,6 +665,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     communityImage() {
       return GestureDetector(
         onTapDown: (details) {
+          if (!isCreator) return;
+
           var getTabPostion = details.globalPosition;
           changeImageWindow(getTabPostion);
         },
@@ -481,7 +685,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InkWell(
-              onTap: () => changeNameWindow(),
+              onTap: () => isCreator ? changeNameWindow() : null,
               child: Center(
                   child: Text(
                 widget.community["name"],
@@ -489,9 +693,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               )),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
             InkWell(
-              onTap: () => changeOrtWindow(),
+              onTap: () => isCreator ? changeOrtWindow() : null,
               child: Row(
                 children: [
                   Text(AppLocalizations.of(context).ort,
@@ -502,22 +706,30 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 ],
               ),
             ),
-            const SizedBox(height: 5),
-            InkWell(
-              onTap: () => changeOrOpenLinkWindow(),
+            const SizedBox(height: 10),
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTapDown: (tabDetails) {
+                var getTabPostion = tabDetails.globalPosition;
+                if (isCreator) changeOrOpenLinkWindow(getTabPostion);
+                if (!isCreator) launch(widget.community["link"]);
+              },
               child: Row(
                 children: [
                   const Text(
                     "Link: ",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Text(widget.community["link"])
+                  Text(widget.community["link"],
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary))
                 ],
               ),
             ),
-            const SizedBox(height: 15),
-            InkWell(
-                onTap: () => changeBeschreibungWindow(),
+            const SizedBox(height: 20),
+            GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => isCreator ? changeBeschreibungWindow() : null,
                 child: Text(widget.community["beschreibung"]))
           ],
         ),
@@ -530,6 +742,17 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            InkWell(
+              onTap: () => _showMembersWindow(),
+              child: Text(
+                widget.community["members"].length.toString() +
+                    " " +
+                    AppLocalizations.of(context).member,
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.secondary),
+              ),
+            ),
+            Expanded(child: SizedBox()),
             InkWell(
                 onTap: () => global_func.changePage(
                     context,
