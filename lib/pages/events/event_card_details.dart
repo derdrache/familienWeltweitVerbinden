@@ -17,6 +17,7 @@ import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/image_galerie.dart';
+import '../../widgets/text_with_hyperlink_detection.dart';
 
 /*
 Clean Code Notize:
@@ -468,11 +469,12 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             )));
       }
 
-      if (eventTags.isEmpty && widget.isCreator)
+      if (eventTags.isEmpty && widget.isCreator) {
         eventTags.add(Container(
-            margin: EdgeInsets.all(10),
-            child: Text("Hier klicken um Eventlabel hinzuzufügen",
+            margin: const EdgeInsets.all(10),
+            child: const Text("Hier klicken um Eventlabel hinzuzufügen",
                 style: TextStyle(color: Colors.grey))));
+      }
 
       return InkWell(
         onTap: () => widget.isCreator ? changeEventTagsWindow() : null,
@@ -794,14 +796,14 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                   )
                 ],
               )
-            : Text(
-                widget.rowData,
-                style: !widget.multiLines
-                    ? TextStyle(
-                        fontSize: fontsize + 8, fontWeight: FontWeight.bold)
-                    : TextStyle(fontSize: fontsize),
-                textAlign: TextAlign.center,
-              ));
+            : widget.multiLines
+            ? TextWithHyperlinkDetection(text: widget.rowData)
+        : Text(
+          widget.rowData,
+          style:  TextStyle(
+                fontSize: fontsize + 8, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center
+        ));
   }
 }
 
