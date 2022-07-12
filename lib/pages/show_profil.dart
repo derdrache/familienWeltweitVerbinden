@@ -18,6 +18,7 @@ import '../services/database.dart';
 import '../services/notification.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/profil_image.dart';
+import '../widgets/text_with_hyperlink_detection.dart';
 
 // ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
@@ -91,12 +92,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     return timeDifferenceLastLogin.inDays / 30.44;
   }
 
-  transformDateToText(dateString) {
+  transformDateToText(dateString, {onlyMonth = false}) {
     DateTime date = DateTime.parse(dateString);
 
     if ((date.month > DateTime.now().month &&
             date.year == DateTime.now().year) ||
-        date.year > DateTime.now().year) {
+        date.year > DateTime.now().year || onlyMonth) {
       return date.month.toString() + "." + date.year.toString();
     } else {
       return AppLocalizations.of(context).jetzt;
@@ -130,9 +131,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return IconButton(
           icon: const Icon(Icons.message),
           onPressed: () async {
-            var name = widget.profil["name"].replaceAll("'", "\\'");
+            var name = widget.profil["name"].replaceAll("'", "''");
             var profilId = await ProfilDatabase()
-                .getData("id", "WHERE name = '${name}'");
+                .getData("id", "WHERE name = '$name'");
             var users = [userID, profilId];
             var chatId = global_functions.getChatID(users);
 
@@ -496,10 +497,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            Text(
-              widget.profil["aboutme"],
-              style: TextStyle(fontSize: textSize),
-            )
+            TextWithHyperlinkDetection(text: widget.profil["aboutme"], fontsize: textSize,)
           ],
         ),
       );
@@ -550,7 +548,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 child: Text(
                     transformDateToText(reiseplan["von"]) +
                         " - " +
-                        transformDateToText(reiseplan["bis"]) +
+                        transformDateToText(reiseplan["bis"], onlyMonth: true) +
                         " in " +
                         ortText,
                     style: TextStyle(fontSize: textSize)),
