@@ -18,6 +18,7 @@ import '../../services/database.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../widgets/search_autocomplete.dart';
+import '../../widgets/text_with_hyperlink_detection.dart';
 import '../start_page.dart';
 
 class CommunityDetails extends StatefulWidget {
@@ -39,9 +40,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var ownPictureKontroller = TextEditingController();
   double fontsize;
   var windowSetState;
-  var imagePaths;
-  var selectedImage;
-  var allUserNames;
+  List<String> imagePaths;
+  String selectedImage;
+  List allUserNames;
   var searchAutocomplete = SearchAutocomplete();
 
   @override
@@ -55,7 +56,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   getDBDataSetAllUserNames() async {
     allUserNames = await ProfilDatabase().getData("name", "");
-
   }
 
   setCreatorText() async {
@@ -276,7 +276,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             children: [
               customTextInput(AppLocalizations.of(context).neuenNamenEingeben,
                   newNameKontroller),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               windowOptions(() => saveChangeName(newNameKontroller.text))
             ],
           );
@@ -311,7 +311,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             title: AppLocalizations.of(context).ortAendern,
             children: [
               ortAuswahlBox,
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               windowOptions(() =>
                   saveChangeLocation(ortAuswahlBox.getGoogleLocationData()))
             ],
@@ -376,7 +376,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             children: [
               customTextInput(AppLocalizations.of(context).neuenLinkEingeben,
                   newLinkKontroller),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               windowOptions(() => saveChangeLink(newLinkKontroller.text))
             ],
           );
@@ -418,7 +418,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   newBeschreibungKontroller,
                   moreLines: 5,
                   textInputAction: TextInputAction.newline),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               windowOptions(
                   () => saveChangeBeschreibung(newBeschreibungKontroller.text))
             ],
@@ -460,7 +460,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             title: AppLocalizations.of(context).mitgliedHinzufuegen,
             children: [
               searchAutocomplete,
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               windowOptions(() => saveNewMember(newUser))
             ],
           );
@@ -476,8 +476,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["members"].add(newMember);
     });
 
-    CommunityDatabase()
-        .update("members = ''", "WHERE id = '${widget.community["id"]}'");
+    CommunityDatabase().update(
+        "members = JSON_ARRAY_APPEND(members, '\$', '$userId')",
+        "WHERE id = '${widget.community["id"]}'");
   }
 
   _showMembersWindow() async {
@@ -498,17 +499,20 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     for (var member in membersProfils) {
       membersBoxes.add(InkWell(
           onTap: () {
-            global_func.changePage(context, ShowProfilPage(
-              userName: member["name"],
-              profil: member,
-            ));
+            global_func.changePage(
+                context,
+                ShowProfilPage(
+                  userName: member["name"],
+                  profil: member,
+                ));
           },
           child: Container(
-            margin: EdgeInsets.all(10),
+              margin: const EdgeInsets.all(10),
               child: Text(
-            member["name"],
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-          ))));
+                member["name"],
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.secondary),
+              ))));
     }
 
     showDialog(
@@ -730,7 +734,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () => isCreator ? changeBeschreibungWindow() : null,
-                child: Text(widget.community["beschreibung"]))
+                child: Container(
+                    height: 200,
+                    child: TextWithHyperlinkDetection(
+                        text: widget.community["beschreibung"])))
           ],
         ),
       );
@@ -752,7 +759,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     TextStyle(color: Theme.of(context).colorScheme.secondary),
               ),
             ),
-            Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
             InkWell(
                 onTap: () => global_func.changePage(
                     context,
