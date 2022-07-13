@@ -198,9 +198,7 @@ class ChatDatabase{
       "zu": messageData["zu"]
     };
 
-
-
-    //await addNewMessageAndSendNotification(newChatGroup, messageData);
+    await addNewMessageAndSendNotification(newChatGroup, messageData);
 
     return newChatGroup;
   }
@@ -740,6 +738,74 @@ class ReportsDatabase{
   }
 
 
+}
+
+class FamiliesDatabase{
+  addNewFamily(familyData) async {
+    var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
+    await http.post(url, body: json.encode(familyData));
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "families",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "families"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+
+    return responseBody;
+  }
+
+  delete(familyId){
+    _deleteInTable("communities", familyId);
+  }
 }
 
 uploadImage(imagePath, imageName, image) async{
