@@ -107,7 +107,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
           (city["kosten"] != null ||
               city["wetter"] != null ||
               city["internet"] != null ||
-              city["familien"].isNotEmpty);
+              city["familien"].isNotEmpty &&
+                  (city["familien"].length == 1 &&
+                      city["familien"].contains(userId)));
 
       for (var cityUser in allCityUserInformation) {
         if (city["ort"].contains(cityUser)) {
@@ -1095,7 +1097,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           " / " +
           locationData["kontinentEng"];
     } else if (filter == "stadt") {
-      return list[0]["ort"];
+      return list[0]["ort"] ?? list[0]["stadt"];
     }
 
     for (var item in list) {
@@ -1124,7 +1126,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   Widget build(BuildContext context) {
     List<Marker> allMarker = [];
 
-    //ändern in createPopupCards // typ = "event" || "community"
     createPopupEvents({event, community, spezialActivation = false}) {
       double screenWidth = MediaQuery.of(context).size.width;
       var eventCrossAxisCount = screenWidth / 190;
@@ -1152,7 +1153,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               SliverChildBuilderDelegate((BuildContext context, int index) {
             var itemData = showItems["profils"][index];
 
-            if(event != null){
+            if (event != null) {
               return EventCard(
                   margin: const EdgeInsets.only(
                       top: 15, bottom: 15, left: 25, right: 25),
@@ -1178,14 +1179,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   });
             } else {
               return CommunityCard(
-                  community: itemData,
-                  margin: const EdgeInsets.only(
-                      top: 15, bottom: 15, left: 25, right: 25
-                  ),
+                community: itemData,
+                margin: const EdgeInsets.only(
+                    top: 15, bottom: 15, left: 25, right: 25),
                 withFavorite: true,
               );
             }
-
           }, childCount: showItems["profils"].length)));
 
       return popupItems;
@@ -1619,8 +1618,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
                 if (newEvents.isNotEmpty) {
                   popupActive = true;
-                  createPopupEvents(event: {"profils": newEvents},
-                      spezialActivation: true);
+                  createPopupEvents(
+                      event: {"profils": newEvents}, spezialActivation: true);
                   Hive.box('secureBox').put("lastLoginEvents", events);
                 }
               }
@@ -1685,7 +1684,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
                 if (newCommunity.isNotEmpty) {
                   popupActive = true;
-                  createPopupEvents(community: {"profils": newCommunity},
+                  createPopupEvents(
+                      community: {"profils": newCommunity},
                       spezialActivation: true);
                   Hive.box('secureBox').put("lastLoginCommunity", communities);
                 }
