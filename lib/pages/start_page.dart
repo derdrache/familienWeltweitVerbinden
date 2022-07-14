@@ -166,7 +166,7 @@ class _StartPageState extends State<StartPage> {
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
       //const ErkundenPage(),
-      FamilieProfilPage(),
+      const FamilieProfilPage(),
       const EventPage(),
       const CommunityPage(),
       const ChatPage(),
