@@ -742,8 +742,9 @@ class ReportsDatabase{
 
 class FamiliesDatabase{
   addNewFamily(familyData) async {
-    var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
-    await http.post(url, body: json.encode(familyData));
+    var url = Uri.parse(databaseUrl + "database/families/newFamily.php");
+    var test = await http.post(url, body: json.encode(familyData));
+    print(test.body);
   }
 
   update(whatData, queryEnd) async  {

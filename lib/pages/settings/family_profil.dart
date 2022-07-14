@@ -1,6 +1,10 @@
+import 'dart:convert';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -18,12 +22,13 @@ class FamilieProfilPage extends StatefulWidget {
 
 class _FamilieProfilPageState extends State<FamilieProfilPage> {
   var ownProfil = Hive.box('secureBox').get("ownProfil");
+  var userId = FirebaseAuth.instance.currentUser.uid;
   bool familyProfilIsActive = false;
-  bool familyExist = false;
   var familyMembersCount = 1;
   var dballProfilIdAndName = [];
   var allProfilsName = [];
   var searchAutocomplete = SearchAutocomplete();
+  var familyProfil;
 
   @override
   void initState() {
@@ -41,20 +46,58 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     }
   }
 
+  checkIfFamilyExist() async {
+    var dbData = await FamiliesDatabase()
+        .getData("*", "WHERE JSON_CONTAINS(members, '\"$userId\"') > 0");
+
+    if (dbData != false) familyProfil = dbData;
+
+    return dbData != false;
+  }
+
+  setProfilData() {
+    if (familyProfil == false) return;
+
+    familyProfilIsActive = familyProfil["active"] == 1 ? true : false;
+    familyMembersCount = familyProfil["members"].length;
+  }
+
+  changeFamilyProfilStatus(active) async {
+    FamiliesDatabase()
+        .update("active = '$active'", "WHERE id = '${familyProfil["id"]}'");
+  }
+
+  createFamilyProfil() async {
+    var uuid = const Uuid();
+    var eventId = uuid.v4();
+
+    FamiliesDatabase().addNewFamily({
+      "id": eventId,
+      "members": jsonEncode([userId]),
+    });
+
+    setState(() {
+      familyProfil = {
+        "id": eventId,
+        "members": [userId],
+        "name": "",
+        "active": "1"
+      };
+    });
+  }
+
   addMember() {
     var idIndex = -1;
 
-    if(searchAutocomplete.getSelected().isEmpty) return;
+    if (searchAutocomplete.getSelected().isEmpty) return;
 
-    if(searchAutocomplete.getSelected().isNotEmpty){
-      idIndex = allProfilsName
-          .indexOf(searchAutocomplete.getSelected()[0]);
-    }else{
+    if (searchAutocomplete.getSelected().isNotEmpty) {
+      idIndex = allProfilsName.indexOf(searchAutocomplete.getSelected()[0]);
+    } else {
       idIndex = dballProfilIdAndName.indexOf("member");
     }
 
     var memberId = dballProfilIdAndName[idIndex]["id"];
-
   }
 
   @override
@@ -95,12 +138,12 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           TextButton(
             child: Text(AppLocalizations.of(context).abbrechen,
-                style: TextStyle()),
+                style: const TextStyle()),
             onPressed: () => Navigator.pop(context),
           ),
           TextButton(
               child: Text(AppLocalizations.of(context).speichern,
-                  style: TextStyle()),
+                  style: const TextStyle()),
               onPressed: () => saveFunction()),
         ]),
       );
@@ -132,11 +175,18 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Familienprofil aktivieren ?"),
-          SizedBox(width: 10),
+          const Text("Familienprofil aktivieren ?"),
+          const SizedBox(width: 10),
           Switch(
             value: familyProfilIsActive,
-            onChanged: (value) {
+            onChanged: (value) async {
+              if (value) {
+                if (familyProfil == null) await createFamilyProfil();
+                changeFamilyProfilStatus(1);
+              } else {
+                changeFamilyProfilStatus(0);
+              }
+
               setState(() {
                 familyProfilIsActive = value;
               });
@@ -152,13 +202,26 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           builder: (BuildContext context) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: const [
+              children: [
                 SizedBox(
                   width: 250,
                   child: SimpleDialog(
                     contentPadding: EdgeInsets.zero,
                     insetPadding: EdgeInsets.only(top: 40, left: 0, right: 10),
-                    children: [],
+                    children: [
+                      SimpleDialogOption(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.person_add),
+                            const SizedBox(width: 10),
+                            Text(AppLocalizations.of(context).mitgliedHinzufuegen),
+                          ],
+                        ),
+                        onPressed: () {
+                          addMemberWindow();
+                        },
+                      )
+                    ],
                   ),
                 ),
               ],
@@ -175,16 +238,16 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       return InkWell(
         onTap: () => addMemberWindow(),
         child: Container(
-          margin: EdgeInsets.all(20),
+          margin: const EdgeInsets.all(20),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
                 width: 250,
-                child: Text(
+                child: const Text(
                   "Für ein Familienprofil werden mindestens zwei Familienmitglieder benötigt",
                   maxLines: 2,
                 )),
-            SizedBox(width: 10),
-            Icon(Icons.person_add)
+            const SizedBox(width: 10),
+            const Icon(Icons.person_add)
           ]),
         ),
       );
@@ -192,6 +255,14 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     familyProfilPage() {
       return;
+    }
+
+    familyProfilDescription() {
+      return Container(
+          margin: EdgeInsets.all(20),
+          child: Text(
+              "Wenn das Familienprofil aktiviert wird, wird bei jedem Familienmitglied ein einheitliches Profil auftauchen."
+              "\n\nAuf der Weltkarte wird nicht mehr jedes Familienmitglied einzeln angezeigt, sondern nur noch das Familienprofil."));
     }
 
     return Scaffold(
@@ -204,14 +275,30 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
             )
           ],
         ),
-        body: ListView(
-          children: [
-            //if (familyProfilIsActive) familyProfilPage(),
-            if (familyMembersCount < 2 && familyProfilIsActive)
-              addFamilyMemberBox(),
-            //chooseMainProfil(),
-            activeSwitch(),
-          ],
-        ));
+        body: FutureBuilder(
+            future: checkIfFamilyExist(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                setProfilData();
+
+                return ListView(
+                  children: [
+                    //if (familyProfilIsActive) familyProfilPage(),
+                    if (familyMembersCount < 2 && familyProfilIsActive)
+                      addFamilyMemberBox(),
+                    //chooseMainProfil(),
+                    activeSwitch(),
+                    if (!familyProfilIsActive) familyProfilDescription()
+                  ],
+                );
+              }
+              return const Center(
+                  child: SizedBox(
+                      height: 100,
+                      width: 100,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 6,
+                      )));
+            }));
   }
 }
