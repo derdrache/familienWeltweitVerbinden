@@ -109,7 +109,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
               city["internet"] != null ||
               city["familien"].isNotEmpty &&
                   (city["familien"].length == 1 &&
-                      city["familien"].contains(userId)));
+                      !city["familien"].contains(userId)));
+
 
       for (var cityUser in allCityUserInformation) {
         if (city["ort"].contains(cityUser)) {
@@ -117,6 +118,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
           break;
         }
       }
+
+
 
       if (condition || hasCityUserInfo) {
         allCitiesNames.add(city["ort"]);
@@ -157,14 +160,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   _asyncMethod() async {
-    getProfilsFromDB();
+    await getProfilsFromDB();
     createAndSetZoomLevels(profils, "profils");
 
-    getEventsFromDB();
+    await getEventsFromDB();
     createAndSetZoomLevels(events, "events");
     setSearchAutocomplete();
 
-    getCommunitiesFromDB();
+    await getCommunitiesFromDB();
     createAndSetZoomLevels(communities, "communities");
 
     buildLoaded = true;

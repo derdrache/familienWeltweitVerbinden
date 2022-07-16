@@ -316,6 +316,8 @@
     "bildAendern": "change image",
     "mitgliedHinzufuegen": "add member",
     "member": "members",
-    "familyProfil": "familie profil"
+    "familyProfil": "familie profil",
+    "annehmen": "accept",
+    "ablehnen": "reject"
 }
 

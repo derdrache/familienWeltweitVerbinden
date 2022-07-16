@@ -347,7 +347,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       return Stack(
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 10, right: 50),
+            padding: const EdgeInsets.only(left: 10, right: 50, bottom: 10),
             decoration: BoxDecoration(
                 color: Colors.white,
                 border: const Border(top: BorderSide(color: Colors.grey)),
@@ -362,15 +362,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minHeight: 60,
-                maxHeight: 200.0,
+                maxHeight: 180.0,
               ),
               child: TextField(
                 maxLines: null,
                 focusNode: myFocusNode,
                 textInputAction: TextInputAction.newline,
                 controller: nachrichtController,
+                textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+                  contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 5),
                   hintText: AppLocalizations.of(context).nachricht,
                   hintStyle: const TextStyle(fontSize: 20),
                   border: InputBorder.none,
@@ -383,7 +384,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ),
           ),
           Positioned(
-            bottom: 4,
+            bottom: 15,
             right: 2,
             child: IconButton(
                 padding: EdgeInsets.zero,

@@ -114,7 +114,7 @@ class _EventCardState extends State<EventCard> {
     var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
     var eventBeginn = widget.event["wann"];
 
-    eventBeginn = DateTime.parse(eventBeginn).add(Duration(hours: eventZeitzone - deviceZeitzone));
+    eventBeginn = DateTime.parse(eventBeginn).add(Duration(hours: deviceZeitzone - eventZeitzone));
 
     return eventBeginn.toString().split(" ")[1].toString().substring(0, 5);
   }
