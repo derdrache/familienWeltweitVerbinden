@@ -24,11 +24,12 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   var userId = FirebaseAuth.instance.currentUser.uid;
   bool familyProfilIsActive = false;
-  var familyMembersCount = 1;
+  var familyMembersCount = 0;
   var dballProfilIdAndName = [];
   var allProfilsName = [];
   var searchAutocomplete = SearchAutocomplete();
   var familyProfil;
+  var inviteFamilyProfil;
 
   @override
   void initState() {
@@ -50,13 +51,20 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     var dbData = await FamiliesDatabase()
         .getData("*", "WHERE JSON_CONTAINS(members, '\"$userId\"') > 0");
 
+    if (dbData == false) {
+      inviteFamilyProfil = await FamiliesDatabase()
+          .getData("*", "WHERE JSON_CONTAINS(einladung, '\"$userId\"') > 0");
+    }
+
     if (dbData != false) familyProfil = dbData;
 
     return dbData != false;
   }
 
   setProfilData() {
-    if (familyProfil == false) return;
+    if (familyProfil == false || familyProfil == null) {
+      return;
+    }
 
     familyProfilIsActive = familyProfil["active"] == 1 ? true : false;
     familyMembersCount = familyProfil["members"].length;
@@ -86,18 +94,63 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     });
   }
 
-  addMember() {
+  checkHasFamilyProfil(user) async {
+    var hasFamilyProfil = await FamiliesDatabase()
+        .getData("*", "WHERE JSON_CONTAINS(members, '\"$user\"') > 0");
+
+    return hasFamilyProfil != false ? true : false;
+  }
+
+  addMember({member}) {
     var idIndex = -1;
 
-    if (searchAutocomplete.getSelected().isEmpty) return;
+    if (searchAutocomplete.getSelected().isEmpty && member == null) return;
 
     if (searchAutocomplete.getSelected().isNotEmpty) {
       idIndex = allProfilsName.indexOf(searchAutocomplete.getSelected()[0]);
     } else {
-      idIndex = dballProfilIdAndName.indexOf("member");
+      idIndex = allProfilsName.indexOf(member);
     }
 
     var memberId = dballProfilIdAndName[idIndex]["id"];
+
+    var hasFamilyProfil = checkHasFamilyProfil(memberId);
+    if (hasFamilyProfil) {
+      customSnackbar(context, "Der Benutzer ist schon in einer Familie");
+      return;
+    }
+
+    if (familyProfil["members"].contains(memberId) ||
+        familyProfil["einladung"].contains(memberId)) return;
+
+    setState(() {
+      familyProfil["einladung"].add(userId);
+    });
+
+    FamiliesDatabase().update(
+        "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$userId')",
+        "WHERE id = '${familyProfil["id"]}'");
+  }
+
+  refuseFamilyInvite() async {
+    setState(() {
+      familyProfil["einladung"].remove(userId);
+    });
+
+    FamiliesDatabase().update(
+        "einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
+        "WHERE id = '${inviteFamilyProfil["id"]}'");
+  }
+
+  acceptFamilyInvite() async {
+    setState(() {
+      familyProfil["einladung"].remove(userId);
+      familyProfil["members"].add(userId);
+    });
+
+    await FamiliesDatabase().update(
+        "members = JSON_ARRAY_APPEND(members, '\$', '$userId'), JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
+        "WHERE id = '${familyProfil["id"]}'");
   }
 
   @override
@@ -105,10 +158,19 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     List<Widget> createFriendlistBox() {
       var userFriendlist = ownProfil["friendlist"];
 
+      for (var i = 0; i < userFriendlist.length; i++) {
+        for (var profil in dballProfilIdAndName) {
+          if (profil["id"] == userFriendlist[i]) {
+            userFriendlist[i] = profil["name"];
+            break;
+          }
+        }
+      }
+
       List<Widget> friendsBoxen = [];
       for (var friend in userFriendlist) {
         friendsBoxen.add(GestureDetector(
-          onTap: () => null,
+          onTap: () => addMember(member: friend),
           child: Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
@@ -207,14 +269,16 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                   width: 250,
                   child: SimpleDialog(
                     contentPadding: EdgeInsets.zero,
-                    insetPadding: EdgeInsets.only(top: 40, left: 0, right: 10),
+                    insetPadding:
+                        const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
                       SimpleDialogOption(
                         child: Row(
                           children: [
                             const Icon(Icons.person_add),
                             const SizedBox(width: 10),
-                            Text(AppLocalizations.of(context).mitgliedHinzufuegen),
+                            Text(AppLocalizations.of(context)
+                                .mitgliedHinzufuegen),
                           ],
                         ),
                         onPressed: () {
@@ -259,10 +323,46 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     familyProfilDescription() {
       return Container(
-          margin: EdgeInsets.all(20),
-          child: Text(
+          margin: const EdgeInsets.all(20),
+          child: const Text(
               "Wenn das Familienprofil aktiviert wird, wird bei jedem Familienmitglied ein einheitliches Profil auftauchen."
               "\n\nAuf der Weltkarte wird nicht mehr jedes Familienmitglied einzeln angezeigt, sondern nur noch das Familienprofil."));
+    }
+
+    familyProfilInvite() {
+      return Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+            border: Border.all(
+                color: Theme.of(context).colorScheme.primary, width: 3)),
+        child: Column(
+          children: [
+            Text("Du wurdest eingeladen dem Familienprofil " +
+                inviteFamilyProfil["name"] +
+                " beizutreten"),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () => acceptFamilyInvite(),
+                  child: Text(AppLocalizations.of(context).annehmen),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.green)),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                    onPressed: () => refuseFamilyInvite(),
+                    child: Text(AppLocalizations.of(context).ablehnen),
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.red))),
+              ],
+            )
+          ],
+        ),
+      );
     }
 
     return Scaffold(
@@ -281,14 +381,20 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
               if (snapshot.hasData) {
                 setProfilData();
 
-                return ListView(
+                return Column(
                   children: [
                     //if (familyProfilIsActive) familyProfilPage(),
                     if (familyMembersCount < 2 && familyProfilIsActive)
                       addFamilyMemberBox(),
                     //chooseMainProfil(),
                     activeSwitch(),
-                    if (!familyProfilIsActive) familyProfilDescription()
+                    if (!familyProfilIsActive) familyProfilDescription(),
+                    const Expanded(
+                      child: SizedBox(),
+                    ),
+                    if (inviteFamilyProfil != false &&
+                        inviteFamilyProfil["einladung"].contains(userId))
+                      familyProfilInvite()
                   ],
                 );
               }

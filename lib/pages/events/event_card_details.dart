@@ -90,7 +90,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     var eventBeginn = widget.event["wann"];
 
     eventBeginn = DateTime.parse(eventBeginn)
-        .add(Duration(hours: eventZeitzone - deviceZeitzone));
+        .add(Duration(hours: deviceZeitzone - eventZeitzone));
 
     var ownDate =
         eventBeginn.toString().split(" ")[0].split("-").reversed.join(".");
