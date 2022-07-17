@@ -126,6 +126,7 @@ class _SettingPageState extends State<SettingPage> {
                   },
                   child: Text(AppLocalizations.of(context).passwortVeraendern,
                       style: TextStyle(color: textColor)))),
+          /*
           PopupMenuItem(
               child: TextButton(
                   onPressed: () {
@@ -133,6 +134,8 @@ class _SettingPageState extends State<SettingPage> {
                   },
                   child: Text(AppLocalizations.of(context).familyProfil,
                       style: TextStyle(color: textColor)))),
+
+           */
           PopupMenuItem(
               child: TextButton(
                   onPressed: () async {
