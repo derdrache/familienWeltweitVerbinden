@@ -165,8 +165,8 @@ class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
-      //const ErkundenPage(),
-      const FamilieProfilPage(),
+      const ErkundenPage(),
+      //const FamilieProfilPage(),
       const EventPage(),
       const CommunityPage(),
       const ChatPage(),

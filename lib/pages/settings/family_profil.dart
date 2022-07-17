@@ -30,6 +30,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   var searchAutocomplete = SearchAutocomplete();
   var familyProfil;
   var inviteFamilyProfil;
+  var nameFamilyKontroller = TextEditingController();
 
   @override
   void initState() {
@@ -39,7 +40,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   }
 
   getAllProfilName() async {
-    dballProfilIdAndName = await ProfilDatabase().getData("id, name", "");
+    dballProfilIdAndName = Hive.box('secureBox').get("profils");//await ProfilDatabase().getData("id, name", "");
     allProfilsName = [];
 
     for (var profil in dballProfilIdAndName) {
@@ -87,7 +88,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     setState(() {
       familyProfil = {
         "id": eventId,
-        "members": [userId],
+        "members": jsonEncode([userId]),
         "name": "",
         "active": "1"
       };
@@ -134,7 +135,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
   refuseFamilyInvite() async {
     setState(() {
-      familyProfil["einladung"].remove(userId);
+      inviteFamilyProfil["einladung"].remove(userId);
     });
 
     FamiliesDatabase().update(
@@ -144,12 +145,14 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
   acceptFamilyInvite() async {
     setState(() {
+      familyProfil = inviteFamilyProfil;
+      inviteFamilyProfil = null;
       familyProfil["einladung"].remove(userId);
       familyProfil["members"].add(userId);
     });
 
     await FamiliesDatabase().update(
-        "members = JSON_ARRAY_APPEND(members, '\$', '$userId'), JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
+        "members = JSON_ARRAY_APPEND(members, '\$', '$userId'), einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
         "WHERE id = '${familyProfil["id"]}'");
   }
 
@@ -293,9 +296,38 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           });
     }
 
+    nameBox(){
+      nameFamilyKontroller.text = familyProfil["name"];
+      return Container(
+        child: customTextInput(
+            "Name vom Familienprofil",
+            nameFamilyKontroller,
+          onSubmit: (){
+              var newName = nameFamilyKontroller.text;
+
+              FamiliesDatabase().update("name = '$newName'", "WHERE id = '${familyProfil["id"]}'");
+          }
+        ),
+      );
+    }
+
     chooseMainProfil() {
+      var allMembersId = familyProfil["members"];
+      List<String> allMembersName = [];
+
+      for(var member in allMembersId){
+        print(member);
+        for(var profil in dballProfilIdAndName){
+          print(profil["id"]);
+          if(member == profil["id"]){
+            allMembersName.add(profil["name"]);
+            break;
+          }
+        }
+      }
+
       return CustomDropDownButton(
-          hintText: "Hauptprofil wählen", selected: "", items: const []);
+          hintText: "Hauptprofil wählen", selected: familyProfil["mainProfil"], items: allMembersName);
     }
 
     addFamilyMemberBox() {
@@ -384,17 +416,20 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                 return Column(
                   children: [
                     //if (familyProfilIsActive) familyProfilPage(),
+
+                    if(familyProfilIsActive) nameBox(),
+                    if(familyProfilIsActive) chooseMainProfil(),
+                    if (!familyProfilIsActive) familyProfilDescription(),
                     if (familyMembersCount < 2 && familyProfilIsActive)
                       addFamilyMemberBox(),
-                    //chooseMainProfil(),
-                    activeSwitch(),
-                    if (!familyProfilIsActive) familyProfilDescription(),
+
                     const Expanded(
                       child: SizedBox(),
                     ),
-                    if (inviteFamilyProfil != false &&
+                    activeSwitch(),
+                    if ((inviteFamilyProfil != false && inviteFamilyProfil != null) &&
                         inviteFamilyProfil["einladung"].contains(userId))
-                      familyProfilInvite()
+                      familyProfilInvite(),
                   ],
                 );
               }
