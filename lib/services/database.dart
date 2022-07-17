@@ -431,7 +431,8 @@ class EventDatabase{
 class CommunityDatabase{
   addNewCommunity(communityData) async {
     var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
-    await http.post(url, body: json.encode(communityData));
+    var test = await http.post(url, body: json.encode(communityData));
+    print(test.body);
   }
 
   update(whatData, queryEnd) async  {

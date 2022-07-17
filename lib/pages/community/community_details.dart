@@ -405,7 +405,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   changeBeschreibungWindow() {
-    var newBeschreibungKontroller = TextEditingController();
+    var newBeschreibungKontroller = TextEditingController(text: widget.community["beschreibung"]);
 
     showDialog(
         context: context,
