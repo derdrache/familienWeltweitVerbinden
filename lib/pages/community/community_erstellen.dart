@@ -1,5 +1,6 @@
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
+import 'package:familien_suche/pages/community/community_details.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,10 +22,11 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var beschreibungKontroller = TextEditingController();
   var linkKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
+  var userId = FirebaseAuth.instance.currentUser.uid;
 
   
 
-  saveCommunity(){
+  saveCommunity() async{
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var communityData = {
       "name" : nameController.text,
@@ -35,12 +37,12 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       "latt": locationData["latt"],
       "longt": locationData["longt"],
       "erstelltAm": DateTime.now().toString(),
-      "erstelltVon": FirebaseAuth.instance.currentUser.uid
+      "erstelltVon": userId
     };
 
     if(!checkValidationAndSendError(communityData)) return false;
 
-    CommunityDatabase().addNewCommunity(communityData);
+    await CommunityDatabase().addNewCommunity(communityData);
 
     return true;
 
@@ -67,12 +69,14 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
         title: AppLocalizations.of(context).communityErstellen,
           buttons: [
             IconButton(
-                onPressed: () {
-                  var success = saveCommunity();
+                onPressed: () async {
+                  var success = await saveCommunity();
                   if(!success) return;
 
-                  global_func.changePage(context, StartPage(selectedIndex: 2));
-                  //global_func.changePage(context, );
+                  var community = await CommunityDatabase().getData("*", "WHERE erstelltVon = '$userId'");
+
+                  global_func.changePageForever(context, StartPage(selectedIndex: 2));
+                  global_func.changePage(context, CommunityDetails(community: community));
     },
                 icon: const Icon(Icons.done, size: 30))
           ]),
