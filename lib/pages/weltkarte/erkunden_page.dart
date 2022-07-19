@@ -578,6 +578,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var profilCountryLocation =
           LocationService().getCountryLocation(profil["land"]);
 
+      if(profilCountryLocation == null) print(profil);
       if (listCountryLocation["latt"] == profilCountryLocation["latt"] &&
           listCountryLocation["longt"] == profilCountryLocation["longt"]) {
         checkNewCountry = false;

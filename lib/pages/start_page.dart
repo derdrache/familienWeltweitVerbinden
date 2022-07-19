@@ -59,14 +59,15 @@ class _StartPageState extends State<StartPage> {
   void _checkNewVersion() async{
     if(kIsWeb) return;
 
-    var updateInfo = await InAppUpdate.checkForUpdate();
+    try{
+      var updateInfo = await InAppUpdate.checkForUpdate();
 
-    if(updateInfo?.updateAvailability ==
-        UpdateAvailability.updateAvailable){
-      await InAppUpdate.startFlexibleUpdate();
-      await InAppUpdate.completeFlexibleUpdate();
-    }
-
+      if(updateInfo?.updateAvailability ==
+          UpdateAvailability.updateAvailable){
+        await InAppUpdate.startFlexibleUpdate();
+        await InAppUpdate.completeFlexibleUpdate();
+      }
+    }catch(_){}
   }
 
   void _checkAndUpdateProfil() async {
