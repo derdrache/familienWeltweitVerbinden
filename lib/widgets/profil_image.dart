@@ -35,7 +35,7 @@ class _ProfilImageState extends State<ProfilImage> {
       return;
     } else if (newLink.substring(0, 4) != "http" &&
         newLink.substring(0, 3) != "www") {
-      customSnackbar(context, "ungültiger Link");
+      customSnackbar(context, AppLocalizations.of(context).ungueltigerLink);
       return;
     } else {
       newLink = [newLink];
@@ -54,7 +54,7 @@ class _ProfilImageState extends State<ProfilImage> {
   }
 
   deleteOldImage(oldLink) {
-    deleteImage(oldLink);
+    DbDeleteImage(oldLink);
   }
 
   pickAndUploadImage() async {

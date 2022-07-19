@@ -54,6 +54,27 @@ class EventCardDetails extends StatefulWidget {
 }
 
 class _EventCardDetailsState extends State<EventCardDetails> {
+  final _controller = ScrollController();
+  var isCardOnBottom = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Setup the listener.
+    _controller.addListener(() {
+      if (_controller.position.atEdge) {
+        bool isTop = _controller.position.pixels == 0;
+        if (isTop) {
+          isCardOnBottom = false;
+        } else {
+          isCardOnBottom = true;
+        }
+        setState(() {});
+      }
+    });
+  }
+
   askForRelease(isOnList) async {
     if (isOnList) {
       customSnackbar(
@@ -487,33 +508,42 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     return Center(
       child: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.only(bottom: 30),
-            width: cardWidth,
-            height: cardHeight,
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: cardShadowColor().withOpacity(0.6),
-                    spreadRadius: 12,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ]),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                bildAndTitleBox(),
-                const SizedBox(height: 20),
-                creatorChangeHintBox(),
-                eventInformationBox(),
-                if (widget.isApproved || widget.isPublic) eventBeschreibung(),
-                eventTags()
-              ],
-            ),
+          Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(bottom: 30),
+                width: cardWidth,
+                height: cardHeight,
+                margin: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: cardShadowColor().withOpacity(0.6),
+                        spreadRadius: 12,
+                        blurRadius: 7,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]),
+                child: ListView(
+                  controller: _controller,
+                  shrinkWrap: true,
+                  children: [
+                    bildAndTitleBox(),
+                    const SizedBox(height: 20),
+                    creatorChangeHintBox(),
+                    eventInformationBox(),
+                    if (widget.isApproved || widget.isPublic) eventBeschreibung(),
+                    eventTags()
+                  ],
+                ),
+              ),
+              if(!isCardOnBottom) const Positioned.fill(
+                bottom: 25,
+                child: Align(alignment: Alignment.bottomCenter, child: Icon(Icons.arrow_downward)),
+              )
+            ],
           ),
           if (!widget.isApproved && !widget.isPublic) secretFogWithButton(),
           if (!widget.isCreator)
@@ -525,7 +555,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               organisator: widget.event["erstelltVon"],
               eventId: widget.event["id"],
               eventZusage: widget.event["zusage"],
-              width: cardWidth)
+              width: cardWidth
+          ),
+
         ],
       ),
     );
