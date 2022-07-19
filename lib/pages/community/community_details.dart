@@ -80,30 +80,39 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   changeImageWindow(tabPosition) async {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+    final RenderBox overlay = Overlay
+        .of(context)
+        .context
+        .findRenderObject();
 
     await showMenu(
       context: context,
       position: RelativeRect.fromRect(
           tabPosition & const Size(40, 40), // smaller rect, the touch area
           Offset.zero & overlay.size // Bigger rect, the entire screen
-          ),
+      ),
       items: [
         PopupMenuItem(
-            child: Text(AppLocalizations.of(context).bilderauswahl),
+            child: Text(AppLocalizations
+                .of(context)
+                .bilderauswahl),
             onTap: () {
               Future.delayed(const Duration(seconds: 0),
-                  () => windowChangeImageToPredetermined());
+                      () => windowChangeImageToPredetermined());
             }),
         PopupMenuItem(
-          child: Text(AppLocalizations.of(context).link),
+          child: Text(AppLocalizations
+              .of(context)
+              .link),
           onTap: () {
             Future.delayed(
                 const Duration(seconds: 0), () => windowChangeImageWithLink());
           },
         ),
         PopupMenuItem(
-            child: Text(AppLocalizations.of(context).hochladen),
+            child: Text(AppLocalizations
+                .of(context)
+                .hochladen),
             onTap: () => selectAndUploadImage()),
       ],
       elevation: 8.0,
@@ -117,11 +126,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           return StatefulBuilder(builder: (context, setState) {
             windowSetState = setState;
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).bildAendern,
+              title: AppLocalizations
+                  .of(context)
+                  .bildAendern,
               children: [
                 showImages(),
                 const SizedBox(height: 20),
-                windowOptions(() => saveChangeImage())
+                windowOptions(() => saveChangeImage(null))
               ],
             );
           });
@@ -195,7 +206,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     }
 
     var imageResizeThumbnail =
-        image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
+    image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
     var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 20);
 
     return imageJpgByte;
@@ -203,13 +214,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   selectAndUploadImage() async {
     var imageName = await pickAndUploadImage();
+    var oldImage = widget.community["bild"];
 
     if (imageName == false) return;
 
-    ownPictureKontroller.text =
-        "https://families-worldwide.com/bilder/" + imageName;
+    var image = "https://families-worldwide.com/bilder/" + imageName;
+    saveChangeImage(image);
 
-    saveChangeImage();
+    DbDeleteImage(oldImage);
   }
 
   windowChangeImageWithLink() async {
@@ -217,15 +229,19 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).bildAendern,
+            title: AppLocalizations
+                .of(context)
+                .bildAendern,
             children: [
               SizedBox(
                   width: 200,
                   child: customTextInput(
-                      AppLocalizations.of(context).eigenesBildLinkEingeben,
+                      AppLocalizations
+                          .of(context)
+                          .eigenesBildLinkEingeben,
                       ownPictureKontroller)),
               const SizedBox(height: 20),
-              windowOptions(() => saveChangeImage())
+              windowOptions(() => saveChangeImage(ownPictureKontroller.text))
             ],
           );
         });
@@ -236,33 +252,57 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       margin: const EdgeInsets.only(right: 10),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         TextButton(
-          child: Text(AppLocalizations.of(context).abbrechen,
+          child: Text(AppLocalizations
+              .of(context)
+              .abbrechen,
               style: TextStyle(fontSize: fontsize)),
           onPressed: () => Navigator.pop(context),
         ),
         TextButton(
-            child: Text(AppLocalizations.of(context).speichern,
+            child: Text(AppLocalizations
+                .of(context)
+                .speichern,
                 style: TextStyle(fontSize: fontsize)),
-            onPressed: () => saveFunction()),
+            onPressed: () {
+              saveFunction();
+              Navigator.pop(context);
+            }),
       ]),
     );
   }
 
-  saveChangeImage() {
-    if (selectedImage == "" && ownPictureKontroller.text == "") {
-      customSnackbar(context, AppLocalizations.of(context).bitteBildAussuchen);
+  saveChangeImage(image) async {
+    var oldImage = widget.community["bild"];
+
+    if (selectedImage == "" && (image == null || image.isEmpty)) {
+      customSnackbar(context, AppLocalizations
+          .of(context)
+          .bitteBildAussuchen);
       return;
     }
 
-    if (selectedImage == "") {
-      selectedImage = ownPictureKontroller.text;
-      widget.community["bild"] = selectedImage;
+    if (image.substring(0, 4) != "http" &&
+        image.substring(0, 3) != "www") {
+      customSnackbar(context, AppLocalizations.of(context).ungueltigerLink);
+      return;
+    }
+
+
+
+    if (image != null) {
+      selectedImage = image;
+      widget.community["bild"] = image;
     } else {
       widget.community["bild"] = selectedImage;
     }
 
-    CommunityDatabase().update(
+    DbDeleteImage(oldImage);
+
+    await CommunityDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.community["id"]}'");
+
+
+    setState(() {});
   }
 
   changeNameWindow() {
@@ -272,9 +312,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).nameAendern,
+            title: AppLocalizations
+                .of(context)
+                .nameAendern,
             children: [
-              customTextInput(AppLocalizations.of(context).neuenNamenEingeben,
+              customTextInput(AppLocalizations
+                  .of(context)
+                  .neuenNamenEingeben,
                   newNameKontroller),
               const SizedBox(height: 15),
               windowOptions(() => saveChangeName(newNameKontroller.text))
@@ -285,7 +329,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   saveChangeName(newName) {
     if (newName.isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context).bitteNameEingeben);
+      customSnackbar(context, AppLocalizations
+          .of(context)
+          .bitteNameEingeben);
       return;
     }
 
@@ -301,14 +347,18 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   changeOrtWindow() {
     var ortAuswahlBox = GoogleAutoComplete(
-      hintText: AppLocalizations.of(context).ortEingeben,
+      hintText: AppLocalizations
+          .of(context)
+          .ortEingeben,
     );
 
     showDialog(
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).ortAendern,
+            title: AppLocalizations
+                .of(context)
+                .ortAendern,
             children: [
               ortAuswahlBox,
               const SizedBox(height: 15),
@@ -321,7 +371,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   saveChangeLocation(newLocationData) {
     if (newLocationData["city"].isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+      customSnackbar(context, AppLocalizations
+          .of(context)
+          .ortEingeben);
       return;
     }
 
@@ -338,23 +390,30 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   changeOrOpenLinkWindow(tabPosition) async {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+    final RenderBox overlay = Overlay
+        .of(context)
+        .context
+        .findRenderObject();
 
     await showMenu(
       context: context,
       position: RelativeRect.fromRect(
           tabPosition & const Size(40, 40), // smaller rect, the touch area
           Offset.zero & overlay.size // Bigger rect, the entire screen
-          ),
+      ),
       items: [
         PopupMenuItem(
-            child: Text(AppLocalizations.of(context).linkBearbeiten),
+            child: Text(AppLocalizations
+                .of(context)
+                .linkBearbeiten),
             onTap: () {
               Future.delayed(
                   const Duration(seconds: 0), () => changeLinkWindow());
             }),
         PopupMenuItem(
-          child: Text(AppLocalizations.of(context).linkOeffnen),
+          child: Text(AppLocalizations
+              .of(context)
+              .linkOeffnen),
           onTap: () {
             Navigator.pop(context);
             launch(widget.community["link"]);
@@ -372,9 +431,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).linkAendern,
+            title: AppLocalizations
+                .of(context)
+                .linkAendern,
             children: [
-              customTextInput(AppLocalizations.of(context).neuenLinkEingeben,
+              customTextInput(AppLocalizations
+                  .of(context)
+                  .neuenLinkEingeben,
                   newLinkKontroller),
               const SizedBox(height: 15),
               windowOptions(() => saveChangeLink(newLinkKontroller.text))
@@ -385,12 +448,16 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   saveChangeLink(newLink) {
     if (newLink.isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context).neuenLinkEingeben);
+      customSnackbar(context, AppLocalizations
+          .of(context)
+          .neuenLinkEingeben);
       return;
     }
 
     if (!newLink.contains("http") && !newLink.contains("www")) {
-      customSnackbar(context, AppLocalizations.of(context).eingabeKeinLink);
+      customSnackbar(context, AppLocalizations
+          .of(context)
+          .eingabeKeinLink);
       return;
     }
 
@@ -405,22 +472,28 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   changeBeschreibungWindow() {
-    var newBeschreibungKontroller = TextEditingController(text: widget.community["beschreibung"]);
+    var newBeschreibungKontroller = TextEditingController(
+        text: widget.community["beschreibung"]);
 
     showDialog(
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).beschreibungAendern,
+            title: AppLocalizations
+                .of(context)
+                .beschreibungAendern,
             children: [
               customTextInput(
-                  AppLocalizations.of(context).neueBeschreibungEingeben,
+                  AppLocalizations
+                      .of(context)
+                      .neueBeschreibungEingeben,
                   newBeschreibungKontroller,
                   moreLines: 5,
                   textInputAction: TextInputAction.newline),
               const SizedBox(height: 15),
               windowOptions(
-                  () => saveChangeBeschreibung(newBeschreibungKontroller.text))
+                      () =>
+                      saveChangeBeschreibung(newBeschreibungKontroller.text))
             ],
           );
         });
@@ -429,7 +502,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   saveChangeBeschreibung(newBeschreibung) {
     if (newBeschreibung.isEmpty) {
       customSnackbar(context,
-          AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
+          AppLocalizations
+              .of(context)
+              .bitteCommunityBeschreibungEingeben);
       return;
     }
 
@@ -457,7 +532,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).mitgliedHinzufuegen,
+            title: AppLocalizations
+                .of(context)
+                .mitgliedHinzufuegen,
             children: [
               searchAutocomplete,
               const SizedBox(height: 15),
@@ -511,7 +588,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               child: Text(
                 member["name"],
                 style:
-                    TextStyle(color: Theme.of(context).colorScheme.secondary),
+                TextStyle(color: Theme
+                    .of(context)
+                    .colorScheme
+                    .secondary),
               ))));
     }
 
@@ -519,7 +599,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).member,
+            title: AppLocalizations
+                .of(context)
+                .member,
             children: membersBoxes,
           );
         });
@@ -527,7 +609,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     fontsize = isWebDesktop ? 12 : 16;
     var isCreator = widget.community["erstelltVon"].contains(userId);
 
@@ -536,26 +621,32 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).eventLoeschen,
-              height: 90,
+              title: AppLocalizations
+                  .of(context)
+                  .communityLoeschen,
+              height: 120,
               children: [
                 const SizedBox(height: 10),
                 Center(
                     child: Text(
-                        AppLocalizations.of(context).communityWirklichLoeschen))
+                        AppLocalizations
+                            .of(context)
+                            .communityWirklichLoeschen))
               ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
-                  onPressed: () {
-                    CommunityDatabase().delete(widget.community["id"]);
-                    deleteImage(widget.community["bild"]);
+                  onPressed: () async {
+                    await CommunityDatabase().delete(widget.community["id"]);
+                    DbDeleteImage(widget.community["bild"]);
                     global_func.changePageForever(
                         context, StartPage(selectedIndex: 2));
                   },
                 ),
                 TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
+                  child: Text(AppLocalizations
+                      .of(context)
+                      .abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -571,10 +662,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
                 height: 500,
-                title: AppLocalizations.of(context).communityMelden,
+                title: AppLocalizations
+                    .of(context)
+                    .communityMelden,
                 children: [
                   customTextInput(
-                      AppLocalizations.of(context).communityMeldenFrage,
+                      AppLocalizations
+                          .of(context)
+                          .communityMeldenFrage,
                       reportController,
                       moreLines: 10),
                   Container(
@@ -587,7 +682,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                               "Melde Community id: " + widget.community["id"],
                               reportController.text);
                         },
-                        label: Text(AppLocalizations.of(context).senden)),
+                        label: Text(AppLocalizations
+                            .of(context)
+                            .senden)),
                   )
                 ]);
           });
@@ -599,7 +696,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           children: [
             const Icon(Icons.report),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).eventMelden),
+            Text(AppLocalizations
+                .of(context)
+                .eventMelden),
           ],
         ),
         onPressed: () {
@@ -615,7 +714,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           children: [
             const Icon(Icons.person_add),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).mitgliedHinzufuegen),
+            Text(AppLocalizations
+                .of(context)
+                .mitgliedHinzufuegen),
           ],
         ),
         onPressed: () {
@@ -631,7 +732,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           children: [
             const Icon(Icons.delete),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).eventLoeschen),
+            Text(AppLocalizations
+                .of(context)
+                .communityLoeschen),
           ],
         ),
         onPressed: () {
@@ -653,7 +756,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   child: SimpleDialog(
                     contentPadding: EdgeInsets.zero,
                     insetPadding:
-                        const EdgeInsets.only(top: 40, left: 0, right: 10),
+                    const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
                       if (!isCreator) _reportDialog(),
                       if (isCreator) _addMemberDialog(),
@@ -667,6 +770,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     }
 
     communityImage() {
+      var isAssetImage =
+      widget.community["bild"].substring(0, 5) == "asset" ? true : false;
+
       return GestureDetector(
         onTapDown: (details) {
           if (!isCreator) return;
@@ -674,7 +780,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           var getTabPostion = details.globalPosition;
           changeImageWindow(getTabPostion);
         },
-        child: Image.asset(widget.community["bild"],
+        child: isAssetImage
+            ? Image.asset(widget.community["bild"])
+            : Image.network(widget.community["bild"],
             height: screenHeight / 3, fit: BoxFit.fitWidth),
       );
     }
@@ -692,17 +800,19 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               onTap: () => isCreator ? changeNameWindow() : null,
               child: Center(
                   child: Text(
-                widget.community["name"],
-                style:
+                    widget.community["name"],
+                    style:
                     const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              )),
+                  )),
             ),
             const SizedBox(height: 20),
             InkWell(
               onTap: () => isCreator ? changeOrtWindow() : null,
               child: Row(
                 children: [
-                  Text(AppLocalizations.of(context).ort,
+                  Text(AppLocalizations
+                      .of(context)
+                      .ort,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   Text(widget.community["ort"] +
                       " / " +
@@ -726,7 +836,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   ),
                   Text(widget.community["link"],
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary))
+                          color: Theme
+                              .of(context)
+                              .colorScheme
+                              .secondary))
                 ],
               ),
             ),
@@ -754,24 +867,34 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               child: Text(
                 widget.community["members"].length.toString() +
                     " " +
-                    AppLocalizations.of(context).member,
+                    AppLocalizations
+                        .of(context)
+                        .member,
                 style:
-                    TextStyle(color: Theme.of(context).colorScheme.secondary),
+                TextStyle(color: Theme
+                    .of(context)
+                    .colorScheme
+                    .secondary),
               ),
             ),
             const Expanded(child: SizedBox()),
             InkWell(
-                onTap: () => global_func.changePage(
-                    context,
-                    ShowProfilPage(
-                      userName: FirebaseAuth.instance.currentUser.displayName,
-                      profil: creatorProfil,
-                    )),
+                onTap: () =>
+                    global_func.changePage(
+                        context,
+                        ShowProfilPage(
+                          userName: FirebaseAuth.instance.currentUser
+                              .displayName,
+                          profil: creatorProfil,
+                        )),
                 child: Text(
                   creatorText,
                   style: TextStyle(
                       fontSize: fontsize,
-                      color: Theme.of(context).colorScheme.secondary),
+                      color: Theme
+                          .of(context)
+                          .colorScheme
+                          .secondary),
                 ))
           ],
         ),
