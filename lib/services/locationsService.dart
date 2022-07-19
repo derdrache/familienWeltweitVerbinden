@@ -42,6 +42,8 @@ class LocationService {
       country = formattedAddressList[formattedAddressList.length - 2];
     }
 
+    country = deleteNumbers(country);
+
     return {
       "city": city,
       "countryname": country,
@@ -233,5 +235,18 @@ class LocationService {
     countriesListEng.sort();
 
     return {"ger": countriesListGer, "eng": countriesListEng};
+  }
+
+  deleteNumbers(string){
+    var words = string.split(" ");
+    var newWords = [];
+
+    for(var word in words){
+      if(!isNumeric(word)){
+        newWords.add(word);
+      }
+    }
+
+    return newWords.join(" ");
   }
 }

@@ -58,6 +58,8 @@ class _ImageGalerieState extends State<ImageGalerie> {
   }
 
   saveChanges() {
+    var oldImage = widget.event["bild"];
+
     if (selectedImage == "" && ownPictureKontroller.text == "") {
       customSnackbar(context, AppLocalizations.of(context).bitteBildAussuchen);
       return;
@@ -73,6 +75,9 @@ class _ImageGalerieState extends State<ImageGalerie> {
     setState(() {
       imageLoading = false;
     });
+
+    DbDeleteImage(oldImage);
+
     EventDatabase().update("bild = '$selectedImage'", "WHERE id = '${widget.event["id"]}'");
   }
 
@@ -193,7 +198,10 @@ class _ImageGalerieState extends State<ImageGalerie> {
           TextButton(
               child: Text(AppLocalizations.of(context).speichern,
                   style: TextStyle(fontSize: fontsize)),
-              onPressed: () => saveChanges()),
+              onPressed: () {
+                saveChanges();
+                Navigator.pop(context);
+              }),
         ]),
       );
     }

@@ -232,7 +232,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                   child: const Text("Ok"),
                   onPressed: () {
                     ProfilDatabase().deleteProfil(widget.profil["id"]);
-                    deleteImage(widget.profil["bild"]);
+                    DbDeleteImage(widget.profil["bild"]);
                     setState(() {});
                     global_functions.changePageForever(
                         context, const LoginPage());

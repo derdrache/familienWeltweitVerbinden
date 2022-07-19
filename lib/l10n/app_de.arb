@@ -316,6 +316,8 @@
     "member": "Mitglieder",
     "familyProfil": "Familienprofil",
     "annehmen": "Annehmen",
-    "ablehnen": "Ablehnen"
+    "ablehnen": "Ablehnen",
+    "communityLoeschen": "Community löschen",
+    "ungueltigerLink": "Link ungültig - Der Link muss mit http oder www anfangen"
 
 }

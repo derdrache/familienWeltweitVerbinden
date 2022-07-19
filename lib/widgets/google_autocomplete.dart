@@ -99,11 +99,11 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
 
     dropDownItem(item) {
       return GestureDetector(
-        onTapUp: (details) async {
-          widget.searchKontroller.text = item["description"];
-          resetSearchBar();
+        onTapDown: (details) async {
           widget.googleSearchResult =
               await getGoogleSearchLocationData(item["place_id"]);
+          widget.searchKontroller.text = item["description"];
+          resetSearchBar();
         },
         child: Container(
             padding: const EdgeInsets.all(10),
