@@ -318,6 +318,8 @@
     "member": "members",
     "familyProfil": "familie profil",
     "annehmen": "accept",
-    "ablehnen": "reject"
+    "ablehnen": "reject",
+    "communityLoeschen": "delete community",
+    "ungueltigerLink": "link invalid - the link must start with http or www"
 }
 
