@@ -22,12 +22,14 @@ class CommunityPage extends StatefulWidget {
 
 class _CommunityPageState extends State<CommunityPage> {
   var suchleiste = SearchAutocomplete();
-  var allCommunities = Hive.box("secureBox").get("communities");
+  var allCommunities = Hive.box('secureBox').get("communities");
   var isLoading = true;
   bool filterOn = false;
   var filterList = [];
   var allCommunitiesCities = [];
   var allCommunitiesCountries = [];
+  bool getInvite = false;
+  int invitedCommunityIndex;
 
   @override
   void initState() {
@@ -66,6 +68,15 @@ class _CommunityPageState extends State<CommunityPage> {
     setState(() {});
   }
 
+  checkCommunityInvite() {
+    for (var i = 0; i < allCommunities.length; i++) {
+      if (allCommunities[i]["einladung"].contains(userId)) {
+        invitedCommunityIndex = i;
+        break;
+      }
+    }
+  }
+
   showFilter() {
     var comunitiesList = Hive.box("secureBox").get("communities");
     var filterCommunities = [];
@@ -75,8 +86,9 @@ class _CommunityPageState extends State<CommunityPage> {
     }
 
     for (var community in comunitiesList) {
-      if (checkIfInFilter(community, filterList))
+      if (checkIfInFilter(community, filterList)) {
         filterCommunities.add(community);
+      }
     }
 
     setState(() {
@@ -139,10 +151,21 @@ class _CommunityPageState extends State<CommunityPage> {
       if (community["interesse"].contains(userId)) {
         allfavorites.add(CommunityCard(
           community: community,
-          margin: const EdgeInsets.only(top: 10, bottom: 10, left: 70, right: 70),
-          afterPageVisit: () => changePage(context, StartPage(selectedIndex: 2,))
+          margin:
+              const EdgeInsets.only(top: 10, bottom: 10, left: 70, right: 70),
+          afterPageVisit: () => changePage(
+              context,
+              StartPage(
+                selectedIndex: 2,
+              )),
         ));
       }
+    }
+
+    if (allfavorites.isEmpty) {
+      allfavorites.add(Container(
+          margin: const EdgeInsets.all(10),
+          child: Text(AppLocalizations.of(context).keineCommunityFavorite)));
     }
 
     showDialog(
@@ -155,6 +178,27 @@ class _CommunityPageState extends State<CommunityPage> {
         });
   }
 
+  communityEinladungAnnehmen() {
+    setState(() {
+      allCommunities[invitedCommunityIndex]["members"].add(userId);
+      allCommunities[invitedCommunityIndex]["einladung"].remove(userId);
+    });
+
+    CommunityDatabase().update(
+        "einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId'))), members = JSON_ARRAY_APPEND(members, '\$', '$userId')",
+        "WHERE id = '${allCommunities[invitedCommunityIndex]["id"]}'");
+  }
+
+  communityEinladungAblehnen() {
+    setState(() {
+      allCommunities[invitedCommunityIndex]["einladung"].remove(userId);
+    });
+
+    CommunityDatabase().update(
+        "einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
+        "WHERE id = '${allCommunities[invitedCommunityIndex]["id"]}'");
+  }
+
   @override
   Widget build(BuildContext context) {
     suchleiste.hintText = AppLocalizations.of(context).filterEventSuche;
@@ -164,10 +208,25 @@ class _CommunityPageState extends State<CommunityPage> {
 
       for (var community in allCommunities) {
         communities.add(CommunityCard(
-          community: community,
-          withFavorite: true,
-            afterPageVisit: () => changePage(context, StartPage(selectedIndex: 2,))
-        ));
+            community: community,
+            withFavorite: true,
+            afterPageVisit: () => changePage(
+                context,
+                StartPage(
+                  selectedIndex: 2,
+                )),
+            afterFavorite: () {
+              for (var i = 0; i < allCommunities.length; i++) {
+                if (community["id"] == allCommunities[i]["id"]) {
+                  if (allCommunities[i]["interesse"].contains(userId)) {
+                    allCommunities[i]["interesse"].remove(userId);
+                  } else {
+                    allCommunities[i]["interesse"].add(userId);
+                  }
+                  setState(() {});
+                }
+              }
+            }));
       }
 
       return SingleChildScrollView(
@@ -177,20 +236,56 @@ class _CommunityPageState extends State<CommunityPage> {
 
     bottomBar() {
       return Container(
+        alignment: Alignment.bottomRight,
         margin: const EdgeInsets.all(10),
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
                 heroTag: "show favorites",
                 child: const Icon(Icons.star),
                 onPressed: () => showFavoritesWindow()),
-            const SizedBox(width: 10),
+            const SizedBox(height: 10),
             FloatingActionButton(
                 heroTag: "create Community",
                 child: const Icon(Icons.create),
                 onPressed: () =>
                     changePage(context, const CommunityErstellen())),
+          ],
+        ),
+      );
+    }
+
+    showInvite() {
+      return Container(
+        padding: const EdgeInsets.all(10),
+        height: 100,
+        decoration: BoxDecoration(
+          border: Border.all(),
+        ),
+        child: Column(
+          children: [
+            Text(AppLocalizations.of(context).zurCommunityEingeladen +
+                allCommunities[invitedCommunityIndex]["name"]),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                    child: Text(AppLocalizations.of(context).annehmen),
+                    onPressed: () => communityEinladungAnnehmen(),
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.green))),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                    child: Text(AppLocalizations.of(context).ablehnen),
+                    onPressed: () => communityEinladungAblehnen(),
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.red)))
+              ],
+            )
           ],
         ),
       );
@@ -203,7 +298,8 @@ class _CommunityPageState extends State<CommunityPage> {
             children: [
               suchleiste,
               Expanded(child: showCommunities()),
-              bottomBar()
+              bottomBar(),
+              if (getInvite) showInvite(),
             ],
           )),
     );

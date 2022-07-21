@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:familien_suche/pages/settings/family_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -167,7 +166,6 @@ class _StartPageState extends State<StartPage> {
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
       const ErkundenPage(),
-      //const FamilieProfilPage(),
       const EventPage(),
       const CommunityPage(),
       const ChatPage(),
@@ -207,6 +205,22 @@ class _StartPageState extends State<StartPage> {
 
             return BadgeIcon(
                 icon: Icons.event, text: events > 0 ? events.toString() : "");
+          });
+    }
+
+    communityIcon(){
+      return FutureBuilder(
+          future: CommunityDatabase().getData("*",
+              "WHERE JSON_CONTAINS(einladung, '\"$userId\"') > 0",
+              returnList: true),
+          builder: (BuildContext context, AsyncSnapshot snap) {
+            if (!snap.hasData) return const Icon(Icons.cottage);
+
+            var invitedCommunity = snap.data;
+            var hasInvite = invitedCommunity == false ? 0 : 1;
+
+            return BadgeIcon(
+                icon: Icons.cottage, text: hasInvite > 0 ? "1" : "");
           });
     }
 
@@ -276,8 +290,8 @@ class _StartPageState extends State<StartPage> {
               icon: eventIcon(),
               label: 'Events',
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.cottage),
+            BottomNavigationBarItem(
+              icon: communityIcon(),
               label: 'Community',
             ),
             BottomNavigationBarItem(

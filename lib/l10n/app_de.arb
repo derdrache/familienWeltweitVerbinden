@@ -318,6 +318,8 @@
     "annehmen": "Annehmen",
     "ablehnen": "Ablehnen",
     "communityLoeschen": "Community löschen",
-    "ungueltigerLink": "Link ungültig - Der Link muss mit http oder www anfangen"
+    "ungueltigerLink": "Link ungültig - Der Link muss mit http oder www anfangen",
+    "keineCommunityFavorite": "Keine Community als Favoriten gespeichert",
+    "zurCommunityEingeladen": "Du wurdest zu folgender Community eingeladen: "
 
 }
