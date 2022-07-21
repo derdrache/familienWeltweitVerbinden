@@ -320,6 +320,8 @@
     "annehmen": "accept",
     "ablehnen": "reject",
     "communityLoeschen": "delete community",
-    "ungueltigerLink": "link invalid - the link must start with http or www"
+    "ungueltigerLink": "link invalid - the link must start with http or www",
+    "keineCommunityFavorite": "no community saved as favorites",
+    "zurCommunityEingeladen": "you have been invited to the following community: "
 }
 
