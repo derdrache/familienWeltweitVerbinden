@@ -61,7 +61,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   void initState() {
     super.initState();
 
-    // Setup the listener.
     _controller.addListener(() {
       if (_controller.position.atEdge) {
         bool isTop = _controller.position.pixels == 0;

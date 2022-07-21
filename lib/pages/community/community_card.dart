@@ -15,11 +15,13 @@ class CommunityCard extends StatefulWidget {
   Function afterPageVisit;
   bool isCreator;
   bool bigCard;
+  Function afterFavorite;
 
   CommunityCard({
     Key key,
     this.community,
     this.withFavorite = false,
+    this.afterFavorite,
     this.margin =
         const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
@@ -102,6 +104,7 @@ class _CommunityCardState extends State<CommunityCard> {
                           hasIntereset:
                               widget.community["interesse"].contains(userId),
                           id: widget.community["id"].toString(),
+                          afterFavorite: widget.afterFavorite
                         )),
                 ],
               ),
@@ -150,8 +153,9 @@ class _CommunityCardState extends State<CommunityCard> {
 class InteresseButton extends StatefulWidget {
   bool hasIntereset;
   String id;
+  Function afterFavorite;
 
-  InteresseButton({Key key, this.hasIntereset, this.id}) : super(key: key);
+  InteresseButton({Key key, this.hasIntereset, this.id, this.afterFavorite}) : super(key: key);
 
   @override
   _InteresseButtonState createState() => _InteresseButtonState();
@@ -165,6 +169,8 @@ class _InteresseButtonState extends State<InteresseButton> {
 
     setState(() {});
 
+
+
     var interesseList =
         await CommunityDatabase().getData("interesse", "WHERE id = '${widget.id}'");
 
@@ -174,8 +180,10 @@ class _InteresseButtonState extends State<InteresseButton> {
       interesseList.remove(userId);
     }
 
-    CommunityDatabase().update("interesse = '${json.encode(interesseList)}'",
+    await CommunityDatabase().update("interesse = '${json.encode(interesseList)}'",
         "WHERE id ='${widget.id}'");
+
+    widget.afterFavorite();
   }
 
   @override
