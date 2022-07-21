@@ -78,11 +78,12 @@ class _ImageGalerieState extends State<ImageGalerie> {
 
     DbDeleteImage(oldImage);
 
-    EventDatabase().update("bild = '$selectedImage'", "WHERE id = '${widget.event["id"]}'");
+    EventDatabase().update(
+        "bild = '$selectedImage'", "WHERE id = '${widget.event["id"]}'");
   }
 
   pickAndUploadImage() async {
-    var eventName = widget.event["name"] +"_";
+    var eventName = widget.event["name"] + "_";
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
@@ -100,7 +101,6 @@ class _ImageGalerieState extends State<ImageGalerie> {
     var imageByte = await changeImageSize(pickedImage);
 
     await uploadImage(pickedImage.path, imageName, imageByte);
-
 
     return imageName;
   }
@@ -130,7 +130,7 @@ class _ImageGalerieState extends State<ImageGalerie> {
     return imageJpgByte;
   }
 
-  selectAndUploadImage() async{
+  selectAndUploadImage() async {
     var imageName = await pickAndUploadImage();
 
     if (imageName == false) return;
@@ -176,8 +176,8 @@ class _ImageGalerieState extends State<ImageGalerie> {
       return SizedBox(
           width: 200,
           child: customTextInput(
-              AppLocalizations.of(context).eigenesBildLinkEingeben, ownPictureKontroller,
-              onSubmit: () {
+              AppLocalizations.of(context).eigenesBildLinkEingeben,
+              ownPictureKontroller, onSubmit: () {
             allImages.add(Image.network(ownPictureKontroller.text,
                 fit: BoxFit.fill, width: 80, height: 60));
 
@@ -263,9 +263,8 @@ class _ImageGalerieState extends State<ImageGalerie> {
             },
           ),
           PopupMenuItem(
-            child: Text(AppLocalizations.of(context).hochladen),
-            onTap: () => selectAndUploadImage()
-          ),
+              child: Text(AppLocalizations.of(context).hochladen),
+              onTap: () => selectAndUploadImage()),
         ],
         elevation: 8.0,
       );
@@ -277,7 +276,14 @@ class _ImageGalerieState extends State<ImageGalerie> {
             minHeight: 200,
           ),
           width: double.infinity,
-          child: imageLoading ? Container(margin:EdgeInsets.all(60), child: CircularProgressIndicator()) :widget.child,
+          child: imageLoading
+              ? Center(
+                  child: Container(
+                      margin: const EdgeInsets.all(10),
+                      width: 100,
+                      height: 100,
+                      child: const CircularProgressIndicator()))
+              : widget.child,
         ),
         onTapDown: !widget.isCreator
             ? null
