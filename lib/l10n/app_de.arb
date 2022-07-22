@@ -189,7 +189,7 @@
     "eventWirklichLoeschen": "Möchtest du das Event wirklich löschen?",
     "unsicher": "Unsicher: ",
     "onlineEvents": "Online Events",
-    "eventsOrganisationstools": "Events Organisationstools",
+    "eventsOrganisationstools": "Events organisieren",
     "newsBoard": "News Board",
     "loginMitGoogle": "Login mit Google",
     "alleEvents": "Alle Events",
@@ -320,6 +320,13 @@
     "communityLoeschen": "Community löschen",
     "ungueltigerLink": "Link ungültig - Der Link muss mit http oder www anfangen",
     "keineCommunityFavorite": "Keine Community als Favoriten gespeichert",
-    "zurCommunityEingeladen": "Du wurdest zu folgender Community eingeladen: "
+    "zurCommunityEingeladen": "Du wurdest zu folgender Community eingeladen: ",
+    "communityErweiterung": "Community Erweiterung",
+    "familienmitgliedHinzufuegen" : "Familienmitglied hinzufügen",
+    "hauptprofilWaehlen": "Hauptprofil wählen",
+    "familienprofilName": "Name vom Familienprofil",
+    "familienprofilAktivieren": "Familienprofil aktivieren ?",
+    "familienprofilBeschreibung": "Wenn das Familienprofil aktiviert wird, wird bei jedem Familienmitglied ein einheitliches Profil auftauchen.\n\nAuf der Weltkarte wird nicht mehr jedes Familienmitglied einzeln angezeigt, sondern nur noch das Familienprofil.",
+    "familyprofilInvite": "Du wurdest eingeladen, folgendem Familienprofil beizutreten: "
 
 }
