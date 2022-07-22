@@ -158,6 +158,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
   @override
   Widget build(BuildContext context) {
+
     List<Widget> createFriendlistBox() {
       var userFriendlist = ownProfil["friendlist"];
 
@@ -240,7 +241,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text("Familienprofil aktivieren ?"),
+          Text(AppLocalizations.of(context).familienprofilAktivieren),
           const SizedBox(width: 10),
           Switch(
             value: familyProfilIsActive,
@@ -298,9 +299,10 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     nameBox(){
       nameFamilyKontroller.text = familyProfil["name"];
+
       return Container(
         child: customTextInput(
-            "Name vom Familienprofil",
+            AppLocalizations.of(context).familienprofilName,
             nameFamilyKontroller,
           onSubmit: (){
               var newName = nameFamilyKontroller.text;
@@ -327,7 +329,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       }
 
       return CustomDropDownButton(
-          hintText: "Hauptprofil wählen", selected: familyProfil["mainProfil"], items: allMembersName);
+          hintText: AppLocalizations.of(context).hauptprofilWaehlen, selected: familyProfil["mainProfil"], items: allMembersName);
     }
 
     addFamilyMemberBox() {
@@ -337,10 +339,8 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           margin: const EdgeInsets.all(20),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
-                width: 250,
-                child: const Text(
-                  "Für ein Familienprofil werden mindestens zwei Familienmitglieder benötigt",
-                  maxLines: 2,
+                child: Text(
+                  AppLocalizations.of(context).familienmitgliedHinzufuegen,
                 )),
             const SizedBox(width: 10),
             const Icon(Icons.person_add)
@@ -349,16 +349,11 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       );
     }
 
-    familyProfilPage() {
-      return;
-    }
-
     familyProfilDescription() {
       return Container(
           margin: const EdgeInsets.all(20),
-          child: const Text(
-              "Wenn das Familienprofil aktiviert wird, wird bei jedem Familienmitglied ein einheitliches Profil auftauchen."
-              "\n\nAuf der Weltkarte wird nicht mehr jedes Familienmitglied einzeln angezeigt, sondern nur noch das Familienprofil."));
+          child: Text(AppLocalizations.of(context).familienprofilBeschreibung)
+      );
     }
 
     familyProfilInvite() {
@@ -369,9 +364,8 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                 color: Theme.of(context).colorScheme.primary, width: 3)),
         child: Column(
           children: [
-            Text("Du wurdest eingeladen dem Familienprofil " +
-                inviteFamilyProfil["name"] +
-                " beizutreten"),
+            Text(AppLocalizations.of(context).familyprofilInvite +
+                inviteFamilyProfil["name"]),
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -415,8 +409,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
                 return Column(
                   children: [
-                    //if (familyProfilIsActive) familyProfilPage(),
-
                     if(familyProfilIsActive) nameBox(),
                     if(familyProfilIsActive) chooseMainProfil(),
                     if (!familyProfilIsActive) familyProfilDescription(),

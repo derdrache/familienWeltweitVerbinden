@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:familien_suche/pages/settings/family_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -165,7 +166,8 @@ class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
-      const ErkundenPage(),
+      FamilieProfilPage(),
+      //const ErkundenPage(),
       const EventPage(),
       const CommunityPage(),
       const ChatPage(),
