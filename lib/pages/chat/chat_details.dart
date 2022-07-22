@@ -184,6 +184,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (messageData["message"].contains("</eventId=")) {
         messageData["message"] = "<Event Card>";
       }
+      if (messageData["message"].contains("</communityId=")) {
+        messageData["message"] = "<Community Card>";
+      }
+
 
       ChatDatabase().updateChatGroup(
           "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
@@ -217,6 +221,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+
     messageList(messages) {
       List<Widget> messageBox = [];
 
@@ -242,6 +247,38 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             child: FutureBuilder(
                 future: EventDatabase().getData(
                     "*", "WHERE id = '${message["message"].substring(10)}'"),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data != false) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 25),
+                      child: Stack(clipBehavior: Clip.none, children: [
+                        EventCard(
+                          margin: const EdgeInsets.all(15),
+                          withInteresse: true,
+                          event: snapshot.data,
+                          afterPageVisit: () => setState(() {}),
+                        ),
+                        Positioned(
+                          bottom: -15,
+                          right: 0,
+                          child: Text(
+                              DateFormat('dd-MM HH:mm').format(messageTime),
+                              style: TextStyle(color: Colors.grey[600])),
+                        )
+                      ]),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+          ));
+          continue;
+        }
+        if (message["message"].contains("</communityId=")) {
+          messageBox.add(Align(
+            alignment: textAlign,
+            child: FutureBuilder(
+                future: CommunityDatabase().getData(
+                    "*", "WHERE id = '${message["message"].substring(14)}'"),
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data != false) {
                     return Container(

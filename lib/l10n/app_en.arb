@@ -191,7 +191,7 @@
     "eventWirklichLoeschen": "Do you really want to delete the event?",
     "unsicher": "Unsure: ",
     "onlineEvents": "Online events",
-    "eventsOrganisationstools": "Events organization tools",
+    "eventsOrganisationstools": "organize events",
     "newsBoard": "News Board",
     "loginMitGoogle": "Login with Google",
     "alleEvents": "All Events",
@@ -322,6 +322,13 @@
     "communityLoeschen": "delete community",
     "ungueltigerLink": "link invalid - the link must start with http or www",
     "keineCommunityFavorite": "no community saved as favorites",
-    "zurCommunityEingeladen": "you have been invited to the following community: "
+    "zurCommunityEingeladen": "you have been invited to the following community: ",
+    "communityErweiterung": "Community expansion",
+    "familienmitgliedHinzufuegen" : "add family member",
+    "hauptprofilWaehlen": "choose main profil",
+    "familienprofilName": "family profil name",
+    "familienprofilAktivieren": "activate family profile ?",
+    "familienprofilBeschreibung": "If the family profile is activated, a unified profile will appear for each family member.\n\nThe world map no longer shows each family member individually, only the family profile.",
+    "familyprofilInvite": "you have been invited to join the following family profile:"
 }
 
