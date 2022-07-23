@@ -31,6 +31,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   var familyProfil;
   var inviteFamilyProfil;
   var nameFamilyKontroller = TextEditingController();
+  var mainProfilDropdown = CustomDropDownButton();
 
   @override
   void initState() {
@@ -328,8 +329,22 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
         }
       }
 
-      return CustomDropDownButton(
-          hintText: AppLocalizations.of(context).hauptprofilWaehlen, selected: familyProfil["mainProfil"], items: allMembersName);
+      mainProfilDropdown = CustomDropDownButton(
+        hintText: AppLocalizations.of(context).hauptprofilWaehlen,
+        selected: familyProfil["mainProfil"],
+        items: allMembersName,
+        onChange: (){
+          var selected = mainProfilDropdown.getSelected();
+
+          var selectedIndex = allMembersName.indexOf(selected);
+          var selectedId = allMembersId[selectedIndex];
+
+          FamiliesDatabase().update("mainProfil = '$selectedId'", "WHERE id = '${familyProfil["id"]}'");
+        }
+      );
+
+      return mainProfilDropdown;
+
     }
 
     addFamilyMemberBox() {
@@ -338,10 +353,9 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
         child: Container(
           margin: const EdgeInsets.all(20),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Container(
-                child: Text(
-                  AppLocalizations.of(context).familienmitgliedHinzufuegen,
-                )),
+            Text(
+              AppLocalizations.of(context).familienmitgliedHinzufuegen,
+            ),
             const SizedBox(width: 10),
             const Icon(Icons.person_add)
           ]),
@@ -414,7 +428,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                     if (!familyProfilIsActive) familyProfilDescription(),
                     if (familyMembersCount < 2 && familyProfilIsActive)
                       addFamilyMemberBox(),
-
                     const Expanded(
                       child: SizedBox(),
                     ),

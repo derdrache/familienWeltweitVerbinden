@@ -88,6 +88,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     changeAllCitiesAndCreateCityNames();
     removeProfilsAndCreateAllUserName();
 
+    createAndSetZoomLevels(profils, "profils");
+
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
@@ -156,7 +158,39 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     localProfils = profils;
-    createAndSetZoomLevels(profils, "profils");
+  }
+
+  changeProfilToFamilyProfil(){
+    var familyProfils = Hive.box('secureBox').get("familyProfils");
+    var deleteProfils = [];
+
+
+    for(var familyProfil in familyProfils){
+      if(familyProfil["active"] == 0) continue;
+
+      var members = familyProfil["members"];
+      var membersFound = 0;
+
+      for(var i = 0; i<profils.length; i++){
+        if(members.contains(profils[i]["id"])){
+          membersFound += 1;
+
+          if(profils[i]["id"] == familyProfil["mainProfil"]){
+            profils[i]["name"] = familyProfil["name"];
+          }else{
+            deleteProfils.add(profils[i]["id"]);
+          }
+        }
+
+        if(membersFound == members.length) break;
+      }
+    }
+
+    for(var profil in deleteProfils){
+      profils.remove(profil);
+    }
+
+    localProfils = profils;
   }
 
   _asyncMethod() async {
