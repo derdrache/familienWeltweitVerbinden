@@ -65,6 +65,8 @@ class _CommunityPageState extends State<CommunityPage> {
           showFilter();
         });
 
+    checkCommunityInvite();
+
     setState(() {});
   }
 
@@ -72,6 +74,7 @@ class _CommunityPageState extends State<CommunityPage> {
     for (var i = 0; i < allCommunities.length; i++) {
       if (allCommunities[i]["einladung"].contains(userId)) {
         invitedCommunityIndex = i;
+        getInvite = true;
         break;
       }
     }
@@ -259,15 +262,19 @@ class _CommunityPageState extends State<CommunityPage> {
     showInvite() {
       return Container(
         padding: const EdgeInsets.all(10),
-        height: 100,
+        height: 112,
         decoration: BoxDecoration(
           border: Border.all(),
         ),
         child: Column(
           children: [
-            Text(AppLocalizations.of(context).zurCommunityEingeladen +
-                allCommunities[invitedCommunityIndex]["name"]),
-            const SizedBox(height: 10),
+            Text(AppLocalizations.of(context).zurCommunityEingeladen),
+            const SizedBox(height: 5),
+            Text(
+              allCommunities[invitedCommunityIndex]["name"],
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -277,7 +284,7 @@ class _CommunityPageState extends State<CommunityPage> {
                     style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all<Color>(Colors.green))),
-                const SizedBox(width: 10),
+                const SizedBox(width: 30),
                 ElevatedButton(
                     child: Text(AppLocalizations.of(context).ablehnen),
                     onPressed: () => communityEinladungAblehnen(),
