@@ -42,7 +42,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var windowSetState;
   List<String> imagePaths;
   String selectedImage;
-  List allUserNames;
+  List allUserNames =[];
+  List allUserIds = [];
   var searchAutocomplete = SearchAutocomplete();
   final _controller = ScrollController();
   var scrollbarOnBottom = true;
@@ -70,7 +71,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _getDBDataSetAllUserNames() async {
-    allUserNames = await ProfilDatabase().getData("name", "");
+    var dbProfils = await ProfilDatabase().getData("name, id", "");
+
+    for(var profil in dbProfils){
+      allUserNames.add(profil["name"]);
+      allUserIds.add(profil["id"]);
+    }
   }
 
   _setCreatorText() async {
@@ -486,6 +492,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var newUser = "";
 
     searchAutocomplete = SearchAutocomplete(
+      hintText: AppLocalizations.of(context).personSuchen,
       searchableItems: allUserNames,
       onConfirm: () {
         newUser = searchAutocomplete.getSelected()[0];
@@ -507,17 +514,20 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _saveNewMember(newMember) {
-    if (widget.community["members"].contains(newMember) ||
-        widget.community["eingeladen"].contains(newMember)) {
+    var userIndex = allUserNames.indexOf(newMember);
+    var newMemberId = allUserIds[userIndex];
+
+    if (widget.community["members"].contains(newMemberId) ||
+        widget.community["einladung"].contains(newMemberId)) {
       return;
     }
 
     setState(() {
-      widget.community["eingeladen"].add(newMember);
+      widget.community["einladung"].add(newMemberId);
     });
 
     CommunityDatabase().update(
-        "eingeladen = JSON_ARRAY_APPEND(eingeladen, '\$', '$userId')",
+        "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",
         "WHERE id = '${widget.community["id"]}'");
   }
 
