@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
+import 'package:familien_suche/pages/community/community_card.dart';
 import 'package:familien_suche/pages/events/eventCard.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
@@ -284,10 +285,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     return Container(
                       margin: const EdgeInsets.only(bottom: 25),
                       child: Stack(clipBehavior: Clip.none, children: [
-                        EventCard(
+                        CommunityCard(
                           margin: const EdgeInsets.all(15),
-                          withInteresse: true,
-                          event: snapshot.data,
+                          withFavorite: true,
+                          community: snapshot.data,
                           afterPageVisit: () => setState(() {}),
                         ),
                         Positioned(

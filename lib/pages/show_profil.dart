@@ -132,30 +132,88 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           icon: const Icon(Icons.message),
           onPressed: () async {
             var name = widget.profil["name"].replaceAll("'", "''");
-            var profilId = await ProfilDatabase()
-                .getData("id", "WHERE name = '$name'");
-            var users = [userID, profilId];
-            var chatId = global_functions.getChatID(users);
+            var groupChatData;
+            var chatpartnerName = "";
+            var chatpartnerId = "";
 
-            var groupChatData =
+            if(name.contains("family") || name.contains("familie")){
+              var familyProfils = Hive.box("secureBox").get("familyProfils");
+              Map familyProfil;
+              var menuList = [];
+
+              for(var searchFamilyProfil in familyProfils){
+                if(searchFamilyProfil["members"].contains(widget.profil["id"])){
+                  familyProfil = searchFamilyProfil;
+                }
+              }
+
+              for(var member in familyProfil["members"]){
+                // all Names einmal ausarbeiten
+
+                menuList.add(
+                    SimpleDialogOption(
+                      child: Row(
+                        children: [
+                          Text(member),
+                        ],
+                      ),
+                      onPressed: () {
+
+                      },
+                    )
+                );
+              }
+
+
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: 250,
+                          child: SimpleDialog(
+                            contentPadding: EdgeInsets.zero,
+                            insetPadding:
+                            const EdgeInsets.only(top: 40, left: 0, right: 10),
+                            children: menuList,
+                          ),
+                        ),
+                      ],
+                    );
+                  });
+            }else{
+              var profilId = await ProfilDatabase()
+                  .getData("id", "WHERE name = '$name'");
+              var users = [userID, profilId];
+              var chatId = global_functions.getChatID(users);
+              chatpartnerName = widget.profil["name"];
+              chatpartnerId = widget.profil["id"];
+
+              groupChatData =
                 await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
-            if (groupChatData == false) {
-              groupChatData = {
-                "users": {
-                  profilId: {"name": widget.profil["name"], "newMessages": 0},
-                  userID: {"name": widget.userName, "newMessages": 0}
-                }
-              };
+              if (groupChatData == false) {
+                groupChatData = {
+                  "users": {
+                    profilId: {"name": widget.profil["name"], "newMessages": 0},
+                    userID: {"name": widget.userName, "newMessages": 0}
+                  }
+                };
+              }
             }
+
+
 
             global_functions.changePage(
                 context,
                 ChatDetailsPage(
-                  chatPartnerName: widget.profil["name"],
-                  chatPartnerId: widget.profil["id"],
+                  chatPartnerName: chatpartnerName,
+                  chatPartnerId: chatpartnerId,
                   groupChatData: groupChatData,
-                ));
+                )
+            );
           });
     }
 
