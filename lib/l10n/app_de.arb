@@ -327,6 +327,7 @@
     "familienprofilName": "Name vom Familienprofil",
     "familienprofilAktivieren": "Familienprofil aktivieren ?",
     "familienprofilBeschreibung": "Wenn das Familienprofil aktiviert wird, wird bei jedem Familienmitglied ein einheitliches Profil auftauchen.\n\nAuf der Weltkarte wird nicht mehr jedes Familienmitglied einzeln angezeigt, sondern nur noch das Familienprofil.",
-    "familyprofilInvite": "Du wurdest eingeladen, folgendem Familienprofil beizutreten: "
+    "familyprofilInvite": "Du wurdest eingeladen, folgendem Familienprofil beizutreten: ",
+    "familie": "Familie"
 
 }

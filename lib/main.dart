@@ -44,6 +44,8 @@ hiveInit() async {
   var continentsGeodata = json.decode(continentsJsonText)["data"];
   Hive.box('secureBox').put("kontinentGeodata", continentsGeodata);
 
+
+
 }
 
 sortProfils(profils) {
@@ -80,6 +82,12 @@ refreshHiveData() async {
   var stadtinfoUser =
   await StadtinfoUserDatabase().getData("*", "", returnList: true);
   Hive.box("secureBox").put("stadtinfoUser", stadtinfoUser);
+
+  var familyProfils = await FamiliesDatabase().getData("*", "");
+  if(familyProfils == false) familyProfils = [];
+  Hive.box("secureBox").put("familyProfils", familyProfils);
+
+
 }
 
 

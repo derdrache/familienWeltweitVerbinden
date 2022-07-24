@@ -37,9 +37,9 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       }
     }
 
-    if(!hasLink) return Text(text);
+    if(!hasLink) return SelectableText(text);
 
-    return RichText(text: TextSpan(children: textSpanList));
+    return SelectableText.rich(TextSpan(children: textSpanList));
   }
 }
 
