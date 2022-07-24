@@ -176,7 +176,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           membersFound += 1;
 
           if(profils[i]["id"] == familyProfil["mainProfil"]){
-            profils[i]["name"] = familyProfil["name"];
+            profils[i]["name"] = AppLocalizations.of(context).familie + " "+ familyProfil["name"];
           }else{
             deleteProfils.add(profils[i]["id"]);
           }
