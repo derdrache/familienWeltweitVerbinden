@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'dart:io';
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/community/community_card.dart';
 import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
@@ -42,6 +42,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var allCities = Hive.box('secureBox').get("stadtinfo");
   var events = Hive.box('secureBox').get("events") ?? [];
   var communities = Hive.box('secureBox').get("communities") ?? [];
+  var familyProfils = Hive.box('secureBox').get("familyProfils");
   MapController mapController = MapController();
   Set<String> allUserName = {};
   var countriesList = LocationService().getAllCountries();
@@ -82,11 +83,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
       communityMarkerOn = false,
       filterOn = false;
   bool createMenuIsOpen = false;
+  var spracheIstDeutsch = kIsWeb
+      ? window.locale.languageCode == "de"
+      : Platform.localeName == "de_DE";
 
   @override
   void initState() {
     changeAllCitiesAndCreateCityNames();
     removeProfilsAndCreateAllUserName();
+    changeProfilToFamilyProfil();
 
     createAndSetZoomLevels(profils, "profils");
 
@@ -161,7 +166,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   changeProfilToFamilyProfil(){
-    var familyProfils = Hive.box('secureBox').get("familyProfils");
     var deleteProfils = [];
 
 
@@ -176,7 +180,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
           membersFound += 1;
 
           if(profils[i]["id"] == familyProfil["mainProfil"]){
-            profils[i]["name"] = AppLocalizations.of(context).familie + " "+ familyProfil["name"];
+            var family = spracheIstDeutsch ? "Familie:" : "family";
+            profils[i]["name"] = family + " "+ familyProfil["name"];
           }else{
             deleteProfils.add(profils[i]["id"]);
           }
@@ -186,11 +191,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
     }
 
+
     for(var profil in deleteProfils){
       profils.remove(profil);
     }
 
     localProfils = profils;
+
   }
 
   _asyncMethod() async {
@@ -228,6 +235,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     profils = checkedProfils;
     removeProfilsAndCreateAllUserName();
+    changeProfilToFamilyProfil();
   }
 
   sortProfils(profils) {
