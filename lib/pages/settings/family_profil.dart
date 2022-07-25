@@ -35,13 +35,16 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
   @override
   void initState() {
-    getAllProfilName();
-
     super.initState();
   }
 
+  init() async{
+    await getAllProfilName();
+    return await checkIfFamilyExist();
+  }
+
   getAllProfilName() async {
-    dballProfilIdAndName = Hive.box('secureBox').get("profils");//await ProfilDatabase().getData("id, name", "");
+    dballProfilIdAndName = await ProfilDatabase().getData("id, name", "");
     allProfilsName = [];
 
     for (var profil in dballProfilIdAndName) {
@@ -79,21 +82,19 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
   createFamilyProfil() async {
     var uuid = const Uuid();
-    var eventId = uuid.v4();
+    var familieId = uuid.v4();
 
-    FamiliesDatabase().addNewFamily({
-      "id": eventId,
+    await FamiliesDatabase().addNewFamily({
+      "id": familieId,
       "members": jsonEncode([userId]),
     });
 
-    setState(() {
-      familyProfil = {
-        "id": eventId,
-        "members": jsonEncode([userId]),
-        "name": "",
-        "active": "1"
-      };
-    });
+    return {
+      "id": familieId,
+      "members": jsonEncode([userId]),
+      "name": "",
+      "active": "1"
+    };
   }
 
   checkHasFamilyProfil(user) async {
@@ -103,7 +104,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     return hasFamilyProfil != false ? true : false;
   }
 
-  addMember({member}) {
+  addMember({member}) async {
     var idIndex = -1;
 
     if (searchAutocomplete.getSelected().isEmpty && member == null) return;
@@ -116,21 +117,31 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     var memberId = dballProfilIdAndName[idIndex]["id"];
 
-    var hasFamilyProfil = checkHasFamilyProfil(memberId);
-    if (hasFamilyProfil) {
-      customSnackbar(context, "Der Benutzer ist schon in einer Familie");
+    if(familyProfil["members"].contains(memberId)){
+      customSnackbar(context, member + " " + AppLocalizations.of(context).isImFamilienprofil);
+      return;
+    }
+    if (familyProfil["einladung"].contains(memberId)){
+      customSnackbar(context, member + " " + AppLocalizations.of(context).wurdeSchonEingeladen);
       return;
     }
 
-    if (familyProfil["members"].contains(memberId) ||
-        familyProfil["einladung"].contains(memberId)) return;
+    var hasFamilyProfil = await checkHasFamilyProfil(memberId);
+    if (hasFamilyProfil) {
+      customSnackbar(context, member + " " + AppLocalizations.of(context).istInEinemFamilienprofil);
+      return;
+    }
+
+
 
     setState(() {
-      familyProfil["einladung"].add(userId);
+      familyProfil["einladung"].add(memberId);
     });
 
+    customSnackbar(context, member + " " + AppLocalizations.of(context).familienprofilEingeladen);
+
     FamiliesDatabase().update(
-        "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$userId')",
+        "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$memberId')",
         "WHERE id = '${familyProfil["id"]}'");
   }
 
@@ -227,7 +238,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-              height: 800,
+              height: 600,
               title: AppLocalizations.of(context).mitgliedHinzufuegen,
               children: [
                 Center(child: SizedBox(width: 300, child: searchAutocomplete)),
@@ -248,7 +259,8 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
             value: familyProfilIsActive,
             onChanged: (value) async {
               if (value) {
-                if (familyProfil == null) await createFamilyProfil();
+                familyProfil ??= await createFamilyProfil();
+
                 changeFamilyProfilStatus(1);
               } else {
                 changeFamilyProfilStatus(0);
@@ -315,14 +327,15 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     }
 
     chooseMainProfil() {
+      var selectedId = familyProfil["mainProfil"];
+      var selectedName = "";
       var allMembersId = familyProfil["members"];
       List<String> allMembersName = [];
 
       for(var member in allMembersId){
-        print(member);
         for(var profil in dballProfilIdAndName){
-          print(profil["id"]);
           if(member == profil["id"]){
+            if(selectedId == member) selectedName = profil["name"];
             allMembersName.add(profil["name"]);
             break;
           }
@@ -331,7 +344,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
       mainProfilDropdown = CustomDropDownButton(
         hintText: AppLocalizations.of(context).hauptprofilWaehlen,
-        selected: familyProfil["mainProfil"],
+        selected: selectedName,
         items: allMembersName,
         onChange: (){
           var selected = mainProfilDropdown.getSelected();
@@ -378,9 +391,10 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                 color: Theme.of(context).colorScheme.primary, width: 3)),
         child: Column(
           children: [
-            Text(AppLocalizations.of(context).familyprofilInvite +
-                inviteFamilyProfil["name"]),
-            const SizedBox(height: 10),
+            Text(AppLocalizations.of(context).familyprofilInvite),
+            const SizedBox(height: 5),
+            Text(inviteFamilyProfil["name"], style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -416,7 +430,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           ],
         ),
         body: FutureBuilder(
-            future: checkIfFamilyExist(),
+            future: init(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 setProfilData();
@@ -426,8 +440,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                     if(familyProfilIsActive) nameBox(),
                     if(familyProfilIsActive) chooseMainProfil(),
                     if (!familyProfilIsActive) familyProfilDescription(),
-                    if (familyMembersCount < 2 && familyProfilIsActive)
-                      addFamilyMemberBox(),
+                    addFamilyMemberBox(),
                     const Expanded(
                       child: SizedBox(),
                     ),

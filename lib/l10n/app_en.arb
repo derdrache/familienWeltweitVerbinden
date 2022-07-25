@@ -330,6 +330,10 @@
     "familienprofilAktivieren": "activate family profile ?",
     "familienprofilBeschreibung": "If the family profile is activated, a unified profile will appear for each family member.\n\nThe world map no longer shows each family member individually, only the family profile.",
     "familyprofilInvite": "you have been invited to join the following family profile:",
-    "familie": "family"
+    "familie": "family",
+    "isImFamilienprofil": "is already in the family profile",
+    "wurdeSchonEingeladen" : "was already invited",
+    "istInEinemFamilienprofil": "is already in a family profile",
+    "familienprofilEingeladen": "has been invited to the family profile"
 }
 
