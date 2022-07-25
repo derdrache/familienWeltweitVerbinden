@@ -83,7 +83,7 @@ refreshHiveData() async {
   await StadtinfoUserDatabase().getData("*", "", returnList: true);
   Hive.box("secureBox").put("stadtinfoUser", stadtinfoUser);
 
-  var familyProfils = await FamiliesDatabase().getData("*", "");
+  var familyProfils = await FamiliesDatabase().getData("*", "", returnList: true);
   if(familyProfils == false) familyProfils = [];
   Hive.box("secureBox").put("familyProfils", familyProfils);
 
