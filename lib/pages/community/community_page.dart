@@ -185,6 +185,7 @@ class _CommunityPageState extends State<CommunityPage> {
     setState(() {
       allCommunities[invitedCommunityIndex]["members"].add(userId);
       allCommunities[invitedCommunityIndex]["einladung"].remove(userId);
+      getInvite = false;
     });
 
     CommunityDatabase().update(
@@ -195,6 +196,7 @@ class _CommunityPageState extends State<CommunityPage> {
   communityEinladungAblehnen() {
     setState(() {
       allCommunities[invitedCommunityIndex]["einladung"].remove(userId);
+      getInvite = false;
     });
 
     CommunityDatabase().update(
