@@ -20,6 +20,7 @@ import '../../widgets/google_autocomplete.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
 import '../start_page.dart';
+import '../../global/variablen.dart' as global_var;
 
 class CommunityDetails extends StatefulWidget {
   Map community;
@@ -488,6 +489,45 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         "WHERE id = '${widget.community["id"]}'");
   }
 
+  List<Widget> createFriendlistBox() {
+    var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
+
+    for (var i = 0; i < userFriendlist.length; i++) {
+      for (var profil in Hive.box('secureBox').get("profils")) {
+        if (profil["id"] == userFriendlist[i]) {
+          userFriendlist[i] = profil["name"];
+          break;
+        }
+      }
+    }
+
+    List<Widget> friendsBoxen = [];
+    for (var friend in userFriendlist) {
+      friendsBoxen.add(GestureDetector(
+        onTap: () => _saveNewMember(friend),
+        child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(
+                        width: 1, color: global_var.borderColorGrey))),
+            child: Text(friend)),
+      ));
+    }
+
+    if (userFriendlist.isEmpty) {
+      return [
+        Center(
+            heightFactor: 10,
+            child: Text(
+                AppLocalizations.of(context).nochKeineFreundeVorhanden,
+                style: const TextStyle(color: Colors.grey)))
+      ];
+    }
+
+    return friendsBoxen;
+  }
+
   _addMemberWindow() {
     var newUser = "";
 
@@ -507,7 +547,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             children: [
               searchAutocomplete,
               const SizedBox(height: 15),
-              _windowOptions(() => _saveNewMember(newUser))
+              _windowOptions(() => _saveNewMember(newUser)),
+              ...createFriendlistBox(),
             ],
           );
         });
@@ -517,10 +558,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var userIndex = allUserNames.indexOf(newMember);
     var newMemberId = allUserIds[userIndex];
 
-    if (widget.community["members"].contains(newMemberId) ||
-        widget.community["einladung"].contains(newMemberId)) {
+    if(widget.community["members"].contains(newMemberId)){
+      customSnackbar(context, newMember + AppLocalizations.of(context).istSchonMitgliedCommunity);
       return;
     }
+    if(widget.community["einladung"].contains(newMemberId)){
+      customSnackbar(context, newMember + AppLocalizations.of(context).wurdeSchonEingeladenCommunity);
+      return;
+    }
+
 
     setState(() {
       widget.community["einladung"].add(newMemberId);
@@ -529,6 +575,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     CommunityDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",
         "WHERE id = '${widget.community["id"]}'");
+
+    customSnackbar(context, newMember + AppLocalizations.of(context).istSchonMitgliedCommunity);
   }
 
   _showMembersWindow() async {
