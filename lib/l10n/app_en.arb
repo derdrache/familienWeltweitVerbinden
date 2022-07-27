@@ -334,6 +334,9 @@
     "isImFamilienprofil": "is already in the family profile",
     "wurdeSchonEingeladen" : "was already invited",
     "istInEinemFamilienprofil": "is already in a family profile",
-    "familienprofilEingeladen": "has been invited to the family profile"
+    "familienprofilEingeladen": "has been invited to the family profile",
+    "istSchonMitgliedCommunity": " is already a member of the community",
+    "wurdeSchonEingeladenCommunity": " has already been invited to the community",
+    "wurdeEingeladenCommunity": " was invited to the community"
 }
 
