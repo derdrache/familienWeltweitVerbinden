@@ -87,7 +87,6 @@ refreshHiveData() async {
   if(familyProfils == false) familyProfils = [];
   Hive.box("secureBox").put("familyProfils", familyProfils);
 
-
 }
 
 
