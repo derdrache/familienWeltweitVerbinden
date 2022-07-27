@@ -36,8 +36,8 @@ class ErkundenPage extends StatefulWidget {
 
 class _ErkundenPageState extends State<ErkundenPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
-  var localProfils = Hive.box('secureBox').get("profils") ?? [];
-  List profils = Hive.box('secureBox').get("profils") ?? [];
+  var localProfils = [];
+  var profils = [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   var allCities = Hive.box('secureBox').get("stadtinfo");
   var events = Hive.box('secureBox').get("events") ?? [];
@@ -89,6 +89,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   void initState() {
+    var hiveProfils = Hive.box('secureBox').get("profils");
+    profils = [for (var profil in hiveProfils) Map.of(profil)];
+    localProfils = profils;
+
     changeAllCitiesAndCreateCityNames();
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
@@ -168,7 +172,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   changeProfilToFamilyProfil(){
     var deleteProfils = [];
 
-
     for(var familyProfil in familyProfils){
       if(familyProfil["active"] == 0) continue;
 
@@ -233,7 +236,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     Hive.box('secureBox').put("profils", checkedProfils);
 
-    profils = checkedProfils;
+    profils = [for (var profil in checkedProfils) Map.of(profil)];
+    localProfils = profils;
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
   }
@@ -620,7 +624,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var profilCountryLocation =
           LocationService().getCountryLocation(profil["land"]);
 
-      if(profilCountryLocation == null) print(profil);
       if (listCountryLocation["latt"] == profilCountryLocation["latt"] &&
           listCountryLocation["longt"] == profilCountryLocation["longt"]) {
         checkNewCountry = false;

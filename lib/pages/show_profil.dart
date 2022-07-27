@@ -56,6 +56,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 .microsecondsSinceEpoch)
             .abs());
 
+    getAllProfilNamesAndId();
+
     super.initState();
   }
 
@@ -122,9 +124,27 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         });
   }
 
+  getAllProfilNamesAndId() {
+    var allProfils = Hive.box('secureBox').get("profils");
+    var allIds = [];
+    var allNames = [];
+
+    for(var profil in allProfils){
+      allIds.add(profil["id"]);
+      allNames.add(profil["name"]);
+      print(profil["name"]);
+    }
+
+    return {
+      "ids" : allIds,
+      "names": allNames
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     var monthDifference = getMonthDifference();
+
 
 
     openChatButton() {
@@ -139,7 +159,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             if(name.contains("family") || name.contains("familie")){
               var familyProfils = Hive.box("secureBox").get("familyProfils");
               Map familyProfil;
-              var menuList = [];
+              List<Widget> menuList = [];
+              var allNamesAndIds = getAllProfilNamesAndId();
 
               for(var searchFamilyProfil in familyProfils){
                 if(searchFamilyProfil["members"].contains(widget.profil["id"])){
@@ -148,13 +169,15 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               }
 
               for(var member in familyProfil["members"]){
-                // all Names einmal ausarbeiten
+                var nameIndex = allNamesAndIds["ids"].indexOf(member);
+                if(nameIndex < 0) continue;
+                var name = allNamesAndIds["names"][nameIndex];
 
                 menuList.add(
                     SimpleDialogOption(
                       child: Row(
                         children: [
-                          Text(member),
+                          Text(name),
                         ],
                       ),
                       onPressed: () {
@@ -202,18 +225,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                   }
                 };
               }
+
+              global_functions.changePage(
+                  context,
+                  ChatDetailsPage(
+                    chatPartnerName: chatpartnerName,
+                    chatPartnerId: chatpartnerId,
+                    groupChatData: groupChatData,
+                  ));
+
             }
 
-
-
-            global_functions.changePage(
-                context,
-                ChatDetailsPage(
-                  chatPartnerName: chatpartnerName,
-                  chatPartnerId: chatpartnerId,
-                  groupChatData: groupChatData,
-                )
-            );
           });
     }
 

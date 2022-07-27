@@ -317,8 +317,16 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
         child: customTextInput(
             AppLocalizations.of(context).familienprofilName,
             nameFamilyKontroller,
-          onSubmit: (){
+          onSubmit: ()async{
               var newName = nameFamilyKontroller.text;
+              newName = newName.replaceAll("'", "''");
+              
+              var nameIsUsed = await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
+              
+              if(nameIsUsed){
+                customSnackbar(context, AppLocalizations.of(context).usernameInVerwendung);
+                return;
+              }
 
               FamiliesDatabase().update("name = '$newName'", "WHERE id = '${familyProfil["id"]}'");
           }
