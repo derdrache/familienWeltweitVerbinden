@@ -58,6 +58,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch150D),
                 _patch(patch141D),
                 _patch(patch140D),
                 _patch(patch131D),
@@ -74,6 +75,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch150E),
                 _patch(patch141E),
                 _patch(patch140E),
                 _patch(patch131E),
@@ -100,6 +102,31 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch150E={
+  "title" : "1.5.0 - 01.08.2022",
+  "inhalt": [
+
+  ]
+};
+var patch150D={
+  "title" : "1.5.0 - 01.08.2022",
+  "inhalt": [
+    "Erweiterung Gemeinschaften - Es ist jetzt möglich Gemeinschaften zu erstellen und auf der Weltkarte oder im extra Reiter zu suchen",
+    "Familienprofil - Unter Einstellungen und dann oben rechts bei den 3 Punkten, gibt es "
+        "jetzt die Möglichkeit ins Familienprofil zu gelangen. Dort kann das Profil aktiviert werden, "
+        "bestimmt werden welches das Hauptprofil ist und weitere Familienmitglieder hinzugefügt werden.",
+    "Allgemein - Es ist jetzt möglich eigene Bilder hochzuladen",
+    "Allgemein - Die Fehler mit einem Apostroph im Namen wurden behoben",
+    "Weltkarte - Profile werden nun korrekt auf der kleinsten Zoomstufe angezeigt",
+    "Online Event - Fehler bei der Zeitumrechnung wurde behoben",
+    "Profil- / Eventbeschreibung - Die Beschreibungstexte sind nun kopierbar und die Links werden automatisch "
+        "in Hyperlinks verwandelt.",
+    "Profil - Interessen wurde um 'Montessori, Waldorf, Gewaltfreie Kommunikation, vegan, zuckerfrei und glutenfrei' erweitert",
+    "verschiedene kleine Fehlerbehebungen",
+    "verschiedene kleine Verbesserungen"
   ]
 };
 
