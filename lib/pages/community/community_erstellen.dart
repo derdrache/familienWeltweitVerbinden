@@ -6,6 +6,7 @@ import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../widgets/google_autocomplete.dart';
 import '../start_page.dart';
@@ -28,7 +29,11 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
   saveCommunity() async{
     var locationData = ortAuswahlBox.getGoogleLocationData();
+    var uuid = const Uuid();
+    var communityId = uuid.v4();
+
     var communityData = {
+      "id": communityId,
       "name" : nameController.text,
       "beschreibung": beschreibungKontroller.text,
       "link": linkKontroller.text,
