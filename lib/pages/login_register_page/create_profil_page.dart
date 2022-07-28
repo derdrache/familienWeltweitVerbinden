@@ -108,6 +108,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
       if (ortMapData["city"] == null) {
         customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+        changeLoading();
+        return;
       }
 
       var data = {
