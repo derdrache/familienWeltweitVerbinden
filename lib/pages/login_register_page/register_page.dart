@@ -50,8 +50,6 @@ class _RegisterPageState extends State<RegisterPage> {
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
 
-        await FirebaseAuth.instance.currentUser?.sendEmailVerification();
-
         success =  true;
       } on FirebaseAuthException catch (error) {
         if (error.code == "email-already-in-use") {
@@ -75,6 +73,18 @@ class _RegisterPageState extends State<RegisterPage> {
 
       }
     }
+
+    try{
+      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+    } on FirebaseAuthException catch (error) {
+      sendEmail({
+      "title": "Send Email Verification Problem",
+      "inhalt": """
+               Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
+               Folgendes Problem ist aufgetaucht: $error"""
+      });
+    }
+
 
     setState(() {
       isLoading = false;
