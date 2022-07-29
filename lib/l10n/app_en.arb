@@ -337,6 +337,8 @@
     "familienprofilEingeladen": "has been invited to the family profile",
     "istSchonMitgliedCommunity": " is already a member of the community",
     "wurdeSchonEingeladenCommunity": " has already been invited to the community",
-    "wurdeEingeladenCommunity": " was invited to the community"
+    "wurdeEingeladenCommunity": " was invited to the community",
+    "familienprofilAnzeigen": "show family profil",
+    "familienprofilUnvollstaendig": "to make the profile visible, a name and a main profile must be selected"
 }
 

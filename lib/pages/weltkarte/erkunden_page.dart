@@ -89,7 +89,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   void initState() {
-    var hiveProfils = Hive.box('secureBox').get("profils");
+    var hiveProfils = Hive.box('secureBox').get("profils") ?? [];
     profils = [for (var profil in hiveProfils) Map.of(profil)];
     localProfils = profils;
 
@@ -98,6 +98,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     changeProfilToFamilyProfil();
 
     createAndSetZoomLevels(profils, "profils");
+
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
@@ -277,7 +278,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     Hive.box('secureBox').put("events", dbEvents);
 
     events = dbEvents;
-    createAndSetZoomLevels(events, "events");
   }
 
   getCommunitiesFromDB() async {
@@ -288,7 +288,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     Hive.box('secureBox').put("communities", dbCommunities);
 
     communities = dbCommunities;
-    createAndSetZoomLevels(communities, "communities");
   }
 
   setSearchAutocomplete() {
@@ -724,6 +723,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       selectedEventList = eventsKontinente;
       selectedComunityList = communitiesContinents;
     }
+
 
     if (mounted) {
       setState(() {
@@ -1653,6 +1653,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
+              if(eventsKontinente == null) createAndSetZoomLevels(events, "events");
+
               if (eventMarkerOn) {
                 eventMarkerOn = false;
                 popupActive = false;
@@ -1719,6 +1721,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
+              if(communitiesCountries == null) createAndSetZoomLevels(communities, "communities");
+
               if (communityMarkerOn) {
                 communityMarkerOn = false;
                 popupActive = false;
