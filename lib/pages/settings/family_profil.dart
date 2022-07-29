@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -12,6 +13,7 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
+import '../../global/global_functions.dart' as global_func;
 
 class FamilieProfilPage extends StatefulWidget {
   const FamilieProfilPage({Key key}) : super(key: key);
@@ -32,15 +34,24 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   var inviteFamilyProfil;
   var nameFamilyKontroller = TextEditingController();
   var mainProfilDropdown = CustomDropDownButton();
+  var isLoding = true;
+  var mainProfil;
 
   @override
   void initState() {
+    setData();
+
     super.initState();
   }
 
-  init() async{
+  setData() async {
     await getAllProfilName();
-    return await checkIfFamilyExist();
+    await checkIfFamilyExist();
+    if (familyProfil != null) setMainProfil(familyProfil["mainProfil"]);
+
+    setState(() {
+      isLoding = false;
+    });
   }
 
   getAllProfilName() async {
@@ -64,6 +75,16 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     if (dbData != false) familyProfil = dbData;
 
     return dbData != false;
+  }
+
+  setMainProfil(mainProfilId) {
+    var allProfils = Hive.box('secureBox').get("profils");
+    for (var profil in allProfils) {
+      if (profil["id"] == mainProfilId) {
+        mainProfil = profil;
+        break;
+      }
+    }
   }
 
   setProfilData() {
@@ -117,28 +138,30 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     var memberId = dballProfilIdAndName[idIndex]["id"];
 
-    if(familyProfil["members"].contains(memberId)){
-      customSnackbar(context, member + " " + AppLocalizations.of(context).isImFamilienprofil);
+    if (familyProfil["members"].contains(memberId)) {
+      customSnackbar(context,
+          member + " " + AppLocalizations.of(context).isImFamilienprofil);
       return;
     }
-    if (familyProfil["einladung"].contains(memberId)){
-      customSnackbar(context, member + " " + AppLocalizations.of(context).wurdeSchonEingeladen);
+    if (familyProfil["einladung"].contains(memberId)) {
+      customSnackbar(context,
+          member + " " + AppLocalizations.of(context).wurdeSchonEingeladen);
       return;
     }
 
     var hasFamilyProfil = await checkHasFamilyProfil(memberId);
     if (hasFamilyProfil) {
-      customSnackbar(context, member + " " + AppLocalizations.of(context).istInEinemFamilienprofil);
+      customSnackbar(context,
+          member + " " + AppLocalizations.of(context).istInEinemFamilienprofil);
       return;
     }
-
-
 
     setState(() {
       familyProfil["einladung"].add(memberId);
     });
 
-    customSnackbar(context, member + " " + AppLocalizations.of(context).familienprofilEingeladen);
+    customSnackbar(context,
+        member + " " + AppLocalizations.of(context).familienprofilEingeladen);
 
     FamiliesDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$memberId')",
@@ -170,7 +193,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-
     List<Widget> createFriendlistBox() {
       var userFriendlist = ownProfil["friendlist"];
 
@@ -310,27 +332,27 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           });
     }
 
-    nameBox(){
+    nameBox() {
       nameFamilyKontroller.text = familyProfil["name"];
 
       return Container(
-        child: customTextInput(
-            AppLocalizations.of(context).familienprofilName,
-            nameFamilyKontroller,
-          onSubmit: ()async{
-              var newName = nameFamilyKontroller.text;
-              newName = newName.replaceAll("'", "''");
-              
-              var nameIsUsed = await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
-              
-              if(nameIsUsed){
-                customSnackbar(context, AppLocalizations.of(context).usernameInVerwendung);
-                return;
-              }
+        child: customTextInput(AppLocalizations.of(context).familienprofilName,
+            nameFamilyKontroller, onSubmit: () async {
+          var newName = nameFamilyKontroller.text;
+          newName = newName.replaceAll("'", "''");
 
-              FamiliesDatabase().update("name = '$newName'", "WHERE id = '${familyProfil["id"]}'");
+          var nameIsUsed =
+              await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
+
+          if (nameIsUsed) {
+            customSnackbar(
+                context, AppLocalizations.of(context).usernameInVerwendung);
+            return;
           }
-        ),
+
+          FamiliesDatabase().update(
+              "name = '$newName'", "WHERE id = '${familyProfil["id"]}'");
+        }),
       );
     }
 
@@ -340,10 +362,10 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       var allMembersId = familyProfil["members"];
       List<String> allMembersName = [];
 
-      for(var member in allMembersId){
-        for(var profil in dballProfilIdAndName){
-          if(member == profil["id"]){
-            if(selectedId == member) selectedName = profil["name"];
+      for (var member in allMembersId) {
+        for (var profil in dballProfilIdAndName) {
+          if (member == profil["id"]) {
+            if (selectedId == member) selectedName = profil["name"];
             allMembersName.add(profil["name"]);
             break;
           }
@@ -351,21 +373,22 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       }
 
       mainProfilDropdown = CustomDropDownButton(
-        hintText: AppLocalizations.of(context).hauptprofilWaehlen,
-        selected: selectedName,
-        items: allMembersName,
-        onChange: (){
-          var selected = mainProfilDropdown.getSelected();
+          hintText: AppLocalizations.of(context).hauptprofilWaehlen,
+          selected: selectedName,
+          items: allMembersName,
+          onChange: () {
+            var selected = mainProfilDropdown.getSelected();
 
-          var selectedIndex = allMembersName.indexOf(selected);
-          var selectedId = allMembersId[selectedIndex];
+            var selectedIndex = allMembersName.indexOf(selected);
+            var selectedId = allMembersId[selectedIndex];
 
-          FamiliesDatabase().update("mainProfil = '$selectedId'", "WHERE id = '${familyProfil["id"]}'");
-        }
-      );
+            setMainProfil(selectedId);
+
+            FamiliesDatabase().update("mainProfil = '$selectedId'",
+                "WHERE id = '${familyProfil["id"]}'");
+          });
 
       return mainProfilDropdown;
-
     }
 
     addFamilyMemberBox() {
@@ -387,8 +410,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     familyProfilDescription() {
       return Container(
           margin: const EdgeInsets.all(20),
-          child: Text(AppLocalizations.of(context).familienprofilBeschreibung)
-      );
+          child: Text(AppLocalizations.of(context).familienprofilBeschreibung));
     }
 
     familyProfilInvite() {
@@ -401,7 +423,8 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           children: [
             Text(AppLocalizations.of(context).familyprofilInvite),
             const SizedBox(height: 5),
-            Text(inviteFamilyProfil["name"], style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(inviteFamilyProfil["name"],
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -427,6 +450,48 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       );
     }
 
+    showProfil() {
+      bool profilComplete = false;
+
+      if (familyProfil["name"].isNotEmpty &&
+          familyProfil["mainProfil"].isNotEmpty) {
+        profilComplete = true;
+      }
+
+      return profilComplete
+          ? InkWell(
+              onTap: () => global_func.changePage(
+                  context,
+                  ShowProfilPage(
+                    userName: familyProfil["name"],
+                    profil: mainProfil,
+                  )),
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(AppLocalizations.of(context).familienprofilAnzeigen),
+                    const SizedBox(width: 5),
+                    const Icon(
+                      Icons.preview,
+                      size: 35,
+                    )
+                  ],
+                ),
+              ),
+            )
+          : Center(
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                child: Text(
+                  AppLocalizations.of(context).familienprofilUnvollstaendig,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+    }
+
     return Scaffold(
         appBar: CustomAppBar(
           title: AppLocalizations.of(context).familyProfil,
@@ -437,35 +502,31 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
             )
           ],
         ),
-        body: FutureBuilder(
-            future: init(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                setProfilData();
-
-                return Column(
-                  children: [
-                    if(familyProfilIsActive) nameBox(),
-                    if(familyProfilIsActive) chooseMainProfil(),
-                    if (!familyProfilIsActive) familyProfilDescription(),
-                    addFamilyMemberBox(),
-                    const Expanded(
-                      child: SizedBox(),
-                    ),
-                    activeSwitch(),
-                    if ((inviteFamilyProfil != false && inviteFamilyProfil != null) &&
-                        inviteFamilyProfil["einladung"].contains(userId))
-                      familyProfilInvite(),
-                  ],
-                );
-              }
-              return const Center(
-                  child: SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 6,
-                      )));
-            }));
+        body: isLoding
+            ? const Center(
+                child: SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 6,
+                    )))
+            : Column(
+                children: [
+                  if (!familyProfilIsActive) activeSwitch(),
+                  if (familyProfilIsActive) nameBox(),
+                  if (familyProfilIsActive) chooseMainProfil(),
+                  if (!familyProfilIsActive) familyProfilDescription(),
+                  if (familyProfilIsActive) addFamilyMemberBox(),
+                  if (familyProfilIsActive) showProfil(),
+                  const Expanded(
+                    child: SizedBox(),
+                  ),
+                  if (familyProfilIsActive) activeSwitch(),
+                  if ((inviteFamilyProfil != false &&
+                          inviteFamilyProfil != null) &&
+                      inviteFamilyProfil["einladung"].contains(userId))
+                    familyProfilInvite(),
+                ],
+              ));
   }
 }
