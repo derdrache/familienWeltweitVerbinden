@@ -99,7 +99,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createAndSetZoomLevels(profils, "profils");
 
-
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
@@ -123,15 +122,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   (city["familien"].length == 1 &&
                       !city["familien"].contains(userId)));
 
-
       for (var cityUser in allCityUserInformation) {
         if (city["ort"].contains(cityUser)) {
           hasCityUserInfo = true;
           break;
         }
       }
-
-
 
       if (condition || hasCityUserInfo) {
         allCitiesNames.add(city["ort"]);
@@ -170,38 +166,42 @@ class _ErkundenPageState extends State<ErkundenPage> {
     localProfils = profils;
   }
 
-  changeProfilToFamilyProfil(){
+  changeProfilToFamilyProfil() {
     var deleteProfils = [];
 
-    for(var familyProfil in familyProfils){
-      if(familyProfil["active"] == 0) continue;
+    for (var familyProfil in familyProfils) {
+      if (familyProfil["active"] == 0 ||
+          familyProfil["name"].isEmpty ||
+          familyProfil["mainProfil"].isEmpty) continue;
 
       var members = familyProfil["members"];
       var membersFound = 0;
 
-      for(var i = 0; i<profils.length; i++){
-        if(members.contains(profils[i]["id"])){
+      for (var i = 0; i < profils.length; i++) {
+
+        if(members.contains(userId) && members.contains(profils[i]["id"])){
+          membersFound += 1;
+          deleteProfils.add(profils[i]);
+        } else if (members.contains(profils[i]["id"])) {
           membersFound += 1;
 
-          if(profils[i]["id"] == familyProfil["mainProfil"]){
+          if (profils[i]["id"] == familyProfil["mainProfil"]) {
             var family = spracheIstDeutsch ? "Familie:" : "family";
-            profils[i]["name"] = family + " "+ familyProfil["name"];
-          }else{
-            deleteProfils.add(profils[i]["id"]);
+            profils[i]["name"] = family + " " + familyProfil["name"];
+          } else {
+            deleteProfils.add(profils[i]);
           }
         }
 
-        if(membersFound == members.length) break;
+        if (membersFound == members.length) break;
       }
     }
 
-
-    for(var profil in deleteProfils){
+    for (var profil in deleteProfils) {
       profils.remove(profil);
     }
 
     localProfils = profils;
-
   }
 
   _asyncMethod() async {
@@ -724,7 +724,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
       selectedComunityList = communitiesContinents;
     }
 
-
     if (mounted) {
       setState(() {
         aktiveProfils = choosenProfils ?? [];
@@ -924,12 +923,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
               children: [
                 createCheckBoxen(windowSetState, reiseartSelection,
                     AppLocalizations.of(context).reisearten),
+                createCheckBoxen(windowSetState, alterKinderSelection,
+                    AppLocalizations.of(context).alterDerKinder),
                 createCheckBoxen(windowSetState, interessenSelection,
                     AppLocalizations.of(context).interessen),
                 createCheckBoxen(windowSetState, sprachenSelection,
                     AppLocalizations.of(context).sprachen),
-                createCheckBoxen(windowSetState, alterKinderSelection,
-                    AppLocalizations.of(context).alterDerKinder),
+
               ],
             );
           });
@@ -1073,7 +1073,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
             global_functions.changePage(
                 context,
                 ShowProfilPage(
-                  userName: ownProfil["name"],
                   profil: profilData,
                 ));
           },
@@ -1653,7 +1652,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
-              if(eventsKontinente == null) createAndSetZoomLevels(events, "events");
+              if (eventsKontinente == null)
+                createAndSetZoomLevels(events, "events");
 
               if (eventMarkerOn) {
                 eventMarkerOn = false;
@@ -1721,7 +1721,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
-              if(communitiesCountries == null) createAndSetZoomLevels(communities, "communities");
+              if (communitiesCountries == null)
+                createAndSetZoomLevels(communities, "communities");
 
               if (communityMarkerOn) {
                 communityMarkerOn = false;
