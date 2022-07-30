@@ -175,7 +175,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return IconButton(
           icon: const Icon(Icons.message),
           onPressed: () async {
-            var name = widget.profil["name"].replaceAll("'", "''");
+            var name = widget.userName ?? widget.profil["name"].replaceAll("'", "''");
 
             if(name.contains("family") || name.contains("familie")){
               var familyProfils = Hive.box("secureBox").get("familyProfils");
@@ -407,17 +407,19 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     titelBox() {
+      var profil = Map.of(widget.profil);
+      if(widget.userName != null) profil["name"] = widget.userName;
       return Container(
         alignment: Alignment.center,
         padding:
             const EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
         child: Row(
           children: [
-            ProfilImage(widget.profil, fullScreenWindow: true),
+            ProfilImage(profil, fullScreenWindow: true),
             const SizedBox(width: 10),
             Flexible(
               child: Text(
-                widget.profil["name"],
+                profil["name"],
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 24),
               ),
