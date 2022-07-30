@@ -8,7 +8,7 @@ List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
 List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
   "Montessori", "Waldorf", "Gemeinsame Aktivitäten", "Weltreise", "Langsam reisen", "Gemeinsam reisen",
   "Gemeinsam wohnen", "Gemeinsame Kinderbetreuung", "Dauerhaft reisen", "Kaffeetreff", "Online kennenlernen",
-  "Vegan", "Zuckerfrei","Glutenfrei", "Gewaltfreie Kommunikation"];
+  "Minimalismus","Frugalismus", "Vegan", "Zuckerfrei","Glutenfrei", "Gewaltfreie Kommunikation"];
 List<String> sprachenListe = ["Deutsch", "Englisch", "Spanisch", "Chinesisch",
   "Französisch", "Arabisch", "Russisch", "Italienisch", "Portugiesisch", "Japanisch", "Türkisch", "Polnisch", "Niederländisch"];
 List<String> eventInterval = ["einmalig", "täglich", "mehrtägig", "wöchentlich", "alle 2 Wochen", "monatlich"];
@@ -22,7 +22,7 @@ List<String> reiseartenEnglisch = ["fixed location", "airplane/housing",
   "car/housing","mobile home/camping", "boat"];
 List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldschooling","montessori", "waldorf",
   "joint activities", "world Travel", "travel slowly", "travel together", "co-living", "shared child care",
-  "open end travel", "coffee meeting", "meet online", "vegan","sugar free","gluten free",
+  "open end travel", "coffee meeting", "meet online","minimalism","frugalism", "vegan","sugar free","gluten free",
   "nonviolent communication"];
 List<String> sprachenListeEnglisch = ["german", "english", "spanish", "chinese",
   "french", "arabic", "russian", "italian", "portuguese", "japanese", "turkish", "polish", "dutch"];

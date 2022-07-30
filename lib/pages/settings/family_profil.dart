@@ -47,7 +47,12 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   setData() async {
     await getAllProfilName();
     await checkIfFamilyExist();
-    if (familyProfil != null) setMainProfil(familyProfil["mainProfil"]);
+
+    if (familyProfil != null){
+      setMainProfil(familyProfil["mainProfil"]);
+      familyProfilIsActive = familyProfil["active"] == 1 ? true: false;
+    }
+
 
     setState(() {
       isLoding = false;
@@ -463,8 +468,9 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
               onTap: () => global_func.changePage(
                   context,
                   ShowProfilPage(
-                    userName: familyProfil["name"],
+                    userName: AppLocalizations.of(context).familie +" " + familyProfil["name"],
                     profil: mainProfil,
+                    ownProfil: true
                   )),
               child: Container(
                 margin: const EdgeInsets.all(10),
