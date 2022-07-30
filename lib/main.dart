@@ -44,6 +44,12 @@ hiveInit() async {
   var continentsGeodata = json.decode(continentsJsonText)["data"];
   Hive.box('secureBox').put("kontinentGeodata", continentsGeodata);
 
+  if(Hive.box('secureBox').get("profils") == null){
+    List<dynamic> dbProfils = await ProfilDatabase().getData("*", "ORDER BY ort ASC");
+    if (dbProfils == false) dbProfils = [];
+
+    Hive.box('secureBox').put("profils", dbProfils);
+  }
 
 
 }

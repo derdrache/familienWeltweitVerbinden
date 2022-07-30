@@ -15,7 +15,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
   var hasLink = false;
   List<InlineSpan> textSpanList = [];
 
-  TextWithHyperlinkDetection({Key key, this.text, this.fontsize = 14}) : super(key: key);
+  TextWithHyperlinkDetection({Key key, this.text, this.fontsize = 15}) : super(key: key);
 
 
   @override
@@ -37,7 +37,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       }
     }
 
-    if(!hasLink) return SelectableText(text);
+    if(!hasLink) return SelectableText(text, style: TextStyle(fontSize: fontsize),);
 
     return SelectableText.rich(TextSpan(children: textSpanList));
   }
