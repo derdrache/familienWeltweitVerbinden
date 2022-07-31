@@ -316,7 +316,7 @@
     "bildAendern": "change image",
     "mitgliedHinzufuegen": "add member",
     "member": "members",
-    "familyProfil": "familie profil",
+    "familyProfil": "family profile",
     "annehmen": "accept",
     "ablehnen": "reject",
     "communityLoeschen": "delete community",
@@ -325,8 +325,8 @@
     "zurCommunityEingeladen": "you have been invited to the following community: ",
     "communityErweiterung": "Community expansion",
     "familienmitgliedHinzufuegen" : "add family member",
-    "hauptprofilWaehlen": "choose main profil",
-    "familienprofilName": "family profil name",
+    "hauptprofilWaehlen": "choose main profile",
+    "familienprofilName": "family profile name",
     "familienprofilAktivieren": "activate family profile ?",
     "familienprofilBeschreibung": "If the family profile is activated, a unified profile will appear for each family member.\n\nThe world map no longer shows each family member individually, only the family profile.",
     "familyprofilInvite": "you have been invited to join the following family profile:",
@@ -338,7 +338,9 @@
     "istSchonMitgliedCommunity": " is already a member of the community",
     "wurdeSchonEingeladenCommunity": " has already been invited to the community",
     "wurdeEingeladenCommunity": " was invited to the community",
-    "familienprofilAnzeigen": "show family profil",
-    "familienprofilUnvollstaendig": "to make the profile visible, a name and a main profile must be selected"
+    "familienprofilAnzeigen": "show family profile",
+    "familienprofilUnvollstaendig": "to make the profile visible and add member, the name and a main profile must be entered",
+    "familyProfilloeschen" : "delete family profile",
+    "familyProfilWirklichLoeschen": "do you really want to delete the family profile?"
 }
 

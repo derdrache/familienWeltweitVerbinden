@@ -55,23 +55,33 @@ class EventCardDetails extends StatefulWidget {
 
 class _EventCardDetailsState extends State<EventCardDetails> {
   final _controller = ScrollController();
-  var isCardOnBottom = false;
+  var moreContent = false;
 
   @override
   void initState() {
-    super.initState();
-
     _controller.addListener(() {
       if (_controller.position.atEdge) {
         bool isTop = _controller.position.pixels == 0;
         if (isTop) {
-          isCardOnBottom = false;
+          moreContent = true;
         } else {
-          isCardOnBottom = true;
+          moreContent = false;
         }
         setState(() {});
       }
     });
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => checkMoreContent());
+    super.initState();
+  }
+
+  checkMoreContent(){
+    if(_controller.position.maxScrollExtent > 0){
+      setState(() {
+        moreContent = true;
+      });
+    }
   }
 
   askForRelease(isOnList) async {
@@ -538,8 +548,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   ],
                 ),
               ),
-              if(!isCardOnBottom) const Positioned.fill(
-                bottom: 25,
+              if(moreContent) const Positioned.fill(
+                bottom: 35,
                 child: Align(alignment: Alignment.bottomCenter, child: Icon(Icons.arrow_downward)),
               )
             ],
