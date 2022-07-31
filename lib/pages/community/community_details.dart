@@ -504,7 +504,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     List<Widget> friendsBoxen = [];
     for (var friend in userFriendlist) {
       friendsBoxen.add(GestureDetector(
-        onTap: () => _saveNewMember(friend),
+        onTap: () {
+          _saveNewMember(friend);
+          Navigator.pop(context);
+        },
         child: Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
@@ -543,6 +546,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
+            height: 600,
             title: AppLocalizations.of(context).mitgliedHinzufuegen,
             children: [
               searchAutocomplete,
@@ -557,6 +561,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   _saveNewMember(newMember) {
     var userIndex = allUserNames.indexOf(newMember);
     var newMemberId = allUserIds[userIndex];
+
+
 
     if(widget.community["members"].contains(newMemberId)){
       customSnackbar(context, newMember + AppLocalizations.of(context).istSchonMitgliedCommunity);
@@ -576,7 +582,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",
         "WHERE id = '${widget.community["id"]}'");
 
-    customSnackbar(context, newMember + AppLocalizations.of(context).istSchonMitgliedCommunity);
+    customSnackbar(context, newMember + AppLocalizations.of(context).wurdeEingeladenCommunity, color: Colors.green);
   }
 
   _showMembersWindow() async {
@@ -678,9 +684,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context).communityLoeschen,
-              height: 120,
+              height: 90,
               children: [
-                const SizedBox(height: 10),
                 Center(
                     child: Text(
                         AppLocalizations.of(context).communityWirklichLoeschen))
