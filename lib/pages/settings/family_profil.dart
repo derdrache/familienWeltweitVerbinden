@@ -36,10 +36,17 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   var mainProfilDropdown = CustomDropDownButton();
   var isLoding = true;
   var mainProfil;
+  FocusNode nameFocusNode = FocusNode();
 
   @override
   void initState() {
     setData();
+
+    nameFocusNode.addListener(() {
+      if (!nameFocusNode.hasFocus) {
+        saveName();
+      }
+    });
 
     super.initState();
   }
@@ -48,11 +55,10 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     await getAllProfilName();
     await checkIfFamilyExist();
 
-    if (familyProfil != null){
+    if (familyProfil != null) {
       setMainProfil(familyProfil["mainProfil"]);
-      familyProfilIsActive = familyProfil["active"] == 1 ? true: false;
+      familyProfilIsActive = familyProfil["active"] == 1 ? true : false;
     }
-
 
     setState(() {
       isLoding = false;
@@ -117,7 +123,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     return {
       "id": familieId,
-      "members": jsonEncode([userId]),
+      "members": [userId],
       "name": "",
       "active": "1"
     };
@@ -194,6 +200,27 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     await FamiliesDatabase().update(
         "members = JSON_ARRAY_APPEND(members, '\$', '$userId'), einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
         "WHERE id = '${familyProfil["id"]}'");
+  }
+
+  saveName() async {
+    var newName = nameFamilyKontroller.text;
+    newName = newName.replaceAll("'", "''");
+
+    var nameIsUsed =
+        await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
+
+    if (nameIsUsed) {
+      customSnackbar(
+          context, AppLocalizations.of(context).usernameInVerwendung);
+      return;
+    }
+
+    setState(() {
+      familyProfil["name"] = newName;
+    });
+
+    FamiliesDatabase()
+        .update("name = '$newName'", "WHERE id = '${familyProfil["id"]}'");
   }
 
   @override
@@ -302,6 +329,67 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       );
     }
 
+    memberListWindow() {
+      var membersId = familyProfil["members"];
+      List<Widget> allMemberName = [];
+
+      for (var member in membersId) {
+        for (var profil in Hive.box('secureBox').get("profils")) {
+          if (member == profil["id"]) {
+            allMemberName.add(Container(
+                margin: EdgeInsets.all(10), child: Text(profil["name"])));
+            break;
+          }
+        }
+      }
+
+      return showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              height: 600,
+              title: AppLocalizations.of(context).mitgliedHinzufuegen,
+              children: allMemberName,
+            );
+          });
+    }
+
+    deleteDialog(){
+      return  showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).familyProfilloeschen,
+              height: 90,
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context).familyProfilWirklichLoeschen))
+              ],
+              actions: [
+                TextButton(
+                  child: const Text("Ok"),
+                  onPressed: ()  async {
+                    await FamiliesDatabase().delete(familyProfil["id"]);
+
+                    Navigator.pop(context);
+
+                    setState(() {
+                      familyProfil = null;
+                      familyProfilIsActive = false;
+                    });
+
+                  },
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context).abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            );
+          });
+    }
+
     moreMenu() {
       showDialog(
           context: context,
@@ -316,19 +404,48 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                     insetPadding:
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
-                      SimpleDialogOption(
-                        child: Row(
-                          children: [
-                            const Icon(Icons.person_add),
-                            const SizedBox(width: 10),
-                            Text(AppLocalizations.of(context)
-                                .mitgliedHinzufuegen),
-                          ],
+                      if (familyProfil != null)
+                        SimpleDialogOption(
+                          child: Row(
+                            children: [
+                              const Icon(Icons.list),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context).member),
+                            ],
+                          ),
+                          onPressed: () {
+                            memberListWindow();
+                          },
                         ),
-                        onPressed: () {
-                          addMemberWindow();
-                        },
-                      )
+                      if (familyProfil != null &&
+                          familyProfil["name"].isNotEmpty)
+                        SimpleDialogOption(
+                          child: Row(
+                            children: [
+                              const Icon(Icons.person_add),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)
+                                  .mitgliedHinzufuegen),
+                            ],
+                          ),
+                          onPressed: () {
+                            addMemberWindow();
+                          },
+                        ),
+                      if (familyProfil != null)
+                        SimpleDialogOption(
+                          child: Row(
+                            children: [
+                              const Icon(Icons.delete),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context).loeschen),
+                            ],
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            deleteDialog();
+                          },
+                        )
                     ],
                   ),
                 ),
@@ -342,22 +459,8 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
       return Container(
         child: customTextInput(AppLocalizations.of(context).familienprofilName,
-            nameFamilyKontroller, onSubmit: () async {
-          var newName = nameFamilyKontroller.text;
-          newName = newName.replaceAll("'", "''");
-
-          var nameIsUsed =
-              await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
-
-          if (nameIsUsed) {
-            customSnackbar(
-                context, AppLocalizations.of(context).usernameInVerwendung);
-            return;
-          }
-
-          FamiliesDatabase().update(
-              "name = '$newName'", "WHERE id = '${familyProfil["id"]}'");
-        }),
+            nameFamilyKontroller,
+            focusNode: nameFocusNode, onSubmit: () => saveName()),
       );
     }
 
@@ -388,6 +491,10 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
             var selectedId = allMembersId[selectedIndex];
 
             setMainProfil(selectedId);
+
+            setState(() {
+              familyProfil["mainProfil"] = selectedId;
+            });
 
             FamiliesDatabase().update("mainProfil = '$selectedId'",
                 "WHERE id = '${familyProfil["id"]}'");
@@ -468,10 +575,11 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
               onTap: () => global_func.changePage(
                   context,
                   ShowProfilPage(
-                    userName: AppLocalizations.of(context).familie +" " + familyProfil["name"],
-                    profil: mainProfil,
-                    ownProfil: true
-                  )),
+                      userName: AppLocalizations.of(context).familie +
+                          " " +
+                          familyProfil["name"],
+                      profil: mainProfil,
+                      ownProfil: true)),
               child: Container(
                 margin: const EdgeInsets.all(10),
                 child: Row(
@@ -489,10 +597,10 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
             )
           : Center(
               child: Container(
-                margin: const EdgeInsets.all(10),
+                margin: const EdgeInsets.all(30),
                 child: Text(
                   AppLocalizations.of(context).familienprofilUnvollstaendig,
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red, fontSize: 16),
                 ),
               ),
             );
@@ -522,7 +630,8 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                   if (familyProfilIsActive) nameBox(),
                   if (familyProfilIsActive) chooseMainProfil(),
                   if (!familyProfilIsActive) familyProfilDescription(),
-                  if (familyProfilIsActive) addFamilyMemberBox(),
+                  if (familyProfilIsActive && familyProfil["name"].isNotEmpty)
+                    addFamilyMemberBox(),
                   if (familyProfilIsActive) showProfil(),
                   const Expanded(
                     child: SizedBox(),

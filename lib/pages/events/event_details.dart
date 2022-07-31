@@ -243,7 +243,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               title: AppLocalizations.of(context).eventLoeschen,
               height: 90,
               children: [
-                const SizedBox(height: 10),
                 Center(
                     child: Text(
                         AppLocalizations.of(context).eventWirklichLoeschen))

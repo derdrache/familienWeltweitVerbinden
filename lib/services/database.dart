@@ -806,7 +806,7 @@ class FamiliesDatabase{
   }
 
   delete(familyId){
-    _deleteInTable("communities", familyId);
+    _deleteInTable("families", familyId);
   }
 }
 

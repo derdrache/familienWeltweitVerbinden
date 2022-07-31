@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/community/community_details.dart';
@@ -42,6 +44,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       "latt": locationData["latt"],
       "longt": locationData["longt"],
       "erstelltAm": DateTime.now().toString(),
+      "members": json.encode([userId]),
       "erstelltVon": userId
     };
 
