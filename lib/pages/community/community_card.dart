@@ -44,6 +44,7 @@ class _CommunityCardState extends State<CommunityCard> {
     var isAssetImage =
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
