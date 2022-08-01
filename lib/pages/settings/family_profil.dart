@@ -190,12 +190,16 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   }
 
   acceptFamilyInvite() async {
+    setMainProfil(inviteFamilyProfil["mainProfil"]);
+
     setState(() {
       familyProfil = inviteFamilyProfil;
       inviteFamilyProfil = null;
       familyProfil["einladung"].remove(userId);
       familyProfil["members"].add(userId);
+      familyProfilIsActive = true;
     });
+
 
     await FamiliesDatabase().update(
         "members = JSON_ARRAY_APPEND(members, '\$', '$userId'), einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
