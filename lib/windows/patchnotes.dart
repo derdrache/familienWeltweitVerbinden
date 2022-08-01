@@ -115,7 +115,7 @@ var patch150E={
     "General - The errors with an apostrophe in the name have been fixed",
     "World map - profiles are now correctly displayed at the smallest zoom level",
     "Online event - time conversion bug has been fixed",
-    "Profile / event description - description texts are now copyable and links are automatically into hyperlinks.",
+    "Profile / event description - description texts are now copyable and links are automatically transform into hyperlinks.",
     "Profile - Interests has been expanded to include 'Montessori, Waldorf, Nonviolent Communication, Minimalism, Frugalism, Vegan, Sugar Free, and Gluten Free'",
     "various small bug fixes",
     "various small improvements"
