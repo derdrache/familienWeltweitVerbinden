@@ -184,6 +184,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
+    if(pickedImage == null) return;
+
     setState(() {
       imageLoading = true;
     });

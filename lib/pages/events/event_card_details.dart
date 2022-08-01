@@ -6,6 +6,7 @@ import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -71,13 +72,12 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       }
     });
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => checkMoreContent());
+    WidgetsBinding.instance.addPostFrameCallback((_) => checkMoreContent());
     super.initState();
   }
 
-  checkMoreContent(){
-    if(_controller.position.maxScrollExtent > 0){
+  checkMoreContent() {
+    if (_controller.position.maxScrollExtent > 0) {
       setState(() {
         moreContent = true;
       });
@@ -543,15 +543,19 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                     const SizedBox(height: 20),
                     creatorChangeHintBox(),
                     eventInformationBox(),
-                    if (widget.isApproved || widget.isPublic) eventBeschreibung(),
+                    if (widget.isApproved || widget.isPublic)
+                      eventBeschreibung(),
                     eventTags()
                   ],
                 ),
               ),
-              if(moreContent) const Positioned.fill(
-                bottom: 35,
-                child: Align(alignment: Alignment.bottomCenter, child: Icon(Icons.arrow_downward)),
-              )
+              if (moreContent)
+                const Positioned.fill(
+                  bottom: 35,
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Icon(Icons.arrow_downward)),
+                )
             ],
           ),
           if (!widget.isApproved && !widget.isPublic) secretFogWithButton(),
@@ -562,11 +566,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             ),
           CardFeet(
               organisator: widget.event["erstelltVon"],
-              eventId: widget.event["id"],
+              event: widget.event,
               eventZusage: widget.event["zusage"],
-              width: cardWidth
-          ),
-
+              width: cardWidth),
         ],
       ),
     );
@@ -838,13 +840,11 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                 ],
               )
             : widget.multiLines
-            ? TextWithHyperlinkDetection(text: widget.rowData)
-        : Text(
-          widget.rowData,
-          style:  TextStyle(
-                fontSize: fontsize + 8, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center
-        ));
+                ? TextWithHyperlinkDetection(text: widget.rowData)
+                : Text(widget.rowData,
+                    style: TextStyle(
+                        fontSize: fontsize + 8, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center));
   }
 }
 
@@ -1056,12 +1056,12 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
 class CardFeet extends StatefulWidget {
   String organisator;
-  String eventId;
+  var event;
   double width;
   var eventZusage;
 
   CardFeet(
-      {Key key, this.organisator, this.width, this.eventId, this.eventZusage})
+      {Key key, this.organisator, this.width, this.event, this.eventZusage})
       : super(key: key);
 
   @override
@@ -1094,6 +1094,50 @@ class _CardFeetState extends State<CardFeet> {
 
   @override
   Widget build(BuildContext context) {
+    showTeilnehmerWindow() {
+      var zusagenIds = widget.event["zusage"];
+      var allProfils = Hive.box("secureBox").get("profils");
+      var zusagenProfils = [];
+      List<Widget> zusagenNameBoxes = [];
+
+      for (var profilId in zusagenIds) {
+        for (var profil in allProfils) {
+          if (profil["id"] == profilId) {
+            zusagenProfils.add(profil);
+            break;
+          }
+        }
+      }
+
+      for (var member in zusagenProfils) {
+        zusagenNameBoxes.add(InkWell(
+            onTap: () {
+              global_func.changePage(
+                  context,
+                  ShowProfilPage(
+                    userName: member["name"],
+                    profil: member,
+                  ));
+            },
+            child: Container(
+                margin: const EdgeInsets.all(10),
+                child: Text(
+                  member["name"],
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                ))));
+      }
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).communityLoeschen,
+              children: zusagenNameBoxes,
+            );
+          });
+    }
+
     return Positioned(
       bottom: 25,
       left: 30,
@@ -1102,10 +1146,20 @@ class _CardFeetState extends State<CardFeet> {
         width: widget.width,
         child: Row(
           children: [
-            Text(AppLocalizations.of(context).teilnehmer,
-                style: TextStyle(fontSize: fontsize)),
-            Text(widget.eventZusage.length.toString(),
-                style: TextStyle(fontSize: fontsize)),
+            InkWell(
+              child: Text(AppLocalizations.of(context).teilnehmer,
+                  style: TextStyle(
+                      fontSize: fontsize,
+                      color: Theme.of(context).colorScheme.secondary)),
+              onTap: () => showTeilnehmerWindow(),
+            ),
+            InkWell(
+              child: Text(widget.eventZusage.length.toString(),
+                  style: TextStyle(
+                      fontSize: fontsize,
+                      color: Theme.of(context).colorScheme.secondary)),
+              onTap: () => showTeilnehmerWindow(),
+            ),
             const Expanded(child: SizedBox()),
             InkWell(
               child: organisatorText,
