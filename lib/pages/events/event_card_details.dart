@@ -624,7 +624,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
   @override
   void initState() {
     if (widget.rowData != String) widget.rowData = widget.rowData.toString();
-    if (!(widget.databaseKennzeichnung == "link")) {
+    if (widget.databaseKennzeichnung != "link") {
       inputKontroller.text = widget.rowData;
     }
 
@@ -790,6 +790,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context);
+                  if(!widget.rowData.contains("http")){
+                    widget.rowData = "http://" + widget.rowData;
+                  }
                   launch(widget.rowData);
                 },
                 child: Text(AppLocalizations.of(context).linkOeffnen),
@@ -833,6 +836,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                             if (widget.isCreator) {
                               openLinkAskWindow();
                             } else {
+                              if(!widget.rowData.contains("http")){
+                                widget.rowData = "http://" + widget.rowData;
+                              }
                               launch(widget.rowData);
                             }
                           },
@@ -1115,7 +1121,6 @@ class _CardFeetState extends State<CardFeet> {
               global_func.changePage(
                   context,
                   ShowProfilPage(
-                    userName: member["name"],
                     profil: member,
                   ));
             },
@@ -1167,7 +1172,6 @@ class _CardFeetState extends State<CardFeet> {
                 global_func.changePage(
                     context,
                     ShowProfilPage(
-                      userName: ownName,
                       profil: organisatorProfil,
                     ));
               },

@@ -56,6 +56,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     _initImages();
     _getDBDataSetAllUserNames();
 
+    if(!widget.community["link"].contains("http")) {
+      widget.community["link"] = "http://" + widget.community["link"];
+    }
+
     _controller.addListener(() {
       if (_controller.position.atEdge) {
         bool isTop = _controller.position.pixels == 0;
@@ -866,6 +870,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               behavior: HitTestBehavior.translucent,
               onTapDown: (tabDetails) {
                 var getTabPostion = tabDetails.globalPosition;
+                var link = widget.community["link"];
+                if(!link.contains("http")) link = "http://" + link;
+
                 if (isCreator) _changeOrOpenLinkWindow(getTabPostion);
                 if (!isCreator) launch(widget.community["link"]);
               },
@@ -919,7 +926,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 onTap: () => global_func.changePage(
                     context,
                     ShowProfilPage(
-                      userName: FirebaseAuth.instance.currentUser.displayName,
                       profil: creatorProfil,
                     )),
                 child: Text(
