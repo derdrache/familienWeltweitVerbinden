@@ -41,6 +41,8 @@ class _ChatPageState extends State<ChatPage> {
         await ProfilDatabase().getData("newMessages", "WHERE id = '$userId'");
     num realNewMessages = 0;
 
+    if(dbNewMessages == false) return;
+
     for (var group in globalChatGroups) {
       var users = group["users"];
       realNewMessages += users[userId]["newMessages"];

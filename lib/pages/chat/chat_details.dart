@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
+import 'package:familien_suche/pages/community/community_card.dart';
 import 'package:familien_suche/pages/events/eventCard.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
@@ -184,6 +185,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (messageData["message"].contains("</eventId=")) {
         messageData["message"] = "<Event Card>";
       }
+      if (messageData["message"].contains("</communityId=")) {
+        messageData["message"] = "<Community Card>";
+      }
+
 
       ChatDatabase().updateChatGroup(
           "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
@@ -217,6 +222,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+
     messageList(messages) {
       List<Widget> messageBox = [];
 
@@ -251,6 +257,38 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           margin: const EdgeInsets.all(15),
                           withInteresse: true,
                           event: snapshot.data,
+                          afterPageVisit: () => setState(() {}),
+                        ),
+                        Positioned(
+                          bottom: -15,
+                          right: 0,
+                          child: Text(
+                              DateFormat('dd-MM HH:mm').format(messageTime),
+                              style: TextStyle(color: Colors.grey[600])),
+                        )
+                      ]),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+          ));
+          continue;
+        }
+        if (message["message"].contains("</communityId=")) {
+          messageBox.add(Align(
+            alignment: textAlign,
+            child: FutureBuilder(
+                future: CommunityDatabase().getData(
+                    "*", "WHERE id = '${message["message"].substring(14)}'"),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data != false) {
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 25),
+                      child: Stack(clipBehavior: Clip.none, children: [
+                        CommunityCard(
+                          margin: const EdgeInsets.all(15),
+                          withFavorite: true,
+                          community: snapshot.data,
                           afterPageVisit: () => setState(() {}),
                         ),
                         Positioned(
@@ -347,7 +385,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       return Stack(
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 10, right: 50),
+            padding: const EdgeInsets.only(left: 10, right: 50, bottom: 10),
             decoration: BoxDecoration(
                 color: Colors.white,
                 border: const Border(top: BorderSide(color: Colors.grey)),
@@ -362,15 +400,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minHeight: 60,
-                maxHeight: 200.0,
+                maxHeight: 180.0,
               ),
               child: TextField(
                 maxLines: null,
                 focusNode: myFocusNode,
                 textInputAction: TextInputAction.newline,
                 controller: nachrichtController,
+                textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+                  contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 5),
                   hintText: AppLocalizations.of(context).nachricht,
                   hintStyle: const TextStyle(fontSize: 20),
                   border: InputBorder.none,
@@ -383,7 +422,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ),
           ),
           Positioned(
-            bottom: 4,
+            bottom: 15,
             right: 2,
             child: IconButton(
                 padding: EdgeInsets.zero,
