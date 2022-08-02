@@ -341,6 +341,7 @@
     "familienprofilAnzeigen": "show family profile",
     "familienprofilUnvollstaendig": "to make the profile visible and add member, the name and a main profile must be entered",
     "familyProfilloeschen" : "delete family profile",
-    "familyProfilWirklichLoeschen": "do you really want to delete the family profile?"
+    "familyProfilWirklichLoeschen": "do you really want to delete the family profile?",
+    "neueCommunities": "new communities"
 }
 
