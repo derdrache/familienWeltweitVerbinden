@@ -250,13 +250,16 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
               borderRadius: const BorderRadius.all(Radius.circular(5))
           ),
           child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
+            child: DropdownButtonFormField<String>(
               isExpanded: true,
               value: widget.selected == "" ? null : widget.selected,
               hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
               elevation: 16,
               style: const TextStyle(color: Colors.black),
               icon: const Icon(Icons.arrow_downward, color: Colors.black,),
+              decoration: widget.hintText != "" ? InputDecoration(
+                labelText: widget.hintText,
+              ) :InputDecoration() ,
               onChanged: (newValue){
 
                 setState(() {
