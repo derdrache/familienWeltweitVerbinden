@@ -124,7 +124,7 @@ class _CreateStadtinformationsPageState
         title: AppLocalizations.of(context).stadtinformationErstellen,
         buttons: [
           if (!onLoading)
-            IconButton(onPressed: () => save(), icon: const Icon(Icons.done)),
+            IconButton(onPressed: () => save(), icon: const Icon(Icons.done, size: 30)),
           if (onLoading)
             Container(
                 width: 30,

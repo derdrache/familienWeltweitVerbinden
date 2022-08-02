@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart' hide Key;
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
-import 'dart:ui';
+import 'dart:io' as io;
+import 'dart:ui' as ui;
 import 'package:encrypt/encrypt.dart';
 
 import '../auth/secrets.dart';
@@ -12,9 +12,9 @@ import '../global/global_functions.dart'as global_functions;
 import 'notification.dart';
 
 
-//var databaseUrl = "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
-var spracheIstDeutsch = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "http://test.families-worldwide.com/";
+var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 
 
@@ -176,19 +176,19 @@ class ChatDatabase{
     var chatID = global_functions.getChatID(userKeysList);
     var date = DateTime.now().millisecondsSinceEpoch;
 
+
     var newChatGroup = {
       "id": chatID,
       "date": date,
       "users": json.encode({
-        userKeysList[0] : {"name": usersList[0], "newMessages": 0},
-        userKeysList[1] : {"name": usersList[1], "newMessages": 0},
+        userKeysList[0] : {"name": usersList[0].replaceAll("'", "''"), "newMessages": 0},
+        userKeysList[1] : {"name": usersList[1].replaceAll("'", "''"), "newMessages": 0},
       }),
       "lastMessage": messageData["message"],
     };
 
     var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
     await http.post(url, body: json.encode(newChatGroup));
-
 
     messageData = {
       "id": chatID,
@@ -197,8 +197,6 @@ class ChatDatabase{
       "von": messageData["von"],
       "zu": messageData["zu"]
     };
-
-
 
     await addNewMessageAndSendNotification(newChatGroup, messageData);
 
@@ -428,6 +426,87 @@ class EventDatabase{
     _deleteInTable("events", eventId);
   }
 
+}
+
+class CommunityDatabase{
+  addNewCommunity(communityData) async {
+    var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
+    var test = await http.post(url, body: json.encode(communityData));
+    print(test.body);
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "communities",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+  updateLocation(id, locationData) async {
+    var url = Uri.parse(databaseUrl + "database/communities/changeLocation.php");
+
+    await http.post(url, body: json.encode({
+      "id": id,
+      "ort": locationData["city"],
+      "land": locationData["countryname"],
+      "latt": locationData["latt"],
+      "longt": locationData["longt"]
+    }));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "communities"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+
+    return responseBody;
+  }
+
+  delete(communityId){
+    _deleteInTable("communities", communityId);
+  }
 }
 
 class StadtinfoDatabase{
@@ -662,6 +741,102 @@ class ReportsDatabase{
 
 }
 
+class FamiliesDatabase{
+  addNewFamily(familyData) async {
+    var url = Uri.parse(databaseUrl + "database/families/newFamily.php");
+    var test = await http.post(url, body: json.encode(familyData));
+    print(test.body);
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "families",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "families"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+
+    return responseBody;
+  }
+
+  delete(familyId){
+    _deleteInTable("families", familyId);
+  }
+}
+
+uploadImage(imagePath, imageName, image) async{
+  var url = Uri.parse("https://families-worldwide.com/database/uploadImage.php");
+  var data = {
+    "imagePath": imagePath,
+    "imageName": imageName,
+    "image": base64Encode(image),
+  };
+
+  try{
+    //Web Version wirft nach vollendung ein Fehler auf => funktioniert aber ohne Probleme
+    await http.post(url, body: json.encode(data));
+  }catch(_){
+
+  }
+
+}
+
+DbDeleteImage(imageName) async{
+  var url = Uri.parse("https://families-worldwide.com/database/deleteImage.php");
+  imageName = imageName.split("/").last;
+  var data = {
+    "imageName": imageName,
+  };
+
+  await http.post(url, body: json.encode(data));
+}
+
 _deleteInTable(table, id) {
   var url = Uri.parse(databaseUrl + "database/deleteAll.php");
 
@@ -670,7 +845,6 @@ _deleteInTable(table, id) {
     "table": table
   }));
 }
-
 
 String decrypt(String encrypted) {
   final key = Key.fromUtf8(phpCryptoKey);
@@ -681,4 +855,6 @@ String decrypt(String encrypted) {
   final decrypted = encrypter.decrypt(enBase64, iv: iv);
   return decrypted;
 }
+
+
 

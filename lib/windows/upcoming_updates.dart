@@ -12,10 +12,10 @@ class UmcomingUpdatesWindow{
 
     return Container(
       width: 200,
-      margin: EdgeInsets.only(left: 10, top: 10),
+      margin: const EdgeInsets.only(left: 10, top: 10),
       child: Text(
         "- " + title,
-        style: TextStyle(fontSize: 15),
+        style: const TextStyle(fontSize: 15),
         maxLines: null,
       )
     );
@@ -30,14 +30,13 @@ class UmcomingUpdatesWindow{
           return CustomAlertDialog(
               title: patchnotesTitle,
               children: [
-                _update(AppLocalizations.of(context).familienAnzeige),
                 _update(AppLocalizations.of(context).newsBoard),
                 _update(AppLocalizations.of(context).weitereAnemdlungsMoeglichkeiten),
                 _update(AppLocalizations.of(context).eventErweiterung),
                 _update(AppLocalizations.of(context).eventsOrganisationstools),
                 _update(AppLocalizations.of(context).chatErweiterung),
                 _update(AppLocalizations.of(context).chatgruppen),
-                _update(AppLocalizations.of(context).gemeinschaftenUpdate),
+                _update(AppLocalizations.of(context).communityErweiterung),
                 _update(AppLocalizations.of(context).layoutVerbessern),
               ]
           );

@@ -6,6 +6,7 @@ import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,6 +18,7 @@ import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/image_galerie.dart';
+import '../../widgets/text_with_hyperlink_detection.dart';
 
 /*
 Clean Code Notize:
@@ -53,6 +55,35 @@ class EventCardDetails extends StatefulWidget {
 }
 
 class _EventCardDetailsState extends State<EventCardDetails> {
+  final _controller = ScrollController();
+  var moreContent = false;
+
+  @override
+  void initState() {
+    _controller.addListener(() {
+      if (_controller.position.atEdge) {
+        bool isTop = _controller.position.pixels == 0;
+        if (isTop) {
+          moreContent = true;
+        } else {
+          moreContent = false;
+        }
+        setState(() {});
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => checkMoreContent());
+    super.initState();
+  }
+
+  checkMoreContent() {
+    if (_controller.position.maxScrollExtent > 0) {
+      setState(() {
+        moreContent = true;
+      });
+    }
+  }
+
   askForRelease(isOnList) async {
     if (isOnList) {
       customSnackbar(
@@ -89,7 +120,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     var eventBeginn = widget.event["wann"];
 
     eventBeginn = DateTime.parse(eventBeginn)
-        .add(Duration(hours: eventZeitzone - deviceZeitzone));
+        .add(Duration(hours: deviceZeitzone - eventZeitzone));
 
     var ownDate =
         eventBeginn.toString().split(" ")[0].split("-").reversed.join(".");
@@ -121,13 +152,17 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   );
                 }).toList(),
                 onChanged: (newValue) async {
-                  if(widget.event["tags"].contains(global_func.changeGermanToEnglish(newValue)) ||
-                      widget.event["tags"].contains(global_func.changeEnglishToGerman(newValue))) return;
+                  if (widget.event["tags"].contains(
+                          global_func.changeGermanToEnglish(newValue)) ||
+                      widget.event["tags"].contains(
+                          global_func.changeEnglishToGerman(newValue))) return;
 
                   widget.event["tags"].add(newValue);
                   changeState(() {});
 
-                  await EventDatabase().update("tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')", "WHERE id = '${widget.event["id"]}'");
+                  await EventDatabase().update(
+                      "tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')",
+                      "WHERE id = '${widget.event["id"]}'");
                   setState(() {});
                 })),
       )
@@ -143,7 +178,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           widget.event["tags"].remove(tag);
           changeState(() {});
 
-          await EventDatabase().update("tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))", "WHERE id = '${widget.event["id"]}'");
+          await EventDatabase().update(
+              "tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))",
+              "WHERE id = '${widget.event["id"]}'");
           setState(() {});
         },
         child: Stack(
@@ -221,8 +258,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           Stack(
             children: [
               ImageGalerie(
-                id: widget.event["id"],
                 isCreator: widget.isCreator,
+                event: widget.event,
                 child: ClipRRect(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20.0),
@@ -462,9 +499,12 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             )));
       }
 
-      if(eventTags.isEmpty && widget.isCreator) eventTags.add(
-        Container(margin: EdgeInsets.all(10), child: Text("Hier klicken um Eventlabel hinzuzufügen", style: TextStyle(color: Colors.grey)))
-      );
+      if (eventTags.isEmpty && widget.isCreator) {
+        eventTags.add(Container(
+            margin: const EdgeInsets.all(10),
+            child: const Text("Hier klicken um Eventlabel hinzuzufügen",
+                style: TextStyle(color: Colors.grey))));
+      }
 
       return InkWell(
         onTap: () => widget.isCreator ? changeEventTagsWindow() : null,
@@ -477,33 +517,46 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     return Center(
       child: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.only(bottom: 30),
-            width: cardWidth,
-            height: cardHeight,
-            margin: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: cardShadowColor().withOpacity(0.6),
-                    spreadRadius: 12,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ]),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                bildAndTitleBox(),
-                const SizedBox(height: 20),
-                creatorChangeHintBox(),
-                eventInformationBox(),
-                if (widget.isApproved || widget.isPublic) eventBeschreibung(),
-                eventTags()
-              ],
-            ),
+          Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.only(bottom: 30),
+                width: cardWidth,
+                height: cardHeight,
+                margin: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: cardShadowColor().withOpacity(0.6),
+                        spreadRadius: 12,
+                        blurRadius: 7,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]),
+                child: ListView(
+                  controller: _controller,
+                  shrinkWrap: true,
+                  children: [
+                    bildAndTitleBox(),
+                    const SizedBox(height: 20),
+                    creatorChangeHintBox(),
+                    eventInformationBox(),
+                    if (widget.isApproved || widget.isPublic)
+                      eventBeschreibung(),
+                    eventTags()
+                  ],
+                ),
+              ),
+              if (moreContent)
+                const Positioned.fill(
+                  bottom: 35,
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Icon(Icons.arrow_downward)),
+                )
+            ],
           ),
           if (!widget.isApproved && !widget.isPublic) secretFogWithButton(),
           if (!widget.isCreator)
@@ -513,9 +566,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             ),
           CardFeet(
               organisator: widget.event["erstelltVon"],
-              eventId: widget.event["id"],
+              event: widget.event,
               eventZusage: widget.event["zusage"],
-              width: cardWidth)
+              width: cardWidth),
         ],
       ),
     );
@@ -571,7 +624,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
   @override
   void initState() {
     if (widget.rowData != String) widget.rowData = widget.rowData.toString();
-    if (!(widget.databaseKennzeichnung == "link")) {
+    if (widget.databaseKennzeichnung != "link") {
       inputKontroller.text = widget.rowData;
     }
 
@@ -737,6 +790,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context);
+                  if(!widget.rowData.contains("http")){
+                    widget.rowData = "http://" + widget.rowData;
+                  }
                   launch(widget.rowData);
                 },
                 child: Text(AppLocalizations.of(context).linkOeffnen),
@@ -767,7 +823,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                             fontSize: fontsize,
                             color: widget.databaseKennzeichnung != "link"
                                 ? Colors.black
-                                : Colors.blue),
+                                : Theme.of(context).colorScheme.secondary),
                         softWrap: false,
                         overflow: TextOverflow.fade,
                         textAlign: TextAlign.end,
@@ -780,20 +836,21 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                             if (widget.isCreator) {
                               openLinkAskWindow();
                             } else {
+                              if(!widget.rowData.contains("http")){
+                                widget.rowData = "http://" + widget.rowData;
+                              }
                               launch(widget.rowData);
                             }
                           },
                   )
                 ],
               )
-            : Text(
-                widget.rowData,
-                style: !widget.multiLines
-                    ? TextStyle(
-                        fontSize: fontsize + 8, fontWeight: FontWeight.bold)
-                    : TextStyle(fontSize: fontsize),
-                textAlign: TextAlign.center,
-              ));
+            : widget.multiLines
+                ? TextWithHyperlinkDetection(text: widget.rowData)
+                : Text(widget.rowData,
+                    style: TextStyle(
+                        fontSize: fontsize + 8, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center));
   }
 }
 
@@ -1005,12 +1062,12 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
 class CardFeet extends StatefulWidget {
   String organisator;
-  String eventId;
+  var event;
   double width;
   var eventZusage;
 
   CardFeet(
-      {Key key, this.organisator, this.width, this.eventId, this.eventZusage})
+      {Key key, this.organisator, this.width, this.event, this.eventZusage})
       : super(key: key);
 
   @override
@@ -1034,13 +1091,58 @@ class _CardFeetState extends State<CardFeet> {
         .getData("*", "WHERE id = '${widget.organisator}'");
 
     organisatorText = Text(organisatorProfil["name"],
-        style: TextStyle(color: Colors.blue, fontSize: fontsize));
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.secondary,
+            fontSize: fontsize));
 
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    showTeilnehmerWindow() {
+      var zusagenIds = widget.event["zusage"];
+      var allProfils = Hive.box("secureBox").get("profils");
+      var zusagenProfils = [];
+      List<Widget> zusagenNameBoxes = [];
+
+      for (var profilId in zusagenIds) {
+        for (var profil in allProfils) {
+          if (profil["id"] == profilId) {
+            zusagenProfils.add(profil);
+            break;
+          }
+        }
+      }
+
+      for (var member in zusagenProfils) {
+        zusagenNameBoxes.add(InkWell(
+            onTap: () {
+              global_func.changePage(
+                  context,
+                  ShowProfilPage(
+                    profil: member,
+                  ));
+            },
+            child: Container(
+                margin: const EdgeInsets.all(10),
+                child: Text(
+                  member["name"],
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                ))));
+      }
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).communityLoeschen,
+              children: zusagenNameBoxes,
+            );
+          });
+    }
+
     return Positioned(
       bottom: 25,
       left: 30,
@@ -1049,10 +1151,20 @@ class _CardFeetState extends State<CardFeet> {
         width: widget.width,
         child: Row(
           children: [
-            Text(AppLocalizations.of(context).teilnehmer,
-                style: TextStyle(fontSize: fontsize)),
-            Text(widget.eventZusage.length.toString(),
-                style: TextStyle(fontSize: fontsize)),
+            InkWell(
+              child: Text(AppLocalizations.of(context).teilnehmer,
+                  style: TextStyle(
+                      fontSize: fontsize,
+                      color: Theme.of(context).colorScheme.secondary)),
+              onTap: () => showTeilnehmerWindow(),
+            ),
+            InkWell(
+              child: Text(widget.eventZusage.length.toString(),
+                  style: TextStyle(
+                      fontSize: fontsize,
+                      color: Theme.of(context).colorScheme.secondary)),
+              onTap: () => showTeilnehmerWindow(),
+            ),
             const Expanded(child: SizedBox()),
             InkWell(
               child: organisatorText,
@@ -1060,7 +1172,6 @@ class _CardFeetState extends State<CardFeet> {
                 global_func.changePage(
                     context,
                     ShowProfilPage(
-                      userName: ownName,
                       profil: organisatorProfil,
                     ));
               },

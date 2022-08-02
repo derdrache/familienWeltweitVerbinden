@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import '../widgets/dialogWindow.dart';
 
 
-
 class PatchnotesWindow{
   var context;
   var patchnotesTitle = "Patchnotes";
@@ -58,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch150D),
                 _patch(patch141D),
                 _patch(patch140D),
                 _patch(patch131D),
@@ -74,6 +74,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch150E),
                 _patch(patch141E),
                 _patch(patch140E),
                 _patch(patch131E),
@@ -100,6 +101,42 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch150E={
+  "title" : "1.5.0 - 01.08.2022",
+  "inhalt": [
+    "Expansion Communities - It is now possible to create communities and search them on the world map or in the extra tab",
+    "Family Profile - Under Settings and then on the top right by the 3 dots, there is "
+        "now the possibility to enter the family profile. There you can activate the profile, "
+        "be determined which is the main profile and add more family members.",
+    "General - It is now possible to upload your own pictures",
+    "General - The errors with an apostrophe in the name have been fixed",
+    "World map - profiles are now correctly displayed at the smallest zoom level",
+    "Online event - time conversion bug has been fixed",
+    "Profile / event description - description texts are now copyable and links are automatically transform into hyperlinks.",
+    "Profile - Interests has been expanded to include 'Montessori, Waldorf, Nonviolent Communication, Minimalism, Frugalism, Vegan, Sugar Free, and Gluten Free'",
+    "various small bug fixes",
+    "various small improvements"
+  ]
+};
+var patch150D={
+  "title" : "1.5.0 - 01.08.2022",
+  "inhalt": [
+    "Erweiterung Gemeinschaften - Es ist jetzt möglich Gemeinschaften zu erstellen und auf der Weltkarte oder im extra Reiter zu suchen",
+    "Familienprofil - Unter Einstellungen und dann oben rechts bei den 3 Punkten, gibt es "
+        "jetzt die Möglichkeit ins Familienprofil zu gelangen. Dort kann das Profil aktiviert werden, "
+        "bestimmt werden welches das Hauptprofil ist und weitere Familienmitglieder hinzugefügt werden.",
+    "Allgemein - Es ist jetzt möglich eigene Bilder hochzuladen",
+    "Allgemein - Die Fehler mit einem Apostroph im Namen wurden behoben",
+    "Weltkarte - Profile werden nun korrekt auf der kleinsten Zoomstufe angezeigt",
+    "Online Event - Fehler bei der Zeitumrechnung wurde behoben",
+    "Profil- / Eventbeschreibung - Die Beschreibungstexte sind nun kopierbar und die Links werden automatisch "
+        "in Hyperlinks verwandelt.",
+    "Profil - Interessen wurde um 'Montessori, Waldorf, Gewaltfreie Kommunikation, Minimalismus, Frugalismus, Vegan, Zuckerfrei und Glutenfrei' erweitert",
+    "verschiedene kleine Fehlerbehebungen",
+    "verschiedene kleine Verbesserungen"
   ]
 };
 
