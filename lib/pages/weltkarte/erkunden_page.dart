@@ -36,7 +36,6 @@ class ErkundenPage extends StatefulWidget {
 
 class _ErkundenPageState extends State<ErkundenPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
-  var localProfils = [];
   var profils = [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   var allCities = Hive.box('secureBox').get("stadtinfo");
@@ -91,7 +90,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   void initState() {
     var hiveProfils = Hive.box('secureBox').get("profils") ?? [];
     profils = [for (var profil in hiveProfils) Map.of(profil)];
-    localProfils = profils;
 
     changeAllCitiesAndCreateCityNames();
     removeProfilsAndCreateAllUserName();
@@ -163,7 +161,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
       profils.remove(profil);
     }
 
-    localProfils = profils;
   }
 
   changeProfilToFamilyProfil() {
@@ -200,8 +197,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     for (var profil in deleteProfils) {
       profils.remove(profil);
     }
-
-    localProfils = profils;
   }
 
   _asyncMethod() async {
@@ -238,7 +233,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     Hive.box('secureBox').put("profils", checkedProfils);
 
     profils = [for (var profil in checkedProfils) Map.of(profil)];
-    localProfils = profils;
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
   }
@@ -324,7 +318,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   filterProfils() {
     var filterProfils = [];
 
-    for (var profil in localProfils) {
+    for (var profil in Hive.box('secureBox').get("profils") ?? []) {
       if (checkIfInFilter(profil)) filterProfils.add(profil);
     }
 
@@ -871,7 +865,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         var planungBis = DateTime.parse(planung["bis"]);
 
         if (selectDates.contains(planungVon)) {
-          var newProfil = Map.from(profil);
+          var newProfil = profil;
           newProfil["ort"] = planung["ortData"]["city"];
           newProfil["land"] = planung["ortData"]["countryname"];
           newProfil["latt"] = planung["ortData"]["latt"];
@@ -1074,6 +1068,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 context,
                 ShowProfilPage(
                   profil: profilData,
+                  reiseplanungSpezial: reiseplanungOn,
                 ));
           },
           child: Container(
@@ -1160,7 +1155,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var newProfilList = [];
 
     for (var profilId in changeList) {
-      for (var profil in localProfils ?? []) {
+      for (var profil in Hive.box('secureBox').get("profils") ?? []) {
         if (profilId == profil["id"]) {
           newProfilList.add(profil);
           break;
@@ -1169,6 +1164,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
     profils = newProfilList;
     createAndSetZoomLevels(profils, "profils");
+  }
+
+  setProfilsFromHive(){
+    var hiveProfils = Hive.box('secureBox').get("profils") ?? [];
+    profils = [for (var profil in hiveProfils) Map.of(profil)];
+    removeProfilsAndCreateAllUserName();
+    changeProfilToFamilyProfil();
   }
 
   @override
@@ -1593,7 +1595,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               if (friendMarkerOn) {
                 friendMarkerOn = false;
                 popupActive = false;
-                profils = localProfils;
+                setProfilsFromHive();
                 createAndSetZoomLevels(profils, "profils");
               } else {
                 friendMarkerOn = true;
@@ -1765,7 +1767,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               onPressed: () {
                 if (reiseplanungOn) {
                   reiseplanungOn = false;
-                  profils = localProfils;
+                  setProfilsFromHive();
                   createAndSetZoomLevels(profils, "profils");
                   setState(() {});
                 } else {

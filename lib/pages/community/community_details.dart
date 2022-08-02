@@ -242,7 +242,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var image = "https://families-worldwide.com/bilder/" + imageName;
     _saveChangeImage(image);
 
-    DbDeleteImage(oldImage);
+    dbDeleteImage(oldImage);
   }
 
   _windowChangeImageWithLink() async {
@@ -306,7 +306,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["bild"] = selectedImage;
     }
 
-    DbDeleteImage(oldImage);
+    dbDeleteImage(oldImage);
 
     await CommunityDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.community["id"]}'");
@@ -701,7 +701,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   child: const Text("Ok"),
                   onPressed: () async {
                     await CommunityDatabase().delete(widget.community["id"]);
-                    DbDeleteImage(widget.community["bild"]);
+                    dbDeleteImage(widget.community["bild"]);
                     global_func.changePageForever(
                         context, StartPage(selectedIndex: 2));
                   },
