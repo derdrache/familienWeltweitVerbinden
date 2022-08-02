@@ -9,7 +9,7 @@ double webWidth = 600;
 
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
-  onSubmit, informationWindow, hintText}){
+  onSubmit, informationWindow, hintText, focusNode}){
 
   return Stack(
     children: [
@@ -19,6 +19,7 @@ Widget customTextInput(text, controller, {validator, passwort = false,
             width: webWidth,
             margin: EdgeInsets.all(sideSpace),
             child: TextFormField(
+                focusNode: focusNode,
                 onFieldSubmitted: (string) {
                   if(onSubmit != null)onSubmit();
                 },
@@ -38,7 +39,6 @@ Widget customTextInput(text, controller, {validator, passwort = false,
                   hintText: hintText,
                   labelText: text,
                   labelStyle: const TextStyle(fontSize: 15, color: Colors.grey),
-                  //floatingLabelStyle: const TextStyle(fontSize: 15, color: Colors.blue)
                 ),
                 validator: validator
             ),
@@ -250,13 +250,16 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
               borderRadius: const BorderRadius.all(Radius.circular(5))
           ),
           child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
+            child: DropdownButtonFormField<String>(
               isExpanded: true,
               value: widget.selected == "" ? null : widget.selected,
               hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
               elevation: 16,
               style: const TextStyle(color: Colors.black),
               icon: const Icon(Icons.arrow_downward, color: Colors.black,),
+              decoration: widget.hintText != "" ? InputDecoration(
+                labelText: widget.hintText,
+              ) :InputDecoration() ,
               onChanged: (newValue){
 
                 setState(() {

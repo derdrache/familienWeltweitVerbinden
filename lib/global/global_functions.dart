@@ -174,6 +174,9 @@ changeEnglishToGerman(list){
 
   for(var i = 0; i < list.length; i++){
     var index = checkList.indexOf(list[i]);
+
+    if(germanList[index] == null) continue;
+
     germanOutputList.add(germanList[index]);
   }
 

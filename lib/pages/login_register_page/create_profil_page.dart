@@ -86,7 +86,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     }
 
     var userName = userNameKontroller.text;
-    userName = userName.replaceAll("'", "\\'");
+    userName = userName.replaceAll("'", "''");
     var userExist = true;
 
     try {
@@ -108,6 +108,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
       if (ortMapData["city"] == null) {
         customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+        changeLoading();
+        return;
       }
 
       var data = {
@@ -235,8 +237,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                     onPressed: saveFunction,
                     child: const Icon(
                       Icons.done,
-                      size: 35,
-                      color: Colors.green,
+                      size: 30,
                     ),
                   )
           ]),
