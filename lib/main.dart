@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import "package:universal_html/js.dart" as js;
 
 import 'firebase_options.dart';
 import 'pages/start_page.dart';
@@ -94,6 +95,8 @@ refreshHiveData() async {
   Hive.box("secureBox").put("familyProfils", familyProfils);
 
 }
+
+
 
 
 void main() async {
@@ -213,6 +216,69 @@ class MyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,
     ));
+
+    Future<bool> showAddHomePageDialog(BuildContext context) async {
+      return showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                      child: Icon(
+                        Icons.add_circle,
+                        size: 70,
+                        color: Theme.of(context).primaryColor,
+                      )),
+                  SizedBox(height: 20.0),
+                  Text(
+                    'Add to Homepage',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 20.0),
+                  Text(
+                    'Want to add this application to home screen?',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 20.0),
+                  ElevatedButton(
+                      onPressed: () {
+                        js.context.callMethod("presentAddToHome");
+                        Navigator.pop(context, false);
+                      },
+                      child: Text("Yes!"))
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    checkA2HS(){
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (true) { // hier local im Hive speichern
+            final bool isDeferredNotNull =
+            js.context.callMethod("isDeferredNotNull") as bool;
+
+            if (true) { //isDeferredNotNull
+              debugPrint(">>> Add to HomeScreen prompt is ready.");
+              await showAddHomePageDialog(context);
+            } else {
+              debugPrint(">>> Add to HomeScreen prompt is not ready yet.");
+            }
+          }
+        });
+      }
+    }
+
+
+    checkA2HS();
 
     return FutureBuilder(
         future: _initialization(),
