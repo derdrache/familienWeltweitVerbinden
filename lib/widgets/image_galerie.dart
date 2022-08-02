@@ -1,42 +1,43 @@
 import 'dart:convert';
-import 'dart:ui';
 
+import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as image_pack;
 
 import '../global/custom_widgets.dart';
 import '../services/database.dart';
 
 class ImageGalerie extends StatefulWidget {
-  var id;
   var isCreator;
+  var event;
   var child;
 
-  ImageGalerie({
-    Key key,
-    this.child,
-    this.id,
-    this.isCreator
-  }) : super(key: key);
+  ImageGalerie({Key key, this.child, this.isCreator, this.event})
+      : super(key: key);
 
   @override
   _ImageGalerieState createState() => _ImageGalerieState();
 }
 
 class _ImageGalerieState extends State<ImageGalerie> {
-  var isWebDesktop = kIsWeb && (defaultTargetPlatform != TargetPlatform.iOS || defaultTargetPlatform != TargetPlatform.android);
+  var isWebDesktop = kIsWeb &&
+      (defaultTargetPlatform != TargetPlatform.iOS ||
+          defaultTargetPlatform != TargetPlatform.android);
   double fontsize;
   List<Widget> allImages = [];
   var ownPictureKontroller = TextEditingController();
-  var selected = "";
+  var selectedImage = "";
   var windowSetState;
   var imagePaths;
+  var imageLoading = false;
 
   @override
   void initState() {
-    fontsize = isWebDesktop? 12 : 16;
+    fontsize = isWebDesktop ? 12 : 16;
 
     _initImages();
 
@@ -44,7 +45,6 @@ class _ImageGalerieState extends State<ImageGalerie> {
   }
 
   Future _initImages() async {
-
     final manifestContent = await rootBundle.loadString('AssetManifest.json');
 
     final Map<String, dynamic> manifestMap = json.decode(manifestContent);
@@ -54,203 +54,242 @@ class _ImageGalerieState extends State<ImageGalerie> {
         .where((String key) => key.contains('.jpg'))
         .toList();
 
-
     setState(() {});
   }
 
-  saveChanges(){
-    if(selected == "" && ownPictureKontroller.text == ""){
+  saveChanges() {
+    var oldImage = widget.event["bild"];
+
+    if (selectedImage == "" && ownPictureKontroller.text == "") {
       customSnackbar(context, AppLocalizations.of(context).bitteBildAussuchen);
       return;
     }
 
-    if(selected == ""){
-      selected = ownPictureKontroller.text;
-      widget.child = Image.network(selected, fit: BoxFit.fitWidth);
-    } else{
-      widget.child = Image.asset(selected, fit: BoxFit.fitWidth);
+    if (selectedImage == "") {
+      selectedImage = ownPictureKontroller.text;
+      widget.child = Image.network(selectedImage, fit: BoxFit.fitWidth);
+    } else {
+      widget.child = Image.asset(selectedImage, fit: BoxFit.fitWidth);
     }
 
-    setState(() {});
-    EventDatabase().update("bild = '$selected'", "WHERE id = '${widget.id}'");
-    Navigator.pop(context);
+    setState(() {
+      imageLoading = false;
+    });
 
+    DbDeleteImage(oldImage);
+
+    EventDatabase().update(
+        "bild = '$selectedImage'", "WHERE id = '${widget.event["id"]}'");
   }
 
+  pickAndUploadImage() async {
+    var eventName = widget.event["name"] + "_";
+    var pickedImage = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 50);
+
+    setState(() {
+      imageLoading = true;
+    });
+
+    var imageName = eventName + pickedImage.name;
+
+    if (pickedImage == null) {
+      customSnackbar(context, "Datei ist beschädigt");
+      return false;
+    }
+
+    var imageByte = await changeImageSize(pickedImage);
+
+    await uploadImage(pickedImage.path, imageName, imageByte);
+
+    return imageName;
+  }
+
+  changeImageSize(pickedImage) async {
+    var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
+    var originalWidth = imageByte.width;
+    var originalHeight = imageByte.height;
+    var minPixel = 1000;
+    var newWidth = 0;
+    var newHeight = 0;
+
+    if (originalWidth > originalHeight) {
+      var factor = originalWidth / originalHeight;
+      newHeight = minPixel;
+      newWidth = (minPixel * factor).round();
+    } else {
+      var factor = originalHeight / originalWidth;
+      newWidth = minPixel;
+      newHeight = (minPixel * factor).round();
+    }
+
+    var imageResizeThumbnail =
+        image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
+    var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 20);
+
+    return imageJpgByte;
+  }
+
+  selectAndUploadImage() async {
+    var imageName = await pickAndUploadImage();
+
+    if (imageName == false) return;
+
+    ownPictureKontroller.text =
+        "https://families-worldwide.com/bilder/" + imageName;
+
+    saveChanges();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     showImages() {
       List<Widget> allImages = [];
 
-      for(var image in imagePaths){
+      for (var image in imagePaths) {
         var imageDecode = Uri.decodeComponent(image);
 
-        allImages.add(
-            InkWell(
-              child: Container(
-                  margin: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          width: selected == imageDecode ? 3: 1,
-                          color: selected == imageDecode ? Colors.green : Colors.black
-                      )
-                  ),
-                  child:Image.asset(imageDecode, fit: BoxFit.fill, width: 80, height: 60)
-              ),
-              onTap: () {
-                selected = imageDecode;
-                windowSetState(() {
-
-                });
-              },
-            )
-        );
+        allImages.add(InkWell(
+          child: Container(
+              margin: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  border: Border.all(
+                      width: selectedImage == imageDecode ? 3 : 1,
+                      color: selectedImage == imageDecode
+                          ? Colors.green
+                          : Colors.black)),
+              child: Image.asset(imageDecode,
+                  fit: BoxFit.fill, width: 80, height: 60)),
+          onTap: () {
+            selectedImage = imageDecode;
+            windowSetState(() {});
+          },
+        ));
       }
 
-      return Container(
-          child: Wrap(
-            children: allImages,
-          )
+      return Wrap(
+        children: allImages,
       );
     }
 
-    _closeWindow(){
-      Navigator.pop(context);
-    }
-
-    windowHeader(){
-      return Container(
-        margin: const EdgeInsets.only(top: 10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Center(
-                  child: Text(
-                    AppLocalizations.of(context).eventBildAendern,
-                    style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold
-                    ),
-                  )
-              ),
-            )
-          ],
-        ),
-      );
-    }
-
-    ownLinkInput(){
-      return Container(
+    ownLinkInput() {
+      return SizedBox(
           width: 200,
           child: customTextInput(
-              "Eigenes Bild - Link eingeben",
-              ownPictureKontroller,
-              onSubmit: () {
-                allImages.add(
-                    Image.network(ownPictureKontroller.text, fit: BoxFit.fill, width: 80, height: 60)
-                );
-                selected = ownPictureKontroller.text;
+              AppLocalizations.of(context).eigenesBildLinkEingeben,
+              ownPictureKontroller, onSubmit: () {
+            allImages.add(Image.network(ownPictureKontroller.text,
+                fit: BoxFit.fill, width: 80, height: 60));
 
-                ownPictureKontroller.clear();
-                windowSetState(() {
-
-                });
-              }
-          )
-      );
+            ownPictureKontroller.clear();
+            windowSetState(() {});
+          }));
     }
 
-    windowOptions(){
+    windowOptions() {
       return Container(
         margin: const EdgeInsets.only(right: 10),
-        child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                child: Text(AppLocalizations.of(context).abbrechen, style: TextStyle(fontSize: fontsize)),
-                onPressed: () => Navigator.pop(context),
-              ),
-              TextButton(
-                  child: Text(AppLocalizations.of(context).speichern, style: TextStyle(fontSize: fontsize)),
-                  onPressed: () => saveChanges()
-              ),
-            ]
-        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          TextButton(
+            child: Text(AppLocalizations.of(context).abbrechen,
+                style: TextStyle(fontSize: fontsize)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+              child: Text(AppLocalizations.of(context).speichern,
+                  style: TextStyle(fontSize: fontsize)),
+              onPressed: () {
+                saveChanges();
+                Navigator.pop(context);
+              }),
+        ]),
       );
     }
 
-    windowCloseButton(){
-      return Positioned(
-        height: 30,
-        right: -13,
-        top: -7,
-        child: InkResponse(
-            onTap: () => _closeWindow(),
-            child: const CircleAvatar(
-              child: Icon(Icons.close, size: 16,),
-              backgroundColor: Colors.red,
-            )
-        ),
-      );
-    }
-
-    return InkWell(
-      child: Container(
-        constraints: BoxConstraints(
-            minHeight: 200,
-        ),
-        width: double.infinity,
-        child:widget.child,
-      ),
-      onTap:!widget.isCreator ? null :   () => showDialog(
+    windowChangeImageToPredetermined() async {
+      showDialog(
           context: context,
-          builder: (BuildContext buildContext){
-            return StatefulBuilder(
-                builder: (context, setState) {
-                  windowSetState = setState;
-                  return AlertDialog(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20.0))
-                    ),
-                    contentPadding: EdgeInsets.zero,
-                    content: SizedBox(
-                      height: 500,
-                      width: 600,
-                      child: Stack(
-                        clipBehavior: Clip.none, children: [
-                          ScrollConfiguration(
-                            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                              PointerDeviceKind.touch,
-                              PointerDeviceKind.mouse,
-                            }),
-                            child: Container(
-                              margin: EdgeInsets.only(left: 10),
-                              child: ListView(
-                                children: [
-                                  windowHeader(),
-                                  SizedBox(height: 10),
-                                  showImages(),
-                                  SizedBox(height: 20),
-                                  ownLinkInput(),
-                                  SizedBox(height: 20),
-                                  windowOptions()
-                                ],
-                              ),
-                            ),
-                          ),
-                          windowCloseButton()
-                        ] ,
-                      ),
-                    ),
+          builder: (BuildContext buildContext) {
+            return StatefulBuilder(builder: (context, setState) {
+              windowSetState = setState;
+              return CustomAlertDialog(
+                title: AppLocalizations.of(context).eventBildAendern,
+                children: [
+                  showImages(),
+                  const SizedBox(height: 20),
+                  windowOptions()
+                ],
+              );
+            });
+          });
+    }
 
-                  );
-                }
+    windowChangeImageWithLink() async {
+      return await showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).eventBildAendern,
+              children: [
+                ownLinkInput(),
+                const SizedBox(height: 20),
+                windowOptions()
+              ],
             );
-          }
-      ),
-    );
+          });
+    }
 
+    _showChangeImagePopupMenu(tabPosition) async {
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+
+      await showMenu(
+        context: context,
+        position: RelativeRect.fromRect(
+            tabPosition & const Size(40, 40), // smaller rect, the touch area
+            Offset.zero & overlay.size // Bigger rect, the entire screen
+            ),
+        items: [
+          PopupMenuItem(
+              child: Text(AppLocalizations.of(context).bilderauswahl),
+              onTap: () {
+                Future.delayed(const Duration(seconds: 0),
+                    () => windowChangeImageToPredetermined());
+              }),
+          PopupMenuItem(
+            child: Text(AppLocalizations.of(context).link),
+            onTap: () {
+              Future.delayed(const Duration(seconds: 0),
+                  () => windowChangeImageWithLink());
+            },
+          ),
+          PopupMenuItem(
+              child: Text(AppLocalizations.of(context).hochladen),
+              onTap: () => selectAndUploadImage()),
+        ],
+        elevation: 8.0,
+      );
+    }
+
+    return GestureDetector(
+        child: Container(
+          constraints: const BoxConstraints(
+            minHeight: 200,
+          ),
+          width: double.infinity,
+          child: imageLoading
+              ? Center(
+                  child: Container(
+                      margin: const EdgeInsets.all(10),
+                      width: 100,
+                      height: 100,
+                      child: const CircularProgressIndicator()))
+              : widget.child,
+        ),
+        onTapDown: !widget.isCreator
+            ? null
+            : (details) {
+                var getTabPostion = details.globalPosition;
+                _showChangeImagePopupMenu(getTabPostion);
+              });
   }
 }
