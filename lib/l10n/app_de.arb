@@ -339,6 +339,7 @@
     "familienprofilAnzeigen": "Familienprofil anzeigen",
     "familienprofilUnvollstaendig": "Um das Profil sichtbar zu machen und neue Mitglieder einzuladen, muss der Name und ein Hauptprofil ausgewählt werden",
     "familyProfilloeschen" : "Familienprofil löschen",
-    "familyProfilWirklichLoeschen": "Möchtest du das Familienprofil wirklich löschen?"
+    "familyProfilWirklichLoeschen": "Möchtest du das Familienprofil wirklich löschen?",
+    "neueCommunities": "Neue Gemeinschaften"
 
 }

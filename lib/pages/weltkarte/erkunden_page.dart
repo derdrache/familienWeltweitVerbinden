@@ -42,7 +42,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var allCities = Hive.box('secureBox').get("stadtinfo");
   var events = Hive.box('secureBox').get("events") ?? [];
   var communities = Hive.box('secureBox').get("communities") ?? [];
-  var familyProfils = Hive.box('secureBox').get("familyProfils");
+  var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
   MapController mapController = MapController();
   Set<String> allUserName = {};
   var countriesList = LocationService().getAllCountries();
@@ -1120,6 +1120,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
       if (filterOn) return AppLocalizations.of(context).filterErgebnisse;
       if (eventMarkerOn) return AppLocalizations.of(context).neueEvents;
+      if (communityMarkerOn) return AppLocalizations.of(context).neueCommunities;
     }
 
     if (currentMapZoom < kontinentZoom) {
