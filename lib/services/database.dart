@@ -431,8 +431,7 @@ class EventDatabase{
 class CommunityDatabase{
   addNewCommunity(communityData) async {
     var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
-    var test = await http.post(url, body: json.encode(communityData));
-    print(test.body);
+    await http.post(url, body: json.encode(communityData));
   }
 
   update(whatData, queryEnd) async  {
@@ -744,8 +743,7 @@ class ReportsDatabase{
 class FamiliesDatabase{
   addNewFamily(familyData) async {
     var url = Uri.parse(databaseUrl + "database/families/newFamily.php");
-    var test = await http.post(url, body: json.encode(familyData));
-    print(test.body);
+    await http.post(url, body: json.encode(familyData));
   }
 
   update(whatData, queryEnd) async  {
@@ -827,7 +825,7 @@ uploadImage(imagePath, imageName, image) async{
 
 }
 
-DbDeleteImage(imageName) async{
+dbDeleteImage(imageName) async{
   var url = Uri.parse("https://families-worldwide.com/database/deleteImage.php");
   imageName = imageName.split("/").last;
   var data = {
