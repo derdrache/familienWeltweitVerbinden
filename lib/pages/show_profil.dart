@@ -25,8 +25,14 @@ class ShowProfilPage extends StatefulWidget {
   String userName;
   Map profil;
   var ownProfil;
+  var reiseplanungSpezial;
 
-  ShowProfilPage({Key key, this.userName, this.profil, this.ownProfil = false})
+  ShowProfilPage(
+      {Key key,
+      this.userName,
+      this.profil,
+      this.ownProfil = false,
+      this.reiseplanungSpezial = false})
       : super(key: key);
 
   @override
@@ -45,18 +51,19 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   var monthsUntilInactive = 3;
   var timeDifferenceLastLogin;
 
-
   @override
   void initState() {
     checkIsOwnProfil();
     checkAccessReiseplanung();
     timeDifferenceLastLogin = Duration(
         microseconds: (DateTime.now().microsecondsSinceEpoch -
-            DateTime.parse(widget.profil["lastLogin"].toString())
-                .microsecondsSinceEpoch)
+                DateTime.parse(widget.profil["lastLogin"].toString())
+                    .microsecondsSinceEpoch)
             .abs());
 
     getAllProfilNamesAndId();
+
+    if(widget.reiseplanungSpezial) setNormalProfil();
 
     super.initState();
   }
@@ -99,11 +106,26 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     if ((date.month > DateTime.now().month &&
             date.year == DateTime.now().year) ||
-        date.year > DateTime.now().year || onlyMonth) {
+        date.year > DateTime.now().year ||
+        onlyMonth) {
       return date.month.toString() + "." + date.year.toString();
     } else {
       return AppLocalizations.of(context).jetzt;
     }
+  }
+
+  setNormalProfil(){
+    var localProfils = Hive.box('secureBox').get("profils") ?? [];
+    var profilData;
+
+
+    for(var profil in localProfils){
+      if(profil["id"] == widget.profil["id"]){
+        profilData = profil;
+      }
+    }
+
+    widget.profil = profilData;
   }
 
   openBesuchteLaenderWindow() {
@@ -129,18 +151,15 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     var allIds = [];
     var allNames = [];
 
-    for(var profil in allProfils){
+    for (var profil in allProfils) {
       allIds.add(profil["id"]);
       allNames.add(profil["name"]);
     }
 
-    return {
-      "ids" : allIds,
-      "names": allNames
-    };
+    return {"ids": allIds, "names": allNames};
   }
 
-  openChat(chatpartnerId, chatpartnerName) async{
+  openChat(chatpartnerId, chatpartnerName) async {
     var users = [userID, chatpartnerId];
     var chatId = global_functions.getChatID(users);
 
@@ -169,48 +188,44 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   Widget build(BuildContext context) {
     var monthDifference = getMonthDifference();
 
-
-
     openChatButton() {
       return IconButton(
           icon: const Icon(Icons.message),
           onPressed: () async {
-            var name = widget.userName ?? widget.profil["name"].replaceAll("'", "''");
+            var name =
+                widget.userName ?? widget.profil["name"].replaceAll("'", "''");
 
-            if(name.contains("family") || name.contains("familie")){
+            if (name.contains("family") || name.contains("familie")) {
               var familyProfils = Hive.box("secureBox").get("familyProfils");
               Map familyProfil;
               List<Widget> menuList = [];
               var allNamesAndIds = getAllProfilNamesAndId();
 
-              for(var searchFamilyProfil in familyProfils){
-                if(searchFamilyProfil["members"].contains(widget.profil["id"])){
+              for (var searchFamilyProfil in familyProfils) {
+                if (searchFamilyProfil["members"]
+                    .contains(widget.profil["id"])) {
                   familyProfil = searchFamilyProfil;
                 }
               }
 
               familyProfil["members"].remove(userID);
 
-
-              for(var memberId in familyProfil["members"]){
+              for (var memberId in familyProfil["members"]) {
                 var nameIndex = allNamesAndIds["ids"].indexOf(memberId);
-                if(nameIndex < 0) continue;
+                if (nameIndex < 0) continue;
                 var name = allNamesAndIds["names"][nameIndex];
 
-                menuList.add(
-                    SimpleDialogOption(
-                      child: Row(
-                        children: [
-                          Text(name),
-                        ],
-                      ),
-                      onPressed: () {
-                        openChat(memberId, name);
-                      },
-                    )
-                );
+                menuList.add(SimpleDialogOption(
+                  child: Row(
+                    children: [
+                      Text(name),
+                    ],
+                  ),
+                  onPressed: () {
+                    openChat(memberId, name);
+                  },
+                ));
               }
-
 
               showDialog(
                   context: context,
@@ -222,15 +237,15 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                           width: 250,
                           child: SimpleDialog(
                             contentPadding: EdgeInsets.zero,
-                            insetPadding:
-                            const EdgeInsets.only(top: 40, left: 0, right: 10),
+                            insetPadding: const EdgeInsets.only(
+                                top: 40, left: 0, right: 10),
                             children: menuList,
                           ),
                         ),
                       ],
                     );
                   });
-            }else{
+            } else {
               openChat(widget.profil["id"], widget.profil["name"]);
             }
           });
@@ -246,8 +261,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               const SizedBox(width: 10),
               Text(onFriendlist
                   ? AppLocalizations.of(context).freundEntfernen
-                  : AppLocalizations.of(context).freundHinzufuegen
-              )
+                  : AppLocalizations.of(context).freundHinzufuegen)
             ],
           ),
           onPressed: () {
@@ -295,7 +309,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             children: [
               Icon(onBlockList ? Icons.do_not_touch : Icons.back_hand),
               const SizedBox(width: 10),
-              Text(onBlockList ? AppLocalizations.of(context).freigeben : AppLocalizations.of(context).blockieren)
+              Text(onBlockList
+                  ? AppLocalizations.of(context).freigeben
+                  : AppLocalizations.of(context).blockieren)
             ],
           ),
           onPressed: () {
@@ -408,7 +424,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     titelBox() {
       var profil = Map.of(widget.profil);
-      if(widget.userName != null) profil["name"] = widget.userName;
+      if (widget.userName != null) profil["name"] = widget.userName;
       return Container(
         alignment: Alignment.center,
         padding:
@@ -467,10 +483,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       if (widget.profil["aufreiseSeit"] == null) return const SizedBox.shrink();
 
       var themenText = AppLocalizations.of(context).aufReise + ": ";
-      var seitText = widget.profil["aufreiseSeit"].split("-").take(2)
-          .toList().reversed.join("-");
+      var seitText = widget.profil["aufreiseSeit"]
+          .split("-")
+          .take(2)
+          .toList()
+          .reversed
+          .join("-");
       var inhaltText = "";
-
 
       if (widget.profil["aufreiseBis"] == null) {
         inhaltText = seitText + " - " + AppLocalizations.of(context).offen;
@@ -487,11 +506,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return Column(children: [
         Row(children: [
           Text(themenText,
-              style: TextStyle(
-                  fontSize: textSize,
-                  fontWeight: FontWeight.bold
-              )
-          ),
+              style:
+                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
           Text(inhaltText, style: TextStyle(fontSize: textSize))
         ]),
         SizedBox(height: columnAbstand),
@@ -576,7 +592,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            TextWithHyperlinkDetection(text: widget.profil["aboutme"], fontsize: textSize,)
+            TextWithHyperlinkDetection(
+              text: widget.profil["aboutme"],
+              fontsize: textSize,
+            )
           ],
         ),
       );
@@ -673,29 +692,26 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       );
     }
 
-    createZuletztOnlineText(){
+    createZuletztOnlineText() {
       var text = "";
       var color = Colors.grey;
       var size = textSize - 2;
       var daysOffline = timeDifferenceLastLogin.inDays;
 
-
-      if(monthDifference >= monthsUntilInactive){
+      if (monthDifference >= monthsUntilInactive) {
         text = AppLocalizations.of(context).inaktiv;
         size = healineTextSize;
-      } else if(daysOffline > 30){
+      } else if (daysOffline > 30) {
         text = AppLocalizations.of(context).langeZeitNichtGesehen;
-      } else if(daysOffline > 7){
+      } else if (daysOffline > 7) {
         text = AppLocalizations.of(context).innerhalbMonatsGesehen;
-      } else if(daysOffline > 1){
+      } else if (daysOffline > 1) {
         text = AppLocalizations.of(context).innerhalbWocheGesehen;
-      } else{
+      } else {
         text = AppLocalizations.of(context).kuerzlichGesehen;
       }
 
-      return Text(text,
-          style: TextStyle(
-              color: color, fontSize: size));
+      return Text(text, style: TextStyle(color: color, fontSize: size));
     }
 
     infoProfil() {
@@ -776,8 +792,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         ),
       );
     }
-
-
 
     return Scaffold(
       appBar: CustomAppBar(title: "", buttons: [
