@@ -18,6 +18,7 @@ import '../services/database.dart';
 import '../services/notification.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/profil_image.dart';
+import '../widgets/text_with_hyperlink_detection.dart';
 
 // ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
@@ -55,6 +56,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 .microsecondsSinceEpoch)
             .abs());
 
+    getAllProfilNamesAndId();
+
     super.initState();
   }
 
@@ -91,12 +94,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     return timeDifferenceLastLogin.inDays / 30.44;
   }
 
-  transformDateToText(dateString) {
+  transformDateToText(dateString, {onlyMonth = false}) {
     DateTime date = DateTime.parse(dateString);
 
     if ((date.month > DateTime.now().month &&
             date.year == DateTime.now().year) ||
-        date.year > DateTime.now().year) {
+        date.year > DateTime.now().year || onlyMonth) {
       return date.month.toString() + "." + date.year.toString();
     } else {
       return AppLocalizations.of(context).jetzt;
@@ -121,39 +124,115 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         });
   }
 
+  getAllProfilNamesAndId() {
+    var allProfils = Hive.box('secureBox').get("profils");
+    var allIds = [];
+    var allNames = [];
+
+    for(var profil in allProfils){
+      allIds.add(profil["id"]);
+      allNames.add(profil["name"]);
+    }
+
+    return {
+      "ids" : allIds,
+      "names": allNames
+    };
+  }
+
+  openChat(chatpartnerId, chatpartnerName) async{
+    var users = [userID, chatpartnerId];
+    var chatId = global_functions.getChatID(users);
+
+    var groupChatData =
+        await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
+
+    if (groupChatData == false) {
+      groupChatData = {
+        "users": {
+          chatpartnerId: {"name": widget.profil["name"], "newMessages": 0},
+          userID: {"name": widget.userName, "newMessages": 0}
+        }
+      };
+    }
+
+    global_functions.changePage(
+        context,
+        ChatDetailsPage(
+          chatPartnerName: chatpartnerName,
+          chatPartnerId: chatpartnerId,
+          groupChatData: groupChatData,
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     var monthDifference = getMonthDifference();
+
 
 
     openChatButton() {
       return IconButton(
           icon: const Icon(Icons.message),
           onPressed: () async {
-            var profilId = await ProfilDatabase()
-                .getData("id", "WHERE name = '${widget.profil["name"]}'");
-            var users = [userID, profilId];
-            var chatId = global_functions.getChatID(users);
+            var name = widget.userName ?? widget.profil["name"].replaceAll("'", "''");
 
-            var groupChatData =
-                await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
+            if(name.contains("family") || name.contains("familie")){
+              var familyProfils = Hive.box("secureBox").get("familyProfils");
+              Map familyProfil;
+              List<Widget> menuList = [];
+              var allNamesAndIds = getAllProfilNamesAndId();
 
-            if (groupChatData == false) {
-              groupChatData = {
-                "users": {
-                  profilId: {"name": widget.profil["name"], "newMessages": 0},
-                  userID: {"name": widget.userName, "newMessages": 0}
+              for(var searchFamilyProfil in familyProfils){
+                if(searchFamilyProfil["members"].contains(widget.profil["id"])){
+                  familyProfil = searchFamilyProfil;
                 }
-              };
-            }
+              }
 
-            global_functions.changePage(
-                context,
-                ChatDetailsPage(
-                  chatPartnerName: widget.profil["name"],
-                  chatPartnerId: widget.profil["id"],
-                  groupChatData: groupChatData,
-                ));
+              familyProfil["members"].remove(userID);
+
+
+              for(var memberId in familyProfil["members"]){
+                var nameIndex = allNamesAndIds["ids"].indexOf(memberId);
+                if(nameIndex < 0) continue;
+                var name = allNamesAndIds["names"][nameIndex];
+
+                menuList.add(
+                    SimpleDialogOption(
+                      child: Row(
+                        children: [
+                          Text(name),
+                        ],
+                      ),
+                      onPressed: () {
+                        openChat(memberId, name);
+                      },
+                    )
+                );
+              }
+
+
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: 250,
+                          child: SimpleDialog(
+                            contentPadding: EdgeInsets.zero,
+                            insetPadding:
+                            const EdgeInsets.only(top: 40, left: 0, right: 10),
+                            children: menuList,
+                          ),
+                        ),
+                      ],
+                    );
+                  });
+            }else{
+              openChat(widget.profil["id"], widget.profil["name"]);
+            }
           });
     }
 
@@ -328,17 +407,19 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     titelBox() {
+      var profil = Map.of(widget.profil);
+      if(widget.userName != null) profil["name"] = widget.userName;
       return Container(
         alignment: Alignment.center,
         padding:
             const EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
         child: Row(
           children: [
-            ProfilImage(widget.profil, fullScreenWindow: true),
+            ProfilImage(profil, fullScreenWindow: true),
             const SizedBox(width: 10),
             Flexible(
               child: Text(
-                widget.profil["name"],
+                profil["name"],
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 24),
               ),
@@ -495,10 +576,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            Text(
-              widget.profil["aboutme"],
-              style: TextStyle(fontSize: textSize),
-            )
+            TextWithHyperlinkDetection(text: widget.profil["aboutme"], fontsize: textSize,)
           ],
         ),
       );
@@ -549,7 +627,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 child: Text(
                     transformDateToText(reiseplan["von"]) +
                         " - " +
-                        transformDateToText(reiseplan["bis"]) +
+                        transformDateToText(reiseplan["bis"], onlyMonth: true) +
                         " in " +
                         ortText,
                     style: TextStyle(fontSize: textSize)),

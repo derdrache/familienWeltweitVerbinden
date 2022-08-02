@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:familien_suche/pages/settings/family_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 
+
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
 import '../global/variablen.dart';
@@ -15,6 +17,7 @@ import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../widgets/badge_icon.dart';
 import '../windows/patchnotes.dart';
+import 'community/community_page.dart';
 import 'force_update.dart';
 import 'events/event_page.dart';
 import 'login_register_page/create_profil_page.dart';
@@ -56,14 +59,15 @@ class _StartPageState extends State<StartPage> {
   void _checkNewVersion() async{
     if(kIsWeb) return;
 
-    var updateInfo = await InAppUpdate.checkForUpdate();
+    try{
+      var updateInfo = await InAppUpdate.checkForUpdate();
 
-    if(updateInfo?.updateAvailability ==
-        UpdateAvailability.updateAvailable){
-      await InAppUpdate.startFlexibleUpdate();
-      await InAppUpdate.completeFlexibleUpdate();
-    }
-
+      if(updateInfo?.updateAvailability ==
+          UpdateAvailability.updateAvailable){
+        await InAppUpdate.startFlexibleUpdate();
+        await InAppUpdate.completeFlexibleUpdate();
+      }
+    }catch(_){}
   }
 
   void _checkAndUpdateProfil() async {
@@ -162,9 +166,10 @@ class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
-      //BoardPage(),
+      //FamilieProfilPage(),
       const ErkundenPage(),
       const EventPage(),
+      const CommunityPage(),
       const ChatPage(),
       const SettingPage()
     ];
@@ -202,6 +207,22 @@ class _StartPageState extends State<StartPage> {
 
             return BadgeIcon(
                 icon: Icons.event, text: events > 0 ? events.toString() : "");
+          });
+    }
+
+    communityIcon(){
+      return FutureBuilder(
+          future: CommunityDatabase().getData("*",
+              "WHERE JSON_CONTAINS(einladung, '\"$userId\"') > 0",
+              returnList: true),
+          builder: (BuildContext context, AsyncSnapshot snap) {
+            if (!snap.hasData) return const Icon(Icons.cottage);
+
+            var invitedCommunity = snap.data;
+            var hasInvite = invitedCommunity == false ? 0 : 1;
+
+            return BadgeIcon(
+                icon: Icons.cottage, text: hasInvite > 0 ? "1" : "");
           });
     }
 
@@ -256,12 +277,13 @@ class _StartPageState extends State<StartPage> {
           selectedItemColor: Colors.white,
           onTap: _onItemTapped,
           items: <BottomNavigationBarItem>[
-            /*
-              BottomNavigationBarItem(
-                icon: Icon(Icons.feed),
-                label: 'News',
-              ),
+/*
+            BottomNavigationBarItem(
+              icon: Icon(Icons.feed),
+              label: 'News',
+            ),
 */
+
             const BottomNavigationBarItem(
               icon: Icon(Icons.map),
               label: 'World',
@@ -269,6 +291,10 @@ class _StartPageState extends State<StartPage> {
             BottomNavigationBarItem(
               icon: eventIcon(),
               label: 'Events',
+            ),
+            BottomNavigationBarItem(
+              icon: communityIcon(),
+              label: 'Community',
             ),
             BottomNavigationBarItem(
               icon: chatIcon(),

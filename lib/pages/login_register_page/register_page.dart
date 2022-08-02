@@ -36,6 +36,8 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   registration() async {
+    var success = false;
+
     if (formKey.currentState.validate()) {
       var email = emailController.text;
       email = email.replaceAll(" ", "");
@@ -44,16 +46,12 @@ class _RegisterPageState extends State<RegisterPage> {
       try {
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
+
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
 
-        await FirebaseAuth.instance.currentUser?.sendEmailVerification();
-
-        return true;
+        success =  true;
       } on FirebaseAuthException catch (error) {
-        setState(() {
-          isLoading = false;
-        });
         if (error.code == "email-already-in-use") {
           customSnackbar(
               context, AppLocalizations.of(context).emailInBenutzung);
@@ -73,15 +71,26 @@ class _RegisterPageState extends State<RegisterPage> {
           });
         }
 
-        return false;
       }
     }
+
+    try{
+      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+    } on FirebaseAuthException catch (error) {
+      sendEmail({
+      "title": "Send Email Verification Problem",
+      "inhalt": """
+               Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
+               Folgendes Problem ist aufgetaucht: $error"""
+      });
+    }
+
 
     setState(() {
       isLoading = false;
     });
 
-    return false;
+    return success;
   }
 
   loadingBox() {

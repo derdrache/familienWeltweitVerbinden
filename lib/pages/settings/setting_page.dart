@@ -30,6 +30,7 @@ import 'change_aufreise.dart';
 import 'change_besuchte_laender.dart';
 import 'change_children.dart';
 import 'change_trade.dart';
+import 'family_profil.dart';
 import 'privacy_security_page.dart';
 import 'feedback_page.dart';
 import 'change_city.dart';
@@ -125,6 +126,14 @@ class _SettingPageState extends State<SettingPage> {
                   },
                   child: Text(AppLocalizations.of(context).passwortVeraendern,
                       style: TextStyle(color: textColor)))),
+          PopupMenuItem(
+              child: TextButton(
+                  onPressed: () {
+                    global_functions.changePage(context, FamilieProfilPage());
+                  },
+                  child: Text(AppLocalizations.of(context).familyProfil,
+                      style: TextStyle(color: textColor)))),
+
           PopupMenuItem(
               child: TextButton(
                   onPressed: () async {

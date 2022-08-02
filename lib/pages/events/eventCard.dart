@@ -93,11 +93,15 @@ class _EventCardState extends State<EventCard> {
   }
 
   createDatetimeText() {
+
     var datetimeText =
         widget.event["wann"].split(" ")[0].split("-").reversed.join(".");
     var datetimeWann = DateTime.parse(widget.event["wann"]);
 
-    if (DateTime.now().day > datetimeWann.day && widget.event["bis"] != null) {
+    if(widget.event["bis"] == null) return datetimeText;
+    var datetimeBis = DateTime.parse(widget.event["bis"]);
+
+    if (DateTime.now().compareTo(datetimeWann) > 0 && datetimeBis.year.toString() == "0000") {
       return DateTime.now()
           .toString()
           .split(" ")[0]
@@ -114,7 +118,7 @@ class _EventCardState extends State<EventCard> {
     var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
     var eventBeginn = widget.event["wann"];
 
-    eventBeginn = DateTime.parse(eventBeginn).add(Duration(hours: eventZeitzone - deviceZeitzone));
+    eventBeginn = DateTime.parse(eventBeginn).add(Duration(hours: deviceZeitzone - eventZeitzone));
 
     return eventBeginn.toString().split(" ")[1].toString().substring(0, 5);
   }
