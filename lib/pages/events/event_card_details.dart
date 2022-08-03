@@ -1107,6 +1107,7 @@ class _CardFeetState extends State<CardFeet> {
       List<Widget> zusagenNameBoxes = [];
 
       for (var profilId in zusagenIds) {
+
         for (var profil in allProfils) {
           if (profil["id"] == profilId) {
             zusagenProfils.add(profil);
@@ -1137,7 +1138,7 @@ class _CardFeetState extends State<CardFeet> {
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).communityLoeschen,
+              title: AppLocalizations.of(context).teilnehmer,
               children: zusagenNameBoxes,
             );
           });
