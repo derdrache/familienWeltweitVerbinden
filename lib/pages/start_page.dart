@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:familien_suche/pages/settings/family_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
+import "package:universal_html/js.dart" as js;
 
 
 import '../global/custom_widgets.dart';
@@ -163,6 +163,8 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
@@ -262,8 +264,69 @@ class _StartPageState extends State<StartPage> {
       }
     }
 
+    Future<bool> showAddHomePageDialog(BuildContext context) async {
+      return showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                      child: Icon(
+                        Icons.add_circle,
+                        size: 70,
+                        color: Theme.of(context).primaryColor,
+                      )),
+                  SizedBox(height: 20.0),
+                  Text(
+                    'Add to Homepage',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  ),
+                  SizedBox(height: 20.0),
+                  Text(
+                    'Want to add this application to home screen?',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  SizedBox(height: 20.0),
+                  ElevatedButton(
+                      onPressed: () {
+                        js.context.callMethod("presentAddToHome");
+                        Navigator.pop(context, false);
+                      },
+                      child: Text("Yes!"))
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    checkA2HS(){
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (true) { // hier local im Hive speichern
+            final bool isDeferredNotNull =
+            js.context.callMethod("isDeferredNotNull") as bool;
+
+            if (isDeferredNotNull) { //isDeferredNotNull << macht probleme
+              debugPrint(">>> Add to HomeScreen prompt is ready.");
+              await showAddHomePageDialog(context);
+            } else {
+              debugPrint(">>> Add to HomeScreen prompt is not ready yet.");
+            }
+          }
+        });
+      }
+    }
+
     if (!kIsWeb) hasNetwork();
     if (!kIsWeb) checkForceUpdate();
+    checkA2HS();
     checkProfilExist();
 
     return Scaffold(

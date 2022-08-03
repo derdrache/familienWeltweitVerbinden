@@ -152,7 +152,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       if (profil["id"] == userId ||
           ownProfil["geblocktVon"].contains(profil["id"]) ||
-          monthDifference >= monthsUntilInactive) {
+          monthDifference >= monthsUntilInactive ||
+          profil["land"].isEmpty) {
         removeProfils.add(profil);
       } else {
         allUserName.add(profil["name"]);
@@ -178,8 +179,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var membersFound = 0;
 
       for (var i = 0; i < profils.length; i++) {
-
-        if(members.contains(userId) && members.contains(profils[i]["id"])){
+        if (members.contains(userId) && members.contains(profils[i]["id"])) {
           membersFound += 1;
           deleteProfils.add(profils[i]);
         } else if (members.contains(profils[i]["id"])) {
@@ -227,15 +227,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     dbProfils = sortProfils(dbProfils);
 
+    Hive.box('secureBox').put("profils", dbProfils);
+
     var checkedProfils = [];
 
     for (var profil in dbProfils) {
-      if (profil["land"].isNotEmpty || profil["land"].isNotEmpty) {
+      if (profil["land"].isNotEmpty && profil["ort"].isNotEmpty) {
         checkedProfils.add(profil);
       }
     }
-
-    Hive.box('secureBox').put("profils", checkedProfils);
 
     profils = [for (var profil in checkedProfils) Map.of(profil)];
     localProfils = profils;
@@ -929,7 +929,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
                     AppLocalizations.of(context).interessen),
                 createCheckBoxen(windowSetState, sprachenSelection,
                     AppLocalizations.of(context).sprachen),
-
               ],
             );
           });
@@ -1120,7 +1119,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
       if (filterOn) return AppLocalizations.of(context).filterErgebnisse;
       if (eventMarkerOn) return AppLocalizations.of(context).neueEvents;
-      if (communityMarkerOn) return AppLocalizations.of(context).neueCommunities;
+      if (communityMarkerOn) {
+        return AppLocalizations.of(context).neueCommunities;
+      }
     }
 
     if (currentMapZoom < kontinentZoom) {
@@ -1653,8 +1654,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
-              if (eventsKontinente == null)
+              if (eventsKontinente == null) {
                 createAndSetZoomLevels(events, "events");
+              }
 
               if (eventMarkerOn) {
                 eventMarkerOn = false;
@@ -1722,8 +1724,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
-              if (communitiesCountries == null)
+              if (communitiesCountries == null) {
                 createAndSetZoomLevels(communities, "communities");
+              }
 
               if (communityMarkerOn) {
                 communityMarkerOn = false;
