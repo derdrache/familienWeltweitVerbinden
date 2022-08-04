@@ -12,8 +12,8 @@ import '../global/global_functions.dart'as global_functions;
 import 'notification.dart';
 
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 
@@ -744,8 +744,7 @@ class ReportsDatabase{
 class FamiliesDatabase{
   addNewFamily(familyData) async {
     var url = Uri.parse(databaseUrl + "database/families/newFamily.php");
-    var test = await http.post(url, body: json.encode(familyData));
-    print(test.body);
+    await http.post(url, body: json.encode(familyData));
   }
 
   update(whatData, queryEnd) async  {
@@ -809,6 +808,75 @@ class FamiliesDatabase{
     _deleteInTable("families", familyId);
   }
 }
+
+class NewsFeedDatabase{
+  addNewNews(news) async{
+    var url = Uri.parse(databaseUrl + "database/newsFeed/newNews.php");
+    await http.post(url, body: json.encode(news));
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "news_page",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "news_page"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+
+    return responseBody;
+  }
+
+  delete(newsId){
+    _deleteInTable("news_page", newsId);
+  }
+}
+
 
 uploadImage(imagePath, imageName, image) async{
   var url = Uri.parse("https://families-worldwide.com/database/uploadImage.php");
