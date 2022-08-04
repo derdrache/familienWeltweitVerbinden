@@ -1,21 +1,18 @@
-import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import 'package:familien_suche/windows/about_project.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../global/variablen.dart' as global_var;
 import '../services/database.dart';
-import '../services/locationsService.dart';
 
-class BoardPage extends StatefulWidget{
-  _BoardPageState createState() => _BoardPageState();
+class NewsPage extends StatefulWidget{
+  const NewsPage({Key key}) : super(key: key);
+
+  _NewsPageState createState() => _NewsPageState();
 }
 
-class _BoardPageState extends State<BoardPage>{
+class _NewsPageState extends State<NewsPage>{
 
 
   Widget build(BuildContext context){
@@ -34,7 +31,7 @@ class _BoardPageState extends State<BoardPage>{
       );
     }
 
-    sliderBox(){
+    friendsSliderBox(){
       return Container(
         decoration: BoxDecoration(
           border: Border(bottom: BorderSide(width: 1, color: global_var.borderColorGrey))
@@ -70,7 +67,7 @@ class _BoardPageState extends State<BoardPage>{
         padding: const EdgeInsets.only(top: kIsWeb? 0: 24),
         child: Column(
           children: [
-            sliderBox(),
+            friendsSliderBox(),
             Expanded(
                 child: newsFeedBox()
             )
