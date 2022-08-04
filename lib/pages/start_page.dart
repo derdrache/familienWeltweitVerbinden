@@ -282,23 +282,23 @@ class _StartPageState extends State<StartPage> {
                         size: 70,
                         color: Theme.of(context).primaryColor,
                       )),
-                  SizedBox(height: 20.0),
-                  Text(
+                  const SizedBox(height: 20.0),
+                  const Text(
                     'Add to Homepage',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                   ),
-                  SizedBox(height: 20.0),
-                  Text(
+                  const SizedBox(height: 20.0),
+                  const Text(
                     'Want to add this application to home screen?',
                     style: TextStyle(fontSize: 16),
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   ElevatedButton(
                       onPressed: () {
                         js.context.callMethod("presentAddToHome");
                         Navigator.pop(context, false);
                       },
-                      child: Text("Yes!"))
+                      child: const Text("Yes!"))
                 ],
               ),
             ),
@@ -341,13 +341,10 @@ class _StartPageState extends State<StartPage> {
           selectedItemColor: Colors.white,
           onTap: _onItemTapped,
           items: <BottomNavigationBarItem>[
-/*
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
               icon: Icon(Icons.feed),
               label: 'News',
             ),
-*/
-
             const BottomNavigationBarItem(
               icon: Icon(Icons.map),
               label: 'World',
