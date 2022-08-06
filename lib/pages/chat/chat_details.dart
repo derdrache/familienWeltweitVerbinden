@@ -207,7 +207,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     global_functions.changePage(
         context,
         ShowProfilPage(
-          userName: userName,
           profil: chatPartnerProfil,
         ));
   }
