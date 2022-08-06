@@ -40,7 +40,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var profils = [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   var allCities = Hive.box('secureBox').get("stadtinfo");
-  var events = Hive.box('secureBox').get("events") ?? [];
+  var events = [];
   var communities = Hive.box('secureBox').get("communities") ?? [];
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
   MapController mapController = MapController();
@@ -93,6 +93,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     profils = [for (var profil in hiveProfils) Map.of(profil)];
     localProfils = profils;
 
+    setEvents();
+
     changeAllCitiesAndCreateCityNames();
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
@@ -101,6 +103,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
+  }
+
+  setEvents(){
+    var localDbEvents = Hive.box('secureBox').get("events") ?? [];
+
+    for(var event in localDbEvents){
+      if(event["art"] != 'privat' && event["art"] != 'private'){
+        events.add(event);
+      }
+    }
+
+    createAndSetZoomLevels(events, "events");
   }
 
   changeAllCitiesAndCreateCityNames() {
@@ -208,8 +222,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     await getProfilsFromDB();
     createAndSetZoomLevels(profils, "profils");
 
-    await getEventsFromDB();
-    createAndSetZoomLevels(events, "events");
     setSearchAutocomplete();
 
     await getCommunitiesFromDB();

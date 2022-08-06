@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:familien_suche/global/variablen.dart';
+import 'package:hive/hive.dart';
 
 
 checkValidatorEmpty(context) {
@@ -181,4 +182,15 @@ changeEnglishToGerman(list){
   }
 
   return germanOutputList;
+}
+
+getProfilFromHive(profilId, {onlyName = false}){
+  var allProfils = Hive.box('secureBox').get("profils");
+
+  for(var profil in allProfils){
+    if(profilId == profil["id"]){
+      if(onlyName) return profil["name"];
+      return profil;
+    }
+  }
 }
