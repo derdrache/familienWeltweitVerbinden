@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
@@ -5,6 +7,7 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class ChangeCityPage extends StatefulWidget {
   var userId = FirebaseAuth.instance.currentUser.uid;
@@ -44,7 +47,10 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
         "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"${widget.userId}\"') < 1"
     );
 
-
+    NewsPageDatabase().addNewNews({
+      "typ": "ortswechsel",
+      "information": json.encode(locationDict),
+    });
 
   }
 

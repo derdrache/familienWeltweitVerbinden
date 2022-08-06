@@ -340,6 +340,7 @@
     "familienprofilUnvollstaendig": "Um das Profil sichtbar zu machen und neue Mitglieder einzuladen, muss der Name und ein Hauptprofil ausgewählt werden",
     "familyProfilloeschen" : "Familienprofil löschen",
     "familyProfilWirklichLoeschen": "Möchtest du das Familienprofil wirklich löschen?",
-    "neueCommunities": "Neue Gemeinschaften"
+    "neueCommunities": "Neue Gemeinschaften",
+    "alsFreundHinzugefuegt": " hat dich als Freund hinzugefügt"
 
 }

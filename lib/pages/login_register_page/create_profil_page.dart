@@ -135,6 +135,11 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             await ProfilDatabase().getData("*", "WHERE id = '$userID'");
         Hive.box('secureBox').put("ownProfil", ownProfil);
 
+        NewsPageDatabase().addNewNews({
+          "typ": "ortswechsel",
+          "information": json.encode(ortMapData),
+        });
+
         global_functions.changePageForever(context, StartPage());
       } catch (_) {
         customSnackbar(
