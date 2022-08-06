@@ -431,8 +431,7 @@ class EventDatabase{
 class CommunityDatabase{
   addNewCommunity(communityData) async {
     var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
-    var test = await http.post(url, body: json.encode(communityData));
-    print(test.body);
+    await http.post(url, body: json.encode(communityData));
   }
 
   update(whatData, queryEnd) async  {
@@ -809,9 +808,12 @@ class FamiliesDatabase{
   }
 }
 
-class NewsFeedDatabase{
+class NewsPageDatabase{
   addNewNews(news) async{
-    var url = Uri.parse(databaseUrl + "database/newsFeed/newNews.php");
+    var url = Uri.parse(databaseUrl + "database/newsPage/newNews.php");
+    news["erstelltAm"] = DateTime.now().toString();
+    news["erstelltVon"] = FirebaseAuth.instance.currentUser.uid;
+
     await http.post(url, body: json.encode(news));
   }
 
