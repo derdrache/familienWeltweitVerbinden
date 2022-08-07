@@ -343,6 +343,8 @@
     "familyProfilloeschen" : "delete family profile",
     "familyProfilWirklichLoeschen": "do you really want to delete the family profile?",
     "neueCommunities": "new communities",
-    "alsFreundHinzugefuegt": " has added you as a friend"
+    "alsFreundHinzugefuegt": " has added you as a friend",
+    "freundOrtsWechsel": " is now in ",
+    "familieInDeinemOrt" : " is now in your location"
 }
 
