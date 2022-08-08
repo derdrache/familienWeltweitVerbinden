@@ -21,7 +21,7 @@ import 'community/community_page.dart';
 import 'force_update.dart';
 import 'events/event_page.dart';
 import 'login_register_page/create_profil_page.dart';
-import 'news_page.dart';
+import 'news/news_page.dart';
 import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
