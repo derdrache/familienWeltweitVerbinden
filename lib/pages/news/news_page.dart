@@ -25,6 +25,7 @@ class _NewsPageState extends State<NewsPage> {
   var events = Hive.box('secureBox').get("events") ?? [];
   var cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
+  Map ownSettingProfil;
   List newsFeed = [];
   var newsFeedDateList = [];
   final _controller = ScrollController();
@@ -32,6 +33,7 @@ class _NewsPageState extends State<NewsPage> {
 
   @override
   void initState() {
+    ownSettingProfil = getSettingProfilOrAddNew();
     _controller.addListener(() {
         bool isTop = _controller.position.pixels == 0;
         if (isTop) {
@@ -45,6 +47,35 @@ class _NewsPageState extends State<NewsPage> {
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
+  }
+
+  getSettingProfilOrAddNew(){
+    var newsSettings = Hive.box('secureBox').get("newsSettings") ?? [];
+    var ownProfil;
+    for(var newsSetting in newsSettings){
+      if(newsSetting["id"] == userId) ownProfil = newsSetting;
+    }
+
+    if(ownProfil != null) return ownProfil;
+
+    var newProfil =  {
+      "id": userId,
+      "showFriendAdded": true,
+      "showFriendChangedLocation": true,
+      "showNewFamilyLocation": true,
+      "showInterestingEvents": true,
+      "showCityInformation": true,
+    };
+
+    NewsSettingsDatabase().newProfil();
+    newsSettings.add(newProfil);
+
+    if(Hive.box('secureBox').get("newsSettings") == null){
+      Hive.box('secureBox').put("newsSettings", newsSettings);
+    }
+
+
+    return newProfil;
   }
 
   _asyncMethod() async {
@@ -113,7 +144,7 @@ class _NewsPageState extends State<NewsPage> {
       var friendProfil = global_func.getProfilFromHive(newsUserId);
       var text = "";
 
-      if (friendProfil == null || !userAdded.contains(userId)) {
+      if (friendProfil == null || !userAdded.contains(userId) || !ownSettingProfil["showFriendAdded"]) {
         return const SizedBox.shrink();
       }
 
@@ -166,11 +197,11 @@ class _NewsPageState extends State<NewsPage> {
       var locationTimeCheck = DateTime.parse(news["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
 
-      if(newsUserProfil == null) return const SizedBox.shrink();
+      if(newsUserProfil == null  || !ownSettingProfil["showFriendChangedLocation"]|| !ownSettingProfil["showNewFamilyLocation"]) return const SizedBox.shrink();
 
-      if (isFriend) {
+      if (isFriend && ownSettingProfil["showFriendChangedLocation"]) {
         text = newsUserProfil["name"] + AppLocalizations.of(context).freundOrtsWechsel + newsOrtInfo;
-      } else if (ownOrt == newsOrt && locationTimeCheck >= 0) {
+      } else if (ownOrt == newsOrt && locationTimeCheck >= 0 && ownSettingProfil["showNewFamilyLocation"]) {
         text = newsUserProfil["name"] + AppLocalizations.of(context).familieInDeinemOrt;
       }
 
@@ -212,7 +243,7 @@ class _NewsPageState extends State<NewsPage> {
       var checkOfflineEvent = event["typ"] == "offline" && locationTimeCheck >= 0 && event["stadt"] == ownProfil["ort"];
       var checkOnlineEvent = event["typ"] == "online" && evenTagMatch(event["tags"]);
 
-      if(!checkOfflineEvent && !checkOnlineEvent) return const SizedBox.shrink();
+      if(!checkOfflineEvent && !checkOnlineEvent || !ownSettingProfil["showInterestingEvents"]) return const SizedBox.shrink();
 
 
 
@@ -242,7 +273,7 @@ class _NewsPageState extends State<NewsPage> {
       var locationTimeCheck = DateTime.parse(info["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
 
-      if(!(locationTimeCheck >= 0 && info["ort"] == ownProfil["ort"]) || info["erstelltVon"] == userId){
+      if(!(locationTimeCheck >= 0 && info["ort"] == ownProfil["ort"]) || info["erstelltVon"] == userId || !ownSettingProfil["showCityInformation"]){
         return const SizedBox.shrink();
       }
 
@@ -294,10 +325,14 @@ class _NewsPageState extends State<NewsPage> {
       for (var news in newsFeedData) {
         if (news["erstelltVon"].contains(userId)) continue;
 
-        if (news["typ"] == "friendlist") newsFeed.add(friendsDisplay(news));
-        if (news["typ"] == "ortswechsel") {
+        if (news["typ"] == "friendlist") {
+          newsFeed.add(friendsDisplay(news));
+        } else if (news["typ"] == "ortswechsel") {
           newsFeed.add(changePlaceDisplay(news, myLastLocationChangeDate));
+        } else if (news["typ"] == "reiseplanung"){
+
         }
+
 
       }
 
@@ -311,6 +346,8 @@ class _NewsPageState extends State<NewsPage> {
       }
     }
 
+
+    getSettingProfilOrAddNew();
     createNewsFeed();
 
     return Scaffold(
@@ -320,7 +357,11 @@ class _NewsPageState extends State<NewsPage> {
           child: FloatingActionButton(
             mini: true,
             child: const Icon(Icons.settings),
-            onPressed: () => global_func.changePage(context, NewsPageSettingsPage()),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => NewsPageSettingsPage(settingsProfil: ownSettingProfil)))
+                .whenComplete(() => setState(() {})),
           ),
         ) : null,
         body: Container(

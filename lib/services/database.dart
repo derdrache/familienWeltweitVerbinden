@@ -879,6 +879,77 @@ class NewsPageDatabase{
   }
 }
 
+class NewsSettingsDatabase{
+  newProfil() async{
+    var url = Uri.parse(databaseUrl + "database/newsSettings/newProfil.php");
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    await http.post(url, body: json.encode({
+      "userId" : userId
+    }));
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "newsSettings",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "newsSettings"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+
+    return responseBody;
+  }
+
+  delete(profilId){
+    _deleteInTable("newsSettings", profilId);
+  }
+}
+
 
 uploadImage(imagePath, imageName, image) async{
   var url = Uri.parse("https://families-worldwide.com/database/uploadImage.php");
