@@ -346,6 +346,12 @@
     "alsFreundHinzugefuegt": " has added you as a friend",
     "freundOrtsWechsel": " is now in ",
     "familieInDeinemOrt" : " is now in your location",
-    "hatNeueStadtinformation": " has a new city information:"
+    "hatNeueStadtinformation": " has a new city information:",
+    "newsSettingTitle": "News display",
+    "newsSettingFriendAdd": "show added as a friend",
+    "newsSettingFriendLocationChanged" : "show friend changed location",
+    "newsSettingNewFamilieLocation": "show new family in your place",
+    "newsSettingShowEvent": "show interesting events",
+    "newsSettingShowCityInformation": "show new city infomation"
 }
 

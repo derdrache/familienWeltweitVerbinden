@@ -1,14 +1,21 @@
+import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 class NewsPageSettingsPage extends StatefulWidget {
-  const NewsPageSettingsPage({Key key}) : super(key: key);
+  Map settingsProfil;
+
+  NewsPageSettingsPage({Key key, this.settingsProfil}) : super(key: key);
 
   @override
   State<NewsPageSettingsPage> createState() => _NewsPageSettingsPageState();
 }
 
 class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
+  var userId = FirebaseAuth.instance.currentUser.uid;
   bool showFriendAdded;
   bool showFriendChangedLocation;
   bool showNewFamilyLocation;
@@ -16,11 +23,30 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
   bool showCityInformation;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    showFriendAdded = widget.settingsProfil["showFriendAdded"];
+    showFriendChangedLocation =
+        widget.settingsProfil["showFriendChangedLocation"];
+    showNewFamilyLocation = widget.settingsProfil["showNewFamilyLocation"];
+    showInterestingEvents = widget.settingsProfil["showInterestingEvents"];
+    showCityInformation = widget.settingsProfil["showCityInformation"];
 
+    super.initState();
+  }
+
+  changeHiveProfil(dbColumn, input) {
+    var newsSettings = Hive.box('secureBox').get("newsSettings") ?? [];
+
+    for (var newsSetting in newsSettings) {
+      if (newsSetting["id"] == userId) newsSetting[dbColumn] = input;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     newFriendOption() {
       return Container(
-          margin: EdgeInsets.only(bottom: 20),
+          margin: const EdgeInsets.only(bottom: 20),
           child: Row(
             children: [
               Switch(
@@ -29,16 +55,21 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     setState(() {
                       showFriendAdded = value;
                     });
+
+                    NewsSettingsDatabase().update(
+                        "showFriendAdded = '${value == true ? 1 : 0}'",
+                        "WHERE id = '$userId'");
+                    changeHiveProfil("showFriendAdded", value);
                   }),
-              SizedBox(width: 10),
-              Text("Als Freund hinzugefügt anzeigen")
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).newsSettingFriendAdd)
             ],
           ));
     }
 
     friendChangedLocationOption() {
       return Container(
-          margin: EdgeInsets.only(bottom: 20),
+          margin: const EdgeInsets.only(bottom: 20),
           child: Row(
             children: [
               Switch(
@@ -47,16 +78,22 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     setState(() {
                       showFriendChangedLocation = value;
                     });
+
+                    NewsSettingsDatabase().update(
+                        "showFriendChangedLocation = '${value == true ? 1 : 0}'",
+                        "WHERE id = '$userId'");
+                    changeHiveProfil("showFriendChangedLocation", value);
                   }),
-              SizedBox(width: 10),
-              Text("Freund Standort gewechselt anzeigen")
+              const SizedBox(width: 10),
+              Text(
+                  AppLocalizations.of(context).newsSettingFriendLocationChanged)
             ],
           ));
     }
 
     newFamilyAtLocationOption() {
       return Container(
-          margin: EdgeInsets.only(bottom: 20),
+          margin: const EdgeInsets.only(bottom: 20),
           child: Row(
             children: [
               Switch(
@@ -65,16 +102,21 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     setState(() {
                       showNewFamilyLocation = value;
                     });
+
+                    NewsSettingsDatabase().update(
+                        "showNewFamilyLocation = '${value == true ? 1 : 0}'",
+                        "WHERE id = '$userId'");
+                    changeHiveProfil("showNewFamilyLocation", value);
                   }),
-              SizedBox(width: 10),
-              Text("Neue Familie an deinem Ort anzeigen")
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).newsSettingNewFamilieLocation)
             ],
           ));
     }
 
     showEventsOption() {
       return Container(
-          margin: EdgeInsets.only(bottom: 20),
+          margin: const EdgeInsets.only(bottom: 20),
           child: Row(
             children: [
               Switch(
@@ -83,16 +125,21 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     setState(() {
                       showInterestingEvents = value;
                     });
+
+                    NewsSettingsDatabase().update(
+                        "showInterestingEvents = '${value == true ? 1 : 0}'",
+                        "WHERE id = '$userId'");
+                    changeHiveProfil("showInterestingEvents", value);
                   }),
-              SizedBox(width: 10),
-              Text("interessante Events anzeigen")
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).newsSettingShowEvent)
             ],
           ));
     }
 
     showCityInformationOption() {
       return Container(
-          margin: EdgeInsets.only(bottom: 20),
+          margin: const EdgeInsets.only(bottom: 20),
           child: Row(
             children: [
               Switch(
@@ -101,20 +148,24 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     setState(() {
                       showCityInformation = value;
                     });
-                  }
-              ),
-              SizedBox(width: 10),
-              Text("neue Statdinfomationen anzeigen")
+
+                    NewsSettingsDatabase().update(
+                        "showCityInformation = '${value == true ? 1 : 0}'",
+                        "WHERE id = '$userId'");
+                    changeHiveProfil("showCityInformation", value);
+                  }),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).newsSettingShowCityInformation)
             ],
           ));
     }
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: "News Anzeige",
+        title: AppLocalizations.of(context).newsSettingTitle,
       ),
       body: Container(
-        margin: EdgeInsets.all(20),
+        margin: const EdgeInsets.all(20),
         child: Column(
           children: [
             newFriendOption(),
