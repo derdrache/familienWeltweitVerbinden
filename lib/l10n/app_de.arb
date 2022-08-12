@@ -346,10 +346,12 @@
     "familieInDeinemOrt" : " ist jetzt in deinem Ort",
     "hatNeueStadtinformation": " hat eine neue Stadtinformation:",
     "newsSettingTitle": "News Anzeige",
-    "newsSettingFriendAdd": "Als Freund hinzugefügt anzeigen",
-    "newsSettingFriendLocationChanged" : "Freund Standort gewechselt anzeigen",
-    "newsSettingNewFamilieLocation": "Neue Familie an deinem Ort anzeigen",
-    "newsSettingShowEvent": "interessante Events anzeigen",
-    "newsSettingShowCityInformation": "neue Stadtinfomationen anzeigen"
+    "newsSettingFriendAdd": "Als Freund hinzugefügt",
+    "newsSettingFriendLocationChanged" : "Freund Standort gewechselt",
+    "newsSettingNewFamilieLocation": "Neue Familie an deinem Ort",
+    "newsSettingShowEvent": "interessante Events",
+    "newsSettingShowCityInformation": "neue Stadtinfomationen in meinem Ort",
+    "newsSettingShowTravelPlan": "neue Reiseplanung von Freunden",
+    "friendNewTravelPlan": " hat eine neue Reiseplanung eingegeben:"
 
 }
