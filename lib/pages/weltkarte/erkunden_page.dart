@@ -244,7 +244,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var checkedProfils = [];
 
     for (var profil in dbProfils) {
-      if (profil["land"].isNotEmpty && profil["ort"].isNotEmpty) {
+      if (profil["land"].isNotEmpty && profil["ort"].isNotEmpty && profil["name"] != "googleView") {
         checkedProfils.add(profil);
       }
     }

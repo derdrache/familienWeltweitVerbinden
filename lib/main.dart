@@ -49,6 +49,12 @@ hiveInit() async {
     List<dynamic> dbProfils = await ProfilDatabase().getData("*", "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
 
+    var viewAccounts = [];
+
+    for(var profil in dbProfils){
+      if(profil["name"] != "googleView") viewAccounts.add(profil);
+    }
+
     Hive.box('secureBox').put("profils", dbProfils);
   }
 

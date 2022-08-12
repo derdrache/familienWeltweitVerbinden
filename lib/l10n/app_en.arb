@@ -348,10 +348,12 @@
     "familieInDeinemOrt" : " is now in your location",
     "hatNeueStadtinformation": " has a new city information:",
     "newsSettingTitle": "News display",
-    "newsSettingFriendAdd": "show added as a friend",
-    "newsSettingFriendLocationChanged" : "show friend changed location",
-    "newsSettingNewFamilieLocation": "show new family in your place",
-    "newsSettingShowEvent": "show interesting events",
-    "newsSettingShowCityInformation": "show new city infomation"
+    "newsSettingFriendAdd": "added as a friend",
+    "newsSettingFriendLocationChanged" : "friend changed location",
+    "newsSettingNewFamilieLocation": "new family in your place",
+    "newsSettingShowEvent": "interesting events",
+    "newsSettingShowCityInformation": "new city information in my location",
+    "newsSettingShowTravelPlan": "new travel plan from friends",
+    "friendNewTravelPlan": " has updated the new travel plan:"
 }
 
