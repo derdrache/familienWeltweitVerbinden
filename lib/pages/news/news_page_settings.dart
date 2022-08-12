@@ -21,6 +21,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
   bool showNewFamilyLocation;
   bool showInterestingEvents;
   bool showCityInformation;
+  bool showFriendTravelPlan;
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
     showNewFamilyLocation = widget.settingsProfil["showNewFamilyLocation"];
     showInterestingEvents = widget.settingsProfil["showInterestingEvents"];
     showCityInformation = widget.settingsProfil["showCityInformation"];
+    showFriendTravelPlan = widget.settingsProfil["showFriendTravelPlan"];
 
     super.initState();
   }
@@ -114,6 +116,29 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
           ));
     }
 
+    newTravelPlanFriend(){
+      return Container(
+          margin: const EdgeInsets.only(bottom: 20),
+          child: Row(
+            children: [
+              Switch(
+                  value: showFriendTravelPlan,
+                  onChanged: (value) {
+                    setState(() {
+                      showFriendTravelPlan = value;
+                    });
+
+                    NewsSettingsDatabase().update(
+                        "showFriendTravelPlan = '${value == true ? 1 : 0}'",
+                        "WHERE id = '$userId'");
+                    changeHiveProfil("showFriendTravelPlan", value);
+                  }),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).newsSettingShowTravelPlan)
+            ],
+          ));
+    }
+
     showEventsOption() {
       return Container(
           margin: const EdgeInsets.only(bottom: 20),
@@ -170,6 +195,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
           children: [
             newFriendOption(),
             friendChangedLocationOption(),
+            newTravelPlanFriend(),
             newFamilyAtLocationOption(),
             showEventsOption(),
             showCityInformationOption()
