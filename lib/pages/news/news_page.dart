@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:collection/collection.dart';
 
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
@@ -31,8 +32,7 @@ class _NewsPageState extends State<NewsPage> {
   var newsFeedDateList = [];
   final _controller = ScrollController();
   var scrollbarOnBottom = true;
-  var userNewsContent =  [];
-
+  var userNewsContent = [];
 
   @override
   void initState() {
@@ -146,42 +146,50 @@ class _NewsPageState extends State<NewsPage> {
     return false;
   }
 
-  sortNewsFeed(){
+  sortNewsFeed() {
     newsFeed.sort((a, b) {
       int compare = a["date"].compareTo(b["date"]);
       return compare;
     });
   }
 
-  getNewsWidgetList(){
+  getNewsWidgetList() {
     var widgetList = [];
 
-    for(var item in newsFeed){
+    for (var item in newsFeed) {
       widgetList.add(item["newsWidget"]);
     }
 
     return widgetList;
   }
 
-  checkIfNotNew(newsContent){
-    for(var hiveNews in userNewsContentHive){
-      if(hiveNews  == newsContent) return false;
-      if(newsContent is Map && hiveNews is Map){
-        if(mapEquals(hiveNews, newsContent)) return false;
+  checkIfNotNew(newsContent, erstelltVon) {
+    for (var hiveNews in userNewsContentHive) {
+      if (hiveNews["news"] == newsContent &&
+          erstelltVon == hiveNews["ersteller"]) return false;
+      if (const DeepCollectionEquality()
+              .equals(hiveNews["news"], newsContent) &&
+          erstelltVon == hiveNews["ersteller"]) return false;
+
+      if (newsContent is Map && hiveNews["news"] is Map) {
+        if (newsContent["ortData"] == null ||
+            hiveNews["news"]["ortData"] == null) continue;
+        if (const DeepCollectionEquality()
+                .equals(hiveNews["news"], newsContent) &&
+            erstelltVon == hiveNews["ersteller"]) {
+          return false;
+        }
       }
-
-
     }
 
     return true;
   }
 
-  updateHiveUserNewsContent(){
+  updateHiveUserNewsContent() {
     Hive.box('secureBox').put("userNewsContent", userNewsContent);
   }
 
   Widget build(BuildContext context) {
-
     friendsDisplay(news) {
       var userAdded = news["information"].split(" ")[1];
       var newsUserId = news["erstelltVon"];
@@ -199,7 +207,8 @@ class _NewsPageState extends State<NewsPage> {
             AppLocalizations.of(context).alsFreundHinzugefuegt;
       }
 
-      userNewsContent.add(news["information"]);
+      userNewsContent
+          .add({"news": news["information"], "ersteller": news["erstelltVon"]});
 
       return InkWell(
         onTap: () {
@@ -228,7 +237,11 @@ class _NewsPageState extends State<NewsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if(checkIfNotNew(news["information"])) const Icon(Icons.fiber_new,size: 30,),
+                    if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                      const Icon(
+                        Icons.fiber_new,
+                        size: 30,
+                      ),
                     const Expanded(child: SizedBox.shrink()),
                     Text(news["erstelltAm"].split(" ")[0],
                         style: TextStyle(color: Colors.grey[600]))
@@ -254,8 +267,9 @@ class _NewsPageState extends State<NewsPage> {
 
       if (newsUserProfil == null ||
           !ownSettingProfil["showFriendChangedLocation"] ||
-          !ownSettingProfil["showNewFamilyLocation"])
+          !ownSettingProfil["showNewFamilyLocation"]) {
         return const SizedBox.shrink();
+      }
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"]) {
         text = newsUserProfil["name"] +
@@ -268,7 +282,8 @@ class _NewsPageState extends State<NewsPage> {
             AppLocalizations.of(context).familieInDeinemOrt;
       }
 
-      userNewsContent.add(news["information"]);
+      userNewsContent
+          .add({"news": news["information"], "ersteller": news["erstelltVon"]});
 
       return InkWell(
         onTap: () {
@@ -298,7 +313,11 @@ class _NewsPageState extends State<NewsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if(checkIfNotNew(news["information"])) const Icon(Icons.fiber_new,size: 30,),
+                    if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                      const Icon(
+                        Icons.fiber_new,
+                        size: 30,
+                      ),
                     const Expanded(child: SizedBox.shrink()),
                     Text(news["erstelltAm"].split(" ")[0],
                         style: TextStyle(color: Colors.grey[600]))
@@ -327,12 +346,13 @@ class _NewsPageState extends State<NewsPage> {
           newTravelPlan["bis"].split(" ")[0].split("-").reversed.join("-");
       var travelPlanCity = newTravelPlan["ortData"]["city"];
       var travelPlanCountry = newTravelPlan["ortData"]["countryname"];
-      var textTitle =
-          friendProfil["name"] + AppLocalizations.of(context).friendNewTravelPlan;
+      var textTitle = friendProfil["name"] +
+          AppLocalizations.of(context).friendNewTravelPlan;
       var textDate = travelPlanVon + " - " + travelPlanbis;
       var textLocation = travelPlanCity + " / " + travelPlanCountry;
 
-      userNewsContent.add(news["information"]);
+      userNewsContent
+          .add({"news": news["information"], "ersteller": news["erstelltVon"]});
 
       return InkWell(
         onTap: () {
@@ -366,7 +386,11 @@ class _NewsPageState extends State<NewsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if(checkIfNotNew(news["information"])) const Icon(Icons.fiber_new,size: 30,),
+                    if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                      const Icon(
+                        Icons.fiber_new,
+                        size: 30,
+                      ),
                     const Expanded(child: SizedBox.shrink()),
                     Text(news["erstelltAm"].split(" ")[0],
                         style: TextStyle(color: Colors.grey[600]))
@@ -387,10 +411,13 @@ class _NewsPageState extends State<NewsPage> {
           event["typ"] == "online" && evenTagMatch(event["tags"]);
 
       if (!checkOfflineEvent && !checkOnlineEvent ||
-          !ownSettingProfil["showInterestingEvents"] || event["erstelltVon"] == userId)
+          !ownSettingProfil["showInterestingEvents"] ||
+          event["erstelltVon"] == userId) {
         return const SizedBox.shrink();
+      }
 
-      userNewsContent.add(event["beschreibung"]);
+      userNewsContent.add(
+          {"news": event["beschreibung"], "ersteller": event["erstelltVon"]});
 
       return Align(
           alignment: Alignment.center,
@@ -410,10 +437,14 @@ class _NewsPageState extends State<NewsPage> {
                   child: Text(event["erstelltAm"].split(" ")[0],
                       style: TextStyle(color: Colors.grey[600])),
                 ),
-                if(checkIfNotNew(event["beschreibung"])) const Positioned(
-                    bottom: 20,
-                    left: -70,
-                    child: Icon(Icons.fiber_new,size: 30,))
+                if (checkIfNotNew(event["beschreibung"], event["erstelltVon"]))
+                  const Positioned(
+                      bottom: 20,
+                      left: -70,
+                      child: Icon(
+                        Icons.fiber_new,
+                        size: 30,
+                      ))
               ],
             ),
           ));
@@ -437,7 +468,7 @@ class _NewsPageState extends State<NewsPage> {
       var textBody =
           spracheIstDeutsch ? info["informationGer"] : info["informationEng"];
 
-      userNewsContent.add(textBody);
+      userNewsContent.add({"news": textBody, "ersteller": info["erstelltVon"]});
 
       return InkWell(
         onTap: () {
@@ -471,7 +502,11 @@ class _NewsPageState extends State<NewsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if(checkIfNotNew(textBody)) const Icon(Icons.fiber_new,size: 30,),
+                    if (checkIfNotNew(textBody, info["erstelltVon"]))
+                      const Icon(
+                        Icons.fiber_new,
+                        size: 30,
+                      ),
                     const Expanded(child: SizedBox.shrink()),
                     Text(info["erstelltAm"].split(" ")[0],
                         style: TextStyle(color: Colors.grey[600]))
@@ -490,20 +525,34 @@ class _NewsPageState extends State<NewsPage> {
         if (news["erstelltVon"].contains(userId)) continue;
 
         if (news["typ"] == "friendlist") {
-          newsFeed.add({"newsWidget": friendsDisplay(news), "date": news["erstelltAm"]});
+          newsFeed.add(
+              {"newsWidget": friendsDisplay(news), "date": news["erstelltAm"]});
         } else if (news["typ"] == "ortswechsel") {
-          newsFeed.add({"newsWidget": changePlaceDisplay(news, myLastLocationChangeDate), "date": news["erstelltAm"] });
+          newsFeed.add({
+            "newsWidget": changePlaceDisplay(news, myLastLocationChangeDate),
+            "date": news["erstelltAm"]
+          });
         } else if (news["typ"] == "reiseplanung") {
-          newsFeed.add({"newsWidget" : friendsNewTravelPlanDisplay(news), "date": news["erstelltAm"]});
+          newsFeed.add({
+            "newsWidget": friendsNewTravelPlanDisplay(news),
+            "date": news["erstelltAm"]
+          });
         }
       }
 
       for (var event in events) {
-        newsFeed.add({"newsWidget": eventsDisplay(event, myLastLocationChangeDate), "date": event["erstelltAm"]});
+        newsFeed.add({
+          "newsWidget": eventsDisplay(event, myLastLocationChangeDate),
+          "date": event["erstelltAm"]
+        });
       }
 
       for (var info in cityUserInfo) {
-        newsFeed.add({"newsWidget": neueStadtinformationDisplay(info, myLastLocationChangeDate), "date": info["erstelltAm"]});
+        newsFeed.add({
+          "newsWidget":
+              neueStadtinformationDisplay(info, myLastLocationChangeDate),
+          "date": info["erstelltAm"]
+        });
       }
     }
 

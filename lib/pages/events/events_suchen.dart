@@ -45,12 +45,11 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
     eventsBackup = await EventDatabase().getData(
         "*",
-        "WHERE art != 'privat' AND art != 'private' AND erstelltVon != '" +
-            userId +
-            "' ORDER BY wann ASC",
+        "WHERE art != 'privat' AND art != 'private' AND erstelltVon != '$userId' ORDER BY wann ASC",
         returnList: true);
 
     if (eventsBackup == false) eventsBackup = [];
+
     allEvents = eventsBackup;
 
     isLoading = false;
