@@ -354,6 +354,10 @@
     "newsSettingShowEvent": "interesting events",
     "newsSettingShowCityInformation": "new city information in my location",
     "newsSettingShowTravelPlan": "new travel plan from friends",
-    "friendNewTravelPlan": " has updated the new travel plan:"
+    "friendNewTravelPlan": " has updated the new travel plan:",
+    "a2hsTitle": "families worldwide place on the home screen ?",
+    "a2hsBody": "This will make the website look 100% like the app version",
+    "ja": "yes",
+    "nein": "no"
 }
 
