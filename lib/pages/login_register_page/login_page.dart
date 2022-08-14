@@ -14,6 +14,7 @@ import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
 import '../../services/database.dart';
+import 'impressum.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -135,22 +136,44 @@ class _LoginPageState extends State<LoginPage> {
               bottom: sideSpace,
               left: sideSpace * 2,
               right: sideSpace * 2),
-          child: Column(
-            children: [
-              Center(child: Image.asset('assets/WeltFlugzeug.png')),
-              const SizedBox(height: 15),
-              Text(AppLocalizations.of(context).willkommenBeiAppName,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              Text(
-                AppLocalizations.of(context).slogn1 +
-                    "\n" +
-                    AppLocalizations.of(context).slogn2,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ));
+          child: kIsWeb
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(child: Image.asset('assets/WeltFlugzeug.png')),
+                    const SizedBox(width: 15),
+                    Column(
+                      children: [
+                        Text(AppLocalizations.of(context).willkommenBeiAppName,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 20),
+                        Text(
+                          AppLocalizations.of(context).slogn1 +
+                              "\n" +
+                              AppLocalizations.of(context).slogn2,
+                          textAlign: TextAlign.center,
+                        )
+                      ],
+                    )
+                  ],
+                )
+              : Column(
+                  children: [
+                    Center(child: Image.asset('assets/WeltFlugzeug.png')),
+                    const SizedBox(height: 15),
+                    Text(AppLocalizations.of(context).willkommenBeiAppName,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    Text(
+                      AppLocalizations.of(context).slogn1 +
+                          "\n" +
+                          AppLocalizations.of(context).slogn2,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ));
     }
 
     angemeldetBleibenBox() {
@@ -263,6 +286,21 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
+    Widget footer() {
+      return Container(
+        margin: EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+                onPressed: () =>
+                    global_functions.changePage(context, ImpressumPage()),
+                child: Text("Impressum"))
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
         body: Form(
             key: _formKey,
@@ -279,16 +317,27 @@ class _LoginPageState extends State<LoginPage> {
                     textInputAction: TextInputAction.done,
                     onSubmit: () => userLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
+                SizedBox(height: 10),
                 forgetPassButton(),
+                SizedBox(height: 10),
                 resendVerificationEmailButton(),
+                SizedBox(height: 10),
                 isLoading
                     ? loadingBox()
-                    : customFloatbuttonExtended("Login", () => userLogin()),
-                customFloatbuttonExtended(
-                    AppLocalizations.of(context).registrieren, () {
-                  global_functions.changePage(context, const RegisterPage());
-                }),
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          customFloatbuttonExtended("Login", () => userLogin()),
+                          customFloatbuttonExtended(
+                              AppLocalizations.of(context).registrieren, () {
+                            global_functions.changePage(
+                                context, const RegisterPage());
+                          })
+                        ],
+                      ),
                 googleLoginButton(),
+                SizedBox(height: 30),
+                if (kIsWeb) footer()
               ],
             )));
   }

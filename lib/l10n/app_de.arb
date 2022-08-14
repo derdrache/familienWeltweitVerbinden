@@ -352,6 +352,10 @@
     "newsSettingShowEvent": "interessante Events",
     "newsSettingShowCityInformation": "neue Stadtinfomationen in meinem Ort",
     "newsSettingShowTravelPlan": "neue Reiseplanung von Freunden",
-    "friendNewTravelPlan": " hat eine neue Reiseplanung eingegeben:"
+    "friendNewTravelPlan": " hat eine neue Reiseplanung eingegeben:",
+    "a2hsTitle": "families worldwide auf den Startbildschirm legen ?",
+    "a2hsBody": "Dadurch wird die Webseite zu 100% wie die App Version aussehen",
+    "ja": "ja",
+    "nein": "nein"
 
 }
