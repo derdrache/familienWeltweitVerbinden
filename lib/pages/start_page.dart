@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 import "package:universal_html/js.dart" as js;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 import '../global/custom_widgets.dart';
@@ -283,22 +284,31 @@ class _StartPageState extends State<StartPage> {
                         color: Theme.of(context).primaryColor,
                       )),
                   const SizedBox(height: 20.0),
-                  const Text(
-                    'Add to Homepage',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  Text(
+                    AppLocalizations.of(context).a2hsTitle,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 20.0),
-                  const Text(
-                    'Want to add this application to home screen?',
-                    style: TextStyle(fontSize: 16),
+                  Text(
+                    AppLocalizations.of(context).a2hsBody,
+                    style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 20.0),
-                  ElevatedButton(
-                      onPressed: () {
-                        js.context.callMethod("presentAddToHome");
-                        Navigator.pop(context, false);
-                      },
-                      child: const Text("Yes!"))
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          js.context.callMethod("presentAddToHome");
+                          Navigator.pop(context, false);
+                        },
+                        child: Text(AppLocalizations.of(context).ja)),
+                    const SizedBox(width: 50),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                        child: Text(AppLocalizations.of(context).nein))
+                  ],)
+
                 ],
               ),
             ),
@@ -310,15 +320,14 @@ class _StartPageState extends State<StartPage> {
     checkA2HS(){
       if (kIsWeb) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          if (true) { // hier local im Hive speichern
+          var usedA2HS = localBox.get("a2hs");
+          if (usedA2HS == null) {
             final bool isDeferredNotNull =
             js.context.callMethod("isDeferredNotNull") as bool;
 
-            if (isDeferredNotNull) { //isDeferredNotNull << macht probleme
-              debugPrint(">>> Add to HomeScreen prompt is ready.");
+            if (isDeferredNotNull){
+              localBox.put("a2hs", true);
               await showAddHomePageDialog(context);
-            } else {
-              debugPrint(">>> Add to HomeScreen prompt is not ready yet.");
             }
           }
         });
