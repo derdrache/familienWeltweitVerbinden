@@ -288,14 +288,14 @@ class _LoginPageState extends State<LoginPage> {
 
     Widget footer() {
       return Container(
-        margin: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             TextButton(
                 onPressed: () =>
-                    global_functions.changePage(context, ImpressumPage()),
-                child: Text("Impressum"))
+                    global_functions.changePage(context, const ImpressumPage()),
+                child: const Text("Impressum"))
           ],
         ),
       );
@@ -317,26 +317,34 @@ class _LoginPageState extends State<LoginPage> {
                     textInputAction: TextInputAction.done,
                     onSubmit: () => userLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 forgetPassButton(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 resendVerificationEmailButton(),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 isLoading
                     ? loadingBox()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          customFloatbuttonExtended("Login", () => userLogin()),
-                          customFloatbuttonExtended(
-                              AppLocalizations.of(context).registrieren, () {
-                            global_functions.changePage(
-                                context, const RegisterPage());
-                          })
-                        ],
-                      ),
+                    : kIsWeb
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              customFloatbuttonExtended(
+                                  "Login", () => userLogin()),
+                              customFloatbuttonExtended(
+                                  AppLocalizations.of(context).registrieren,
+                                  () {
+                                global_functions.changePage(
+                                    context, const RegisterPage());
+                              })
+                            ],
+                          )
+                        : customFloatbuttonExtended("Login", () => userLogin()),
+                customFloatbuttonExtended(
+                    AppLocalizations.of(context).registrieren, () {
+                  global_functions.changePage(context, const RegisterPage());
+                }),
                 googleLoginButton(),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 if (kIsWeb) footer()
               ],
             )));

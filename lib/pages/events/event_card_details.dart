@@ -803,9 +803,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
       );
     }
 
-    return InkWell(
-        onTap: !widget.isCreator ? null : () => openChangeWindow(),
-        child: !widget.singleShow && !widget.multiLines
+    return !widget.singleShow && !widget.multiLines
             ? Row(
                 children: [
                   Text(widget.rowTitle + " ",
@@ -846,11 +844,11 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                 ],
               )
             : widget.multiLines
-                ? TextWithHyperlinkDetection(text: widget.rowData)
+                ? TextWithHyperlinkDetection(text: widget.rowData, onTextTab: widget.isCreator ? () => openChangeWindow(): null)
                 : Text(widget.rowData,
                     style: TextStyle(
                         fontSize: fontsize + 8, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center));
+                    textAlign: TextAlign.center);
   }
 }
 

@@ -119,13 +119,14 @@ class ProfilDatabase{
 
   deleteProfil(userId) async {
     try{
-      FirebaseAuth.instance.currentUser.delete();
+      await FirebaseAuth.instance.currentUser.delete();
     }catch(_){
       return false;
     }
-
-
+    
     _deleteInTable("profils", userId);
+    _deleteInTable("newsSettings", userId);
+    _deleteInTable("news_page", userId);
 
     updateProfil(
         "friendlist = JSON_REMOVE(friendlist, JSON_UNQUOTE(JSON_SEARCH(friendlist, 'one', '$userId')))",
@@ -133,8 +134,10 @@ class ProfilDatabase{
     );
 
     var userEvents = await EventDatabase().getData("id", "WHERE erstelltVon = '$userId'", returnList: true);
-    for(var eventId in userEvents){
-      _deleteInTable("events", eventId);
+    if(userEvents != false){
+      for(var eventId in userEvents){
+        _deleteInTable("events", eventId);
+      }
     }
 
     EventDatabase().update(

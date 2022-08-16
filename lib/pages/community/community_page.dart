@@ -159,7 +159,7 @@ class _CommunityPageState extends State<CommunityPage> {
           afterPageVisit: () => changePage(
               context,
               StartPage(
-                selectedIndex: 2,
+                selectedIndex: 3,
               )),
         ));
       }
@@ -218,7 +218,7 @@ class _CommunityPageState extends State<CommunityPage> {
             afterPageVisit: () => changePage(
                 context,
                 StartPage(
-                  selectedIndex: 2,
+                  selectedIndex: 3,
                 )),
             afterFavorite: () {
               for (var i = 0; i < allCommunities.length; i++) {
