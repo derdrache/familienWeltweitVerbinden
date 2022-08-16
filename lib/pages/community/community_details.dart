@@ -889,13 +889,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               ),
             ),
             const SizedBox(height: 20),
-            GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () => isCreator ? _changeBeschreibungWindow() : null,
-                child: Container(
-                    height: 200,
+            Container(
+                    height: 100,
+                    width: double.infinity,
                     child: TextWithHyperlinkDetection(
-                        text: widget.community["beschreibung"])))
+                        text: widget.community["beschreibung"],
+                      onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
+                    ),
+                )
           ],
         ),
       );

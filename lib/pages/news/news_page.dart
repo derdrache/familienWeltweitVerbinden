@@ -264,10 +264,13 @@ class _NewsPageState extends State<NewsPage> {
       var ownOrt = ownProfil["ort"];
       var locationTimeCheck = DateTime.parse(news["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
+      var samePlaceAndTime = ownOrt == newsOrt &&
+          locationTimeCheck >= 0 &&
+          ownSettingProfil["showNewFamilyLocation"];
 
       if (newsUserProfil == null ||
           !ownSettingProfil["showFriendChangedLocation"] ||
-          !ownSettingProfil["showNewFamilyLocation"]) {
+          !ownSettingProfil["showNewFamilyLocation"] || !(isFriend || samePlaceAndTime)) {
         return const SizedBox.shrink();
       }
 
@@ -521,6 +524,7 @@ class _NewsPageState extends State<NewsPage> {
       newsFeed = [];
       var myLastLocationChangeDate = getMyLastLocationChangeDate();
 
+
       for (var news in newsFeedData) {
         if (news["erstelltVon"].contains(userId)) continue;
 
@@ -539,6 +543,7 @@ class _NewsPageState extends State<NewsPage> {
           });
         }
       }
+
 
       for (var event in events) {
         newsFeed.add({
