@@ -50,6 +50,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var scrollbarOnBottom = true;
   var imageLoading = false;
 
+
   @override
   void initState() {
     _setCreatorText();
@@ -681,6 +682,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     fontsize = isWebDesktop ? 12 : 16;
     var isCreator = widget.community["erstelltVon"].contains(userId);
 
@@ -703,7 +705,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     await CommunityDatabase().delete(widget.community["id"]);
                     DbDeleteImage(widget.community["bild"]);
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 2));
+                        context, StartPage(selectedIndex: 3));
                   },
                 ),
                 TextButton(
@@ -837,6 +839,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     }
 
     _communityInformation() {
+      var fremdeCommunity = widget.community["ownCommunity"] == 0;
+
       return Container(
         margin: const EdgeInsets.all(10),
         padding: const EdgeInsets.only(bottom: 10),
@@ -851,6 +855,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 style:
                     const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               )),
+            ),
+            const SizedBox(height: 20),
+            if(fremdeCommunity) SizedBox(
+              width: screenWidth *0.9,
+              child: Text(AppLocalizations.of(context).nichtTeilGemeinschaft, style: const TextStyle(
+                  color: Colors.red, fontSize: 18
+              ),maxLines: 2),
             ),
             const SizedBox(height: 20),
             InkWell(
@@ -888,8 +899,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 ],
               ),
             ),
+
             const SizedBox(height: 20),
-            Container(
+            SizedBox(
                     height: 100,
                     width: double.infinity,
                     child: TextWithHyperlinkDetection(
@@ -904,7 +916,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     _footbar() {
       return Container(
-        width: MediaQuery.of(context).size.width - 20,
+        width: screenWidth - 20,
         margin: const EdgeInsets.all(10),
         child: Row(
           //mainAxisAlignment: MainAxisAlignment.end,
@@ -956,7 +968,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         ),
         body: Stack(
           children: [
-            Container(
+            SizedBox(
               height: screenHeight,
               child: ListView(
                 controller: _controller,

@@ -254,7 +254,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     EventDatabase().delete(widget.event["id"]);
                     DbDeleteImage(widget.event["bild"]);
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 1));
+                        context, StartPage(selectedIndex: 2));
                   },
                 ),
                 TextButton(
@@ -379,8 +379,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       return SimpleDialogOption(
           child: Row(
             children: [
-              Icon(Icons.settings),
-              SizedBox(width: 10),
+              const Icon(Icons.settings),
+              const SizedBox(width: 10),
               Text(AppLocalizations.of(context).eventOptionen),
             ],
           ),
