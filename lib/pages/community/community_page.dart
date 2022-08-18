@@ -239,7 +239,7 @@ class _CommunityPageState extends State<CommunityPage> {
       );
     }
 
-    bottomBar() {
+    floatingActionButtons() {
       return Container(
         alignment: Alignment.bottomRight,
         margin: const EdgeInsets.all(10),
@@ -253,7 +253,7 @@ class _CommunityPageState extends State<CommunityPage> {
             const SizedBox(height: 10),
             FloatingActionButton(
                 heroTag: "create Community",
-                child: const Icon(Icons.create),
+                child: const Icon(Icons.add),
                 onPressed: () =>
                     changePage(context, const CommunityErstellen())),
           ],
@@ -301,13 +301,13 @@ class _CommunityPageState extends State<CommunityPage> {
     }
 
     return Scaffold(
+      floatingActionButton: floatingActionButtons(),
       body: Padding(
           padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
           child: Column(
             children: [
               suchleiste,
               Expanded(child: showCommunities()),
-              bottomBar(),
               if (getInvite) showInvite(),
             ],
           )),

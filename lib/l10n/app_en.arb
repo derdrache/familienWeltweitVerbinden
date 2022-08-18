@@ -358,6 +358,10 @@
     "a2hsTitle": "families worldwide place on the home screen ?",
     "a2hsBody": "This will make the website look 100% like the app version",
     "ja": "yes",
-    "nein": "no"
+    "nein": "no",
+    "frageTeilGemeinschaft": "Are you the creator or a community member ?",
+    "frageErstellerEvent": "Are you the initiator of this event?",
+    "nichtTeilGemeinschaft": "The creator is not a part of this community",
+    "nichtErstellerEvent" : "The creator is not the initiator of the event"
 }
 
