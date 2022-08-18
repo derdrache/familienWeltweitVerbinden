@@ -58,6 +58,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   final _controller = ScrollController();
   var moreContent = false;
 
+
   @override
   void initState() {
     _controller.addListener(() {
@@ -323,6 +324,22 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       return const SizedBox.shrink();
     }
 
+    fremdesEventBox(){
+      var fremdesEvent = widget.event["ownEvent"] == 0;
+
+      if(fremdesEvent && !widget.isCreator){
+        return Container(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          width: screenWidth *0.8,
+          child: Text(AppLocalizations.of(context).nichtErstellerEvent, style: const TextStyle(
+              color: Colors.red, fontSize: 18
+          ),maxLines: 2),
+        );
+      }
+
+      return const SizedBox.shrink();
+    }
+
     eventInformationBox() {
       return Container(
         margin: const EdgeInsets.all(10),
@@ -542,6 +559,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                     bildAndTitleBox(),
                     const SizedBox(height: 20),
                     creatorChangeHintBox(),
+                    fremdesEventBox(),
                     eventInformationBox(),
                     if (widget.isApproved || widget.isPublic)
                       eventBeschreibung(),

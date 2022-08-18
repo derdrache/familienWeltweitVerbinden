@@ -26,17 +26,16 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var linkKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
   var userId = FirebaseAuth.instance.currentUser.uid;
+  var ownCommunity = true;
 
-  
-
-  saveCommunity() async{
+  saveCommunity() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = const Uuid();
     var communityId = uuid.v4();
 
     var communityData = {
       "id": communityId,
-      "name" : nameController.text,
+      "name": nameController.text,
       "beschreibung": beschreibungKontroller.text,
       "link": linkKontroller.text,
       "ort": locationData["city"],
@@ -45,25 +44,26 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       "longt": locationData["longt"],
       "erstelltAm": DateTime.now().toString(),
       "members": json.encode([userId]),
-      "erstelltVon": userId
+      "erstelltVon": userId,
+      "ownCommunity": ownCommunity
     };
 
-    if(!checkValidationAndSendError(communityData)) return false;
+    if (!checkValidationAndSendError(communityData)) return false;
 
     await CommunityDatabase().addNewCommunity(communityData);
 
     return true;
-
   }
 
-  checkValidationAndSendError(communityData){
-    if(communityData["name"].isEmpty){
+  checkValidationAndSendError(communityData) {
+    if (communityData["name"].isEmpty) {
       customSnackbar(context, AppLocalizations.of(context).bitteNameEingeben);
-    }else if(communityData["beschreibung"].isEmpty){
-      customSnackbar(context, AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
-    }else if(communityData["ort"].isEmpty){
+    } else if (communityData["beschreibung"].isEmpty) {
+      customSnackbar(context,
+          AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
+    } else if (communityData["ort"].isEmpty) {
       customSnackbar(context, AppLocalizations.of(context).bitteStadtEingeben);
-    } else{
+    } else {
       return true;
     }
   }
@@ -72,28 +72,63 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   Widget build(BuildContext context) {
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
 
+    ownCommunityBox() {
+      double screenWidth = MediaQuery.of(context).size.width;
+
+      return Container(
+        margin: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.only(left:10),
+                width: screenWidth * 0.75,
+                child: Text(AppLocalizations.of(context).frageTeilGemeinschaft,
+                    maxLines: 2, style: const TextStyle(fontSize: 16))),
+            const Expanded(
+              child: SizedBox.shrink(),
+            ),
+            Checkbox(
+                value: ownCommunity,
+                onChanged: (value) {
+                  setState(() {
+                    ownCommunity = value;
+                  });
+                }),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: CustomAppBar(
-        title: AppLocalizations.of(context).communityErstellen,
+          title: AppLocalizations.of(context).communityErstellen,
           buttons: [
             IconButton(
                 onPressed: () async {
                   var success = await saveCommunity();
-                  if(!success) return;
+                  if (!success) return;
 
-                  var community = await CommunityDatabase().getData("*", "WHERE erstelltVon = '$userId'");
+                  var community = await CommunityDatabase()
+                      .getData("*", "WHERE erstelltVon = '$userId'");
 
-                  global_func.changePageForever(context, StartPage(selectedIndex: 2));
-                  global_func.changePage(context, CommunityDetails(community: community));
-    },
+                  global_func.changePageForever(
+                      context, StartPage(selectedIndex: 3));
+                  global_func.changePage(
+                      context, CommunityDetails(community: community));
+                },
                 icon: const Icon(Icons.done, size: 30))
           ]),
       body: ListView(
         children: [
-          customTextInput(AppLocalizations.of(context).communityName, nameController),
+          customTextInput(
+              AppLocalizations.of(context).communityName, nameController),
           ortAuswahlBox,
-          customTextInput(AppLocalizations.of(context).linkEingebenOptional, linkKontroller),
-          customTextInput(AppLocalizations.of(context).beschreibungCommunity, beschreibungKontroller, moreLines: 5, textInputAction: TextInputAction.newline)
+          ownCommunityBox(),
+          customTextInput(AppLocalizations.of(context).linkEingebenOptional,
+              linkKontroller),
+          customTextInput(AppLocalizations.of(context).beschreibungCommunity,
+              beschreibungKontroller,
+              moreLines: 5, textInputAction: TextInputAction.newline)
         ],
       ),
     );
