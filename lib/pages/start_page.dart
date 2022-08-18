@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -135,12 +136,20 @@ class _StartPageState extends State<StartPage> {
       if (automaticLocationStatus == standortbestimmung[1] ||
           automaticLocationStatus == standortbestimmungEnglisch[1]) {
 
-        ProfilDatabase().updateProfilLocation(userId, {
+        var locationData = {
           "ort": nearstLocationData["city"],
           "land": nearstLocationData["country"],
           "longt": currentPosition.longitude,
           "latt": currentPosition.latitude,
+        };
+
+        ProfilDatabase().updateProfilLocation(userId, locationData);
+
+        NewsPageDatabase().addNewNews({
+          "typ": "ortswechsel",
+          "information": json.encode(locationData),
         });
+
         return;
       } else if (automaticLocationStatus == standortbestimmung[2] ||
           automaticLocationStatus == standortbestimmungEnglisch[2]) {
@@ -161,7 +170,12 @@ class _StartPageState extends State<StartPage> {
       await StadtinfoDatabase().addNewCity(locationData);
       StadtinfoDatabase().update(
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
+      );
+      NewsPageDatabase().addNewNews({
+        "typ": "ortswechsel",
+        "information": json.encode(locationData),
+      });
     }
   }
 
