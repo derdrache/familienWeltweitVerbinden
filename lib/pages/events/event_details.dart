@@ -122,10 +122,40 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         "WHERE id = '$eventId'");
   }
 
+  newOrganisatorIsOwnerWindow() async {
+    var newOwnerIsInitsiator = false;
+
+    await showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+            title: AppLocalizations.of(context).newOwnerIsInitiator,
+            children: [],
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    newOwnerIsInitsiator = true;
+                    Navigator.pop(context);
+                  },
+                  child: Text(AppLocalizations.of(context).ja)),
+              TextButton(
+                  onPressed: () {
+                    newOwnerIsInitsiator = false;
+                    Navigator.pop(context);
+                  },
+                  child: Text(AppLocalizations.of(context).nein)),
+            ],
+          );
+        });
+
+    return newOwnerIsInitsiator;
+  }
+
   changeOrganisatorWindow() {
     var inputKontroller = TextEditingController();
 
     searchAutocomplete = SearchAutocomplete(
+      hintText: AppLocalizations.of(context).benutzerEingeben,
       searchableItems: allName,
       onConfirm: () {
         inputKontroller.text = searchAutocomplete.getSelected()[0];
@@ -144,16 +174,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 FloatingActionButton.extended(
                   label: Text(AppLocalizations.of(context).uebertragen),
                   onPressed: () async {
+                    Navigator.pop(context);
+                    var isInitiator = await newOrganisatorIsOwnerWindow();
+
                     var selectedUserId = await ProfilDatabase().getData(
                         "id", "WHERE name = '${inputKontroller.text}'");
-                    await EventDatabase().update(
-                        "erstelltVon = '$selectedUserId'",
-                        "WHERE id = '${widget.event["id"]}'");
+
                     setState(() {
                       widget.event["erstelltVon"] = selectedUserId;
+                      widget.event["isOwner"] = isInitiator;
                     });
-
-                    Navigator.pop(context);
 
                     customSnackbar(
                         context,
@@ -161,6 +191,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             inputKontroller.text +
                             AppLocalizations.of(context).eventUebergebenAn2,
                         color: Colors.green);
+
+                    await EventDatabase().update(
+                        "erstelltVon = '$selectedUserId', ownEvent = '$isInitiator'",
+                        "WHERE id = '${widget.event["id"]}'");
                   },
                 )
               ]);
