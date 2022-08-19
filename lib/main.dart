@@ -87,7 +87,21 @@ sortProfils(profils) {
   return profils;
 }
 
+refreshHiveChats() async{
+  String userId = FirebaseAuth.instance.currentUser?.uid;
+
+  if(userId == null) return;
+
+  var myChatData = await ChatDatabase().getChatData("*",
+      "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+      returnList: true);
+  Hive.box("secureBox").put("myChats", myChatData);
+}
+
 refreshHiveData() async {
+
+  refreshHiveChats();
+
   var stadtinfo = await StadtinfoDatabase()
       .getData("*", "ORDER BY ort ASC", returnList: true);
   Hive.box("secureBox").put("stadtinfo", stadtinfo);

@@ -1512,23 +1512,27 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   size: markerSize,
                   color: Theme.of(context).colorScheme.primary),
               Positioned(
-                  top: 12,
+                  top: 8,
                   left: 8.5,
                   child: Container(
-                      padding: const EdgeInsets.only(left: 2, bottom: 2),
+                      alignment: Alignment.bottomCenter,
+                      padding: const EdgeInsets.only(left: 1),
                       decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(3.0),
-                              topRight: Radius.circular(3.0))),
+                              topLeft: Radius.circular(9.0),
+                              topRight: Radius.circular(9.0))),
                       width: 15,
-                      height: 14,
-                      child: Center(
-                          child: Text(numberText,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.black))))),
+                      height: 18,
+                      child: Text(numberText,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.black
+                          )
+                      )
+                  )
+              ),
             ],
           ),
           onPressed: buttonFunction,

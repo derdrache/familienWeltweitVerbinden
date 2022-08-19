@@ -360,6 +360,9 @@
     "frageTeilGemeinschaft": "Bist du der Ersteller oder ein Mitglied der Gemeinschaft ?",
     "frageErstellerEvent": "Bist du der Initiator des Events?",
     "nichtTeilGemeinschaft": "Der Ersteller ist nicht Teil dieser Community",
-    "nichtErstellerEvent" : "Der Ersteller ist nicht Initiator des Events"
+    "nichtErstellerEvent" : "Der Ersteller ist nicht Initiator des Events",
+    "benutzerEingeben": "Benutzer eingeben",
+    "nichtErstellerEvent": "Handelt es sich beim neuen Eventbesitzer um den Initiator?",
+    "nochKeineNewsVorhanden": "Es sind noch keine News für dich erstellt worden"
 
 }
