@@ -43,13 +43,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var windowSetState;
   List<String> imagePaths;
   String selectedImage;
-  List allUserNames =[];
+  List allUserNames = [];
   List allUserIds = [];
   var searchAutocomplete = SearchAutocomplete();
   final _controller = ScrollController();
   var scrollbarOnBottom = true;
   var imageLoading = false;
-
 
   @override
   void initState() {
@@ -57,7 +56,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     _initImages();
     _getDBDataSetAllUserNames();
 
-    if(!widget.community["link"].contains("http")) {
+    if (!widget.community["link"].contains("http")) {
       widget.community["link"] = "http://" + widget.community["link"];
     }
 
@@ -79,7 +78,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   _getDBDataSetAllUserNames() async {
     var dbProfils = await ProfilDatabase().getData("name, id", "");
 
-    for(var profil in dbProfils){
+    for (var profil in dbProfils) {
       allUserNames.add(profil["name"]);
       allUserIds.add(profil["id"]);
     }
@@ -189,7 +188,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
-    if(pickedImage == null) return;
+    if (pickedImage == null) return;
 
     setState(() {
       imageLoading = true;
@@ -529,8 +528,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       return [
         Center(
             heightFactor: 10,
-            child: Text(
-                AppLocalizations.of(context).nochKeineFreundeVorhanden,
+            child: Text(AppLocalizations.of(context).nochKeineFreundeVorhanden,
                 style: const TextStyle(color: Colors.grey)))
       ];
     }
@@ -569,17 +567,18 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var userIndex = allUserNames.indexOf(newMember);
     var newMemberId = allUserIds[userIndex];
 
-
-
-    if(widget.community["members"].contains(newMemberId)){
-      customSnackbar(context, newMember + AppLocalizations.of(context).istSchonMitgliedCommunity);
+    if (widget.community["members"].contains(newMemberId)) {
+      customSnackbar(context,
+          newMember + AppLocalizations.of(context).istSchonMitgliedCommunity);
       return;
     }
-    if(widget.community["einladung"].contains(newMemberId)){
-      customSnackbar(context, newMember + AppLocalizations.of(context).wurdeSchonEingeladenCommunity);
+    if (widget.community["einladung"].contains(newMemberId)) {
+      customSnackbar(
+          context,
+          newMember +
+              AppLocalizations.of(context).wurdeSchonEingeladenCommunity);
       return;
     }
-
 
     setState(() {
       widget.community["einladung"].add(newMemberId);
@@ -589,7 +588,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",
         "WHERE id = '${widget.community["id"]}'");
 
-    customSnackbar(context, newMember + AppLocalizations.of(context).wurdeEingeladenCommunity, color: Colors.green);
+    customSnackbar(context,
+        newMember + AppLocalizations.of(context).wurdeEingeladenCommunity,
+        color: Colors.green);
   }
 
   _showMembersWindow() async {
@@ -702,8 +703,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () async {
+
+                    var communities = Hive.box('secureBox').get("communities");
+                    communities.remove(widget.community);
+
                     await CommunityDatabase().delete(widget.community["id"]);
                     DbDeleteImage(widget.community["bild"]);
+
                     global_func.changePageForever(
                         context, StartPage(selectedIndex: 3));
                   },
@@ -857,12 +863,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               )),
             ),
             const SizedBox(height: 20),
-            if(fremdeCommunity) SizedBox(
-              width: screenWidth *0.9,
-              child: Text(AppLocalizations.of(context).nichtTeilGemeinschaft, style: const TextStyle(
-                  color: Colors.red, fontSize: 18
-              ),maxLines: 2),
-            ),
+            if (fremdeCommunity)
+              SizedBox(
+                width: screenWidth * 0.9,
+                child: Text(AppLocalizations.of(context).nichtTeilGemeinschaft,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.red, fontSize: 18),
+                    maxLines: 2),
+              ),
             const SizedBox(height: 20),
             InkWell(
               onTap: () => isCreator ? _changeOrtWindow() : null,
@@ -882,7 +890,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               onTapDown: (tabDetails) {
                 var getTabPostion = tabDetails.globalPosition;
                 var link = widget.community["link"];
-                if(!link.contains("http")) link = "http://" + link;
+                if (!link.contains("http")) link = "http://" + link;
 
                 if (isCreator) _changeOrOpenLinkWindow(getTabPostion);
                 if (!isCreator) launch(widget.community["link"]);
@@ -899,16 +907,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
             SizedBox(
-                    height: 100,
-                    width: double.infinity,
-                    child: TextWithHyperlinkDetection(
-                        text: widget.community["beschreibung"],
-                      onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
-                    ),
-                )
+              height: 100,
+              width: double.infinity,
+              child: TextWithHyperlinkDetection(
+                text: widget.community["beschreibung"],
+                onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
+              ),
+            )
           ],
         ),
       );

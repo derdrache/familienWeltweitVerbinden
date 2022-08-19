@@ -362,6 +362,9 @@
     "frageTeilGemeinschaft": "Are you the creator or a community member ?",
     "frageErstellerEvent": "Are you the initiator of this event?",
     "nichtTeilGemeinschaft": "The creator is not a part of this community",
-    "nichtErstellerEvent" : "The creator is not the initiator of the event"
+    "nichtErstellerEvent" : "The creator is not the initiator of the event",
+    "benutzerEingeben": "enter user",
+    "newOwnerIsInitiator": "Is the new event owner the initiator?",
+    "nochKeineNewsVorhanden": "No news have been created for you yet"
 }
 

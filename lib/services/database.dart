@@ -506,8 +506,8 @@ class CommunityDatabase{
     return responseBody;
   }
 
-  delete(communityId){
-    _deleteInTable("communities", communityId);
+  delete(communityId) async {
+    await _deleteInTable("communities", communityId);
   }
 }
 
@@ -981,10 +981,10 @@ DbDeleteImage(imageName) async{
   await http.post(url, body: json.encode(data));
 }
 
-_deleteInTable(table, id) {
+_deleteInTable(table, id) async {
   var url = Uri.parse(databaseUrl + "database/deleteAll.php");
 
-  http.post(url, body: json.encode({
+  await http.post(url, body: json.encode({
     "id": id,
     "table": table
   }));
