@@ -442,6 +442,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return Scaffold(
         appBar: CustomAppBar(
           title: widget.chatPartnerName ?? "",
+          profilBildProfil : chatPartnerProfil,
           onTap: () => openProfil(),
         ),
         body: Column(

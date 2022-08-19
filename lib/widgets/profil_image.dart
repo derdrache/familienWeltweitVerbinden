@@ -182,8 +182,6 @@ class _ProfilImageState extends State<ProfilImage> {
     }
 
     return Container(
-      width: widget.changeable ? 65 : null,
-      height: widget.changeable ? 65 : null,
       color: Colors.transparent,
       child: Stack(
         clipBehavior: Clip.none,
