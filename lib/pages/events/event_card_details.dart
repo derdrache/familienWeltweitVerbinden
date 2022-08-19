@@ -58,7 +58,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   final _controller = ScrollController();
   var moreContent = false;
 
-
   @override
   void initState() {
     _controller.addListener(() {
@@ -274,7 +273,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                                 BoxConstraints(maxHeight: screenHeight / 2.08),
                             child: Image.network(
                               widget.event["bild"],
-                              fit: BoxFit.fitWidth,
                             ))),
               ),
             ],
@@ -324,16 +322,17 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       return const SizedBox.shrink();
     }
 
-    fremdesEventBox(){
+    fremdesEventBox() {
       var fremdesEvent = widget.event["ownEvent"] == 0;
 
-      if(fremdesEvent && !widget.isCreator){
+      if (fremdesEvent && !widget.isCreator) {
         return Container(
           padding: const EdgeInsets.only(left: 10, right: 10),
-          width: screenWidth *0.8,
-          child: Text(AppLocalizations.of(context).nichtErstellerEvent, style: const TextStyle(
-              color: Colors.red, fontSize: 18
-          ),maxLines: 2),
+          width: screenWidth * 0.8,
+          child: Text(AppLocalizations.of(context).nichtErstellerEvent,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.red, fontSize: 18),
+              maxLines: 2),
         );
       }
 
@@ -808,7 +807,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context);
-                  if(!widget.rowData.contains("http")){
+                  if (!widget.rowData.contains("http")) {
                     widget.rowData = "http://" + widget.rowData;
                   }
                   launch(widget.rowData);
@@ -822,51 +821,56 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     }
 
     return !widget.singleShow && !widget.multiLines
-            ? Row(
-                children: [
-                  Text(widget.rowTitle + " ",
-                      style: TextStyle(
-                          fontSize: fontsize, fontWeight: FontWeight.bold)),
-                  const Expanded(child: SizedBox.shrink()),
-                  InkWell(
-                    child: SizedBox(
-                      width: 200,
-                      child: Text(
-                        widget.databaseKennzeichnung == "zeitzone"
-                            ? "GMT " + widget.rowData.toString()
-                            : widget.rowData,
-                        style: TextStyle(
-                            fontSize: fontsize,
-                            color: widget.databaseKennzeichnung != "link"
-                                ? Colors.black
-                                : Theme.of(context).colorScheme.secondary),
-                        softWrap: false,
-                        overflow: TextOverflow.fade,
-                        textAlign: TextAlign.end,
-                      ),
-                    ),
-                    onTap: widget.databaseKennzeichnung != "link" ||
-                            widget.rowData == ""
-                        ? null
-                        : () {
-                            if (widget.isCreator) {
-                              openLinkAskWindow();
-                            } else {
-                              if(!widget.rowData.contains("http")){
-                                widget.rowData = "http://" + widget.rowData;
-                              }
-                              launch(widget.rowData);
-                            }
-                          },
-                  )
-                ],
-              )
-            : widget.multiLines
-                ? TextWithHyperlinkDetection(text: widget.rowData, onTextTab: widget.isCreator ? () => openChangeWindow(): null)
-                : Text(widget.rowData,
+        ? Row(
+            children: [
+              Text(widget.rowTitle + " ",
+                  style: TextStyle(
+                      fontSize: fontsize, fontWeight: FontWeight.bold)),
+              const Expanded(child: SizedBox.shrink()),
+              InkWell(
+                child: SizedBox(
+                  width: 200,
+                  child: Text(
+                    widget.databaseKennzeichnung == "zeitzone"
+                        ? "GMT " + widget.rowData.toString()
+                        : widget.rowData,
                     style: TextStyle(
-                        fontSize: fontsize + 8, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center);
+                        fontSize: fontsize,
+                        color: widget.databaseKennzeichnung != "link"
+                            ? Colors.black
+                            : Theme.of(context).colorScheme.secondary),
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+                onTap: widget.databaseKennzeichnung != "link"
+                    ? null
+                    : () {
+                        if (widget.isCreator) {
+                          if(widget.rowData.isEmpty){
+                            openChangeWindow();
+                          } else{
+                            openLinkAskWindow();
+                          }
+                        } else {
+                          if (!widget.rowData.contains("http")) {
+                            widget.rowData = "http://" + widget.rowData;
+                          }
+                          launch(widget.rowData);
+                        }
+                      },
+              )
+            ],
+          )
+        : widget.multiLines
+            ? TextWithHyperlinkDetection(
+                text: widget.rowData,
+                onTextTab: widget.isCreator ? () => openChangeWindow() : null)
+            : Text(widget.rowData,
+                style: TextStyle(
+                    fontSize: fontsize + 8, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center);
   }
 }
 
@@ -1123,7 +1127,6 @@ class _CardFeetState extends State<CardFeet> {
       List<Widget> zusagenNameBoxes = [];
 
       for (var profilId in zusagenIds) {
-
         for (var profil in allProfils) {
           if (profil["id"] == profilId) {
             zusagenProfils.add(profil);
