@@ -26,7 +26,8 @@ class _ChatPageState extends State<ChatPage> {
   var userName = FirebaseAuth.instance.currentUser.displayName;
   var userEmail = FirebaseAuth.instance.currentUser.email;
   var searchAutocomplete;
-  List allName, userFriendlist, dbProfilData, globalChatGroups = [];
+  List dbProfilData =Hive.box("secureBox").get("profils");
+  List allName, userFriendlist, globalChatGroups = [];
 
   @override
   void initState() {
@@ -57,7 +58,6 @@ class _ChatPageState extends State<ChatPage> {
   initilizeCreateChatData() {
     dynamic userFriendIdList =
         Hive.box("secureBox").get("ownProfil")["friendlist"];
-    dbProfilData = Hive.box("secureBox").get("profils");
     allName = [];
     userFriendlist = [];
     var ownProfil = Hive.box('secureBox').get("ownProfil");
@@ -208,6 +208,17 @@ class _ChatPageState extends State<ChatPage> {
     return newChatList;
   }
 
+  refreshDbProfilData() async{
+    dbProfilData = await ProfilDatabase().getData("*", "ORDER BY ort ASC");
+    if (dbProfilData == false) dbProfilData = [];
+
+    Hive.box('secureBox').put("profils", dbProfilData);
+
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -330,6 +341,11 @@ class _ChatPageState extends State<ChatPage> {
                 if (snapshot.hasData) {
                   myChats = snapshot.data == false ? [] : snapshot.data;
                   myChatBox.put("myChats", myChats);
+                }
+
+                if(dbProfilData.isEmpty){
+                  refreshDbProfilData();
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 if (myChats != null && myChats.isNotEmpty) {

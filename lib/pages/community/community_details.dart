@@ -687,6 +687,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     fontsize = isWebDesktop ? 12 : 16;
     var isCreator = widget.community["erstelltVon"].contains(userId);
 
+
     _deleteWindow() {
       showDialog(
           context: context,
@@ -838,9 +839,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           _changeImageWindow(getTabPostion);
         },
         child: isAssetImage
-            ? Image.asset(widget.community["bild"])
+            ? Image.asset(widget.community["bild"], height: screenWidth > 600 ? screenHeight /3  : null)
             : Image.network(widget.community["bild"],
-                height: screenHeight / 3, fit: BoxFit.fitWidth),
+            height: screenHeight / 3, fit: screenWidth > 600 ? null :  BoxFit.fitWidth),
       );
     }
 
