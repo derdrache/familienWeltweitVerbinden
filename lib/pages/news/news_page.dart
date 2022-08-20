@@ -190,6 +190,7 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   Widget build(BuildContext context) {
+
     friendsDisplay(news) {
       var userAdded = news["information"].split(" ")[1];
       var newsUserId = news["erstelltVon"];
@@ -214,41 +215,44 @@ class _NewsPageState extends State<NewsPage> {
         onTap: () {
           global_func.changePage(context, ShowProfilPage(profil: friendProfil));
         },
-        child: Container(
-            margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (checkIfNotNew(news["information"], news["erstelltVon"]))
-                      const Icon(
-                        Icons.fiber_new,
-                        size: 30,
-                      ),
-                    const Expanded(child: SizedBox.shrink()),
-                    Text(news["erstelltAm"].split(" ")[0],
-                        style: TextStyle(color: Colors.grey[600]))
-                  ],
-                )
-              ],
-            )),
+        child: Align(
+          child: Container(
+              width: 800,
+              margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                        const Icon(
+                          Icons.fiber_new,
+                          size: 30,
+                        ),
+                      const Expanded(child: SizedBox.shrink()),
+                      Text(news["erstelltAm"].split(" ")[0],
+                          style: TextStyle(color: Colors.grey[600]))
+                    ],
+                  )
+                ],
+              )),
+        ),
       );
     }
 
@@ -293,41 +297,44 @@ class _NewsPageState extends State<NewsPage> {
           global_func.changePage(
               context, ShowProfilPage(profil: newsUserProfil));
         },
-        child: Container(
-            margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (checkIfNotNew(news["information"], news["erstelltVon"]))
-                      const Icon(
-                        Icons.fiber_new,
-                        size: 30,
-                      ),
-                    const Expanded(child: SizedBox.shrink()),
-                    Text(news["erstelltAm"].split(" ")[0],
-                        style: TextStyle(color: Colors.grey[600]))
-                  ],
-                )
-              ],
-            )),
+        child: Align(
+          child: Container(
+              width: 800,
+              margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                        const Icon(
+                          Icons.fiber_new,
+                          size: 30,
+                        ),
+                      const Expanded(child: SizedBox.shrink()),
+                      Text(news["erstelltAm"].split(" ")[0],
+                          style: TextStyle(color: Colors.grey[600]))
+                    ],
+                  )
+                ],
+              )),
+        ),
       );
     }
 
@@ -361,46 +368,49 @@ class _NewsPageState extends State<NewsPage> {
         onTap: () {
           global_func.changePage(context, ShowProfilPage(profil: friendProfil));
         },
-        child: Container(
-            margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(textTitle,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                Text(textDate),
-                Text(textLocation),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (checkIfNotNew(news["information"], news["erstelltVon"]))
-                      const Icon(
-                        Icons.fiber_new,
-                        size: 30,
-                      ),
-                    const Expanded(child: SizedBox.shrink()),
-                    Text(news["erstelltAm"].split(" ")[0],
-                        style: TextStyle(color: Colors.grey[600]))
-                  ],
-                )
-              ],
-            )),
+        child: Align(
+          child: Container(
+              width: 800,
+              margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(textTitle,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  Text(textDate),
+                  Text(textLocation),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                        const Icon(
+                          Icons.fiber_new,
+                          size: 30,
+                        ),
+                      const Expanded(child: SizedBox.shrink()),
+                      Text(news["erstelltAm"].split(" ")[0],
+                          style: TextStyle(color: Colors.grey[600]))
+                    ],
+                  )
+                ],
+              )),
+        ),
       );
     }
 
@@ -478,45 +488,48 @@ class _NewsPageState extends State<NewsPage> {
           global_func.changePage(
               context, StadtinformationsPage(ortName: info["ort"]));
         },
-        child: Container(
-            margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(textHeader,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                Text(textBody),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (checkIfNotNew(textBody, info["erstelltVon"]))
-                      const Icon(
-                        Icons.fiber_new,
-                        size: 30,
-                      ),
-                    const Expanded(child: SizedBox.shrink()),
-                    Text(info["erstelltAm"].split(" ")[0],
-                        style: TextStyle(color: Colors.grey[600]))
-                  ],
-                )
-              ],
-            )),
+        child: Align(
+          child: Container(
+            width: 800,
+              margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(textHeader,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  Text(textBody),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (checkIfNotNew(textBody, info["erstelltVon"]))
+                        const Icon(
+                          Icons.fiber_new,
+                          size: 30,
+                        ),
+                      const Expanded(child: SizedBox.shrink()),
+                      Text(info["erstelltAm"].split(" ")[0],
+                          style: TextStyle(color: Colors.grey[600]))
+                    ],
+                  )
+                ],
+              )),
+        ),
       );
     }
 
@@ -584,7 +597,7 @@ class _NewsPageState extends State<NewsPage> {
               )
             : null,
         body: Container(
-            padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
+            padding: const EdgeInsets.only(top: 24),
             child: ListView(
                 controller: _controller,
                 reverse: true,
