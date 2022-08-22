@@ -58,6 +58,7 @@ class _EventErstellenState extends State<EventErstellen> {
     ortTypDropdown = CustomDropDownButton(
       selected: "offline",
       hintText: "offline / online",
+      labelText: "Event typ",
       items: isGerman ? global_var.eventTyp : global_var.eventTypEnglisch,
       onChange: () {
         setState(() {});
@@ -198,7 +199,9 @@ class _EventErstellenState extends State<EventErstellen> {
     double screenWidth = MediaQuery.of(context).size.width;
     sprachenAuswahlBox.hintText =
         AppLocalizations.of(context).spracheAuswaehlen;
+    eventArtDropdown.labelText =  AppLocalizations.of(context).eventOeffentlichkeit;
     eventArtDropdown.hintText = AppLocalizations.of(context).eventArten;
+    eventIntervalDropdown.labelText = AppLocalizations.of(context).eventWiederholung;
     eventIntervalDropdown.hintText = isGerman
         ? global_var.eventInterval.join(", ")
         : global_var.eventIntervalEnglisch.join(", ");
