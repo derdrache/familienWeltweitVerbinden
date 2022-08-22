@@ -95,7 +95,7 @@ getChatID(usersList){
 }
 
 changeGermanToEnglish(list){
-  var englishOutputList = [];
+  List<String> englishOutputList = [];
   var checkList = [];
   var englishList = [];
 
@@ -138,7 +138,7 @@ changeGermanToEnglish(list){
 }
 
 changeEnglishToGerman(list){
-  var germanOutputList = [];
+  List<String> germanOutputList = [];
   var checkList = [];
   var germanList = [];
 
