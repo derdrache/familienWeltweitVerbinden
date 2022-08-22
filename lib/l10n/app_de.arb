@@ -363,6 +363,8 @@
     "nichtErstellerEvent" : "Der Ersteller ist nicht Initiator des Events",
     "benutzerEingeben": "Benutzer eingeben",
     "nichtErstellerEvent": "Handelt es sich beim neuen Eventbesitzer um den Initiator?",
-    "nochKeineNewsVorhanden": "Es sind noch keine News für dich erstellt worden"
+    "nochKeineNewsVorhanden": "Es sind noch keine News für dich erstellt worden",
+    "eventWiederholung": "Event Wiederholung",
+    "eventOeffentlichkeit" : "Öffentlichkeit"
 
 }

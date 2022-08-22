@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
+//import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:multiselect/multiselect.dart';
 
 double sideSpace = 10;
 double borderRounding = 5;
@@ -98,7 +99,7 @@ customSnackbar(context, text, {color = Colors.red, duration = const Duration(sec
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
-  var selected;
+  List<String> selected;
   String hintText;
   var onConfirm;
   var validator;
@@ -107,7 +108,6 @@ class CustomMultiTextForm extends StatefulWidget {
   getSelected(){
     return selected;
   }
-
 
 
   CustomMultiTextForm({Key key,
@@ -132,13 +132,11 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     super.initState();
   }
 
-  List<MultiSelectItem> _createMultiselectItems(){
-    List<MultiSelectItem> multiSelectItems = [];
+  List<String> _createMultiselectItems(){
+    List<String> multiSelectItems = [];
 
     for(var auswahl in widget.auswahlList){
-      multiSelectItems.add(
-          MultiSelectItem(auswahl, auswahl)
-      );
+      multiSelectItems.add(auswahl);
     }
 
     return multiSelectItems;
@@ -147,7 +145,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
   @override
   Widget build(BuildContext context) {
-    List<MultiSelectItem> auswahlListSelectItem = _createMultiselectItems();
+    List<String> auswahlListSelectItem = _createMultiselectItems();
     var textColor = Colors.black;
 
     String createDropdownText(){
@@ -169,42 +167,45 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     }
 
     changeSelectToList(select){
+      widget.onConfirm;
       setState(() {
         widget.selected = select;
       });
     }
 
     return Align(
+      alignment: Alignment.topCenter,
       child: Container(
-        width: webWidth,
-        margin: EdgeInsets.all(sideSpace),
-        child: MultiSelectDialogField (
-            buttonIcon: widget.icon,
-            initialValue: widget.selected,
-            buttonText: Text(
-              createDropdownText(),
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: textColor),
-            ),
-            chipDisplay: MultiSelectChipDisplay.none(),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.all(Radius.circular(borderRounding))
-            ),
-            items: auswahlListSelectItem,
+          width: webWidth,
+          margin: EdgeInsets.all(sideSpace),
+          child : DropDownMultiSelect(
+            onChanged: changeSelectToList,
+            options: auswahlListSelectItem,
+            selectedValues: widget.selected,
             validator: widget.validator,
-            onSelectionChanged: changeSelectToList,
-            onConfirm: widget.onConfirm
+            hint: Text(widget.hintText),
+            icon: const Icon(Icons.arrow_downward, color: Colors.black,),
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.black, width: 1.0)
+              ),
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 15,
+                horizontal: 10,
+              ),
+            ),
           )
       ),
     );
   }
 }
 
+
 class CustomDropDownButton extends StatefulWidget {
   List<String> items;
   String hintText;
+  String labelText;
   String selected;
   double width;
   var onChange;
@@ -213,6 +214,7 @@ class CustomDropDownButton extends StatefulWidget {
     this.items,
     this.hintText = "",
     this.selected = "",
+    this.labelText = "",
     this.onChange,
     this.width
   }) : super(key: key);
@@ -257,8 +259,8 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
               elevation: 16,
               style: const TextStyle(color: Colors.black),
               icon: const Icon(Icons.arrow_downward, color: Colors.black,),
-              decoration: widget.hintText != "" ? InputDecoration(
-                labelText: widget.hintText,
+              decoration: widget.labelText != "" ? InputDecoration(
+                labelText: widget.labelText,
               ) :InputDecoration() ,
               onChanged: (newValue){
 
