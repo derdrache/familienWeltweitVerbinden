@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
-import 'dart:io';
 
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
@@ -8,12 +6,10 @@ import 'package:familien_suche/pages/community/community_details.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../services/locationsService.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../start_page.dart';
 
@@ -31,31 +27,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var ortAuswahlBox = GoogleAutoComplete();
   var userId = FirebaseAuth.instance.currentUser.uid;
   var ownCommunity = true;
-  var locationDropdown = CustomDropDownButton();
-  var kontinentDropdown = CustomDropDownButton();
 
-
-  @override
-  void initState() {
-    var isGerman = kIsWeb
-        ? window.locale.languageCode == "de"
-        : Platform.localeName == "de_DE";
-    var allContinents = LocationService().getAllContinents();
-
-    locationDropdown = CustomDropDownButton(
-      items: ["Ort / Land", "Kontinent"],
-      hintText: "Genauigkeit des Standorts der Gemeinschaft",
-      selected: "Ort / Land",
-      onChange: () => setState(() {}),
-    );
-
-    kontinentDropdown = CustomDropDownButton(
-      items: isGerman ? allContinents["ger"] : allContinents["eng"],
-      hintText: "Kontinent auswählen",
-    );
-
-    super.initState();
-  }
 
   saveCommunity() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
@@ -154,9 +126,6 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
         children: [
           customTextInput(
               AppLocalizations.of(context).communityName, nameController),
-          locationDropdown,
-          if(locationDropdown.selected != "Kontinent") ortAuswahlBox,
-          if(locationDropdown.selected == "Kontinent") kontinentDropdown,
           ownCommunityBox(),
           customTextInput(AppLocalizations.of(context).linkEingebenOptional,
               linkKontroller),
