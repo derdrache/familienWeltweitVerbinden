@@ -146,25 +146,6 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
   @override
   Widget build(BuildContext context) {
     List<String> auswahlListSelectItem = _createMultiselectItems();
-    var textColor = Colors.black;
-
-    String createDropdownText(){
-      String dropdownText = "";
-      var textMaxLength = 55;
-
-      if (widget.selected.isEmpty){
-        dropdownText = widget.hintText;
-        textColor = Colors.grey;
-      } else{
-        dropdownText = widget.selected.join(" , ");
-      }
-
-      if (dropdownText.length > textMaxLength){
-        dropdownText = dropdownText.substring(0,textMaxLength - 3) + "...";
-      }
-
-      return dropdownText;
-    }
 
     changeSelectToList(select){
       widget.onConfirm;
@@ -186,11 +167,18 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
             hint: Text(widget.hintText),
             icon: const Icon(Icons.arrow_downward, color: Colors.black,),
             decoration: InputDecoration(
-              border: OutlineInputBorder(
-                  borderSide: const BorderSide(color: Colors.black, width: 1.0)
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+                borderSide:  const BorderSide(color: Colors.black ),
+
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5.0),
+                borderSide:  const BorderSide(color: Colors.black ),
+
               ),
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 vertical: 15,
                 horizontal: 10,
               ),
@@ -261,7 +249,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
               icon: const Icon(Icons.arrow_downward, color: Colors.black,),
               decoration: widget.labelText != "" ? InputDecoration(
                 labelText: widget.labelText,
-              ) :InputDecoration() ,
+              ) :const InputDecoration() ,
               onChanged: (newValue){
 
                 setState(() {
