@@ -110,8 +110,8 @@ class ProfilDatabase{
 
     await http.post(url, body: json.encode({
       "id": userId,
-      "land": locationDict["land"],
-      "city": locationDict["ort"],
+      "land": locationDict["countryname"],
+      "city": locationDict["city"],
       "longt":locationDict["longt"],
       "latt": locationDict["latt"]
     }));

@@ -367,6 +367,7 @@
     "newOwnerIsInitiator": "Is the new event owner the initiator?",
     "nochKeineNewsVorhanden": "No news have been created for you yet",
     "eventWiederholung": "Event repetition",
-    "eventOeffentlichkeit" : "Event public"
+    "eventOeffentlichkeit" : "Event public",
+    "keineNewsVorhanden": "No news yet"
 }
 
