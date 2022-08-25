@@ -67,8 +67,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double currentMapZoom = 1.6;
   double exactZoom = 10;
   double cityZoom = 8.5;
-  double countryZoom = 4.0;
-  double kontinentZoom = 2.5;
+  double countryZoom = 5.5;
+  double kontinentZoom = 3.5;
   var searchAutocomplete = SearchAutocomplete();
   LatLng mapPosition;
   bool buildLoaded = false;
@@ -308,7 +308,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
         spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
     searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context).filterErkunden,
         searchableItems:
             allUserName.toList() + countryDropDownList + allCitiesNames,
         onConfirm: () {
@@ -1189,6 +1188,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   @override
   Widget build(BuildContext context) {
     List<Marker> allMarker = [];
+    searchAutocomplete.hintText = AppLocalizations.of(context).filterErkunden;
 
     createPopupEvents({event, community, spezialActivation = false}) {
       double screenWidth = MediaQuery.of(context).size.width;

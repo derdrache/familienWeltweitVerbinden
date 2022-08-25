@@ -365,6 +365,7 @@
     "nichtErstellerEvent": "Handelt es sich beim neuen Eventbesitzer um den Initiator?",
     "nochKeineNewsVorhanden": "Es sind noch keine News für dich erstellt worden",
     "eventWiederholung": "Event Wiederholung",
-    "eventOeffentlichkeit" : "Öffentlichkeit"
+    "eventOeffentlichkeit" : "Öffentlichkeit",
+    "keineNewsVorhanden": "Noch keine News vorhanden"
 
 }

@@ -125,6 +125,11 @@ class _LoginPageState extends State<LoginPage> {
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
+  bool isPhone() {
+    final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    return data.size.shortestSide < 600 ? true : false;
+  }
+
   @override
   Widget build(BuildContext context) {
     double sideSpace = 20;
@@ -136,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
               bottom: sideSpace,
               left: sideSpace * 2,
               right: sideSpace * 2),
-          child: kIsWeb
+          child: kIsWeb && !isPhone()
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -324,7 +329,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 10),
                 isLoading
                     ? loadingBox()
-                    : kIsWeb
+                    : kIsWeb && !isPhone()
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
