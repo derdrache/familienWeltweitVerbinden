@@ -154,10 +154,21 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   getNewsWidgetList() {
+    double screenHeight = MediaQuery.of(context).size.height;
     var widgetList = [];
 
     for (var item in newsFeed) {
       widgetList.add(item["newsWidget"]);
+    }
+
+    if (isEmptyWidgetList(widgetList)) {
+      widgetList.add(Center(
+          child: SizedBox(
+              height: screenHeight / 2,
+              child: Text(
+                AppLocalizations.of(context).keineNewsVorhanden,
+                style: const TextStyle(fontSize: 20),
+              ))));
     }
 
     return widgetList;
@@ -189,8 +200,18 @@ class _NewsPageState extends State<NewsPage> {
     Hive.box('secureBox').put("userNewsContent", userNewsContent);
   }
 
-  Widget build(BuildContext context) {
+  isEmptyWidgetList(widgetList){
 
+    for (var widget in widgetList) {
+      if (!(widget.runtimeType == SizedBox)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  Widget build(BuildContext context) {
     friendsDisplay(news) {
       var userAdded = news["information"].split(" ")[1];
       var newsUserId = news["erstelltVon"];
@@ -235,12 +256,14 @@ class _NewsPageState extends State<NewsPage> {
               ),
               child: Column(
                 children: [
-                  Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(text,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                      if (checkIfNotNew(
+                          news["information"], news["erstelltVon"]))
                         const Icon(
                           Icons.fiber_new,
                           size: 30,
@@ -274,7 +297,8 @@ class _NewsPageState extends State<NewsPage> {
 
       if (newsUserProfil == null ||
           !ownSettingProfil["showFriendChangedLocation"] ||
-          !ownSettingProfil["showNewFamilyLocation"] || !(isFriend || samePlaceAndTime)) {
+          !ownSettingProfil["showNewFamilyLocation"] ||
+          !(isFriend || samePlaceAndTime)) {
         return const SizedBox.shrink();
       }
 
@@ -317,12 +341,14 @@ class _NewsPageState extends State<NewsPage> {
               ),
               child: Column(
                 children: [
-                  Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(text,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                      if (checkIfNotNew(
+                          news["information"], news["erstelltVon"]))
                         const Icon(
                           Icons.fiber_new,
                           size: 30,
@@ -398,7 +424,8 @@ class _NewsPageState extends State<NewsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (checkIfNotNew(news["information"], news["erstelltVon"]))
+                      if (checkIfNotNew(
+                          news["information"], news["erstelltVon"]))
                         const Icon(
                           Icons.fiber_new,
                           size: 30,
@@ -490,7 +517,7 @@ class _NewsPageState extends State<NewsPage> {
         },
         child: Align(
           child: Container(
-            width: 800,
+              width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -537,7 +564,6 @@ class _NewsPageState extends State<NewsPage> {
       newsFeed = [];
       var myLastLocationChangeDate = getMyLastLocationChangeDate();
 
-
       for (var news in newsFeedData) {
         if (news["erstelltVon"].contains(userId)) continue;
 
@@ -556,7 +582,6 @@ class _NewsPageState extends State<NewsPage> {
           });
         }
       }
-
 
       for (var event in events) {
         newsFeed.add({
@@ -598,12 +623,8 @@ class _NewsPageState extends State<NewsPage> {
             : null,
         body: Container(
             padding: const EdgeInsets.only(top: 24),
-            child: ListView(
-                controller: _controller,
-                reverse: true,
-                shrinkWrap: true,
-                children: [
-                  ...getNewsWidgetList().reversed.toList(),
-                ])));
+            child: ListView(controller: _controller, reverse: true, children: [
+              ...getNewsWidgetList().reversed.toList(),
+            ])));
   }
 }
