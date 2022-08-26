@@ -883,6 +883,7 @@ class NewsPageDatabase{
 }
 
 class NewsSettingsDatabase{
+
   newProfil() async{
     var url = Uri.parse(databaseUrl + "database/newsSettings/newProfil.php");
     var userId = FirebaseAuth.instance.currentUser.uid;
@@ -896,7 +897,7 @@ class NewsSettingsDatabase{
     var url = Uri.parse(databaseUrl + "database/update.php");
 
     await http.post(url, body: json.encode({
-      "table": "newsSettings",
+      "table": "news_settings",
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
@@ -908,7 +909,7 @@ class NewsSettingsDatabase{
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
       "queryEnd": queryEnd,
-      "table": "newsSettings"
+      "table": "news_settings"
     }));
 
     dynamic responseBody = res.body;
@@ -949,7 +950,7 @@ class NewsSettingsDatabase{
   }
 
   delete(profilId){
-    _deleteInTable("newsSettings", profilId);
+    _deleteInTable("news_settings", profilId);
   }
 }
 
