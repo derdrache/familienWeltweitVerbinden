@@ -104,6 +104,31 @@ var patchVorlage={
   ]
 };
 
+var patch160E={
+  "title" : "1.6.0 - 01.09.2022",
+  "inhalt": [
+    "News Page has been added",
+    "A2HS has been added",
+    "Third party events/communities can be created and will be clearly visible at the event/community",
+    "Bug fix - Event and community description can be changed again",
+    "Performance improvement - World map in web version on smartphones has been slightly improved from performance",
+    "various small improvements",
+    "various small bug fixes"
+  ]
+};
+var patch160D={
+  "title" : "1.6.0 - 01.09.2022",
+  "inhalt": [
+    "News Page wurde hinzugefügt",
+    "A2HS wurde eingebaut",
+    "Events / Gemeinschaften von dritten können erstellt werden und werden beim jeweiligen Event / Gemeinschaft gut sichtbar angezeigt",
+    "Fehlerbehebung - Event- und Gemeinschaftsbeschreibung kann wieder geändert werden",
+    "Leistungsverbesserung - Die Weltkarte in der Web Version auf Smartphones wurde von der Leistung etwas verbessert",
+    "verschiedene kleine Verbesserungen",
+    "verschiedene kleine Fehlerbehebungen"
+  ]
+};
+
 var patch150E={
   "title" : "1.5.0 - 01.08.2022",
   "inhalt": [
