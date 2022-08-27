@@ -972,7 +972,7 @@ uploadImage(imagePath, imageName, image) async{
 
 }
 
-DbDeleteImage(imageName) async{
+dbDeleteImage(imageName) async{
   var url = Uri.parse("https://families-worldwide.com/database/deleteImage.php");
   imageName = imageName.split("/").last;
   var data = {
