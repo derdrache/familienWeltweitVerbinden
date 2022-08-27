@@ -99,6 +99,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     changeProfilToFamilyProfil();
 
     createAndSetZoomLevels(profils, "profils");
+    createAndSetZoomLevels(communities, "communities");
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
@@ -115,6 +116,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createAndSetZoomLevels(events, "events");
   }
+
 
   changeAllCitiesAndCreateCityNames() {
     var stadtInfoUser = Hive.box("secureBox").get("stadtinfoUser");
@@ -226,6 +228,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     buildLoaded = true;
 
     refreshStadtinfoUser();
+
+    setState(() {});
   }
 
   getProfilsFromDB() async {
@@ -1674,10 +1678,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
-              if (eventsKontinente == null) {
-                createAndSetZoomLevels(events, "events");
-              }
-
               if (eventMarkerOn) {
                 eventMarkerOn = false;
                 popupActive = false;
@@ -1744,10 +1744,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
-              if (communitiesCountries == null) {
-                createAndSetZoomLevels(communities, "communities");
-              }
-
               if (communityMarkerOn) {
                 communityMarkerOn = false;
                 popupActive = false;

@@ -76,7 +76,7 @@ class _ImageGalerieState extends State<ImageGalerie> {
       imageLoading = false;
     });
 
-    dbDeleteImage(oldImage);
+    DbDeleteImage(oldImage);
 
     EventDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.event["id"]}'");
