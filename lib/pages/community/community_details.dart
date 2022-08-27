@@ -242,7 +242,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var image = "https://families-worldwide.com/bilder/" + imageName;
     _saveChangeImage(image);
 
-    dbDeleteImage(oldImage);
+    DbDeleteImage(oldImage);
   }
 
   _windowChangeImageWithLink() async {
@@ -306,7 +306,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["bild"] = selectedImage;
     }
 
-    dbDeleteImage(oldImage);
+    DbDeleteImage(oldImage);
 
     await CommunityDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.community["id"]}'");
