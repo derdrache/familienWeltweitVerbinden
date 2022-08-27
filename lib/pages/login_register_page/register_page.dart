@@ -47,9 +47,6 @@ class _RegisterPageState extends State<RegisterPage> {
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
 
-        await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: email, password: password);
-
         success =  true;
       } on FirebaseAuthException catch (error) {
         if (error.code == "email-already-in-use") {

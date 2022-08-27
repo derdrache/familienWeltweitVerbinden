@@ -32,6 +32,11 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     ProfilDatabase().updateProfil(
         "reisePlanung = '${jsonEncode(widget.reiseplanung)}'",
         "WHERE id = '${widget.userId}'");
+
+    NewsPageDatabase().addNewNews({
+      "typ": "reiseplanung",
+      "information": json.encode(widget.reiseplanung.last),
+    });
   }
 
   checkOverlappingPeriods(newPlan) {

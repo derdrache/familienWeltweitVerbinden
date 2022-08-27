@@ -237,6 +237,21 @@ class LocationService {
     return {"ger": countriesListGer, "eng": countriesListEng};
   }
 
+  getAllContinents(){
+    List<String> continentsListGer = [];
+    List<String> continentsListEng = [];
+
+    for (var continent in kontinentGeodata) {
+      continentsListGer.add(continent["kontinentGer"]);
+      continentsListEng.add(continent["kontinentEng"]);
+    }
+
+    continentsListGer.sort();
+    continentsListEng.sort();
+
+    return {"ger": continentsListGer, "eng": continentsListEng};
+  }
+
   deleteNumbers(string){
     var words = string.split(" ");
     var newWords = [];

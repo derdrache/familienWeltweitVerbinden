@@ -11,6 +11,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'package:collection/collection.dart';
 
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';
@@ -39,7 +40,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var profils = [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   var allCities = Hive.box('secureBox').get("stadtinfo");
-  var events = Hive.box('secureBox').get("events") ?? [];
+  var events = [];
   var communities = Hive.box('secureBox').get("communities") ?? [];
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
   MapController mapController = MapController();
@@ -65,8 +66,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double currentMapZoom = 1.6;
   double exactZoom = 10;
   double cityZoom = 8.5;
-  double countryZoom = 4.0;
-  double kontinentZoom = 2.5;
+  double countryZoom = 5.5;
+  double kontinentZoom = 3.5;
   var searchAutocomplete = SearchAutocomplete();
   LatLng mapPosition;
   bool buildLoaded = false;
@@ -91,6 +92,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var hiveProfils = Hive.box('secureBox').get("profils") ?? [];
     profils = [for (var profil in hiveProfils) Map.of(profil)];
 
+    setEvents();
+
     changeAllCitiesAndCreateCityNames();
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
@@ -99,6 +102,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
+  }
+
+  setEvents(){
+    var localDbEvents = Hive.box('secureBox').get("events") ?? [];
+
+    for(var event in localDbEvents){
+      if(event["art"] != 'privat' && event["art"] != 'private'){
+        events.add(event);
+      }
+    }
+
+    createAndSetZoomLevels(events, "events");
   }
 
   changeAllCitiesAndCreateCityNames() {
@@ -150,7 +165,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       if (profil["id"] == userId ||
           ownProfil["geblocktVon"].contains(profil["id"]) ||
-          monthDifference >= monthsUntilInactive) {
+          monthDifference >= monthsUntilInactive ||
+          profil["land"].isEmpty) {
         removeProfils.add(profil);
       } else {
         allUserName.add(profil["name"]);
@@ -175,8 +191,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var membersFound = 0;
 
       for (var i = 0; i < profils.length; i++) {
-
-        if(members.contains(userId) && members.contains(profils[i]["id"])){
+        if (members.contains(userId) && members.contains(profils[i]["id"])) {
           membersFound += 1;
           deleteProfils.add(profils[i]);
         } else if (members.contains(profils[i]["id"])) {
@@ -203,8 +218,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     await getProfilsFromDB();
     createAndSetZoomLevels(profils, "profils");
 
-    await getEventsFromDB();
-    createAndSetZoomLevels(events, "events");
     setSearchAutocomplete();
 
     await getCommunitiesFromDB();
@@ -222,15 +235,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     dbProfils = sortProfils(dbProfils);
 
+    Hive.box('secureBox').put("profils", dbProfils);
+
     var checkedProfils = [];
 
     for (var profil in dbProfils) {
-      if (profil["land"].isNotEmpty || profil["land"].isNotEmpty) {
+      if (profil["land"].isNotEmpty && profil["ort"].isNotEmpty && profil["name"] != "googleView") {
         checkedProfils.add(profil);
       }
     }
-
-    Hive.box('secureBox').put("profils", checkedProfils);
 
     profils = [for (var profil in checkedProfils) Map.of(profil)];
     removeProfilsAndCreateAllUserName();
@@ -289,7 +302,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
         spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
     searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context).filterErkunden,
         searchableItems:
             allUserName.toList() + countryDropDownList + allCitiesNames,
         onConfirm: () {
@@ -718,7 +730,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
       selectedComunityList = communitiesContinents;
     }
 
-    if (mounted) {
+
+    if (mounted && !DeepCollectionEquality().equals(choosenProfils, aktiveProfils)) {
       setState(() {
         aktiveProfils = choosenProfils ?? [];
         aktiveEvents = selectedEventList ?? [];
@@ -923,7 +936,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
                     AppLocalizations.of(context).interessen),
                 createCheckBoxen(windowSetState, sprachenSelection,
                     AppLocalizations.of(context).sprachen),
-
               ],
             );
           });
@@ -1115,7 +1127,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
       if (filterOn) return AppLocalizations.of(context).filterErgebnisse;
       if (eventMarkerOn) return AppLocalizations.of(context).neueEvents;
-      if (communityMarkerOn) return AppLocalizations.of(context).neueCommunities;
+      if (communityMarkerOn) {
+        return AppLocalizations.of(context).neueCommunities;
+      }
     }
 
     if (currentMapZoom < kontinentZoom) {
@@ -1176,6 +1190,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   @override
   Widget build(BuildContext context) {
     List<Marker> allMarker = [];
+    searchAutocomplete.hintText = AppLocalizations.of(context).filterErkunden;
 
     createPopupEvents({event, community, spezialActivation = false}) {
       double screenWidth = MediaQuery.of(context).size.width;
@@ -1501,23 +1516,27 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   size: markerSize,
                   color: Theme.of(context).colorScheme.primary),
               Positioned(
-                  top: 12,
+                  top: 8,
                   left: 8.5,
                   child: Container(
-                      padding: const EdgeInsets.only(left: 2, bottom: 2),
+                      alignment: Alignment.bottomCenter,
+                      padding: const EdgeInsets.only(left: 1),
                       decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(3.0),
-                              topRight: Radius.circular(3.0))),
+                              topLeft: Radius.circular(9.0),
+                              topRight: Radius.circular(9.0))),
                       width: 15,
-                      height: 14,
-                      child: Center(
-                          child: Text(numberText,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.black))))),
+                      height: 18,
+                      child: Text(numberText,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.black
+                          )
+                      )
+                  )
+              ),
             ],
           ),
           onPressed: buttonFunction,
@@ -1655,8 +1674,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
-              if (eventsKontinente == null)
+              if (eventsKontinente == null) {
                 createAndSetZoomLevels(events, "events");
+              }
 
               if (eventMarkerOn) {
                 eventMarkerOn = false;
@@ -1724,8 +1744,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ],
             ),
             onPressed: () {
-              if (communitiesCountries == null)
+              if (communitiesCountries == null) {
                 createAndSetZoomLevels(communities, "communities");
+              }
 
               if (communityMarkerOn) {
                 communityMarkerOn = false;

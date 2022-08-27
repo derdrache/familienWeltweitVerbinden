@@ -12,8 +12,8 @@ import '../global/global_functions.dart'as global_functions;
 import 'notification.dart';
 
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 
@@ -110,8 +110,8 @@ class ProfilDatabase{
 
     await http.post(url, body: json.encode({
       "id": userId,
-      "land": locationDict["land"],
-      "city": locationDict["ort"],
+      "land": locationDict["countryname"],
+      "city": locationDict["city"],
       "longt":locationDict["longt"],
       "latt": locationDict["latt"]
     }));
@@ -119,13 +119,14 @@ class ProfilDatabase{
 
   deleteProfil(userId) async {
     try{
-      FirebaseAuth.instance.currentUser.delete();
+      await FirebaseAuth.instance.currentUser.delete();
     }catch(_){
       return false;
     }
-
-
+    
     _deleteInTable("profils", userId);
+    _deleteInTable("newsSettings", userId);
+    _deleteInTable("news_page", userId);
 
     updateProfil(
         "friendlist = JSON_REMOVE(friendlist, JSON_UNQUOTE(JSON_SEARCH(friendlist, 'one', '$userId')))",
@@ -133,8 +134,10 @@ class ProfilDatabase{
     );
 
     var userEvents = await EventDatabase().getData("id", "WHERE erstelltVon = '$userId'", returnList: true);
-    for(var eventId in userEvents){
-      _deleteInTable("events", eventId);
+    if(userEvents != false){
+      for(var eventId in userEvents){
+        _deleteInTable("events", eventId);
+      }
     }
 
     EventDatabase().update(
@@ -503,8 +506,8 @@ class CommunityDatabase{
     return responseBody;
   }
 
-  delete(communityId){
-    _deleteInTable("communities", communityId);
+  delete(communityId) async {
+    await _deleteInTable("communities", communityId);
   }
 }
 
@@ -808,6 +811,150 @@ class FamiliesDatabase{
   }
 }
 
+class NewsPageDatabase{
+  addNewNews(news) async{
+    var url = Uri.parse(databaseUrl + "database/newsPage/newNews.php");
+    news["erstelltAm"] = DateTime.now().toString();
+    news["erstelltVon"] = FirebaseAuth.instance.currentUser.uid;
+
+    await http.post(url, body: json.encode(news));
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "news_page",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "news_page"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+
+    return responseBody;
+  }
+
+  delete(newsId){
+    _deleteInTable("news_page", newsId);
+  }
+}
+
+class NewsSettingsDatabase{
+
+  newProfil() async{
+    var url = Uri.parse(databaseUrl + "database/newsSettings/newProfil.php");
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    await http.post(url, body: json.encode({
+      "userId" : userId
+    }));
+  }
+
+  update(whatData, queryEnd) async  {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "news_settings",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "news_settings"
+    }));
+
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+
+    return responseBody;
+  }
+
+  delete(profilId){
+    _deleteInTable("news_settings", profilId);
+  }
+}
+
+
 uploadImage(imagePath, imageName, image) async{
   var url = Uri.parse("https://families-worldwide.com/database/uploadImage.php");
   var data = {
@@ -835,10 +982,10 @@ dbDeleteImage(imageName) async{
   await http.post(url, body: json.encode(data));
 }
 
-_deleteInTable(table, id) {
+_deleteInTable(table, id) async {
   var url = Uri.parse(databaseUrl + "database/deleteAll.php");
 
-  http.post(url, body: json.encode({
+  await http.post(url, body: json.encode({
     "id": id,
     "table": table
   }));
