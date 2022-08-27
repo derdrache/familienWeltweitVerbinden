@@ -11,7 +11,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
-import 'package:collection/collection.dart';
 
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';
@@ -116,7 +115,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createAndSetZoomLevels(events, "events");
   }
-
 
   changeAllCitiesAndCreateCityNames() {
     var stadtInfoUser = Hive.box("secureBox").get("stadtinfoUser");
@@ -735,7 +733,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
 
-    if (mounted && !DeepCollectionEquality().equals(choosenProfils, aktiveProfils)) {
+    if (mounted) {
       setState(() {
         aktiveProfils = choosenProfils ?? [];
         aktiveEvents = selectedEventList ?? [];
