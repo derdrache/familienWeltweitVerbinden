@@ -42,6 +42,7 @@ class _EventErstellenState extends State<EventErstellen> {
   var ortTypDropdown = CustomDropDownButton();
   var ortAuswahlBox = GoogleAutoComplete();
   var eventIntervalDropdown = CustomDropDownButton();
+  var ownEvent = true;
 
   @override
   void initState() {
@@ -57,6 +58,7 @@ class _EventErstellenState extends State<EventErstellen> {
     ortTypDropdown = CustomDropDownButton(
       selected: "offline",
       hintText: "offline / online",
+      labelText: "Event typ",
       items: isGerman ? global_var.eventTyp : global_var.eventTypEnglisch,
       onChange: () {
         setState(() {});
@@ -136,6 +138,7 @@ class _EventErstellenState extends State<EventErstellen> {
       "zeitzone": DateTime.now().timeZoneOffset.inHours.toString(),
       "interesse": json.encode([userID]),
       "bild": "assets/bilder/strand.jpg",
+      "ownEvent": ownEvent
     };
 
     await EventDatabase().addNewEvent(eventData);
@@ -196,7 +199,9 @@ class _EventErstellenState extends State<EventErstellen> {
     double screenWidth = MediaQuery.of(context).size.width;
     sprachenAuswahlBox.hintText =
         AppLocalizations.of(context).spracheAuswaehlen;
+    eventArtDropdown.labelText =  AppLocalizations.of(context).eventOeffentlichkeit;
     eventArtDropdown.hintText = AppLocalizations.of(context).eventArten;
+    eventIntervalDropdown.labelText = AppLocalizations.of(context).eventWiederholung;
     eventIntervalDropdown.hintText = isGerman
         ? global_var.eventInterval.join(", ")
         : global_var.eventIntervalEnglisch.join(", ");
@@ -215,9 +220,9 @@ class _EventErstellenState extends State<EventErstellen> {
               dateTimeTyp == "bis"
           ? const SizedBox.shrink()
           : Align(
-            child: Container(
-              width: 600,
-                margin: const EdgeInsets.only(left: 10, right: 10),
+              child: Container(
+                width: 600,
+                margin: const EdgeInsets.only(left: 20, right: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -269,7 +274,7 @@ class _EventErstellenState extends State<EventErstellen> {
                   ],
                 ),
               ),
-          );
+            );
     }
 
     ortEingabeBox() {
@@ -365,6 +370,31 @@ class _EventErstellenState extends State<EventErstellen> {
                   })));
     }
 
+    ownEventBox() {
+      return Container(
+        margin: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Container(
+                padding: const EdgeInsets.only(left:10),
+                width: screenWidth * 0.75,
+                child: Text(AppLocalizations.of(context).frageErstellerEvent,
+                    maxLines: 2, style: const TextStyle(fontSize: 18),)),
+            const Expanded(
+              child: SizedBox.shrink(),
+            ),
+            Checkbox(
+                value: ownEvent,
+                onChanged: (value) {
+                  setState(() {
+                    ownEvent = value;
+                  });
+                }),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).eventErstellen,
@@ -386,6 +416,7 @@ class _EventErstellenState extends State<EventErstellen> {
           eventIntervalDropdown,
           dateTimeBox(eventWannDatum, eventWannUhrzeit, "wann"),
           dateTimeBox(eventBisDatum, eventBisUhrzeit, "bis"),
+          ownEventBox(),
           customTextInput(AppLocalizations.of(context).eventBeschreibung,
               eventBeschreibungKontroller,
               moreLines: 8, textInputAction: TextInputAction.newline),

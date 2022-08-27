@@ -42,7 +42,7 @@ class _EventPageState extends State<EventPage> {
                 afterPageVisit: () => changePage(
                     context,
                     StartPage(
-                      selectedIndex: 1,
+                      selectedIndex: 2,
                     ))),
             if (isOwner)
               Positioned(

@@ -44,15 +44,14 @@ class _CommunityCardState extends State<CommunityCard> {
     var isAssetImage =
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
-
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => CommunityDetails(community: widget.community)))
+                context,
+                MaterialPageRoute(
+                    builder: (_) =>
+                        CommunityDetails(community: widget.community)))
             .whenComplete(() => widget.afterPageVisit());
-
       },
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
@@ -102,11 +101,10 @@ class _CommunityCardState extends State<CommunityCard> {
                         top: 2,
                         right: 8,
                         child: InteresseButton(
-                          hasIntereset:
-                              widget.community["interesse"].contains(userId),
-                          id: widget.community["id"].toString(),
-                          afterFavorite: widget.afterFavorite
-                        )),
+                            hasIntereset:
+                                widget.community["interesse"].contains(userId),
+                            id: widget.community["id"].toString(),
+                            afterFavorite: widget.afterFavorite)),
                 ],
               ),
               Expanded(
@@ -135,13 +133,14 @@ class _CommunityCardState extends State<CommunityCard> {
                           ],
                         ),
                         const SizedBox(height: 2.5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(widget.community["land"],
-                                style: TextStyle(fontSize: fontSize))
-                          ],
-                        ),
+                        if (widget.community["ort"] != widget.community["land"])
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(widget.community["land"],
+                                  style: TextStyle(fontSize: fontSize))
+                            ],
+                          ),
                       ],
                     )),
               )
@@ -156,7 +155,8 @@ class InteresseButton extends StatefulWidget {
   String id;
   Function afterFavorite;
 
-  InteresseButton({Key key, this.hasIntereset, this.id, this.afterFavorite}) : super(key: key);
+  InteresseButton({Key key, this.hasIntereset, this.id, this.afterFavorite})
+      : super(key: key);
 
   @override
   _InteresseButtonState createState() => _InteresseButtonState();
@@ -170,10 +170,8 @@ class _InteresseButtonState extends State<InteresseButton> {
 
     setState(() {});
 
-
-
-    var interesseList =
-        await CommunityDatabase().getData("interesse", "WHERE id = '${widget.id}'");
+    var interesseList = await CommunityDatabase()
+        .getData("interesse", "WHERE id = '${widget.id}'");
 
     if (widget.hasIntereset) {
       interesseList.add(userId);
@@ -181,7 +179,8 @@ class _InteresseButtonState extends State<InteresseButton> {
       interesseList.remove(userId);
     }
 
-    await CommunityDatabase().update("interesse = '${json.encode(interesseList)}'",
+    await CommunityDatabase().update(
+        "interesse = '${json.encode(interesseList)}'",
         "WHERE id ='${widget.id}'");
 
     widget.afterFavorite();
@@ -191,7 +190,8 @@ class _InteresseButtonState extends State<InteresseButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () => setInteresse(),
-        child: Icon(Icons.star, size: 30,
+        child: Icon(Icons.star,
+            size: 30,
             color: widget.hasIntereset ? Colors.amberAccent : Colors.black));
   }
 }

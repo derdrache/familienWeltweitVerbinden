@@ -43,7 +43,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var windowSetState;
   List<String> imagePaths;
   String selectedImage;
-  List allUserNames =[];
+  List allUserNames = [];
   List allUserIds = [];
   var searchAutocomplete = SearchAutocomplete();
   final _controller = ScrollController();
@@ -56,7 +56,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     _initImages();
     _getDBDataSetAllUserNames();
 
-    if(!widget.community["link"].contains("http")) {
+    if (!widget.community["link"].contains("http")) {
       widget.community["link"] = "http://" + widget.community["link"];
     }
 
@@ -78,7 +78,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   _getDBDataSetAllUserNames() async {
     var dbProfils = await ProfilDatabase().getData("name, id", "");
 
-    for(var profil in dbProfils){
+    for (var profil in dbProfils) {
       allUserNames.add(profil["name"]);
       allUserIds.add(profil["id"]);
     }
@@ -188,7 +188,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
-    if(pickedImage == null) return;
+    if (pickedImage == null) return;
 
     setState(() {
       imageLoading = true;
@@ -528,8 +528,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       return [
         Center(
             heightFactor: 10,
-            child: Text(
-                AppLocalizations.of(context).nochKeineFreundeVorhanden,
+            child: Text(AppLocalizations.of(context).nochKeineFreundeVorhanden,
                 style: const TextStyle(color: Colors.grey)))
       ];
     }
@@ -568,17 +567,18 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var userIndex = allUserNames.indexOf(newMember);
     var newMemberId = allUserIds[userIndex];
 
-
-
-    if(widget.community["members"].contains(newMemberId)){
-      customSnackbar(context, newMember + AppLocalizations.of(context).istSchonMitgliedCommunity);
+    if (widget.community["members"].contains(newMemberId)) {
+      customSnackbar(context,
+          newMember + AppLocalizations.of(context).istSchonMitgliedCommunity);
       return;
     }
-    if(widget.community["einladung"].contains(newMemberId)){
-      customSnackbar(context, newMember + AppLocalizations.of(context).wurdeSchonEingeladenCommunity);
+    if (widget.community["einladung"].contains(newMemberId)) {
+      customSnackbar(
+          context,
+          newMember +
+              AppLocalizations.of(context).wurdeSchonEingeladenCommunity);
       return;
     }
-
 
     setState(() {
       widget.community["einladung"].add(newMemberId);
@@ -588,7 +588,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",
         "WHERE id = '${widget.community["id"]}'");
 
-    customSnackbar(context, newMember + AppLocalizations.of(context).wurdeEingeladenCommunity, color: Colors.green);
+    customSnackbar(context,
+        newMember + AppLocalizations.of(context).wurdeEingeladenCommunity,
+        color: Colors.green);
   }
 
   _showMembersWindow() async {
@@ -681,8 +683,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     fontsize = isWebDesktop ? 12 : 16;
     var isCreator = widget.community["erstelltVon"].contains(userId);
+
 
     _deleteWindow() {
       showDialog(
@@ -700,10 +704,16 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () async {
+
+                    var communities = Hive.box('secureBox').get("communities");
+                    communities.remove(widget.community);
+
                     await CommunityDatabase().delete(widget.community["id"]);
-                    dbDeleteImage(widget.community["bild"]);
+
+                    DbDeleteImage(widget.community["bild"]);
+
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 2));
+                        context, StartPage(selectedIndex: 3));
                   },
                 ),
                 TextButton(
@@ -830,13 +840,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           _changeImageWindow(getTabPostion);
         },
         child: isAssetImage
-            ? Image.asset(widget.community["bild"])
+            ? Image.asset(widget.community["bild"], height: screenWidth > 600 ? screenHeight /3  : null)
             : Image.network(widget.community["bild"],
-                height: screenHeight / 3, fit: BoxFit.fitWidth),
+            height: screenHeight / 3, fit: screenWidth > 600 ? null :  BoxFit.fitWidth),
       );
     }
 
     _communityInformation() {
+      var fremdeCommunity = widget.community["ownCommunity"] == 0;
+
       return Container(
         margin: const EdgeInsets.all(10),
         padding: const EdgeInsets.only(bottom: 10),
@@ -852,6 +864,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               )),
             ),
+            const SizedBox(height: 20),
+            if (fremdeCommunity)
+              SizedBox(
+                width: screenWidth * 0.9,
+                child: Text(AppLocalizations.of(context).nichtTeilGemeinschaft,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.red, fontSize: 18),
+                    maxLines: 2),
+              ),
             const SizedBox(height: 20),
             InkWell(
               onTap: () => isCreator ? _changeOrtWindow() : null,
@@ -871,7 +892,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               onTapDown: (tabDetails) {
                 var getTabPostion = tabDetails.globalPosition;
                 var link = widget.community["link"];
-                if(!link.contains("http")) link = "http://" + link;
+                if (!link.contains("http")) link = "http://" + link;
 
                 if (isCreator) _changeOrOpenLinkWindow(getTabPostion);
                 if (!isCreator) launch(widget.community["link"]);
@@ -889,13 +910,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               ),
             ),
             const SizedBox(height: 20),
-            GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () => isCreator ? _changeBeschreibungWindow() : null,
-                child: Container(
-                    height: 200,
-                    child: TextWithHyperlinkDetection(
-                        text: widget.community["beschreibung"])))
+            SizedBox(
+              height: 100,
+              width: double.infinity,
+              child: TextWithHyperlinkDetection(
+                text: widget.community["beschreibung"],
+                onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
+              ),
+            )
           ],
         ),
       );
@@ -903,7 +925,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     _footbar() {
       return Container(
-        width: MediaQuery.of(context).size.width - 20,
+        width: screenWidth - 20,
         margin: const EdgeInsets.all(10),
         child: Row(
           //mainAxisAlignment: MainAxisAlignment.end,
@@ -955,7 +977,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         ),
         body: Stack(
           children: [
-            Container(
+            SizedBox(
               height: screenHeight,
               child: ListView(
                 controller: _controller,
