@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../global/variablen.dart' as global_var;
 
-
 class GoogleAutoComplete extends StatefulWidget {
   List searchableItems = [];
   List autoCompleteItems = [];
@@ -16,29 +15,30 @@ class GoogleAutoComplete extends StatefulWidget {
   var googleSearchResult;
   var sessionToken = const Uuid().v4();
 
-  getGoogleLocationData(){
-    return googleSearchResult ?? {
-      "city": null,
-      "countryname": null,
-      "longt": null,
-      "latt": null,
-      "adress": null
-    };
+  getGoogleLocationData() {
+    return googleSearchResult ??
+        {
+          "city": null,
+          "countryname": null,
+          "longt": null,
+          "latt": null,
+          "adress": null
+        };
   }
 
   _googleAutoCompleteSuche(input) async {
     var googleInput = input;
     searchableItems = [];
-    var googleSuche = await LocationService().getGoogleAutocompleteItems(googleInput, sessionToken);
-    if(googleSuche.isEmpty) return ;
+    var googleSuche = await LocationService()
+        .getGoogleAutocompleteItems(googleInput, sessionToken);
+    if (googleSuche.isEmpty) return;
 
     final Map<String, dynamic> data = Map.from(googleSuche);
     searchableItems = data["predictions"];
-
   }
 
-
-  GoogleAutoComplete({Key key,
+  GoogleAutoComplete({
+    Key key,
     this.hintText,
     this.width,
     this.suche = true,
@@ -51,51 +51,48 @@ class GoogleAutoComplete extends StatefulWidget {
 class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   double dropdownExtraBoxHeight = 50;
 
-
-  showAutoComplete(text){
-    if(text.length == 0) {
+  showAutoComplete(text) {
+    if (text.length == 0) {
       widget.isSearching = false;
-    } else{
+    } else {
       widget.isSearching = true;
     }
 
     setState(() {});
-
   }
 
-  addAutoCompleteItems(text){
+  addAutoCompleteItems(text) {
     widget.autoCompleteItems = [];
-    if(text.isEmpty) return widget.autoCompleteItems;
+    if (text.isEmpty) return widget.autoCompleteItems;
 
-    for(var item in widget.searchableItems){
-      if(item["description"] != widget.searchKontroller.text){
+    for (var item in widget.searchableItems) {
+      if (item["description"] != widget.searchKontroller.text) {
         widget.autoCompleteItems.add(item);
       }
     }
   }
 
-  resetSearchBar(){
+  resetSearchBar() {
     widget.isSearching = false;
     widget.autoCompleteItems = [];
     FocusScope.of(context).unfocus();
 
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   getGoogleSearchLocationData(placeId) async {
-    var locationData = await LocationService().getLocationdataFromGoogleID(placeId, widget.sessionToken);
+    var locationData = await LocationService()
+        .getLocationdataFromGoogleID(placeId, widget.sessionToken);
 
-    var databaseLocationData = await LocationService().getDatabaseLocationdataFromGoogleResult(locationData);
+    var databaseLocationData = await LocationService()
+        .getDatabaseLocationdataFromGoogleResult(locationData);
     return databaseLocationData;
   }
-
 
   @override
   Widget build(BuildContext context) {
     double dropdownItemSumHeight = widget.autoCompleteItems.length * 38.0;
-    if(widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = 152;
+    if (widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = 152;
 
     dropDownItem(item) {
       return GestureDetector(
@@ -115,11 +112,11 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
       );
     }
 
-    autoCompleteDropdownBox(){
+    autoCompleteDropdownBox() {
       List<Widget> autoCompleteList = [];
 
-      for(var item in widget.autoCompleteItems){
-        autoCompleteList.add( dropDownItem(item));
+      for (var item in widget.autoCompleteItems) {
+        autoCompleteList.add(dropDownItem(item));
       }
 
       return Container(
@@ -137,13 +134,12 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.all(Radius.circular(5)),
-          border: Border.all()
-      ),
-      height:  dropdownExtraBoxHeight + dropdownItemSumHeight,
-      margin: const EdgeInsets.all(10),
-      //padding: EdgeInsets.only(left: 5),
-      child:Stack(
-        clipBehavior: Clip.none, children: [
+          border: Border.all()),
+      height: dropdownExtraBoxHeight + dropdownItemSumHeight,
+      margin: const EdgeInsets.all(5),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
           Column(
             children: [
               Padding(
@@ -155,8 +151,8 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                         isDense: widget.isDense,
                         border: InputBorder.none,
                         hintText: widget.hintText,
-                        hintStyle: const TextStyle(fontSize: 15, color: Colors.grey)
-                    ),
+                        hintStyle:
+                            const TextStyle(fontSize: 15, color: Colors.grey)),
                     style: const TextStyle(),
                     onChanged: (value) async {
                       await widget._googleAutoCompleteSuche(value);
@@ -165,47 +161,21 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                       addAutoCompleteItems(value);
 
                       setState(() {});
-                    }
-                ),
+                    }),
               ),
-              if(widget.isSearching) autoCompleteDropdownBox()
-
+              if (widget.isSearching) autoCompleteDropdownBox()
             ],
           ),
           const Positioned(
               right: 15,
               top: 12,
-              child: Icon(Icons.search, size: 25, color: Colors.black,)
-          ),
+              child: Icon(
+                Icons.search,
+                size: 25,
+                color: Colors.black,
+              )),
         ],
       ),
     );
   }
 }
-
-/*
-class GoogleAutocomplete2 extends StatelessWidget {
-  const GoogleAutocomplete2({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Autocomplete(
-        optionsBuilder: (TextEditingValue textEditingValue) {
-          if (textEditingValue.text == '') {
-            return const Iterable<User>.empty();
-          }
-          return _userOptions.where((User option) {
-            return option
-                .toString()
-                .contains(textEditingValue.text.toLowerCase());
-          });
-        },
-        onSelected: (User selection) {
-          debugPrint('You just selected ${_displayStringForOption(selection)}');
-        }
-    );
-  }
-}
-
-
- */

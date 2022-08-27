@@ -266,15 +266,23 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           ),
           onPressed: () {
             var snackbarText = "";
+            var newsData = {
+              "typ": "friendlist",
+              "information": "",
+            };
 
             if (onFriendlist) {
               userFriendlist.remove(widget.profil["id"]);
               snackbarText = widget.profil["name"] +
                   AppLocalizations.of(context).friendlistEntfernt;
+
+              newsData["information"] = "added " + widget.profil["id"];
+              NewsPageDatabase().addNewNews(newsData);
             } else {
               userFriendlist.add(widget.profil["id"]);
               snackbarText = widget.profil["name"] +
                   AppLocalizations.of(context).friendlistHinzugefuegt;
+
 
               prepareFriendNotification(
                   newFriendId: userID,
@@ -294,6 +302,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             ProfilDatabase().updateProfil(
                 "friendlist = '${jsonEncode(userFriendlist)}'",
                 "WHERE id = '$userID'");
+
+
 
             Navigator.pop(context);
             setState(() {});
