@@ -207,7 +207,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     global_functions.changePage(
         context,
         ShowProfilPage(
-          userName: userName,
           profil: chatPartnerProfil,
         ));
   }
@@ -441,9 +440,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     return Scaffold(
-        appBar: CustomAppBar(
+        appBar: chatPartnerProfil != false ? CustomAppBar(
           title: widget.chatPartnerName ?? "",
+          profilBildProfil : chatPartnerProfil,
           onTap: () => openProfil(),
+        ) : CustomAppBar(
+          title: AppLocalizations.of(context).geloeschterUser
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.end,

@@ -194,9 +194,7 @@ class _EventCardState extends State<EventCard> {
       },
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
-          //  Android 165
           height: screenHeight / 3.2 * bigMultiplikator,
-          // Android 220 ~3,4
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
