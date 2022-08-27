@@ -54,7 +54,7 @@ class _ProfilImageState extends State<ProfilImage> {
   }
 
   deleteOldImage(oldLink) {
-    DbDeleteImage(oldLink);
+    dbDeleteImage(oldLink);
   }
 
   pickAndUploadImage() async {

@@ -286,7 +286,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   child: const Text("Ok"),
                   onPressed: () {
                     EventDatabase().delete(widget.event["id"]);
-                    DbDeleteImage(widget.event["bild"]);
+                    dbDeleteImage(widget.event["bild"]);
                     global_func.changePageForever(
                         context, StartPage(selectedIndex: 2));
                   },
