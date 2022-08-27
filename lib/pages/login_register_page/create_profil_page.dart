@@ -112,6 +112,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         return;
       }
 
+
       var data = {
         "id": userID,
         "email": email,
@@ -134,6 +135,11 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         var ownProfil =
             await ProfilDatabase().getData("*", "WHERE id = '$userID'");
         Hive.box('secureBox').put("ownProfil", ownProfil);
+
+        NewsPageDatabase().addNewNews({
+          "typ": "ortswechsel",
+          "information": json.encode(ortMapData),
+        });
 
         global_functions.changePageForever(context, StartPage());
       } catch (_) {

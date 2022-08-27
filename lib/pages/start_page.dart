@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:familien_suche/pages/settings/family_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
+import "package:universal_html/js.dart" as js;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 import '../global/custom_widgets.dart';
@@ -21,6 +23,7 @@ import 'community/community_page.dart';
 import 'force_update.dart';
 import 'events/event_page.dart';
 import 'login_register_page/create_profil_page.dart';
+import 'news/news_page.dart';
 import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
@@ -133,12 +136,20 @@ class _StartPageState extends State<StartPage> {
       if (automaticLocationStatus == standortbestimmung[1] ||
           automaticLocationStatus == standortbestimmungEnglisch[1]) {
 
-        ProfilDatabase().updateProfilLocation(userId, {
+        var locationData = {
           "ort": nearstLocationData["city"],
           "land": nearstLocationData["country"],
           "longt": currentPosition.longitude,
           "latt": currentPosition.latitude,
+        };
+
+        ProfilDatabase().updateProfilLocation(userId, locationData);
+
+        NewsPageDatabase().addNewNews({
+          "typ": "ortswechsel",
+          "information": json.encode(locationData),
         });
+
         return;
       } else if (automaticLocationStatus == standortbestimmung[2] ||
           automaticLocationStatus == standortbestimmungEnglisch[2]) {
@@ -159,14 +170,21 @@ class _StartPageState extends State<StartPage> {
       await StadtinfoDatabase().addNewCity(locationData);
       StadtinfoDatabase().update(
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
+      );
+      NewsPageDatabase().addNewNews({
+        "typ": "ortswechsel",
+        "information": json.encode(locationData),
+      });
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
     List<Widget> tabPages = <Widget>[
-      //FamilieProfilPage(),
+      const NewsPage(),
       const ErkundenPage(),
       const EventPage(),
       const CommunityPage(),
@@ -262,8 +280,77 @@ class _StartPageState extends State<StartPage> {
       }
     }
 
+    Future<bool> showAddHomePageDialog(BuildContext context) async {
+      return showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                      child: Icon(
+                        Icons.add_circle,
+                        size: 70,
+                        color: Theme.of(context).primaryColor,
+                      )),
+                  const SizedBox(height: 20.0),
+                  Text(
+                    AppLocalizations.of(context).a2hsTitle,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 20.0),
+                  Text(
+                    AppLocalizations.of(context).a2hsBody,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 20.0),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          js.context.callMethod("presentAddToHome");
+                          Navigator.pop(context, false);
+                        },
+                        child: Text(AppLocalizations.of(context).ja)),
+                    const SizedBox(width: 50),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                        child: Text(AppLocalizations.of(context).nein))
+                  ],)
+
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    checkA2HS(){
+      if (kIsWeb) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          var usedA2HS = localBox.get("a2hs");
+          if (usedA2HS == null) {
+            final bool isDeferredNotNull =
+            js.context.callMethod("isDeferredNotNull") as bool;
+
+            if (isDeferredNotNull){
+              localBox.put("a2hs", true);
+              await showAddHomePageDialog(context);
+            }
+          }
+        });
+      }
+    }
+
     if (!kIsWeb) hasNetwork();
     if (!kIsWeb) checkForceUpdate();
+    checkA2HS();
     checkProfilExist();
 
     return Scaffold(
@@ -277,13 +364,10 @@ class _StartPageState extends State<StartPage> {
           selectedItemColor: Colors.white,
           onTap: _onItemTapped,
           items: <BottomNavigationBarItem>[
-/*
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
               icon: Icon(Icons.feed),
               label: 'News',
             ),
-*/
-
             const BottomNavigationBarItem(
               icon: Icon(Icons.map),
               label: 'World',

@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+
 import 'firebase_options.dart';
 import 'pages/start_page.dart';
 import 'pages/show_profil.dart';
@@ -48,6 +49,12 @@ hiveInit() async {
     List<dynamic> dbProfils = await ProfilDatabase().getData("*", "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
 
+    var viewAccounts = [];
+
+    for(var profil in dbProfils){
+      if(profil["name"] != "googleView") viewAccounts.add(profil);
+    }
+
     Hive.box('secureBox').put("profils", dbProfils);
   }
 
@@ -80,7 +87,21 @@ sortProfils(profils) {
   return profils;
 }
 
+refreshHiveChats() async{
+  String userId = FirebaseAuth.instance.currentUser?.uid;
+
+  if(userId == null) return;
+
+  var myChatData = await ChatDatabase().getChatData("*",
+      "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+      returnList: true);
+  Hive.box("secureBox").put("myChats", myChatData);
+}
+
 refreshHiveData() async {
+
+  refreshHiveChats();
+
   var stadtinfo = await StadtinfoDatabase()
       .getData("*", "ORDER BY ort ASC", returnList: true);
   Hive.box("secureBox").put("stadtinfo", stadtinfo);
@@ -94,6 +115,8 @@ refreshHiveData() async {
   Hive.box("secureBox").put("familyProfils", familyProfils);
 
 }
+
+
 
 
 void main() async {
@@ -213,6 +236,9 @@ class MyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,
     ));
+
+
+
 
     return FutureBuilder(
         future: _initialization(),

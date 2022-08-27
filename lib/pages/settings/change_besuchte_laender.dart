@@ -11,7 +11,7 @@ import '../../widgets/custom_appbar.dart';
 
 class ChangeBesuchteLaenderPage extends StatefulWidget {
   var userId = FirebaseAuth.instance.currentUser.uid;
-  List selected;
+  var selected;
   bool isGerman;
 
   ChangeBesuchteLaenderPage(

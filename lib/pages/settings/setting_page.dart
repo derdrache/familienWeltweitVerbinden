@@ -69,9 +69,9 @@ class _SettingPageState extends State<SettingPage> {
       childrenAgeTimestamp.add(changeTimeStamp.intoDate());
     });
 
-    interessenInputBox.selected = spracheIstDeutsch
+    interessenInputBox.selected = List<String>.from(spracheIstDeutsch
         ? global_func.changeEnglishToGerman(userProfil["interessen"])
-        : global_func.changeGermanToEnglish(userProfil["interessen"]);
+        : global_func.changeGermanToEnglish(userProfil["interessen"]));
 
     kinderAgeBox.setSelected(childrenAgeTimestamp);
 
@@ -79,9 +79,9 @@ class _SettingPageState extends State<SettingPage> {
         ? global_func.changeEnglishToGerman(userProfil["reiseart"])
         : global_func.changeGermanToEnglish(userProfil["reiseart"]);
 
-    sprachenInputBox.selected = spracheIstDeutsch
+    sprachenInputBox.selected = List<String>.from(spracheIstDeutsch
         ? global_func.changeEnglishToGerman(userProfil["sprachen"])
-        : global_func.changeGermanToEnglish(userProfil["sprachen"]);
+        : global_func.changeGermanToEnglish(userProfil["sprachen"]));
   }
 
   openSettingWindow() async {
@@ -267,7 +267,7 @@ class _SettingPageState extends State<SettingPage> {
 
     profilContainer() {
       var reisePlanung = userProfil["reisePlanung"];
-      var besuchteLaender = userProfil["besuchteLaender"] ?? [];
+      List<String> besuchteLaender = List<String>.from(userProfil["besuchteLaender"] ?? []);
 
       return Container(
           width: double.maxFinite,
