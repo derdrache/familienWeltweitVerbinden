@@ -140,7 +140,10 @@ class _NewsPageState extends State<NewsPage> {
     var ownInteressen = ownProfil["interessen"];
 
     for (var interesse in ownInteressen) {
-      if (tags.contains(interesse)) return true;
+      if (tags.contains(global_func.changeGermanToEnglish(interesse)) ||
+          tags.contains(global_func.changeEnglishToGerman(interesse))) {
+        return true;
+      }
     }
 
     return false;
@@ -200,8 +203,7 @@ class _NewsPageState extends State<NewsPage> {
     Hive.box('secureBox').put("userNewsContent", userNewsContent);
   }
 
-  isEmptyWidgetList(widgetList){
-
+  isEmptyWidgetList(widgetList) {
     for (var widget in widgetList) {
       if (!(widget.runtimeType == SizedBox)) {
         return false;
