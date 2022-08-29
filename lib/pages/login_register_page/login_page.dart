@@ -149,9 +149,11 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(width: 15),
                     Column(
                       children: [
-                        Text(AppLocalizations.of(context).willkommenBeiAppName,
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold)),
+                        Center(
+                          child: Text(AppLocalizations.of(context).willkommenBeiAppName,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                        ),
                         const SizedBox(height: 20),
                         Text(
                           AppLocalizations.of(context).slogn1 +
@@ -168,6 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                     Center(child: Image.asset('assets/WeltFlugzeug.png')),
                     const SizedBox(height: 15),
                     Text(AppLocalizations.of(context).willkommenBeiAppName,
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),

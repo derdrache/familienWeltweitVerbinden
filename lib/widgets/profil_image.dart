@@ -282,18 +282,21 @@ class OwnProfilImage extends StatelessWidget {
 
     return InkWell(
         onTap: fullScreenWindow ? () => showBigImage() : null,
-        child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: profil["bild"][0].contains("http")
-                ? CachedNetworkImage(
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    imageUrl: profil["bild"][0],
-                    placeholder: (context, url) => Container(
-                          color: Colors.black12,
-                        ))
-                : Image.asset(profil["bild"][0],
-                    width: 60, height: 60, fit: BoxFit.cover)));
+        child: Padding(
+          padding: const EdgeInsets.only(right: 5, left: 5),
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: profil["bild"][0].contains("http")
+                  ? CachedNetworkImage(
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      imageUrl: profil["bild"][0],
+                      placeholder: (context, url) => Container(
+                            color: Colors.black12,
+                          ))
+                  : Image.asset(profil["bild"][0],
+                      width: 60, height: 60, fit: BoxFit.cover)),
+        ));
   }
 }

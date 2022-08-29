@@ -451,10 +451,11 @@ class _NewsPageState extends State<NewsPage> {
           event["stadt"] == ownProfil["ort"];
       var checkOnlineEvent =
           event["typ"] == "online" && evenTagMatch(event["tags"]);
+      var isPrivate = event["art"] == "privat" || event["art"] == "private";
 
       if (!checkOfflineEvent && !checkOnlineEvent ||
           !ownSettingProfil["showInterestingEvents"] ||
-          event["erstelltVon"] == userId) {
+          event["erstelltVon"] == userId || isPrivate) {
         return const SizedBox.shrink();
       }
 
