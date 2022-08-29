@@ -313,12 +313,14 @@ class _StartPageState extends State<StartPage> {
                         onPressed: () {
                           js.context.callMethod("presentAddToHome");
                           Navigator.pop(context, false);
+                          localBox.put("a2hs", true);
                         },
                         child: Text(AppLocalizations.of(context).ja)),
                     const SizedBox(width: 50),
                     ElevatedButton(
                         onPressed: () {
                           Navigator.pop(context, false);
+                          localBox.put("a2hs", false);
                         },
                         child: Text(AppLocalizations.of(context).nein))
                   ],)
