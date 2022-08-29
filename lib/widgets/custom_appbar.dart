@@ -28,6 +28,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     buttons ??= <Widget>[];
 
     return AppBar(
+      titleSpacing: 0,
       leading: leading == null
           ? null
           : Builder(
@@ -47,12 +48,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(children: [
           if (profilBildProfil != null)
             Padding(
-                padding: const EdgeInsets.only(top: 3),
+                padding: const EdgeInsets.only(top: 3, right: 10),
                 child: ProfilImage(
                   profilBildProfil,
                   fullScreenWindow: true,
                 )),
-          const SizedBox(width: 10),
           Expanded(
             child: InkWell(
               onTap: onTap,
