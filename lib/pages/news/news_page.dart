@@ -84,7 +84,6 @@ class _NewsPageState extends State<NewsPage> {
     if (ownProfil.isEmpty) await getOwnProfil();
     await refreshNewsFeed();
     await refreshEvents();
-    await refreshCityUserInfo();
 
     setState(() {});
   }
@@ -114,12 +113,6 @@ class _NewsPageState extends State<NewsPage> {
     Hive.box('secureBox').put("events", dbEvents);
 
     events = dbEvents;
-  }
-
-  refreshCityUserInfo() async {
-    cityUserInfo =
-        await StadtinfoUserDatabase().getData("*", "", returnList: true);
-    Hive.box('secureBox').put("stadtinfoUser", cityUserInfo);
   }
 
   getMyLastLocationChangeDate() {
