@@ -36,7 +36,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     with WidgetsBindingObserver {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser.displayName;
-  bool newChat = false;
   var nachrichtController = TextEditingController();
   Timer timer;
   List<dynamic> messages = [];
@@ -87,14 +86,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   createNewChat() async {
     if (widget.groupChatData["id"] != null) return;
-    var userID = FirebaseAuth.instance.currentUser.uid;
 
-    widget.groupChatData = await ChatDatabase().addNewChatGroup(
-        {userID: userName, widget.chatPartnerId: widget.chatPartnerName},
-        "");
+    var userID = FirebaseAuth.instance.currentUser.uid;
+    var chatUsers = {
+      userID: userName,
+      widget.chatPartnerId: widget.chatPartnerName
+    };
+
+    widget.groupChatData = await ChatDatabase().addNewChatGroup(chatUsers);
   }
 
   getAndSetChatData() async {
+    // prüfen, da groupChatData nie mehr null ist
     if (widget.groupChatData != null) {
 
       widget.chatId = widget.groupChatData["id"];
@@ -122,10 +125,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     widget.groupChatData ??=
         await ChatDatabase().getChatData("*", "WHERE id = '$widget.chatId'");
-
-    if (widget.groupChatData == false) {
-      newChat = true;
-    }
 
     setState(() {});
   }
@@ -178,38 +177,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": widget.chatPartnerId
     };
-    if (newChat) {
-      widget.groupChatData = await ChatDatabase().addNewChatGroup(
-          {userID: userName, widget.chatPartnerId: widget.chatPartnerName},
-          messageData);
 
-      setState(() {
-        widget.chatId = widget.groupChatData["id"];
-        messages.add(messageData);
-        newChat = false;
-      });
-    } else {
-      setState(() {
-        messages.add(messageData);
-      });
+    setState(() {
+      messages.add(messageData);
+    });
 
-      await ChatDatabase()
-          .addNewMessageAndSendNotification(widget.groupChatData, messageData);
+    await ChatDatabase()
+        .addNewMessageAndSendNotification(widget.groupChatData, messageData);
 
 
-      if (messageData["message"].contains("</eventId=")) {
-        messageData["message"] = "<Event Card>";
-      }
-      if (messageData["message"].contains("</communityId=")) {
-        messageData["message"] = "<Community Card>";
-      }
-
-
-      ChatDatabase().updateChatGroup(
-          "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.chatId}'");
-
+    if (messageData["message"].contains("</eventId=")) {
+      messageData["message"] = "<Event Card>";
     }
+    if (messageData["message"].contains("</communityId=")) {
+      messageData["message"] = "<Community Card>";
+    }
+
+
+    ChatDatabase().updateChatGroup(
+        "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
+        "WHERE id = '${widget.chatId}'");
   }
 
   openProfil() async {
