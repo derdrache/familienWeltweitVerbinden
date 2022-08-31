@@ -173,12 +173,11 @@ class ProfilDatabase{
 
 class ChatDatabase{
 
-  addNewChatGroup(users, messageData)async {
+  addNewChatGroup(users)async {
     var userKeysList = users.keys.toList();
     var usersList = users.values.toList();
     var chatID = global_functions.getChatID(userKeysList);
     var date = DateTime.now().millisecondsSinceEpoch;
-
 
     var newChatGroup = {
       "id": chatID,
@@ -187,28 +186,17 @@ class ChatDatabase{
         userKeysList[0] : {"name": usersList[0].replaceAll("'", "''"), "newMessages": 0},
         userKeysList[1] : {"name": usersList[1].replaceAll("'", "''"), "newMessages": 0},
       }),
-      "lastMessage": messageData["message"],
+      "lastMessage": "",
     };
 
     var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
     await http.post(url, body: json.encode(newChatGroup));
-
-    messageData = {
-      "id": chatID,
-      "date": date,
-      "message": messageData["message"],
-      "von": messageData["von"],
-      "zu": messageData["zu"]
-    };
-
-    await addNewMessageAndSendNotification(newChatGroup, messageData);
 
     return newChatGroup;
   }
 
   getChatData(whatData, queryEnd, {returnList = false}) async{
     var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
 
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
