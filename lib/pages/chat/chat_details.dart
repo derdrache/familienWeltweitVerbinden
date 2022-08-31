@@ -37,9 +37,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var userId = FirebaseAuth.instance.currentUser.uid;
   var userName = FirebaseAuth.instance.currentUser.displayName;
   bool newChat = false;
-  List<Widget> messagesList = [];
   var nachrichtController = TextEditingController();
   Timer timer;
+  List<dynamic> messages = [];
   Widget pufferList = const Center(child: CircularProgressIndicator());
   var eventCardList = [];
   var chatPartnerProfil;
@@ -72,6 +72,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _asyncMethod() async {
+    await createNewChat();
     await getAndSetChatData();
     writeActiveChat();
     await getChatPartnerProfil();
@@ -84,9 +85,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         const Duration(seconds: 10), (Timer t) => checkNewMessages());
   }
 
+  createNewChat() async {
+    if (widget.groupChatData["id"] != null) return;
+    var userID = FirebaseAuth.instance.currentUser.uid;
+
+    widget.groupChatData = await ChatDatabase().addNewChatGroup(
+        {userID: userName, widget.chatPartnerId: widget.chatPartnerName},
+        "");
+  }
+
   getAndSetChatData() async {
     if (widget.groupChatData != null) {
-      if (widget.groupChatData["id"] == null) newChat = true;
 
       widget.chatId = widget.groupChatData["id"];
       var groupchatUsers = widget.groupChatData["users"];
@@ -161,12 +170,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var userID = FirebaseAuth.instance.currentUser.uid;
     var checkMessage = nachrichtController.text.split("\n").join();
 
-    if (checkMessage == "") return;
+    if (checkMessage.isEmpty) return;
 
     var messageData = {
       "message": message,
       "von": userID,
-      "date": DateTime.now().millisecondsSinceEpoch,
+      "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": widget.chatPartnerId
     };
     if (newChat) {
@@ -176,11 +185,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       setState(() {
         widget.chatId = widget.groupChatData["id"];
+        messages.add(messageData);
         newChat = false;
       });
     } else {
+      setState(() {
+        messages.add(messageData);
+      });
+
       await ChatDatabase()
           .addNewMessageAndSendNotification(widget.groupChatData, messageData);
+
 
       if (messageData["message"].contains("</eventId=")) {
         messageData["message"] = "<Event Card>";
@@ -194,7 +209,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.chatId}'");
 
-      setState(() {});
     }
   }
 
@@ -358,7 +372,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             AsyncSnapshot snap,
           ) {
             if (snap.data != null) {
-              List<dynamic> messages = snap.data;
+              messages = snap.data;
 
               if (messages.isEmpty) {
                 return Center(

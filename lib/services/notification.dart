@@ -9,6 +9,7 @@ import 'database.dart';
 var databaseUrl = "https://families-worldwide.com/";
 
 sendEmail(notificationInformation) async {
+  return;
   var url = Uri.parse(databaseUrl + "services/sendEmail2.php");
   var emailAdresse = await ProfilDatabase()
       .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
@@ -24,6 +25,7 @@ sendEmail(notificationInformation) async {
 }
 
 _sendNotification(notificationInformation) async {
+  return;
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
 
   http.post(url,
