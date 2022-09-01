@@ -148,8 +148,8 @@
     "neueBeschreibungEingeben" : "enter new description",
     "eventInteresseZurueckgenommen" : "Your interest in the event has been withdrawn",
     "eventInteresseMitgeteilt": "Your interest in the event has been sent to the organizer",
-    "speichern": "Save",
-    "abbrechen": "Cancel",
+    "speichern": "save",
+    "abbrechen": "cancel",
     "eventBildAendern": "Change event image",
     "datumAuswaehlen": "Select date",
     "uhrzeitAuswaehlen": "Select time",
@@ -368,6 +368,9 @@
     "nochKeineNewsVorhanden": "No news have been created for you yet",
     "eventWiederholung": "Event repetition",
     "eventOeffentlichkeit" : "Event public",
-    "keineNewsVorhanden": "No news yet"
+    "keineNewsVorhanden": "No news yet",
+    "chatLoeschen": "delete Chat",
+    "chatWirklichLoeschen": "Do you really want to delete the chat ? ",
+    "auchBeiLoeschen": "also delete for "
 }
 

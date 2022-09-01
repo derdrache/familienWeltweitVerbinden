@@ -57,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch160D),
                 _patch(patch150D),
                 _patch(patch141D),
                 _patch(patch140D),
@@ -74,6 +75,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch160E),
                 _patch(patch150E),
                 _patch(patch141E),
                 _patch(patch140E),
