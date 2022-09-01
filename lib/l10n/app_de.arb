@@ -366,6 +366,9 @@
     "nochKeineNewsVorhanden": "Es sind noch keine News für dich erstellt worden",
     "eventWiederholung": "Event Wiederholung",
     "eventOeffentlichkeit" : "Öffentlichkeit",
-    "keineNewsVorhanden": "Noch keine News vorhanden"
+    "keineNewsVorhanden": "Noch keine News vorhanden",
+    "chatLoeschen": "Chat löschen",
+    "chatWirklichLoeschen": "Möchtest du den Chat wirklich löschen ? ",
+    "auchBeiLoeschen": "Auch löschen bei "
 
 }
