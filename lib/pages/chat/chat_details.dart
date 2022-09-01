@@ -13,6 +13,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/dialogWindow.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   String chatPartnerId;
@@ -88,6 +89,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (widget.groupChatData["id"] != null) return;
 
     var userID = FirebaseAuth.instance.currentUser.uid;
+    widget.chatPartnerId ??= await ProfilDatabase()
+        .getData("id", "WHERE name = '${widget.chatPartnerName}'");
+    widget.chatPartnerName ??= await ProfilDatabase()
+        .getData("name", "WHERE id = '${widget.chatPartnerId}'");
+
     var chatUsers = {
       userID: userName,
       widget.chatPartnerId: widget.chatPartnerName
@@ -97,36 +103,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getAndSetChatData() async {
-    // prüfen, da groupChatData nie mehr null ist
-    if (widget.groupChatData != null) {
-
-      widget.chatId = widget.groupChatData["id"];
-      var groupchatUsers = widget.groupChatData["users"];
-      groupchatUsers.forEach((key, value) {
-        if (key != userId) {
-          widget.chatPartnerId = key;
-        }
-      });
-
-      widget.chatPartnerName ??= await ProfilDatabase()
-          .getData("name", "WHERE id = '${widget.chatPartnerId}'");
-
-      return;
-    }
-
-    widget.chatPartnerId ??= await ProfilDatabase()
-        .getData("id", "WHERE name = '${widget.chatPartnerName}'");
+    widget.chatId = widget.groupChatData["id"];
+    var groupchatUsers = widget.groupChatData["users"];
+    groupchatUsers.forEach((key, value) {
+      if (key != userId) {
+        widget.chatPartnerId = key;
+      }
+    });
 
     widget.chatPartnerName ??= await ProfilDatabase()
         .getData("name", "WHERE id = '${widget.chatPartnerId}'");
-
-    widget.chatId ??=
-        global_functions.getChatID([userId, widget.chatPartnerId]);
-
-    widget.groupChatData ??=
-        await ChatDatabase().getChatData("*", "WHERE id = '$widget.chatId'");
-
-    setState(() {});
   }
 
   writeActiveChat() {
@@ -165,6 +151,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     setState(() {});
   }
 
+  checkChatgroupUsers() {
+    var chatUsers = widget.groupChatData["users"];
+
+    if (chatUsers.length == 2) return;
+
+    chatUsers.add({
+      userId: {
+        "name": widget.chatPartnerName.replaceAll("'", "''"),
+        "newMessages": 0
+      }
+    });
+
+    ChatDatabase().updateChatGroup("users = '${json.encode(chatUsers)}'",
+        "WHERE id = '${widget.groupChatData["id"]}'");
+  }
+
   messageToDbAndClearMessageInput(message) async {
     var userID = FirebaseAuth.instance.currentUser.uid;
     var checkMessage = nachrichtController.text.split("\n").join();
@@ -185,14 +187,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     await ChatDatabase()
         .addNewMessageAndSendNotification(widget.groupChatData, messageData);
 
-
     if (messageData["message"].contains("</eventId=")) {
       messageData["message"] = "<Event Card>";
     }
     if (messageData["message"].contains("</communityId=")) {
       messageData["message"] = "<Community Card>";
     }
-
 
     ChatDatabase().updateChatGroup(
         "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
@@ -220,9 +220,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return message;
   }
 
+  deleteChat({bothDelete = false}) {
+    var chatUsers = widget.groupChatData["users"];
+    var chatId = widget.groupChatData["id"];
+
+    if (chatUsers.length <= 1 || bothDelete) {
+      ChatDatabase().deleteChat(chatId);
+      ChatDatabase().deleteMessages(chatId);
+    } else {
+      var newChatUsers = [];
+
+      for (var user in chatUsers) {
+        if (user.keys[0] != userId) {
+          newChatUsers.add(user);
+        }
+      }
+
+      ChatDatabase().updateChatGroup(
+          "users = '${json.encode(chatUsers)}'", "WHERE id ='$chatId'");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     messageList(messages) {
       List<Widget> messageBox = [];
 
@@ -427,6 +447,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () {
+                  checkChatgroupUsers();
                   messageToDbAndClearMessageInput(nachrichtController.text);
 
                   setState(() {
@@ -440,14 +461,104 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    return Scaffold(
-        appBar: chatPartnerProfil != false ? CustomAppBar(
-          title: widget.chatPartnerName ?? "",
-          profilBildProfil : chatPartnerProfil,
-          onTap: () => openProfil(),
-        ) : CustomAppBar(
-          title: AppLocalizations.of(context).geloeschterUser
+    deleteDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.delete),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).chatLoeschen),
+          ],
         ),
+        onPressed: () {
+          var bothDelete = false;
+          Navigator.pop(context);
+
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomAlertDialog(
+                  title: AppLocalizations.of(context).chatLoeschen,
+                  height: 140,
+                  children: [
+                    Center(
+                        child: Text(
+                            AppLocalizations.of(context).chatWirklichLoeschen)),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Checkbox(
+                            value: bothDelete,
+                            onChanged: (value) => bothDelete = value),
+                        Text(AppLocalizations.of(context).auchBeiLoeschen +
+                            widget.chatPartnerName)
+                      ],
+                    )
+                  ],
+                  actions: [
+                    TextButton(
+                      child: Text(AppLocalizations.of(context).loeschen),
+                      onPressed: () async {
+                        deleteChat(bothDelete: bothDelete);
+                      },
+                    ),
+                    TextButton(
+                      child: Text(AppLocalizations.of(context).abbrechen),
+                      onPressed: () => Navigator.pop(context),
+                    )
+                  ],
+                );
+              });
+        },
+      );
+    }
+
+    moreMenu() {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 180,
+                  child: SimpleDialog(
+                    contentPadding: EdgeInsets.zero,
+                    insetPadding:
+                        const EdgeInsets.only(top: 40, left: 0, right: 10),
+                    children: [deleteDialog()],
+                  ),
+                ),
+              ],
+            );
+          });
+    }
+
+    return Scaffold(
+        appBar: chatPartnerProfil != false
+            ? CustomAppBar(
+                title: widget.chatPartnerName ?? "",
+                profilBildProfil: chatPartnerProfil,
+                onTap: () => openProfil(),
+                buttons: [
+                  IconButton(
+                      onPressed: () => moreMenu(),
+                      icon: Icon(
+                        Icons.more_vert,
+                        color: Colors.white,
+                      ))
+                ],
+              )
+            : CustomAppBar(
+                title: AppLocalizations.of(context).geloeschterUser,
+                buttons: [
+                    IconButton(
+                        onPressed: () => moreMenu(),
+                        icon: Icon(
+                          Icons.more_vert,
+                          color: Colors.white,
+                        ))
+                  ]),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

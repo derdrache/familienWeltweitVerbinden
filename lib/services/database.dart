@@ -334,6 +334,14 @@ class ChatDatabase{
 
   }
 
+  deleteChat(chatId){
+    _deleteInTable("chats", chatId);
+  }
+
+  deleteMessages(chatId){
+    _deleteInTable("messages", chatId);
+  }
+
 }
 
 class EventDatabase{
