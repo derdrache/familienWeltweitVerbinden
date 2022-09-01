@@ -9,12 +9,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   var onTap;
   var leading;
   var profilBildProfil;
+  var withLeading;
 
   CustomAppBar(
       {Key key,
       this.title,
       this.buttons,
       this.elevation = 4.0,
+      this.withLeading = true,
       this.onTap,
       this.leading,
       this.profilBildProfil})
@@ -31,18 +33,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 0,
       leading: leading == null
           ? null
-          : Builder(
-              builder: (BuildContext context) {
-                return IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    changePage(context, leading);
-                  },
-                  tooltip:
-                      MaterialLocalizations.of(context).openAppDrawerTooltip,
-                );
-              },
-            ),
+          : leading.runtimeType == IconButton ? leading : Builder(
+        builder: (BuildContext context) {
+          return IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              changePage(context, leading);
+            },
+            tooltip:
+            MaterialLocalizations.of(context).openAppDrawerTooltip,
+          );
+        },
+      ),
       title: SizedBox(
         height: 50,
         child: Row(children: [
@@ -67,6 +69,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: elevation,
       iconTheme: const IconThemeData(color: Colors.white),
       actions: buttons,
+      automaticallyImplyLeading: withLeading,
     );
   }
 }
