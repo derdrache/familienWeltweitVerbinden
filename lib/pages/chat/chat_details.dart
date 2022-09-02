@@ -6,14 +6,17 @@ import 'package:familien_suche/global/global_functions.dart'
 import 'package:familien_suche/pages/community/community_card.dart';
 import 'package:familien_suche/pages/events/eventCard.dart';
 import 'package:familien_suche/pages/show_profil.dart';
+import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
+
 
 class ChatDetailsPage extends StatefulWidget {
   String chatPartnerId;
@@ -43,6 +46,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   Widget pufferList = const Center(child: CircularProgressIndicator());
   var eventCardList = [];
   var chatPartnerProfil;
+  var bothDelete = false;
 
   @override
   void dispose() {
@@ -65,6 +69,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
+    widget.chatId = widget.groupChatData["id"];
     _asyncMethod();
 
     WidgetsBinding.instance.addObserver(this);
@@ -103,7 +108,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getAndSetChatData() async {
-    widget.chatId = widget.groupChatData["id"];
+    widget.chatId ??= widget.groupChatData["id"];
     var groupchatUsers = widget.groupChatData["users"];
     groupchatUsers.forEach((key, value) {
       if (key != userId) {
@@ -223,22 +228,48 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   deleteChat({bothDelete = false}) {
     var chatUsers = widget.groupChatData["users"];
     var chatId = widget.groupChatData["id"];
+    var myChatBox = Hive.box("secureBox");
+    var myChats = myChatBox.get("myChats");
 
     if (chatUsers.length <= 1 || bothDelete) {
+      var removeChat = {};
+
+      for(var myChat in myChats){
+        if(myChat["id"] == widget.chatId) removeChat = myChat;
+      }
+
+      myChats.remove(removeChat);
+
       ChatDatabase().deleteChat(chatId);
       ChatDatabase().deleteMessages(chatId);
     } else {
-      var newChatUsers = [];
+      var newChatUsersData = {};
 
-      for (var user in chatUsers) {
-        if (user.keys[0] != userId) {
-          newChatUsers.add(user);
+      chatUsers.forEach((key,value){
+        if (key != userId) {
+          newChatUsersData = {key: value};
+        }
+      });
+
+      for(var myChat in myChats){
+        if(myChat["id"] == widget.chatId){
+          myChat["users"] = newChatUsersData;
         }
       }
 
       ChatDatabase().updateChatGroup(
-          "users = '${json.encode(chatUsers)}'", "WHERE id ='$chatId'");
+          "users = '${json.encode(newChatUsersData)}'", "WHERE id ='$chatId'");
     }
+
+    global_functions.changePageForever(context, StartPage(selectedIndex: 4,));
+  }
+
+  getAllMessages() async {
+    if(widget.chatId != null){
+      return await ChatDatabase().getAllMessages(widget.chatId);
+    }
+
+    return null;
   }
 
   @override
@@ -373,15 +404,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     messageAnzeige() {
       return FutureBuilder(
-          future: ChatDatabase().getAllMessages(widget.chatId),
+          future: getAllMessages(),
           builder: (
             BuildContext context,
             AsyncSnapshot snap,
           ) {
-            if (snap.data != null) {
+            if (snap.hasData) {
               messages = snap.data;
 
-              if (messages.isEmpty) {
+              if (messages.length == 0) {
                 return Center(
                     child: Text(
                   AppLocalizations.of(context).nochKeineNachrichtVorhanden,
@@ -471,42 +502,49 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ],
         ),
         onPressed: () {
-          var bothDelete = false;
           Navigator.pop(context);
 
           showDialog(
               context: context,
               builder: (BuildContext context) {
-                return CustomAlertDialog(
-                  title: AppLocalizations.of(context).chatLoeschen,
-                  height: 140,
-                  children: [
-                    Center(
-                        child: Text(
-                            AppLocalizations.of(context).chatWirklichLoeschen)),
-                    SizedBox(height: 20),
-                    Row(
+                return StatefulBuilder(
+                  builder: (ontext, setState) {
+                    return CustomAlertDialog(
+                      title: AppLocalizations.of(context).chatLoeschen,
+                      height: 140,
                       children: [
-                        Checkbox(
-                            value: bothDelete,
-                            onChanged: (value) => bothDelete = value),
-                        Text(AppLocalizations.of(context).auchBeiLoeschen +
-                            widget.chatPartnerName)
+                        Center(
+                            child: Text(
+                                AppLocalizations.of(context).chatWirklichLoeschen)),
+                        SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Checkbox(
+                                value: bothDelete,
+                                onChanged: (value) => {
+                                  setState((){
+                                    bothDelete = value;
+                                  })
+                                }),
+                            Text(AppLocalizations.of(context).auchBeiLoeschen +
+                                widget.chatPartnerName)
+                          ],
+                        )
                       ],
-                    )
-                  ],
-                  actions: [
-                    TextButton(
-                      child: Text(AppLocalizations.of(context).loeschen),
-                      onPressed: () async {
-                        deleteChat(bothDelete: bothDelete);
-                      },
-                    ),
-                    TextButton(
-                      child: Text(AppLocalizations.of(context).abbrechen),
-                      onPressed: () => Navigator.pop(context),
-                    )
-                  ],
+                      actions: [
+                        TextButton(
+                          child: Text(AppLocalizations.of(context).loeschen),
+                          onPressed: () async {
+                            deleteChat(bothDelete: bothDelete);
+                          },
+                        ),
+                        TextButton(
+                          child: Text(AppLocalizations.of(context).abbrechen),
+                          onPressed: () => Navigator.pop(context),
+                        )
+                      ],
+                    );
+                  }
                 );
               });
         },
