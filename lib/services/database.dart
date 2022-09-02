@@ -175,7 +175,6 @@ class ChatDatabase{
 
   addNewChatGroup(users)async {
     var userKeysList = users.keys.toList();
-    var usersList = users.values.toList();
     var chatID = global_functions.getChatID(userKeysList);
     var date = DateTime.now().millisecondsSinceEpoch;
 
@@ -183,8 +182,8 @@ class ChatDatabase{
       "id": chatID,
       "date": date,
       "users": json.encode({
-        userKeysList[0] : {"name": usersList[0].replaceAll("'", "''"), "newMessages": 0},
-        userKeysList[1] : {"name": usersList[1].replaceAll("'", "''"), "newMessages": 0},
+        userKeysList[0] : {"newMessages": 0},
+        userKeysList[1] : {"newMessages": 0},
       }),
       "lastMessage": "",
     };
