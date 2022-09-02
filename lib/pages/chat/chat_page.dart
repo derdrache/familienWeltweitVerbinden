@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -30,6 +31,7 @@ class _ChatPageState extends State<ChatPage> {
   List allName, userFriendlist, myChats = [];
   bool changeBarOn = false;
   var changeChatsDict = {};
+  var deleteBoth = false;
 
   @override
   void initState() {
@@ -48,6 +50,9 @@ class _ChatPageState extends State<ChatPage> {
 
     for (var group in myChats) {
       var users = group["users"];
+
+      if(users[userId] == null) continue;
+
       realNewMessages += users[userId]["newMessages"];
     }
 
@@ -219,12 +224,55 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
-  deleteChat(choosenChatIds, {deleteBoth = false}){
+  deleteChat(choosenChatIds, {deleteBoth = false}) async{
+    for(var choosenChatId in choosenChatIds){
+      var chat = {};
 
+      for(var myChat in myChats){
+        if(myChat["id"] == choosenChatId){
+          chat = myChat;
+        }
+      }
+
+      var chatUsers = chat["users"];
+
+      if (chatUsers.length <= 1 || deleteBoth) {
+        var removeChat = {};
+
+        for(var myChat in myChats){
+          if(myChat["id"] == choosenChatId) removeChat = myChat;
+        }
+
+        myChats.remove(removeChat);
+
+        ChatDatabase().deleteChat(choosenChatId);
+        ChatDatabase().deleteMessages(choosenChatId);
+      } else {
+        var newChatUsersData = {};
+
+        chatUsers.forEach((key,value){
+          if (key != userId) {
+            newChatUsersData = {key: value};
+          }
+        });
+
+        for(var myChat in myChats){
+          if(myChat["id"] == choosenChatId){
+            myChat["users"] = newChatUsersData;
+          }
+        }
+
+        ChatDatabase().updateChatGroup(
+            "users = '${json.encode(newChatUsersData)}'", "WHERE id ='$choosenChatId'");
+      }
+    }
+
+    setState(() {
+
+    });
   }
 
   deleteChatDialog(chatgroupData){
-    var deleteBoth = false;
     var countSelected = 0;
     var choosenChatgroupsId = [];
     var chatPartnerName = "";
@@ -236,12 +284,14 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
 
-    for(var chat in myChats){
-      if(chat["id"] == choosenChatgroupsId[0]){
-        for(var chatUserId in chat["users"].keys){
-          if(chatUserId != userId){
-            chatPartnerName = chat["users"][chatUserId]["name"];
-          }
+    if(choosenChatgroupsId.length == 1){
+      var chatId = choosenChatgroupsId[0];
+      var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
+
+      for(var profil in dbProfilData){
+        if(profil["id"] == chatPartnerId){
+          chatPartnerName = profil["name"];
+          break;
         }
       }
     }
@@ -249,38 +299,49 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return CustomAlertDialog(
-            title: AppLocalizations.of(context).chatLoeschen,
-            height: countSelected == 1 ? 100 : 150,
-            children: [
-              Center(
-                  child: Text(
-                      AppLocalizations.of(context).chatWirklichLoeschen)),
-              if(countSelected == 1) const SizedBox(height: 20),
-              if(countSelected == 1) Row(
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return CustomAlertDialog(
+                title: AppLocalizations.of(context).chatLoeschen,
+                height: countSelected == 1 ? 150 : 100,
                 children: [
-                  Checkbox(
-                      value: deleteBoth,
-                      onChanged: (value) => deleteBoth = value),
-                  Expanded(
-                    child: Text(AppLocalizations.of(context).auchBeiLoeschen +
-                        chatPartnerName),
-                  )//widget.chatPartnerName)
+                  Center(
+                      child: Text(
+                          AppLocalizations.of(context).chatWirklichLoeschen)),
+                  if(countSelected == 1) const SizedBox(height: 20),
+                  if(countSelected == 1) Row(
+                    children: [
+                      Checkbox(
+                          value: deleteBoth,
+                          onChanged: (value) {
+                            setState(() {
+                              deleteBoth = value;
+                            });
+                          } ),
+                      Expanded(
+                        child: Text(AppLocalizations.of(context).auchBeiLoeschen +
+                            chatPartnerName),
+                      )//widget.chatPartnerName)
+                    ],
+                  )
                 ],
-              )
-            ],
-            actions: [
-              TextButton(
-                child: Text(AppLocalizations.of(context).loeschen),
-                onPressed: () async {
-                  deleteChat(choosenChatgroupsId, deleteBoth: deleteBoth);
-                },
-              ),
-              TextButton(
-                child: Text(AppLocalizations.of(context).abbrechen),
-                onPressed: () => Navigator.pop(context),
-              )
-            ],
+                actions: [
+                  TextButton(
+                    child: Text(AppLocalizations.of(context).loeschen),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      changeBarOn = false;
+                      changeChatsDict = {};
+                      deleteChat(choosenChatgroupsId, deleteBoth: deleteBoth);
+                    },
+                  ),
+                  TextButton(
+                    child: Text(AppLocalizations.of(context).abbrechen),
+                    onPressed: () => Navigator.pop(context),
+                  )
+                ],
+              );
+            }
           );
         });
   }
@@ -296,8 +357,7 @@ class _ChatPageState extends State<ChatPage> {
         String chatPartnerId;
         var users = group["users"];
 
-        if (group["lastMessage"].isEmpty) continue;
-
+        if(group["lastMessage"].isEmpty || group["users"][userId] == null) continue;
 
         changeChatsDict[group["id"]] ??= false;
 
