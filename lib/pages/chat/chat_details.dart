@@ -283,11 +283,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return null;
   }
 
-  replyMessage() {
-    //Über Inputfeld ein Container mit Icon, Name - Auf Nachricht antworten \n Text und die Möglichkeit den Vorgang abzubrechen
-    //Über der Nachricht ist die gekürzte Nachricht worauf geantwortet wurde
-    // Bei klick auf diese zur Original Message kommen
-    // => neue Spalte in der db?
+  replyMessage(message) {
+    messageIdChange = message["tableId"];
+    myFocusNode.requestFocus();
+    changeMessageModus = "reply";
   }
 
   editMessage(message) {
@@ -295,7 +294,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     myFocusNode.requestFocus();
     nachrichtController.text = message["message"];
     changeMessageModus = "edit";
-
   }
 
   copyMessage(messageText) {
@@ -324,7 +322,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         color: Colors.green);
   }
 
-  resetExtraInputInformation(){
+  resetExtraInputInformation() {
     messageIdChange = null;
     extraInputInformationBox = const SizedBox.shrink();
     nachrichtController.clear();
@@ -334,21 +332,67 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     setState(() {});
   }
 
-  saveEditMessage(){
-    for(var message in messages){
-      if(message["tableId"] == messageIdChange){
+  saveEditMessage() {
+    for (var message in messages) {
+      if (message["tableId"] == messageIdChange) {
         message["message"] = nachrichtController.text;
       }
     }
 
     ChatDatabase().updateMessage(
         "message = '${nachrichtController.text}', editDate = '${DateTime.now().millisecondsSinceEpoch}'",
-        "WHERE tableId = '$messageIdChange'"
-    );
+        "WHERE tableId = '$messageIdChange'");
   }
 
   @override
   Widget build(BuildContext context) {
+    inputInformationBox(icon, title, bodyText) {
+      return Container(
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                  top: const BorderSide(color: Colors.grey),
+                  bottom: BorderSide(color: Colors.grey.withOpacity(0.3))),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 0,
+                  blurRadius: 7,
+                  offset: const Offset(0, -2), // changes position of shadow
+                ),
+              ]),
+          child: Row(children: [
+            const SizedBox(width: 5),
+            const Icon(Icons.reply),
+            const SizedBox(width: 20),
+            if (bodyText.isNotEmpty)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16)),
+                    Text(bodyText)
+                  ],
+                ),
+              ),
+            if (bodyText.isEmpty)
+              Expanded(
+                child: Text(title,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16)),
+              ),
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => resetExtraInputInformation(),
+            )
+          ]));
+    }
 
     openMessageMenu(tapPosition, message) {
       final RenderBox overlay = Overlay.of(context).context.findRenderObject();
@@ -362,7 +406,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ),
         items: [
           PopupMenuItem(
-            onTap: () => replyMessage(),
+            onTap: () {
+              var profils = Hive.box("secureBox").get("profils");
+              var replyUser = "";
+
+              for(var profil in profils){
+                if(message["von"] == profil["id"]) replyUser = profil["name"];
+              }
+
+              extraInputInformationBox =
+                  inputInformationBox(Icons.reply, replyUser, message["message"]);
+
+              replyMessage(message);
+            },
             child: Row(
               children: [
                 const Icon(Icons.reply),
@@ -374,33 +430,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           if (isMyMessage)
             PopupMenuItem(
               onTap: () {
-
-                extraInputInformationBox = Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                            top: const BorderSide(color: Colors.grey),
-                            bottom: BorderSide(color: Colors.grey.withOpacity(0.3))
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 0,
-                            blurRadius: 7,
-                            offset: const Offset(0, -2), // changes position of shadow
-                          ),
-                        ]),
-                    child: Row(children: [
-                      const SizedBox(width: 5),
-                      const Icon(Icons.edit),
-                      const SizedBox(width: 20),
-                      Expanded(child: Text(AppLocalizations.of(context).nachrichtBearbeiten)),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => resetExtraInputInformation(),
-                      )
-                    ])
-                );
+                extraInputInformationBox = inputInformationBox(Icons.edit,
+                    AppLocalizations.of(context).nachrichtBearbeiten, "");
 
                 editMessage(message);
               },
@@ -464,9 +495,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       for (var i = 0; i < messages.length; i++) {
         var message = messages[i];
-        var messageTime = DateFormat('dd-MM HH:mm')
-            .format(DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"])));
-        var messageEdit = message["editDate"] == null ? "" : AppLocalizations.of(context).bearbeitet;
+        var messageTime = DateFormat('dd-MM HH:mm').format(
+            DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"])));
+        var messageEdit = message["editDate"] == null
+            ? ""
+            : AppLocalizations.of(context).bearbeitet;
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
 
@@ -499,8 +532,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         Positioned(
                           bottom: -15,
                           right: 0,
-                          child: Text(
-                              messageTime,
+                          child: Text(messageTime,
                               style: TextStyle(color: Colors.grey[600])),
                         )
                       ]),
@@ -531,8 +563,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         Positioned(
                           bottom: -15,
                           right: 0,
-                          child: Text(
-                              messageTime,
+                          child: Text(messageTime,
                               style: TextStyle(color: Colors.grey[600])),
                         )
                       ]),
@@ -571,8 +602,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       ),
                       Container(
                         padding: const EdgeInsets.only(bottom: 5, right: 10),
-                        child: Text(
-                            messageEdit +" "+messageTime,
+                        child: Text(messageEdit + " " + messageTime,
                             style: TextStyle(color: Colors.grey[600])),
                       )
                     ],
@@ -632,14 +662,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 border: extraInputInformationBox.runtimeType == SizedBox
                     ? const Border(top: BorderSide(color: Colors.grey))
                     : null,
-                boxShadow: extraInputInformationBox.runtimeType == SizedBox ? [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ]: []),
+                boxShadow: extraInputInformationBox.runtimeType == SizedBox
+                    ? [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
+                        ),
+                      ]
+                    : []),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minHeight: 60,
@@ -669,25 +702,27 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             right: 2,
             child: changeMessageModus == null
                 ? IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  checkChatgroupUsers();
-                  messageToDbAndClearMessageInput(nachrichtController.text);
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      checkChatgroupUsers();
+                      messageToDbAndClearMessageInput(nachrichtController.text);
 
-                  setState(() {
-                    nachrichtController.clear();
-                  });
-                },
-                icon: Icon(Icons.send,
-                    size: 34, color: Theme.of(context).colorScheme.secondary))
+                      setState(() {
+                        nachrichtController.clear();
+                      });
+                    },
+                    icon: Icon(Icons.send,
+                        size: 34,
+                        color: Theme.of(context).colorScheme.secondary))
                 : IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  saveEditMessage();
-                  resetExtraInputInformation();
-                },
-                icon: Icon(Icons.done,
-                    size: 38, color: Theme.of(context).colorScheme.secondary)),
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      saveEditMessage();
+                      resetExtraInputInformation();
+                    },
+                    icon: Icon(Icons.done,
+                        size: 38,
+                        color: Theme.of(context).colorScheme.secondary)),
           ),
         ],
       );
@@ -770,7 +805,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             );
           });
     }
-
 
     return Scaffold(
         appBar: chatPartnerProfil != false
