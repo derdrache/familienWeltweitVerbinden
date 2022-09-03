@@ -371,6 +371,16 @@
     "keineNewsVorhanden": "No news yet",
     "chatLoeschen": "delete Chat",
     "chatWirklichLoeschen": "Do you really want to delete the chat ? ",
-    "auchBeiLoeschen": "also delete for "
+    "auchBeiLoeschen": "also delete for ",
+    "antworten": "Reply",
+    "bearbeiten": "Edit",
+    "textKopieren": "Copy text",
+    "weiterleiten": "Forward",
+    "loeschenGross": "Delete",
+    "meldenGross": "Melden",
+    "nachrichtZwischenAblage": "Message stored in clipboard",
+    "nachrichtGemeldet": "Message was reported",
+    "nachrichtBearbeiten": "Edit message",
+    "bearbeitet": "edited"
 }
 
