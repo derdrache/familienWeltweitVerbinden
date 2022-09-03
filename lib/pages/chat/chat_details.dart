@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
+import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/community/community_card.dart';
 import 'package:familien_suche/pages/events/eventCard.dart';
 import 'package:familien_suche/pages/show_profil.dart';
@@ -10,13 +11,14 @@ import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
-
 
 class ChatDetailsPage extends StatefulWidget {
   String chatPartnerId;
@@ -43,16 +45,21 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var nachrichtController = TextEditingController();
   Timer timer;
   List<dynamic> messages = [];
-  Widget pufferList = const Center(child: CircularProgressIndicator());
+  Widget MessagesPufferList = const Center(child: CircularProgressIndicator());
   var eventCardList = [];
   var chatPartnerProfil;
-  var bothDelete = false;
+  bool bothDelete = false;
+  var myFocusNode = FocusNode();
+  var messageIdChange;
+  String changeMessageModus;
+  Widget extraInputInformationBox = const SizedBox.shrink();
 
   @override
   void dispose() {
     ProfilDatabase().updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
     WidgetsBinding.instance.removeObserver(this);
     timer.cancel();
+    myFocusNode.dispose();
     super.dispose();
   }
 
@@ -234,8 +241,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (chatUsers.length <= 1 || bothDelete) {
       var removeChat = {};
 
-      for(var myChat in myChats){
-        if(myChat["id"] == widget.chatId) removeChat = myChat;
+      for (var myChat in myChats) {
+        if (myChat["id"] == widget.chatId) removeChat = myChat;
       }
 
       myChats.remove(removeChat);
@@ -245,14 +252,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     } else {
       var newChatUsersData = {};
 
-      chatUsers.forEach((key,value){
+      chatUsers.forEach((key, value) {
         if (key != userId) {
           newChatUsersData = {key: value};
         }
       });
 
-      for(var myChat in myChats){
-        if(myChat["id"] == widget.chatId){
+      for (var myChat in myChats) {
+        if (myChat["id"] == widget.chatId) {
           myChat["users"] = newChatUsersData;
         }
       }
@@ -261,26 +268,205 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "users = '${json.encode(newChatUsersData)}'", "WHERE id ='$chatId'");
     }
 
-    global_functions.changePageForever(context, StartPage(selectedIndex: 4,));
+    global_functions.changePageForever(
+        context,
+        StartPage(
+          selectedIndex: 4,
+        ));
   }
 
   getAllMessages() async {
-    if(widget.chatId != null){
+    if (widget.chatId != null) {
       return await ChatDatabase().getAllMessages(widget.chatId);
     }
 
     return null;
   }
 
+  replyMessage() {
+    //Über Inputfeld ein Container mit Icon, Name - Auf Nachricht antworten \n Text und die Möglichkeit den Vorgang abzubrechen
+    //Über der Nachricht ist die gekürzte Nachricht worauf geantwortet wurde
+    // Bei klick auf diese zur Original Message kommen
+    // => neue Spalte in der db?
+  }
+
+  editMessage(message) {
+    messageIdChange = message["tableId"];
+    myFocusNode.requestFocus();
+    nachrichtController.text = message["message"];
+    changeMessageModus = "edit";
+
+  }
+
+  copyMessage(messageText) {
+    Clipboard.setData(ClipboardData(text: messageText));
+    customSnackbar(
+        context, AppLocalizations.of(context).nachrichtZwischenAblage,
+        color: Colors.green);
+  }
+
+  forwardMessage() {
+    //Gruppen / Personen aussuchen, die diese Nachricht bekommen
+    // möglichkeit noch einen Text mitzugeben
+  }
+
+  deleteMessage(messageId) {
+    ChatDatabase().deleteMessages(messageId);
+  }
+
+  reportMessage(message) {
+    ReportsDatabase().add(
+        userId,
+        "Message tableId: " + message["tableId"] + " gemeldet",
+        message["message"]);
+
+    customSnackbar(context, AppLocalizations.of(context).nachrichtGemeldet,
+        color: Colors.green);
+  }
+
+  resetExtraInputInformation(){
+    messageIdChange = null;
+    extraInputInformationBox = const SizedBox.shrink();
+    nachrichtController.clear();
+    changeMessageModus = null;
+    myFocusNode.unfocus();
+
+    setState(() {});
+  }
+
+  saveEditMessage(){
+    for(var message in messages){
+      if(message["tableId"] == messageIdChange){
+        message["message"] = nachrichtController.text;
+      }
+    }
+
+    ChatDatabase().updateMessage(
+        "message = '${nachrichtController.text}', editDate = '${DateTime.now().millisecondsSinceEpoch}'",
+        "WHERE tableId = '$messageIdChange'"
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    openMessageMenu(tapPosition, message) {
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      var isMyMessage = message["von"] == userId;
+
+      showMenu(
+        context: context,
+        position: RelativeRect.fromRect(
+            tapPosition & const Size(40, 40), // smaller rect, the touch area
+            Offset.zero & overlay.size // Bigger rect, the entire screen
+            ),
+        items: [
+          PopupMenuItem(
+            onTap: () => replyMessage(),
+            child: Row(
+              children: [
+                const Icon(Icons.reply),
+                const SizedBox(width: 20),
+                Text(AppLocalizations.of(context).antworten),
+              ],
+            ),
+          ),
+          if (isMyMessage)
+            PopupMenuItem(
+              onTap: () {
+
+                extraInputInformationBox = Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                            top: const BorderSide(color: Colors.grey),
+                            bottom: BorderSide(color: Colors.grey.withOpacity(0.3))
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 0,
+                            blurRadius: 7,
+                            offset: const Offset(0, -2), // changes position of shadow
+                          ),
+                        ]),
+                    child: Row(children: [
+                      const SizedBox(width: 5),
+                      const Icon(Icons.edit),
+                      const SizedBox(width: 20),
+                      Expanded(child: Text(AppLocalizations.of(context).nachrichtBearbeiten)),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => resetExtraInputInformation(),
+                      )
+                    ])
+                );
+
+                editMessage(message);
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.edit),
+                  const SizedBox(width: 20),
+                  Text(AppLocalizations.of(context).bearbeiten),
+                ],
+              ),
+            ),
+          PopupMenuItem(
+            onTap: () => copyMessage(message["message"]),
+            child: Row(
+              children: [
+                const Icon(Icons.copy),
+                const SizedBox(width: 20),
+                Text(AppLocalizations.of(context).textKopieren),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            onTap: () => forwardMessage(),
+            child: Row(
+              children: [
+                const Icon(Icons.forward),
+                const SizedBox(width: 20),
+                Text(AppLocalizations.of(context).weiterleiten),
+              ],
+            ),
+          ),
+          if (isMyMessage)
+            PopupMenuItem(
+              onTap: () => deleteMessage(message["tableId"]),
+              child: Row(
+                children: [
+                  const Icon(Icons.delete),
+                  const SizedBox(width: 20),
+                  Text(AppLocalizations.of(context).loeschenGross),
+                ],
+              ),
+            ),
+          if (!isMyMessage)
+            PopupMenuItem(
+              onTap: () => reportMessage(message),
+              child: Row(
+                children: [
+                  const Icon(Icons.report),
+                  const SizedBox(width: 20),
+                  Text(AppLocalizations.of(context).meldenGross),
+                ],
+              ),
+            ),
+        ],
+        elevation: 4.0,
+      );
+    }
+
     messageList(messages) {
       List<Widget> messageBox = [];
 
       for (var i = 0; i < messages.length; i++) {
         var message = messages[i];
-        var messageTime =
-            DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
+        var messageTime = DateFormat('dd-MM HH:mm')
+            .format(DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"])));
+        var messageEdit = message["editDate"] == null ? "" : AppLocalizations.of(context).bearbeitet;
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
 
@@ -314,7 +500,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           bottom: -15,
                           right: 0,
                           child: Text(
-                              DateFormat('dd-MM HH:mm').format(messageTime),
+                              messageTime,
                               style: TextStyle(color: Colors.grey[600])),
                         )
                       ]),
@@ -346,7 +532,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           bottom: -15,
                           right: 0,
                           child: Text(
-                              DateFormat('dd-MM HH:mm').format(messageTime),
+                              messageTime,
                               style: TextStyle(color: Colors.grey[600])),
                         )
                       ]),
@@ -361,31 +547,37 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         messageBox.add(
           Align(
             alignment: textAlign, //right and left
-            child: Container(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.85),
-                margin: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    color: boxColor,
-                    border: Border.all(),
-                    borderRadius: const BorderRadius.all(Radius.circular(10))),
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.end,
-                  alignment: WrapAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.only(
-                          top: 5, left: 10, bottom: 7, right: 10),
-                      child: Text(message["message"] ?? "",
-                          style: const TextStyle(fontSize: 16)),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(bottom: 5, right: 10),
-                      child: Text(DateFormat('dd-MM HH:mm').format(messageTime),
-                          style: TextStyle(color: Colors.grey[600])),
-                    )
-                  ],
-                )),
+            child: GestureDetector(
+              onTapDown: (tapDetails) =>
+                  openMessageMenu(tapDetails.globalPosition, message),
+              child: Container(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.85),
+                  margin: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: boxColor,
+                      border: Border.all(),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(10))),
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.end,
+                    alignment: WrapAlignment.end,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(
+                            top: 5, left: 10, bottom: 7, right: 10),
+                        child: Text(message["message"] ?? "",
+                            style: const TextStyle(fontSize: 16)),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(bottom: 5, right: 10),
+                        child: Text(
+                            messageEdit +" "+messageTime,
+                            style: TextStyle(color: Colors.grey[600])),
+                      )
+                    ],
+                  )),
+            ),
           ),
         );
       }
@@ -422,32 +614,32 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
               messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
-              pufferList = messageList(messages);
-              return pufferList;
+              MessagesPufferList = messageList(messages);
+              return MessagesPufferList;
             }
 
-            return pufferList;
+            return MessagesPufferList;
           });
     }
 
     textEingabeFeld() {
-      var myFocusNode = FocusNode();
-
       return Stack(
         children: [
           Container(
             padding: const EdgeInsets.only(left: 10, right: 50, bottom: 10),
             decoration: BoxDecoration(
                 color: Colors.white,
-                border: const Border(top: BorderSide(color: Colors.grey)),
-                boxShadow: [
+                border: extraInputInformationBox.runtimeType == SizedBox
+                    ? const Border(top: BorderSide(color: Colors.grey))
+                    : null,
+                boxShadow: extraInputInformationBox.runtimeType == SizedBox ? [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 7,
                     offset: const Offset(0, 3), // changes position of shadow
                   ),
-                ]),
+                ]: []),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minHeight: 60,
@@ -475,7 +667,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           Positioned(
             bottom: 15,
             right: 2,
-            child: IconButton(
+            child: changeMessageModus == null
+                ? IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () {
                   checkChatgroupUsers();
@@ -486,7 +679,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   });
                 },
                 icon: Icon(Icons.send,
-                    size: 34, color: Theme.of(context).colorScheme.secondary)),
+                    size: 34, color: Theme.of(context).colorScheme.secondary))
+                : IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  saveEditMessage();
+                  resetExtraInputInformation();
+                },
+                icon: Icon(Icons.done,
+                    size: 38, color: Theme.of(context).colorScheme.secondary)),
           ),
         ],
       );
@@ -507,45 +708,43 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           showDialog(
               context: context,
               builder: (BuildContext context) {
-                return StatefulBuilder(
-                  builder: (ontext, setState) {
-                    return CustomAlertDialog(
-                      title: AppLocalizations.of(context).chatLoeschen,
-                      height: 140,
-                      children: [
-                        Center(
-                            child: Text(
-                                AppLocalizations.of(context).chatWirklichLoeschen)),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Checkbox(
-                                value: bothDelete,
-                                onChanged: (value) => {
-                                  setState((){
-                                    bothDelete = value;
-                                  })
-                                }),
-                            Text(AppLocalizations.of(context).auchBeiLoeschen +
-                                widget.chatPartnerName)
-                          ],
-                        )
-                      ],
-                      actions: [
-                        TextButton(
-                          child: Text(AppLocalizations.of(context).loeschen),
-                          onPressed: () async {
-                            deleteChat(bothDelete: bothDelete);
-                          },
-                        ),
-                        TextButton(
-                          child: Text(AppLocalizations.of(context).abbrechen),
-                          onPressed: () => Navigator.pop(context),
-                        )
-                      ],
-                    );
-                  }
-                );
+                return StatefulBuilder(builder: (ontext, setState) {
+                  return CustomAlertDialog(
+                    title: AppLocalizations.of(context).chatLoeschen,
+                    height: 140,
+                    children: [
+                      Center(
+                          child: Text(AppLocalizations.of(context)
+                              .chatWirklichLoeschen)),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Checkbox(
+                              value: bothDelete,
+                              onChanged: (value) => {
+                                    setState(() {
+                                      bothDelete = value;
+                                    })
+                                  }),
+                          Text(AppLocalizations.of(context).auchBeiLoeschen +
+                              widget.chatPartnerName)
+                        ],
+                      )
+                    ],
+                    actions: [
+                      TextButton(
+                        child: Text(AppLocalizations.of(context).loeschen),
+                        onPressed: () async {
+                          deleteChat(bothDelete: bothDelete);
+                        },
+                      ),
+                      TextButton(
+                        child: Text(AppLocalizations.of(context).abbrechen),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    ],
+                  );
+                });
               });
         },
       );
@@ -572,6 +771,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           });
     }
 
+
     return Scaffold(
         appBar: chatPartnerProfil != false
             ? CustomAppBar(
@@ -581,7 +781,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 buttons: [
                   IconButton(
                       onPressed: () => moreMenu(),
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.more_vert,
                         color: Colors.white,
                       ))
@@ -592,7 +792,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 buttons: [
                     IconButton(
                         onPressed: () => moreMenu(),
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.more_vert,
                           color: Colors.white,
                         ))
@@ -601,6 +801,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Expanded(child: messageAnzeige()),
+            extraInputInformationBox,
             textEingabeFeld(),
           ],
         ));
