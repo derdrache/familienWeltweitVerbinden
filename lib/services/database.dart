@@ -255,11 +255,21 @@ class ChatDatabase{
 
   }
 
-  updateChatGroup(whatData,queryEnd ) async {
+  updateChatGroup(whatData,queryEnd) async {
     var url = Uri.parse(databaseUrl + "database/update.php");
 
     await http.post(url, body: json.encode({
       "table": "chats",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+  }
+
+  updateMessage(whatData,queryEnd) async{
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "messages",
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
@@ -337,8 +347,8 @@ class ChatDatabase{
     _deleteInTable("chats", chatId);
   }
 
-  deleteMessages(chatId){
-    _deleteInTable("messages", chatId);
+  deleteMessages(messageId){
+    _deleteInTable("messages", messageId);
   }
 
 }
