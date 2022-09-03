@@ -279,8 +279,8 @@ class _NewsPageState extends State<NewsPage> {
       var newsUserProfil = global_func.getProfilFromHive(newsUserId);
       var isFriend = ownProfil["friendlist"].contains(newsUserId);
       var text = "";
-      var newsOrt = news["information"]["city"];
-      var newsLand = news["information"]["countryname"];
+      var newsOrt = news["information"]["city"] ?? "";
+      var newsLand = news["information"]["countryname"] ?? "";
       var newsOrtInfo =
           newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
       var ownOrt = ownProfil["ort"];
