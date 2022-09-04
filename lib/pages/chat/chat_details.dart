@@ -54,7 +54,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   String changeMessageModus;
   Widget extraInputInformationBox = const SizedBox.shrink();
   var _scrollController = ItemScrollController();
-  var itemPositionsListener = ItemPositionsListener.create();
+  var itemPositionListener = ItemPositionsListener.create();
   var scrollIndex = -1;
 
   @override
@@ -349,6 +349,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+    print(itemPositionListener.itemPositions.value.);
     inputInformationBox(icon, title, bodyText) {
       return Container(
           decoration: BoxDecoration(
@@ -710,7 +711,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               scrollIndex = replyIndex;
                             });
 
-                            Future.delayed(const Duration(milliseconds: 1500), () {
+                            Future.delayed(const Duration(milliseconds: 1300), () {
                               setState(() {
                                 scrollIndex = -1;
                               });
@@ -783,47 +784,52 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           child: ScrollablePositionedList.builder(
             initialScrollIndex: messageBox.length,
             itemScrollController: _scrollController,
+            itemPositionsListener: itemPositionListener,
             itemCount: messageBox.length,
             itemBuilder: (context, index) {
               return messageBox[index];
             },
           )
-          /*
-        child: ListView(
-          reverse: true,
-          children: messageBox.reversed.toList(),
-        ),
-
-         */
           );
     }
 
     messageAnzeige() {
-      return FutureBuilder(
-          future: getAllMessages(),
-          builder: (
-            BuildContext context,
-            AsyncSnapshot snap,
-          ) {
-            if (snap.hasData) {
-              messages = snap.data;
+      return Stack(
+        children: [
+          FutureBuilder(
+              future: getAllMessages(),
+              builder: (
+                BuildContext context,
+                AsyncSnapshot snap,
+              ) {
+                if (snap.hasData) {
+                  messages = snap.data;
 
-              if (messages.length == 0) {
-                return Center(
-                    child: Text(
-                  AppLocalizations.of(context).nochKeineNachrichtVorhanden,
-                  style: const TextStyle(fontSize: 20),
-                ));
-              }
+                  if (messages.length == 0) {
+                    return Center(
+                        child: Text(
+                      AppLocalizations.of(context).nochKeineNachrichtVorhanden,
+                      style: const TextStyle(fontSize: 20),
+                    ));
+                  }
 
-              messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
+                  messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
-              MessagesPufferList = messageList(messages);
-              return MessagesPufferList;
-            }
+                  MessagesPufferList = messageList(messages);
+                  return MessagesPufferList;
+                }
 
-            return MessagesPufferList;
-          });
+                return MessagesPufferList;
+              }),
+          Positioned(
+            bottom: 10, right: 10,
+            child: FloatingActionButton(
+              onPressed: null,
+              child: Icon(Icons.arrow_downward),
+            ),
+          )
+        ],
+      );
     }
 
     textEingabeFeld() {
@@ -1014,6 +1020,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             extraInputInformationBox,
             textEingabeFeld(),
           ],
-        ));
+        ),
+    );
   }
 }
