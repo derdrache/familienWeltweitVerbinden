@@ -275,7 +275,7 @@ class ChatDatabase{
     }));
   }
 
-  addNewMessageAndSendNotification(chatgroupData, messageData)async {
+  addNewMessageAndSendNotification(chatgroupData, messageData, responseId)async {
     var users = chatgroupData["users"];
     if(users is String) users = jsonDecode(chatgroupData["users"]);
     users = users.keys.toList();
@@ -290,7 +290,8 @@ class ChatDatabase{
       "date": date,
       "message": messageData["message"],
       "von": messageData["von"],
-      "zu": messageData["zu"]
+      "zu": messageData["zu"],
+      "responseId": responseId
     }));
 
 
