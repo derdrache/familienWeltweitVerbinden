@@ -11,11 +11,11 @@ import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
@@ -53,6 +53,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var messageIdChange;
   String changeMessageModus;
   Widget extraInputInformationBox = const SizedBox.shrink();
+  var _scrollController = ItemScrollController();
+  var itemPositionsListener = ItemPositionsListener.create();
+  var scrollIndex = -1;
 
   @override
   void dispose() {
@@ -196,8 +199,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       messages.add(messageData);
     });
 
-    await ChatDatabase()
-        .addNewMessageAndSendNotification(widget.groupChatData, messageData);
+    await ChatDatabase().addNewMessageAndSendNotification(
+        widget.groupChatData, messageData, messageIdChange);
 
     if (messageData["message"].contains("</eventId=")) {
       messageData["message"] = "<Event Card>";
@@ -373,9 +376,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     Text(title,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16)),
-                    Text(bodyText)
+                            fontWeight: FontWeight.bold)),
+                    Text(bodyText, maxLines: 1, overflow: TextOverflow.ellipsis)
                   ],
                 ),
               ),
@@ -407,15 +409,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         items: [
           PopupMenuItem(
             onTap: () {
-              var profils = Hive.box("secureBox").get("profils");
-              var replyUser = "";
+              var replyUser = global_functions.getProfilFromHive(message["von"],
+                  onlyName: true);
 
-              for(var profil in profils){
-                if(message["von"] == profil["id"]) replyUser = profil["name"];
-              }
-
-              extraInputInformationBox =
-                  inputInformationBox(Icons.reply, replyUser, message["message"]);
+              extraInputInformationBox = inputInformationBox(
+                  Icons.reply, replyUser, message["message"]);
 
               replyMessage(message);
             },
@@ -513,115 +511,291 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
 
         if (message["message"].contains("</eventId=")) {
-          messageBox.add(Align(
-            alignment: textAlign,
-            child: FutureBuilder(
-                future: EventDatabase().getData(
-                    "*", "WHERE id = '${message["message"].substring(10)}'"),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data != false) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 25),
-                      child: Stack(clipBehavior: Clip.none, children: [
-                        EventCard(
-                          margin: const EdgeInsets.all(15),
-                          withInteresse: true,
-                          event: snapshot.data,
-                          afterPageVisit: () => setState(() {}),
-                        ),
-                        Positioned(
-                          bottom: -15,
-                          right: 0,
-                          child: Text(messageTime,
-                              style: TextStyle(color: Colors.grey[600])),
-                        )
-                      ]),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                }),
+          messageBox.add(AnimatedContainer(
+            color: scrollIndex == i
+                ? Theme.of(context).colorScheme.primary
+                : Colors.white,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeIn,
+            child: Align(
+              alignment: textAlign,
+              child: FutureBuilder(
+                  future: EventDatabase().getData(
+                      "*", "WHERE id = '${message["message"].substring(10)}'"),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data != false) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 25),
+                        child: Stack(clipBehavior: Clip.none, children: [
+                          EventCard(
+                            margin: const EdgeInsets.all(15),
+                            withInteresse: true,
+                            event: snapshot.data,
+                            afterPageVisit: () => setState(() {}),
+                          ),
+                          Positioned(
+                            bottom: -25,
+                            right: 15,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                    onPressed: () {
+                                      var replyUser = global_functions
+                                          .getProfilFromHive(message["von"],
+                                              onlyName: true);
+
+                                      extraInputInformationBox =
+                                          inputInformationBox(Icons.reply,
+                                              replyUser, message["message"]);
+                                      replyMessage(message);
+                                    },
+                                    child: Text(AppLocalizations.of(context).antworten)),
+                                Text(messageTime,
+                                    style: TextStyle(color: Colors.grey[600])),
+                              ],
+                            ),
+                          )
+                        ]),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+            ),
           ));
           continue;
         }
         if (message["message"].contains("</communityId=")) {
-          messageBox.add(Align(
-            alignment: textAlign,
-            child: FutureBuilder(
-                future: CommunityDatabase().getData(
-                    "*", "WHERE id = '${message["message"].substring(14)}'"),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data != false) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 25),
-                      child: Stack(clipBehavior: Clip.none, children: [
-                        CommunityCard(
-                          margin: const EdgeInsets.all(15),
-                          withFavorite: true,
-                          community: snapshot.data,
-                          afterPageVisit: () => setState(() {}),
-                        ),
-                        Positioned(
-                          bottom: -15,
-                          right: 0,
-                          child: Text(messageTime,
-                              style: TextStyle(color: Colors.grey[600])),
-                        )
-                      ]),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                }),
+          messageBox.add(AnimatedContainer(
+            color: scrollIndex == i
+                ? Theme.of(context).colorScheme.primary
+                : Colors.white,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeIn,
+            child: Align(
+              alignment: textAlign,
+              child: FutureBuilder(
+                  future: CommunityDatabase().getData(
+                      "*", "WHERE id = '${message["message"].substring(14)}'"),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data != false) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 25),
+                        child: Stack(clipBehavior: Clip.none, children: [
+                          CommunityCard(
+                            margin: const EdgeInsets.all(15),
+                            withFavorite: true,
+                            community: snapshot.data,
+                            afterPageVisit: () => setState(() {}),
+                          ),
+                          Positioned(
+                            bottom: -15,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                    onPressed: () {
+                                      var replyUser = global_functions
+                                          .getProfilFromHive(message["von"],
+                                              onlyName: true);
+
+                                      extraInputInformationBox =
+                                          inputInformationBox(Icons.reply,
+                                              replyUser, message["message"]);
+                                      replyMessage(message);
+                                    },
+                                    child: Text(AppLocalizations.of(context).antworten)),
+                                Text(messageTime,
+                                    style: TextStyle(color: Colors.grey[600])),
+                              ],
+                            ),
+                          )
+                        ]),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+            ),
           ));
           continue;
         }
 
-        messageBox.add(
-          Align(
-            alignment: textAlign, //right and left
-            child: GestureDetector(
-              onTapDown: (tapDetails) =>
-                  openMessageMenu(tapDetails.globalPosition, message),
-              child: Container(
-                  constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.85),
-                  margin: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: boxColor,
-                      border: Border.all(),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(10))),
-                  child: Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.end,
-                    alignment: WrapAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(
-                            top: 5, left: 10, bottom: 7, right: 10),
-                        child: Text(message["message"] ?? "",
-                            style: const TextStyle(fontSize: 16)),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(bottom: 5, right: 10),
-                        child: Text(messageEdit + " " + messageTime,
-                            style: TextStyle(color: Colors.grey[600])),
-                      )
-                    ],
-                  )),
+        if (int.parse(message["responseId"]) == 0) {
+          messageBox.add(AnimatedContainer(
+            color: scrollIndex == i
+                ? Theme.of(context).colorScheme.primary
+                : Colors.white,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeIn,
+            child: Align(
+              alignment: textAlign,
+              child: GestureDetector(
+                onTapDown: (tapDetails) =>
+                    openMessageMenu(tapDetails.globalPosition, message),
+                child: Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.85),
+                    margin: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: boxColor,
+                        border: Border.all(),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10))),
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.end,
+                      alignment: WrapAlignment.end,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(
+                              top: 5, left: 10, bottom: 7, right: 10),
+                          child: Text(message["message"] ?? "",
+                              style: const TextStyle(fontSize: 16)),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 5, right: 10),
+                          child: Text(messageEdit + " " + messageTime,
+                              style: TextStyle(color: Colors.grey[600])),
+                        )
+                      ],
+                    )),
+              ),
             ),
-          ),
-        );
+          ));
+        } else {
+          var replyFromId =
+              message["id"].replaceAll(userId, "").replaceAll("_", "");
+          var messageFromProfil =
+              global_functions.getProfilFromHive(replyFromId);
+          var replyMessage;
+          var replyIndex = messages.length;
+
+          for (var lookMessage in messages.reversed.toList()) {
+            replyIndex -= 1;
+
+            if (lookMessage["tableId"] == message["responseId"]) {
+              replyMessage = lookMessage;
+              break;
+            }
+          }
+
+          messageBox.add(AnimatedContainer(
+            color: scrollIndex == i
+                ? Theme.of(context).colorScheme.primary
+                : Colors.white,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeIn,
+            child: Row(
+              children: [
+                const Expanded(flex: 2, child: SizedBox.shrink()),
+                Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.85),
+                    margin: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: boxColor,
+                        border: Border.all(),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10))),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _scrollController.scrollTo(
+                                index: replyIndex,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.easeInOutCubic);
+                            setState(() {
+                              scrollIndex = replyIndex;
+                            });
+
+                            Future.delayed(const Duration(milliseconds: 1500), () {
+                              setState(() {
+                                scrollIndex = -1;
+                              });
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                                padding: const EdgeInsets.only(left: 5),
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        left: BorderSide(
+                                            width: 2,
+                                            color: Color(messageFromProfil[
+                                                    "bildStandardFarbe"])
+                                                .withOpacity(1)))),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(messageFromProfil["name"],
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(messageFromProfil[
+                                                    "bildStandardFarbe"])
+                                                .withOpacity(1))),
+                                    Text(
+                                      replyMessage["message"],
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                  ],
+                                )),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTapDown: (tapDetails) => openMessageMenu(
+                              tapDetails.globalPosition, message),
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.end,
+                            alignment: WrapAlignment.end,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    top: 5, left: 10, bottom: 7, right: 10),
+                                child: Text(message["message"] ?? "",
+                                    style: const TextStyle(fontSize: 16)),
+                              ),
+                              Container(
+                                padding:
+                                    const EdgeInsets.only(bottom: 5, right: 10),
+                                child: Text(messageEdit + " " + messageTime,
+                                    style: TextStyle(color: Colors.grey[600])),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    )),
+              ],
+            ),
+          ));
+        }
       }
 
       return ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-          PointerDeviceKind.touch,
-          PointerDeviceKind.mouse,
-        }),
+          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          }),
+          child: ScrollablePositionedList.builder(
+            initialScrollIndex: messageBox.length,
+            itemScrollController: _scrollController,
+            itemCount: messageBox.length,
+            itemBuilder: (context, index) {
+              return messageBox[index];
+            },
+          )
+          /*
         child: ListView(
           reverse: true,
           children: messageBox.reversed.toList(),
         ),
-      );
+
+         */
+          );
     }
 
     messageAnzeige() {
@@ -700,12 +874,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           Positioned(
             bottom: 15,
             right: 2,
-            child: changeMessageModus == null
+            child: changeMessageModus != "edit"
                 ? IconButton(
                     padding: EdgeInsets.zero,
                     onPressed: () {
                       checkChatgroupUsers();
                       messageToDbAndClearMessageInput(nachrichtController.text);
+
+                      resetExtraInputInformation();
 
                       setState(() {
                         nachrichtController.clear();
