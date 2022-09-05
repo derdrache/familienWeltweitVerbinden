@@ -213,6 +213,7 @@ class _CommunityPageState extends State<CommunityPage> {
 
       for (var community in allCommunities) {
         communities.add(CommunityCard(
+            margin: const EdgeInsets.all(10),
             community: community,
             withFavorite: true,
             afterPageVisit: () => changePage(
