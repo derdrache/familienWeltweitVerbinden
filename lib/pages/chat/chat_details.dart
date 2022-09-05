@@ -56,6 +56,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var _scrollController = ItemScrollController();
   var itemPositionListener = ItemPositionsListener.create();
   var scrollIndex = -1;
+  var hasStartPosition = true;
+  var startData;
+  var counter = 0;
 
   @override
   void dispose() {
@@ -79,6 +82,25 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
+
+    itemPositionListener.itemPositions.addListener((){
+      var scrollValue = itemPositionListener.itemPositions.value;
+
+      if(startData != scrollValue.first.index +1 && hasStartPosition == true && startData != null){
+        setState(() {
+          hasStartPosition = false;
+        });
+      } else if(startData == scrollValue.first.index +1 && hasStartPosition == false){
+        setState(() {
+          hasStartPosition = true;
+        });
+      }
+
+      startData ??= scrollValue.first.index;
+
+
+    });
+
     widget.chatId = widget.groupChatData["id"];
     _asyncMethod();
 
@@ -349,7 +371,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   Widget build(BuildContext context) {
-    print(itemPositionListener.itemPositions.value.);
+
     inputInformationBox(icon, title, bodyText) {
       return Container(
           decoration: BoxDecoration(
@@ -821,7 +843,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                 return MessagesPufferList;
               }),
-          Positioned(
+          if(!hasStartPosition) Positioned(
             bottom: 10, right: 10,
             child: FloatingActionButton(
               onPressed: null,
