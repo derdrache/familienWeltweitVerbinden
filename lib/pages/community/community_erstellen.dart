@@ -126,12 +126,13 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
         children: [
           customTextInput(
               AppLocalizations.of(context).communityName, nameController),
-          ownCommunityBox(),
+          ortAuswahlBox,
           customTextInput(AppLocalizations.of(context).linkEingebenOptional,
               linkKontroller),
           customTextInput(AppLocalizations.of(context).beschreibungCommunity,
               beschreibungKontroller,
-              moreLines: 5, textInputAction: TextInputAction.newline)
+              moreLines: 5, textInputAction: TextInputAction.newline),
+          ownCommunityBox(),
         ],
       ),
     );
