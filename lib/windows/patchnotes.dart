@@ -57,6 +57,8 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch161D),
+                _patch(patch160D),
                 _patch(patch150D),
                 _patch(patch141D),
                 _patch(patch140D),
@@ -74,6 +76,8 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch161E),
+                _patch(patch160E),
                 _patch(patch150E),
                 _patch(patch141E),
                 _patch(patch140E),
@@ -101,6 +105,25 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch161E={
+  "title" : "1.6.1 - 06.09.2022",
+  "inhalt": [
+    "The error when creating communities has been fixed",
+    "The incorrect display of communities was corrected",
+    "Newspage now works without errors",
+    "Change of location is now properly saved in the database again"
+  ]
+};
+var patch161D={
+  "title" : "1.6.1 - 06.09.2022",
+  "inhalt": [
+    "Der Fehler beim Gemeinschaften erstellen wurde behoben",
+    "Die Fehlerhafte Anzeige der Gemeinschaften wurde korrigiert"
+    "Newspage funktioniert jetzt ohne Fehler",
+    "Ortswechsel wird jetzt wieder ordentlich in der Datenbank gespeichert"
   ]
 };
 
