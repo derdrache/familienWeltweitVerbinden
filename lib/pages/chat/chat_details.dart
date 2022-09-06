@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
@@ -60,6 +61,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var hasStartPosition = true;
   var startData;
   var counter = 0;
+  bool emojisShowing = false;
 
   @override
   void dispose() {
@@ -83,23 +85,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
-
-    itemPositionListener.itemPositions.addListener((){
+    itemPositionListener.itemPositions.addListener(() {
       var scrollValue = itemPositionListener.itemPositions.value;
 
-      if(startData != scrollValue.first.index +1 && hasStartPosition == true && startData != null){
+      if (startData != scrollValue.first.index + 1 &&
+          hasStartPosition == true &&
+          startData != null) {
         setState(() {
           hasStartPosition = false;
         });
-      } else if(startData == scrollValue.first.index +1 && hasStartPosition == false){
+      } else if (startData == scrollValue.first.index + 1 &&
+          hasStartPosition == false) {
         setState(() {
           hasStartPosition = true;
         });
       }
 
       startData ??= scrollValue.first.index;
-
-
     });
 
     widget.chatId = widget.groupChatData["id"];
@@ -372,7 +374,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   Widget build(BuildContext context) {
-
     inputInformationBox(icon, title, bodyText) {
       return Container(
           decoration: BoxDecoration(
@@ -515,7 +516,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     messageList(messages) {
       List<Widget> messageBox = [];
 
-      for (var i = 0; i < messages.length; i++) {
+      for (var i = messages.length-1; i >= 0; i--) {
         var message = messages[i];
         var messageTime = DateFormat('dd-MM HH:mm').format(
             DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"])));
@@ -575,7 +576,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                               replyUser, message["message"]);
                                       replyMessage(message);
                                     },
-                                    child: Text(AppLocalizations.of(context).antworten)),
+                                    child: Text(AppLocalizations.of(context)
+                                        .antworten)),
                                 Text(messageTime,
                                     style: TextStyle(color: Colors.grey[600])),
                               ],
@@ -630,7 +632,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                               replyUser, message["message"]);
                                       replyMessage(message);
                                     },
-                                    child: Text(AppLocalizations.of(context).antworten)),
+                                    child: Text(AppLocalizations.of(context)
+                                        .antworten)),
                                 Text(messageTime,
                                     style: TextStyle(color: Colors.grey[600])),
                               ],
@@ -735,7 +738,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               scrollIndex = replyIndex;
                             });
 
-                            Future.delayed(const Duration(milliseconds: 1300), () {
+                            Future.delayed(const Duration(milliseconds: 1300),
+                                () {
                               setState(() {
                                 scrollIndex = -1;
                               });
@@ -806,15 +810,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             PointerDeviceKind.mouse,
           }),
           child: ScrollablePositionedList.builder(
-            initialScrollIndex: messageBox.length,
             itemScrollController: _scrollController,
             itemPositionsListener: itemPositionListener,
+            reverse: true,
             itemCount: messageBox.length,
             itemBuilder: (context, index) {
               return messageBox[index];
             },
-          )
-          );
+          ));
     }
 
     messageAnzeige() {
@@ -845,48 +848,66 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                 return MessagesPufferList;
               }),
-          if(!hasStartPosition) Positioned(
-            bottom: 10, right: 10,
-            child: FloatingActionButton(
-              onPressed: null,
-              child: Icon(Icons.arrow_downward),
-            ),
-          )
+          if (!hasStartPosition)
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: FloatingActionButton(
+                onPressed: () {
+                  _scrollController.scrollTo(
+                      index: messages.length,
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeInOutCubic);
+                  setState(() {
+
+                  });
+                },
+                child: Icon(Icons.arrow_downward),
+              ),
+            )
         ],
       );
     }
 
     textEingabeFeld() {
-      return Stack(
+      return Column(
         children: [
           Container(
-            padding: const EdgeInsets.only(left: 10, right: 50, bottom: 10),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: extraInputInformationBox.runtimeType == SizedBox
-                    ? const Border(top: BorderSide(color: Colors.grey))
-                    : null,
-                boxShadow: extraInputInformationBox.runtimeType == SizedBox
-                    ? [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset:
-                              const Offset(0, 3), // changes position of shadow
-                        ),
-                      ]
-                    : []),
-            child: ConstrainedBox(
               constraints: const BoxConstraints(
                 minHeight: 60,
-                maxHeight: 180.0,
               ),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: extraInputInformationBox.runtimeType == SizedBox
+                      ? const Border(top: BorderSide(color: Colors.grey))
+                      : null,
+                  boxShadow: extraInputInformationBox.runtimeType == SizedBox
+                      ? [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(
+                                0, 3), // changes position of shadow
+                          ),
+                        ]
+                      : []),
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () => EmojiPicker(),
-                    icon: Icon(Icons.sentiment_satisfied),
+                    onPressed: () {
+                      emojisShowing = !emojisShowing;
+
+                      if(emojisShowing == true){
+                        myFocusNode.unfocus();
+                      } else{
+                        myFocusNode.requestFocus();
+                      }
+
+                      setState(() {});
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
+                    icon: Icon(Icons.mood),
                   ),
                   SizedBox(width: 5),
                   Expanded(
@@ -897,7 +918,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       controller: nachrichtController,
                       textAlignVertical: TextAlignVertical.center,
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 5),
                         hintText: AppLocalizations.of(context).nachricht,
                         hintStyle: const TextStyle(fontSize: 20),
                         border: InputBorder.none,
@@ -908,39 +928,68 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       ),
                     ),
                   ),
+                  changeMessageModus != "edit"
+                      ? IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            checkChatgroupUsers();
+                            messageToDbAndClearMessageInput(
+                                nachrichtController.text);
+
+                            resetExtraInputInformation();
+
+                            setState(() {
+                              nachrichtController.clear();
+                            });
+                          },
+                          icon: Icon(Icons.send,
+                              size: 34,
+                              color: Theme.of(context).colorScheme.secondary))
+                      : IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            saveEditMessage();
+                            resetExtraInputInformation();
+                          },
+                          icon: Icon(Icons.done,
+                              size: 38,
+                              color: Theme.of(context).colorScheme.secondary))
                 ],
+              )),
+          if(emojisShowing) SizedBox(
+            height: 250,
+            child: EmojiPicker(
+              textEditingController: nachrichtController,
+              config: Config(
+                columns: 7,
+                emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
+                // Issue: https://github.com/flutter/flutter/issues/28894
+                verticalSpacing: 0,
+                horizontalSpacing: 0,
+                gridPadding: EdgeInsets.zero,
+                initCategory: Category.RECENT,
+                bgColor: Color(0xFFF2F2F2),
+                indicatorColor: Colors.blue,
+                iconColor: Colors.grey,
+                iconColorSelected: Colors.blue,
+                progressIndicatorColor: Colors.blue,
+                backspaceColor: Colors.blue,
+                skinToneDialogBgColor: Colors.white,
+                skinToneIndicatorColor: Colors.grey,
+                enableSkinTones: true,
+                showRecentsTab: true,
+                recentsLimit: 28,
+                noRecents: const Text(
+                  'No Recents',
+                  style: TextStyle(fontSize: 20, color: Colors.black26),
+                  textAlign: TextAlign.center,
+                ),
+                tabIndicatorAnimDuration: kTabScrollDuration,
+                categoryIcons: const CategoryIcons(),
+                buttonMode: ButtonMode.MATERIAL,
               ),
             ),
-          ),
-          Positioned(
-            bottom: 15,
-            right: 2,
-            child: changeMessageModus != "edit"
-                ? IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      checkChatgroupUsers();
-                      messageToDbAndClearMessageInput(nachrichtController.text);
-
-                      resetExtraInputInformation();
-
-                      setState(() {
-                        nachrichtController.clear();
-                      });
-                    },
-                    icon: Icon(Icons.send,
-                        size: 34,
-                        color: Theme.of(context).colorScheme.secondary))
-                : IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      saveEditMessage();
-                      resetExtraInputInformation();
-                    },
-                    icon: Icon(Icons.done,
-                        size: 38,
-                        color: Theme.of(context).colorScheme.secondary)),
-          ),
+          )
         ],
       );
     }
@@ -1024,38 +1073,38 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     return Scaffold(
-        appBar: chatPartnerProfil != false
-            ? CustomAppBar(
-                title: widget.chatPartnerName ?? "",
-                profilBildProfil: chatPartnerProfil,
-                onTap: () => openProfil(),
-                buttons: [
+      appBar: chatPartnerProfil != false
+          ? CustomAppBar(
+              title: widget.chatPartnerName ?? "",
+              profilBildProfil: chatPartnerProfil,
+              onTap: () => openProfil(),
+              buttons: [
+                IconButton(
+                    onPressed: () => moreMenu(),
+                    icon: const Icon(
+                      Icons.more_vert,
+                      color: Colors.white,
+                    ))
+              ],
+            )
+          : CustomAppBar(
+              title: AppLocalizations.of(context).geloeschterUser,
+              buttons: [
                   IconButton(
                       onPressed: () => moreMenu(),
                       icon: const Icon(
                         Icons.more_vert,
                         color: Colors.white,
                       ))
-                ],
-              )
-            : CustomAppBar(
-                title: AppLocalizations.of(context).geloeschterUser,
-                buttons: [
-                    IconButton(
-                        onPressed: () => moreMenu(),
-                        icon: const Icon(
-                          Icons.more_vert,
-                          color: Colors.white,
-                        ))
-                  ]),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Expanded(child: messageAnzeige()),
-            extraInputInformationBox,
-            textEingabeFeld(),
-          ],
-        ),
+                ]),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Expanded(child: messageAnzeige()),
+          extraInputInformationBox,
+          textEingabeFeld(),
+        ],
+      ),
     );
   }
 }
