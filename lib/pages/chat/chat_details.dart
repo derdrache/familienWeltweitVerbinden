@@ -16,6 +16,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
@@ -523,6 +524,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             : AppLocalizations.of(context).bearbeitet;
         var textAlign = Alignment.centerLeft;
         var boxColor = Colors.white;
+        message["responseId"] ??= "0";
 
         if (message["message"] == "") continue;
 
@@ -880,22 +882,33 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 minHeight: 60,
                 maxHeight: 180.0,
               ),
-              child: TextField(
-                maxLines: null,
-                focusNode: myFocusNode,
-                textInputAction: TextInputAction.newline,
-                controller: nachrichtController,
-                textAlignVertical: TextAlignVertical.center,
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 5),
-                  hintText: AppLocalizations.of(context).nachricht,
-                  hintStyle: const TextStyle(fontSize: 20),
-                  border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                ),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => EmojiPicker(),
+                    icon: Icon(Icons.sentiment_satisfied),
+                  ),
+                  SizedBox(width: 5),
+                  Expanded(
+                    child: TextField(
+                      maxLines: null,
+                      focusNode: myFocusNode,
+                      textInputAction: TextInputAction.newline,
+                      controller: nachrichtController,
+                      textAlignVertical: TextAlignVertical.center,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.fromLTRB(0, 15, 0, 5),
+                        hintText: AppLocalizations.of(context).nachricht,
+                        hintStyle: const TextStyle(fontSize: 20),
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
