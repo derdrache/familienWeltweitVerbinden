@@ -70,7 +70,7 @@ class _ChatPageState extends State<ChatPage> {
     var ownProfil = Hive.box('secureBox').get("ownProfil");
 
     for (var data in dbProfilData) {
-      if (!ownProfil["geblocktVon"].contains(data["id"])) {
+      if (!ownProfil["geblocktVon"].contains(data["id"]) || data["id"] != "bbGp4rxJvCMywMI7eTahtZMHY2o2") {
         allName.add(data["name"]);
       }
 
