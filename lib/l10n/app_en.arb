@@ -381,6 +381,7 @@
     "nachrichtZwischenAblage": "Message stored in clipboard",
     "nachrichtGemeldet": "Message was reported",
     "nachrichtBearbeiten": "Edit message",
-    "bearbeitet": "edited"
+    "bearbeitet": "edited",
+    "empfaengerWaehlen": "Select receiver"
 }
 
