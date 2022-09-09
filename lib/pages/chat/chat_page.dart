@@ -51,7 +51,7 @@ class _ChatPageState extends State<ChatPage> {
     for (var group in myChats) {
       var users = group["users"];
 
-      if(users[userId] == null) continue;
+      if (users[userId] == null) continue;
 
       realNewMessages += users[userId]["newMessages"];
     }
@@ -70,7 +70,10 @@ class _ChatPageState extends State<ChatPage> {
     var ownProfil = Hive.box('secureBox').get("ownProfil");
 
     for (var data in dbProfilData) {
-      if (!ownProfil["geblocktVon"].contains(data["id"]) || data["id"] != "bbGp4rxJvCMywMI7eTahtZMHY2o2") {
+
+      if (!ownProfil["geblocktVon"].contains(data["id"]) &&
+          data["id"] != "bbGp4rxJvCMywMI7eTahtZMHY2o2" &&
+          data["id"] != userId) {
         allName.add(data["name"]);
       }
 
@@ -112,6 +115,9 @@ class _ChatPageState extends State<ChatPage> {
     var chatPartner = searchAutocomplete.getSelected()[0];
     var chatPartnerId =
         await ProfilDatabase().getData("id", "WHERE name = '$chatPartner'");
+
+    print(chatPartner);
+    print(chatPartnerId);
 
     checkValidAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
   }
@@ -224,12 +230,12 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
-  deleteChat(choosenChatIds, {deleteBoth = false}) async{
-    for(var choosenChatId in choosenChatIds){
+  deleteChat(choosenChatIds, {deleteBoth = false}) async {
+    for (var choosenChatId in choosenChatIds) {
       var chat = {};
 
-      for(var myChat in myChats){
-        if(myChat["id"] == choosenChatId){
+      for (var myChat in myChats) {
+        if (myChat["id"] == choosenChatId) {
           chat = myChat;
         }
       }
@@ -239,8 +245,8 @@ class _ChatPageState extends State<ChatPage> {
       if (chatUsers.length <= 1 || deleteBoth) {
         var removeChat = {};
 
-        for(var myChat in myChats){
-          if(myChat["id"] == choosenChatId) removeChat = myChat;
+        for (var myChat in myChats) {
+          if (myChat["id"] == choosenChatId) removeChat = myChat;
         }
 
         myChats.remove(removeChat);
@@ -250,46 +256,45 @@ class _ChatPageState extends State<ChatPage> {
       } else {
         var newChatUsersData = {};
 
-        chatUsers.forEach((key,value){
+        chatUsers.forEach((key, value) {
           if (key != userId) {
             newChatUsersData = {key: value};
           }
         });
 
-        for(var myChat in myChats){
-          if(myChat["id"] == choosenChatId){
+        for (var myChat in myChats) {
+          if (myChat["id"] == choosenChatId) {
             myChat["users"] = newChatUsersData;
           }
         }
 
         ChatDatabase().updateChatGroup(
-            "users = '${json.encode(newChatUsersData)}'", "WHERE id ='$choosenChatId'");
+            "users = '${json.encode(newChatUsersData)}'",
+            "WHERE id ='$choosenChatId'");
       }
     }
 
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-  deleteChatDialog(chatgroupData){
+  deleteChatDialog(chatgroupData) {
     var countSelected = 0;
     var choosenChatgroupsId = [];
     var chatPartnerName = "";
 
-    for(var chatId in changeChatsDict.keys){
-      if(changeChatsDict[chatId]){
+    for (var chatId in changeChatsDict.keys) {
+      if (changeChatsDict[chatId]) {
         choosenChatgroupsId.add(chatId);
         countSelected += 1;
       }
     }
 
-    if(choosenChatgroupsId.length == 1){
+    if (choosenChatgroupsId.length == 1) {
       var chatId = choosenChatgroupsId[0];
       var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
 
-      for(var profil in dbProfilData){
-        if(profil["id"] == chatPartnerId){
+      for (var profil in dbProfilData) {
+        if (profil["id"] == chatPartnerId) {
           chatPartnerName = profil["name"];
           break;
         }
@@ -299,17 +304,17 @@ class _ChatPageState extends State<ChatPage> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return CustomAlertDialog(
-                title: AppLocalizations.of(context).chatLoeschen,
-                height: countSelected == 1 ? 150 : 100,
-                children: [
-                  Center(
-                      child: Text(
-                          AppLocalizations.of(context).chatWirklichLoeschen)),
-                  if(countSelected == 1) const SizedBox(height: 20),
-                  if(countSelected == 1) Row(
+          return StatefulBuilder(builder: (context, setState) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).chatLoeschen,
+              height: countSelected == 1 ? 150 : 100,
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context).chatWirklichLoeschen)),
+                if (countSelected == 1) const SizedBox(height: 20),
+                if (countSelected == 1)
+                  Row(
                     children: [
                       Checkbox(
                           value: deleteBoth,
@@ -317,32 +322,32 @@ class _ChatPageState extends State<ChatPage> {
                             setState(() {
                               deleteBoth = value;
                             });
-                          } ),
+                          }),
                       Expanded(
-                        child: Text(AppLocalizations.of(context).auchBeiLoeschen +
-                            chatPartnerName),
-                      )//widget.chatPartnerName)
+                        child: Text(
+                            AppLocalizations.of(context).auchBeiLoeschen +
+                                chatPartnerName),
+                      ) //widget.chatPartnerName)
                     ],
                   )
-                ],
-                actions: [
-                  TextButton(
-                    child: Text(AppLocalizations.of(context).loeschen),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      changeBarOn = false;
-                      changeChatsDict = {};
-                      deleteChat(choosenChatgroupsId, deleteBoth: deleteBoth);
-                    },
-                  ),
-                  TextButton(
-                    child: Text(AppLocalizations.of(context).abbrechen),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              );
-            }
-          );
+              ],
+              actions: [
+                TextButton(
+                  child: Text(AppLocalizations.of(context).loeschen),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    changeBarOn = false;
+                    changeChatsDict = {};
+                    deleteChat(choosenChatgroupsId, deleteBoth: deleteBoth);
+                  },
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context).abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            );
+          });
         });
   }
 
@@ -357,7 +362,8 @@ class _ChatPageState extends State<ChatPage> {
         String chatPartnerId;
         var users = group["users"];
 
-        if(group["lastMessage"].isEmpty || group["users"][userId] == null) continue;
+        if (group["lastMessage"].isEmpty || group["users"][userId] == null)
+          continue;
 
         changeChatsDict[group["id"]] ??= false;
 
@@ -389,27 +395,27 @@ class _ChatPageState extends State<ChatPage> {
 
         chatGroupContainers.add(InkWell(
           onTap: () {
-            if(changeBarOn){
+            if (changeBarOn) {
               var markerOn = false;
 
               setState(() {
                 changeChatsDict[group["id"]] = !changeChatsDict[group["id"]];
-                for(var chatId in changeChatsDict.keys){
-                  if(changeChatsDict[chatId]) markerOn = true;
+                for (var chatId in changeChatsDict.keys) {
+                  if (changeChatsDict[chatId]) markerOn = true;
                   break;
                 }
                 changeBarOn = markerOn;
               });
-            } else{
+            } else {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (_) => ChatDetailsPage(
-                        chatPartnerName: chatPartnerName,
-                        groupChatData: group,
-                      ))).whenComplete(() => setState(() {}));
+                            chatPartnerName: chatPartnerName,
+                            groupChatData: group,
+                          ))).whenComplete(() => setState(() {}));
             }
-          } ,
+          },
           onLongPress: () {
             setState(() {
               changeBarOn = true;
@@ -428,12 +434,19 @@ class _ChatPageState extends State<ChatPage> {
                   Stack(
                     children: [
                       ProfilImage(chatPartnerProfil),
-                      if(changeChatsDict[group["id"]])
-                        const Positioned(bottom: 0,right: 0, child: CircleAvatar(
-                          radius: 12,
-                          backgroundColor: Colors.white,
-                          child: Icon(Icons.check_circle, size: 24, color: Colors.green,),
-                        ))
+                      if (changeChatsDict[group["id"]])
+                        const Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.check_circle,
+                                size: 24,
+                                color: Colors.green,
+                              ),
+                            ))
                     ],
                   ),
                   const SizedBox(width: 10),
@@ -498,24 +511,28 @@ class _ChatPageState extends State<ChatPage> {
                 onPressed: () {
                   setState(() {
                     changeBarOn = false;
-                    for(var chatId in changeChatsDict.keys){
+                    for (var chatId in changeChatsDict.keys) {
                       changeChatsDict[chatId] = false;
                     }
                   });
                 },
               ),
-        buttons: [
-          IconButton(onPressed: () => deleteChatDialog(""), icon: const Icon(Icons.delete))
-        ],
-      )
+              buttons: [
+                IconButton(
+                    onPressed: () => deleteChatDialog(""),
+                    icon: const Icon(Icons.delete))
+              ],
+            )
           : CustomAppBar(
               title: "",
               withLeading: false,
-              buttons: const [IconButton(onPressed: null, icon: Icon(Icons.search))],
+              buttons: const [
+                IconButton(onPressed: null, icon: Icon(Icons.search))
+              ],
             ),
       body: FutureBuilder(
-          future: ChatDatabase().getChatData("*",
-              "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+          future: ChatDatabase().getChatData(
+              "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
               returnList: true),
           builder: (context, snapshot) {
             var myChatBox = Hive.box("secureBox");
@@ -538,8 +555,8 @@ class _ChatPageState extends State<ChatPage> {
                 removeTop: true,
                 context: context,
                 child: ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context)
-                      .copyWith(dragDevices: {
+                  behavior:
+                      ScrollConfiguration.of(context).copyWith(dragDevices: {
                     PointerDeviceKind.touch,
                     PointerDeviceKind.mouse,
                   }),
@@ -554,8 +571,7 @@ class _ChatPageState extends State<ChatPage> {
                 heightFactor: 20,
                 child: Text(
                     AppLocalizations.of(context).nochKeineChatsVorhanden,
-                    style:
-                        const TextStyle(fontSize: 20, color: Colors.grey)));
+                    style: const TextStyle(fontSize: 20, color: Colors.grey)));
           }),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
