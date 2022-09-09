@@ -1,4 +1,3 @@
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/dialogWindow.dart';
