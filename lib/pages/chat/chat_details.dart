@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'dart:ui';
+
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
 import 'package:familien_suche/global/custom_widgets.dart';
@@ -21,10 +22,12 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
+import '../../widgets/text_with_hyperlink_detection.dart';
+import '../../windows/all_user_select.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   String chatPartnerId;
-  String chatPartnerName;
+  var chatPartnerName;
   String chatId;
   var groupChatData;
 
@@ -47,7 +50,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var nachrichtController = TextEditingController();
   Timer timer;
   List<dynamic> messages = [];
-  Widget MessagesPufferList = const Center(child: CircularProgressIndicator());
+  Widget messagesPufferList = const Center(child: CircularProgressIndicator());
   var eventCardList = [];
   var chatPartnerProfil;
   bool bothDelete = false;
@@ -62,6 +65,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var startData;
   var counter = 0;
   bool emojisShowing = false;
+  var newMessageDate;
 
   @override
   void dispose() {
@@ -86,25 +90,30 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   void initState() {
     itemPositionListener.itemPositions.addListener(() {
-      var scrollValue = itemPositionListener.itemPositions.value;
+      var scrollValueFirstItem =
+          itemPositionListener.itemPositions.value.first.index;
 
-      if (startData != scrollValue.first.index + 1 &&
+      startData ??= scrollValueFirstItem;
+
+      if (startData != scrollValueFirstItem &&
           hasStartPosition == true &&
           startData != null) {
         setState(() {
           hasStartPosition = false;
         });
-      } else if (startData == scrollValue.first.index + 1 &&
+      } else if (startData == scrollValueFirstItem &&
           hasStartPosition == false) {
         setState(() {
           hasStartPosition = true;
         });
       }
-
-      startData ??= scrollValue.first.index;
     });
+    if (widget.groupChatData == null) {
+      widget.chatId = global_functions.getChatID(widget.chatPartnerId);
+    } else {
+      widget.chatId = widget.groupChatData["id"];
+    }
 
-    widget.chatId = widget.groupChatData["id"];
     _asyncMethod();
 
     WidgetsBinding.instance.addObserver(this);
@@ -126,7 +135,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   createNewChat() async {
-    if (widget.groupChatData["id"] != null) return;
+    if (widget.groupChatData != null) return;
 
     var userID = FirebaseAuth.instance.currentUser.uid;
     widget.chatPartnerId ??= await ProfilDatabase()
@@ -134,12 +143,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     widget.chatPartnerName ??= await ProfilDatabase()
         .getData("name", "WHERE id = '${widget.chatPartnerId}'");
 
-    var chatUsers = {
-      userID: userName,
-      widget.chatPartnerId: widget.chatPartnerName
-    };
-
-    widget.groupChatData = await ChatDatabase().addNewChatGroup(chatUsers);
+    widget.groupChatData =
+        await ChatDatabase().addNewChatGroup(widget.chatPartnerId);
   }
 
   getAndSetChatData() async {
@@ -331,9 +336,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         color: Colors.green);
   }
 
-  forwardMessage() {
-    //Gruppen / Personen aussuchen, die diese Nachricht bekommen
-    // möglichkeit noch einen Text mitzugeben
+  forwardMessage(message) async {
+    var allUserSelectWindow = AllUserSelectWindow(
+        context: context,
+        title: AppLocalizations.of(context).empfaengerWaehlen);
+    var selectedId = await allUserSelectWindow.openWindow();
+    var selectedChatId = global_functions.getChatID(selectedId);
+    var chatGroupData =
+        await ChatDatabase().getChatData("*", "WHERE id = '$selectedChatId'");
+
+    var messageData = {
+      "message": "<weiterleitung>",
+      "von": userId,
+      "date": DateTime.now().millisecondsSinceEpoch.toString(),
+      "zu": selectedId,
+      "forward": json.encode(message)
+    };
+
+    ChatDatabase().updateChatGroup(
+        "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
+        "WHERE id = '${selectedChatId}'");
+
+    ChatDatabase()
+        .addNewMessageAndSendNotification(chatGroupData, messageData, 0);
   }
 
   deleteMessage(messageId) {
@@ -374,6 +399,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     inputInformationBox(icon, title, bodyText) {
       return Container(
           decoration: BoxDecoration(
@@ -421,14 +447,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ]));
     }
 
-    openMessageMenu(tapPosition, message) {
+    openMessageMenu(message) {
       final RenderBox overlay = Overlay.of(context).context.findRenderObject();
       var isMyMessage = message["von"] == userId;
 
       showMenu(
         context: context,
         position: RelativeRect.fromRect(
-            tapPosition & const Size(40, 40), // smaller rect, the touch area
+            Offset(0, screenHeight / 3) & const Size(40, 40),
+            // smaller rect, the touch area
             Offset.zero & overlay.size // Bigger rect, the entire screen
             ),
         items: [
@@ -477,7 +504,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ),
           ),
           PopupMenuItem(
-            onTap: () => forwardMessage(),
+            onTap: () => Future.delayed(
+                Duration(seconds: 0), () => forwardMessage(message)),
             child: Row(
               children: [
                 const Icon(Icons.forward),
@@ -516,10 +544,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     messageList(messages) {
       List<Widget> messageBox = [];
 
-      for (var i = messages.length-1; i >= 0; i--) {
+      for (var i = messages.length - 1; i >= 0; i--) {
         var message = messages[i];
-        var messageTime = DateFormat('dd-MM HH:mm').format(
-            DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"])));
+        var messageDateTime =
+            DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
+        var messageDate = DateFormat('dd.MM.yy').format(messageDateTime);
+        var messageTime = DateFormat('HH:mm').format(messageDateTime);
         var messageEdit = message["editDate"] == null
             ? ""
             : AppLocalizations.of(context).bearbeitet;
@@ -534,6 +564,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         if (message["von"] == userId) {
           textAlign = Alignment.centerRight;
           boxColor = Colors.greenAccent;
+        }
+
+        if (newMessageDate == null || newMessageDate != messageDate) {
+          newMessageDate = messageDate;
+
+          messageBox.add(Align(
+            child: Container(
+              width: 80,
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: const BorderRadius.all(Radius.circular(20))),
+              child: Center(
+                  child: Text(
+                messageDate,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )),
+            ),
+          ));
         }
 
         if (message["message"].contains("</eventId=")) {
@@ -648,61 +698,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ));
           continue;
         }
-
-        if (int.parse(message["responseId"]) == 0) {
-          messageBox.add(AnimatedContainer(
-            color: scrollIndex == i
-                ? Theme.of(context).colorScheme.primary
-                : Colors.white,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeIn,
-            child: Align(
-              alignment: textAlign,
-              child: GestureDetector(
-                onTapDown: (tapDetails) =>
-                    openMessageMenu(tapDetails.globalPosition, message),
-                child: Container(
-                    constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.85),
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: boxColor,
-                        border: Border.all(),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10))),
-                    child: Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.end,
-                      alignment: WrapAlignment.end,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(
-                              top: 5, left: 10, bottom: 7, right: 10),
-                          child: Text(message["message"] ?? "",
-                              style: const TextStyle(fontSize: 16)),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(bottom: 5, right: 10),
-                          child: Text(messageEdit + " " + messageTime,
-                              style: TextStyle(color: Colors.grey[600])),
-                        )
-                      ],
-                    )),
-              ),
-            ),
-          ));
-        } else {
+        if (int.parse(message["responseId"]) != 0) {
           var replyFromId =
               message["id"].replaceAll(userId, "").replaceAll("_", "");
           var messageFromProfil =
               global_functions.getProfilFromHive(replyFromId);
-          var replyMessage;
+          var replyMessageText;
           var replyIndex = messages.length;
 
           for (var lookMessage in messages.reversed.toList()) {
             replyIndex -= 1;
 
             if (lookMessage["tableId"] == message["responseId"]) {
-              replyMessage = lookMessage;
+              replyMessageText = lookMessage;
               break;
             }
           }
@@ -716,6 +724,113 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             child: Row(
               children: [
                 const Expanded(flex: 2, child: SizedBox.shrink()),
+                Stack(
+                  children: [
+                    Container(
+                        constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.85),
+                        margin: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            color: boxColor,
+                            border: Border.all(),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10))),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                _scrollController.scrollTo(
+                                    index: replyIndex,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOutCubic);
+                                setState(() {
+                                  scrollIndex = replyIndex;
+                                });
+
+                                Future.delayed(
+                                    const Duration(milliseconds: 1300), () {
+                                  setState(() {
+                                    scrollIndex = -1;
+                                  });
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                    padding: const EdgeInsets.only(left: 5),
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            left: BorderSide(
+                                                width: 2,
+                                                color: Color(messageFromProfil[
+                                                        "bildStandardFarbe"])
+                                                    .withOpacity(1)))),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(messageFromProfil["name"],
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(messageFromProfil[
+                                                        "bildStandardFarbe"])
+                                                    .withOpacity(1))),
+                                        Text(
+                                          replyMessageText["message"],
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
+                                      ],
+                                    )),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.only(
+                                  top: 5, left: 10, bottom: 7, right: 10),
+                              child: Wrap(
+                                children: [
+                                  TextWithHyperlinkDetection(
+                                    text: message["message"] ?? "",
+                                    fontsize: 16,
+                                    onTextTab: () => openMessageMenu(message),
+                                  ),
+                                  SizedBox(
+                                      width: message["editDate"] == null
+                                          ? 40
+                                          : 110)
+                                ],
+                              ),
+                            ),
+                          ],
+                        )),
+                    Positioned(
+                      right: 20,
+                      bottom: 15,
+                      child: Text(messageEdit + " " + messageTime,
+                          style: TextStyle(color: Colors.grey[600])),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ));
+          continue;
+        }
+        if(message["forward"].isNotEmpty){
+          continue;
+        }
+
+        messageBox.add(AnimatedContainer(
+          color: scrollIndex == i
+              ? Theme.of(context).colorScheme.primary
+              : Colors.white,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeIn,
+          child: Align(
+            alignment: textAlign,
+            child: Stack(
+              children: [
                 Container(
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.85),
@@ -725,83 +840,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         border: Border.all(),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10))),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Wrap(
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            _scrollController.scrollTo(
-                                index: replyIndex,
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.easeInOutCubic);
-                            setState(() {
-                              scrollIndex = replyIndex;
-                            });
-
-                            Future.delayed(const Duration(milliseconds: 1300),
-                                () {
-                              setState(() {
-                                scrollIndex = -1;
-                              });
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                                padding: const EdgeInsets.only(left: 5),
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                        left: BorderSide(
-                                            width: 2,
-                                            color: Color(messageFromProfil[
-                                                    "bildStandardFarbe"])
-                                                .withOpacity(1)))),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(messageFromProfil["name"],
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(messageFromProfil[
-                                                    "bildStandardFarbe"])
-                                                .withOpacity(1))),
-                                    Text(
-                                      replyMessage["message"],
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    )
-                                  ],
-                                )),
-                          ),
+                        Container(
+                          padding: const EdgeInsets.only(
+                              top: 5, left: 10, bottom: 7, right: 10),
+                          child: TextWithHyperlinkDetection(
+                              text: message["message"] ?? "",
+                              fontsize: 16,
+                              onTextTab: () => openMessageMenu(message)),
                         ),
-                        GestureDetector(
-                          onTapDown: (tapDetails) => openMessageMenu(
-                              tapDetails.globalPosition, message),
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.end,
-                            alignment: WrapAlignment.end,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(
-                                    top: 5, left: 10, bottom: 7, right: 10),
-                                child: Text(message["message"] ?? "",
-                                    style: const TextStyle(fontSize: 16)),
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.only(bottom: 5, right: 10),
-                                child: Text(messageEdit + " " + messageTime,
-                                    style: TextStyle(color: Colors.grey[600])),
-                              )
-                            ],
-                          ),
-                        ),
+                        SizedBox(width: message["editDate"] == null ? 40 : 110),
                       ],
                     )),
+                Positioned(
+                  right: 20,
+                  bottom: 15,
+                  child: Text(messageEdit + " " + messageTime,
+                      style: TextStyle(color: Colors.grey[600])),
+                )
               ],
             ),
-          ));
-        }
+          ),
+        ));
       }
 
       return ScrollConfiguration(
@@ -842,11 +903,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                   messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
-                  MessagesPufferList = messageList(messages);
-                  return MessagesPufferList;
+                  messagesPufferList = messageList(messages);
+                  return messagesPufferList;
                 }
 
-                return MessagesPufferList;
+                return messagesPufferList;
               }),
           if (!hasStartPosition)
             Positioned(
@@ -856,13 +917,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 onPressed: () {
                   _scrollController.scrollTo(
                       index: messages.length,
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOutCubic);
-                  setState(() {
-
-                  });
+                  setState(() {});
                 },
-                child: Icon(Icons.arrow_downward),
+                child: const Icon(Icons.arrow_downward),
               ),
             )
         ],
@@ -898,18 +957,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     onPressed: () {
                       emojisShowing = !emojisShowing;
 
-                      if(emojisShowing == true){
+                      if (emojisShowing == true) {
                         myFocusNode.unfocus();
-                      } else{
+                      } else {
                         myFocusNode.requestFocus();
                       }
 
                       setState(() {});
-                      FocusManager.instance.primaryFocus?.unfocus();
                     },
-                    icon: Icon(Icons.mood),
+                    icon: emojisShowing
+                        ? const Icon(Icons.keyboard)
+                        : const Icon(Icons.mood),
                   ),
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   Expanded(
                     child: TextField(
                       maxLines: null,
@@ -956,40 +1016,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               color: Theme.of(context).colorScheme.secondary))
                 ],
               )),
-          if(emojisShowing) SizedBox(
-            height: 250,
-            child: EmojiPicker(
-              textEditingController: nachrichtController,
-              config: Config(
-                columns: 7,
-                emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
-                // Issue: https://github.com/flutter/flutter/issues/28894
-                verticalSpacing: 0,
-                horizontalSpacing: 0,
-                gridPadding: EdgeInsets.zero,
-                initCategory: Category.RECENT,
-                bgColor: Color(0xFFF2F2F2),
-                indicatorColor: Colors.blue,
-                iconColor: Colors.grey,
-                iconColorSelected: Colors.blue,
-                progressIndicatorColor: Colors.blue,
-                backspaceColor: Colors.blue,
-                skinToneDialogBgColor: Colors.white,
-                skinToneIndicatorColor: Colors.grey,
-                enableSkinTones: true,
-                showRecentsTab: true,
-                recentsLimit: 28,
-                noRecents: const Text(
-                  'No Recents',
-                  style: TextStyle(fontSize: 20, color: Colors.black26),
-                  textAlign: TextAlign.center,
-                ),
-                tabIndicatorAnimDuration: kTabScrollDuration,
-                categoryIcons: const CategoryIcons(),
-                buttonMode: ButtonMode.MATERIAL,
-              ),
-            ),
-          )
         ],
       );
     }
@@ -1103,6 +1129,42 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           Expanded(child: messageAnzeige()),
           extraInputInformationBox,
           textEingabeFeld(),
+          Offstage(
+              offstage: !emojisShowing,
+              child: SizedBox(
+                height: 250,
+                child: EmojiPicker(
+                  textEditingController: nachrichtController,
+                  config: Config(
+                    columns: 7,
+                    emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
+                    // Issue: https://github.com/flutter/flutter/issues/28894
+                    verticalSpacing: 0,
+                    horizontalSpacing: 0,
+                    gridPadding: EdgeInsets.zero,
+                    initCategory: Category.RECENT,
+                    bgColor: const Color(0xFFF2F2F2),
+                    indicatorColor: Colors.blue,
+                    iconColor: Colors.grey,
+                    iconColorSelected: Colors.blue,
+                    progressIndicatorColor: Colors.blue,
+                    backspaceColor: Colors.blue,
+                    skinToneDialogBgColor: Colors.white,
+                    skinToneIndicatorColor: Colors.grey,
+                    enableSkinTones: true,
+                    showRecentsTab: true,
+                    recentsLimit: 28,
+                    noRecents: const Text(
+                      'No Recents',
+                      style: TextStyle(fontSize: 20, color: Colors.black26),
+                      textAlign: TextAlign.center,
+                    ),
+                    tabIndicatorAnimDuration: kTabScrollDuration,
+                    categoryIcons: const CategoryIcons(),
+                    buttonMode: ButtonMode.MATERIAL,
+                  ),
+                ),
+              ))
         ],
       ),
     );
