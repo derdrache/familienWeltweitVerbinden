@@ -173,23 +173,27 @@ class ProfilDatabase{
 
 class ChatDatabase{
 
-  addNewChatGroup(users)async {
-    var userKeysList = users.keys.toList();
-    var chatID = global_functions.getChatID(userKeysList);
+  addNewChatGroup(chatPartner)async {
+    var userId = FirebaseAuth.instance.currentUser.uid;
+    var userKeysList = [userId, chatPartner];
+    var chatID = global_functions.getChatID(chatPartner);
     var date = DateTime.now().millisecondsSinceEpoch;
+    var userData = {
+      userKeysList[0] : {"newMessages": 0},
+      userKeysList[1] : {"newMessages": 0},
+    };
 
     var newChatGroup = {
       "id": chatID,
       "date": date,
-      "users": json.encode({
-        userKeysList[0] : {"newMessages": 0},
-        userKeysList[1] : {"newMessages": 0},
-      }),
+      "users": json.encode(userData),
       "lastMessage": "",
     };
 
     var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
     await http.post(url, body: json.encode(newChatGroup));
+
+    newChatGroup["users"] = userData;
 
     return newChatGroup;
   }
@@ -276,10 +280,7 @@ class ChatDatabase{
   }
 
   addNewMessageAndSendNotification(chatgroupData, messageData, responseId)async {
-    var users = chatgroupData["users"];
-    if(users is String) users = jsonDecode(chatgroupData["users"]);
-    users = users.keys.toList();
-    var chatID = global_functions.getChatID(users);
+    var chatID = chatgroupData["id"];
     var date = DateTime.now().millisecondsSinceEpoch;
 
     messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
@@ -291,7 +292,8 @@ class ChatDatabase{
       "message": messageData["message"],
       "von": messageData["von"],
       "zu": messageData["zu"],
-      "responseId": responseId
+      "responseId": responseId,
+      "forward": messageData["forward"]
     }));
 
 

@@ -127,7 +127,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
   @override
   void initState() {
-    widget.onConfirm ??= (selected){};
+    widget.onConfirm ??= (){};
     widget.selected ??= [];
     super.initState();
   }
