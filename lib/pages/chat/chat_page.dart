@@ -70,7 +70,6 @@ class _ChatPageState extends State<ChatPage> {
     var ownProfil = Hive.box('secureBox').get("ownProfil");
 
     for (var data in dbProfilData) {
-
       if (!ownProfil["geblocktVon"].contains(data["id"]) &&
           data["id"] != "bbGp4rxJvCMywMI7eTahtZMHY2o2" &&
           data["id"] != userId) {
@@ -78,7 +77,7 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       for (var user in userFriendIdList) {
-        if (data["id"] == user &&
+        if (data["name"] == user &&
             !ownProfil["geblocktVon"].contains(data["id"])) {
           userFriendlist.add(data["name"]);
           break;
@@ -116,14 +115,12 @@ class _ChatPageState extends State<ChatPage> {
     var chatPartnerId =
         await ProfilDatabase().getData("id", "WHERE name = '$chatPartner'");
 
-    print(chatPartner);
-    print(chatPartnerId);
-
     checkValidAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
   }
 
   List<Widget> createFriendlistBox(userFriendlist) {
     List<Widget> friendsBoxen = [];
+
     for (var friend in userFriendlist) {
       friendsBoxen.add(GestureDetector(
         onTap: () => checkValidAndOpenChatgroup(name: friend),
@@ -392,6 +389,8 @@ class _ChatPageState extends State<ChatPage> {
         var ownChatNewMessages = users[userId]["newMessages"];
         var lastMessageTime =
             DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
+
+        if(lastMessage == "<weiterleitung>") lastMessage = AppLocalizations.of(context).weitergeleitet;
 
         chatGroupContainers.add(InkWell(
           onTap: () {
