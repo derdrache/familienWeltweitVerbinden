@@ -37,6 +37,7 @@ class ErkundenPage extends StatefulWidget {
 class _ErkundenPageState extends State<ErkundenPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var profils = [];
+  var profilsBackup = [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   var allCities = Hive.box('secureBox').get("stadtinfo");
   var events = [];
@@ -97,8 +98,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
 
+    profilsBackup = profils;
+
     createAndSetZoomLevels(profils, "profils");
     createAndSetZoomLevels(communities, "communities");
+
+    setSearchAutocomplete();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
@@ -218,8 +223,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     await getProfilsFromDB();
     createAndSetZoomLevels(profils, "profils");
 
-    setSearchAutocomplete();
-
     await getCommunitiesFromDB();
     createAndSetZoomLevels(communities, "communities");
 
@@ -332,9 +335,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
   filterProfils() {
     var filterProfils = [];
 
-    for (var profil in Hive.box('secureBox').get("profils") ?? []) {
-      if (checkIfInFilter(profil)) filterProfils.add(profil);
+    if(filterList.isEmpty){
+      filterProfils = profilsBackup;
+    }else{
+      for (var profil in Hive.box('secureBox').get("profils") ?? []) {
+        if (checkIfInFilter(profil)) filterProfils.add(profil);
+      }
     }
+
 
     setState(() {
       profils = filterProfils;
