@@ -19,11 +19,13 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:collection/collection.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
 import '../../windows/all_user_select.dart';
+import '../../widgets/strike_through_icon.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   String chatPartnerId;
@@ -65,7 +67,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var startData;
   var counter = 0;
   bool emojisShowing = false;
-  var newMessageDate;
+  var ownMessageBoxColor = Colors.greenAccent;
+  var chatpartnerMessageBoxColor = Colors.white;
 
   @override
   void dispose() {
@@ -137,7 +140,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   createNewChat() async {
     if (widget.groupChatData != null) return;
 
-    var userID = FirebaseAuth.instance.currentUser.uid;
     widget.chatPartnerId ??= await ProfilDatabase()
         .getData("id", "WHERE name = '${widget.chatPartnerName}'");
     widget.chatPartnerName ??= await ProfilDatabase()
@@ -375,6 +377,24 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         color: Colors.green);
   }
 
+  pinMessage(message, index) async {
+    message["forward"] = json.decode(message["forward"]);
+    var pinMessage = {"message": message, "index": index};
+
+    ChatDatabase().updateChatGroup(
+        "angeheftet = JSON_ARRAY_APPEND(angeheftet, '\$', '${json.encode(pinMessage)}')",
+        "WHERE id = '${message["id"]}'");
+
+    //HIve
+    //setState
+  }
+
+  detachMessage(message){
+    // logik
+    // Hive
+    // SetState
+  }
+
   resetExtraInputInformation() {
     messageIdChange = null;
     extraInputInformationBox = const SizedBox.shrink();
@@ -400,6 +420,47 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+
+    angehefteteNachrichten() {
+      var pinMessages = widget.groupChatData["angeheftet"];
+
+      if (widget.groupChatData == null || pinMessages.isEmpty) {
+        return SizedBox.shrink();
+      }
+
+      var firstPinMessage = json.decode(pinMessages.last)["message"];
+      var fristPinText = firstPinMessage["forward"].isEmpty
+          ? firstPinMessage["message"]
+          : firstPinMessage["forward"]["message"];
+
+      return Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+            color: chatpartnerMessageBoxColor, border: Border.all()),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppLocalizations.of(context).angehefteteNachrichten,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 5),
+                  Text(fristPinText)
+                ],
+              ),
+            ),
+            Icon(
+              Icons.manage_search,
+              size: 30,
+            ),
+          ],
+        ),
+      );
+    }
+
     inputInformationBox(icon, title, bodyText) {
       return Container(
           decoration: BoxDecoration(
@@ -447,9 +508,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ]));
     }
 
-    openMessageMenu(message) {
+    openMessageMenu(message, index) {
       final RenderBox overlay = Overlay.of(context).context.findRenderObject();
       var isMyMessage = message["von"] == userId;
+      message["forward"] = json.decode(message["forward"]);
+      var isInPinned = false;
+
+      for (var pin in widget.groupChatData["angeheftet"]) {
+        if (DeepCollectionEquality()
+            .equals(json.decode(pin), {"message": message, "index": index})) {
+          isInPinned = true;
+          break;
+        }
+      }
+
+      widget.groupChatData["angeheftet"]
+          .contains({"message": message, "index": index});
 
       showMenu(
         context: context,
@@ -474,6 +548,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 const Icon(Icons.reply),
                 const SizedBox(width: 20),
                 Text(AppLocalizations.of(context).antworten),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            onTap: () => isInPinned ? detachMessage(message) : pinMessage(message, index),
+            child: Row(
+              children: [
+                isInPinned
+                    ? StrikeThroughIcon(child: Icon(Icons.push_pin))
+                    : Icon(Icons.push_pin),
+                const SizedBox(width: 20),
+                Text(isInPinned
+                    ? AppLocalizations.of(context).losloesen
+                    : AppLocalizations.of(context).anheften),
               ],
             ),
           ),
@@ -505,7 +593,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ),
           PopupMenuItem(
             onTap: () => Future.delayed(
-                Duration(seconds: 0), () => forwardMessage(message)),
+                const Duration(seconds: 0), () => forwardMessage(message)),
             child: Row(
               children: [
                 const Icon(Icons.forward),
@@ -543,6 +631,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     messageList(messages) {
       List<Widget> messageBox = [];
+      var newMessageDate;
 
       for (var i = messages.length - 1; i >= 0; i--) {
         var message = messages[i];
@@ -554,7 +643,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ? ""
             : AppLocalizations.of(context).bearbeitet;
         var textAlign = Alignment.centerLeft;
-        var boxColor = Colors.white;
+        var boxColor = chatpartnerMessageBoxColor;
+        var forwardData = json.decode(message["forward"]);
         message["responseId"] ??= "0";
 
         if (message["message"] == "") continue;
@@ -563,27 +653,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
         if (message["von"] == userId) {
           textAlign = Alignment.centerRight;
-          boxColor = Colors.greenAccent;
-        }
-
-        if (newMessageDate == null || newMessageDate != messageDate) {
-          newMessageDate = messageDate;
-
-          messageBox.add(Align(
-            child: Container(
-              width: 80,
-              margin: const EdgeInsets.all(10),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: const BorderRadius.all(Radius.circular(20))),
-              child: Center(
-                  child: Text(
-                messageDate,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )),
-            ),
-          ));
+          boxColor = ownMessageBoxColor;
         }
 
         if (message["message"].contains("</eventId=")) {
@@ -640,9 +710,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   }),
             ),
           ));
-          continue;
-        }
-        if (message["message"].contains("</communityId=")) {
+        } else if (message["message"].contains("</communityId=")) {
           messageBox.add(AnimatedContainer(
             color: scrollIndex == i
                 ? Theme.of(context).colorScheme.primary
@@ -696,9 +764,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   }),
             ),
           ));
-          continue;
-        }
-        if (int.parse(message["responseId"]) != 0) {
+        } else if (int.parse(message["responseId"]) != 0) {
           var replyFromId =
               message["id"].replaceAll(userId, "").replaceAll("_", "");
           var messageFromProfil =
@@ -793,7 +859,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   TextWithHyperlinkDetection(
                                     text: message["message"] ?? "",
                                     fontsize: 16,
-                                    onTextTab: () => openMessageMenu(message),
+                                    onTextTab: () =>
+                                        openMessageMenu(message, i),
                                   ),
                                   SizedBox(
                                       width: message["editDate"] == null
@@ -815,54 +882,142 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               ],
             ),
           ));
-          continue;
-        }
-        if(message["forward"].isNotEmpty){
-          continue;
+        } else if (forwardData.isNotEmpty) {
+          var forwardProfil =
+              global_functions.getProfilFromHive(forwardData["von"]);
+
+          messageBox.add(AnimatedContainer(
+            color: scrollIndex == i
+                ? Theme.of(context).colorScheme.primary
+                : Colors.white,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeIn,
+            child: Align(
+              alignment: textAlign,
+              child: Stack(
+                children: [
+                  Container(
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.85),
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: boxColor,
+                          border: Border.all(),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 5, left: 10, right: 5),
+                            child: GestureDetector(
+                              onTap: () => global_functions.changePage(
+                                  context,
+                                  ShowProfilPage(
+                                    profil: forwardProfil,
+                                  )),
+                              child: Text(
+                                AppLocalizations.of(context).weitergeleitetVon +
+                                    forwardProfil["name"],
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          Wrap(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    top: 5, left: 10, bottom: 7, right: 10),
+                                child: TextWithHyperlinkDetection(
+                                    text: forwardData["message"] ?? "",
+                                    fontsize: 16,
+                                    onTextTab: () =>
+                                        openMessageMenu(message, i)),
+                              ),
+                              SizedBox(
+                                  width:
+                                      message["editDate"] == null ? 40 : 110),
+                            ],
+                          ),
+                        ],
+                      )),
+                  Positioned(
+                    right: 20,
+                    bottom: 15,
+                    child: Text(messageEdit + " " + messageTime,
+                        style: TextStyle(color: Colors.grey[600])),
+                  )
+                ],
+              ),
+            ),
+          ));
+        } else {
+          messageBox.add(AnimatedContainer(
+            color: scrollIndex == i
+                ? Theme.of(context).colorScheme.primary
+                : Colors.white,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeIn,
+            child: Align(
+              alignment: textAlign,
+              child: Stack(
+                children: [
+                  Container(
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.85),
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: boxColor,
+                          border: Border.all(),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10))),
+                      child: Wrap(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 5, left: 10, bottom: 7, right: 10),
+                            child: TextWithHyperlinkDetection(
+                                text: message["message"] ?? "",
+                                fontsize: 16,
+                                onTextTab: () => openMessageMenu(message, i)),
+                          ),
+                          SizedBox(
+                              width: message["editDate"] == null ? 40 : 110),
+                        ],
+                      )),
+                  Positioned(
+                    right: 20,
+                    bottom: 15,
+                    child: Text(messageEdit + " " + messageTime,
+                        style: TextStyle(color: Colors.grey[600])),
+                  )
+                ],
+              ),
+            ),
+          ));
         }
 
-        messageBox.add(AnimatedContainer(
-          color: scrollIndex == i
-              ? Theme.of(context).colorScheme.primary
-              : Colors.white,
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeIn,
-          child: Align(
-            alignment: textAlign,
-            child: Stack(
-              children: [
-                Container(
-                    constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.85),
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: boxColor,
-                        border: Border.all(),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10))),
-                    child: Wrap(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(
-                              top: 5, left: 10, bottom: 7, right: 10),
-                          child: TextWithHyperlinkDetection(
-                              text: message["message"] ?? "",
-                              fontsize: 16,
-                              onTextTab: () => openMessageMenu(message)),
-                        ),
-                        SizedBox(width: message["editDate"] == null ? 40 : 110),
-                      ],
-                    )),
-                Positioned(
-                  right: 20,
-                  bottom: 15,
-                  child: Text(messageEdit + " " + messageTime,
-                      style: TextStyle(color: Colors.grey[600])),
-                )
-              ],
+        if (newMessageDate == null || newMessageDate != messageDate) {
+          newMessageDate = messageDate;
+
+          messageBox.add(Align(
+            child: Container(
+              width: 80,
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: const BorderRadius.all(Radius.circular(20))),
+              child: Center(
+                  child: Text(
+                messageDate,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )),
             ),
-          ),
-        ));
+          ));
+        }
       }
 
       return ScrollConfiguration(
@@ -1126,6 +1281,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          angehefteteNachrichten(),
           Expanded(child: messageAnzeige()),
           extraInputInformationBox,
           textEingabeFeld(),

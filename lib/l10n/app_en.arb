@@ -382,6 +382,11 @@
     "nachrichtGemeldet": "Message was reported",
     "nachrichtBearbeiten": "Edit message",
     "bearbeitet": "edited",
-    "empfaengerWaehlen": "Select receiver"
+    "empfaengerWaehlen": "Select receiver",
+    "weitergeleitetVon": "Forwarded by ",
+    "weitergeleitet": "Forwarded",
+    "angehefteteNachrichten": "Pinned messages",
+    "anheften": "Pin",
+    "losloesen": "detach"
 }
 
