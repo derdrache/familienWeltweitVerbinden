@@ -380,6 +380,11 @@
     "nachrichtGemeldet": "Nachricht wurde gemeldet",
     "nachrichtBearbeiten": "Nachricht bearbeiten",
     "bearbeitet": "bearbeitet",
-    "empfaengerWaehlen": "Empfänger wählen"
+    "empfaengerWaehlen": "Empfänger wählen",
+    "weitergeleitetVon": "Weitergeleitet von ",
+    "weitergeleitet": "Weitergeleitet",
+    "angehefteteNachrichten": "Angeheftete Nachrichten",
+    "anheften": "Anheften",
+    "losloesen": "Loslösen"
 
 }
