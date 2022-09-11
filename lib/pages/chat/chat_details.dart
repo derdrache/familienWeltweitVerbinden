@@ -69,6 +69,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   bool emojisShowing = false;
   var ownMessageBoxColor = Colors.greenAccent;
   var chatpartnerMessageBoxColor = Colors.white;
+  var myChats = Hive.box("secureBox").get("myChats");
 
   @override
   void dispose() {
@@ -385,14 +386,30 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "angeheftet = JSON_ARRAY_APPEND(angeheftet, '\$', '${json.encode(pinMessage)}')",
         "WHERE id = '${message["id"]}'");
 
-    //HIve
-    //setState
+    for(var chat in myChats){
+      if(chat["id"] == message["id"]){
+        chat["angeheftet"].add(pinMessage);
+      }
+    }
+
+    setState(() {});
   }
 
-  detachMessage(message){
-    // logik
-    // Hive
-    // SetState
+  detachMessage(message, index) {
+    message["forward"] = json.decode(message["forward"]);
+    var pinMessage = {"message": message, "index": index};
+
+    ChatDatabase().updateChatGroup(
+        "angeheftet = JSON_REMOVE(angeheftet, JSON_UNQUOTE(JSON_SEARCH(angeheftet, 'one', '${json.encode(pinMessage)}')))",
+        "WHERE id = '${message["id"]}'");
+
+    for(var chat in myChats){
+      if(chat["id"] == message["id"]){
+        chat["angeheftet"].remove(pinMessage);
+      }
+    }
+
+    setState(() {});
   }
 
   resetExtraInputInformation() {
@@ -552,7 +569,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ),
           ),
           PopupMenuItem(
-            onTap: () => isInPinned ? detachMessage(message) : pinMessage(message, index),
+            onTap: () => isInPinned
+                ? detachMessage(message, index)
+                : pinMessage(message, index),
             child: Row(
               children: [
                 isInPinned
@@ -644,7 +663,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             : AppLocalizations.of(context).bearbeitet;
         var textAlign = Alignment.centerLeft;
         var boxColor = chatpartnerMessageBoxColor;
-        var forwardData = json.decode(message["forward"]);
+        var forwardData = message["forward"].runtimeType == String
+            ? json.decode(message["forward"])
+            : message["forward"];
         message["responseId"] ??= "0";
 
         if (message["message"] == "") continue;
