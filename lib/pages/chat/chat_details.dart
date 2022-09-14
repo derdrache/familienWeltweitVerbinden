@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
 import 'package:familien_suche/global/custom_widgets.dart';
+import 'package:familien_suche/pages/chat/pin_messages.dart';
 import 'package:familien_suche/pages/community/community_card.dart';
 import 'package:familien_suche/pages/events/eventCard.dart';
 import 'package:familien_suche/pages/show_profil.dart';
@@ -70,6 +71,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var ownMessageBoxColor = Colors.greenAccent;
   var chatpartnerMessageBoxColor = Colors.white;
   var myChats = Hive.box("secureBox").get("myChats");
+  var angehefteteMessageShowIndex;
 
   @override
   void dispose() {
@@ -434,21 +436,38 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "WHERE tableId = '$messageIdChange'");
   }
 
+  showAllPinMessages(){
+    global_functions.changePage(context, pinMessagesPage(pinMessages: widget.groupChatData["angeheftet"]));
+  }
+
+  jumpToMessageAndShowNextAngeheftet(pinnedMessage){
+    angehefteteMessageShowIndex = angehefteteMessageShowIndex -1;
+    if(angehefteteMessageShowIndex <0) angehefteteMessageShowIndex = 0;
+
+    setState(() {});
+
+    _scrollController.jumpTo(index: pinnedMessage["index"]);
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     angehefteteNachrichten() {
+      //nur eigene Anzeigen //in Gruppen für alle anzeigen? Nur Admins?
       var pinMessages = widget.groupChatData["angeheftet"];
 
       if (widget.groupChatData == null || pinMessages.isEmpty) {
         return SizedBox.shrink();
       }
 
-      var firstPinMessage = json.decode(pinMessages.last)["message"];
-      var fristPinText = firstPinMessage["forward"].isEmpty
-          ? firstPinMessage["message"]
-          : firstPinMessage["forward"]["message"];
+      angehefteteMessageShowIndex ??= json.decode(pinMessages.last)["message"];
+
+      var pinMessage = json.decode(pinMessages[angehefteteMessageShowIndex])["message"];
+
+      var fristPinText = pinMessage["forward"].isEmpty
+          ? pinMessage["message"]
+          : pinMessage["forward"]["message"];
 
       return Container(
         padding: EdgeInsets.all(10),
@@ -456,22 +475,28 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             color: chatpartnerMessageBoxColor, border: Border.all()),
         child: Row(
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context).angehefteteNachrichten,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 5),
-                  Text(fristPinText)
-                ],
+            GestureDetector(
+              onTap: () => jumpToMessageAndShowNextAngeheftet(pinMessage),
+              child: Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).angehefteteNachrichten,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 5),
+                    Text(fristPinText)
+                  ],
+                ),
               ),
             ),
-            Icon(
-              Icons.manage_search,
-              size: 30,
+            GestureDetector(
+              onTap: () => showAllPinMessages(),
+              child: Icon(
+                Icons.manage_search,
+                size: 30,
+              ),
             ),
           ],
         ),
