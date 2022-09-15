@@ -220,6 +220,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     setSearchAutocomplete();
 
+    await getEventsFromDB();
+
     await getCommunitiesFromDB();
     createAndSetZoomLevels(communities, "communities");
 
@@ -283,10 +285,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         "*", "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC",
         returnList: true);
     if (dbEvents == false) dbEvents = [];
-
     Hive.box('secureBox').put("events", dbEvents);
-
-    events = dbEvents;
   }
 
   getCommunitiesFromDB() async {
