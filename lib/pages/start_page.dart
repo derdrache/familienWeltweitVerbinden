@@ -43,6 +43,7 @@ class _StartPageState extends State<StartPage> {
   var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
   var hasInternet = true;
   var localBox = Hive.box('secureBox');
+  var checkedA2HS = false;
 
   @override
   void initState() {
@@ -52,14 +53,21 @@ class _StartPageState extends State<StartPage> {
   }
 
   _asyncMethod() async {
-    _checkNewVersion();
+    if (!kIsWeb){
+      var newUpdate = await checkForceUpdate();
+      if(newUpdate) return;
+    }
 
-    _checkAndUpdateProfil();
+    await _checkNewVersion();
 
-    _showPatchnotes();
+    await checkProfilExist();
+
+    await _checkAndUpdateProfil();
+
+    await _showPatchnotes();
   }
 
-  void _checkNewVersion() async{
+  _checkNewVersion() async{
     if(kIsWeb) return;
 
     try{
@@ -73,7 +81,7 @@ class _StartPageState extends State<StartPage> {
     }catch(_){}
   }
 
-  void _checkAndUpdateProfil() async {
+  _checkAndUpdateProfil() async {
     if (userName == null) return;
 
     var dbData = await ProfilDatabase()
@@ -103,9 +111,20 @@ class _StartPageState extends State<StartPage> {
 
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
+
+
   }
 
-  void _showPatchnotes() async {
+  checkProfilExist() async {
+    var profilExist =
+    await ProfilDatabase().getData("name", "WHERE id = '$userId'");
+
+    if (profilExist == false) {
+      changePageForever(context, const CreateProfilPage());
+    }
+  }
+
+  _showPatchnotes() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var buildNumber = int.parse(packageInfo.buildNumber);
 
@@ -116,7 +135,7 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
-  void _setAutomaticLoaction(automaticLocationStatus) async {
+  _setAutomaticLoaction(automaticLocationStatus) async {
     var ownProfil = Hive.box('secureBox').get("ownProfil");
 
     if (DateTime.now()
@@ -179,6 +198,19 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
+  checkForceUpdate() async {
+    var importantUpdateNumber =
+    await AllgemeinDatabase().getData("importantUpdate", "");
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var buildNumber = int.parse(packageInfo.buildNumber);
+
+    if (buildNumber < importantUpdateNumber) {
+      changePageForever(context, ForceUpdatePage());
+      return true;
+    }
+    return false;
+  }
+
 
 
   @override
@@ -191,6 +223,7 @@ class _StartPageState extends State<StartPage> {
       const ChatPage(),
       const SettingPage()
     ];
+
 
     void hasNetwork() async {
       try {
@@ -260,26 +293,6 @@ class _StartPageState extends State<StartPage> {
           });
     }
 
-    checkForceUpdate() async {
-      var importantUpdateNumber =
-          await AllgemeinDatabase().getData("importantUpdate", "");
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      var buildNumber = int.parse(packageInfo.buildNumber);
-
-      if (buildNumber < importantUpdateNumber) {
-        changePageForever(context, ForceUpdatePage());
-      }
-    }
-
-    checkProfilExist() async {
-      var profilExist =
-          await ProfilDatabase().getData("name", "WHERE id = '$userId'");
-
-      if (profilExist == false) {
-        changePageForever(context, const CreateProfilPage());
-      }
-    }
-
     Future<bool> showAddHomePageDialog(BuildContext context) async {
       return showDialog<bool>(
         context: context,
@@ -334,7 +347,8 @@ class _StartPageState extends State<StartPage> {
     }
 
     checkA2HS(){
-      if (kIsWeb) {
+      if (kIsWeb && !checkedA2HS) {
+        checkedA2HS = true;
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           var usedA2HS = localBox.get("a2hs");
           if (usedA2HS == null) {
@@ -351,9 +365,9 @@ class _StartPageState extends State<StartPage> {
     }
 
     if (!kIsWeb) hasNetwork();
-    if (!kIsWeb) checkForceUpdate();
+
     checkA2HS();
-    checkProfilExist();
+
 
     return Scaffold(
         body: Center(

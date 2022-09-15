@@ -99,7 +99,6 @@ refreshHiveChats() async{
 }
 
 refreshHiveData() async {
-
   refreshHiveChats();
 
   var stadtinfo = await StadtinfoDatabase()
@@ -113,20 +112,6 @@ refreshHiveData() async {
   var familyProfils = await FamiliesDatabase().getData("*", "", returnList: true);
   if(familyProfils == false) familyProfils = [];
   Hive.box("secureBox").put("familyProfils", familyProfils);
-
-  dynamic dbEvents = await EventDatabase().getData(
-      "*", "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC",
-      returnList: true);
-  if (dbEvents == false) dbEvents = [];
-
-  Hive.box('secureBox').put("events", dbEvents);
-
-  dynamic dbCommunities = await CommunityDatabase()
-      .getData("*", "ORDER BY ort ASC", returnList: true);
-  if (dbCommunities == false) dbCommunities = [];
-
-  Hive.box('secureBox').put("communities", dbCommunities);
-
 }
 
 

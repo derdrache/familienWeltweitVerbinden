@@ -208,7 +208,6 @@ class ChatDatabase{
 
   getChatData(whatData, queryEnd, {returnList = false}) async{
     var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
 
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
@@ -216,7 +215,6 @@ class ChatDatabase{
       "table": "chats"
     }));
     dynamic responseBody = res.body;
-
     responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
@@ -380,17 +378,14 @@ class EventDatabase{
 
   getData(whatData, queryEnd, {returnList = false}) async{
     var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
 
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
       "queryEnd": queryEnd,
       "table": "events"
     }));
-
     dynamic responseBody = res.body;
     responseBody = decrypt(responseBody);
-
     responseBody = jsonDecode(responseBody);
 
     if(responseBody.isEmpty) return false;

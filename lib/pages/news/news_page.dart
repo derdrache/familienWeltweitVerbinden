@@ -595,6 +595,7 @@ class _NewsPageState extends State<NewsPage> {
       }
     }
 
+
     getSettingProfilOrAddNew();
     createNewsFeed();
     sortNewsFeed();
