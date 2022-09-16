@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:async/async.dart';
+
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -53,13 +55,43 @@ class _SettingPageState extends State<SettingPage> {
       : Platform.localeName == "de_DE";
   var borderColor = Colors.grey[200];
   var userID = FirebaseAuth.instance.currentUser.uid;
-  var userProfil;
+  var userProfil = Hive.box("secureBox").get("ownProfil");
   var kinderAgeBox = ChildrenBirthdatePickerBox();
   var interessenInputBox =
       CustomMultiTextForm(auswahlList: global_variablen.interessenListe);
   var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
   var sprachenInputBox =
       CustomMultiTextForm(auswahlList: global_variablen.sprachenListe);
+  var _myCancelableFuture;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((_){
+      _myCancelableFuture = CancelableOperation.fromFuture(
+        _asyncMethod(),
+        onCancel: () => null,
+      );
+    });
+    setData();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _myCancelableFuture?.cancel();
+    super.dispose();
+  }
+
+  _asyncMethod() async{
+    var ownProfilDb = await ProfilDatabase().getData("*", "WHERE id = '$userID'");
+    Hive.box("secureBox").put("ownProfil", ownProfilDb);
+
+    setData();
+
+    setState(() {
+      userProfil = ownProfilDb;
+    });
+  }
 
   void setData() async {
     List childrenAgeTimestamp = [];
@@ -471,46 +503,24 @@ class _SettingPageState extends State<SettingPage> {
     return Column(
       children: [
         menuBar(),
-        FutureBuilder(
-            future: ProfilDatabase().getData("*", "WHERE id = '$userID'"),
-            builder: (
-              BuildContext context,
-              AsyncSnapshot snapshot,
-            ) {
-              var secureBox = Hive.box("secureBox");
-              var data = secureBox.get("ownProfil");
-
-              if (snapshot.hasData) {
-                data = snapshot.data;
-                secureBox.put("ownProfil", data);
-              }
-
-              if (data != null) {
-                userProfil = data;
-
-                setData();
-
-                return Expanded(
-                  child: ScrollConfiguration(
-                    behavior:
-                        ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    }),
-                    child: ListView(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        children: [
-                          nameContainer(),
-                          profilContainer(),
-                          settingContainer(),
-                          aboutAppContainer(),
-                        ]),
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            })
+        Expanded(
+          child: ScrollConfiguration(
+            behavior:
+            ScrollConfiguration.of(context).copyWith(dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+            }),
+            child: ListView(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                children: [
+                  nameContainer(),
+                  profilContainer(),
+                  settingContainer(),
+                  aboutAppContainer(),
+                ]),
+          ),
+        )
       ],
     );
   }
