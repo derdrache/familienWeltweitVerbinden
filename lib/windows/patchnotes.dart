@@ -57,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch162D),
                 _patch(patch161D),
                 _patch(patch160D),
                 _patch(patch150D),
@@ -76,6 +77,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch162E),
                 _patch(patch161E),
                 _patch(patch160E),
                 _patch(patch150E),
@@ -105,6 +107,18 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+
+var patch162E={
+  "title" : "1.6.2 - 16.09.2022",
+  "inhalt": [
+  ]
+};
+var patch162D={
+  "title" : "1.6.2 - 16.09.2022",
+  "inhalt": [
+    "Serverlast verringert"
   ]
 };
 
