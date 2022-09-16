@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:familien_suche/pages/events/events_suchen.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
@@ -24,6 +25,50 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   double textSizeHeadline = 20.0;
+  var myOwnEvents = Hive.box('secureBox').get("myEvents");
+  var myInterestedEvents = Hive.box('secureBox').get("interestEvents");
+  var _myCancelableFuture;
+
+
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((_){
+      _myCancelableFuture = CancelableOperation.fromFuture(
+        _asyncMethod(),
+        onCancel: () => null,
+      );
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _myCancelableFuture?.cancel();
+    super.dispose();
+  }
+
+  _asyncMethod() async{
+    var ownEventsDb = await EventDatabase().getData("*",
+        "WHERE erstelltVon = '" + userId + "' ORDER BY wann ASC",
+        returnList: true);
+    if(ownEventsDb == false) ownEventsDb = [];
+    Hive.box('secureBox').put("myEvents", ownEventsDb);
+
+    var myInterestedEventsDb = await EventDatabase().getData("*",
+        "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
+        returnList: true);
+    if(myInterestedEventsDb == false) myInterestedEventsDb = [];
+    Hive.box('secureBox').put("interestEvents", myInterestedEventsDb);
+
+
+
+    setState(() {
+      myOwnEvents = ownEventsDb;
+      myInterestedEvents = myInterestedEventsDb;
+    });
+
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,25 +131,15 @@ class _EventPageState extends State<EventPage> {
                     style: TextStyle(fontSize: textSizeHeadline),
                   )),
               FutureBuilder(
-                  future: EventDatabase().getData("*",
-                      "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
-                      returnList: true),
+                  future: null,
                   builder: (context, snapshot) {
-                    var secureBox = Hive.box('secureBox');
-                    dynamic data = secureBox.get("interestEvents");
-
-                    if (snapshot.hasData) {
-                      data = snapshot.data == false ? [] : snapshot.data;
-                      secureBox.put("interestEvents", data);
-                    }
-
-                    if (data != null && data.isNotEmpty) {
+                    if (myInterestedEvents != null && myInterestedEvents.isNotEmpty) {
                       return Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
                               direction: Axis.vertical,
-                              children: createEventCards(data, true)),
+                              children: createEventCards(myInterestedEvents, true)),
                         ),
                       );
                     }
@@ -137,25 +172,15 @@ class _EventPageState extends State<EventPage> {
                     style: TextStyle(fontSize: textSizeHeadline),
                   )),
               FutureBuilder(
-                  future: EventDatabase().getData("*",
-                      "WHERE erstelltVon = '" + userId + "' ORDER BY wann ASC",
-                      returnList: true),
+                  future: null,
                   builder: (context, snapshot) {
-                    var secureBox = Hive.box('secureBox');
-                    dynamic data = secureBox.get("myEvents");
-
-                    if (snapshot.hasData) {
-                      data = snapshot.data == false ? [] : snapshot.data;
-                      secureBox.put("myEvents", data);
-                    }
-
-                    if (data != null && data.isNotEmpty) {
+                    if (myOwnEvents != null && myOwnEvents.isNotEmpty) {
                       return Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
                               direction: Axis.vertical,
-                              children: createEventCards(data, false)),
+                              children: createEventCards(myOwnEvents, false)),
                         ),
                       );
                     }

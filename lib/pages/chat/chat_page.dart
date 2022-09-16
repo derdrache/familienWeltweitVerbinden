@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:async/async.dart';
 
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
@@ -28,13 +29,40 @@ class _ChatPageState extends State<ChatPage> {
   var searchAutocomplete;
   List dbProfilData =Hive.box("secureBox").get("profils");
   List allName, userFriendlist, globalChatGroups = [];
+  var _myCancelableFuture;
+  var myChats = Hive.box("secureBox").get("myChats");
 
   @override
   void initState() {
     checkNewMessageCounter();
     initilizeCreateChatData();
 
+    WidgetsBinding.instance?.addPostFrameCallback((_){
+      _myCancelableFuture = CancelableOperation.fromFuture(
+        _asyncMethod(),
+        onCancel: () => null,
+      );
+    });
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _myCancelableFuture?.cancel();
+    super.dispose();
+  }
+
+  _asyncMethod() async {
+    var myChatData = await ChatDatabase().getChatData("*",
+        "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+        returnList: true);
+    if(myChatData == false) myChatData = [];
+    Hive.box("secureBox").put("myChats", myChatData);
+
+    setState(() {
+      myChats = myChatData;
+    });
   }
 
   checkNewMessageCounter() async {
@@ -331,18 +359,8 @@ class _ChatPageState extends State<ChatPage> {
       body: Container(
           padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
           child: FutureBuilder(
-              future: ChatDatabase().getChatData("*",
-                  "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
-                  returnList: true),
+              future: null,
               builder: (context, snapshot) {
-                var myChatBox = Hive.box("secureBox");
-                dynamic myChats = myChatBox.get("myChats");
-
-                if (snapshot.hasData) {
-                  myChats = snapshot.data == false ? [] : snapshot.data;
-                  myChatBox.put("myChats", myChats);
-                }
-
                 if(dbProfilData.isEmpty){
                   refreshDbProfilData();
                   return Center(child: CircularProgressIndicator());
