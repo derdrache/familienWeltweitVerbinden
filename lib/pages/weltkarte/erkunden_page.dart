@@ -11,6 +11,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'package:async/async.dart';
 
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';
@@ -85,6 +86,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
+  var _myCancelableFuture;
 
   @override
   void initState() {
@@ -100,9 +102,16 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomLevels(profils, "profils");
     createAndSetZoomLevels(communities, "communities");
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    WidgetsBinding.instance?.addPostFrameCallback((_){
+      _myCancelableFuture = CancelableOperation.fromFuture(
+        _asyncMethod(),
+        onCancel: () => null,
+      );
+    });
     super.initState();
   }
+
+
 
   setEvents(){
     var localDbEvents = Hive.box('secureBox').get("events") ?? [];
@@ -230,6 +239,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
     refreshStadtinfoUser();
 
     setState(() {});
+
+
+
   }
 
   getProfilsFromDB() async {
@@ -1186,6 +1198,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
     profils = [for (var profil in hiveProfils) Map.of(profil)];
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
+  }
+
+@override
+  void dispose() {
+    _myCancelableFuture?.cancel();
+    super.dispose();
   }
 
   @override
