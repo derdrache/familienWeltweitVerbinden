@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:collection/collection.dart';
+import 'package:async/async.dart';
 
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
@@ -33,6 +34,7 @@ class _NewsPageState extends State<NewsPage> {
   final _controller = ScrollController();
   var scrollbarOnBottom = true;
   var userNewsContent = [];
+  var _myCancelableFuture;
 
   @override
   void initState() {
@@ -47,8 +49,19 @@ class _NewsPageState extends State<NewsPage> {
       setState(() {});
     });
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    WidgetsBinding.instance?.addPostFrameCallback((_){
+      _myCancelableFuture = CancelableOperation.fromFuture(
+        _asyncMethod(),
+        onCancel: () => null,
+      );
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _myCancelableFuture?.cancel();
+    super.dispose();
   }
 
   getSettingProfilOrAddNew() {
@@ -205,6 +218,7 @@ class _NewsPageState extends State<NewsPage> {
 
     return true;
   }
+
 
   Widget build(BuildContext context) {
     friendsDisplay(news) {
