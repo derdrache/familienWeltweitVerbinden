@@ -113,12 +113,13 @@ var patchVorlage={
 var patch162E={
   "title" : "1.6.2 - 16.09.2022",
   "inhalt": [
+    "optimizations to decrease server crashes"
   ]
 };
 var patch162D={
   "title" : "1.6.2 - 16.09.2022",
   "inhalt": [
-    "Serverlast verringert"
+    "Optimierungen um Serverabstürze zu vermindern"
   ]
 };
 
