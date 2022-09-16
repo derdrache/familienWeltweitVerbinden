@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:async/async.dart';
 
 import '../../services/locationsService.dart';
 import '../../widgets/dialogWindow.dart';
@@ -30,12 +31,24 @@ class _CommunityPageState extends State<CommunityPage> {
   var allCommunitiesCountries = [];
   bool getInvite = false;
   int invitedCommunityIndex;
+  var _myCancelableFuture;
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) => initialize());
+    WidgetsBinding.instance?.addPostFrameCallback((_){
+      _myCancelableFuture = CancelableOperation.fromFuture(
+        initialize(),
+        onCancel: () => null,
+      );
+    });
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _myCancelableFuture?.cancel();
+    super.dispose();
   }
 
   initialize() async {
