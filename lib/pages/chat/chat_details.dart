@@ -381,7 +381,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   pinMessage(message, index) async {
-    message["forward"] = json.decode(message["forward"]);
+    if(message["forward"].runtimeType == String) message["forward"] = json.decode(message["forward"]);
     var pinMessage = {"message": message, "index": index};
 
     ChatDatabase().updateChatGroup(
@@ -460,10 +460,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (widget.groupChatData == null || pinMessages.isEmpty) {
         return SizedBox.shrink();
       }
+      angehefteteMessageShowIndex ??= pinMessages.length - 1;
 
-      angehefteteMessageShowIndex ??= json.decode(pinMessages.last)["message"];
-
-      var pinMessage = json.decode(pinMessages[angehefteteMessageShowIndex])["message"];
+      var pinMessage = Map<String, dynamic>.from(json.decode(pinMessages[angehefteteMessageShowIndex]))["message"];
 
       var fristPinText = pinMessage["forward"].isEmpty
           ? pinMessage["message"]
@@ -475,9 +474,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             color: chatpartnerMessageBoxColor, border: Border.all()),
         child: Row(
           children: [
-            GestureDetector(
-              onTap: () => jumpToMessageAndShowNextAngeheftet(pinMessage),
-              child: Expanded(
+            Expanded(
+              child: GestureDetector(
+                onTap: () => jumpToMessageAndShowNextAngeheftet(pinMessage),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -486,7 +485,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 5),
-                    Text(fristPinText)
+                    Container(child: Text(fristPinText))
                   ],
                 ),
               ),
