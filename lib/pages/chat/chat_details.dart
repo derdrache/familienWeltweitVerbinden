@@ -73,6 +73,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var myChats = Hive.box("secureBox").get("myChats");
   var angehefteteMessageShowIndex;
 
+
   @override
   void dispose() {
     ProfilDatabase().updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
@@ -381,37 +382,57 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   pinMessage(message, index) async {
-    if(message["forward"].runtimeType == String) message["forward"] = json.decode(message["forward"]);
-    var pinMessage = {"message": message, "index": index};
+    if (message["forward"].runtimeType == String)
+      message["forward"] = json.decode(message["forward"]);
 
-    ChatDatabase().updateChatGroup(
-        "angeheftet = JSON_ARRAY_APPEND(angeheftet, '\$', '${json.encode(pinMessage)}')",
-        "WHERE id = '${message["id"]}'");
+    var pinMessage = json.encode({"message": message, "index": index});
 
-    for(var chat in myChats){
-      if(chat["id"] == message["id"]){
+    for (var chat in myChats) {
+      if (chat["id"] == message["id"]) {
         chat["angeheftet"].add(pinMessage);
       }
     }
 
-    setState(() {});
+    setState(() {
+      angehefteteMessageShowIndex = widget.groupChatData["angeheftet"].length -1;
+    });
+
+    pinMessage = pinMessage.replaceAll(r"\n", r"\\n");
+
+
+    ChatDatabase().updateChatGroup(
+        "angeheftet = JSON_ARRAY_APPEND(angeheftet, '\$', '$pinMessage')",
+        "WHERE id = '${message["id"]}'");
+
   }
 
   detachMessage(message, index) {
-    message["forward"] = json.decode(message["forward"]);
-    var pinMessage = {"message": message, "index": index};
+    if(message["forward"].runtimeType == String) message["forward"] = json.decode(message["forward"]);
+    var pinMessage = json.encode({"message": message, "index": index});
+    var angeheftetIsEmpty = false;
 
-    ChatDatabase().updateChatGroup(
-        "angeheftet = JSON_REMOVE(angeheftet, JSON_UNQUOTE(JSON_SEARCH(angeheftet, 'one', '${json.encode(pinMessage)}')))",
-        "WHERE id = '${message["id"]}'");
-
-    for(var chat in myChats){
-      if(chat["id"] == message["id"]){
+    for (var chat in myChats) {
+      if (chat["id"] == message["id"]) {
         chat["angeheftet"].remove(pinMessage);
+        if(chat["angeheftet"].isEmpty) angeheftetIsEmpty = true;
       }
     }
 
     setState(() {});
+
+    if(angeheftetIsEmpty){
+      ChatDatabase().updateChatGroup(
+          "angeheftet = '${json.encode([])}'",
+          "WHERE id = '${message["id"]}'");
+    }else{
+      ChatDatabase().updateChatGroup(
+          "angeheftet = JSON_REMOVE(angeheftet, JSON_UNQUOTE(JSON_SEARCH(angeheftet, 'one', '${json.encode(pinMessage)}')))",
+          "WHERE id = '${message["id"]}'");
+    }
+
+
+
+
   }
 
   resetExtraInputInformation() {
@@ -436,17 +457,31 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "WHERE tableId = '$messageIdChange'");
   }
 
-  showAllPinMessages(){
-    global_functions.changePage(context, pinMessagesPage(pinMessages: widget.groupChatData["angeheftet"]));
+  showAllPinMessages() {
+    global_functions.changePage(context,
+        pinMessagesPage(pinMessages: widget.groupChatData["angeheftet"]));
   }
 
-  jumpToMessageAndShowNextAngeheftet(pinnedMessage){
-    angehefteteMessageShowIndex = angehefteteMessageShowIndex -1;
-    if(angehefteteMessageShowIndex <0) angehefteteMessageShowIndex = 0;
+  jumpToMessageAndShowNextAngeheftet(pinnedMessage) {
+    angehefteteMessageShowIndex = angehefteteMessageShowIndex - 1;
+    if (angehefteteMessageShowIndex < 0) angehefteteMessageShowIndex = widget.groupChatData["angeheftet"].length -1;
 
-    setState(() {});
 
-    _scrollController.jumpTo(index: pinnedMessage["index"]);
+    _scrollController.scrollTo(
+    index: messages.length -1 - pinnedMessage["index"],
+    duration: const Duration(milliseconds: 300),
+    curve: Curves.easeInOutCubic);
+
+    setState(() {
+      scrollIndex = pinnedMessage["index"];
+    });
+
+    Future.delayed(
+        const Duration(milliseconds: 1300), () {
+      setState(() {
+        scrollIndex = -1;
+      });
+    });
   }
 
   @override
@@ -462,16 +497,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
       angehefteteMessageShowIndex ??= pinMessages.length - 1;
 
-      var pinMessage = Map<String, dynamic>.from(json.decode(pinMessages[angehefteteMessageShowIndex]))["message"];
+      var pinMessage = Map<String, dynamic>.from(
+          json.decode(pinMessages[angehefteteMessageShowIndex]));
 
-      var fristPinText = pinMessage["forward"].isEmpty
-          ? pinMessage["message"]
-          : pinMessage["forward"]["message"];
+      var fristPinText = pinMessage["message"]["forward"].isEmpty
+          ? pinMessage["message"]["message"]
+          : pinMessage["message"]["forward"]["message"];
 
       return Container(
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
-            color: chatpartnerMessageBoxColor, border: Border.all()),
+            color: Colors.white60, border: Border.all()),
         child: Row(
           children: [
             Expanded(
@@ -485,7 +521,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 5),
-                    Container(child: Text(fristPinText))
+                    Container(child: Text(fristPinText, maxLines: 1,))
                   ],
                 ),
               ),
@@ -552,19 +588,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     openMessageMenu(message, index) {
       final RenderBox overlay = Overlay.of(context).context.findRenderObject();
       var isMyMessage = message["von"] == userId;
-      message["forward"] = json.decode(message["forward"]);
+      if(message["forward"].runtimeType == String) message["forward"] = json.decode(message["forward"]);
       var isInPinned = false;
+      var angehefteteMessages = widget.groupChatData["angeheftet"];
 
-      for (var pin in widget.groupChatData["angeheftet"]) {
+      for (var pin in angehefteteMessages) {
         if (DeepCollectionEquality()
             .equals(json.decode(pin), {"message": message, "index": index})) {
           isInPinned = true;
           break;
         }
       }
-
-      widget.groupChatData["angeheftet"]
-          .contains({"message": message, "index": index});
 
       showMenu(
         context: context,
@@ -691,6 +725,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ? json.decode(message["forward"])
             : message["forward"];
         message["responseId"] ??= "0";
+
 
         if (message["message"] == "") continue;
 
@@ -1116,7 +1151,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               child: FloatingActionButton(
                 onPressed: () {
                   _scrollController.scrollTo(
-                      index: messages.length,
+                      index: 0,
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOutCubic);
                   setState(() {});
