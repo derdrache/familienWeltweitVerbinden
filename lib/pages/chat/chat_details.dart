@@ -20,7 +20,6 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:collection/collection.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
@@ -72,7 +71,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var chatpartnerMessageBoxColor = Colors.white;
   var myChats = Hive.box("secureBox").get("myChats");
   var angehefteteMessageShowIndex;
-
+  var isLoading = true;
 
   @override
   void dispose() {
@@ -96,6 +95,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
+    getAllDbMessages();
+
     itemPositionListener.itemPositions.addListener(() {
       var scrollValueFirstItem =
           itemPositionListener.itemPositions.value.first.index;
@@ -130,15 +131,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   _asyncMethod() async {
     await createNewChat();
     await getAndSetChatData();
+    if (messages.isEmpty) getAllDbMessages();
     writeActiveChat();
     await getChatPartnerProfil();
 
     if (widget.groupChatData != false) resetNewMessageCounter();
 
     setState(() {});
-
+/*
     timer = Timer.periodic(
-        const Duration(seconds: 10), (Timer t) => checkNewMessages());
+        const Duration(seconds: 10), (Timer t) => getAllDbMessages());
+
+ */
   }
 
   createNewChat() async {
@@ -198,8 +202,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "WHERE id = '${widget.groupChatData["id"]}'");
   }
 
-  checkNewMessages() {
-    setState(() {});
+  getAllDbMessages() async {
+    if (widget.chatId == null && widget.groupChatData == null) return;
+
+    var chatId = widget.chatId ?? widget.groupChatData["id"];
+
+    List<dynamic> allDbMessages = await ChatDatabase().getAllMessages(chatId);
+
+    allDbMessages.sort((a, b) => (a["date"]).compareTo(b["date"]));
+
+    messages = allDbMessages;
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   checkChatgroupUsers() {
@@ -314,14 +330,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ));
   }
 
-  getAllMessages() async {
-    if (widget.chatId != null) {
-      return await ChatDatabase().getAllMessages(widget.chatId);
-    }
-
-    return null;
-  }
-
   replyMessage(message) {
     messageIdChange = message["tableId"];
     myFocusNode.requestFocus();
@@ -381,58 +389,45 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         color: Colors.green);
   }
 
-  pinMessage(message, index) async {
-    if (message["forward"].runtimeType == String)
-      message["forward"] = json.decode(message["forward"]);
+  pinMessage(message) async {
+    if (widget.groupChatData["pinMessages"].isEmpty) {
+      var pinnedMessageGroupData = {
+        widget.chatPartnerId: [],
+        userId: [message["tableId"]]
+      };
 
-    var pinMessage = json.encode({"message": message, "index": index});
+      widget.groupChatData["pinMessages"] = pinnedMessageGroupData;
 
-    for (var chat in myChats) {
-      if (chat["id"] == message["id"]) {
-        chat["angeheftet"].add(pinMessage);
-      }
+      setState(() {
+        angehefteteMessageShowIndex =
+            widget.groupChatData["pinMessages"][userId].length - 1;
+      });
+
+      ChatDatabase().updateChatGroup(
+          "pinMessages = '${json.encode(pinnedMessageGroupData)}'",
+          "WHERE id = '${message["id"]}'");
+    } else {
+      widget.groupChatData["pinMessages"][userId].add(message["tableId"]);
+
+      setState(() {
+        angehefteteMessageShowIndex =
+            widget.groupChatData["pinMessages"][userId].length - 1;
+      });
+
+      ChatDatabase().updateChatGroup(
+          "pinMessages = JSON_ARRAY_APPEND(pinMessages, '\$.$userId', '${message["tableId"]}')",
+          "WHERE id = '${message["id"]}'");
     }
-
-    setState(() {
-      angehefteteMessageShowIndex = widget.groupChatData["angeheftet"].length -1;
-    });
-
-    pinMessage = pinMessage.replaceAll(r"\n", r"\\n");
-
-
-    ChatDatabase().updateChatGroup(
-        "angeheftet = JSON_ARRAY_APPEND(angeheftet, '\$', '$pinMessage')",
-        "WHERE id = '${message["id"]}'");
-
   }
 
   detachMessage(message, index) {
-    if(message["forward"].runtimeType == String) message["forward"] = json.decode(message["forward"]);
-    var pinMessage = json.encode({"message": message, "index": index});
-    var angeheftetIsEmpty = false;
-
-    for (var chat in myChats) {
-      if (chat["id"] == message["id"]) {
-        chat["angeheftet"].remove(pinMessage);
-        if(chat["angeheftet"].isEmpty) angeheftetIsEmpty = true;
-      }
-    }
+    widget.groupChatData["pinMessages"][userId].remove(message["tableId"]);
 
     setState(() {});
 
-    if(angeheftetIsEmpty){
-      ChatDatabase().updateChatGroup(
-          "angeheftet = '${json.encode([])}'",
-          "WHERE id = '${message["id"]}'");
-    }else{
-      ChatDatabase().updateChatGroup(
-          "angeheftet = JSON_REMOVE(angeheftet, JSON_UNQUOTE(JSON_SEARCH(angeheftet, 'one', '${json.encode(pinMessage)}')))",
-          "WHERE id = '${message["id"]}'");
-    }
-
-
-
-
+    ChatDatabase().updateChatGroup(
+        "pinMessages = JSON_REMOVE(pinMessages, JSON_UNQUOTE(JSON_SEARCH(pinMessages, 'one', '${message["tableId"]}')))",
+        "WHERE id = '${message["id"]}'");
   }
 
   resetExtraInputInformation() {
@@ -458,26 +453,34 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   showAllPinMessages() {
-    global_functions.changePage(context,
-        pinMessagesPage(pinMessages: widget.groupChatData["angeheftet"]));
+    var allPinMessages = [];
+
+    for (var pinMessageId in widget.groupChatData["pinMessages"][userId]) {
+      for (var message in messages) {
+        if (pinMessageId == message["tableId"]) allPinMessages.add(message);
+      }
+    }
+
+    global_functions.changePage(
+        context, pinMessagesPage(pinMessages: allPinMessages));
   }
 
-  jumpToMessageAndShowNextAngeheftet(pinnedMessage) {
+  jumpToMessageAndShowNextAngeheftet(index) {
     angehefteteMessageShowIndex = angehefteteMessageShowIndex - 1;
-    if (angehefteteMessageShowIndex < 0) angehefteteMessageShowIndex = widget.groupChatData["angeheftet"].length -1;
-
+    if (angehefteteMessageShowIndex < 0)
+      angehefteteMessageShowIndex =
+          widget.groupChatData["pinMessages"].length - 1;
 
     _scrollController.scrollTo(
-    index: messages.length -1 - pinnedMessage["index"],
-    duration: const Duration(milliseconds: 300),
-    curve: Curves.easeInOutCubic);
+        index: messages.length - 1 - index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic);
 
     setState(() {
-      scrollIndex = pinnedMessage["index"];
+      scrollIndex = index;
     });
 
-    Future.delayed(
-        const Duration(milliseconds: 1300), () {
+    Future.delayed(const Duration(milliseconds: 1300), () {
       setState(() {
         scrollIndex = -1;
       });
@@ -489,30 +492,41 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     double screenHeight = MediaQuery.of(context).size.height;
 
     angehefteteNachrichten() {
-      //nur eigene Anzeigen //in Gruppen für alle anzeigen? Nur Admins?
-      var pinMessages = widget.groupChatData["angeheftet"];
+      var chatAngeheftet = widget.groupChatData["pinMessages"];
 
-      if (widget.groupChatData == null || pinMessages.isEmpty) {
+      if (widget.groupChatData == null ||
+          chatAngeheftet == null ||
+          chatAngeheftet.isEmpty) {
         return SizedBox.shrink();
       }
-      angehefteteMessageShowIndex ??= pinMessages.length - 1;
 
-      var pinMessage = Map<String, dynamic>.from(
-          json.decode(pinMessages[angehefteteMessageShowIndex]));
+      chatAngeheftet = chatAngeheftet[userId];
+      if (chatAngeheftet.isEmpty) return SizedBox.shrink();
 
-      var fristPinText = pinMessage["message"]["forward"].isEmpty
-          ? pinMessage["message"]["message"]
-          : pinMessage["message"]["forward"]["message"];
+      angehefteteMessageShowIndex ??= chatAngeheftet.length - 1;
+
+      var pinMessageShow = chatAngeheftet[angehefteteMessageShowIndex];
+
+      var fristPinText = "";
+      var index = -1;
+
+      for (var message in messages) {
+        index = index + 1;
+
+        if (message["tableId"] == pinMessageShow) {
+          fristPinText = message["message"];
+          break;
+        }
+      }
 
       return Container(
         padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            color: Colors.white60, border: Border.all()),
+        decoration: BoxDecoration(color: Colors.white60, border: Border.all()),
         child: Row(
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () => jumpToMessageAndShowNextAngeheftet(pinMessage),
+                onTap: () => jumpToMessageAndShowNextAngeheftet(index),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -521,7 +535,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 5),
-                    Container(child: Text(fristPinText, maxLines: 1,))
+                    Container(
+                        child: Text(
+                      fristPinText,
+                      maxLines: 1,
+                    ))
                   ],
                 ),
               ),
@@ -530,7 +548,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               onTap: () => showAllPinMessages(),
               child: Icon(
                 Icons.manage_search,
-                size: 30,
+                size: 35,
               ),
             ),
           ],
@@ -588,14 +606,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     openMessageMenu(message, index) {
       final RenderBox overlay = Overlay.of(context).context.findRenderObject();
       var isMyMessage = message["von"] == userId;
-      if(message["forward"].runtimeType == String) message["forward"] = json.decode(message["forward"]);
+      if (message["forward"].runtimeType == String)
+        message["forward"] = json.decode(message["forward"]);
       var isInPinned = false;
-      var angehefteteMessages = widget.groupChatData["angeheftet"];
+      var angehefteteMessages = widget.groupChatData["pinMessages"].isEmpty
+          ? []
+          : widget.groupChatData["pinMessages"][userId];
 
-      for (var pin in angehefteteMessages) {
-        if (DeepCollectionEquality()
-            .equals(json.decode(pin), {"message": message, "index": index})) {
+      for (var pinId in angehefteteMessages) {
+        if (pinId == message["tableId"]) {
           isInPinned = true;
+
           break;
         }
       }
@@ -629,7 +650,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           PopupMenuItem(
             onTap: () => isInPinned
                 ? detachMessage(message, index)
-                : pinMessage(message, index),
+                : pinMessage(message),
             child: Row(
               children: [
                 isInPinned
@@ -725,7 +746,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ? json.decode(message["forward"])
             : message["forward"];
         message["responseId"] ??= "0";
-
 
         if (message["message"] == "") continue;
 
@@ -1119,31 +1139,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     messageAnzeige() {
       return Stack(
         children: [
-          FutureBuilder(
-              future: getAllMessages(),
-              builder: (
-                BuildContext context,
-                AsyncSnapshot snap,
-              ) {
-                if (snap.hasData) {
-                  messages = snap.data;
-
-                  if (messages.length == 0) {
-                    return Center(
-                        child: Text(
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : messages.length == 0
+                  ? Center(
+                      child: Text(
                       AppLocalizations.of(context).nochKeineNachrichtVorhanden,
                       style: const TextStyle(fontSize: 20),
-                    ));
-                  }
-
-                  messages.sort((a, b) => (a["date"]).compareTo(b["date"]));
-
-                  messagesPufferList = messageList(messages);
-                  return messagesPufferList;
-                }
-
-                return messagesPufferList;
-              }),
+                    ))
+                  : messageList(messages),
           if (!hasStartPosition)
             Positioned(
               bottom: 10,
@@ -1255,6 +1259,125 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
+    pinDialog() {
+      var chatIsPinned = widget.groupChatData["users"][userId]["pinned"] ?? false;
+      chatIsPinned = chatIsPinned == "true";
+
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            chatIsPinned
+                ? StrikeThroughIcon(child: Icon(Icons.push_pin))
+                : Icon(Icons.push_pin),
+            const SizedBox(width: 10),
+            Text(chatIsPinned
+                ? AppLocalizations.of(context).losloesen
+                : AppLocalizations.of(context).anheften
+            ),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+
+          setState(() {
+            widget.groupChatData["users"][userId]["pinned"] = !chatIsPinned;
+          });
+
+          ChatDatabase().updateChatGroup(
+              "users = JSON_SET(users, '\$.$userId.pinned', '${!chatIsPinned}')",
+              "WHERE id = '${widget.chatId}'");
+
+        },
+      );
+    }
+
+    muteDialog() {
+      var chatIsMute = widget.groupChatData["users"][userId]["mute"] ?? false;
+      chatIsMute = chatIsMute == "true";
+
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            Icon(chatIsMute
+                ? Icons.notifications_active
+                : Icons.notifications_off),
+            const SizedBox(width: 10),
+            Text(chatIsMute
+                ? AppLocalizations.of(context).stummEin
+                : AppLocalizations.of(context).stummAus),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+
+          setState(() {
+            widget.groupChatData["users"][userId]["mute"] = !chatIsMute;
+          });
+
+          ChatDatabase().updateChatGroup(
+              "users = JSON_SET(users, '\$.$userId.mute', '${!chatIsMute}')",
+              "WHERE id = '${widget.chatId}'");
+        },
+      );
+    }
+
+    settingDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.delete),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).chatLoeschen),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return StatefulBuilder(builder: (ontext, setState) {
+                  return CustomAlertDialog(
+                    title: AppLocalizations.of(context).chatLoeschen,
+                    height: 140,
+                    children: [
+                      Center(
+                          child: Text(AppLocalizations.of(context)
+                              .chatWirklichLoeschen)),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Checkbox(
+                              value: bothDelete,
+                              onChanged: (value) => {
+                                    setState(() {
+                                      bothDelete = value;
+                                    })
+                                  }),
+                          Text(AppLocalizations.of(context).auchBeiLoeschen +
+                              widget.chatPartnerName)
+                        ],
+                      )
+                    ],
+                    actions: [
+                      TextButton(
+                        child: Text(AppLocalizations.of(context).loeschen),
+                        onPressed: () async {
+                          deleteChat(bothDelete: bothDelete);
+                        },
+                      ),
+                      TextButton(
+                        child: Text(AppLocalizations.of(context).abbrechen),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    ],
+                  );
+                });
+              });
+        },
+      );
+    }
+
     deleteDialog() {
       return SimpleDialogOption(
         child: Row(
@@ -1325,7 +1448,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     contentPadding: EdgeInsets.zero,
                     insetPadding:
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
-                    children: [deleteDialog()],
+                    children: [
+                      pinDialog(),
+                      muteDialog(),
+                      settingDialog(),
+                      deleteDialog()
+                    ],
                   ),
                 ),
               ],

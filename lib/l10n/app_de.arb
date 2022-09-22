@@ -385,6 +385,7 @@
     "weitergeleitet": "Weitergeleitet",
     "angehefteteNachrichten": "Angeheftete Nachrichten",
     "anheften": "Anheften",
-    "losloesen": "Loslösen"
-
+    "losloesen": "Loslösen",
+    "stummEin": "Stumm ein",
+    "stummAus": "Stumm aus"
 }
