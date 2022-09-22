@@ -387,6 +387,8 @@
     "weitergeleitet": "Forwarded",
     "angehefteteNachrichten": "Pinned messages",
     "anheften": "Pin",
-    "losloesen": "detach"
+    "losloesen": "detach",
+    "stummEin": "Mute on",
+    "stummAus": "Mute off"
 }
 
