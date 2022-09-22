@@ -178,8 +178,8 @@ class ChatDatabase{
     var chatID = global_functions.getChatID(chatPartner);
     var date = DateTime.now().millisecondsSinceEpoch;
     var userData = {
-      userKeysList[0] : {"newMessages": 0},
-      userKeysList[1] : {"newMessages": 0},
+      userKeysList[0] : {"newMessages": 0, "mute": 0},
+      userKeysList[1] : {"newMessages": 0, "mute": 0},
     };
 
     var newChatGroup = {
