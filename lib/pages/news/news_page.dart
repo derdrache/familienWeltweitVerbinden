@@ -47,7 +47,7 @@ class _NewsPageState extends State<NewsPage> {
       setState(() {});
     });
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    //WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
 
