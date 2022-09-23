@@ -389,6 +389,7 @@
     "anheften": "Pin",
     "losloesen": "detach",
     "stummEin": "Mute on",
-    "stummAus": "Mute off"
+    "stummAus": "Mute off",
+    "chatEinstellung": "chat settings"
 }
 
