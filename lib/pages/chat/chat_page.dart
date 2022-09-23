@@ -13,6 +13,7 @@ import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
+import '../../widgets/strike_through_icon.dart';
 import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget {
@@ -30,7 +31,9 @@ class _ChatPageState extends State<ChatPage> {
   List dbProfilData = Hive.box("secureBox").get("profils");
   List allName, userFriendlist, myChats = [];
   bool changeBarOn = false;
-  var changeChatsDict = {};
+  var selectedChats = [];
+  var firstSelectedIsPinned = false;
+  var firstSelectedIsMute = false;
   var deleteBoth = false;
 
   @override
@@ -279,14 +282,7 @@ class _ChatPageState extends State<ChatPage> {
     var choosenChatgroupsId = [];
     var chatPartnerName = "";
 
-    for (var chatId in changeChatsDict.keys) {
-      if (changeChatsDict[chatId]) {
-        choosenChatgroupsId.add(chatId);
-        countSelected += 1;
-      }
-    }
-
-    if (choosenChatgroupsId.length == 1) {
+    if (selectedChats.length == 1) {
       var chatId = choosenChatgroupsId[0];
       var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
 
@@ -334,7 +330,7 @@ class _ChatPageState extends State<ChatPage> {
                   onPressed: () async {
                     Navigator.pop(context);
                     changeBarOn = false;
-                    changeChatsDict = {};
+                    selectedChats = [];
                     deleteChat(choosenChatgroupsId, deleteBoth: deleteBoth);
                   },
                 ),
@@ -348,8 +344,108 @@ class _ChatPageState extends State<ChatPage> {
         });
   }
 
+  pinChat() {
+    for (var choosenChatId in selectedChats) {
+      var chat = {};
+
+      for (var myChat in myChats) {
+        if (myChat["id"] == choosenChatId) {
+          chat = myChat;
+        }
+      }
+
+      var chatIsPinned = chat["users"][userId]["pinned"] ?? false;
+      chatIsPinned = chatIsPinned == "true";
+
+      chat["users"][userId]["pinned"] = !chatIsPinned;
+
+      ChatDatabase().updateChatGroup(
+          "users = JSON_SET(users, '\$.$userId.pinned', '${!chatIsPinned}')",
+          "WHERE id = '${chat["id"]}'");
+    }
+
+    setState(() {});
+  }
+
+  muteChat(){
+    for (var choosenChatId in selectedChats) {
+      var chat = {};
+
+      for (var myChat in myChats) {
+        if (myChat["id"] == choosenChatId) {
+          chat = myChat;
+        }
+      }
+
+      var chatIsMute = chat["users"][userId]["mute"] ?? false;
+      chatIsMute = chatIsMute == "true";
+
+      chat["users"][userId]["mute"] = !chatIsMute;
+
+      ChatDatabase().updateChatGroup(
+          "users = JSON_SET(users, '\$.$userId.mute', '${!chatIsMute}')",
+          "WHERE id = '${chat["id"]}'");
+    }
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    muteDialog(chatGroupData) {
+      var chatIsMute = chatGroupData["users"][userId]["mute"] ?? false;
+      chatIsMute = chatIsMute == "true";
+
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            Icon(chatIsMute
+                ? Icons.notifications_active
+                : Icons.notifications_off),
+            const SizedBox(width: 10),
+            Text(chatIsMute
+                ? AppLocalizations.of(context).stummEin
+                : AppLocalizations.of(context).stummAus),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+
+          setState(() {
+            chatGroupData["users"][userId]["mute"] = !chatIsMute;
+          });
+
+          ChatDatabase().updateChatGroup(
+              "users = JSON_SET(users, '\$.$userId.mute', '${!chatIsMute}')",
+              "WHERE id = '${chatGroupData["id"]}'");
+        },
+      );
+    }
+
+    newMessageAndPinnedBox(newMessages, isPinned) {
+      if (newMessages == 0 && !isPinned) return const SizedBox(height: 30);
+
+      if (newMessages > 0) {
+        return Container(
+            height: 30,
+            width: 30,
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                shape: BoxShape.circle),
+            child: Center(
+              child: FittedBox(
+                child: Text(
+                  newMessages.toString(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ),
+            ));
+      } else if (isPinned) {
+        return Center(child: Icon(Icons.push_pin));
+      }
+    }
+
     createChatGroupContainers(groupdata) {
       List<Widget> chatGroupContainers = [];
 
@@ -361,8 +457,6 @@ class _ChatPageState extends State<ChatPage> {
 
         if (group["lastMessage"].isEmpty || group["users"][userId] == null)
           continue;
-
-        changeChatsDict[group["id"]] ??= false;
 
         users.forEach((key, value) async {
           if (key != userId) {
@@ -387,114 +481,116 @@ class _ChatPageState extends State<ChatPage> {
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
+        var isPinned = users[userId]["pinned"] == "true";
         var lastMessageTime =
             DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
+        var sortIndex = chatGroupContainers.length;
 
-        if(lastMessage == "<weiterleitung>") lastMessage = AppLocalizations.of(context).weitergeleitet;
+        if (isPinned) sortIndex = 0;
+        if (lastMessage == "<weiterleitung>")
+          lastMessage = AppLocalizations.of(context).weitergeleitet;
 
-        chatGroupContainers.add(InkWell(
-          onTap: () {
-            if (changeBarOn) {
-              var markerOn = false;
+        chatGroupContainers.insert(
+            sortIndex,
+            InkWell(
+              onTap: () {
+                if (changeBarOn) {
+                  var markerOn = false;
 
-              setState(() {
-                changeChatsDict[group["id"]] = !changeChatsDict[group["id"]];
-                for (var chatId in changeChatsDict.keys) {
-                  if (changeChatsDict[chatId]) markerOn = true;
-                  break;
+                  setState(() {
+                    if(selectedChats.contains(group["id"])){
+                      selectedChats.remove(group["id"]);
+                    }else{
+                      selectedChats.add(group["id"]);
+                    }
+
+                    if(selectedChats.length > 0) markerOn = true;
+                    if(selectedChats.length == 0){
+                      firstSelectedIsMute = false;
+                      firstSelectedIsPinned = false;
+                    }
+
+
+                    changeBarOn = markerOn;
+                  });
+                } else {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => ChatDetailsPage(
+                                chatPartnerName: chatPartnerName,
+                                groupChatData: group,
+                              ))).whenComplete(() => setState(() {}));
                 }
-                changeBarOn = markerOn;
-              });
-            } else {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => ChatDetailsPage(
-                            chatPartnerName: chatPartnerName,
-                            groupChatData: group,
-                          ))).whenComplete(() => setState(() {}));
-            }
-          },
-          onLongPress: () {
-            setState(() {
-              changeBarOn = true;
-              changeChatsDict[group["id"]] = true;
-            });
-          },
-          child: Container(
-              padding: const EdgeInsets.only(
-                  left: 10, right: 10, top: 15, bottom: 15),
-              decoration: BoxDecoration(
-                  border: Border(
-                bottom: BorderSide(width: 1, color: global_var.borderColorGrey),
-              )),
-              child: Row(
-                children: [
-                  Stack(
+              },
+              onLongPress: () {
+                setState(() {
+                  changeBarOn = true;
+                  firstSelectedIsPinned = group["users"][userId]["pinned"] == "true";
+                  firstSelectedIsMute = group["users"][userId]["mute"] == "true";
+                  selectedChats.add(group["id"]);
+                });
+              },
+              child: Container(
+                  padding: const EdgeInsets.only(
+                      left: 10, right: 10, top: 15, bottom: 15),
+                  decoration: BoxDecoration(
+                      border: Border(
+                    bottom:
+                        BorderSide(width: 1, color: global_var.borderColorGrey),
+                  )),
+                  child: Row(
                     children: [
-                      ProfilImage(chatPartnerProfil),
-                      if (changeChatsDict[group["id"]])
-                        const Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: CircleAvatar(
-                              radius: 12,
-                              backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.check_circle,
-                                size: 24,
-                                color: Colors.green,
-                              ),
-                            ))
-                    ],
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Stack(
                         children: [
-                          Text(chatPartnerName,
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 10),
-                          Text(lastMessage,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              style: TextStyle(
-                                  fontSize: 16, color: Colors.grey[600]))
-                        ]),
-                  ),
-                  //const Expanded(child: SizedBox.shrink()),
-                  Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(DateFormat('dd-MM HH:mm').format(lastMessageTime),
-                            style: TextStyle(color: Colors.grey[600])),
-                        const SizedBox(height: 10),
-                        ownChatNewMessages == 0
-                            ? const SizedBox(height: 30)
-                            : Container(
-                                height: 30,
-                                width: 30,
-                                decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
-                                    shape: BoxShape.circle),
-                                child: Center(
-                                  child: FittedBox(
-                                    child: Text(
-                                      ownChatNewMessages.toString(),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
+                          ProfilImage(chatPartnerProfil),
+                          if (selectedChats.contains(group["id"]))
+                            const Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: Colors.white,
+                                  child: Icon(
+                                    Icons.check_circle,
+                                    size: 24,
+                                    color: Colors.green,
                                   ),
                                 ))
-                      ])
-                ],
-              )),
-        ));
+                        ],
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(chatPartnerName,
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 10),
+                              Text(lastMessage,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.grey[600]))
+                            ]),
+                      ),
+                      //const Expanded(child: SizedBox.shrink()),
+                      Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                                DateFormat('dd-MM HH:mm')
+                                    .format(lastMessageTime),
+                                style: TextStyle(color: Colors.grey[600])),
+                            const SizedBox(height: 10),
+                            newMessageAndPinnedBox(ownChatNewMessages, isPinned)
+                          ])
+                    ],
+                  )),
+            ));
       }
 
       return chatGroupContainers;
@@ -510,13 +606,21 @@ class _ChatPageState extends State<ChatPage> {
                 onPressed: () {
                   setState(() {
                     changeBarOn = false;
-                    for (var chatId in changeChatsDict.keys) {
-                      changeChatsDict[chatId] = false;
-                    }
+                    selectedChats = [];
                   });
                 },
               ),
               buttons: [
+                IconButton(
+                    onPressed: () => muteChat(),
+                    icon: selectedChats.length == 1 && firstSelectedIsMute
+                        ? Icon(Icons.notifications_active)
+                        : Icon(Icons.notifications_off)),
+                IconButton(
+                    onPressed: () => pinChat(),
+                    icon: selectedChats.length == 1 && firstSelectedIsPinned
+                        ? StrikeThroughIcon(child: Icon(Icons.push_pin))
+                        : Icon(Icons.push_pin)),
                 IconButton(
                     onPressed: () => deleteChatDialog(""),
                     icon: const Icon(Icons.delete))
