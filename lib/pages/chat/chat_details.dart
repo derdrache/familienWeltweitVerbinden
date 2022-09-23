@@ -390,43 +390,54 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   pinMessage(message) async {
-    if (widget.groupChatData["pinMessages"].isEmpty) {
-      var pinnedMessageGroupData = {
-        widget.chatPartnerId: [],
-        userId: [message["tableId"]]
-      };
+    var messageIsPinned = widget.groupChatData["users"][userId]["pinnedMessages"];
+    if(messageIsPinned != null && messageIsPinned.runtimeType == String) messageIsPinned = json.decode(messageIsPinned);
 
-      widget.groupChatData["pinMessages"] = pinnedMessageGroupData;
+    if (messageIsPinned == null || messageIsPinned.isEmpty) {
+
+      widget.groupChatData["users"][userId]["pinnedMessages"] = [message["tableId"]];
 
       setState(() {
-        angehefteteMessageShowIndex =
-            widget.groupChatData["pinMessages"][userId].length - 1;
+        angehefteteMessageShowIndex = widget.groupChatData["users"][userId]["pinnedMessages"].length - 1;
       });
 
       ChatDatabase().updateChatGroup(
-          "pinMessages = '${json.encode(pinnedMessageGroupData)}'",
+          "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${[message["tableId"]]}')",
           "WHERE id = '${message["id"]}'");
+
+
     } else {
-      widget.groupChatData["pinMessages"][userId].add(message["tableId"]);
+      messageIsPinned.add(message["tableId"]);
+      widget.groupChatData["users"][userId]["pinnedMessages"] = messageIsPinned;
 
       setState(() {
         angehefteteMessageShowIndex =
-            widget.groupChatData["pinMessages"][userId].length - 1;
+            messageIsPinned.length - 1;
       });
 
       ChatDatabase().updateChatGroup(
-          "pinMessages = JSON_ARRAY_APPEND(pinMessages, '\$.$userId', '${message["tableId"]}')",
+          "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${messageIsPinned}')",
           "WHERE id = '${message["id"]}'");
+
     }
   }
 
   detachMessage(message, index) {
-    widget.groupChatData["pinMessages"][userId].remove(message["tableId"]);
+    var messageIsPinned = widget.groupChatData["users"][userId]["pinnedMessages"];
+    if(messageIsPinned.runtimeType == String) messageIsPinned = json.decode(messageIsPinned);
 
-    setState(() {});
+    messageIsPinned.remove(int.parse(message["tableId"]));
+
+    widget.groupChatData["users"][userId]["pinnedMessages"] = messageIsPinned;
+
+    setState(() {
+      angehefteteMessageShowIndex =
+          messageIsPinned.length - 1;
+    });
+
 
     ChatDatabase().updateChatGroup(
-        "pinMessages = JSON_REMOVE(pinMessages, JSON_UNQUOTE(JSON_SEARCH(pinMessages, 'one', '${message["tableId"]}')))",
+        "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${messageIsPinned}')",
         "WHERE id = '${message["id"]}'");
   }
 
@@ -453,11 +464,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   showAllPinMessages() {
+    var allPinnedMessageIds = json.decode(widget.groupChatData["users"][userId]["pinnedMessages"]);
     var allPinMessages = [];
 
-    for (var pinMessageId in widget.groupChatData["pinMessages"][userId]) {
+
+    for (var pinMessageId in allPinnedMessageIds) {
       for (var message in messages) {
-        if (pinMessageId == message["tableId"]) allPinMessages.add(message);
+        if (pinMessageId == int.parse(message["tableId"])) allPinMessages.add(message);
       }
     }
 
@@ -492,7 +505,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     double screenHeight = MediaQuery.of(context).size.height;
 
     angehefteteNachrichten() {
-      var chatAngeheftet = widget.groupChatData["pinMessages"];
+      var chatAngeheftet = widget.groupChatData["users"][userId]["pinnedMessages"];
 
       if (widget.groupChatData == null ||
           chatAngeheftet == null ||
@@ -500,20 +513,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         return SizedBox.shrink();
       }
 
-      chatAngeheftet = chatAngeheftet[userId];
-      if (chatAngeheftet.isEmpty) return SizedBox.shrink();
+      if(chatAngeheftet.runtimeType == String) chatAngeheftet = json.decode(chatAngeheftet);
+
 
       angehefteteMessageShowIndex ??= chatAngeheftet.length - 1;
 
       var pinMessageShow = chatAngeheftet[angehefteteMessageShowIndex];
-
       var fristPinText = "";
       var index = -1;
 
       for (var message in messages) {
         index = index + 1;
-
-        if (message["tableId"] == pinMessageShow) {
+        if (message["tableId"] == pinMessageShow.toString()) {
           fristPinText = message["message"];
           break;
         }
@@ -609,12 +620,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (message["forward"].runtimeType == String)
         message["forward"] = json.decode(message["forward"]);
       var isInPinned = false;
-      var angehefteteMessages = widget.groupChatData["pinMessages"].isEmpty
-          ? []
-          : widget.groupChatData["pinMessages"][userId];
+      var angehefteteMessages = widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
+      if(angehefteteMessages.runtimeType == String) angehefteteMessages = json.decode(angehefteteMessages);
 
       for (var pinId in angehefteteMessages) {
-        if (pinId == message["tableId"]) {
+        if (pinId.toString() == message["tableId"]) {
           isInPinned = true;
 
           break;
@@ -1325,9 +1335,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       return SimpleDialogOption(
         child: Row(
           children: [
-            const Icon(Icons.delete),
+            Icon(Icons.settings),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).chatLoeschen),
+            Text(AppLocalizations.of(context).einstellungen),
           ],
         ),
         onPressed: () {
@@ -1338,38 +1348,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               builder: (BuildContext context) {
                 return StatefulBuilder(builder: (ontext, setState) {
                   return CustomAlertDialog(
-                    title: AppLocalizations.of(context).chatLoeschen,
+                    title: AppLocalizations.of(context).chatEinstellung,
                     height: 140,
                     children: [
-                      Center(
-                          child: Text(AppLocalizations.of(context)
-                              .chatWirklichLoeschen)),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Checkbox(
-                              value: bothDelete,
-                              onChanged: (value) => {
-                                    setState(() {
-                                      bothDelete = value;
-                                    })
-                                  }),
-                          Text(AppLocalizations.of(context).auchBeiLoeschen +
-                              widget.chatPartnerName)
-                        ],
-                      )
-                    ],
-                    actions: [
-                      TextButton(
-                        child: Text(AppLocalizations.of(context).loeschen),
-                        onPressed: () async {
-                          deleteChat(bothDelete: bothDelete);
+                      Center(child: Text("Message Input Größe")),
+                      Slider(
+                        max: 70,
+                        min: 40,
+                        value: 50,
+                        onChanged: (value){
+
                         },
-                      ),
-                      TextButton(
-                        child: Text(AppLocalizations.of(context).abbrechen),
-                        onPressed: () => Navigator.pop(context),
                       )
+
                     ],
                   );
                 });
@@ -1451,7 +1442,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     children: [
                       pinDialog(),
                       muteDialog(),
-                      settingDialog(),
+                      //settingDialog(),
+                      SizedBox(height: 10),
                       deleteDialog()
                     ],
                   ),
