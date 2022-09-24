@@ -56,7 +56,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var eventCardList = [];
   var chatPartnerProfil;
   bool bothDelete = false;
-  var myFocusNode = FocusNode();
+  var messageInputNode = FocusNode();
+  var searchInputNode = FocusNode();
   var messageIdChange;
   String changeMessageModus;
   Widget extraInputInformationBox = const SizedBox.shrink();
@@ -72,13 +73,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var myChats = Hive.box("secureBox").get("myChats");
   var angehefteteMessageShowIndex;
   var isLoading = true;
+  var textSearchIsActive = false;
+  var searchTextKontroller = TextEditingController();
+  var messagesWithSearchText = [];
+  var isTextSearching = false;
+  var searchTextIndex = 1;
 
   @override
   void dispose() {
     ProfilDatabase().updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
     WidgetsBinding.instance.removeObserver(this);
     timer.cancel();
-    myFocusNode.dispose();
+    messageInputNode.dispose();
     super.dispose();
   }
 
@@ -332,13 +338,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   replyMessage(message) {
     messageIdChange = message["tableId"];
-    myFocusNode.requestFocus();
+    messageInputNode.requestFocus();
     changeMessageModus = "reply";
   }
 
   editMessage(message) {
     messageIdChange = message["tableId"];
-    myFocusNode.requestFocus();
+    messageInputNode.requestFocus();
     nachrichtController.text = message["message"];
     changeMessageModus = "edit";
   }
@@ -390,51 +396,52 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   pinMessage(message) async {
-    var messageIsPinned = widget.groupChatData["users"][userId]["pinnedMessages"];
-    if(messageIsPinned != null && messageIsPinned.runtimeType == String) messageIsPinned = json.decode(messageIsPinned);
+    var messageIsPinned =
+        widget.groupChatData["users"][userId]["pinnedMessages"];
+    if (messageIsPinned != null && messageIsPinned.runtimeType == String)
+      messageIsPinned = json.decode(messageIsPinned);
 
     if (messageIsPinned == null || messageIsPinned.isEmpty) {
-
-      widget.groupChatData["users"][userId]["pinnedMessages"] = [message["tableId"]];
+      widget.groupChatData["users"][userId]
+          ["pinnedMessages"] = [message["tableId"]];
 
       setState(() {
-        angehefteteMessageShowIndex = widget.groupChatData["users"][userId]["pinnedMessages"].length - 1;
+        angehefteteMessageShowIndex =
+            widget.groupChatData["users"][userId]["pinnedMessages"].length - 1;
       });
 
       ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${[message["tableId"]]}')",
+          "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${[
+            message["tableId"]
+          ]}')",
           "WHERE id = '${message["id"]}'");
-
-
     } else {
       messageIsPinned.add(message["tableId"]);
       widget.groupChatData["users"][userId]["pinnedMessages"] = messageIsPinned;
 
       setState(() {
-        angehefteteMessageShowIndex =
-            messageIsPinned.length - 1;
+        angehefteteMessageShowIndex = messageIsPinned.length - 1;
       });
 
       ChatDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${messageIsPinned}')",
           "WHERE id = '${message["id"]}'");
-
     }
   }
 
   detachMessage(message, index) {
-    var messageIsPinned = widget.groupChatData["users"][userId]["pinnedMessages"];
-    if(messageIsPinned.runtimeType == String) messageIsPinned = json.decode(messageIsPinned);
+    var messageIsPinned =
+        widget.groupChatData["users"][userId]["pinnedMessages"];
+    if (messageIsPinned.runtimeType == String)
+      messageIsPinned = json.decode(messageIsPinned);
 
     messageIsPinned.remove(int.parse(message["tableId"]));
 
     widget.groupChatData["users"][userId]["pinnedMessages"] = messageIsPinned;
 
     setState(() {
-      angehefteteMessageShowIndex =
-          messageIsPinned.length - 1;
+      angehefteteMessageShowIndex = messageIsPinned.length - 1;
     });
-
 
     ChatDatabase().updateChatGroup(
         "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${messageIsPinned}')",
@@ -446,7 +453,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     extraInputInformationBox = const SizedBox.shrink();
     nachrichtController.clear();
     changeMessageModus = null;
-    myFocusNode.unfocus();
+    messageInputNode.unfocus();
 
     setState(() {});
   }
@@ -464,13 +471,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   showAllPinMessages() {
-    var allPinnedMessageIds = json.decode(widget.groupChatData["users"][userId]["pinnedMessages"]);
+    var allPinnedMessageIds =
+        json.decode(widget.groupChatData["users"][userId]["pinnedMessages"]);
     var allPinMessages = [];
-
 
     for (var pinMessageId in allPinnedMessageIds) {
       for (var message in messages) {
-        if (pinMessageId == int.parse(message["tableId"])) allPinMessages.add(message);
+        if (pinMessageId == int.parse(message["tableId"]))
+          allPinMessages.add(message);
       }
     }
 
@@ -500,12 +508,45 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
   }
 
+  searchTextInMessages(searchText) {
+    messagesWithSearchText = [];
+    var index = -1;
+
+    for (var message in messages) {
+      index = index + 1;
+
+      if (message["message"].contains(searchText)) {
+        message["index"] = index;
+        messagesWithSearchText.add(message);
+      }
+    }
+  }
+
+  textSearchNext(direction){
+    var maxResults = messagesWithSearchText.length -1;
+
+    if(direction == "up"){
+      searchTextIndex += 1;
+      if(searchTextIndex > maxResults) searchTextIndex = 0;
+
+    } else if(direction == "down"){
+      searchTextIndex -= 1;
+      if(searchTextIndex < 0) searchTextIndex = maxResults;
+    }
+     //jumpto message
+    setState(() {
+
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
     angehefteteNachrichten() {
-      var chatAngeheftet = widget.groupChatData["users"][userId]["pinnedMessages"];
+      var chatAngeheftet =
+          widget.groupChatData["users"][userId]["pinnedMessages"];
 
       if (widget.groupChatData == null ||
           chatAngeheftet == null ||
@@ -513,8 +554,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         return SizedBox.shrink();
       }
 
-      if(chatAngeheftet.runtimeType == String) chatAngeheftet = json.decode(chatAngeheftet);
-
+      if (chatAngeheftet.runtimeType == String)
+        chatAngeheftet = json.decode(chatAngeheftet);
 
       angehefteteMessageShowIndex ??= chatAngeheftet.length - 1;
 
@@ -620,8 +661,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (message["forward"].runtimeType == String)
         message["forward"] = json.decode(message["forward"]);
       var isInPinned = false;
-      var angehefteteMessages = widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
-      if(angehefteteMessages.runtimeType == String) angehefteteMessages = json.decode(angehefteteMessages);
+      var angehefteteMessages =
+          widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
+      if (angehefteteMessages.runtimeType == String)
+        angehefteteMessages = json.decode(angehefteteMessages);
 
       for (var pinId in angehefteteMessages) {
         if (pinId.toString() == message["tableId"]) {
@@ -1177,100 +1220,149 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
+    searchIndexKontrollButton(direction, icon){
+      return IconButton(
+          iconSize: 30,
+          padding: EdgeInsets.all(3),
+          onPressed: textSearchNext(direction),
+          icon: Icon(icon, color: Colors.black, size: 30));
+    }
+
     textEingabeFeld() {
-      return Column(
-        children: [
-          Container(
-              constraints: const BoxConstraints(
-                minHeight: 60,
-              ),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: extraInputInformationBox.runtimeType == SizedBox
-                      ? const Border(top: BorderSide(color: Colors.grey))
-                      : null,
-                  boxShadow: extraInputInformationBox.runtimeType == SizedBox
-                      ? [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(
-                                0, 3), // changes position of shadow
-                          ),
-                        ]
-                      : []),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      emojisShowing = !emojisShowing;
-
-                      if (emojisShowing == true) {
-                        myFocusNode.unfocus();
-                      } else {
-                        myFocusNode.requestFocus();
-                      }
-
-                      setState(() {});
-                    },
-                    icon: emojisShowing
-                        ? const Icon(Icons.keyboard)
-                        : const Icon(Icons.mood),
+      if(!isTextSearching){
+        return Container(
+            constraints: const BoxConstraints(
+              minHeight: 60,
+            ),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                border: extraInputInformationBox.runtimeType == SizedBox
+                    ? const Border(top: BorderSide(color: Colors.grey))
+                    : null,
+                boxShadow: extraInputInformationBox.runtimeType == SizedBox
+                    ? [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(
+                        0, 3), // changes position of shadow
                   ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: TextField(
-                      maxLines: null,
-                      focusNode: myFocusNode,
-                      textInputAction: TextInputAction.newline,
-                      controller: nachrichtController,
-                      textAlignVertical: TextAlignVertical.center,
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context).nachricht,
-                        hintStyle: const TextStyle(fontSize: 20),
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                      ),
+                ]
+                    : []),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    emojisShowing = !emojisShowing;
+
+                    if (emojisShowing == true) {
+                      messageInputNode.unfocus();
+                    } else {
+                      messageInputNode.requestFocus();
+                    }
+
+                    setState(() {});
+                  },
+                  icon: emojisShowing
+                      ? const Icon(Icons.keyboard)
+                      : const Icon(Icons.mood),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: TextField(
+                    maxLines: null,
+                    focusNode: messageInputNode,
+                    textInputAction: TextInputAction.newline,
+                    controller: nachrichtController,
+                    textAlignVertical: TextAlignVertical.center,
+                    decoration: InputDecoration(
+                      hintText: AppLocalizations.of(context).nachricht,
+                      hintStyle: const TextStyle(fontSize: 20),
+                      border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
                     ),
                   ),
-                  changeMessageModus != "edit"
-                      ? IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            checkChatgroupUsers();
-                            messageToDbAndClearMessageInput(
-                                nachrichtController.text);
+                ),
+                changeMessageModus != "edit"
+                    ? IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      checkChatgroupUsers();
+                      messageToDbAndClearMessageInput(
+                          nachrichtController.text);
 
-                            resetExtraInputInformation();
+                      resetExtraInputInformation();
 
-                            setState(() {
-                              nachrichtController.clear();
-                            });
-                          },
-                          icon: Icon(Icons.send,
-                              size: 34,
-                              color: Theme.of(context).colorScheme.secondary))
-                      : IconButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            saveEditMessage();
-                            resetExtraInputInformation();
-                          },
-                          icon: Icon(Icons.done,
-                              size: 38,
-                              color: Theme.of(context).colorScheme.secondary))
-                ],
-              )),
-        ],
+                      setState(() {
+                        nachrichtController.clear();
+                      });
+                    },
+                    icon: Icon(Icons.send,
+                        size: 34,
+                        color: Theme.of(context).colorScheme.secondary))
+                    : IconButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      saveEditMessage();
+                      resetExtraInputInformation();
+                    },
+                    icon: Icon(Icons.done,
+                        size: 38,
+                        color: Theme.of(context).colorScheme.secondary))
+              ],
+            ));
+      }
+      else
+      if (isTextSearching) {
+        return Container(
+          constraints: const BoxConstraints(
+            minHeight: 60,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(
+                  child: Center(
+                      child: Text(
+                          "$searchTextIndex von ${messagesWithSearchText.length}")
+                  )
+              ),
+              searchIndexKontrollButton("up", Icons.keyboard_arrow_up),
+              searchIndexKontrollButton("down", Icons.keyboard_arrow_down),
+            ],
+          ),
+        );
+      }
+    }
+
+    searchDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            Icon(Icons.search),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).suche),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+
+          setState(() {
+            textSearchIsActive = true;
+          });
+
+          searchInputNode.requestFocus();
+        },
       );
     }
 
     pinDialog() {
-      var chatIsPinned = widget.groupChatData["users"][userId]["pinned"] ?? false;
+      var chatIsPinned =
+          widget.groupChatData["users"][userId]["pinned"] ?? false;
       chatIsPinned = chatIsPinned == "true";
 
       return SimpleDialogOption(
@@ -1282,8 +1374,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             const SizedBox(width: 10),
             Text(chatIsPinned
                 ? AppLocalizations.of(context).losloesen
-                : AppLocalizations.of(context).anheften
-            ),
+                : AppLocalizations.of(context).anheften),
           ],
         ),
         onPressed: () {
@@ -1296,7 +1387,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ChatDatabase().updateChatGroup(
               "users = JSON_SET(users, '\$.$userId.pinned', '${!chatIsPinned}')",
               "WHERE id = '${widget.chatId}'");
-
         },
       );
     }
@@ -1356,11 +1446,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         max: 70,
                         min: 40,
                         value: 50,
-                        onChanged: (value){
-
-                        },
+                        onChanged: (value) {},
                       )
-
                     ],
                   );
                 });
@@ -1440,6 +1527,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     insetPadding:
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
+                      searchDialog(),
                       pinDialog(),
                       muteDialog(),
                       //settingDialog(),
@@ -1453,31 +1541,69 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           });
     }
 
+    showAppBar() {
+      if (textSearchIsActive) {
+        return CustomAppBar(
+            title: TextField(
+              cursorColor: Colors.black,
+              focusNode: searchInputNode,
+              controller: searchTextKontroller,
+              textInputAction: TextInputAction.search,
+              maxLines: 1,
+              decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context).suche,
+                  suffixIcon: CloseButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      searchTextKontroller.clear();
+                    },
+                  )),
+              onSubmitted: (value) {
+                searchTextInMessages(value);
+                setState(() {
+                  isTextSearching = true;
+                });
+              },
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_sharp),
+              onPressed: () {
+                setState(() {
+                  textSearchIsActive = false;
+                  isTextSearching = false;
+                });
+              },
+            ));
+      } else if (chatPartnerProfil == false) {
+        return CustomAppBar(
+            title: AppLocalizations.of(context).geloeschterUser,
+            buttons: [
+              IconButton(
+                  onPressed: () => moreMenu(),
+                  icon: const Icon(
+                    Icons.more_vert,
+                    color: Colors.white,
+                  ))
+            ]);
+      } else if (chatPartnerProfil != false) {
+        return CustomAppBar(
+          title: widget.chatPartnerName ?? "",
+          profilBildProfil: chatPartnerProfil,
+          onTap: () => openProfil(),
+          buttons: [
+            IconButton(
+                onPressed: () => moreMenu(),
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: Colors.white,
+                ))
+          ],
+        );
+      }
+    }
+
     return Scaffold(
-      appBar: chatPartnerProfil != false
-          ? CustomAppBar(
-              title: widget.chatPartnerName ?? "",
-              profilBildProfil: chatPartnerProfil,
-              onTap: () => openProfil(),
-              buttons: [
-                IconButton(
-                    onPressed: () => moreMenu(),
-                    icon: const Icon(
-                      Icons.more_vert,
-                      color: Colors.white,
-                    ))
-              ],
-            )
-          : CustomAppBar(
-              title: AppLocalizations.of(context).geloeschterUser,
-              buttons: [
-                  IconButton(
-                      onPressed: () => moreMenu(),
-                      icon: const Icon(
-                        Icons.more_vert,
-                        color: Colors.white,
-                      ))
-                ]),
+      appBar: showAppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
