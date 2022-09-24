@@ -45,7 +45,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           );
         },
       ),
-      title: SizedBox(
+      title: title.runtimeType == String ? SizedBox(
         height: 50,
         child: Row(children: [
           if (profilBildProfil != null)
@@ -64,7 +64,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           )
         ]),
-      ),
+      ) : title,
       backgroundColor: Theme.of(context).colorScheme.primary,
       elevation: elevation,
       iconTheme: const IconThemeData(color: Colors.white),
