@@ -52,7 +52,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var nachrichtController = TextEditingController();
   Timer timer;
   List<dynamic> messages = [];
-  Widget messagesPufferList = const Center(child: CircularProgressIndicator());
   var eventCardList = [];
   var chatPartnerProfil;
   bool bothDelete = false;
@@ -103,8 +102,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
-    getAllDbMessages();
-
     itemPositionListener.itemPositions.addListener(() {
       if (itemPositionListener.itemPositions.value.first.index == 0 &&
           !hasStartPosition) {
@@ -117,7 +114,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           hasStartPosition = false;
         });
       }
-
     });
     if (widget.groupChatData == null) {
       widget.chatId = global_functions.getChatID(widget.chatPartnerId);
@@ -211,7 +207,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var chatId = widget.chatId ?? widget.groupChatData["id"];
 
     List<dynamic> allDbMessages = await ChatDatabase().getAllMessages(chatId);
-
     allDbMessages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
     messages = allDbMessages;
@@ -244,10 +239,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (checkMessage.isEmpty) return;
 
     var messageData = {
+      "chatId": widget.chatId,
       "message": message,
       "von": userID,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
-      "zu": widget.chatPartnerId
+      "zu": widget.chatPartnerId,
+      "responseId" : messageIdChange ??= "0"
     };
 
     setState(() {
@@ -334,13 +331,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   replyMessage(message) {
-    messageIdChange = message["tableId"];
-    messageInputNode.requestFocus();
-    changeMessageModus = "reply";
+    messageIdChange = message["id"];
+    setState((){
+      changeMessageModus = "reply";
+    });
+
+
+    Future.delayed(const Duration(milliseconds: 50), () {
+      messageInputNode.requestFocus();
+    });
+
   }
 
   editMessage(message) {
-    messageIdChange = message["tableId"];
+    messageIdChange = message["id"];
     messageInputNode.requestFocus();
     nachrichtController.text = message["message"];
     changeMessageModus = "edit";
@@ -372,7 +376,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     ChatDatabase().updateChatGroup(
         "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
-        "WHERE id = '${selectedChatId}'");
+        "WHERE id = '$selectedChatId'");
 
     ChatDatabase()
         .addNewMessageAndSendNotification(chatGroupData, messageData, 0);
@@ -380,12 +384,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   deleteMessage(messageId) {
     ChatDatabase().deleteMessages(messageId);
+
+    messages.removeWhere((element) => element["id"] == messageId);
+
+    setState(() {});
   }
 
   reportMessage(message) {
     ReportsDatabase().add(
         userId,
-        "Message tableId: " + message["tableId"] + " gemeldet",
+        "Message tableId: " + message["id"] + " gemeldet",
         message["message"]);
 
     customSnackbar(context, AppLocalizations.of(context).nachrichtGemeldet,
@@ -395,12 +403,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   pinMessage(message) async {
     var messageIsPinned =
         widget.groupChatData["users"][userId]["pinnedMessages"];
-    if (messageIsPinned != null && messageIsPinned.runtimeType == String)
+    if (messageIsPinned != null && messageIsPinned.runtimeType == String) {
       messageIsPinned = json.decode(messageIsPinned);
+    }
 
     if (messageIsPinned == null || messageIsPinned.isEmpty) {
       widget.groupChatData["users"][userId]
-          ["pinnedMessages"] = [message["tableId"]];
+          ["pinnedMessages"] = [message["id"]];
 
       setState(() {
         angehefteteMessageShowIndex =
@@ -409,11 +418,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       ChatDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${[
-            message["tableId"]
+            message["id"]
           ]}')",
-          "WHERE id = '${message["id"]}'");
+          "WHERE id = '${message["chatId"]}'");
     } else {
-      messageIsPinned.add(message["tableId"]);
+      messageIsPinned.add(message["id"]);
       widget.groupChatData["users"][userId]["pinnedMessages"] = messageIsPinned;
 
       setState(() {
@@ -421,18 +430,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       });
 
       ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${messageIsPinned}')",
-          "WHERE id = '${message["id"]}'");
+          "users = JSON_SET(users, '\$.$userId.pinnedMessages', '$messageIsPinned')",
+          "WHERE id = '${message["chatId"]}'");
     }
   }
 
   detachMessage(message, index) {
     var messageIsPinned =
         widget.groupChatData["users"][userId]["pinnedMessages"];
-    if (messageIsPinned.runtimeType == String)
+    if (messageIsPinned.runtimeType == String) {
       messageIsPinned = json.decode(messageIsPinned);
+    }
 
-    messageIsPinned.remove(int.parse(message["tableId"]));
+    messageIsPinned.remove(int.parse(message["id"]));
 
     widget.groupChatData["users"][userId]["pinnedMessages"] = messageIsPinned;
 
@@ -441,8 +451,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
 
     ChatDatabase().updateChatGroup(
-        "users = JSON_SET(users, '\$.$userId.pinnedMessages', '${messageIsPinned}')",
-        "WHERE id = '${message["id"]}'");
+        "users = JSON_SET(users, '\$.$userId.pinnedMessages', '$messageIsPinned')",
+        "WHERE id = '${message["chatId"]}'");
   }
 
   resetExtraInputInformation() {
@@ -457,7 +467,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   saveEditMessage() {
     for (var message in messages) {
-      if (message["tableId"] == messageIdChange) {
+      if (message["id"] == messageIdChange) {
         message["message"] = nachrichtController.text;
       }
     }
@@ -474,8 +484,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     for (var pinMessageId in allPinnedMessageIds) {
       for (var message in messages) {
-        if (pinMessageId == int.parse(message["tableId"]))
+        if (pinMessageId == int.parse(message["id"])) {
           allPinMessages.add(message);
+        }
       }
     }
 
@@ -485,9 +496,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   jumpToMessageAndShowNextAngeheftet(index) {
     angehefteteMessageShowIndex = angehefteteMessageShowIndex - 1;
-    if (angehefteteMessageShowIndex < 0)
+    if (angehefteteMessageShowIndex < 0) {
       angehefteteMessageShowIndex =
           widget.groupChatData["pinMessages"].length - 1;
+    }
 
     scrollAndColoringMessage(index);
   }
@@ -525,8 +537,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   scrollAndColoringMessage(messageIndex) {
+    var scrollToIndex = messages.length - 1 - messageIndex  -1;
+    if(scrollToIndex<0) scrollToIndex = 0;
+
     _scrollController.scrollTo(
-        index: messages.length - 1 - messageIndex,
+        index: scrollToIndex,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOutCubic);
 
@@ -534,7 +549,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       scrollIndex = messageIndex;
     });
 
-    Future.delayed(Duration(milliseconds: 1300), () {
+    Future.delayed(const Duration(milliseconds: 1300), () {
       setState(() {
         scrollIndex = -1;
       });
@@ -549,8 +564,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var chatAngeheftet =
           widget.groupChatData["users"][userId]["pinnedMessages"];
 
-      if (chatAngeheftet.runtimeType == String)
+      if (chatAngeheftet.runtimeType == String) {
         chatAngeheftet = json.decode(chatAngeheftet);
+      }
 
       if (widget.groupChatData == null ||
           chatAngeheftet == null ||
@@ -566,7 +582,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       for (var message in messages) {
         index = index + 1;
-        if (message["tableId"] == pinMessageShow.toString()) {
+        if (message["id"] == pinMessageShow.toString()) {
           fristPinText = message["message"];
           break;
         }
@@ -588,11 +604,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
-                    Container(
-                        child: Text(
+                    Text(
                       fristPinText,
                       maxLines: 1,
-                    ))
+                    )
                   ],
                 ),
               ),
@@ -659,16 +674,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     openMessageMenu(message, index) {
       final RenderBox overlay = Overlay.of(context).context.findRenderObject();
       var isMyMessage = message["von"] == userId;
-      if (message["forward"].runtimeType == String)
+      if (message["forward"].runtimeType == String) {
         message["forward"] = json.decode(message["forward"]);
+      }
       var isInPinned = false;
       var angehefteteMessages =
           widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
-      if (angehefteteMessages.runtimeType == String)
+      if (angehefteteMessages.runtimeType == String) {
         angehefteteMessages = json.decode(angehefteteMessages);
+      }
 
       for (var pinId in angehefteteMessages) {
-        if (pinId.toString() == message["tableId"]) {
+        if (pinId.toString() == message["id"]) {
           isInPinned = true;
 
           break;
@@ -756,7 +773,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ),
           if (isMyMessage)
             PopupMenuItem(
-              onTap: () => deleteMessage(message["tableId"]),
+              onTap: () => deleteMessage(message["id"]),
               child: Row(
                 children: [
                   const Icon(Icons.delete),
@@ -803,6 +820,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             child: Container(
               margin: const EdgeInsets.only(bottom: 25),
               child: Stack(clipBehavior: Clip.none, children: [
+                Container(width:180, height: 290 ),
                 EventCard(
                   margin: const EdgeInsets.all(15),
                   withInteresse: true,
@@ -810,7 +828,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   afterPageVisit: () => setState(() {}),
                 ),
                 Positioned(
-                  bottom: -25,
+                  bottom: 0,
                   right: 15,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -858,6 +876,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               child: Container(
                 margin: const EdgeInsets.only(bottom: 25),
                 child: Stack(clipBehavior: Clip.none, children: [
+                  Container(width:180, height: 290 ),
                   CommunityCard(
                     margin: const EdgeInsets.all(15),
                     withFavorite: true,
@@ -865,8 +884,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     afterPageVisit: () => setState(() {}),
                   ),
                   Positioned(
-                    bottom: -15,
-                    right: 0,
+                    bottom: 0,
+                    right: 15,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -891,23 +910,50 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               )));
     }
 
-    responseMessage(index, message, boxColor, messageTime, messageEdit){
+    responseMessage(index, message, boxColor, messageTime, messageEdit) {
       var replyFromId =
-      message["id"].replaceAll(userId, "").replaceAll("_", "");
-      var messageFromProfil =
-      global_functions.getProfilFromHive(replyFromId);
+          message["chatId"].replaceAll(userId, "").replaceAll("_", "");
+      var messageFromProfil = global_functions.getProfilFromHive(replyFromId);
       var replyMessageText;
       var replyIndex = messages.length;
+
 
       for (var lookMessage in messages.reversed.toList()) {
         replyIndex -= 1;
 
-        if (lookMessage["tableId"] == message["responseId"]) {
+        if (lookMessage["id"] == message["responseId"]) {
           replyMessageText = lookMessage;
           break;
         }
       }
 
+      var isEvent = replyMessageText["message"].contains("</eventId=");
+      var isCommunity = replyMessageText["message"].contains("</communityId=");
+      var cardData = {};
+      var textAddition = "";
+
+      if(isEvent || isCommunity){
+        if(isEvent){
+          var eventId = replyMessageText["message"].substring(10);
+          for(var event in allEvents){
+            if(event["id"] == eventId){
+              textAddition = "Event: ";
+              cardData = event;
+              break;
+            }
+          }
+        }
+        else if(isCommunity){
+          var communityId = replyMessageText["message"].substring(14);
+          for(var community in allCommunities){
+            if(community["id"] == communityId){
+              textAddition = "Community: ";
+              cardData = community;
+              break;
+            }
+          }
+        }
+      }
 
       return AnimatedContainer(
         color: scrollIndex == index
@@ -928,7 +974,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         color: boxColor,
                         border: Border.all(),
                         borderRadius:
-                        const BorderRadius.all(Radius.circular(10))),
+                            const BorderRadius.all(Radius.circular(10))),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -945,20 +991,21 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                         left: BorderSide(
                                             width: 2,
                                             color: Color(messageFromProfil[
-                                            "bildStandardFarbe"])
+                                                    "bildStandardFarbe"])
                                                 .withOpacity(1)))),
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(messageFromProfil["name"],
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Color(messageFromProfil[
-                                            "bildStandardFarbe"])
+                                                    "bildStandardFarbe"])
                                                 .withOpacity(1))),
                                     Text(
-                                      replyMessageText["message"],
+                                      cardData["name"] == null
+                                          ? replyMessageText["message"]
+                                          : textAddition + cardData["name"],
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     )
@@ -978,9 +1025,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     openMessageMenu(message, index),
                               ),
                               SizedBox(
-                                  width: message["editDate"] == null
-                                      ? 40
-                                      : 110)
+                                  width: message["editDate"] == null ? 40 : 110)
                             ],
                           ),
                         ),
@@ -999,13 +1044,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    forwardMessage(index,textAlign, message, boxColor, messageTime, messageEdit){
-      var forwardData = message["forward"].runtimeType == String
-          ? json.decode(message["forward"])
-          : message["forward"];
+    forwardMessage(index, textAlign, message, boxColor, messageTime,
+        messageEdit, forwardData) {
       var forwardProfil =
-        global_functions.getProfilFromHive(forwardData["von"]);
-
+          global_functions.getProfilFromHive(forwardData["von"]);
 
       return AnimatedContainer(
         color: scrollIndex == index
@@ -1025,13 +1067,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       color: boxColor,
                       border: Border.all(),
                       borderRadius:
-                      const BorderRadius.all(Radius.circular(10))),
+                          const BorderRadius.all(Radius.circular(10))),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        padding: const EdgeInsets.only(
-                            top: 5, left: 10, right: 5),
+                        padding:
+                            const EdgeInsets.only(top: 5, left: 10, right: 5),
                         child: GestureDetector(
                           onTap: () => global_functions.changePage(
                               context,
@@ -1041,8 +1083,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           child: Text(
                             AppLocalizations.of(context).weitergeleitetVon +
                                 forwardProfil["name"],
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -1058,8 +1099,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     openMessageMenu(message, index)),
                           ),
                           SizedBox(
-                              width:
-                              message["editDate"] == null ? 40 : 110),
+                              width: message["editDate"] == null ? 40 : 110),
                         ],
                       ),
                     ],
@@ -1074,11 +1114,52 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ),
         ),
       );
-
     }
 
-    normalMessage(){
-
+    normalMessage(
+        index, textAlign, message, boxColor, messageTime, messageEdit) {
+      return AnimatedContainer(
+        color: scrollIndex == index
+            ? Theme.of(context).colorScheme.primary
+            : Colors.white,
+        duration: const Duration(seconds: 1),
+        curve: Curves.easeIn,
+        child: Align(
+          alignment: textAlign,
+          child: Stack(
+            children: [
+              Container(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.85),
+                  margin: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: boxColor,
+                      border: Border.all(),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(10))),
+                  child: Wrap(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(
+                            top: 5, left: 10, bottom: 7, right: 10),
+                        child: TextWithHyperlinkDetection(
+                            text: message["message"] ?? "",
+                            fontsize: 16,
+                            onTextTab: () => openMessageMenu(message, index)),
+                      ),
+                      SizedBox(width: message["editDate"] == null ? 40 : 110),
+                    ],
+                  )),
+              Positioned(
+                right: 20,
+                bottom: 15,
+                child: Text(messageEdit + " " + messageTime,
+                    style: TextStyle(color: Colors.grey[600])),
+              )
+            ],
+          ),
+        ),
+      );
     }
 
     messageList(messages) {
@@ -1099,6 +1180,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         var forwardData = message["forward"].runtimeType == String
             ? json.decode(message["forward"])
             : message["forward"];
+        forwardData ??= {};
         message["responseId"] ??= "0";
 
         if (message["message"] == "") continue;
@@ -1110,249 +1192,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           boxColor = ownMessageBoxColor;
         }
 
-        if (message["message"].contains("</eventId=")) {
-          messageBox.add(eventMessage(i, textAlign, message, messageTime));
-
-
-        }
-        else if (message["message"].contains("</communityId=")) {
-          messageBox.add(communityMessage(i, textAlign, message, messageTime));
-        }
-        else if (int.parse(message["responseId"]) != 0) {
-          messageBox.add(responseMessage(i, message, boxColor, messageTime, messageEdit));
-          /*
-          var replyFromId =
-              message["id"].replaceAll(userId, "").replaceAll("_", "");
-          var messageFromProfil =
-              global_functions.getProfilFromHive(replyFromId);
-          var replyMessageText;
-          var replyIndex = messages.length;
-
-          for (var lookMessage in messages.reversed.toList()) {
-            replyIndex -= 1;
-
-            if (lookMessage["tableId"] == message["responseId"]) {
-              replyMessageText = lookMessage;
-              break;
-            }
-          }
-
-          messageBox.add(AnimatedContainer(
-            color: scrollIndex == i
-                ? Theme.of(context).colorScheme.primary
-                : Colors.white,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeIn,
-            child: Row(
-              children: [
-                const Expanded(flex: 2, child: SizedBox.shrink()),
-                Stack(
-                  children: [
-                    Container(
-                        constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * 0.85),
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: boxColor,
-                            border: Border.all(),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10))),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                scrollAndColoringMessage(replyIndex);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                    padding: const EdgeInsets.only(left: 5),
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            left: BorderSide(
-                                                width: 2,
-                                                color: Color(messageFromProfil[
-                                                        "bildStandardFarbe"])
-                                                    .withOpacity(1)))),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(messageFromProfil["name"],
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(messageFromProfil[
-                                                        "bildStandardFarbe"])
-                                                    .withOpacity(1))),
-                                        Text(
-                                          replyMessageText["message"],
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        )
-                                      ],
-                                    )),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.only(
-                                  top: 5, left: 10, bottom: 7, right: 10),
-                              child: Wrap(
-                                children: [
-                                  TextWithHyperlinkDetection(
-                                    text: message["message"] ?? "",
-                                    fontsize: 16,
-                                    onTextTab: () =>
-                                        openMessageMenu(message, i),
-                                  ),
-                                  SizedBox(
-                                      width: message["editDate"] == null
-                                          ? 40
-                                          : 110)
-                                ],
-                              ),
-                            ),
-                          ],
-                        )),
-                    Positioned(
-                      right: 20,
-                      bottom: 15,
-                      child: Text(messageEdit + " " + messageTime,
-                          style: TextStyle(color: Colors.grey[600])),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ));
-
-           */
-        }
-        else if (forwardData.isNotEmpty) {
-          messageBox.add(forwardMessage(i,textAlign, message, boxColor, messageTime, messageEdit));
-          /*
-          var forwardProfil =
-              global_functions.getProfilFromHive(forwardData["von"]);
-
-          messageBox.add(AnimatedContainer(
-            color: scrollIndex == i
-                ? Theme.of(context).colorScheme.primary
-                : Colors.white,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeIn,
-            child: Align(
-              alignment: textAlign,
-              child: Stack(
-                children: [
-                  Container(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.85),
-                      margin: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: boxColor,
-                          border: Border.all(),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10))),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.only(
-                                top: 5, left: 10, right: 5),
-                            child: GestureDetector(
-                              onTap: () => global_functions.changePage(
-                                  context,
-                                  ShowProfilPage(
-                                    profil: forwardProfil,
-                                  )),
-                              child: Text(
-                                AppLocalizations.of(context).weitergeleitetVon +
-                                    forwardProfil["name"],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                          Wrap(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(
-                                    top: 5, left: 10, bottom: 7, right: 10),
-                                child: TextWithHyperlinkDetection(
-                                    text: forwardData["message"] ?? "",
-                                    fontsize: 16,
-                                    onTextTab: () =>
-                                        openMessageMenu(message, i)),
-                              ),
-                              SizedBox(
-                                  width:
-                                      message["editDate"] == null ? 40 : 110),
-                            ],
-                          ),
-                        ],
-                      )),
-                  Positioned(
-                    right: 20,
-                    bottom: 15,
-                    child: Text(messageEdit + " " + messageTime,
-                        style: TextStyle(color: Colors.grey[600])),
-                  )
-                ],
-              ),
-            ),
-          ));
-
-           */
-        }
-        else {
-          messageBox.add(AnimatedContainer(
-            color: scrollIndex == i
-                ? Theme.of(context).colorScheme.primary
-                : Colors.white,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeIn,
-            child: Align(
-              alignment: textAlign,
-              child: Stack(
-                children: [
-                  Container(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.85),
-                      margin: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: boxColor,
-                          border: Border.all(),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10))),
-                      child: Wrap(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.only(
-                                top: 5, left: 10, bottom: 7, right: 10),
-                            child: TextWithHyperlinkDetection(
-                                text: message["message"] ?? "",
-                                fontsize: 16,
-                                onTextTab: () => openMessageMenu(message, i)),
-                          ),
-                          SizedBox(
-                              width: message["editDate"] == null ? 40 : 110),
-                        ],
-                      )),
-                  Positioned(
-                    right: 20,
-                    bottom: 15,
-                    child: Text(messageEdit + " " + messageTime,
-                        style: TextStyle(color: Colors.grey[600])),
-                  )
-                ],
-              ),
-            ),
-          ));
-        }
-
-        if (newMessageDate == null || newMessageDate != messageDate) {
+        if(newMessageDate == null){
           newMessageDate = messageDate;
-
+        }
+        else if (newMessageDate != messageDate) {
           messageBox.add(Align(
             child: Container(
               width: 80,
@@ -1363,13 +1206,52 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   borderRadius: const BorderRadius.all(Radius.circular(20))),
               child: Center(
                   child: Text(
-                messageDate,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )),
+                    newMessageDate,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  )),
             ),
           ));
+
+          newMessageDate = messageDate;
         }
+
+        if (message["message"].contains("</eventId=")) {
+          messageBox.add(eventMessage(i, textAlign, message, messageTime));
+        }
+        else if (message["message"].contains("</communityId=")) {
+          messageBox.add(communityMessage(i, textAlign, message, messageTime));
+        }
+        else if (int.parse(message["responseId"]) != 0) {
+          messageBox.add(
+              responseMessage(i, message, boxColor, messageTime, messageEdit));
+        }
+        else if (forwardData.isNotEmpty) {
+          messageBox.add(forwardMessage(i, textAlign, message, boxColor,
+              messageTime, messageEdit, forwardMessage));
+        }
+        else {
+          messageBox.add(normalMessage(
+              i, textAlign, message, boxColor, messageTime, messageEdit));
+        }
+
+
       }
+
+      messageBox.add(Align(
+        child: Container(
+          width: 80,
+          margin: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: const BorderRadius.all(Radius.circular(20))),
+          child: Center(
+              child: Text(
+                newMessageDate,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )),
+        ),
+      ));
 
       return ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
@@ -1392,7 +1274,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         children: [
           isLoading
               ? const Center(child: CircularProgressIndicator())
-              : messages.length == 0
+              : messages.isEmpty
                   ? Center(
                       child: Text(
                       AppLocalizations.of(context).nochKeineNachrichtVorhanden,
@@ -1423,7 +1305,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       return IconButton(
           iconSize: 30,
           padding: const EdgeInsets.all(3),
-          onPressed: messagesWithSearchText.length == 0
+          onPressed: messagesWithSearchText.isEmpty
               ? null
               : () => textSearchNext(direction),
           icon: Icon(icon, color: Colors.black, size: 30));
@@ -1534,7 +1416,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             children: [
               Expanded(
                   child: Center(
-                      child: Text(messagesWithSearchText.length == 0
+                      child: Text(messagesWithSearchText.isEmpty
                           ? AppLocalizations.of(context).keineErgebnisse
                           : "${searchTextIndex + 1} von ${messagesWithSearchText.length}"))),
               searchIndexKontrollButton("up", Icons.keyboard_arrow_up),
