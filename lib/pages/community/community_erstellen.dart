@@ -44,7 +44,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       "latt": locationData["latt"],
       "longt": locationData["longt"],
       "erstelltAm": DateTime.now().toString(),
-      "members": json.encode([userId]),
+      "members": json.encode(ownCommunity ? [userId] : []),
       "erstelltVon": userId,
       "ownCommunity": ownCommunity
     };
@@ -62,11 +62,13 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     } else if (communityData["beschreibung"].isEmpty) {
       customSnackbar(context,
           AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
-    } else if (communityData["ort"].isEmpty) {
+    } else if (communityData["ort"] == null || communityData["ort"].isEmpty) {
       customSnackbar(context, AppLocalizations.of(context).bitteStadtEingeben);
     } else {
       return true;
     }
+
+    return false;
   }
 
 

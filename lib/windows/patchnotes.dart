@@ -57,6 +57,8 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch162D),
+                _patch(patch161D),
                 _patch(patch160D),
                 _patch(patch150D),
                 _patch(patch141D),
@@ -75,6 +77,8 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch162E),
+                _patch(patch161E),
                 _patch(patch160E),
                 _patch(patch150E),
                 _patch(patch141E),
@@ -106,11 +110,43 @@ var patchVorlage={
   ]
 };
 
+
+var patch162E={
+  "title" : "1.6.2 - 16.09.2022",
+  "inhalt": [
+    "optimizations to decrease server crashes"
+  ]
+};
+var patch162D={
+  "title" : "1.6.2 - 16.09.2022",
+  "inhalt": [
+    "Optimierungen um Serverabstürze zu vermindern"
+  ]
+};
+
+var patch161E={
+  "title" : "1.6.1 - 06.09.2022",
+  "inhalt": [
+    "The error when creating communities has been fixed",
+    "The incorrect display of communities was corrected",
+    "Newspage now works without errors",
+    "Change of location is now properly saved in the database again"
+  ]
+};
+var patch161D={
+  "title" : "1.6.1 - 06.09.2022",
+  "inhalt": [
+    "Der Fehler beim Gemeinschaften erstellen wurde behoben",
+    "Die Fehlerhafte Anzeige der Gemeinschaften wurde korrigiert"
+    "Newspage funktioniert jetzt ohne Fehler",
+    "Ortswechsel wird jetzt wieder ordentlich in der Datenbank gespeichert"
+  ]
+};
+
 var patch160E={
-  "title" : "1.6.0 - 01.09.2022",
+  "title" : "1.6.0 - 31.08.2022",
   "inhalt": [
     "News Page has been added",
-    "A2HS has been added",
     "Third party events/communities can be created and will be clearly visible at the event/community",
     "Bug fix - Event and community description can be changed again",
     "Performance improvement - World map in web version on smartphones has been slightly improved from performance",
@@ -119,10 +155,9 @@ var patch160E={
   ]
 };
 var patch160D={
-  "title" : "1.6.0 - 01.09.2022",
+  "title" : "1.6.0 - 31.08.2022",
   "inhalt": [
     "News Page wurde hinzugefügt",
-    "A2HS wurde eingebaut",
     "Events / Gemeinschaften von dritten können erstellt werden und werden beim jeweiligen Event / Gemeinschaft gut sichtbar angezeigt",
     "Fehlerbehebung - Event- und Gemeinschaftsbeschreibung kann wieder geändert werden",
     "Leistungsverbesserung - Die Weltkarte in der Web Version auf Smartphones wurde von der Leistung etwas verbessert",
