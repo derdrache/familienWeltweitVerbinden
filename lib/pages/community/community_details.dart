@@ -746,7 +746,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                           Navigator.pop(context);
                           ReportsDatabase().add(
                               userId,
-                              "Melde Community id: " + widget.community["id"],
+                              "Melde Community id: " + widget.community["id"].toString(),
                               reportController.text);
                         },
                         label: Text(AppLocalizations.of(context).senden)),
