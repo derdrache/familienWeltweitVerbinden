@@ -32,18 +32,15 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
     besuchteLaenderDropdown = CustomMultiTextForm(
         auswahlList:
             widget.isGerman ? allCountries["ger"] : allCountries["eng"],
-        selected: widget.selected,
-        onConfirm: (value) {
-          saveInDB();
-          setState(() {});
-        });
+        selected: widget.selected,);
+
     super.initState();
   }
 
-  saveInDB() {
+  saveInDB() async{
     var selectedCountries = besuchteLaenderDropdown.getSelected();
 
-    ProfilDatabase().updateProfil(
+    await ProfilDatabase().updateProfil(
         "besuchteLaender = '${jsonEncode(selectedCountries)}'",
         "WHERE id = '${widget.userId}'");
 
@@ -70,9 +67,22 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
       return visitedCountriesWidgetlist;
     }
 
+    saveButton() {
+      return IconButton(
+        icon: const Icon(Icons.done),
+        onPressed: () {
+          saveInDB();
+          setState(() {
+
+          });
+        }
+      );
+    }
+
     return Scaffold(
         appBar: CustomAppBar(
           title: AppLocalizations.of(context).besucheLaenderVeraendern,
+          buttons: [saveButton()],
         ),
         body: ListView(
           children: [
