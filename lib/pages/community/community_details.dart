@@ -849,78 +849,84 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     _communityInformation() {
       var fremdeCommunity = widget.community["ownCommunity"] == 0;
 
-      return Container(
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            InkWell(
-              onTap: () => isCreator ? _changeNameWindow() : null,
-              child: Center(
-                  child: Text(
-                widget.community["name"],
-                style:
-                    const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              )),
-            ),
-            const SizedBox(height: 20),
-            if (fremdeCommunity)
-              SizedBox(
-                width: screenWidth * 0.9,
-                child: Text(AppLocalizations.of(context).nichtTeilGemeinschaft,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red, fontSize: 18),
-                    maxLines: 2),
-              ),
-            const SizedBox(height: 20),
-            InkWell(
-              onTap: () => isCreator ? _changeOrtWindow() : null,
-              child: Row(
-                children: [
-                  Text(AppLocalizations.of(context).ort,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(widget.community["ort"] +
-                      " / " +
-                      widget.community["land"])
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTapDown: (tabDetails) {
-                var getTabPostion = tabDetails.globalPosition;
-                var link = widget.community["link"];
-                if (!link.contains("http")) link = "http://" + link;
-
-                if (isCreator) _changeOrOpenLinkWindow(getTabPostion);
-                if (!isCreator) launch(widget.community["link"]);
-              },
-              child: Row(
-                children: [
-                  const Text(
-                    "Link: ",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(widget.community["link"],
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary))
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 100,
-              width: double.infinity,
-              child: TextWithHyperlinkDetection(
-                text: widget.community["beschreibung"],
-                onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
-              ),
-            )
-          ],
+      return [
+        Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15),
+          child: InkWell(
+            onTap: () => isCreator ? _changeNameWindow() : null,
+            child: Center(
+                child: Text(
+                  widget.community["name"],
+                  style:
+                  const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                )),
+          ),
         ),
-      );
+        const SizedBox(height: 20),
+        if (fremdeCommunity)
+          Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15),
+            child: SizedBox(
+              width: screenWidth * 0.9,
+              child: Text(AppLocalizations.of(context).nichtTeilGemeinschaft,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.red, fontSize: 18),
+                  maxLines: 2),
+            ),
+          ),
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15),
+          child: InkWell(
+            onTap: () => isCreator ? _changeOrtWindow() : null,
+            child: Row(
+              children: [
+                Text(AppLocalizations.of(context).ort,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(widget.community["ort"] +
+                    " / " +
+                    widget.community["land"])
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15),
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTapDown: (tabDetails) {
+              var getTabPostion = tabDetails.globalPosition;
+              var link = widget.community["link"];
+              if (!link.contains("http")) link = "http://" + link;
+
+              if (isCreator) _changeOrOpenLinkWindow(getTabPostion);
+              if (!isCreator) launch(widget.community["link"]);
+            },
+            child: Row(
+              children: [
+                const Text(
+                  "Link: ",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(widget.community["link"],
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary))
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15),
+          child: SizedBox(
+            child: TextWithHyperlinkDetection(
+              text: widget.community["beschreibung"],
+              onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
+            ),
+          ),
+        )
+      ];
     }
 
     _footbar() {
@@ -977,8 +983,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         ),
         body: Stack(
           children: [
-            SizedBox(
+            Container(
               height: screenHeight,
+              padding: EdgeInsets.only(bottom: 50),
               child: ListView(
                 controller: _controller,
                 shrinkWrap: true,
@@ -992,7 +999,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                               height: 100,
                               child: const CircularProgressIndicator()))
                       : _communityImage(),
-                  _communityInformation()
+                  SizedBox(height: 10),
+                  ..._communityInformation()
                 ],
               ),
             ),
