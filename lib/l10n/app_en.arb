@@ -151,8 +151,6 @@
     "speichern": "save",
     "abbrechen": "cancel",
     "eventBildAendern": "Change event image",
-    "datumAuswaehlen": "Select date",
-    "uhrzeitAuswaehlen": "Select time",
     "eventArtAendern" : "Change event type",
     "uhrzeit": "Time: ",
     "ort": "Location: ",

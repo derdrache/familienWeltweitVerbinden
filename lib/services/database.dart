@@ -246,7 +246,7 @@ class ChatDatabase{
 
     var res = await http.post(url, body: json.encode({
       "whatData": "*",
-      "queryEnd": "WHERE id = '$chatId'",
+      "queryEnd": "WHERE chatId = '$chatId'",
       "table": "messages"
     }));
     dynamic responseBody = res.body;
@@ -294,7 +294,6 @@ class ChatDatabase{
       "responseId": responseId,
       "forward": messageData["forward"]
     }));
-
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
