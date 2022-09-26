@@ -137,11 +137,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (widget.groupChatData != false) resetNewMessageCounter();
 
     setState(() {});
-/*
+
     timer = Timer.periodic(
         const Duration(seconds: 10), (Timer t) => getAllDbMessages());
 
- */
   }
 
   createNewChat() async {
