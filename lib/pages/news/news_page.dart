@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:collection/collection.dart';
-import 'package:async/async.dart';
 
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
@@ -34,7 +33,6 @@ class _NewsPageState extends State<NewsPage> {
   final _controller = ScrollController();
   var scrollbarOnBottom = true;
   var userNewsContent = [];
-  var _myCancelableFuture;
 
   @override
   void initState() {
@@ -49,19 +47,8 @@ class _NewsPageState extends State<NewsPage> {
       setState(() {});
     });
 
-    WidgetsBinding.instance?.addPostFrameCallback((_){
-      _myCancelableFuture = CancelableOperation.fromFuture(
-        _asyncMethod(),
-        onCancel: () => null,
-      );
-    });
+    //WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _myCancelableFuture?.cancel();
-    super.dispose();
   }
 
   getSettingProfilOrAddNew() {
@@ -219,7 +206,6 @@ class _NewsPageState extends State<NewsPage> {
     return true;
   }
 
-
   Widget build(BuildContext context) {
     friendsDisplay(news) {
       var userAdded = news["information"].split(" ")[1];
@@ -293,8 +279,8 @@ class _NewsPageState extends State<NewsPage> {
       var newsUserProfil = global_func.getProfilFromHive(newsUserId);
       var isFriend = ownProfil["friendlist"].contains(newsUserId);
       var text = "";
-      var newsOrt = news["information"]["city"];
-      var newsLand = news["information"]["countryname"];
+      var newsOrt = news["information"]["city"] ?? "";
+      var newsLand = news["information"]["countryname"] ?? "";
       var newsOrtInfo =
           newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
       var ownOrt = ownProfil["ort"];
@@ -608,7 +594,6 @@ class _NewsPageState extends State<NewsPage> {
         });
       }
     }
-
 
     getSettingProfilOrAddNew();
     createNewsFeed();
