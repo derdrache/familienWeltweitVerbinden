@@ -34,10 +34,10 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
   pushLocationDataToDB(locationData) async {
     var locationDict = {
-      "ort": locationData["city"],
+      "city": locationData["city"],
       "longt": locationData["longt"],
       "latt": locationData["latt"],
-      "land": locationData["countryname"],
+      "countryname": locationData["countryname"],
     };
 
     await ProfilDatabase().updateProfilLocation(widget.userId, locationDict);
