@@ -11,7 +11,6 @@ import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
 import 'notification.dart';
 
-
 var databaseUrl = "https://families-worldwide.com/";
 //var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
@@ -173,42 +172,33 @@ class ProfilDatabase{
 
 class ChatDatabase{
 
-  addNewChatGroup(users, messageData)async {
-    var userKeysList = users.keys.toList();
-    var usersList = users.values.toList();
-    var chatID = global_functions.getChatID(userKeysList);
+  addNewChatGroup(chatPartner)async {
+    var userId = FirebaseAuth.instance.currentUser.uid;
+    var userKeysList = [userId, chatPartner];
+    var chatID = global_functions.getChatID(chatPartner);
     var date = DateTime.now().millisecondsSinceEpoch;
-
+    var userData = {
+      userKeysList[0] : {"newMessages": 0, "mute": 0},
+      userKeysList[1] : {"newMessages": 0, "mute": 0},
+    };
 
     var newChatGroup = {
       "id": chatID,
       "date": date,
-      "users": json.encode({
-        userKeysList[0] : {"name": usersList[0].replaceAll("'", "''"), "newMessages": 0},
-        userKeysList[1] : {"name": usersList[1].replaceAll("'", "''"), "newMessages": 0},
-      }),
-      "lastMessage": messageData["message"],
+      "users": json.encode(userData),
+      "lastMessage": "",
     };
 
     var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
     await http.post(url, body: json.encode(newChatGroup));
 
-    messageData = {
-      "id": chatID,
-      "date": date,
-      "message": messageData["message"],
-      "von": messageData["von"],
-      "zu": messageData["zu"]
-    };
-
-    await addNewMessageAndSendNotification(newChatGroup, messageData);
+    newChatGroup["users"] = userData;
 
     return newChatGroup;
   }
 
   getChatData(whatData, queryEnd, {returnList = false}) async{
     var url = Uri.parse(databaseUrl + "database/getData2.php");
-    //queryEnd = Uri.encodeComponent(queryEnd);
 
     var res = await http.post(url, body: json.encode({
       "whatData": whatData,
@@ -256,7 +246,7 @@ class ChatDatabase{
 
     var res = await http.post(url, body: json.encode({
       "whatData": "*",
-      "queryEnd": "WHERE id = '$chatId'",
+      "queryEnd": "WHERE chatId = '$chatId'",
       "table": "messages"
     }));
     dynamic responseBody = res.body;
@@ -268,7 +258,7 @@ class ChatDatabase{
 
   }
 
-  updateChatGroup(whatData,queryEnd ) async {
+  updateChatGroup(whatData,queryEnd) async {
     var url = Uri.parse(databaseUrl + "database/update.php");
 
     await http.post(url, body: json.encode({
@@ -278,11 +268,18 @@ class ChatDatabase{
     }));
   }
 
-  addNewMessageAndSendNotification(chatgroupData, messageData)async {
-    var users = chatgroupData["users"];
-    if(users is String) users = jsonDecode(chatgroupData["users"]);
-    users = users.keys.toList();
-    var chatID = global_functions.getChatID(users);
+  updateMessage(whatData,queryEnd) async{
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "messages",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+  }
+
+  addNewMessageAndSendNotification(chatgroupData, messageData, responseId)async {
+    var chatID = chatgroupData["id"];
     var date = DateTime.now().millisecondsSinceEpoch;
 
     messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
@@ -293,9 +290,10 @@ class ChatDatabase{
       "date": date,
       "message": messageData["message"],
       "von": messageData["von"],
-      "zu": messageData["zu"]
+      "zu": messageData["zu"],
+      "responseId": responseId,
+      "forward": messageData["forward"]
     }));
-
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
@@ -344,6 +342,14 @@ class ChatDatabase{
       "inhalt": message
     }));
 
+  }
+
+  deleteChat(chatId){
+    _deleteInTable("chats", chatId);
+  }
+
+  deleteMessages(messageId){
+    _deleteInTable("messages", messageId);
   }
 
 }
