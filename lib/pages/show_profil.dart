@@ -160,8 +160,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   }
 
   openChat(chatpartnerId, chatpartnerName) async {
-    var users = [userID, chatpartnerId];
-    var chatId = global_functions.getChatID(users);
+    var chatId = global_functions.getChatID(chatpartnerId);
 
     var groupChatData =
         await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
