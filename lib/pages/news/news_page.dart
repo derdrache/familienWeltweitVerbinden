@@ -235,7 +235,7 @@ class _NewsPageState extends State<NewsPage> {
           child: Container(
               width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(),
@@ -320,7 +320,7 @@ class _NewsPageState extends State<NewsPage> {
           child: Container(
               width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(),
@@ -393,7 +393,7 @@ class _NewsPageState extends State<NewsPage> {
           child: Container(
               width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(),
@@ -515,7 +515,7 @@ class _NewsPageState extends State<NewsPage> {
           child: Container(
               width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(),
