@@ -11,7 +11,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
-import 'package:async/async.dart';
 
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';
@@ -38,6 +37,7 @@ class ErkundenPage extends StatefulWidget {
 class _ErkundenPageState extends State<ErkundenPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var profils = [];
+  var profilsBackup = [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   var allCities = Hive.box('secureBox').get("stadtinfo");
   var events = [];
@@ -86,7 +86,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  var _myCancelableFuture;
 
   @override
   void initState() {
@@ -99,19 +98,16 @@ class _ErkundenPageState extends State<ErkundenPage> {
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
 
+    profilsBackup = profils;
+
     createAndSetZoomLevels(profils, "profils");
     createAndSetZoomLevels(communities, "communities");
 
-    WidgetsBinding.instance?.addPostFrameCallback((_){
-      _myCancelableFuture = CancelableOperation.fromFuture(
-        _asyncMethod(),
-        onCancel: () => null,
-      );
-    });
+    setSearchAutocomplete();
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
-
-
 
   setEvents(){
     var localDbEvents = Hive.box('secureBox').get("events") ?? [];
@@ -227,10 +223,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     await getProfilsFromDB();
     createAndSetZoomLevels(profils, "profils");
 
-    setSearchAutocomplete();
-
-    await getEventsFromDB();
-
     await getCommunitiesFromDB();
     createAndSetZoomLevels(communities, "communities");
 
@@ -239,9 +231,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     refreshStadtinfoUser();
 
     setState(() {});
-
-
-
   }
 
   getProfilsFromDB() async {
@@ -297,7 +286,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
         "*", "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC",
         returnList: true);
     if (dbEvents == false) dbEvents = [];
+
     Hive.box('secureBox').put("events", dbEvents);
+
+    events = dbEvents;
   }
 
   getCommunitiesFromDB() async {
@@ -343,9 +335,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
   filterProfils() {
     var filterProfils = [];
 
-    for (var profil in Hive.box('secureBox').get("profils") ?? []) {
-      if (checkIfInFilter(profil)) filterProfils.add(profil);
+    if(filterList.isEmpty){
+      filterProfils = profilsBackup;
+    }else{
+      for (var profil in Hive.box('secureBox').get("profils") ?? []) {
+        if (checkIfInFilter(profil)) filterProfils.add(profil);
+      }
     }
+
 
     setState(() {
       profils = filterProfils;
@@ -1198,12 +1195,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     profils = [for (var profil in hiveProfils) Map.of(profil)];
     removeProfilsAndCreateAllUserName();
     changeProfilToFamilyProfil();
-  }
-
-@override
-  void dispose() {
-    _myCancelableFuture?.cancel();
-    super.dispose();
   }
 
   @override
