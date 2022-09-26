@@ -110,11 +110,11 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
       ) {
     return ButtonTheme(
         child: ButtonBar(children: <Widget>[
-          FlatButton(
+          TextButton(
             onPressed: () => Navigator.pop(context, null),
             child: Text(localizations.cancelButtonLabel),
           ),
-          FlatButton(
+          TextButton(
             onPressed: () => Navigator.pop(context, selectedDate),
             child: Text(localizations.okButtonLabel),
           )
@@ -255,20 +255,21 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
           selectedDate = DateTime(date.year, date.month));
     else
       callback = () => null;
-    return FlatButton(
+    return TextButton(
       onPressed: callback,
-      color: date.month == selectedDate.month && date.year == selectedDate.year
-          ? theme.colorScheme.secondary
-          : null,
-      textColor:
-      date.month == selectedDate.month && date.year == selectedDate.year
-          ? theme.accentTextTheme.button.color
-          : date.month == DateTime.now().month &&
-          date.year == DateTime.now().year
-          ? theme.colorScheme.secondary
-          : null,
+      style: TextButton.styleFrom(
+        foregroundColor: date.month == selectedDate.month && date.year == selectedDate.year
+            ? theme.colorScheme.secondary
+            : null,
+      ),
       child: Text(
         DateFormat.MMM(locale).format(date),
+        style: TextStyle(color: date.month == selectedDate.month && date.year == selectedDate.year
+            ? theme.accentTextTheme.button.color
+            : date.month == DateTime.now().month &&
+            date.year == DateTime.now().year
+            ? theme.colorScheme.secondary
+            : null),
       ),
     );
   }
@@ -298,14 +299,16 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
       callback = () => null;
 
 
-    return FlatButton(
+    return TextButton(
       onPressed: callback,
-      color: year == selectedDate.year ? theme.colorScheme.secondary : null,
-      textColor: year == selectedDate.year
-          ? theme.accentTextTheme.button.color
-          : year == DateTime.now().year ? theme.accentColor : null,
+      style: TextButton.styleFrom(
+        foregroundColor: year == selectedDate.year ? theme.colorScheme.secondary : null,
+      ),
       child: Text(
         DateFormat.y(locale).format(DateTime(year)),
+        style: TextStyle(color: year == selectedDate.year
+            ? theme.accentTextTheme.button.color
+            : year == DateTime.now().year ? theme.accentColor : null),
       ),
     );
   }
