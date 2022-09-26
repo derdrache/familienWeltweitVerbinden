@@ -46,7 +46,7 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    //WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
   }
