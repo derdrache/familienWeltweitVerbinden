@@ -11,8 +11,8 @@ import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
 import 'notification.dart';
 
-//var databaseUrl = "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 
