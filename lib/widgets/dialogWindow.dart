@@ -57,6 +57,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
                           child: WindowTopbar(
                         title: widget.title,
                       )),
+                    if(widget.title.isNotEmpty) SizedBox(height: 10),
                     const SizedBox(height: 10),
                     ...widget.children
                   ],
