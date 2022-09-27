@@ -156,8 +156,8 @@ class _StartPageState extends State<StartPage> {
           automaticLocationStatus == standortbestimmungEnglisch[1]) {
 
         var locationData = {
-          "ort": nearstLocationData["city"],
-          "land": nearstLocationData["country"],
+          "city": nearstLocationData["city"],
+          "countryname": nearstLocationData["country"],
           "longt": currentPosition.longitude,
           "latt": currentPosition.latitude,
         };
@@ -184,7 +184,7 @@ class _StartPageState extends State<StartPage> {
 
       var locationData = await LocationService()
           .getDatabaseLocationdataFromGoogleResult(geoData);
-
+      print(locationData);
       ProfilDatabase().updateProfilLocation(userId, locationData);
       await StadtinfoDatabase().addNewCity(locationData);
       StadtinfoDatabase().update(
