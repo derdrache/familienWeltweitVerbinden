@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../../global/custom_widgets.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
@@ -32,14 +33,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     super.initState();
   }
 
-  pushLocationDataToDB(locationData) async {
-    var locationDict = {
-      "city": locationData["city"],
-      "longt": locationData["longt"],
-      "latt": locationData["latt"],
-      "countryname": locationData["countryname"],
-    };
-
+  pushLocationDataToDB(locationDict) async {
     await ProfilDatabase().updateProfilLocation(widget.userId, locationDict);
     await StadtinfoDatabase().addNewCity(locationDict);
     await StadtinfoDatabase().update(
@@ -71,10 +65,23 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       return;
     }
 
+    var locationDict = {
+      "city": locationData["city"],
+      "longt": locationData["longt"],
+      "latt": locationData["latt"],
+      "countryname": locationData["countryname"],
+    };
 
-    await pushLocationDataToDB(locationData);
+    pushLocationDataToDB(locationDict);
+
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
+    ownProfil["ort"] = locationDict["city"];
+    ownProfil["longt"] =locationDict["longt"];
+    ownProfil["latt"] =locationDict["latt"];
+    ownProfil["land"] =locationDict["countryname"];
+
     customSnackbar(context,
-        AppLocalizations.of(context).aktuelleOrt +" "+
+    AppLocalizations.of(context).aktuelleOrt +" "+
             AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
     Navigator.pop(context);
   }
