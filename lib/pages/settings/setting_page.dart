@@ -66,12 +66,15 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_){
+    /*WidgetsBinding.instance?.addPostFrameCallback((_){
       _myCancelableFuture = CancelableOperation.fromFuture(
         _asyncMethod(),
         onCancel: () => null,
       );
     });
+
+     */
+
     setData();
     super.initState();
   }
@@ -216,6 +219,7 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     var headLineColor = Theme.of(context).colorScheme.primary;
+    userProfil = Hive.box("secureBox").get("ownProfil");
 
     menuBar() {
       return SizedBox(
