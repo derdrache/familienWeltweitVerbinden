@@ -112,6 +112,10 @@ refreshHiveData() async {
   var familyProfils = await FamiliesDatabase().getData("*", "", returnList: true);
   if(familyProfils == false) familyProfils = [];
   Hive.box("secureBox").put("familyProfils", familyProfils);
+
+  var events = await EventDatabase().getData("*", "", returnList: true);
+  if(events == false) events = [];
+  Hive.box("secureBox").put("events", events);
 }
 
 
@@ -131,7 +135,7 @@ void main() async {
   }
 
   await hiveInit();
-  refreshHiveData();
+  //refreshHiveData();
 
   runApp(MyApp());
 }
