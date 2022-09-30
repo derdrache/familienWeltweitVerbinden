@@ -769,53 +769,55 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           });
     }
 
-    return Scaffold(
-      appBar: CustomAppBar(title: "", buttons: [
-        if (isCreator && isNotPublic)
-          FutureBuilder(
-              future: EventDatabase().getData(
-                  "freischalten", "WHERE id = '${widget.event["id"]}'"),
-              builder: (context, snap) {
-                var data = snap.hasData ? snap.data.length.toString() : "";
-                if (data == "0") data = "";
+    return SelectionArea(
+      child: Scaffold(
+        appBar: CustomAppBar(title: "", buttons: [
+          if (isCreator && isNotPublic)
+            FutureBuilder(
+                future: EventDatabase().getData(
+                    "freischalten", "WHERE id = '${widget.event["id"]}'"),
+                builder: (context, snap) {
+                  var data = snap.hasData ? snap.data.length.toString() : "";
+                  if (data == "0") data = "";
 
-                return IconButton(
-                    icon: BadgeIcon(
-                        icon: Icons.event_available,
-                        text: data
-                            .toString()), //const Icon(Icons.event_available),
-                    onPressed: () => userfreischalteWindow());
-              }),
-        IconButton(
-          icon: const Icon(Icons.link),
-          onPressed: () => linkTeilenWindow(),
-        ),
-        if (!isCreator)
+                  return IconButton(
+                      icon: BadgeIcon(
+                          icon: Icons.event_available,
+                          text: data
+                              .toString()), //const Icon(Icons.event_available),
+                      onPressed: () => userfreischalteWindow());
+                }),
           IconButton(
-            icon: const Icon(Icons.message),
-            onPressed: () => global_func.changePage(context,
-                ChatDetailsPage(chatPartnerId: widget.event["erstelltVon"])),
+            icon: const Icon(Icons.link),
+            onPressed: () => linkTeilenWindow(),
           ),
-        IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () => moreMenu(),
+          if (!isCreator)
+            IconButton(
+              icon: const Icon(Icons.message),
+              onPressed: () => global_func.changePage(context,
+                  ChatDetailsPage(chatPartnerId: widget.event["erstelltVon"])),
+            ),
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () => moreMenu(),
+          ),
+        ]),
+        body: ListView(
+          children: [
+            Stack(children: [
+              EventCardDetails(
+                event: widget.event,
+                isApproved: isApproved,
+              ),
+              EventArtButton(
+                event: widget.event,
+                isCreator: isCreator,
+                pageState: setState,
+              ),
+            ]),
+            if (isApproved || !isNotPublic) teilnahmeButtonBox(),
+          ],
         ),
-      ]),
-      body: ListView(
-        children: [
-          Stack(children: [
-            EventCardDetails(
-              event: widget.event,
-              isApproved: isApproved,
-            ),
-            EventArtButton(
-              event: widget.event,
-              isCreator: isCreator,
-              pageState: setState,
-            ),
-          ]),
-          if (isApproved || !isNotPublic) teilnahmeButtonBox(),
-        ],
       ),
     );
   }

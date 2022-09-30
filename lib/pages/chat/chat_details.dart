@@ -19,7 +19,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
@@ -66,7 +65,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var hasStartPosition = true;
   var startData;
   var counter = 0;
-  bool emojisShowing = false;
   var ownMessageBoxColor = Colors.greenAccent;
   var chatpartnerMessageBoxColor = Colors.white;
   var myChats = Hive.box("secureBox").get("myChats");
@@ -115,6 +113,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         });
       }
     });
+
     if (widget.groupChatData == null) {
       widget.chatId = global_functions.getChatID(widget.chatPartnerId);
     } else {
@@ -554,6 +553,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       });
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -1334,23 +1334,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     : []),
             child: Row(
               children: [
-                IconButton(
-                  onPressed: () {
-                    emojisShowing = !emojisShowing;
-
-                    if (emojisShowing == true) {
-                      messageInputNode.unfocus();
-                    } else {
-                      messageInputNode.requestFocus();
-                    }
-
-                    setState(() {});
-                  },
-                  icon: emojisShowing
-                      ? const Icon(Icons.keyboard)
-                      : const Icon(Icons.mood),
-                ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     maxLines: null,
@@ -1698,52 +1682,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     }
 
-    return Scaffold(
-      appBar: showAppBar(),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          angehefteteNachrichten(),
-          Expanded(child: messageAnzeige()),
-          extraInputInformationBox,
-          textEingabeFeld(),
-          Offstage(
-              offstage: !emojisShowing,
-              child: SizedBox(
-                height: 250,
-                child: EmojiPicker(
-                  textEditingController: nachrichtController,
-                  config: Config(
-                    columns: 7,
-                    emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
-                    // Issue: https://github.com/flutter/flutter/issues/28894
-                    verticalSpacing: 0,
-                    horizontalSpacing: 0,
-                    gridPadding: EdgeInsets.zero,
-                    initCategory: Category.RECENT,
-                    bgColor: const Color(0xFFF2F2F2),
-                    indicatorColor: Colors.blue,
-                    iconColor: Colors.grey,
-                    iconColorSelected: Colors.blue,
-                    progressIndicatorColor: Colors.blue,
-                    backspaceColor: Colors.blue,
-                    skinToneDialogBgColor: Colors.white,
-                    skinToneIndicatorColor: Colors.grey,
-                    enableSkinTones: true,
-                    showRecentsTab: true,
-                    recentsLimit: 28,
-                    noRecents: const Text(
-                      'No Recents',
-                      style: TextStyle(fontSize: 20, color: Colors.black26),
-                      textAlign: TextAlign.center,
-                    ),
-                    tabIndicatorAnimDuration: kTabScrollDuration,
-                    categoryIcons: const CategoryIcons(),
-                    buttonMode: ButtonMode.MATERIAL,
-                  ),
-                ),
-              ))
-        ],
+    return SelectionArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: showAppBar(),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            angehefteteNachrichten(),
+            Expanded(child: messageAnzeige()),
+            extraInputInformationBox,
+            textEingabeFeld(),
+          ],
+        ),
       ),
     );
   }
