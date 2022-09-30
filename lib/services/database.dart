@@ -16,7 +16,6 @@ var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 
-
 class ProfilDatabase{
 
   addNewProfil(profilData) async{

@@ -802,26 +802,28 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       );
     }
 
-    return Scaffold(
-      appBar: CustomAppBar(title: "", buttons: [
-        widget.ownProfil ? const SizedBox.shrink() : openChatButton(),
-        widget.ownProfil ? const SizedBox.shrink() : moreMenuButton()
-      ]),
-      body: SizedBox(
-        width: double.maxFinite,
-        child: Scrollbar(
-          child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            }),
-            child: ListView(children: [
-              titelBox(),
-              const SizedBox(height: 10),
-              infoProfil(),
-              const SizedBox(height: 15),
-              if (widget.profil["emailAnzeigen"] == 1) kontaktProfil(),
-            ]),
+    return SelectionArea(
+      child: Scaffold(
+        appBar: CustomAppBar(title: "", buttons: [
+          widget.ownProfil ? const SizedBox.shrink() : openChatButton(),
+          widget.ownProfil ? const SizedBox.shrink() : moreMenuButton()
+        ]),
+        body: SizedBox(
+          width: double.maxFinite,
+          child: Scrollbar(
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              }),
+              child: ListView(children: [
+                titelBox(),
+                const SizedBox(height: 10),
+                infoProfil(),
+                const SizedBox(height: 15),
+                if (widget.profil["emailAnzeigen"] == 1) kontaktProfil(),
+              ]),
+            ),
           ),
         ),
       ),
