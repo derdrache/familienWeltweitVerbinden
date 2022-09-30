@@ -921,9 +921,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
             child: TextWithHyperlinkDetection(
-              text: widget.community["beschreibung"],
-              onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
-            ),
+                text: widget.community["beschreibung"]
+            )
+
           ),
         )
       ];
@@ -967,45 +967,47 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
-    return Scaffold(
-        appBar: CustomAppBar(
-          title: widget.community["name"],
-          buttons: [
-            IconButton(
-              icon: const Icon(Icons.link),
-              onPressed: () => _linkTeilenWindow(),
-            ),
-            IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () => _moreMenu(),
-            )
-          ],
-        ),
-        body: Stack(
-          children: [
-            Container(
-              height: screenHeight,
-              padding: EdgeInsets.only(bottom: 50),
-              child: ListView(
-                controller: _controller,
-                shrinkWrap: true,
-                padding: EdgeInsets.zero,
-                children: [
-                  imageLoading
-                      ? Center(
-                          child: Container(
-                              margin: const EdgeInsets.all(10),
-                              width: 100,
-                              height: 100,
-                              child: const CircularProgressIndicator()))
-                      : _communityImage(),
-                  SizedBox(height: 10),
-                  ..._communityInformation()
-                ],
+    return SelectionArea(
+      child: Scaffold(
+          appBar: CustomAppBar(
+            title: widget.community["name"],
+            buttons: [
+              IconButton(
+                icon: const Icon(Icons.link),
+                onPressed: () => _linkTeilenWindow(),
               ),
-            ),
-            Positioned(bottom: 0, child: _footbar())
-          ],
-        ));
+              IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () => _moreMenu(),
+              )
+            ],
+          ),
+          body: Stack(
+            children: [
+              Container(
+                height: screenHeight,
+                padding: EdgeInsets.only(bottom: 50),
+                child: ListView(
+                  controller: _controller,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  children: [
+                    imageLoading
+                        ? Center(
+                            child: Container(
+                                margin: const EdgeInsets.all(10),
+                                width: 100,
+                                height: 100,
+                                child: const CircularProgressIndicator()))
+                        : _communityImage(),
+                    SizedBox(height: 10),
+                    ..._communityInformation()
+                  ],
+                ),
+              ),
+              Positioned(bottom: 0, child: _footbar())
+            ],
+          )),
+    );
   }
 }
