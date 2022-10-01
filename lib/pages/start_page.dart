@@ -47,7 +47,7 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
-    //WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
   }
@@ -184,7 +184,7 @@ class _StartPageState extends State<StartPage> {
 
       var locationData = await LocationService()
           .getDatabaseLocationdataFromGoogleResult(geoData);
-      print(locationData);
+
       ProfilDatabase().updateProfilLocation(userId, locationData);
       await StadtinfoDatabase().addNewCity(locationData);
       StadtinfoDatabase().update(

@@ -111,13 +111,8 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     transformDateToText(dateString) {
       DateTime date = DateTime.parse(dateString);
 
-      if ((date.month > DateTime.now().month &&
-              date.year == DateTime.now().year) ||
-          date.year > DateTime.now().year) {
-        return date.month.toString() + "." + date.year.toString();
-      } else {
-        return AppLocalizations.of(context).jetzt;
-      }
+      return date.month.toString() + "." + date.year.toString();
+
     }
 
     addNewPlanBox() {

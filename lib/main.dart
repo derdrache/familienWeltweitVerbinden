@@ -95,6 +95,7 @@ refreshHiveChats() async{
   var myChatData = await ChatDatabase().getChatData("*",
       "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
       returnList: true);
+
   Hive.box("secureBox").put("myChats", myChatData);
 }
 
@@ -117,8 +118,6 @@ refreshHiveData() async {
   if(events == false) events = [];
   Hive.box("secureBox").put("events", events);
 }
-
-
 
 
 void main() async {
