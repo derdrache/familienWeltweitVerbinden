@@ -1,4 +1,3 @@
-import 'package:async/async.dart';
 import 'package:familien_suche/pages/events/events_suchen.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
@@ -25,26 +24,13 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   double textSizeHeadline = 20.0;
-  var myOwnEvents = Hive.box('secureBox').get("myEvents");
-  var myInterestedEvents = Hive.box('secureBox').get("interestEvents");
-  var _myCancelableFuture;
-
+  var myOwnEvents = Hive.box('secureBox').get("myEvents") ?? [];
+  var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_){
-      _myCancelableFuture = CancelableOperation.fromFuture(
-        _asyncMethod(),
-        onCancel: () => null,
-      );
-    });
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _myCancelableFuture?.cancel();
-    super.dispose();
   }
 
   _asyncMethod() async{
