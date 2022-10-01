@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:async/async.dart';
 
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
@@ -62,28 +61,15 @@ class _SettingPageState extends State<SettingPage> {
   var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
   var sprachenInputBox =
       CustomMultiTextForm(auswahlList: global_variablen.sprachenListe);
-  var _myCancelableFuture;
 
   @override
   void initState() {
-    /*WidgetsBinding.instance?.addPostFrameCallback((_){
-      _myCancelableFuture = CancelableOperation.fromFuture(
-        _asyncMethod(),
-        onCancel: () => null,
-      );
-    });
-
-     */
-
     setData();
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _myCancelableFuture?.cancel();
-    super.dispose();
-  }
 
   _asyncMethod() async{
     var ownProfilDb = await ProfilDatabase().getData("*", "WHERE id = '$userID'");

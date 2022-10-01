@@ -182,7 +182,7 @@ class ChatDatabase{
     };
 
     var newChatGroup = {
-      "id": chatID,
+      "chatId": chatID,
       "date": date,
       "users": json.encode(userData),
       "lastMessage": "",
@@ -274,6 +274,7 @@ class ChatDatabase{
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
+
   }
 
   addNewMessageAndSendNotification(chatgroupData, messageData, responseId)async {
@@ -284,7 +285,7 @@ class ChatDatabase{
 
     var url = Uri.parse(databaseUrl + "database/chats/newMessage.php");
     await http.post(url, body: json.encode({
-      "id": chatID,
+      "chatId": chatID,
       "date": date,
       "message": messageData["message"],
       "von": messageData["von"],

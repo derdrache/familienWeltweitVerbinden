@@ -38,8 +38,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var profils = [];
   var profilsBackup = [];
-  var ownProfil = Hive.box('secureBox').get("ownProfil");
-  var allCities = Hive.box('secureBox').get("stadtinfo");
+  var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
+  var allCities = Hive.box('secureBox').get("stadtinfo") ?? [];
   var events = [];
   var communities = Hive.box('secureBox').get("communities") ?? [];
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
@@ -122,7 +122,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   changeAllCitiesAndCreateCityNames() {
-    var stadtInfoUser = Hive.box("secureBox").get("stadtinfoUser");
+    var stadtInfoUser = Hive.box("secureBox").get("stadtinfoUser") ?? [];
     var newAllCities = [];
     var allCityUserInformation = <String>{};
 

@@ -25,21 +25,25 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
-  var userName = FirebaseAuth.instance.currentUser.displayName;
-  var userEmail = FirebaseAuth.instance.currentUser.email;
   var searchAutocomplete;
-  List dbProfilData = Hive.box("secureBox").get("profils");
-  List allName, userFriendlist, myChats = [];
+  List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
+  List myChats = Hive.box("secureBox").get("myChats") ?? [];
+  List allName, userFriendlist;
   bool changeBarOn = false;
   var selectedChats = [];
   var firstSelectedIsPinned = false;
   var firstSelectedIsMute = false;
   var deleteBoth = false;
+  var isLoaded = false;
 
   @override
   void initState() {
     checkNewMessageCounter();
     initilizeCreateChatData();
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      refreshDataFromDb();
+    });
 
     super.initState();
   }
@@ -87,6 +91,20 @@ class _ChatPageState extends State<ChatPage> {
         }
       }
     }
+  }
+
+  refreshDataFromDb() async {
+    var newDbData = await ChatDatabase().getChatData(
+        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+        returnList: true);
+    if (newDbData == false) newDbData = [];
+
+    Hive.box("secureBox").put("myChats", newDbData);
+    myChats = newDbData;
+
+    setState(() {
+      isLoaded = true;
+    });
   }
 
   selectChatpartnerWindow() async {
@@ -221,15 +239,6 @@ class _ChatPageState extends State<ChatPage> {
     return newChatList;
   }
 
-  refreshDbProfilData() async {
-    dbProfilData = await ProfilDatabase().getData("*", "ORDER BY ort ASC");
-    if (dbProfilData == false) dbProfilData = [];
-
-    Hive.box('secureBox').put("profils", dbProfilData);
-
-    setState(() {});
-  }
-
   deleteChat(choosenChatIds, {deleteBoth = false}) async {
     for (var choosenChatId in choosenChatIds) {
       var chat = {};
@@ -345,29 +354,38 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   pinChat() {
+    var selectedIsPinned;
+
     for (var choosenChatId in selectedChats) {
       var chat = {};
 
       for (var myChat in myChats) {
         if (myChat["id"] == choosenChatId) {
           chat = myChat;
+          break;
         }
       }
 
       var chatIsPinned = chat["users"][userId]["pinned"] ?? false;
-      chatIsPinned = chatIsPinned == "true";
+      if(chatIsPinned.runtimeType == String) chatIsPinned = chatIsPinned == "true";
 
-      chat["users"][userId]["pinned"] = !chatIsPinned;
+      chat["users"][userId]["pinned"] = "${!chatIsPinned}";
+      selectedIsPinned ??= !chatIsPinned;
 
       ChatDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.pinned', '${!chatIsPinned}')",
           "WHERE id = '${chat["id"]}'");
+
     }
 
-    setState(() {});
+    setState(() {
+      firstSelectedIsPinned = selectedIsPinned;
+    });
   }
 
-  muteChat(){
+  muteChat() {
+    var selectedIsMute;
+
     for (var choosenChatId in selectedChats) {
       var chat = {};
 
@@ -378,50 +396,23 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       var chatIsMute = chat["users"][userId]["mute"] ?? false;
-      chatIsMute = chatIsMute == "true";
+      if(chatIsMute.runtimeType == String) chatIsMute = chatIsMute == "true";
 
-      chat["users"][userId]["mute"] = !chatIsMute;
+      chat["users"][userId]["mute"] = "${!chatIsMute}";
+      selectedIsMute ??= !chatIsMute;
 
       ChatDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.mute', '${!chatIsMute}')",
           "WHERE id = '${chat["id"]}'");
     }
 
-    setState(() {});
+    setState(() {
+      firstSelectedIsMute = selectedIsMute;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    muteDialog(chatGroupData) {
-      var chatIsMute = chatGroupData["users"][userId]["mute"] ?? false;
-      chatIsMute = chatIsMute == "true";
-
-      return SimpleDialogOption(
-        child: Row(
-          children: [
-            Icon(chatIsMute
-                ? Icons.notifications_active
-                : Icons.notifications_off),
-            const SizedBox(width: 10),
-            Text(chatIsMute
-                ? AppLocalizations.of(context).stummEin
-                : AppLocalizations.of(context).stummAus),
-          ],
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-
-          setState(() {
-            chatGroupData["users"][userId]["mute"] = !chatIsMute;
-          });
-
-          ChatDatabase().updateChatGroup(
-              "users = JSON_SET(users, '\$.$userId.mute', '${!chatIsMute}')",
-              "WHERE id = '${chatGroupData["id"]}'");
-        },
-      );
-    }
-
     newMessageAndPinnedBox(newMessages, isPinned) {
       if (newMessages == 0 && !isPinned) return const SizedBox(height: 30);
 
@@ -442,7 +433,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ));
       } else if (isPinned) {
-        return Center(child: Icon(Icons.push_pin));
+        return const Center(child: Icon(Icons.push_pin));
       }
     }
 
@@ -455,8 +446,9 @@ class _ChatPageState extends State<ChatPage> {
         String chatPartnerId;
         var users = group["users"];
 
-        if (group["lastMessage"].isEmpty || group["users"][userId] == null)
+        if (group["lastMessage"].isEmpty || group["users"][userId] == null) {
           continue;
+        }
 
         users.forEach((key, value) async {
           if (key != userId) {
@@ -481,14 +473,16 @@ class _ChatPageState extends State<ChatPage> {
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
+
         var isPinned = users[userId]["pinned"] == "true";
         var lastMessageTime =
             DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
         var sortIndex = chatGroupContainers.length;
 
         if (isPinned) sortIndex = 0;
-        if (lastMessage == "<weiterleitung>")
+        if (lastMessage == "<weiterleitung>") {
           lastMessage = AppLocalizations.of(context).weitergeleitet;
+        }
 
         chatGroupContainers.insert(
             sortIndex,
@@ -498,18 +492,17 @@ class _ChatPageState extends State<ChatPage> {
                   var markerOn = false;
 
                   setState(() {
-                    if(selectedChats.contains(group["id"])){
+                    if (selectedChats.contains(group["id"])) {
                       selectedChats.remove(group["id"]);
-                    }else{
+                    } else {
                       selectedChats.add(group["id"]);
                     }
 
-                    if(selectedChats.length > 0) markerOn = true;
-                    if(selectedChats.length == 0){
+                    if (selectedChats.isNotEmpty) markerOn = true;
+                    if (selectedChats.isEmpty) {
                       firstSelectedIsMute = false;
                       firstSelectedIsPinned = false;
                     }
-
 
                     changeBarOn = markerOn;
                   });
@@ -526,8 +519,10 @@ class _ChatPageState extends State<ChatPage> {
               onLongPress: () {
                 setState(() {
                   changeBarOn = true;
-                  firstSelectedIsPinned = group["users"][userId]["pinned"] == "true";
-                  firstSelectedIsMute = group["users"][userId]["mute"] == "true";
+                  firstSelectedIsPinned =
+                      group["users"][userId]["pinned"] == "true";
+                  firstSelectedIsMute =
+                      group["users"][userId]["mute"] == "true";
                   selectedChats.add(group["id"]);
                 });
               },
@@ -614,13 +609,13 @@ class _ChatPageState extends State<ChatPage> {
                 IconButton(
                     onPressed: () => muteChat(),
                     icon: selectedChats.length == 1 && firstSelectedIsMute
-                        ? Icon(Icons.notifications_active)
-                        : Icon(Icons.notifications_off)),
+                        ? const Icon(Icons.notifications_active)
+                        : const Icon(Icons.notifications_off)),
                 IconButton(
                     onPressed: () => pinChat(),
                     icon: selectedChats.length == 1 && firstSelectedIsPinned
-                        ? StrikeThroughIcon(child: Icon(Icons.push_pin))
-                        : Icon(Icons.push_pin)),
+                        ? StrikeThroughIcon(child: const Icon(Icons.push_pin))
+                        : const Icon(Icons.push_pin)),
                 IconButton(
                     onPressed: () => deleteChatDialog(""),
                     icon: const Icon(Icons.delete))
@@ -633,49 +628,29 @@ class _ChatPageState extends State<ChatPage> {
                 IconButton(onPressed: null, icon: Icon(Icons.search))
               ],
             ),
-      body: FutureBuilder(
-          future: ChatDatabase().getChatData(
-              "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
-              returnList: true),
-          builder: (context, snapshot) {
-            var myChatBox = Hive.box("secureBox");
-            myChats = myChatBox.get("myChats");
-
-            if (snapshot.hasData) {
-              myChats = snapshot.data == false ? [] : snapshot.data;
-              myChatBox.put("myChats", myChats);
-            }
-
-            if (dbProfilData.isEmpty) {
-              refreshDbProfilData();
-              return const Center(child: const CircularProgressIndicator());
-            }
-
-            if (myChats != null && myChats.isNotEmpty) {
-              myChats = removeBlockedChats(myChats);
-
-              return MediaQuery.removePadding(
-                removeTop: true,
-                context: context,
-                child: ScrollConfiguration(
-                  behavior:
-                      ScrollConfiguration.of(context).copyWith(dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
-                  }),
-                  child: ListView(
-                      shrinkWrap: true,
-                      children: createChatGroupContainers(myChats)),
-                ),
-              );
-            }
-
-            return Center(
-                heightFactor: 20,
-                child: Text(
-                    AppLocalizations.of(context).nochKeineChatsVorhanden,
-                    style: const TextStyle(fontSize: 20, color: Colors.grey)));
-          }),
+      body: myChats.isNotEmpty
+          ? MediaQuery.removePadding(
+              removeTop: true,
+              context: context,
+              child: ScrollConfiguration(
+                behavior:
+                    ScrollConfiguration.of(context).copyWith(dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                }),
+                child: ListView(
+                    shrinkWrap: true,
+                    children: createChatGroupContainers(myChats)),
+              ),
+            )
+          : !isLoaded
+              ? const Center(child: CircularProgressIndicator())
+              : Center(
+                  heightFactor: 20,
+                  child: Text(
+                      AppLocalizations.of(context).nochKeineChatsVorhanden,
+                      style:
+                          const TextStyle(fontSize: 20, color: Colors.grey))),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
         child: const Icon(Icons.create),
