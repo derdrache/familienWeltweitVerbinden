@@ -47,7 +47,7 @@ class _NewsPageState extends State<NewsPage> {
       setState(() {});
     });
 
-    //WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
 
@@ -279,8 +279,8 @@ class _NewsPageState extends State<NewsPage> {
       var newsUserProfil = global_func.getProfilFromHive(newsUserId);
       var isFriend = ownProfil["friendlist"].contains(newsUserId);
       var text = "";
-      var newsOrt = news["information"]["city"] ?? "";
-      var newsLand = news["information"]["countryname"] ?? "";
+      var newsOrt = news["information"]["city"];
+      var newsLand = news["information"]["countryname"];
       var newsOrtInfo =
           newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
       var ownOrt = ownProfil["ort"];
@@ -290,7 +290,7 @@ class _NewsPageState extends State<NewsPage> {
           locationTimeCheck >= 0 &&
           ownSettingProfil["showNewFamilyLocation"];
 
-      if (newsUserProfil == null ||
+      if (newsUserProfil == null || newsOrt == null || newsLand == null ||
           !ownSettingProfil["showFriendChangedLocation"] ||
           !ownSettingProfil["showNewFamilyLocation"] ||
           !(isFriend || samePlaceAndTime)) {
