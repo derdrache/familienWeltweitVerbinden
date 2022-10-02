@@ -76,13 +76,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
+    print(widget.groupChatData);
+    createNewChat();
+    getAndSetChatData();
+    writeActiveChat();
     setScrollbarListener();
-
-    if (widget.groupChatData == null) {
-      widget.chatId = global_functions.getChatID(widget.chatPartnerId);
-    } else {
-      widget.chatId = widget.groupChatData["id"];
-    }
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     WidgetsBinding.instance.addObserver(this);
@@ -92,13 +90,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void dispose() {
+    timer.cancel();
+    messageInputNode.dispose();
     ProfilDatabase().updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
 
     WidgetsBinding.instance.removeObserver(this);
-
-    timer.cancel();
-
-    messageInputNode.dispose();
 
     super.dispose();
   }
@@ -112,6 +108,39 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       ProfilDatabase()
           .updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
     }
+  }
+
+  getAndSetChatData(){
+    widget.chatPartnerId ??= global_functions.getProfilFromHive(
+        profilName: widget.chatPartnerName, getIdOnly: true
+    );
+    widget.chatPartnerName ??= global_functions.getProfilFromHive(
+        profilId: widget.chatPartnerId, getNameOnly: true
+    );
+
+    widget.chatId ??= widget.groupChatData["id"];
+    chatPartnerProfil = global_functions.getProfilFromHive(profilId: widget.chatPartnerId);
+
+    if(widget.groupChatData["users"][userId] == null){
+      widget.groupChatData["users"][userId] = {"newMessages" : 0};
+      ChatDatabase().updateChatGroup(
+          "users = JSON_MERGE(users, '${json.encode({"userId": "test"})}'",
+          "WHERE id = '${widget.groupChatData["id"]}'");
+    }
+
+  }
+
+  createNewChat(){
+    if (widget.groupChatData == null || widget.groupChatData["id"] == null){
+      //check if chatgroup exist
+      widget.chatId ??= global_functions.getChatID(widget.chatPartnerId);
+      widget.groupChatData = ChatDatabase().addNewChatGroup(widget.chatPartnerId);
+    }
+  }
+
+  writeActiveChat() {
+    ProfilDatabase()
+        .updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
   }
 
   setScrollbarListener(){
@@ -131,75 +160,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _asyncMethod() async {
-    await createNewChat();
-    await getAndSetChatData();
-    if (messages.isEmpty) getAllDbMessages();
-    writeActiveChat();
-    await getChatPartnerProfil();
+    await getAllDbMessages();
 
-    if (widget.groupChatData != false) resetNewMessageCounter();
-
-    setState(() {});
+    resetNewMessageCounter();
 
     timer = Timer.periodic(
         const Duration(seconds: 10), (Timer t) => getAllDbMessages());
-  }
-
-  createNewChat() async {
-    if (widget.groupChatData != null) return;
-
-    widget.chatPartnerId ??= await ProfilDatabase()
-        .getData("id", "WHERE name = '${widget.chatPartnerName}'");
-    widget.chatPartnerName ??= await ProfilDatabase()
-        .getData("name", "WHERE id = '${widget.chatPartnerId}'");
-
-    widget.groupChatData =
-        await ChatDatabase().addNewChatGroup(widget.chatPartnerId);
-  }
-
-  getAndSetChatData() async {
-    widget.chatId ??= widget.groupChatData["id"];
-    var groupchatUsers = widget.groupChatData["users"];
-    groupchatUsers.forEach((key, value) {
-      if (key != userId) {
-        widget.chatPartnerId = key;
-      }
-    });
-
-    widget.chatPartnerName ??= await ProfilDatabase()
-        .getData("name", "WHERE id = '${widget.chatPartnerId}'");
-  }
-
-  writeActiveChat() {
-    ProfilDatabase()
-        .updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
-  }
-
-  getChatPartnerProfil() async {
-    chatPartnerProfil = await ProfilDatabase()
-        .getData("*", "WHERE id = '${widget.chatPartnerId}'");
-  }
-
-  resetNewMessageCounter() async {
-    var users = widget.groupChatData["users"];
-
-    var usersChatNewMessages = users[userId]["newMessages"];
-
-    if (usersChatNewMessages == 0) return;
-
-    var usersAllNewMessages =
-        await ProfilDatabase().getData("newMessages", "WHERE id = '$userId'");
-    usersAllNewMessages = usersAllNewMessages - usersChatNewMessages < 0
-        ? 0
-        : usersAllNewMessages - usersChatNewMessages;
-
-    ProfilDatabase().updateProfil(
-        "newMessages = '$usersAllNewMessages'", "WHERE id ='$userId'");
-    widget.groupChatData["users"][userId]["newMessages"] = 0;
-
-    ChatDatabase().updateChatGroup(
-        "users = '${json.encode(widget.groupChatData["users"])}'",
-        "WHERE id = '${widget.groupChatData["id"]}'");
   }
 
   getAllDbMessages() async {
@@ -217,21 +183,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
   }
 
-  checkChatgroupUsers() {
-    var chatUsers = widget.groupChatData["users"];
+  resetNewMessageCounter() async {
+    var users = widget.groupChatData["users"];
+    var usersChatNewMessages = users[userId]["newMessages"];
 
-    if (chatUsers.length == 2) return;
+    if (usersChatNewMessages == 0) return;
 
-    chatUsers.add({
-      userId: {
-        "name": widget.chatPartnerName.replaceAll("'", "''"),
-        "newMessages": 0
-      }
-    });
+    var ownProfil = Hive.box('secureBox').get("ownProfil");
+    var ownAllMessages = ownProfil["newMessages"];
+    var newOwnAllMessages = ownAllMessages - usersChatNewMessages < 0
+        ? 0
+        : ownAllMessages - usersChatNewMessages;
 
-    ChatDatabase().updateChatGroup("users = '${json.encode(chatUsers)}'",
+    ownProfil["newMessages"] = newOwnAllMessages;
+
+    ProfilDatabase().updateProfil(
+        "newMessages = '$newOwnAllMessages'", "WHERE id ='$userId'");
+    widget.groupChatData["users"][userId]["newMessages"] = 0;
+
+    ChatDatabase().updateChatGroup(
+        "users = '${json.encode(widget.groupChatData["users"])}'",
         "WHERE id = '${widget.groupChatData["id"]}'");
   }
+
 
   messageToDbAndClearMessageInput(message) async {
     var userID = FirebaseAuth.instance.currentUser.uid;
@@ -268,9 +242,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   openProfil() async {
-    chatPartnerProfil ??= await ProfilDatabase()
-        .getData("*", "WHERE id = '${widget.chatPartnerId}'");
-
     if (chatPartnerProfil == false) return;
 
     global_functions.changePage(
@@ -709,8 +680,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         items: [
           PopupMenuItem(
             onTap: () {
-              var replyUser = global_functions.getProfilFromHive(message["von"],
-                  onlyName: true);
+              var replyUser = global_functions.getProfilFromHive(profilId: message["von"],
+                  getNameOnly: true);
 
               extraInputInformationBox = inputInformationBox(
                   Icons.reply, replyUser, message["message"]);
@@ -843,8 +814,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       TextButton(
                           onPressed: () {
                             var replyUser = global_functions.getProfilFromHive(
-                                message["von"],
-                                onlyName: true);
+                                profilId: message["von"],
+                                getNameOnly: true);
 
                             extraInputInformationBox = inputInformationBox(
                                 Icons.reply, replyUser, message["message"]);
@@ -899,8 +870,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         TextButton(
                             onPressed: () {
                               var replyUser = global_functions
-                                  .getProfilFromHive(message["von"],
-                                      onlyName: true);
+                                  .getProfilFromHive(profilId: message["von"],
+                                      getNameOnly: true);
 
                               extraInputInformationBox = inputInformationBox(
                                   Icons.reply, replyUser, message["message"]);
@@ -920,7 +891,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     responseMessage(index, message, boxColor, messageTime, messageEdit) {
       var replyFromId =
           message["chatId"].replaceAll(userId, "").replaceAll("_", "");
-      var messageFromProfil = global_functions.getProfilFromHive(replyFromId);
+      var messageFromProfil = global_functions.getProfilFromHive(profilId: replyFromId);
       var replyMessageText;
       var replyIndex = messages.length;
 
@@ -1052,7 +1023,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     forwardMessage(index, textAlign, message, boxColor, messageTime,
         messageEdit, forwardData) {
       var forwardProfil =
-          global_functions.getProfilFromHive(forwardData["von"]);
+          global_functions.getProfilFromHive(profilId: forwardData["von"]);
 
       return AnimatedContainer(
         color: scrollIndex == index
@@ -1359,7 +1330,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     ? IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: () {
-                          checkChatgroupUsers();
+                          //checkChatgroupUsers();
                           messageToDbAndClearMessageInput(
                               nachrichtController.text);
 
@@ -1433,10 +1404,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    pinDialog() {
+    pinChatDialog() {
       var chatIsPinned =
           widget.groupChatData["users"][userId]["pinned"] ?? false;
-      chatIsPinned = chatIsPinned == "true";
+      if(chatIsPinned.runtimeType == String) chatIsPinned = chatIsPinned == "true";
 
       return SimpleDialogOption(
         child: Row(
@@ -1466,7 +1437,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     muteDialog() {
       var chatIsMute = widget.groupChatData["users"][userId]["mute"] ?? false;
-      chatIsMute = chatIsMute == "true";
+      chatIsMute = chatIsMute == "true" || chatIsMute == true;
 
       return SimpleDialogOption(
         child: Row(
@@ -1604,7 +1575,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
                       searchDialog(),
-                      pinDialog(),
+                      pinChatDialog(),
                       muteDialog(),
                       //settingDialog(),
                       const SizedBox(height: 10),

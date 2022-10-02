@@ -171,7 +171,7 @@ class ProfilDatabase{
 
 class ChatDatabase{
 
-  addNewChatGroup(chatPartner)async {
+  addNewChatGroup(chatPartner) {
     var userId = FirebaseAuth.instance.currentUser.uid;
     var userKeysList = [userId, chatPartner];
     var chatID = global_functions.getChatID(chatPartner);
@@ -182,14 +182,14 @@ class ChatDatabase{
     };
 
     var newChatGroup = {
-      "chatId": chatID,
+      "id": chatID,
       "date": date,
       "users": json.encode(userData),
       "lastMessage": "",
     };
 
     var url = Uri.parse(databaseUrl + "database/chats/newChatGroup.php");
-    await http.post(url, body: json.encode(newChatGroup));
+    http.post(url, body: json.encode(newChatGroup));
 
     newChatGroup["users"] = userData;
 
@@ -259,11 +259,12 @@ class ChatDatabase{
   updateChatGroup(whatData,queryEnd) async {
     var url = Uri.parse(databaseUrl + "database/update.php");
 
-    await http.post(url, body: json.encode({
+    var test = await http.post(url, body: json.encode({
       "table": "chats",
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
+    print(test.body);
   }
 
   updateMessage(whatData,queryEnd) async{

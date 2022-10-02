@@ -13,6 +13,8 @@ import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
+import 'package:familien_suche/global/global_functions.dart'
+  as global_functions;
 import '../../widgets/strike_through_icon.dart';
 import 'chat_details.dart';
 
@@ -83,11 +85,13 @@ class _ChatPageState extends State<ChatPage> {
         allName.add(data["name"]);
       }
 
+      if(!userFriendIdList.contains(data["id"])) continue;
+
       for (var user in userFriendIdList) {
-        if (data["name"] == user &&
+        if (data["id"] == user &&
             !ownProfil["geblocktVon"].contains(data["id"])) {
+
           userFriendlist.add(data["name"]);
-          break;
         }
       }
     }
@@ -113,7 +117,7 @@ class _ChatPageState extends State<ChatPage> {
       hintText: AppLocalizations.of(context).personSuchen,
       searchableItems: allName,
       onConfirm: () {
-        searchUser();
+        searchUser(searchAutocomplete.getSelected()[0]);
       },
     );
 
@@ -131,27 +135,33 @@ class _ChatPageState extends State<ChatPage> {
         });
   }
 
-  searchUser() async {
-    var chatPartner = searchAutocomplete.getSelected()[0];
-    var chatPartnerId =
-        await ProfilDatabase().getData("id", "WHERE name = '$chatPartner'");
+  searchUser(chatPartnerName) async {
+    var chatPartnerId = global_functions.getProfilFromHive(
+        profilName: chatPartnerName, getIdOnly: true
+    );
 
-    checkValidAndOpenChatgroup(chatPartnerID: chatPartnerId, name: chatPartner);
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => ChatDetailsPage(
+              chatPartnerId: chatPartnerId,
+              chatPartnerName: chatPartnerName,
+            ))).whenComplete(() => setState(() {}));
   }
 
   List<Widget> createFriendlistBox(userFriendlist) {
     List<Widget> friendsBoxen = [];
 
-    for (var friend in userFriendlist) {
+    for (var friendName in userFriendlist) {
       friendsBoxen.add(GestureDetector(
-        onTap: () => checkValidAndOpenChatgroup(name: friend),
+        onTap: () => searchUser(friendName),
         child: Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
                         width: 1, color: global_var.borderColorGrey))),
-            child: Text(friend)),
+            child: Text(friendName)),
       ));
     }
 
@@ -165,31 +175,6 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     return friendsBoxen;
-  }
-
-  checkValidAndOpenChatgroup({chatPartnerID, name}) async {
-    chatPartnerID ??=
-        await ProfilDatabase().getData("id", "WHERE name = '$name'");
-    var checkAndIndex = checkNewChatGroup(chatPartnerID);
-
-    Navigator.pop(context);
-
-    if (checkAndIndex[0]) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => ChatDetailsPage(
-                    chatPartnerId: chatPartnerID,
-                    chatPartnerName: name,
-                  ))).whenComplete(() => setState(() {}));
-    } else {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => ChatDetailsPage(
-                    groupChatData: myChats[checkAndIndex[1]],
-                  ))).whenComplete(() => setState(() {}));
-    }
   }
 
   checkNewChatGroup(chatPartnerId) {
@@ -259,7 +244,7 @@ class _ChatPageState extends State<ChatPage> {
         }
 
         myChats.remove(removeChat);
-
+        print(choosenChatId);
         ChatDatabase().deleteChat(choosenChatId);
         ChatDatabase().deleteMessages(choosenChatId);
       } else {
@@ -292,7 +277,7 @@ class _ChatPageState extends State<ChatPage> {
     var chatPartnerName = "";
 
     if (selectedChats.length == 1) {
-      var chatId = choosenChatgroupsId[0];
+      var chatId = selectedChats[0];
       var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
 
       for (var profil in dbProfilData) {
@@ -474,7 +459,7 @@ class _ChatPageState extends State<ChatPage> {
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
 
-        var isPinned = users[userId]["pinned"] == "true";
+        var isPinned = users[userId]["pinned"] == "true" || users[userId]["pinned"] == true;
         var lastMessageTime =
             DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
         var sortIndex = chatGroupContainers.length;
