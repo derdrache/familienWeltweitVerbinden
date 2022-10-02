@@ -210,7 +210,7 @@ class _NewsPageState extends State<NewsPage> {
     friendsDisplay(news) {
       var userAdded = news["information"].split(" ")[1];
       var newsUserId = news["erstelltVon"];
-      var friendProfil = global_func.getProfilFromHive(newsUserId);
+      var friendProfil = global_func.getProfilFromHive(profilId: newsUserId);
       var text = "";
 
       if (friendProfil == null ||
@@ -276,13 +276,11 @@ class _NewsPageState extends State<NewsPage> {
 
     changePlaceDisplay(news, myLastLocationDate) {
       var newsUserId = news["erstelltVon"];
-      var newsUserProfil = global_func.getProfilFromHive(newsUserId);
+      var newsUserProfil = global_func.getProfilFromHive(profilId: newsUserId);
       var isFriend = ownProfil["friendlist"].contains(newsUserId);
       var text = "";
       var newsOrt = news["information"]["city"];
       var newsLand = news["information"]["countryname"];
-      var newsOrtInfo =
-          newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
       var ownOrt = ownProfil["ort"];
       var locationTimeCheck = DateTime.parse(news["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
@@ -296,6 +294,9 @@ class _NewsPageState extends State<NewsPage> {
           !(isFriend || samePlaceAndTime)) {
         return const SizedBox.shrink();
       }
+
+      var newsOrtInfo =
+      newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"]) {
         text = newsUserProfil["name"] +
@@ -361,7 +362,7 @@ class _NewsPageState extends State<NewsPage> {
 
     friendsNewTravelPlanDisplay(news) {
       var newsUserId = news["erstelltVon"];
-      var friendProfil = global_func.getProfilFromHive(newsUserId);
+      var friendProfil = global_func.getProfilFromHive(profilId: newsUserId);
       var isFriend = ownProfil["friendlist"].contains(newsUserId);
 
       if (!isFriend ||
