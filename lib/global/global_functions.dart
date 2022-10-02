@@ -60,7 +60,7 @@ changePage(context, page){
 changePageForever(context, page){
   Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => page)
+      MaterialPageRoute(maintainState:false,builder: (context) => page)
   );
 }
 
@@ -188,13 +188,24 @@ changeEnglishToGerman(list){
   return germanOutputList;
 }
 
-getProfilFromHive(profilId, {onlyName = false}){
+getProfilFromHive({profilId, profilName, getNameOnly = false, getIdOnly = false}){
   var allProfils = Hive.box('secureBox').get("profils");
 
-  for(var profil in allProfils){
-    if(profilId == profil["id"]){
-      if(onlyName) return profil["name"];
-      return profil;
+  if(profilId != null){
+    for(var profil in allProfils){
+      if(profilId == profil["id"]){
+        if(getNameOnly) return profil["name"];
+        return profil;
+      }
     }
   }
+  else if(profilName != null){
+    for(var profil in allProfils){
+      if(profilName == profil["name"]){
+        if(getIdOnly) return profil["id"];
+        return profil;
+      }
+    }
+  }
+
 }
