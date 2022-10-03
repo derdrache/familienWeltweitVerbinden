@@ -244,7 +244,7 @@ class _ChatPageState extends State<ChatPage> {
         }
 
         myChats.remove(removeChat);
-        print(choosenChatId);
+
         ChatDatabase().deleteChat(choosenChatId);
         ChatDatabase().deleteMessages(choosenChatId);
       } else {

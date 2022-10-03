@@ -76,7 +76,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
-    print(widget.groupChatData);
     createNewChat();
     getAndSetChatData();
     writeActiveChat();
@@ -110,6 +109,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
+  createNewChat(){
+    if (widget.groupChatData == null || widget.groupChatData["id"] == null){
+
+      widget.chatId ??= global_functions.getChatID(widget.chatPartnerId);
+
+      for(var chat in myChats){
+        if(widget.chatId == chat["id"]){
+          widget.groupChatData = chat;
+          return;
+        }
+
+      }
+      widget.groupChatData = ChatDatabase().addNewChatGroup(widget.chatPartnerId);
+    }
+  }
+
   getAndSetChatData(){
     widget.chatPartnerId ??= global_functions.getProfilFromHive(
         profilName: widget.chatPartnerName, getIdOnly: true
@@ -124,17 +139,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if(widget.groupChatData["users"][userId] == null){
       widget.groupChatData["users"][userId] = {"newMessages" : 0};
       ChatDatabase().updateChatGroup(
-          "users = JSON_MERGE(users, '${json.encode({"userId": "test"})}'",
+          "users = JSON_MERGE(users, '${json.encode({userId: {"newMessages" : 0}})}')",
           "WHERE id = '${widget.groupChatData["id"]}'");
-    }
-
-  }
-
-  createNewChat(){
-    if (widget.groupChatData == null || widget.groupChatData["id"] == null){
-      //check if chatgroup exist
-      widget.chatId ??= global_functions.getChatID(widget.chatPartnerId);
-      widget.groupChatData = ChatDatabase().addNewChatGroup(widget.chatPartnerId);
     }
   }
 
@@ -266,13 +272,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var myChats = myChatBox.get("myChats");
 
     if (chatUsers.length <= 1 || bothDelete) {
-      var removeChat = {};
-
       for (var myChat in myChats) {
-        if (myChat["id"] == widget.chatId) removeChat = myChat;
+        if (myChat["id"] == widget.chatId){
+          myChat["users"] = {};
+          myChat["id"] = "";
+        }
       }
-
-      myChats.remove(removeChat);
 
       ChatDatabase().deleteChat(chatId);
       ChatDatabase().deleteMessages(chatId);
