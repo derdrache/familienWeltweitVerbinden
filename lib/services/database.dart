@@ -259,12 +259,11 @@ class ChatDatabase{
   updateChatGroup(whatData,queryEnd) async {
     var url = Uri.parse(databaseUrl + "database/update.php");
 
-    var test = await http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "table": "chats",
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
-    print(test.body);
   }
 
   updateMessage(whatData,queryEnd) async{
