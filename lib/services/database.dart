@@ -122,9 +122,9 @@ class ProfilDatabase{
       return false;
     }
     
-    _deleteInTable("profils", userId);
-    _deleteInTable("newsSettings", userId);
-    _deleteInTable("news_page", userId);
+    _deleteInTable("profils", "id", userId);
+    _deleteInTable("newsSettings", "id",  userId);
+    _deleteInTable("news_page", "id", userId);
 
     updateProfil(
         "friendlist = JSON_REMOVE(friendlist, JSON_UNQUOTE(JSON_SEARCH(friendlist, 'one', '$userId')))",
@@ -134,7 +134,7 @@ class ProfilDatabase{
     var userEvents = await EventDatabase().getData("id", "WHERE erstelltVon = '$userId'", returnList: true);
     if(userEvents != false){
       for(var eventId in userEvents){
-        _deleteInTable("events", eventId);
+        _deleteInTable("events", "id",  eventId);
       }
     }
 
@@ -239,7 +239,7 @@ class ChatDatabase{
     return responseBody;
   }
 
-  getAllMessages(chatId) async {
+  getAllChatMessages(chatId) async {
     var url = Uri.parse(databaseUrl + "database/getData2.php");
 
     var res = await http.post(url, body: json.encode({
@@ -283,7 +283,7 @@ class ChatDatabase{
 
     messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
 
-    var url = Uri.parse(databaseUrl + "database/chats/newMessage.php");
+    var url = Uri.parse(databaseUrl + "database/chats/newMessage2.php");
     await http.post(url, body: json.encode({
       "chatId": chatID,
       "date": date,
@@ -344,11 +344,15 @@ class ChatDatabase{
   }
 
   deleteChat(chatId){
-    _deleteInTable("chats", chatId);
+    _deleteInTable("chats", "id", chatId);
   }
 
   deleteMessages(messageId){
-    _deleteInTable("messages", messageId);
+    _deleteInTable("messages", "id", messageId);
+  }
+
+  deleteAllMessages(chatId){
+    _deleteInTable("messages", "chatId", chatId);
   }
 
 }
@@ -428,7 +432,7 @@ class EventDatabase{
   }
 
   delete(eventId){
-    _deleteInTable("events", eventId);
+    _deleteInTable("events", "id", eventId);
   }
 
 }
@@ -509,7 +513,7 @@ class CommunityDatabase{
   }
 
   delete(communityId) async {
-    await _deleteInTable("communities", communityId);
+    await _deleteInTable("communities","id", communityId);
   }
 }
 
@@ -671,7 +675,7 @@ class StadtinfoUserDatabase{
 
 
   delete(informationId){
-    _deleteInTable("stadtinfo_user", informationId);
+    _deleteInTable("stadtinfo_user","id", informationId);
   }
 
 
@@ -809,7 +813,7 @@ class FamiliesDatabase{
   }
 
   delete(familyId){
-    _deleteInTable("families", familyId);
+    _deleteInTable("families","id", familyId);
   }
 }
 
@@ -880,7 +884,7 @@ class NewsPageDatabase{
   }
 
   delete(newsId){
-    _deleteInTable("news_page", newsId);
+    _deleteInTable("news_page","id", newsId);
   }
 }
 
@@ -953,7 +957,7 @@ class NewsSettingsDatabase{
   }
 
   delete(profilId){
-    _deleteInTable("news_settings", profilId);
+    _deleteInTable("news_settings","id", profilId);
   }
 }
 
@@ -985,11 +989,12 @@ DbDeleteImage(imageName) async{
   await http.post(url, body: json.encode(data));
 }
 
-_deleteInTable(table, id) async {
-  var url = Uri.parse(databaseUrl + "database/deleteAll.php");
+_deleteInTable(table, whereParameter, whereValue) async {
+  var url = Uri.parse(databaseUrl + "database/deleteAll2.php");
 
   await http.post(url, body: json.encode({
-    "id": id,
+    "whereParameter": whereParameter,
+    "whereValue": whereValue,
     "table": table
   }));
 }

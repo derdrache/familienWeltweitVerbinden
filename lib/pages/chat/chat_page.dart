@@ -14,7 +14,7 @@ import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 import 'package:familien_suche/global/global_functions.dart'
-  as global_functions;
+    as global_functions;
 import '../../widgets/strike_through_icon.dart';
 import 'chat_details.dart';
 
@@ -35,7 +35,7 @@ class _ChatPageState extends State<ChatPage> {
   var selectedChats = [];
   var firstSelectedIsPinned = false;
   var firstSelectedIsMute = false;
-  var deleteBoth = false;
+  var bothDelete = false;
   var isLoaded = false;
 
   @override
@@ -85,12 +85,11 @@ class _ChatPageState extends State<ChatPage> {
         allName.add(data["name"]);
       }
 
-      if(!userFriendIdList.contains(data["id"])) continue;
+      if (!userFriendIdList.contains(data["id"])) continue;
 
       for (var user in userFriendIdList) {
         if (data["id"] == user &&
             !ownProfil["geblocktVon"].contains(data["id"])) {
-
           userFriendlist.add(data["name"]);
         }
       }
@@ -117,6 +116,7 @@ class _ChatPageState extends State<ChatPage> {
       hintText: AppLocalizations.of(context).personSuchen,
       searchableItems: allName,
       onConfirm: () {
+        Navigator.pop(context);
         searchUser(searchAutocomplete.getSelected()[0]);
       },
     );
@@ -137,16 +137,15 @@ class _ChatPageState extends State<ChatPage> {
 
   searchUser(chatPartnerName) async {
     var chatPartnerId = global_functions.getProfilFromHive(
-        profilName: chatPartnerName, getIdOnly: true
-    );
+        profilName: chatPartnerName, getIdOnly: true);
 
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (_) => ChatDetailsPage(
-              chatPartnerId: chatPartnerId,
-              chatPartnerName: chatPartnerName,
-            ))).whenComplete(() => setState(() {}));
+                  chatPartnerId: chatPartnerId,
+                  chatPartnerName: chatPartnerName,
+                ))).whenComplete(() => setState(() {}));
   }
 
   List<Widget> createFriendlistBox(userFriendlist) {
@@ -224,8 +223,8 @@ class _ChatPageState extends State<ChatPage> {
     return newChatList;
   }
 
-  deleteChat(choosenChatIds, {deleteBoth = false}) async {
-    for (var choosenChatId in choosenChatIds) {
+  deleteChat() async {
+    for (var choosenChatId in selectedChats) {
       var chat = {};
 
       for (var myChat in myChats) {
@@ -236,17 +235,16 @@ class _ChatPageState extends State<ChatPage> {
 
       var chatUsers = chat["users"];
 
-      if (chatUsers.length <= 1 || deleteBoth) {
-        var removeChat = {};
-
+      if (chatUsers.length <= 1 || bothDelete) {
         for (var myChat in myChats) {
-          if (myChat["id"] == choosenChatId) removeChat = myChat;
+          if (myChat["id"] == choosenChatId) {
+            myChat["users"] = {};
+            myChat["id"] = "";
+          }
         }
 
-        myChats.remove(removeChat);
-
         ChatDatabase().deleteChat(choosenChatId);
-        ChatDatabase().deleteMessages(choosenChatId);
+        ChatDatabase().deleteAllMessages(choosenChatId);
       } else {
         var newChatUsersData = {};
 
@@ -272,11 +270,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   deleteChatDialog(chatgroupData) {
-    var countSelected = 0;
-    var choosenChatgroupsId = [];
+    var countSelected = selectedChats.length;
     var chatPartnerName = "";
 
-    if (selectedChats.length == 1) {
+    if (countSelected == 1) {
       var chatId = selectedChats[0];
       var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
 
@@ -297,17 +294,18 @@ class _ChatPageState extends State<ChatPage> {
               height: countSelected == 1 ? 150 : 100,
               children: [
                 Center(
-                    child: Text(
-                        AppLocalizations.of(context).chatWirklichLoeschen)),
+                    child: Text(countSelected == 1
+                        ? AppLocalizations.of(context).chatWirklichLoeschen
+                        : AppLocalizations.of(context).chatsWirklichLoeschen)),
                 if (countSelected == 1) const SizedBox(height: 20),
                 if (countSelected == 1)
                   Row(
                     children: [
                       Checkbox(
-                          value: deleteBoth,
+                          value: bothDelete,
                           onChanged: (value) {
                             setState(() {
-                              deleteBoth = value;
+                              bothDelete = value;
                             });
                           }),
                       Expanded(
@@ -324,8 +322,8 @@ class _ChatPageState extends State<ChatPage> {
                   onPressed: () async {
                     Navigator.pop(context);
                     changeBarOn = false;
+                    deleteChat();
                     selectedChats = [];
-                    deleteChat(choosenChatgroupsId, deleteBoth: deleteBoth);
                   },
                 ),
                 TextButton(
@@ -352,7 +350,8 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       var chatIsPinned = chat["users"][userId]["pinned"] ?? false;
-      if(chatIsPinned.runtimeType == String) chatIsPinned = chatIsPinned == "true";
+      if (chatIsPinned.runtimeType == String)
+        chatIsPinned = chatIsPinned == "true";
 
       chat["users"][userId]["pinned"] = "${!chatIsPinned}";
       selectedIsPinned ??= !chatIsPinned;
@@ -360,7 +359,6 @@ class _ChatPageState extends State<ChatPage> {
       ChatDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.pinned', '${!chatIsPinned}')",
           "WHERE id = '${chat["id"]}'");
-
     }
 
     setState(() {
@@ -381,7 +379,7 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       var chatIsMute = chat["users"][userId]["mute"] ?? false;
-      if(chatIsMute.runtimeType == String) chatIsMute = chatIsMute == "true";
+      if (chatIsMute.runtimeType == String) chatIsMute = chatIsMute == "true";
 
       chat["users"][userId]["mute"] = "${!chatIsMute}";
       selectedIsMute ??= !chatIsMute;
@@ -459,7 +457,8 @@ class _ChatPageState extends State<ChatPage> {
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
 
-        var isPinned = users[userId]["pinned"] == "true" || users[userId]["pinned"] == true;
+        var isPinned = users[userId]["pinned"] == "true" ||
+            users[userId]["pinned"] == true;
         var lastMessageTime =
             DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
         var sortIndex = chatGroupContainers.length;

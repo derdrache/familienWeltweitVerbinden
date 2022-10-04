@@ -175,16 +175,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getAllDbMessages() async {
-    if (widget.chatId == null && widget.groupChatData == null) return;
-
     var chatId = widget.chatId ?? widget.groupChatData["id"];
 
-    List<dynamic> allDbMessages = await ChatDatabase().getAllMessages(chatId);
+    List<dynamic> allDbMessages = await ChatDatabase().getAllChatMessages(chatId);
     allDbMessages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
-    messages = allDbMessages;
-
     setState(() {
+      messages = allDbMessages;
       isLoading = false;
     });
   }
@@ -205,10 +202,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     ProfilDatabase().updateProfil(
         "newMessages = '$newOwnAllMessages'", "WHERE id ='$userId'");
+
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
     ChatDatabase().updateChatGroup(
-        "users = '${json.encode(widget.groupChatData["users"])}'",
+        "users = JSON_SET(users, '\$.$userId.newMessages', '0')",
         "WHERE id = '${widget.groupChatData["id"]}'");
   }
 
@@ -235,11 +233,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     await ChatDatabase().addNewMessageAndSendNotification(
         widget.groupChatData, messageData, messageIdChange);
 
+
     if (messageData["message"].contains("</eventId=")) {
       messageData["message"] = "<Event Card>";
     }
     if (messageData["message"].contains("</communityId=")) {
       messageData["message"] = "<Community Card>";
+    }
+
+    for(var myChat in myChats){
+      if(myChat["id"] == widget.chatId){
+        myChat["lastMessage"] = messageData["message"];
+        myChat["lastMessageDate"] = messageData["date"];
+      }
     }
 
     ChatDatabase().updateChatGroup(
@@ -280,7 +286,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       ChatDatabase().deleteChat(chatId);
-      ChatDatabase().deleteMessages(chatId);
+      ChatDatabase().deleteAllMessages(chatId);
     } else {
       var newChatUsersData = {};
 
@@ -299,6 +305,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       ChatDatabase().updateChatGroup(
           "users = '${json.encode(newChatUsersData)}'", "WHERE id ='$chatId'");
     }
+
+    Navigator.pop(context);
+
 
     global_functions.changePageForever(
         context,
@@ -1526,7 +1535,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 return StatefulBuilder(builder: (ontext, setState) {
                   return CustomAlertDialog(
                     title: AppLocalizations.of(context).chatLoeschen,
-                    height: 140,
+                    height: 150,
                     children: [
                       Center(
                           child: Text(AppLocalizations.of(context)
@@ -1541,8 +1550,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                       bothDelete = value;
                                     })
                                   }),
-                          Text(AppLocalizations.of(context).auchBeiLoeschen +
-                              widget.chatPartnerName)
+                          Expanded(
+                            child: Text(AppLocalizations.of(context).auchBeiLoeschen +
+                                widget.chatPartnerName),
+                          )
                         ],
                       )
                     ],
