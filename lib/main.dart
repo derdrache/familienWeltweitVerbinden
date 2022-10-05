@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-
 import 'firebase_options.dart';
 import 'pages/start_page.dart';
 import 'pages/show_profil.dart';
@@ -33,32 +32,32 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 hiveInit() async {
   await Hive.initFlutter();
 
-  await Hive.openBox("secureBox", encryptionCipher: HiveAesCipher(boxEncrpytionKey), crashRecovery: false);
+  await Hive.openBox("secureBox",
+      encryptionCipher: HiveAesCipher(boxEncrpytionKey), crashRecovery: false);
 
   var countryJsonText =
-  await rootBundle.loadString('assets/countryGeodata.json');
+      await rootBundle.loadString('assets/countryGeodata.json');
   var geodata = json.decode(countryJsonText)["data"];
   Hive.box('secureBox').put("countryGeodata", geodata);
 
   var continentsJsonText =
-  await rootBundle.loadString('assets/continentsGeodata.json');
+      await rootBundle.loadString('assets/continentsGeodata.json');
   var continentsGeodata = json.decode(continentsJsonText)["data"];
   Hive.box('secureBox').put("kontinentGeodata", continentsGeodata);
 
-  if(Hive.box('secureBox').get("profils") == null){
-    List<dynamic> dbProfils = await ProfilDatabase().getData("*", "ORDER BY ort ASC");
+  if (Hive.box('secureBox').get("profils") == null) {
+    List<dynamic> dbProfils =
+        await ProfilDatabase().getData("*", "ORDER BY ort ASC");
     if (dbProfils == false) dbProfils = [];
 
     var viewAccounts = [];
 
-    for(var profil in dbProfils){
-      if(profil["name"] != "googleView") viewAccounts.add(profil);
+    for (var profil in dbProfils) {
+      if (profil["name"] != "googleView") viewAccounts.add(profil);
     }
 
     Hive.box('secureBox').put("profils", dbProfils);
   }
-
-
 }
 
 sortProfils(profils) {
@@ -87,38 +86,41 @@ sortProfils(profils) {
   return profils;
 }
 
-refreshHiveChats() async{
+refreshHiveChats() async {
   String userId = FirebaseAuth.instance.currentUser?.uid;
 
-  if(userId == null) return;
+  if (userId == null) return;
 
-  var myChatData = await ChatDatabase().getChatData("*",
-      "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+  var myChatData = await ChatDatabase().getChatData(
+      "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
       returnList: true);
 
   Hive.box("secureBox").put("myChats", myChatData);
 }
 
-refreshHiveData() async {
-  refreshHiveChats();
+refreshHiveEvents() async{
+  var events = await EventDatabase().getData("*", "", returnList: true);
+  if (events == false) events = [];
+  Hive.box("secureBox").put("events", events);
+}
 
+refreshHiveData() async {
   var stadtinfo = await StadtinfoDatabase()
       .getData("*", "ORDER BY ort ASC", returnList: true);
   Hive.box("secureBox").put("stadtinfo", stadtinfo);
 
   var stadtinfoUser =
-  await StadtinfoUserDatabase().getData("*", "", returnList: true);
+      await StadtinfoUserDatabase().getData("*", "", returnList: true);
   Hive.box("secureBox").put("stadtinfoUser", stadtinfoUser);
 
-  var familyProfils = await FamiliesDatabase().getData("*", "", returnList: true);
-  if(familyProfils == false) familyProfils = [];
+  var familyProfils =
+      await FamiliesDatabase().getData("*", "", returnList: true);
+  if (familyProfils == false) familyProfils = [];
   Hive.box("secureBox").put("familyProfils", familyProfils);
 
-  var events = await EventDatabase().getData("*", "", returnList: true);
-  if(events == false) events = [];
-  Hive.box("secureBox").put("events", events);
-}
+  await refreshHiveEvents();
 
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -134,14 +136,15 @@ void main() async {
   }
 
   await hiveInit();
-  //refreshHiveData();
+  refreshHiveData();
 
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   String userId = FirebaseAuth.instance.currentUser?.uid;
-  bool emailVerified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+  bool emailVerified =
+      FirebaseAuth.instance.currentUser?.emailVerified ?? false;
   BuildContext pageContext;
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -160,6 +163,15 @@ class MyApp extends StatelessWidget {
     _setFirebaseNotifications();
   }
 
+  notificationLeadPage(notification) {
+    if (notification["typ"] == "chat") {
+      _changeToChat(notification["link"]);
+    }
+    if (notification["typ"] == "event") _changeToEvent(notification["link"]);
+    if (notification["typ"] == "newFriend")
+      _changeToProfil(notification["link"]);
+  }
+
   _setFirebaseNotifications() {
     final FlutterLocalNotificationsPlugin _notificationsPlugin =
         FlutterLocalNotificationsPlugin();
@@ -170,35 +182,38 @@ class MyApp extends StatelessWidget {
         onSelectNotification: (payload) async {
       final Map<String, dynamic> payLoadMap = json.decode(payload);
 
-      if (payLoadMap["typ"] == "chat") _changeToChat(payLoadMap["link"]);
-      if (payLoadMap["typ"] == "event") _changeToEvent(payLoadMap["link"]);
-      if (payLoadMap["typ"] == "newFriend") _changeToProfil(payLoadMap["link"]);
+      notificationLeadPage(payLoadMap);
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((value) {
       if (value != null) {
-        var notificationTyp = json.decode(value.data.values.last)["typ"];
-        var pageId = json.decode(value.data.values.last)["link"];
-
-        if (notificationTyp == "chat") _changeToChat(pageId);
-        if (notificationTyp == "event") _changeToEvent(pageId);
-        if (notificationTyp == "newFriend") _changeToProfil(pageId);
+        var notification = json.decode(value.data.values.last);
+        notificationLeadPage(notification);
       }
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       if (message.data.isNotEmpty) {
+        var messageData = json.decode(message.data["info"]);
+
+        if (messageData["typ"] == "chat") {
+          var chatId = messageData["link"];
+          var chatData = getChatFromHive(chatId);
+
+          if (chatData["users"][userId]["mute"] == true ||
+              chatData["users"][userId]["mute"] == "true") {
+            return;
+          }
+        }
+
         LocalNotificationService().display(message);
       }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      var notificationTyp = json.decode(message.data.values.last)["typ"];
-      var pageId = json.decode(message.data.values.last)["link"];
+      var notification = json.decode(message.data.values.last);
       if (pageContext != null) {
-        if (notificationTyp == "chat") _changeToChat(pageId);
-        if (notificationTyp == "chat") _changeToEvent(pageId);
-        if (notificationTyp == "newFriend") _changeToProfil(pageId);
+        notificationLeadPage(notification);
       }
     });
   }
@@ -238,9 +253,6 @@ class MyApp extends StatelessWidget {
       statusBarColor: Colors.black,
     ));
 
-
-
-
     return FutureBuilder(
         future: _initialization(),
         builder: (context, snapshot) {
@@ -255,7 +267,6 @@ class MyApp extends StatelessWidget {
                   colorScheme: ColorScheme.fromSwatch().copyWith(
                     primary: const Color(0xFFBF1D53),
                     secondary: const Color(0xFF3CB28F),
-                    //buttonColor?
                   ),
                   iconTheme: const IconThemeData(color: Color(0xFF3CB28F))),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -267,8 +278,7 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               home: FirebaseAuth.instance.currentUser != null && emailVerified
                   ? StartPage()
-                  : const LoginPage()
-          );
+                  : const LoginPage());
         });
   }
 }

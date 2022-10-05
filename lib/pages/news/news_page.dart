@@ -210,7 +210,7 @@ class _NewsPageState extends State<NewsPage> {
     friendsDisplay(news) {
       var userAdded = news["information"].split(" ")[1];
       var newsUserId = news["erstelltVon"];
-      var friendProfil = global_func.getProfilFromHive(profilId: newsUserId);
+      var friendProfil = getProfilFromHive(profilId: newsUserId);
       var text = "";
 
       if (friendProfil == null ||
@@ -276,7 +276,7 @@ class _NewsPageState extends State<NewsPage> {
 
     changePlaceDisplay(news, myLastLocationDate) {
       var newsUserId = news["erstelltVon"];
-      var newsUserProfil = global_func.getProfilFromHive(profilId: newsUserId);
+      var newsUserProfil = getProfilFromHive(profilId: newsUserId);
       var isFriend = ownProfil["friendlist"].contains(newsUserId);
       var text = "";
       var newsOrt = news["information"]["city"];
@@ -362,7 +362,7 @@ class _NewsPageState extends State<NewsPage> {
 
     friendsNewTravelPlanDisplay(news) {
       var newsUserId = news["erstelltVon"];
-      var friendProfil = global_func.getProfilFromHive(profilId: newsUserId);
+      var friendProfil = getProfilFromHive(profilId: newsUserId);
       var isFriend = ownProfil["friendlist"].contains(newsUserId);
 
       if (!isFriend ||
