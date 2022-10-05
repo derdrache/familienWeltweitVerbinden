@@ -53,6 +53,7 @@ class _StartPageState extends State<StartPage> {
   }
 
   _asyncMethod() async {
+    print("refresht");
     if (!kIsWeb){
       var newUpdate = await checkForceUpdate();
       if(newUpdate) return;
