@@ -24,9 +24,10 @@ sendEmail(notificationInformation) async {
       }));
 }
 
-_sendNotification(notificationInformation) async {
-  return;
+sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
+
+  notificationInformation["token"] = "fiXd_mPLTl2yvDu0U5fQar:APA91bFivQUcW3tCZT9OZBTPTYGtQnyJ3A9aoT06DqQMkH94o7AlVszkulXm_cjY9sPMOwX002rFb2s_tPAyRAc0rJHZzccome60Oc-LjDy8XJGcB-nrB17P8zC30WOhzBdepg7af2aq";
 
   http.post(url,
       body: json.encode({
@@ -65,6 +66,9 @@ prepareChatNotification({chatId, vonId, toId, inhalt}) async {
     "typ": "chat",
   };
 
+  sendNotification(notificationInformation);
+  return;
+
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
     var dbData =
@@ -86,7 +90,7 @@ prepareChatNotification({chatId, vonId, toId, inhalt}) async {
 
     sendEmail(notificationInformation);
   } else {
-    _sendNotification(notificationInformation);
+    sendNotification(notificationInformation);
   }
 }
 
@@ -133,7 +137,7 @@ prepareEventNotification({eventId, toId, eventName}) async {
 
     sendEmail(notificationInformation);
   } else {
-    _sendNotification(notificationInformation);
+    sendNotification(notificationInformation);
   }
 }
 
@@ -180,6 +184,6 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
 
     sendEmail(notificationInformation);
   } else {
-    _sendNotification(notificationInformation);
+    sendNotification(notificationInformation);
   }
 }

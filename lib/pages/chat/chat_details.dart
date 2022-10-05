@@ -72,6 +72,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var searchTextIndex = 0;
   var allEvents = Hive.box('secureBox').get("events") ?? [];
   var allCommunities = Hive.box('secureBox').get("communities") ?? [];
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
 
 
   @override
@@ -126,15 +127,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getAndSetChatData(){
-    widget.chatPartnerId ??= global_functions.getProfilFromHive(
+    widget.chatPartnerId ??= getProfilFromHive(
         profilName: widget.chatPartnerName, getIdOnly: true
     );
-    widget.chatPartnerName ??= global_functions.getProfilFromHive(
+    widget.chatPartnerName ??= getProfilFromHive(
         profilId: widget.chatPartnerId, getNameOnly: true
     );
 
     widget.chatId ??= widget.groupChatData["id"];
-    chatPartnerProfil = global_functions.getProfilFromHive(profilId: widget.chatPartnerId);
+    chatPartnerProfil = getProfilFromHive(profilId: widget.chatPartnerId);
 
     if(widget.groupChatData["users"][userId] == null){
       widget.groupChatData["users"][userId] = {"newMessages" : 0};
@@ -176,7 +177,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   getAllDbMessages() async {
     var chatId = widget.chatId ?? widget.groupChatData["id"];
-
     List<dynamic> allDbMessages = await ChatDatabase().getAllChatMessages(chatId);
     allDbMessages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
@@ -192,7 +192,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     if (usersChatNewMessages == 0) return;
 
-    var ownProfil = Hive.box('secureBox').get("ownProfil");
+
     var ownAllMessages = ownProfil["newMessages"];
     var newOwnAllMessages = ownAllMessages - usersChatNewMessages < 0
         ? 0
@@ -230,8 +230,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       messages.add(messageData);
     });
 
+    var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
     await ChatDatabase().addNewMessageAndSendNotification(
-        widget.groupChatData, messageData, messageIdChange);
+        widget.groupChatData, messageData, messageIdChange, isBlocked);
 
 
     if (messageData["message"].contains("</eventId=")) {
@@ -244,7 +245,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     for(var myChat in myChats){
       if(myChat["id"] == widget.chatId){
         myChat["lastMessage"] = messageData["message"];
-        myChat["lastMessageDate"] = messageData["date"];
+        myChat["lastMessageDate"] = int.parse(messageData["date"]);
       }
     }
 
@@ -369,8 +370,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
         "WHERE id = '$selectedChatId'");
 
+    var isBlocked = ownProfil["geblocktVon"].contains(userId);
     ChatDatabase()
-        .addNewMessageAndSendNotification(chatGroupData, messageData, 0);
+        .addNewMessageAndSendNotification(chatGroupData, messageData, 0, isBlocked);
   }
 
   deleteMessage(messageId) {
@@ -694,7 +696,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         items: [
           PopupMenuItem(
             onTap: () {
-              var replyUser = global_functions.getProfilFromHive(profilId: message["von"],
+              var replyUser = getProfilFromHive(profilId: message["von"],
                   getNameOnly: true);
 
               extraInputInformationBox = inputInformationBox(
@@ -827,7 +829,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     children: [
                       TextButton(
                           onPressed: () {
-                            var replyUser = global_functions.getProfilFromHive(
+                            var replyUser = getProfilFromHive(
                                 profilId: message["von"],
                                 getNameOnly: true);
 
@@ -883,8 +885,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       children: [
                         TextButton(
                             onPressed: () {
-                              var replyUser = global_functions
-                                  .getProfilFromHive(profilId: message["von"],
+                              var replyUser = getProfilFromHive(profilId: message["von"],
                                       getNameOnly: true);
 
                               extraInputInformationBox = inputInformationBox(
@@ -905,7 +906,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     responseMessage(index, message, boxColor, messageTime, messageEdit) {
       var replyFromId =
           message["chatId"].replaceAll(userId, "").replaceAll("_", "");
-      var messageFromProfil = global_functions.getProfilFromHive(profilId: replyFromId);
+      var messageFromProfil = getProfilFromHive(profilId: replyFromId);
       var replyMessageText;
       var replyIndex = messages.length;
 
@@ -1036,8 +1037,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     forwardMessage(index, textAlign, message, boxColor, messageTime,
         messageEdit, forwardData) {
-      var forwardProfil =
-          global_functions.getProfilFromHive(profilId: forwardData["von"]);
+      var forwardProfil = getProfilFromHive(profilId: forwardData["von"]);
 
       return AnimatedContainer(
         color: scrollIndex == index
@@ -1461,8 +1461,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 : Icons.notifications_off),
             const SizedBox(width: 10),
             Text(chatIsMute
-                ? AppLocalizations.of(context).stummEin
-                : AppLocalizations.of(context).stummAus),
+                ? AppLocalizations.of(context).stummAus
+                : AppLocalizations.of(context).stummEin),
           ],
         ),
         onPressed: () {
