@@ -177,8 +177,8 @@ class ChatDatabase{
     var chatID = global_functions.getChatID(chatPartner);
     var date = DateTime.now().millisecondsSinceEpoch;
     var userData = {
-      userKeysList[0] : {"newMessages": 0, "mute": 0},
-      userKeysList[1] : {"newMessages": 0, "mute": 0},
+      userKeysList[0] : {"newMessages": 0},
+      userKeysList[1] : {"newMessages": 0},
     };
 
     var newChatGroup = {
@@ -277,7 +277,7 @@ class ChatDatabase{
 
   }
 
-  addNewMessageAndSendNotification(chatgroupData, messageData, responseId)async {
+  addNewMessageAndSendNotification(chatgroupData, messageData, responseId, isBlocked)async {
     var chatID = chatgroupData["id"];
     var date = DateTime.now().millisecondsSinceEpoch;
 
@@ -293,6 +293,8 @@ class ChatDatabase{
       "responseId": responseId,
       "forward": messageData["forward"]
     }));
+
+    if(isBlocked) return;
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
@@ -1009,5 +1011,33 @@ String decrypt(String encrypted) {
   return decrypted;
 }
 
+getProfilFromHive({profilId, profilName, getNameOnly = false, getIdOnly = false}){
+  var allProfils = Hive.box('secureBox').get("profils");
 
+  if(profilId != null){
+    for(var profil in allProfils){
+      if(profilId == profil["id"]){
+        if(getNameOnly) return profil["name"];
+        return profil;
+      }
+    }
+  }
+  else if(profilName != null){
+    for(var profil in allProfils){
+      if(profilName == profil["name"]){
+        if(getIdOnly) return profil["id"];
+        return profil;
+      }
+    }
+  }
+
+}
+
+getChatFromHive(chatId){
+  var myChats = Hive.box('secureBox').get("myChats");
+
+  for(var myChat in myChats){
+    if(myChat["id"] == chatId) return myChat;
+  }
+}
 

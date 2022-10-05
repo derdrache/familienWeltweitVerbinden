@@ -13,8 +13,6 @@ import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
-import 'package:familien_suche/global/global_functions.dart'
-    as global_functions;
 import '../../widgets/strike_through_icon.dart';
 import 'chat_details.dart';
 
@@ -44,6 +42,7 @@ class _ChatPageState extends State<ChatPage> {
     initilizeCreateChatData();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
+      refreshOwnProfil();
       refreshDataFromDb();
     });
 
@@ -96,6 +95,12 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  refreshOwnProfil() async {
+    var userID = FirebaseAuth.instance.currentUser.uid;
+    var ownProfilDb = await ProfilDatabase().getData("*", "WHERE id = '$userID'");
+    Hive.box("secureBox").put("ownProfil", ownProfilDb);
+  }
+
   refreshDataFromDb() async {
     var newDbData = await ChatDatabase().getChatData(
         "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
@@ -136,7 +141,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   searchUser(chatPartnerName) async {
-    var chatPartnerId = global_functions.getProfilFromHive(
+    var chatPartnerId = getProfilFromHive(
         profilName: chatPartnerName, getIdOnly: true);
 
     Navigator.push(
@@ -429,9 +434,6 @@ class _ChatPageState extends State<ChatPage> {
         String chatPartnerId;
         var users = group["users"];
 
-        if (group["lastMessage"].isEmpty || group["users"][userId] == null) {
-          continue;
-        }
 
         users.forEach((key, value) async {
           if (key != userId) {
@@ -453,6 +455,11 @@ class _ChatPageState extends State<ChatPage> {
         chatPartnerProfil ??= {
           "bild": ["assets/WeltFlugzeug.png"]
         };
+
+        var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
+        if (group["lastMessage"].isEmpty || group["users"][userId] == null || isBlocked) {
+          continue;
+        }
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
