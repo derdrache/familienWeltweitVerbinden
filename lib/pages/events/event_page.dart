@@ -1,6 +1,5 @@
 import 'package:familien_suche/pages/events/events_suchen.dart';
 import 'package:familien_suche/pages/start_page.dart';
-import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,31 +28,7 @@ class _EventPageState extends State<EventPage> {
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
-  }
-
-  _asyncMethod() async{
-    var ownEventsDb = await EventDatabase().getData("*",
-        "WHERE erstelltVon = '" + userId + "' ORDER BY wann ASC",
-        returnList: true);
-    if(ownEventsDb == false) ownEventsDb = [];
-    Hive.box('secureBox').put("myEvents", ownEventsDb);
-
-    var myInterestedEventsDb = await EventDatabase().getData("*",
-        "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0 AND erstelltVon != '$userId' ORDER BY wann ASC",
-        returnList: true);
-    if(myInterestedEventsDb == false) myInterestedEventsDb = [];
-    Hive.box('secureBox').put("interestEvents", myInterestedEventsDb);
-
-
-
-    setState(() {
-      myOwnEvents = ownEventsDb;
-      myInterestedEvents = myInterestedEventsDb;
-    });
-
-
   }
 
   @override
@@ -64,6 +39,7 @@ class _EventPageState extends State<EventPage> {
 
       for (var event in events) {
         bool isOwner = event["erstelltVon"] == userId;
+        var freischaltenCount = event["freischalten"].length;
 
         eventCards.add(Stack(
           children: [
@@ -79,18 +55,9 @@ class _EventPageState extends State<EventPage> {
               Positioned(
                 right: 10,
                 top: 10,
-                child: FutureBuilder(
-                    future: EventDatabase()
-                        .getData("freischalten", "WHERE id = '${event["id"]}'"),
-                    builder: (context, snap) {
-                      var data =
-                          snap.hasData ? snap.data.length.toString() : "";
-                      if (data == "0") data = "";
-
-                      return BadgeIcon(
-                        text: data.toString(),
-                      );
-                    }),
+                child: BadgeIcon(
+                  text: freischaltenCount > 0 ? freischaltenCount.toString(): "",
+                )
               )
           ],
         ));
