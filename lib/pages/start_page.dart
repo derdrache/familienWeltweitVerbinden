@@ -37,7 +37,7 @@ class StartPage extends StatefulWidget {
   _StartPageState createState() => _StartPageState();
 }
 
-class _StartPageState extends State<StartPage> {
+class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var userName = FirebaseAuth.instance.currentUser?.displayName;
   var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
@@ -47,13 +47,28 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      refreshHiveDb();
+    }
+  }
+
+  refreshHiveDb() async{
+    await refreshHiveChats();
+    await refreshHiveEvents();
+    await refreshHiveProfils();
+    await refreshHiveCommunities();
+    await refreshHiveNewsPage();
+  }
+
   _asyncMethod() async {
-    print("refresht");
     if (!kIsWeb){
       var newUpdate = await checkForceUpdate();
       if(newUpdate) return;
@@ -85,11 +100,12 @@ class _StartPageState extends State<StartPage> {
   _checkAndUpdateProfil() async {
     if (userName == null) return;
 
-    var dbData = await ProfilDatabase()
-        .getData("email, token, automaticLocation", "WHERE id = '$userId'");
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
 
-    var userDBEmail = dbData["email"];
-    var userDeviceTokenDb = dbData["token"];
+    if(ownProfil == null) return;
+
+    var userDBEmail = ownProfil["email"];
+    var userDeviceTokenDb = ownProfil["token"];
     var userDeviceTokenReal =
         kIsWeb ? null : await FirebaseMessaging.instance.getToken();
 
@@ -103,7 +119,7 @@ class _StartPageState extends State<StartPage> {
           "token = '$userDeviceTokenReal'", "WHERE id = '$userId'");
     }
 
-    var automaticLocation = dbData["automaticLocation"];
+    var automaticLocation = ownProfil["automaticLocation"];
     if (automaticLocation != null &&
         automaticLocation != standortbestimmung[0] &&
         automaticLocation != standortbestimmungEnglisch[0]) {
@@ -247,51 +263,35 @@ class _StartPageState extends State<StartPage> {
     }
 
     eventIcon() {
-      return FutureBuilder(
-          future: EventDatabase().getData("*",
-              "WHERE erstelltVon ='$userId' AND json_length(freischalten) > 0",
-              returnList: true),
-          builder: (BuildContext context, AsyncSnapshot snap) {
-            if (!snap.hasData) return const Icon(Icons.event);
+      var userFreischalten = 0;
+      var myEvents = Hive.box('secureBox').get("myEvents")?? [];
 
-            var events = snap.data;
-            events = events == false ? 0 : events.length;
+      for(var event in myEvents){
+        userFreischalten += event["freischalten"].length;
+      }
 
-            return BadgeIcon(
-                icon: Icons.event, text: events > 0 ? events.toString() : "");
-          });
+      return BadgeIcon(
+          icon: Icons.event, text: userFreischalten > 0 ? userFreischalten.toString() : "");
     }
 
     communityIcon(){
-      return FutureBuilder(
-          future: CommunityDatabase().getData("*",
-              "WHERE JSON_CONTAINS(einladung, '\"$userId\"') > 0",
-              returnList: true),
-          builder: (BuildContext context, AsyncSnapshot snap) {
-            if (!snap.hasData) return const Icon(Icons.cottage);
+      var communityInvite = 0;
+      var allCommunities = Hive.box('secureBox').get("communities")?? [];
 
-            var invitedCommunity = snap.data;
-            var hasInvite = invitedCommunity == false ? 0 : 1;
+      for(var community in allCommunities){
+        if(community["einladung"].contains(userId)) communityInvite += 1;
+      }
 
-            return BadgeIcon(
-                icon: Icons.cottage, text: hasInvite > 0 ? "1" : "");
-          });
+      return BadgeIcon(
+          icon: Icons.cottage, text: communityInvite > 0 ? communityInvite.toString() : "");
     }
 
     chatIcon() {
-      return FutureBuilder(
-          future:
-              ProfilDatabase().getData("newMessages", "WHERE id = '$userId'"),
-          builder: (BuildContext context, AsyncSnapshot snap) {
-            if (!snap.hasData) return const Icon(Icons.chat);
+      var ownProfil = Hive.box('secureBox').get("ownProfil");
 
-            var newMessages = snap.data;
-            newMessages = newMessages == false ? 0 : newMessages;
-
-            return BadgeIcon(
-                icon: Icons.chat,
-                text: newMessages > 0 ? newMessages.toString() : "");
-          });
+      return BadgeIcon(
+          icon: Icons.chat,
+          text: ownProfil["newMessages"] > 0 ? ownProfil["newMessages"].toString() : "");
     }
 
     Future<bool> showAddHomePageDialog(BuildContext context) async {

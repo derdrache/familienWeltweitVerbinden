@@ -9,6 +9,7 @@ import 'package:encrypt/encrypt.dart';
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
+import 'locationsService.dart';
 import 'notification.dart';
 
 //var databaseUrl = "https://families-worldwide.com/";
@@ -277,7 +278,7 @@ class ChatDatabase{
 
   }
 
-  addNewMessageAndSendNotification(chatgroupData, messageData, responseId, isBlocked)async {
+  addNewMessageAndSendNotification(chatgroupData, messageData, isBlocked)async {
     var chatID = chatgroupData["id"];
     var date = DateTime.now().millisecondsSinceEpoch;
 
@@ -290,7 +291,7 @@ class ChatDatabase{
       "message": messageData["message"],
       "von": messageData["von"],
       "zu": messageData["zu"],
-      "responseId": responseId,
+      "responseId": messageData["responseId"],
       "forward": messageData["forward"]
     }));
 
@@ -321,9 +322,10 @@ class ChatDatabase{
       oldChatNewMessages[chatPartnerId]["newMessages"] = oldChatNewMessages[chatPartnerId]["newMessages"] +1;
 
       ChatDatabase().updateChatGroup(
-          "users = '${json.encode(oldChatNewMessages)}'",
+          "users = JSON_SET(users, '\$.$chatPartnerId.newMessages',${oldChatNewMessages[chatPartnerId]["newMessages"]})",
           "WHERE id = '${chatData["id"]}'"
       );
+
 
     }
 
@@ -1011,6 +1013,32 @@ String decrypt(String encrypted) {
   return decrypted;
 }
 
+sortProfils(profils) {
+  var allCountries = LocationService().getAllCountries();
+
+  profils.sort((a, b) {
+    var profilALand = a['land'];
+    var profilBLand = b['land'];
+
+    if (allCountries["eng"].contains(profilALand)) {
+      var index = allCountries["eng"].indexOf(profilALand);
+      profilALand = allCountries["ger"][index];
+    }
+    if (allCountries["eng"].contains(profilBLand)) {
+      var index = allCountries["eng"].indexOf(profilBLand);
+      profilBLand = allCountries["ger"][index];
+    }
+
+    int compareCountry = (profilBLand).compareTo(profilALand) as int;
+
+    if (compareCountry != 0) return compareCountry;
+
+    return b["ort"].compareTo(a["ort"]) as int;
+  });
+
+  return profils;
+}
+
 getProfilFromHive({profilId, profilName, getNameOnly = false, getIdOnly = false}){
   var allProfils = Hive.box('secureBox').get("profils");
 
@@ -1039,5 +1067,100 @@ getChatFromHive(chatId){
   for(var myChat in myChats){
     if(myChat["id"] == chatId) return myChat;
   }
+}
+
+getEventFromHive(eventId){
+  var events = Hive.box('secureBox').get("events");
+
+  for(var event in events){
+    if(event["id"] == eventId) return event;
+  }
+}
+
+refreshHiveChats() async {
+  String userId = FirebaseAuth.instance.currentUser?.uid;
+
+  if (userId == null) return;
+
+  var myChatData = await ChatDatabase().getChatData(
+      "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+      returnList: true);
+
+  Hive.box("secureBox").put("myChats", myChatData);
+}
+
+refreshHiveEvents() async{
+  var events = await EventDatabase().getData("*", "ORDER BY wann ASC", returnList: true);
+  if (events == false) events = [];
+  Hive.box("secureBox").put("events", events);
+
+  var userId = FirebaseAuth.instance.currentUser?.uid;
+  if(userId == null) return;
+
+  var ownEvents = [];
+  var myInterestedEvents = [];
+  for(var event in events){
+    if(event["erstelltVon"] == userId) ownEvents.add(event);
+    if(event["interesse"].contains(userId) && event["erstelltVon"] != userId) myInterestedEvents.add(event);
+  }
+
+  Hive.box('secureBox').put("myEvents", ownEvents);
+  Hive.box('secureBox').put("interestEvents", myInterestedEvents);
+}
+
+refreshHiveProfils() async{
+  List<dynamic> dbProfils =
+  await ProfilDatabase().getData("*", "WHERE name != 'googleView' ORDER BY ort ASC");
+  if (dbProfils == false) dbProfils = [];
+
+  dbProfils = sortProfils(dbProfils);
+
+
+  Hive.box('secureBox').put("profils", dbProfils);
+
+  var userId = FirebaseAuth.instance.currentUser?.uid;
+  var ownProfil = {};
+
+  if(userId == null || userId.isEmpty) return;
+
+  for(var profil in dbProfils){
+    if(profil["id"] == userId) ownProfil = profil;
+  }
+  Hive.box('secureBox').put("ownProfil", ownProfil);
+}
+
+refreshHiveCommunities() async {
+  dynamic dbCommunities = await CommunityDatabase()
+      .getData("*", "ORDER BY ort ASC", returnList: true);
+  if (dbCommunities == false) dbCommunities = [];
+
+  Hive.box('secureBox').put("communities", dbCommunities);
+}
+
+refreshHiveNewsPage() async {
+  List<dynamic> dbNewsData = await NewsPageDatabase()
+      .getData("*", "ORDER BY erstelltAm ASC", returnList: true);
+  if (dbNewsData == false) dbNewsData = [];
+
+  Hive.box('secureBox').put("newsFeed", dbNewsData);
+}
+
+refreshHiveStadtInfo() async{
+  var stadtinfo = await StadtinfoDatabase()
+      .getData("*", "ORDER BY ort ASC", returnList: true);
+  Hive.box("secureBox").put("stadtinfo", stadtinfo);
+}
+
+refreshHiveStadtInfoUser() async {
+  var stadtinfoUser =
+  await StadtinfoUserDatabase().getData("*", "", returnList: true);
+  Hive.box("secureBox").put("stadtinfoUser", stadtinfoUser);
+}
+
+refreshHiveFamilyProfils() async{
+  var familyProfils =
+  await FamiliesDatabase().getData("*", "", returnList: true);
+  if (familyProfils == false) familyProfils = [];
+  Hive.box("secureBox").put("familyProfils", familyProfils);
 }
 

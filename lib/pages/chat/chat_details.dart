@@ -53,16 +53,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   bool bothDelete = false;
   var messageInputNode = FocusNode();
   var searchInputNode = FocusNode();
-  var messageIdChange;
-  String changeMessageModus;
+  var messageExtraInformationId;
+  String changeMessageInputModus;
   Widget extraInputInformationBox = const SizedBox.shrink();
   final _scrollController = ItemScrollController();
   var itemPositionListener = ItemPositionsListener.create();
   var scrollIndex = -1;
   var hasStartPosition = true;
-  var ownMessageBoxColor = Colors.greenAccent;
-  var chatpartnerMessageBoxColor = Colors.white;
   var myChats = Hive.box("secureBox").get("myChats");
+  var allEvents = Hive.box('secureBox').get("events") ?? [];
+  var allCommunities = Hive.box('secureBox').get("communities") ?? [];
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
   var angehefteteMessageShowIndex;
   var isLoading = true;
   var textSearchIsActive = false;
@@ -70,9 +71,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var messagesWithSearchText = [];
   var isTextSearching = false;
   var searchTextIndex = 0;
-  var allEvents = Hive.box('secureBox').get("events") ?? [];
-  var allCommunities = Hive.box('secureBox').get("communities") ?? [];
-  var ownProfil = Hive.box('secureBox').get("ownProfil");
 
 
   @override
@@ -206,7 +204,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
     ChatDatabase().updateChatGroup(
-        "users = JSON_SET(users, '\$.$userId.newMessages', '0')",
+        "users = JSON_SET(users, '\$.$userId.newMessages', ${widget.groupChatData["users"][userId]["newMessages"]})",
         "WHERE id = '${widget.groupChatData["id"]}'");
   }
 
@@ -223,7 +221,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "von": userID,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": widget.chatPartnerId,
-      "responseId": messageIdChange ??= "0"
+      "responseId": messageExtraInformationId ??= "0"
     };
 
     setState(() {
@@ -232,7 +230,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
     await ChatDatabase().addNewMessageAndSendNotification(
-        widget.groupChatData, messageData, messageIdChange, isBlocked);
+        widget.groupChatData, messageData, isBlocked);
 
 
     if (messageData["message"].contains("</eventId=")) {
@@ -272,11 +270,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return message;
   }
 
-  deleteChat({bothDelete = false}) {
+  deleteChat() {
     var chatUsers = widget.groupChatData["users"];
-    var chatId = widget.groupChatData["id"];
-    var myChatBox = Hive.box("secureBox");
-    var myChats = myChatBox.get("myChats");
 
     if (chatUsers.length <= 1 || bothDelete) {
       for (var myChat in myChats) {
@@ -286,8 +281,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
-      ChatDatabase().deleteChat(chatId);
-      ChatDatabase().deleteAllMessages(chatId);
+      ChatDatabase().deleteChat(widget.chatId);
+      ChatDatabase().deleteAllMessages(widget.chatId);
     } else {
       var newChatUsersData = {};
 
@@ -304,11 +299,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       ChatDatabase().updateChatGroup(
-          "users = '${json.encode(newChatUsersData)}'", "WHERE id ='$chatId'");
+          "users = '${json.encode(newChatUsersData)}'", "WHERE id ='${widget.chatId}'");
     }
 
     Navigator.pop(context);
-
 
     global_functions.changePageForever(
         context,
@@ -318,9 +312,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   replyMessage(message) {
-    messageIdChange = message["id"];
+    messageExtraInformationId = message["id"];
+
     setState(() {
-      changeMessageModus = "reply";
+      changeMessageInputModus = "reply";
     });
 
     Future.delayed(const Duration(milliseconds: 50), () {
@@ -329,13 +324,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   editMessage(message) {
-    messageIdChange = message["id"];
+    messageExtraInformationId = message["id"];
     nachrichtController.text = message["message"];
 
     setState(() {
-      changeMessageModus = "edit";
+      changeMessageInputModus = "edit";
     });
-
 
     Future.delayed(const Duration(milliseconds: 50), () {
       messageInputNode.requestFocus();
@@ -363,8 +357,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "von": userId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": selectedId,
-      "forward": json.encode(message)
+      "forward": json.encode(message),
+      "responseId": "0"
     };
+
 
     ChatDatabase().updateChatGroup(
         "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
@@ -372,7 +368,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     var isBlocked = ownProfil["geblocktVon"].contains(userId);
     ChatDatabase()
-        .addNewMessageAndSendNotification(chatGroupData, messageData, 0, isBlocked);
+        .addNewMessageAndSendNotification(chatGroupData, messageData, isBlocked);
   }
 
   deleteMessage(messageId) {
@@ -447,10 +443,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   resetExtraInputInformation() {
-    messageIdChange = null;
+    messageExtraInformationId = null;
     extraInputInformationBox = const SizedBox.shrink();
     nachrichtController.clear();
-    changeMessageModus = null;
+    changeMessageInputModus = null;
     messageInputNode.unfocus();
 
     setState(() {});
@@ -458,7 +454,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   saveEditMessage() {
     for (var message in messages) {
-      if (message["id"] == messageIdChange) {
+      if (message["id"] == messageExtraInformationId) {
         message["message"] = nachrichtController.text;
         message["editDate"] = DateTime.now().millisecondsSinceEpoch;
       }
@@ -466,7 +462,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     ChatDatabase().updateMessage(
         "message = '${nachrichtController.text}', editDate = '${DateTime.now().millisecondsSinceEpoch}'",
-        "WHERE id = '$messageIdChange'");
+        "WHERE id = '$messageExtraInformationId'");
   }
 
   showAllPinMessages() {
@@ -553,6 +549,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    var ownMessageBoxColor = Colors.greenAccent;
+    var chatpartnerMessageBoxColor = Colors.white;
 
     angehefteteNachrichten() {
       var chatAngeheftet =
@@ -1037,7 +1035,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     forwardMessage(index, textAlign, message, boxColor, messageTime,
         messageEdit, forwardData) {
+
       var forwardProfil = getProfilFromHive(profilId: forwardData["von"]);
+
 
       return AnimatedContainer(
         color: scrollIndex == index
@@ -1216,7 +1216,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               responseMessage(i, message, boxColor, messageTime, messageEdit));
         } else if (forwardData.isNotEmpty) {
           messageBox.add(forwardMessage(i, textAlign, message, boxColor,
-              messageTime, messageEdit, forwardMessage));
+              messageTime, messageEdit, forwardData));
         } else {
           messageBox.add(normalMessage(
               i, textAlign, message, boxColor, messageTime, messageEdit));
@@ -1340,7 +1340,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     ),
                   ),
                 ),
-                changeMessageModus != "edit"
+                changeMessageInputModus != "edit"
                     ? IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: () {
@@ -1421,7 +1421,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     pinChatDialog() {
       var chatIsPinned =
           widget.groupChatData["users"][userId]["pinned"] ?? false;
-      if(chatIsPinned.runtimeType == String) chatIsPinned = chatIsPinned == "true";
 
       return SimpleDialogOption(
         child: Row(
@@ -1443,7 +1442,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           });
 
           ChatDatabase().updateChatGroup(
-              "users = JSON_SET(users, '\$.$userId.pinned', '${!chatIsPinned}')",
+              "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
               "WHERE id = '${widget.chatId}'");
         },
       );
@@ -1451,7 +1450,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     muteDialog() {
       var chatIsMute = widget.groupChatData["users"][userId]["mute"] ?? false;
-      chatIsMute = chatIsMute == "true" || chatIsMute == true;
 
       return SimpleDialogOption(
         child: Row(
@@ -1473,7 +1471,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           });
 
           ChatDatabase().updateChatGroup(
-              "users = JSON_SET(users, '\$.$userId.mute', '${!chatIsMute}')",
+              "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
               "WHERE id = '${widget.chatId}'");
         },
       );
@@ -1561,7 +1559,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       TextButton(
                         child: Text(AppLocalizations.of(context).loeschen),
                         onPressed: () async {
-                          deleteChat(bothDelete: bothDelete);
+                          deleteChat();
                         },
                       ),
                       TextButton(

@@ -70,7 +70,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double kontinentZoom = 3.5;
   var searchAutocomplete = SearchAutocomplete();
   LatLng mapPosition;
-  bool buildLoaded = false;
+  bool buildLoaded = true;
   bool popupActive = false;
   var popupTyp = "";
   List<Widget> popupItems = [];
@@ -220,39 +220,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   _asyncMethod() async {
-    await getProfilsFromDB();
-    createAndSetZoomLevels(profils, "profils");
-
-    await getCommunitiesFromDB();
-    createAndSetZoomLevels(communities, "communities");
-
     buildLoaded = true;
 
-    refreshStadtinfoUser();
-
     setState(() {});
-  }
-
-  getProfilsFromDB() async {
-    List<dynamic> dbProfils =
-        await ProfilDatabase().getData("*", "ORDER BY ort ASC");
-    if (dbProfils == false) dbProfils = [];
-
-    dbProfils = sortProfils(dbProfils);
-
-    Hive.box('secureBox').put("profils", dbProfils);
-
-    var checkedProfils = [];
-
-    for (var profil in dbProfils) {
-      if (profil["land"].isNotEmpty && profil["ort"].isNotEmpty && profil["name"] != "googleView") {
-        checkedProfils.add(profil);
-      }
-    }
-
-    profils = [for (var profil in checkedProfils) Map.of(profil)];
-    removeProfilsAndCreateAllUserName();
-    changeProfilToFamilyProfil();
   }
 
   sortProfils(profils) {
@@ -279,27 +249,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     });
 
     return profils;
-  }
-
-  getEventsFromDB() async {
-    dynamic dbEvents = await EventDatabase().getData(
-        "*", "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC",
-        returnList: true);
-    if (dbEvents == false) dbEvents = [];
-
-    Hive.box('secureBox').put("events", dbEvents);
-
-    events = dbEvents;
-  }
-
-  getCommunitiesFromDB() async {
-    dynamic dbCommunities = await CommunityDatabase()
-        .getData("*", "ORDER BY ort ASC", returnList: true);
-    if (dbCommunities == false) dbCommunities = [];
-
-    Hive.box('secureBox').put("communities", dbCommunities);
-
-    communities = dbCommunities;
   }
 
   setSearchAutocomplete() {
@@ -459,12 +408,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
         });
       }
     }
-  }
-
-  refreshStadtinfoUser() async {
-    var stadtinfoUser =
-        await StadtinfoUserDatabase().getData("*", "", returnList: true);
-    Hive.box('secureBox').put("stadtinfoUser", stadtinfoUser);
   }
 
   createAndSetZoomLevels(mainList, typ) async {

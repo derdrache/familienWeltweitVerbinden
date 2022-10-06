@@ -65,6 +65,7 @@ class _LoginPageState extends State<LoginPage> {
         var ownProfil =
             await ProfilDatabase().getData("*", "WHERE id = '$userId'");
         Hive.box('secureBox').put("ownProfil", ownProfil);
+        await refreshHiveEvents();
 
         if (ownProfil != false) {
           global_functions.changePageForever(context, StartPage());

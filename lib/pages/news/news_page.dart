@@ -47,7 +47,6 @@ class _NewsPageState extends State<NewsPage> {
       setState(() {});
     });
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
 
@@ -80,40 +79,6 @@ class _NewsPageState extends State<NewsPage> {
     return newProfil;
   }
 
-  _asyncMethod() async {
-    if (ownProfil.isEmpty) await getOwnProfil();
-    await refreshNewsFeed();
-    await refreshEvents();
-
-    setState(() {});
-  }
-
-  getOwnProfil() async {
-    ownProfil = await ProfilDatabase().getData("*", "WHERE id = '$userId'");
-    if (ownProfil == false) ownProfil = {};
-
-    Hive.box('secureBox').put("ownProfil", ownProfil);
-  }
-
-  refreshNewsFeed() async {
-    List<dynamic> dbNewsData = await NewsPageDatabase()
-        .getData("*", "ORDER BY erstelltAm ASC", returnList: true);
-    if (dbNewsData == false) dbNewsData = [];
-
-    Hive.box('secureBox').put("newsFeed", dbNewsData);
-
-    newsFeedData = dbNewsData;
-  }
-
-  refreshEvents() async {
-    List<dynamic> dbEvents = await EventDatabase()
-        .getData("*", "ORDER BY stadt ASC", returnList: true);
-    if (dbEvents == false) dbEvents = [];
-
-    Hive.box('secureBox').put("events", dbEvents);
-
-    events = dbEvents;
-  }
 
   getMyLastLocationChangeDate() {
     var lastLocationChangeDate = "";
