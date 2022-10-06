@@ -552,7 +552,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       List<Widget> freizugebenListe = [];
 
       for (var user in widget.event["freischalten"]) {
-        var profil = await ProfilDatabase().getData("*", "WHERE id = '$user'");
+        var profil = getProfilFromHive(profilId: user);
 
         freizugebenListe.add(Container(
             margin: const EdgeInsets.only(left: 20),
@@ -598,9 +598,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     freigeschalteteUser(windowSetState) async {
       List<Widget> freigeschlatetList = [];
-
       for (var user in widget.event["freigegeben"]) {
-        var profil = await ProfilDatabase().getData("*", "WHERE id = '$user'");
+        var profil = getProfilFromHive(profilId: user);
 
         freigeschlatetList.add(Container(
             margin: const EdgeInsets.only(left: 20),

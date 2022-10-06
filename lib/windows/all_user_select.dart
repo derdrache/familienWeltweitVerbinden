@@ -15,6 +15,7 @@ class AllUserSelectWindow {
   var allUserIds = [];
   var searchAutocomplete = SearchAutocomplete();
   var selectedUserId;
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
 
   AllUserSelectWindow({this.context, this.title});
 
@@ -22,6 +23,8 @@ class AllUserSelectWindow {
       var allProfilData = Hive.box("secureBox").get("profils");
 
       for (var profil in allProfilData) {
+        if(ownProfil["geblocktVon"].contains(profil["id"])) continue;
+
         allUserNames.add(profil["name"]);
         allUserIds.add(profil["id"]);
       }
