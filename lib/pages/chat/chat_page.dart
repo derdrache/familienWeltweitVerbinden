@@ -28,6 +28,7 @@ class _ChatPageState extends State<ChatPage> {
   var searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
   List allName, userFriendlist;
   bool changeBarOn = false;
   var selectedChats = [];
@@ -42,16 +43,14 @@ class _ChatPageState extends State<ChatPage> {
     initilizeCreateChatData();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      refreshOwnProfil();
-      refreshDataFromDb();
+      refreshChatDataFromDb();
     });
 
     super.initState();
   }
 
   checkNewMessageCounter() async {
-    var dbNewMessages =
-        await ProfilDatabase().getData("newMessages", "WHERE id = '$userId'");
+    var dbNewMessages = ownProfil["newMessages"];
     num realNewMessages = 0;
 
     if (dbNewMessages == false) return;
@@ -71,11 +70,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   initilizeCreateChatData() {
-    dynamic userFriendIdList =
-        Hive.box("secureBox").get("ownProfil")["friendlist"];
+    dynamic userFriendIdList = ownProfil["friendlist"];
     allName = [];
     userFriendlist = [];
-    var ownProfil = Hive.box('secureBox').get("ownProfil");
+
 
     for (var data in dbProfilData) {
       if (!ownProfil["geblocktVon"].contains(data["id"]) &&
@@ -95,13 +93,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  refreshOwnProfil() async {
-    var userID = FirebaseAuth.instance.currentUser.uid;
-    var ownProfilDb = await ProfilDatabase().getData("*", "WHERE id = '$userID'");
-    Hive.box("secureBox").put("ownProfil", ownProfilDb);
-  }
-
-  refreshDataFromDb() async {
+  refreshChatDataFromDb() async {
     var newDbData = await ChatDatabase().getChatData(
         "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
         returnList: true);
@@ -355,14 +347,12 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       var chatIsPinned = chat["users"][userId]["pinned"] ?? false;
-      if (chatIsPinned.runtimeType == String)
-        chatIsPinned = chatIsPinned == "true";
 
-      chat["users"][userId]["pinned"] = "${!chatIsPinned}";
+      chat["users"][userId]["pinned"] = !chatIsPinned;
       selectedIsPinned ??= !chatIsPinned;
 
       ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.pinned', '${!chatIsPinned}')",
+          "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
           "WHERE id = '${chat["id"]}'");
     }
 
@@ -384,13 +374,12 @@ class _ChatPageState extends State<ChatPage> {
       }
 
       var chatIsMute = chat["users"][userId]["mute"] ?? false;
-      if (chatIsMute.runtimeType == String) chatIsMute = chatIsMute == "true";
 
-      chat["users"][userId]["mute"] = "${!chatIsMute}";
+      chat["users"][userId]["mute"] = !chatIsMute;
       selectedIsMute ??= !chatIsMute;
 
       ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.mute', '${!chatIsMute}')",
+          "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
           "WHERE id = '${chat["id"]}'");
     }
 

@@ -40,14 +40,6 @@ class _CommunityPageState extends State<CommunityPage> {
 
 
   initialize() async {
-    var dbCommunities = await CommunityDatabase()
-        .getData("*", "", returnList: true); //sortieren?
-
-    if (dbCommunities == false) dbCommunities = [];
-    Hive.box("secureBox").put("communities", dbCommunities);
-
-    allCommunities = dbCommunities;
-
     for (var community in allCommunities) {
       allCommunitiesCities.add(community["ort"]);
 
