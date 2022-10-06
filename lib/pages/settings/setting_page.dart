@@ -18,7 +18,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../global/global_functions.dart' as global_func;
-import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
@@ -66,21 +65,9 @@ class _SettingPageState extends State<SettingPage> {
   void initState() {
     setData();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     super.initState();
   }
 
-
-  _asyncMethod() async{
-    var ownProfilDb = await ProfilDatabase().getData("*", "WHERE id = '$userID'");
-    Hive.box("secureBox").put("ownProfil", ownProfilDb);
-
-    setData();
-
-    setState(() {
-      userProfil = ownProfilDb;
-    });
-  }
 
   void setData() async {
     List childrenAgeTimestamp = [];
