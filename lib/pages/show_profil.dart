@@ -193,8 +193,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           onPressed: () async {
             var name =
                 widget.userName ?? widget.profil["name"].replaceAll("'", "''");
+            var checkFamily = name.split(" ").contains("family") || name.split(" ").contains("Familie");
 
-            if (name.contains("family") || name.contains("familie")) {
+            if (checkFamily) {
               var familyProfils = Hive.box("secureBox").get("familyProfils");
               Map familyProfil;
               List<Widget> menuList = [];
