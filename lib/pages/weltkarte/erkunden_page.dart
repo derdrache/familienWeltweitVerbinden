@@ -221,8 +221,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   _asyncMethod() async {
     buildLoaded = true;
-
-    setState(() {});
   }
 
   sortProfils(profils) {

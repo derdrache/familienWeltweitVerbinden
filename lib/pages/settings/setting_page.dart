@@ -18,7 +18,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../global/global_functions.dart' as global_func;
-import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
@@ -73,7 +72,7 @@ class _SettingPageState extends State<SettingPage> {
     List childrenAgeTimestamp = [];
 
     userProfil["kinder"].forEach((kind) {
-      var changeTimeStamp = global_functions.ChangeTimeStamp(kind);
+      var changeTimeStamp = global_func.ChangeTimeStamp(kind);
       childrenAgeTimestamp.add(changeTimeStamp.intoDate());
     });
 
@@ -130,14 +129,14 @@ class _SettingPageState extends State<SettingPage> {
           PopupMenuItem(
               child: TextButton(
                   onPressed: () {
-                    global_functions.changePage(context, ChangePasswortPage());
+                    global_func.changePage(context, ChangePasswortPage());
                   },
                   child: Text(AppLocalizations.of(context).passwortVeraendern,
                       style: TextStyle(color: textColor)))),
           PopupMenuItem(
               child: TextButton(
                   onPressed: () {
-                    global_functions.changePage(context, FamilieProfilPage());
+                    global_func.changePage(context, const FamilieProfilPage());
                   },
                   child: Text(AppLocalizations.of(context).familyProfil,
                       style: TextStyle(color: textColor)))),
@@ -146,7 +145,7 @@ class _SettingPageState extends State<SettingPage> {
               child: TextButton(
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
-                    global_functions.changePageForever(
+                    global_func.changePageForever(
                         context, const LoginPage());
                   },
                   child: Text(AppLocalizations.of(context).abmelden,
@@ -300,7 +299,7 @@ class _SettingPageState extends State<SettingPage> {
                 const Expanded(child: SizedBox()),
                 GestureDetector(
                     onTap: () {
-                      global_functions.changePage(context,
+                      global_func.changePage(context,
                           ShowProfilPage(profil: userProfil, ownProfil: true));
                     },
                     child: const Icon(
@@ -420,13 +419,13 @@ class _SettingPageState extends State<SettingPage> {
               settingThemeContainer(
                   AppLocalizations.of(context).privatsphaereSicherheit,
                   Icons.lock,
-                  () => global_functions.changePage(
+                  () => global_func.changePage(
                       context, PrivacySecurityPage(profil: userProfil))),
               const SizedBox(height: 20),
               settingThemeContainer(
                   AppLocalizations.of(context).benachrichtigungen,
                   Icons.notifications,
-                  () => global_functions.changePage(
+                  () => global_func.changePage(
                       context, NotificationsOptionsPage(profil: userProfil))),
             ],
           ));
@@ -445,7 +444,7 @@ class _SettingPageState extends State<SettingPage> {
                       fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
               settingThemeContainer("Feedback", Icons.feedback,
-                  () => global_functions.changePage(context, FeedbackPage())),
+                  () => global_func.changePage(context, FeedbackPage())),
               const SizedBox(height: 20),
               settingThemeContainer("Patch Notes", Icons.format_list_bulleted,
                   () => PatchnotesWindow(context: context).openWindow()),
