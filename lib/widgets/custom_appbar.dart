@@ -56,10 +56,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   fullScreenWindow: true,
                 )),
           Expanded(
-            child: InkWell(
+            child: GestureDetector(
               onTap: onTap,
               child: Text(title,
-                  overflow: TextOverflow.fade,
                   style: const TextStyle(color: Colors.white, fontSize: 20)),
             ),
           )
