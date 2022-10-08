@@ -212,7 +212,7 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               home: FirebaseAuth.instance.currentUser != null && emailVerified
                   ? StartPage()
-                  : const LoginPage());
+                  : LoginPage());
         });
   }
 }

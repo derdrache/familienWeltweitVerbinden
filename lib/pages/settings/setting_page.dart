@@ -146,7 +146,7 @@ class _SettingPageState extends State<SettingPage> {
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
                     global_func.changePageForever(
-                        context, const LoginPage());
+                        context, LoginPage());
                   },
                   child: Text(AppLocalizations.of(context).abmelden,
                       style: TextStyle(color: textColor)))),

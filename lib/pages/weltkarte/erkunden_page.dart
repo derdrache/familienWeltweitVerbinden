@@ -70,13 +70,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double kontinentZoom = 3.5;
   var searchAutocomplete = SearchAutocomplete();
   LatLng mapPosition;
-  bool buildLoaded = true;
   bool popupActive = false;
   var popupTyp = "";
   List<Widget> popupItems = [];
   List popupCities = [];
   var lastEventPopup;
   var monthsUntilInactive = 3;
+  var mounted = false;
   bool friendMarkerOn = false,
       eventMarkerOn = false,
       reiseplanungOn = false,
@@ -220,7 +220,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   _asyncMethod() async {
-    buildLoaded = true;
+    mounted = true;
   }
 
   sortProfils(profils) {
@@ -1526,7 +1526,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           maxZoom: maxZoom,
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed) {
-            if (buildLoaded) {
+            if (mounted) {
               mapPosition = position.center;
               currentMapZoom = position.zoom;
               FocusScope.of(context).unfocus();
