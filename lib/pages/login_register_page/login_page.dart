@@ -1,3 +1,4 @@
+import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -17,7 +18,8 @@ import '../../services/database.dart';
 import 'impressum.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key key}) : super(key: key);
+  bool newAccount;
+  LoginPage({this.newAccount = false, Key key}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -31,6 +33,17 @@ class _LoginPageState extends State<LoginPage> {
   String passwort = "";
   bool isLoading = false;
   bool angemeldetBleiben = true;
+
+
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      if(widget.newAccount) showEmailBestaetigungsInformation();
+    });
+
+    super.initState();
+  }
+
 
   loadingBox() {
     return const SizedBox(
@@ -130,6 +143,28 @@ class _LoginPageState extends State<LoginPage> {
     final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
     return data.size.shortestSide < 600 ? true : false;
   }
+
+  showEmailBestaetigungsInformation(){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomAlertDialog(
+          title: "Email Bestätigen",
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: Text("Wir haben dir gerade eine E-Mail gesendet und bitten dich, deine E-Mail Adresse zu bestätigen. \nEs kann bis zu 15 Minuten dauern bis du die Nachricht bekommst."),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: Text("Prüfe bitte gegebenenfalls deinen Spam Ordner.",style: TextStyle(fontStyle: FontStyle.italic),),
+            )
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +363,6 @@ class _LoginPageState extends State<LoginPage> {
                 if (kIsWeb) angemeldetBleibenBox(),
                 const SizedBox(height: 10),
                 forgetPassButton(),
-                const SizedBox(height: 10),
                 resendVerificationEmailButton(),
                 const SizedBox(height: 10),
                 isLoading

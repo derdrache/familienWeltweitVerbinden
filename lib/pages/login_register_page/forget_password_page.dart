@@ -55,7 +55,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                   AppLocalizations.of(context).emailSenden, () async {
                 var wasReset = await resetPassword();
                 if (wasReset) {
-                  globa_functions.changePageForever(context, const LoginPage());
+                  globa_functions.changePageForever(context, LoginPage());
                 }
               })
             ],
