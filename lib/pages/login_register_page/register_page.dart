@@ -28,10 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
     });
     var registrationComplete = await registration();
     if (registrationComplete) {
-      customSnackbar(
-          context, AppLocalizations.of(context).registerAndEmailBestaetigen,
-          color: Colors.green);
-      global_functions.changePageForever(context, const LoginPage());
+      global_functions.changePageForever(context, LoginPage(newAccount: true,));
     }
   }
 

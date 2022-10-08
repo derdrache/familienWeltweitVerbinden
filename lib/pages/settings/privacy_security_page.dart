@@ -235,7 +235,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                     DbDeleteImage(widget.profil["bild"]);
                     setState(() {});
                     global_functions.changePageForever(
-                        context, const LoginPage());
+                        context, LoginPage());
                   },
                 ),
                 TextButton(
