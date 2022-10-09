@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_func;
@@ -810,7 +809,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                   if (!widget.rowData.contains("http")) {
                     widget.rowData = "http://" + widget.rowData;
                   }
-                  launch(widget.rowData);
+                  global_func.openURL(widget.rowData);
                 },
                 child: Text(AppLocalizations.of(context).linkOeffnen),
               ),
@@ -857,7 +856,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                           if (!widget.rowData.contains("http")) {
                             widget.rowData = "http://" + widget.rowData;
                           }
-                          launch(widget.rowData);
+                          global_func.openURL(widget.rowData);
                         }
                       },
               )
