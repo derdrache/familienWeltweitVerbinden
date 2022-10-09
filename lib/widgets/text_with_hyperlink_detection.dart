@@ -1,20 +1,11 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../global/global_functions.dart' as global_func;
 
 bool _isLink(String input) {
   final matcher = RegExp(
       r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)");
 
-  if(matcher.hasMatch(input)){
-    try{
-      if(Uri.parse(input).isAbsolute) return true;
-    }catch(_){
-      return false;
-    }
-  }
-
-  return false;
+  return matcher.hasMatch(input);
 }
 
 class TextWithHyperlinkDetection extends StatelessWidget {
@@ -23,6 +14,8 @@ class TextWithHyperlinkDetection extends StatelessWidget {
   var hasLink = false;
   List<InlineSpan> textSpanList = [];
   Function onTextTab;
+  var hyperlinkColor = Colors.blue;
+  var textColor = Colors.black;
 
   TextWithHyperlinkDetection(
       {Key key, this.text, this.fontsize = 15, this.onTextTab})
@@ -34,35 +27,48 @@ class TextWithHyperlinkDetection extends StatelessWidget {
     var hasLink = false;
     var newText = "";
 
+    addNormalText(text){
+      textSpanList.add(WidgetSpan(
+          child: GestureDetector(onTap: onTextTab == null ? null :() => onTextTab(), child: Text(text)),
+          style: TextStyle(color: textColor, fontSize: fontsize)));
+    }
+
+    addHyperLinkText(text){
+      textSpanList.add(WidgetSpan(
+          child: GestureDetector(
+              onTap: () => global_func.openURL(text),
+              child: Text(text,
+                  style: TextStyle(
+                      color: hyperlinkColor,
+                      fontSize: fontsize)))));
+    }
+
     for (var word in beschreibungsList) {
+
       if (_isLink(word) || word.contains("http")) {
         hasLink = true;
         var wordArray = word.split("\n");
 
-        if (wordArray.length == 1) {
-          textSpanList.add(WidgetSpan(
-              child: GestureDetector(
-                  onTap: () => launch(word),
-                  child: Text(word,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.secondary,
-                          fontSize: fontsize)))));
+        if (newText.isNotEmpty) {
+          addNormalText(newText);
+          newText = "";
+        }
+
+        if (wordArray.length == 1) {//google.de
+          addHyperLinkText(word);
         } else {
           for (var line in wordArray) {
             if (line.isEmpty) continue;
 
-            if (!line.contains("http")) {
-              newText += wordArray[0];
+            if (!_isLink(line)) {
+              newText += line;
               break;
             }
+
+            if(_isLink(line)) break;
           }
 
-          textSpanList.add(WidgetSpan(
-              child: GestureDetector(
-                onTap: onTextTab == null ? null :() => onTextTab(),
-                child: Text(newText,
-                    style: TextStyle(color: Colors.black, fontSize: fontsize)),
-              )));
+          addNormalText(newText);
 
           var hyperLinkIndex = wordArray.indexWhere(
               (checkWord) => _isLink(checkWord) || checkWord.contains("http"));
@@ -70,12 +76,12 @@ class TextWithHyperlinkDetection extends StatelessWidget {
 
           textSpanList.add(WidgetSpan(
               child: GestureDetector(
-                  onTap: () => launch(hyperLinkLine),
+                  onTap: () => global_func.openURL(hyperLinkLine),
                   child: Row(
                     children: [
                       Text(hyperLinkLine,
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: hyperlinkColor,
                               fontSize: fontsize)),
                     ],
                   ))));
@@ -88,15 +94,8 @@ class TextWithHyperlinkDetection extends StatelessWidget {
                       : wordArray.length)
               .join();
 
-          textSpanList.add(WidgetSpan(
-              child: GestureDetector(
-                onTap: onTextTab == null ? null :() => onTextTab(),
-                child: Text(lastWord + " ",
-                    style: TextStyle(color: Colors.black, fontSize: fontsize)),
-              )));
-
+          addNormalText(lastWord + " ");
           newText = "";
-          hasLink = true;
         }
       } else {
         newText += word + " ";
@@ -107,13 +106,11 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       return GestureDetector(
         onTap: onTextTab == null ? null :() => onTextTab(),
           child: Text(text,
-              style: TextStyle(color: Colors.black, fontSize: fontsize)));
+              style: TextStyle(color: textColor, fontSize: fontsize)));
     }
 
     if (newText.isNotEmpty) {
-      textSpanList.add(WidgetSpan(
-          child: GestureDetector(onTap: onTextTab == null ? null :() => onTextTab(), child: Text(newText)),
-          style: TextStyle(color: Colors.black, fontSize: fontsize)));
+      addNormalText(newText);
     }
 
     return RichText(text: TextSpan(children: textSpanList));
