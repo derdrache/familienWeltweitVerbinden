@@ -441,9 +441,8 @@ class _ChatPageState extends State<ChatPage> {
         if (chatPartnerName.isEmpty) {
           chatPartnerName = AppLocalizations.of(context).geloeschterUser;
         }
-        chatPartnerProfil ??= {
-          "bild": ["assets/WeltFlugzeug.png"]
-        };
+
+        if(chatPartnerProfil == null) continue;
 
         var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
         if (group["lastMessage"].isEmpty || group["users"][userId] == null || isBlocked) {
