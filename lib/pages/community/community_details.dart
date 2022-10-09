@@ -11,7 +11,6 @@ import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -408,7 +407,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           child: Text(AppLocalizations.of(context).linkOeffnen),
           onTap: () {
             Navigator.pop(context);
-            launch(widget.community["link"]);
+            global_func.openURL(widget.community["link"]);
           },
         ),
       ],
@@ -901,7 +900,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               if (!link.contains("http")) link = "http://" + link;
 
               if (isCreator) _changeOrOpenLinkWindow(getTabPostion);
-              if (!isCreator) launch(widget.community["link"]);
+              if (!isCreator) global_func.openURL(widget.community["link"]);
             },
             child: Row(
               children: [
