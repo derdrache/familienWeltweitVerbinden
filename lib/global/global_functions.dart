@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:familien_suche/global/variablen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 checkValidatorEmpty(context) {
@@ -185,4 +186,12 @@ changeEnglishToGerman(list){
   }
 
   return germanOutputList;
+}
+
+openURL(url){
+  if(url.contains("http")){
+    launch(url);
+  } else{
+    launch("http://"+url);
+  }
 }

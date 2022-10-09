@@ -220,7 +220,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "von": userID,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": widget.chatPartnerId,
-      "responseId": messageExtraInformationId ??= "0"
+      "responseId": messageExtraInformationId ??= "0",
+      "forward": ""
     };
 
     setState(() {
@@ -352,11 +353,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         await ChatDatabase().getChatData("*", "WHERE id = '$selectedChatId'");
 
     var messageData = {
-      "message": "<weiterleitung>",
+      "message": message["message"],
       "von": userId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": selectedUserId,
-      "forward": json.encode(message),
+      "forward": "userId:" + message["von"],
       "responseId": "0"
     };
 
@@ -561,8 +562,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    var ownMessageBoxColor = Colors.greenAccent;
+    var ownMessageBoxColor = Theme.of(context).colorScheme.primary;
     var chatpartnerMessageBoxColor = Colors.white;
+    var timeStampColor = Colors.grey;
 
     angehefteteNachrichten() {
       var chatAngeheftet =
@@ -678,9 +680,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     openMessageMenu(message, index) {
       final RenderBox overlay = Overlay.of(context).context.findRenderObject();
       var isMyMessage = message["von"] == userId;
-      if (message["forward"].runtimeType == String) {
-        message["forward"] = json.decode(message["forward"]);
-      }
       var isInPinned = false;
       var angehefteteMessages =
           widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
@@ -830,85 +829,89 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         curve: Curves.easeIn,
         child: Align(
             alignment: messageBoxInformation["textAlign"],
-            child: Container(
-              child: Column(children: [
-                Container(
-                  alignment: messageBoxInformation["textAlign"],
-                  child: EventCard(
-                    margin: const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 0),
-                    withInteresse: true,
-                    event: eventData,
-                    afterPageVisit: () => setState(() {}),
-                  ),
+            child: Column(children: [
+              Container(
+                alignment: messageBoxInformation["textAlign"],
+                child: EventCard(
+                  margin: const EdgeInsets.only(
+                      left: 15, right: 15, top: 15, bottom: 0),
+                  withInteresse: true,
+                  event: eventData,
+                  afterPageVisit: () => setState(() {}),
                 ),
-                messageSplit.length == 1
-                    ? Row(
-                  mainAxisAlignment: messageBoxInformation["textAlign"] == Alignment.centerLeft
-                      ? MainAxisAlignment.start
-                      : MainAxisAlignment.end,
-                        children: [
-                          SizedBox(width: 70),
-                          TextButton(
-                              onPressed: () {
-                                var replyUser = getProfilFromHive(
-                                    profilId: message["von"],
-                                    getNameOnly: true);
+              ),
+              messageSplit.length == 1
+                  ? Row(
+                      mainAxisAlignment: messageBoxInformation["textAlign"] ==
+                              Alignment.centerLeft
+                          ? MainAxisAlignment.start
+                          : MainAxisAlignment.end,
+                      children: [
+                        const SizedBox(width: 70),
+                        TextButton(
+                            onPressed: () {
+                              var replyUser = getProfilFromHive(
+                                  profilId: message["von"], getNameOnly: true);
 
-                                extraInputInformationBox = inputInformationBox(
-                                    Icons.reply, replyUser, message["message"]);
-                                replyMessage(message);
-                              },
-                              child:
-                                  Text(AppLocalizations.of(context).antworten)),
-                          Text(messageBoxInformation["messageTime"],
-                              style: TextStyle(color: Colors.grey[600])),
+                              extraInputInformationBox = inputInformationBox(
+                                  Icons.reply, replyUser, message["message"]);
+                              replyMessage(message);
+                            },
+                            child:
+                                Text(AppLocalizations.of(context).antworten)),
+                        Text(messageBoxInformation["messageTime"],
+                            style: TextStyle(color: timeStampColor)),
+                      ],
+                    )
+                  : Align(
+                      alignment: messageBoxInformation["textAlign"],
+                      child: Stack(
+                        children: [
+                          Container(
+                              constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.85),
+                              margin: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color:
+                                      messageBoxInformation["messageBoxColor"],
+                                  border: Border.all(),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              child: Wrap(
+                                alignment: WrapAlignment.end,
+                                children: [
+                                  TextWithHyperlinkDetection(
+                                      text: message["message"] ?? "",
+                                      fontsize: 16,
+                                      onTextTab: () =>
+                                          openMessageMenu(message, index)),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                      messageBoxInformation["messageEdit"] +
+                                          " " +
+                                          messageBoxInformation["messageTime"],
+                                      style: const TextStyle(
+                                          color: Colors.transparent))
+                                ],
+                              )),
+                          Positioned(
+                            right: 20,
+                            bottom: 15,
+                            child: Text(
+                                messageBoxInformation["messageEdit"] +
+                                    messageBoxInformation["messageTime"],
+                                style: TextStyle(color: timeStampColor)),
+                          )
                         ],
-                      )
-                    : Align(
-                        alignment: messageBoxInformation["textAlign"],
-                        child: Stack(
-                          children: [
-                            Container(
-                                constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.85),
-                                margin: const EdgeInsets.all(10),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: messageBoxInformation["messageBoxColor"],
-                                    border: Border.all(),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(10))),
-                                child: Wrap(
-                                  alignment: WrapAlignment.end,
-                                  children: [
-                                    TextWithHyperlinkDetection(
-                                        text: message["message"] ?? "",
-                                        fontsize: 16,
-                                        onTextTab: () =>
-                                            openMessageMenu(message, index)),
-                                    const SizedBox(width: 5),
-                                    Text(messageBoxInformation["messageEdit"] + " " + messageBoxInformation["messageTime"],
-                                        style: const TextStyle(
-                                            color: Colors.transparent))
-                                  ],
-                                )),
-                            Positioned(
-                              right: 20,
-                              bottom: 15,
-                              child: Text(messageBoxInformation["messageEdit"] + messageBoxInformation["messageTime"],
-                                  style: TextStyle(color: Colors.grey[600])),
-                            )
-                          ],
-                        ),
-                      )
-              ]),
-            )),
+                      ),
+                    )
+            ])),
       );
     }
 
-    communityMessage(index,message, messageBoxInformation) {
+    communityMessage(index, message, messageBoxInformation) {
       var messageSplit = message["message"].split(" ");
       var communityId = "";
       var communityData;
@@ -932,107 +935,110 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         curve: Curves.easeIn,
         child: Align(
             alignment: messageBoxInformation["textAlign"],
-            child: Container(
-              child: Column(children: [
-                Container(
-                  alignment: messageBoxInformation["textAlign"],
-                  child: CommunityCard(
-                    margin: const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 0),
-                    community: communityData,
-                    afterPageVisit: () => setState(() {}),
-                  ),
+            child: Column(children: [
+              Container(
+                alignment: messageBoxInformation["textAlign"],
+                child: CommunityCard(
+                  margin: const EdgeInsets.only(
+                      left: 15, right: 15, top: 15, bottom: 0),
+                  community: communityData,
+                  afterPageVisit: () => setState(() {}),
                 ),
-                messageSplit.length == 1
-                    ? Row(
-                        mainAxisAlignment: messageBoxInformation["textAlign"] == Alignment.centerLeft
-                            ? MainAxisAlignment.start
-                            : MainAxisAlignment.end,
-                        children: [
-                          SizedBox(width: 70),
-                          TextButton(
-                              onPressed: () {
-                                var replyUser = getProfilFromHive(
-                                    profilId: message["von"],
-                                    getNameOnly: true);
+              ),
+              messageSplit.length == 1
+                  ? Row(
+                      mainAxisAlignment: messageBoxInformation["textAlign"] ==
+                              Alignment.centerLeft
+                          ? MainAxisAlignment.start
+                          : MainAxisAlignment.end,
+                      children: [
+                        const SizedBox(width: 70),
+                        TextButton(
+                            onPressed: () {
+                              var replyUser = getProfilFromHive(
+                                  profilId: message["von"], getNameOnly: true);
 
-                                extraInputInformationBox = inputInformationBox(
-                                    Icons.reply, replyUser, message["message"]);
-                                replyMessage(message);
-                              },
-                              child:
-                                  Text(AppLocalizations.of(context).antworten)),
-                          Text(messageBoxInformation["messageTime"],
-                              style: TextStyle(color: Colors.grey[600])),
+                              extraInputInformationBox = inputInformationBox(
+                                  Icons.reply, replyUser, message["message"]);
+                              replyMessage(message);
+                            },
+                            child:
+                                Text(AppLocalizations.of(context).antworten)),
+                        Text(messageBoxInformation["messageTime"],
+                            style: TextStyle(color: timeStampColor)),
+                      ],
+                    )
+                  : Align(
+                      alignment: messageBoxInformation["textAlign"],
+                      child: Stack(
+                        children: [
+                          Container(
+                              constraints: BoxConstraints(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.85),
+                              margin: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color:
+                                      messageBoxInformation["messageBoxColor"],
+                                  border: Border.all(),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              child: Wrap(
+                                alignment: WrapAlignment.end,
+                                children: [
+                                  TextWithHyperlinkDetection(
+                                      text: message["message"] ?? "",
+                                      fontsize: 16,
+                                      onTextTab: () =>
+                                          openMessageMenu(message, index)),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                      messageBoxInformation["messageEdit"] +
+                                          " " +
+                                          messageBoxInformation["messageTime"],
+                                      style: const TextStyle(
+                                          color: Colors.transparent))
+                                ],
+                              )),
+                          Positioned(
+                            right: 20,
+                            bottom: 15,
+                            child: Text(
+                                messageBoxInformation["messageEdit"] +
+                                    messageBoxInformation["messageTime"],
+                                style: TextStyle(color: timeStampColor)),
+                          )
                         ],
-                      )
-                    : Align(
-                        alignment: messageBoxInformation["textAlign"],
-                        child: Stack(
-                          children: [
-                            Container(
-                                constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width *
-                                            0.85),
-                                margin: const EdgeInsets.all(10),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: messageBoxInformation["messageBoxColor"],
-                                    border: Border.all(),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(10))),
-                                child: Wrap(
-                                  alignment: WrapAlignment.end,
-                                  children: [
-                                    TextWithHyperlinkDetection(
-                                        text: message["message"] ?? "",
-                                        fontsize: 16,
-                                        onTextTab: () =>
-                                            openMessageMenu(message, index)),
-                                    const SizedBox(width: 5),
-                                    Text(messageBoxInformation["messageEdit"] + " " + messageBoxInformation["messageTime"],
-                                        style: const TextStyle(
-                                            color: Colors.transparent))
-                                  ],
-                                )),
-                            Positioned(
-                              right: 20,
-                              bottom: 15,
-                              child: Text(messageBoxInformation["messageEdit"] + messageBoxInformation["messageTime"],
-                                  style: TextStyle(color: Colors.grey[600])),
-                            )
-                          ],
-                        ),
-                      )
-              ]),
-            )),
+                      ),
+                    )
+            ])),
       );
     }
 
-    responseMessage(index, message,messageBoxInformation) {
-      var replyFromId =
-          message["chatId"].replaceAll(userId, "").replaceAll("_", "");
-      var messageFromProfil = getProfilFromHive(profilId: replyFromId);
-      var replyMessageText;
+    responseMessage(index, message, messageBoxInformation) {
+      var replyMessage;
       var replyIndex = messages.length;
 
       for (var lookMessage in messages.reversed.toList()) {
         replyIndex -= 1;
 
         if (lookMessage["id"] == message["responseId"]) {
-          replyMessageText = lookMessage;
+          replyMessage = lookMessage;
           break;
         }
       }
 
-      var isEvent = replyMessageText["message"].contains("</eventId=");
-      var isCommunity = replyMessageText["message"].contains("</communityId=");
+      var replyFromId = replyMessage["von"];
+      var messageFromProfil = getProfilFromHive(profilId: replyFromId);
+      var isEvent = replyMessage["message"].contains("</eventId=");
+      var isCommunity = replyMessage["message"].contains("</communityId=");
       var cardData = {};
       var textAddition = "";
 
       if (isEvent || isCommunity) {
         if (isEvent) {
-          var eventId = replyMessageText["message"].substring(10);
+          var eventId = replyMessage["message"].substring(10);
           for (var event in allEvents) {
             if (event["id"] == eventId) {
               textAddition = "Event: ";
@@ -1041,7 +1047,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             }
           }
         } else if (isCommunity) {
-          var communityId = replyMessageText["message"].substring(14);
+          var communityId = replyMessage["message"].substring(14);
           for (var community in allCommunities) {
             if (community["id"] == communityId) {
               textAddition = "Community: ";
@@ -1059,13 +1065,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         duration: const Duration(seconds: 1),
         curve: Curves.easeIn,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Expanded(flex: 2, child: SizedBox.shrink()),
+            if (messageBoxInformation["textAlign"] == Alignment.centerRight)
+              const Expanded(flex: 2, child: SizedBox.shrink()),
             Stack(
               children: [
                 Container(
-                    constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.85),
                     margin: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                         color: messageBoxInformation["messageBoxColor"],
@@ -1088,8 +1094,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                         left: BorderSide(
                                             width: 2,
                                             color: Color(messageFromProfil[
-                                                    "bildStandardFarbe"])
-                                                .withOpacity(1)))),
+                                            "bildStandardFarbe"])))),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -1097,11 +1102,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             color: Color(messageFromProfil[
-                                                    "bildStandardFarbe"])
-                                                .withOpacity(1))),
+                                                    "bildStandardFarbe"]))),
                                     Text(
                                       cardData["name"] == null
-                                          ? replyMessageText["message"]
+                                          ? replyMessage["message"]
                                           : textAddition + cardData["name"],
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -1122,7 +1126,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     openMessageMenu(message, index),
                               ),
                               const SizedBox(width: 5),
-                              Text(messageBoxInformation["messageEdit"] + " " + messageBoxInformation["messageTime"],
+                              Text(
+                                  messageBoxInformation["messageEdit"] +
+                                      " " +
+                                      messageBoxInformation["messageTime"],
                                   style: const TextStyle(
                                       color: Colors.transparent))
                             ],
@@ -1133,18 +1140,24 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 Positioned(
                   right: 20,
                   bottom: 15,
-                  child: Text(messageBoxInformation["messageEdit"] + " " + messageBoxInformation["messageTime"],
-                      style: TextStyle(color: Colors.grey[600])),
+                  child: Text(
+                      messageBoxInformation["messageEdit"] +
+                          " " +
+                          messageBoxInformation["messageTime"],
+                      style: TextStyle(color: timeStampColor)),
                 )
               ],
             ),
+            if (messageBoxInformation["textAlign"] == Alignment.centerLeft)
+              const Expanded(flex: 2, child: SizedBox.shrink()),
           ],
         ),
       );
     }
 
-    forwardMessage(index, message, forwardData,messageBoxInformation) {
-      var forwardProfil = getProfilFromHive(profilId: forwardData["von"]);
+    forwardMessage(index, message, forwardData, messageBoxInformation) {
+      var messageAutorId = forwardData.split(":")[1];
+      var forwardProfil = getProfilFromHive(profilId: messageAutorId);
 
       return AnimatedContainer(
         color: scrollIndex == index
@@ -1190,13 +1203,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             padding: const EdgeInsets.only(
                                 top: 5, left: 10, bottom: 7, right: 10),
                             child: TextWithHyperlinkDetection(
-                                text: forwardData["message"] ?? "",
+                                text: message["message"] ?? "",
                                 fontsize: 16,
                                 onTextTab: () =>
                                     openMessageMenu(message, index)),
                           ),
                           const SizedBox(width: 5),
-                          Text(messageBoxInformation["messageEdit"] + " " + messageBoxInformation["messageTime"],
+                          Text(
+                              messageBoxInformation["messageEdit"] +
+                                  " " +
+                                  messageBoxInformation["messageTime"],
                               style: const TextStyle(color: Colors.transparent))
                         ],
                       ),
@@ -1205,8 +1221,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               Positioned(
                 right: 20,
                 bottom: 15,
-                child: Text(messageBoxInformation["messageEdit"] + " " + messageBoxInformation["messageTime"],
-                    style: TextStyle(color: Colors.grey[600])),
+                child: Text(
+                    messageBoxInformation["messageEdit"] +
+                        " " +
+                        messageBoxInformation["messageTime"],
+                    style: TextStyle(color: timeStampColor)),
               )
             ],
           ),
@@ -1243,15 +1262,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           fontsize: 16,
                           onTextTab: () => openMessageMenu(message, index)),
                       const SizedBox(width: 5),
-                      Text(messageBoxInformation["messageEdit"] + " " + messageBoxInformation["messageTime"],
+                      Text(
+                          messageBoxInformation["messageEdit"] +
+                              " " +
+                              messageBoxInformation["messageTime"],
                           style: const TextStyle(color: Colors.transparent))
                     ],
                   )),
               Positioned(
                 right: 20,
                 bottom: 15,
-                child: Text(messageBoxInformation["messageEdit"] + messageBoxInformation["messageTime"],
-                    style: TextStyle(color: Colors.grey[600])),
+                child: Text(
+                    messageBoxInformation["messageEdit"] +
+                        messageBoxInformation["messageTime"],
+                    style: TextStyle(color: timeStampColor)),
               )
             ],
           ),
@@ -1268,13 +1292,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         var messageDateTime =
             DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         var messageDate = DateFormat('dd.MM.yy').format(messageDateTime);
-        var forwardData = message["forward"].runtimeType == String
-            ? json.decode(message["forward"])
-            : message["forward"];
-        forwardData ??= {};
+        var forwardData = message["forward"];
+
         message["responseId"] ??= "0";
         var messageBoxInformation = {
-          "messageBoxColor" : chatpartnerMessageBoxColor,
+          "messageBoxColor": chatpartnerMessageBoxColor,
           "textAlign": Alignment.centerLeft,
           "messageTime": DateFormat('HH:mm').format(messageDateTime),
           "messageEdit": message["editDate"] == null
@@ -1320,7 +1342,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         } else if (int.parse(message["responseId"]) != 0) {
           messageBox.add(responseMessage(i, message, messageBoxInformation));
         } else if (forwardData.isNotEmpty) {
-          messageBox.add(forwardMessage(i, message, forwardData, messageBoxInformation));
+          messageBox.add(
+              forwardMessage(i, message, forwardData, messageBoxInformation));
         } else {
           messageBox.add(normalMessage(i, message, messageBoxInformation));
         }
@@ -1447,11 +1470,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     ? IconButton(
                         padding: EdgeInsets.zero,
                         onPressed: () {
-                          //checkChatgroupUsers();
                           messageToDbAndClearMessageInput(
                               nachrichtController.text);
 
                           resetExtraInputInformation();
+
+                          _scrollController.jumpTo(index: 0);
 
                           setState(() {
                             nachrichtController.clear();
@@ -1761,7 +1785,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           title: widget.chatPartnerName ?? "",
           leading: widget.backToChatPage
               ? IconButton(
-                  icon: Icon(Icons.arrow_back_sharp),
+                  icon: const Icon(Icons.arrow_back_sharp),
                   onPressed: () => global_functions.changePageForever(
                       context,
                       StartPage(
