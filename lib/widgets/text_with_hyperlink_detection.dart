@@ -14,7 +14,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
   var hasLink = false;
   List<InlineSpan> textSpanList = [];
   Function onTextTab;
-  var hyperlinkColor = Colors.blue;
+  var hyperlinkColor = Colors.blue[700];
   var textColor = Colors.black;
 
   TextWithHyperlinkDetection(
@@ -40,7 +40,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
               child: Text(text,
                   style: TextStyle(
                       color: hyperlinkColor,
-                      fontSize: fontsize)))));
+                      fontSize: fontsize-3)))));
     }
 
     for (var word in beschreibungsList) {
@@ -54,7 +54,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
           newText = "";
         }
 
-        if (wordArray.length == 1) {//google.de
+        if (wordArray.length == 1) {
           addHyperLinkText(word);
         } else {
           for (var line in wordArray) {
