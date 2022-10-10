@@ -229,7 +229,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
 
     var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
-    await ChatDatabase().addNewMessageAndSendNotification(
+    ChatDatabase().addNewMessageAndSendNotification(
         widget.groupChatData, messageData, isBlocked);
 
     if (messageData["message"].contains("</eventId=")) {
@@ -340,7 +340,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     Clipboard.setData(ClipboardData(text: messageText));
     customSnackbar(
         context, AppLocalizations.of(context).nachrichtZwischenAblage,
-        color: Colors.green);
+        color: Colors.green, duration: Duration(seconds: 1));
   }
 
   forwardedMessage(message) async {
@@ -562,9 +562,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    var ownMessageBoxColor = Theme.of(context).colorScheme.primary;
+    var ownMessageBoxColor = Theme.of(context).colorScheme.secondary;
     var chatpartnerMessageBoxColor = Colors.white;
-    var timeStampColor = Colors.grey;
+    var timeStampColor = Colors.grey[600];
 
     angehefteteNachrichten() {
       var chatAngeheftet =
@@ -1035,6 +1035,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var isCommunity = replyMessage["message"].contains("</communityId=");
       var cardData = {};
       var textAddition = "";
+      var replyColor = messageFromProfil["bildStandardFarbe"] == 4285132974
+          ? Colors.greenAccent[100]
+          : Color(messageFromProfil["bildStandardFarbe"]);
 
       if (isEvent || isCommunity) {
         if (isEvent) {
@@ -1087,31 +1090,32 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                                padding: const EdgeInsets.only(left: 5),
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                        left: BorderSide(
-                                            width: 2,
-                                            color: Color(messageFromProfil[
-                                            "bildStandardFarbe"])))),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(messageFromProfil["name"],
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(messageFromProfil[
-                                                    "bildStandardFarbe"]))),
-                                    Text(
-                                      cardData["name"] == null
-                                          ? replyMessage["message"]
-                                          : textAddition + cardData["name"],
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    )
-                                  ],
-                                )),
+                            child: GestureDetector(
+                              onTap: () => openMessageMenu(message, index),
+                              child: Container(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                          left: BorderSide(
+                                              width: 2,
+                                              color: replyColor))),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(messageFromProfil["name"],
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: replyColor)),
+                                      Text(
+                                        cardData["name"] == null
+                                            ? replyMessage["message"]
+                                            : textAddition + cardData["name"],
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )
+                                    ],
+                                  )),
+                            ),
                           ),
                         ),
                         Container(
@@ -1197,24 +1201,27 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           ),
                         ),
                       ),
-                      Wrap(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.only(
-                                top: 5, left: 10, bottom: 7, right: 10),
-                            child: TextWithHyperlinkDetection(
-                                text: message["message"] ?? "",
-                                fontsize: 16,
-                                onTextTab: () =>
-                                    openMessageMenu(message, index)),
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                              messageBoxInformation["messageEdit"] +
-                                  " " +
-                                  messageBoxInformation["messageTime"],
-                              style: const TextStyle(color: Colors.transparent))
-                        ],
+                      GestureDetector(
+                        onTap: () => openMessageMenu(message, index),
+                        child: Wrap(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.only(
+                                  top: 5, left: 10, bottom: 7, right: 10),
+                              child: TextWithHyperlinkDetection(
+                                  text: message["message"] ?? "",
+                                  fontsize: 16,
+                                  onTextTab: () =>
+                                      openMessageMenu(message, index)),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                                messageBoxInformation["messageEdit"] +
+                                    " " +
+                                    messageBoxInformation["messageTime"],
+                                style: const TextStyle(color: Colors.transparent))
+                          ],
+                        ),
                       ),
                     ],
                   )),
@@ -1234,50 +1241,53 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     normalMessage(index, message, messageBoxInformation) {
-      return AnimatedContainer(
-        color: scrollIndex == index
-            ? Theme.of(context).colorScheme.primary
-            : Colors.white,
-        duration: const Duration(seconds: 1),
-        curve: Curves.easeIn,
-        child: Align(
-          alignment: messageBoxInformation["textAlign"],
-          child: Stack(
-            children: [
-              Container(
-                  constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.85),
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      color: messageBoxInformation["messageBoxColor"],
-                      border: Border.all(),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(10))),
-                  child: Wrap(
-                    alignment: WrapAlignment.end,
-                    children: [
-                      TextWithHyperlinkDetection(
-                          text: message["message"] ?? "",
-                          fontsize: 16,
-                          onTextTab: () => openMessageMenu(message, index)),
-                      const SizedBox(width: 5),
-                      Text(
-                          messageBoxInformation["messageEdit"] +
-                              " " +
-                              messageBoxInformation["messageTime"],
-                          style: const TextStyle(color: Colors.transparent))
-                    ],
-                  )),
-              Positioned(
-                right: 20,
-                bottom: 15,
-                child: Text(
-                    messageBoxInformation["messageEdit"] +
-                        messageBoxInformation["messageTime"],
-                    style: TextStyle(color: timeStampColor)),
-              )
-            ],
+      return GestureDetector(
+        onTap: () => openMessageMenu(message, index),
+        child: AnimatedContainer(
+          color: scrollIndex == index
+              ? Theme.of(context).colorScheme.primary
+              : Colors.white,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeIn,
+          child: Align(
+            alignment: messageBoxInformation["textAlign"],
+            child: Stack(
+              children: [
+                Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.85),
+                    margin: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: messageBoxInformation["messageBoxColor"],
+                        border: Border.all(),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10))),
+                    child: Wrap(
+                      alignment: WrapAlignment.end,
+                      children: [
+                        TextWithHyperlinkDetection(
+                            text: message["message"] ?? "",
+                            fontsize: 16,
+                            onTextTab: () => openMessageMenu(message, index)),
+                        const SizedBox(width: 5),
+                        Text(
+                            messageBoxInformation["messageEdit"] +
+                                " " +
+                                messageBoxInformation["messageTime"],
+                            style: const TextStyle(color: Colors.transparent))
+                      ],
+                    )),
+                Positioned(
+                  right: 20,
+                  bottom: 15,
+                  child: Text(
+                      messageBoxInformation["messageEdit"] +
+                          messageBoxInformation["messageTime"],
+                      style: TextStyle(color: timeStampColor)),
+                )
+              ],
+            ),
           ),
         ),
       );
@@ -1603,44 +1613,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         },
       );
     }
-
-    /*
-    settingDialog() {
-      return SimpleDialogOption(
-        child: Row(
-          children: [
-            const Icon(Icons.settings),
-            const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).einstellungen),
-          ],
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(builder: (ontext, setState) {
-                  return CustomAlertDialog(
-                    title: AppLocalizations.of(context).chatEinstellung,
-                    height: 140,
-                    children: [
-                      const Center(child: Text("Message Input Größe")),
-                      Slider(
-                        max: 70,
-                        min: 40,
-                        value: 50,
-                        onChanged: (value) {},
-                      )
-                    ],
-                  );
-                });
-              });
-        },
-      );
-    }
-
-     */
 
     deleteDialog() {
       return SimpleDialogOption(
