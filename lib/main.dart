@@ -199,10 +199,10 @@ class MyApp extends StatelessWidget {
               theme: ThemeData(
                   scaffoldBackgroundColor: Colors.white,
                   colorScheme: ColorScheme.fromSwatch().copyWith(
-                    primary: const Color(0xEEBF1D53),
-                    secondary: const Color(0xEE3CB28F),
+                    primary: const Color(0xFFBF1D53),
+                    secondary: const Color(0xAA3CB28F),
                   ),
-                  iconTheme: const IconThemeData(color: Color(0xFF3CB28F))),
+                  iconTheme: const IconThemeData(color: Color(0xAA3CB28F))),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: const [
                 Locale('en', ''),

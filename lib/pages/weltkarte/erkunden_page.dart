@@ -95,8 +95,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     setEvents();
 
     changeAllCitiesAndCreateCityNames();
+    //changeProfilToFamilyProfil();
     removeProfilsAndCreateAllUserName();
-    changeProfilToFamilyProfil();
 
     profilsBackup = profils;
 
