@@ -57,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch170D),
                 _patch(patch162D),
                 _patch(patch161D),
                 _patch(patch160D),
@@ -77,6 +78,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch170E),
                 _patch(patch162E),
                 _patch(patch161E),
                 _patch(patch160E),
@@ -110,6 +112,24 @@ var patchVorlage={
   ]
 };
 
+var patch170E={
+  "title" : "1.7.0 - 12.10.2022",
+  "inhalt": [
+    "optimizations to decrease server crashes"
+  ]
+};
+var patch170D={
+  "title" : "1.7.0 - 12.10.2022",
+  "inhalt": [
+    "Chatsystem wurde stark verbessert"
+    "Profil - Besuchte Länder können wieder gespeichert werden",
+    "Profil - Der Ortswechsel wird nach der Veränderung wieder sofort upgedatet",
+    "Profil - kleine Anpassungen bei der Reiseplanung",
+    "Newsseite - Crashprobleme wurden behoben (grauer Bildschirm)",
+    "verschiedene kleine Verbesserungen",
+    "verschiedene kleine Fehlerbehebungen"
+  ]
+};
 
 var patch162E={
   "title" : "1.6.2 - 16.09.2022",
