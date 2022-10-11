@@ -232,16 +232,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     ChatDatabase().addNewMessageAndSendNotification(
         widget.groupChatData, messageData, isBlocked);
 
+    var groupText = messageData["message"];
+
     if (messageData["message"].contains("</eventId=")) {
-      messageData["message"] = "<Event Card>";
+      groupText = "<Event Card>";
     }
     if (messageData["message"].contains("</communityId=")) {
-      messageData["message"] = "<Community Card>";
+      groupText = "<Community Card>";
     }
 
     for (var myChat in myChats) {
       if (myChat["id"] == widget.chatId) {
-        myChat["lastMessage"] = messageData["message"];
+        myChat["lastMessage"] = groupText;
         myChat["lastMessageDate"] = int.parse(messageData["date"]);
       }
     }
@@ -340,7 +342,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     Clipboard.setData(ClipboardData(text: messageText));
     customSnackbar(
         context, AppLocalizations.of(context).nachrichtZwischenAblage,
-        color: Colors.green, duration: Duration(seconds: 1));
+        color: Colors.green, duration: const Duration(seconds: 1));
   }
 
   forwardedMessage(message) async {
@@ -805,6 +807,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var messageSplit = message["message"].split(" ");
       var eventId = "";
       var eventData;
+      var hasForward = message["forward"].isNotEmpty;
+      var forwardProfil;
+
+
+      if(hasForward){
+        var messageAutorId = message["forward"].split(":")[1];
+        forwardProfil = getProfilFromHive(profilId: messageAutorId);
+      }
 
       messageSplit.asMap().forEach((index, text) {
         if (text.contains("</eventId=")) {
@@ -830,6 +840,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: Align(
             alignment: messageBoxInformation["textAlign"],
             child: Column(children: [
+              if(hasForward) Container(
+                alignment: messageBoxInformation["textAlign"],
+                padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
+                child: GestureDetector(
+                  onTap: () => global_functions.changePage(
+                      context,
+                      ShowProfilPage(
+                        profil: forwardProfil,
+                      )),
+                  child: Text(
+                    AppLocalizations.of(context).weitergeleitetVon +
+                        forwardProfil["name"],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
               Container(
                 alignment: messageBoxInformation["textAlign"],
                 child: EventCard(
@@ -847,7 +873,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           ? MainAxisAlignment.start
                           : MainAxisAlignment.end,
                       children: [
-                        const SizedBox(width: 70),
+                        if(messageBoxInformation["textAlign"] ==
+                            Alignment.centerLeft) const SizedBox(width:10),
                         TextButton(
                             onPressed: () {
                               var replyUser = getProfilFromHive(
@@ -859,8 +886,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             },
                             child:
                                 Text(AppLocalizations.of(context).antworten)),
+                        TextButton(
+                            onPressed: () {
+                              forwardedMessage(message);
+                            },
+                            child:
+                            Text(AppLocalizations.of(context).weiterleiten)
+                        ),
                         Text(messageBoxInformation["messageTime"],
                             style: TextStyle(color: timeStampColor)),
+                        if(messageBoxInformation["textAlign"] ==
+                            Alignment.centerRight) const SizedBox(width:10),
                       ],
                     )
                   : Align(
@@ -915,6 +951,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var messageSplit = message["message"].split(" ");
       var communityId = "";
       var communityData;
+      var hasForward = message["forward"].isNotEmpty;
+      var forwardProfil;
+
+      if(hasForward){
+        var messageAutorId = message["forward"].split(":")[1];
+        forwardProfil = getProfilFromHive(profilId: messageAutorId);
+      }
 
       for (var text in messageSplit) {
         if (text.contains("</communityId=")) communityId = text.substring(14);
@@ -936,6 +979,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: Align(
             alignment: messageBoxInformation["textAlign"],
             child: Column(children: [
+              if(hasForward) Container(
+                alignment: messageBoxInformation["textAlign"],
+                padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
+                child: GestureDetector(
+                  onTap: () => global_functions.changePage(
+                      context,
+                      ShowProfilPage(
+                        profil: forwardProfil,
+                      )),
+                  child: Text(
+                    AppLocalizations.of(context).weitergeleitetVon +
+                        forwardProfil["name"],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
               Container(
                 alignment: messageBoxInformation["textAlign"],
                 child: CommunityCard(
@@ -952,8 +1011,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           ? MainAxisAlignment.start
                           : MainAxisAlignment.end,
                       children: [
-                        const SizedBox(width: 70),
+                        if(messageBoxInformation["textAlign"] ==
+                            Alignment.centerLeft) const SizedBox(width:5),
                         TextButton(
+                          style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,),
                             onPressed: () {
                               var replyUser = getProfilFromHive(
                                   profilId: message["von"], getNameOnly: true);
@@ -964,8 +1026,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             },
                             child:
                                 Text(AppLocalizations.of(context).antworten)),
+                        TextButton(
+                            onPressed: () {
+                              forwardedMessage(message);
+                            },
+                            child:
+                            Text(AppLocalizations.of(context).weiterleiten)
+                        ),
                         Text(messageBoxInformation["messageTime"],
                             style: TextStyle(color: timeStampColor)),
+                        if(messageBoxInformation["textAlign"] ==
+                            Alignment.centerRight) const SizedBox(width:10),
                       ],
                     )
                   : Align(
@@ -1074,73 +1145,84 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               const Expanded(flex: 2, child: SizedBox.shrink()),
             Stack(
               children: [
-                Container(
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: messageBoxInformation["messageBoxColor"],
-                        border: Border.all(),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10))),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            scrollAndColoringMessage(replyIndex);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
-                              onTap: () => openMessageMenu(message, index),
+                GestureDetector(
+                  onTap: () => openMessageMenu(message, index),
+                  child: Container(
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: messageBoxInformation["messageBoxColor"],
+                          border: Border.all(),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              scrollAndColoringMessage(replyIndex);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
                               child: Container(
                                   padding: const EdgeInsets.only(left: 5),
                                   decoration: BoxDecoration(
                                       border: Border(
                                           left: BorderSide(
-                                              width: 2,
-                                              color: replyColor))),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(messageFromProfil["name"],
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: replyColor)),
-                                      Text(
-                                        cardData["name"] == null
-                                            ? replyMessage["message"]
-                                            : textAddition + cardData["name"],
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    ],
+                                              width: 2, color: replyColor))),
+                                  child: Container(
+                                    height: 35,
+                                    constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.785),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(messageFromProfil["name"],
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: replyColor)),
+                                        Flexible(
+                                          child: Text(
+                                            cardData["name"] == null
+                                                ? replyMessage["message"]
+                                                : textAddition +
+                                                    cardData["name"],
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   )),
                             ),
                           ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(
-                              top: 5, left: 10, bottom: 7, right: 10),
-                          child: Wrap(
-                            children: [
-                              TextWithHyperlinkDetection(
-                                text: message["message"] ?? "",
-                                fontsize: 16,
-                                onTextTab: () =>
-                                    openMessageMenu(message, index),
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                  messageBoxInformation["messageEdit"] +
-                                      " " +
-                                      messageBoxInformation["messageTime"],
-                                  style: const TextStyle(
-                                      color: Colors.transparent))
-                            ],
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 5, left: 10, bottom: 7, right: 10),
+                            child: Wrap(
+                              children: [
+                                TextWithHyperlinkDetection(
+                                  text: message["message"] ?? "",
+                                  fontsize: 16,
+                                  onTextTab: () =>
+                                      openMessageMenu(message, index),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                    messageBoxInformation["messageEdit"] +
+                                        " " +
+                                        messageBoxInformation["messageTime"],
+                                    style: const TextStyle(
+                                        color: Colors.transparent))
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    )),
+                        ],
+                      )),
+                ),
                 Positioned(
                   right: 20,
                   bottom: 15,
@@ -1159,8 +1241,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    forwardMessage(index, message, forwardData, messageBoxInformation) {
-      var messageAutorId = forwardData.split(":")[1];
+    forwardMessage(index, message, messageBoxInformation) {
+      var messageAutorId = message["forward"].split(":")[1];
       var forwardProfil = getProfilFromHive(profilId: messageAutorId);
 
       return AnimatedContainer(
@@ -1219,7 +1301,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 messageBoxInformation["messageEdit"] +
                                     " " +
                                     messageBoxInformation["messageTime"],
-                                style: const TextStyle(color: Colors.transparent))
+                                style:
+                                    const TextStyle(color: Colors.transparent))
                           ],
                         ),
                       ),
@@ -1353,7 +1436,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           messageBox.add(responseMessage(i, message, messageBoxInformation));
         } else if (forwardData.isNotEmpty) {
           messageBox.add(
-              forwardMessage(i, message, forwardData, messageBoxInformation));
+              forwardMessage(i, message, messageBoxInformation));
         } else {
           messageBox.add(normalMessage(i, message, messageBoxInformation));
         }
