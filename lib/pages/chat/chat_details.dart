@@ -392,7 +392,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "Message tableId: " + message["id"] + " gemeldet", message["message"]);
 
     customSnackbar(context, AppLocalizations.of(context).nachrichtGemeldet,
-        color: Colors.green);
+        color: Colors.green, duration: const Duration(seconds: 2));
   }
 
   pinMessage(message) async {
@@ -516,7 +516,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     for (var message in messages) {
       index = index + 1;
 
-      if (message["message"].contains(searchText)) {
+      if (message["message"].contains(searchText) ||
+          message["message"].contains(searchText.toLowerCase())) {
         message["index"] = index;
         messagesWithSearchText.add(message);
       }
@@ -596,14 +597,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
-      return Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: Colors.white60, border: Border.all()),
-        child: Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => jumpToMessageAndShowNextAngeheftet(index),
+      return GestureDetector(
+        onTap: () => jumpToMessageAndShowNextAngeheftet(index),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration:
+              BoxDecoration(color: Colors.white60, border: Border.all()),
+          child: Row(
+            children: [
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -619,15 +621,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   ],
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () => showAllPinMessages(),
-              child: const Icon(
-                Icons.manage_search,
-                size: 35,
+              GestureDetector(
+                onTap: () => showAllPinMessages(),
+                child: const Icon(
+                  Icons.manage_search,
+                  size: 35,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -810,8 +812,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var hasForward = message["forward"].isNotEmpty;
       var forwardProfil;
 
-
-      if(hasForward){
+      if (hasForward) {
         var messageAutorId = message["forward"].split(":")[1];
         forwardProfil = getProfilFromHive(profilId: messageAutorId);
       }
@@ -840,22 +841,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: Align(
             alignment: messageBoxInformation["textAlign"],
             child: Column(children: [
-              if(hasForward) Container(
-                alignment: messageBoxInformation["textAlign"],
-                padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
-                child: GestureDetector(
-                  onTap: () => global_functions.changePage(
-                      context,
-                      ShowProfilPage(
-                        profil: forwardProfil,
-                      )),
-                  child: Text(
-                    AppLocalizations.of(context).weitergeleitetVon +
-                        forwardProfil["name"],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+              if (hasForward)
+                Container(
+                  alignment: messageBoxInformation["textAlign"],
+                  padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
+                  child: GestureDetector(
+                    onTap: () => global_functions.changePage(
+                        context,
+                        ShowProfilPage(
+                          profil: forwardProfil,
+                        )),
+                    child: Text(
+                      AppLocalizations.of(context).weitergeleitetVon +
+                          forwardProfil["name"],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
               Container(
                 alignment: messageBoxInformation["textAlign"],
                 child: EventCard(
@@ -873,8 +875,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           ? MainAxisAlignment.start
                           : MainAxisAlignment.end,
                       children: [
-                        if(messageBoxInformation["textAlign"] ==
-                            Alignment.centerLeft) const SizedBox(width:10),
+                        if (messageBoxInformation["textAlign"] ==
+                            Alignment.centerLeft)
+                          const SizedBox(width: 10),
                         TextButton(
                             onPressed: () {
                               var replyUser = getProfilFromHive(
@@ -890,13 +893,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             onPressed: () {
                               forwardedMessage(message);
                             },
-                            child:
-                            Text(AppLocalizations.of(context).weiterleiten)
-                        ),
+                            child: Text(
+                                AppLocalizations.of(context).weiterleiten)),
                         Text(messageBoxInformation["messageTime"],
                             style: TextStyle(color: timeStampColor)),
-                        if(messageBoxInformation["textAlign"] ==
-                            Alignment.centerRight) const SizedBox(width:10),
+                        if (messageBoxInformation["textAlign"] ==
+                            Alignment.centerRight)
+                          const SizedBox(width: 10),
                       ],
                     )
                   : Align(
@@ -954,7 +957,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var hasForward = message["forward"].isNotEmpty;
       var forwardProfil;
 
-      if(hasForward){
+      if (hasForward) {
         var messageAutorId = message["forward"].split(":")[1];
         forwardProfil = getProfilFromHive(profilId: messageAutorId);
       }
@@ -979,22 +982,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: Align(
             alignment: messageBoxInformation["textAlign"],
             child: Column(children: [
-              if(hasForward) Container(
-                alignment: messageBoxInformation["textAlign"],
-                padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
-                child: GestureDetector(
-                  onTap: () => global_functions.changePage(
-                      context,
-                      ShowProfilPage(
-                        profil: forwardProfil,
-                      )),
-                  child: Text(
-                    AppLocalizations.of(context).weitergeleitetVon +
-                        forwardProfil["name"],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+              if (hasForward)
+                Container(
+                  alignment: messageBoxInformation["textAlign"],
+                  padding: const EdgeInsets.only(top: 5, left: 10, right: 5),
+                  child: GestureDetector(
+                    onTap: () => global_functions.changePage(
+                        context,
+                        ShowProfilPage(
+                          profil: forwardProfil,
+                        )),
+                    child: Text(
+                      AppLocalizations.of(context).weitergeleitetVon +
+                          forwardProfil["name"],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
               Container(
                 alignment: messageBoxInformation["textAlign"],
                 child: CommunityCard(
@@ -1011,11 +1015,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           ? MainAxisAlignment.start
                           : MainAxisAlignment.end,
                       children: [
-                        if(messageBoxInformation["textAlign"] ==
-                            Alignment.centerLeft) const SizedBox(width:5),
+                        if (messageBoxInformation["textAlign"] ==
+                            Alignment.centerLeft)
+                          const SizedBox(width: 5),
                         TextButton(
-                          style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
                             onPressed: () {
                               var replyUser = getProfilFromHive(
                                   profilId: message["von"], getNameOnly: true);
@@ -1030,13 +1036,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             onPressed: () {
                               forwardedMessage(message);
                             },
-                            child:
-                            Text(AppLocalizations.of(context).weiterleiten)
-                        ),
+                            child: Text(
+                                AppLocalizations.of(context).weiterleiten)),
                         Text(messageBoxInformation["messageTime"],
                             style: TextStyle(color: timeStampColor)),
-                        if(messageBoxInformation["textAlign"] ==
-                            Alignment.centerRight) const SizedBox(width:10),
+                        if (messageBoxInformation["textAlign"] ==
+                            Alignment.centerRight)
+                          const SizedBox(width: 10),
                       ],
                     )
                   : Align(
@@ -1356,7 +1362,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         const SizedBox(width: 5),
                         Text(
                             messageBoxInformation["messageEdit"] +
-                                " " +
                                 messageBoxInformation["messageTime"],
                             style: const TextStyle(color: Colors.transparent))
                       ],
@@ -1435,8 +1440,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         } else if (int.parse(message["responseId"]) != 0) {
           messageBox.add(responseMessage(i, message, messageBoxInformation));
         } else if (forwardData.isNotEmpty) {
-          messageBox.add(
-              forwardMessage(i, message, messageBoxInformation));
+          messageBox.add(forwardMessage(i, message, messageBoxInformation));
         } else {
           messageBox.add(normalMessage(i, message, messageBoxInformation));
         }
@@ -1617,27 +1621,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     }
 
-    searchDialog() {
-      return SimpleDialogOption(
-        child: Row(
-          children: [
-            const Icon(Icons.search),
-            const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).suche),
-          ],
-        ),
-        onPressed: () {
-          Navigator.pop(context);
-
-          setState(() {
-            textSearchIsActive = true;
-          });
-
-          searchInputNode.requestFocus();
-        },
-      );
-    }
-
     pinChatDialog() {
       var chatIsPinned =
           widget.groupChatData["users"][userId]["pinned"] ?? false;
@@ -1771,10 +1754,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     insetPadding:
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
-                      searchDialog(),
                       pinChatDialog(),
                       muteDialog(),
-                      //settingDialog(),
                       const SizedBox(height: 10),
                       deleteDialog()
                     ],
@@ -1829,6 +1810,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             title: AppLocalizations.of(context).geloeschterUser,
             buttons: [
               IconButton(
+                  onPressed: () {
+                    setState(() {
+                      textSearchIsActive = true;
+                    });
+
+                    searchInputNode.requestFocus();
+                  },
+                  icon: const Icon(Icons.search, color: Colors.white)
+              ),
+              IconButton(
                   onPressed: () => moreMenu(),
                   icon: const Icon(
                     Icons.more_vert,
@@ -1850,6 +1841,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           profilBildProfil: chatPartnerProfil,
           onTap: () => openProfil(),
           buttons: [
+            IconButton(
+                onPressed: () {
+                  setState(() {
+                    textSearchIsActive = true;
+                  });
+
+                  searchInputNode.requestFocus();
+                },
+                icon: const Icon(Icons.search, color: Colors.white)
+            ),
             IconButton(
                 onPressed: () => moreMenu(),
                 icon: const Icon(

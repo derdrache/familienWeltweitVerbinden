@@ -82,7 +82,7 @@ class pinMessagesPage extends StatelessWidget {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context).angehefteteNachrichten,
       ),
-      body: ListView(reverse: true, children: _showMessages(),),
+      body: ListView(reverse: true, children: _showMessages().reversed.toList(),),
     );
   }
 }
