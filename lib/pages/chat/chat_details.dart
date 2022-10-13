@@ -60,7 +60,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   Widget extraInputInformationBox = const SizedBox.shrink();
   final _scrollController = ItemScrollController();
   var itemPositionListener = ItemPositionsListener.create();
-  var scrollIndex = -1;
   var hasStartPosition = true;
   var myChats = Hive.box("secureBox").get("myChats");
   var allEvents = Hive.box('secureBox').get("events") ?? [];
@@ -73,6 +72,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var messagesWithSearchText = [];
   var isTextSearching = false;
   var searchTextIndex = 0;
+  var highlightMessages = [];
 
   @override
   void initState() {
@@ -353,13 +353,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var selectedChatId = global_functions.getChatID(selectedUserId);
     var chatGroupData =
         await ChatDatabase().getChatData("*", "WHERE id = '$selectedChatId'");
+    var forwardMessage = message["forward"];
 
     var messageData = {
       "message": message["message"],
       "von": userId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": selectedUserId,
-      "forward": "userId:" + message["von"],
+      "forward": "userId:" + (forwardMessage.isEmpty
+          ? message["von"]
+          : forwardMessage.split(":")[1].toString()),
       "responseId": "0"
     };
 
@@ -455,7 +458,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     extraInputInformationBox = const SizedBox.shrink();
     nachrichtController.clear();
     changeMessageInputModus = null;
-    messageInputNode.unfocus();
 
     setState(() {});
   }
@@ -543,7 +545,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   scrollAndColoringMessage(messageIndex) {
-    var scrollToIndex = messages.length - 1 - messageIndex - 1;
+    var scrollToIndex = messages.length - 1 - messageIndex;
     if (scrollToIndex < 0) scrollToIndex = 0;
 
     _scrollController.scrollTo(
@@ -552,14 +554,28 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         curve: Curves.easeInOutCubic);
 
     setState(() {
-      scrollIndex = messageIndex;
+      highlightMessages.add(messageIndex);
     });
 
     Future.delayed(const Duration(milliseconds: 1300), () {
       setState(() {
-        scrollIndex = -1;
+        highlightMessages.remove(messageIndex);
       });
     });
+  }
+
+  checkAndRemovePinnedMessage(message) {
+    var pinnedMessages =
+        widget.groupChatData["users"][userId]["pinnedMessages"];
+    if (pinnedMessages.runtimeType == String) json.decode(pinnedMessages);
+    pinnedMessages.remove(int.parse(message["id"]));
+
+    widget.groupChatData["users"][userId]["pinnedMessages"] = pinnedMessages;
+    angehefteteMessageShowIndex = pinnedMessages.length - 1;
+
+    ChatDatabase().updateChatGroup(
+        "users = JSON_SET(users, '\$.$userId.pinnedMessages', '$pinnedMessages')",
+        "WHERE id = '${message["chatId"]}'");
   }
 
   @override
@@ -780,7 +796,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ),
           if (isMyMessage)
             PopupMenuItem(
-              onTap: () => deleteMessage(message["id"]),
+              onTap: () {
+                checkAndRemovePinnedMessage(message);
+                deleteMessage(message["id"]);
+              },
               child: Row(
                 children: [
                   const Icon(Icons.delete),
@@ -833,7 +852,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       return AnimatedContainer(
-        color: scrollIndex == index
+        color: highlightMessages.contains(index)
             ? Theme.of(context).colorScheme.primary
             : Colors.white,
         duration: const Duration(seconds: 1),
@@ -974,7 +993,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       return AnimatedContainer(
-        color: scrollIndex == index
+        color: highlightMessages.contains(index)
             ? Theme.of(context).colorScheme.primary
             : Colors.white,
         duration: const Duration(seconds: 1),
@@ -1096,6 +1115,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     responseMessage(index, message, messageBoxInformation) {
       var replyMessage;
       var replyIndex = messages.length;
+      var cardData = {};
+      var textAddition = "";
 
       for (var lookMessage in messages.reversed.toList()) {
         replyIndex -= 1;
@@ -1106,15 +1127,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
+      replyMessage ??= {};
       var replyFromId = replyMessage["von"];
-      var messageFromProfil = getProfilFromHive(profilId: replyFromId);
-      var isEvent = replyMessage["message"].contains("</eventId=");
-      var isCommunity = replyMessage["message"].contains("</communityId=");
-      var cardData = {};
-      var textAddition = "";
+      var messageFromProfil = getProfilFromHive(profilId: replyFromId) ?? {};
       var replyColor = messageFromProfil["bildStandardFarbe"] == 4285132974
           ? Colors.greenAccent[100]
-          : Color(messageFromProfil["bildStandardFarbe"]);
+          : messageFromProfil["bildStandardFarbe"] != null
+              ? Color(messageFromProfil["bildStandardFarbe"])
+              : Colors.black;
+      var isEvent = replyMessage.isEmpty
+          ? false
+          : replyMessage["message"].contains("</eventId=");
+      var isCommunity = replyMessage.isEmpty
+          ? false
+          : replyMessage["message"].contains("</communityId=");
 
       if (isEvent || isCommunity) {
         if (isEvent) {
@@ -1139,7 +1165,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       return AnimatedContainer(
-        color: scrollIndex == index
+        color: highlightMessages.contains(index)
             ? Theme.of(context).colorScheme.primary
             : Colors.white,
         duration: const Duration(seconds: 1),
@@ -1166,7 +1192,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () {
-                              scrollAndColoringMessage(replyIndex);
+                              if (replyFromId != null) {
+                                scrollAndColoringMessage(replyIndex);
+                              }
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -1182,26 +1210,42 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                         maxWidth:
                                             MediaQuery.of(context).size.width *
                                                 0.785),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(messageFromProfil["name"],
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: replyColor)),
-                                        Flexible(
-                                          child: Text(
-                                            cardData["name"] == null
-                                                ? replyMessage["message"]
-                                                : textAddition +
-                                                    cardData["name"],
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                                    child: replyFromId != null
+                                        ? Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(messageFromProfil["name"],
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: replyColor)),
+                                              Flexible(
+                                                child: Text(
+                                                  cardData["name"] == null
+                                                      ? replyMessage["message"]
+                                                      : textAddition +
+                                                          cardData["name"],
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        : Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                AppLocalizations.of(context)
+                                                    .geloeschteNachricht,
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
                                           ),
-                                        )
-                                      ],
-                                    ),
                                   )),
                             ),
                           ),
@@ -1252,7 +1296,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var forwardProfil = getProfilFromHive(profilId: messageAutorId);
 
       return AnimatedContainer(
-        color: scrollIndex == index
+        color: highlightMessages.contains(index)
             ? Theme.of(context).colorScheme.primary
             : Colors.white,
         duration: const Duration(seconds: 1),
@@ -1333,7 +1377,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       return GestureDetector(
         onTap: () => openMessageMenu(message, index),
         child: AnimatedContainer(
-          color: scrollIndex == index
+          color: highlightMessages.contains(index)
               ? Theme.of(context).colorScheme.primary
               : Colors.white,
           duration: const Duration(seconds: 1),
@@ -1817,8 +1861,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                     searchInputNode.requestFocus();
                   },
-                  icon: const Icon(Icons.search, color: Colors.white)
-              ),
+                  icon: const Icon(Icons.search, color: Colors.white)),
               IconButton(
                   onPressed: () => moreMenu(),
                   icon: const Icon(
@@ -1849,8 +1892,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                   searchInputNode.requestFocus();
                 },
-                icon: const Icon(Icons.search, color: Colors.white)
-            ),
+                icon: const Icon(Icons.search, color: Colors.white)),
             IconButton(
                 onPressed: () => moreMenu(),
                 icon: const Icon(
