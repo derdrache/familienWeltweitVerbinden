@@ -9,7 +9,6 @@ import 'database.dart';
 var databaseUrl = "https://families-worldwide.com/";
 
 sendEmail(notificationInformation) async {
-  return;
   var url = Uri.parse(databaseUrl + "services/sendEmail2.php");
   var emailAdresse = await ProfilDatabase()
       .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
@@ -26,8 +25,6 @@ sendEmail(notificationInformation) async {
 
 sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
-
-  notificationInformation["token"] = "fiXd_mPLTl2yvDu0U5fQar:APA91bFivQUcW3tCZT9OZBTPTYGtQnyJ3A9aoT06DqQMkH94o7AlVszkulXm_cjY9sPMOwX002rFb2s_tPAyRAc0rJHZzccome60Oc-LjDy8XJGcB-nrB17P8zC30WOhzBdepg7af2aq";
 
   http.post(url,
       body: json.encode({
@@ -67,7 +64,7 @@ prepareChatNotification({chatId, vonId, toId, inhalt}) async {
   };
 
   sendNotification(notificationInformation);
-  return;
+
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
