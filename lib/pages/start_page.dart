@@ -218,7 +218,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   checkForceUpdate() async {
     var importantUpdateNumber =
     await AllgemeinDatabase().getData("importantUpdate", "");
-    var buildNumber = 28;
+    var buildNumber = 29;
 
     if (buildNumber < importantUpdateNumber) {
       changePageForever(context, ForceUpdatePage());
