@@ -74,7 +74,6 @@ class _ChatPageState extends State<ChatPage> {
     allName = [];
     userFriendlist = [];
 
-
     for (var data in dbProfilData) {
       if (!ownProfil["geblocktVon"].contains(data["id"]) &&
           data["id"] != "bbGp4rxJvCMywMI7eTahtZMHY2o2" &&
@@ -133,8 +132,8 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   searchUser(chatPartnerName) async {
-    var chatPartnerId = getProfilFromHive(
-        profilName: chatPartnerName, getIdOnly: true);
+    var chatPartnerId =
+        getProfilFromHive(profilName: chatPartnerName, getIdOnly: true);
 
     Navigator.push(
         context,
@@ -390,6 +389,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+
     newMessageAndPinnedBox(newMessages, isPinned) {
       if (newMessages == 0 && !isPinned) return const SizedBox(height: 30);
 
@@ -423,7 +423,6 @@ class _ChatPageState extends State<ChatPage> {
         String chatPartnerId;
         var users = group["users"];
 
-
         users.forEach((key, value) async {
           if (key != userId) {
             chatPartnerId = key;
@@ -442,10 +441,12 @@ class _ChatPageState extends State<ChatPage> {
           chatPartnerName = AppLocalizations.of(context).geloeschterUser;
         }
 
-        if(chatPartnerProfil == null) continue;
+        if (chatPartnerProfil == null) continue;
 
         var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
-        if (group["lastMessage"].isEmpty || group["users"][userId] == null || isBlocked) {
+        if (group["lastMessage"].isEmpty ||
+            group["users"][userId] == null ||
+            isBlocked) {
           continue;
         }
 
@@ -498,10 +499,8 @@ class _ChatPageState extends State<ChatPage> {
               onLongPress: () {
                 setState(() {
                   changeBarOn = true;
-                  firstSelectedIsPinned =
-                      group["users"][userId]["pinned"] == "true";
-                  firstSelectedIsMute =
-                      group["users"][userId]["mute"] == "true";
+                  firstSelectedIsPinned = group["users"][userId]["pinned"];
+                  firstSelectedIsMute = group["users"][userId]["mute"];
                   selectedChats.add(group["id"]);
                 });
               },
