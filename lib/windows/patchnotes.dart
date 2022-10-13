@@ -113,21 +113,21 @@ var patchVorlage={
 };
 
 var patch170E={
-  "title" : "1.7.0 - 12.10.2022",
+  "title" : "1.7.0 - 13.10.2022",
   "inhalt": [
     "optimizations to decrease server crashes"
   ]
 };
 var patch170D={
-  "title" : "1.7.0 - 12.10.2022",
+  "title" : "1.7.0 - 13.10.2022",
   "inhalt": [
-    "Chatsystem wurde stark verbessert"
-    "Profil - Besuchte Länder können wieder gespeichert werden",
-    "Profil - Der Ortswechsel wird nach der Veränderung wieder sofort upgedatet",
-    "Profil - kleine Anpassungen bei der Reiseplanung",
-    "Newsseite - Crashprobleme wurden behoben (grauer Bildschirm)",
-    "verschiedene kleine Verbesserungen",
-    "verschiedene kleine Fehlerbehebungen"
+    "Chat system has been greatly improved",
+    "Profile - Visited countries can be saved again",
+    "Profile - Change of location is updated again immediately after the change",
+    "Profile - small adjustments in trip planning",
+    "News page - crash problems have been fixed (gray screen)",
+    "various small improvements",
+    "various small bug fixes"
   ]
 };
 
