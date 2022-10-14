@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -28,6 +29,7 @@ class _ChatPageState extends State<ChatPage> {
   var searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
+  List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   List allName, userFriendlist;
   bool changeBarOn = false;
@@ -36,6 +38,7 @@ class _ChatPageState extends State<ChatPage> {
   var firstSelectedIsMute = false;
   var bothDelete = false;
   var isLoaded = false;
+  var mainSlider = 0;
 
   @override
   void initState() {
@@ -97,9 +100,16 @@ class _ChatPageState extends State<ChatPage> {
         "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
         returnList: true);
     if (newDbData == false) newDbData = [];
-
     Hive.box("secureBox").put("myChats", newDbData);
     myChats = newDbData;
+
+    var newChatGroupData = await ChatGroupsDatabase().getChatData(
+        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+        returnList: true);
+    if (newChatGroupData == false) newChatGroupData = [];
+    Hive.box("secureBox").put("myGroupChats", newChatGroupData);
+    myGroupChats = newChatGroupData;
+
 
     setState(() {
       isLoaded = true;
@@ -387,9 +397,18 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  getSelectedChatData(){
+    if(mainSlider == 0){
+      return myChats + myGroupChats;
+    } else if(mainSlider == 1){
+      return myChats;
+    } else if(mainSlider == 2){
+      return myGroupChats;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     newMessageAndPinnedBox(newMessages, isPinned) {
       if (newMessages == 0 && !isPinned) return const SizedBox(height: 30);
 
@@ -414,10 +433,11 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
 
-    createChatGroupContainers(groupdata) {
+    createChatGroupContainers() {
       List<Widget> chatGroupContainers = [];
+      var chatData = getSelectedChatData();
 
-      for (dynamic group in groupdata) {
+      for (dynamic group in chatData) {
         String chatPartnerName = "";
         Map chatPartnerProfil;
         String chatPartnerId;
@@ -600,7 +620,22 @@ class _ChatPageState extends State<ChatPage> {
               ],
             )
           : CustomAppBar(
-              title: "",
+              title: Center(
+                child: CupertinoSlidingSegmentedControl(
+                  children: {
+                    0: Text(AppLocalizations.of(context).alle, style: const TextStyle(color: Colors.black),),
+                    1: Text(AppLocalizations.of(context).private, style: const TextStyle(color: Colors.black)),
+                    2: Text(AppLocalizations.of(context).gruppen, style: const TextStyle(color: Colors.black))
+                  },
+                  backgroundColor: Colors.transparent,
+                  groupValue: mainSlider,
+                  onValueChanged: (value){
+                    setState(() {
+                      mainSlider = value;
+                    });
+                  },
+                ),
+              ),
               withLeading: false,
               buttons: const [
                 IconButton(onPressed: null, icon: Icon(Icons.search))
@@ -618,7 +653,7 @@ class _ChatPageState extends State<ChatPage> {
                 }),
                 child: ListView(
                     shrinkWrap: true,
-                    children: createChatGroupContainers(myChats)),
+                    children: createChatGroupContainers()),
               ),
             )
           : !isLoaded

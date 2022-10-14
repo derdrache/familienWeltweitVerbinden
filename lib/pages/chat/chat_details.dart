@@ -31,6 +31,8 @@ class ChatDetailsPage extends StatefulWidget {
   String chatId;
   var groupChatData;
   bool backToChatPage;
+  bool isChatgroup;
+  String connectedId;
 
   ChatDetailsPage({
     Key key,
@@ -39,6 +41,8 @@ class ChatDetailsPage extends StatefulWidget {
     this.chatId,
     this.groupChatData,
     this.backToChatPage = false,
+    this.isChatgroup = false,
+    this.connectedId,
   }) : super(key: key);
 
   @override
@@ -76,9 +80,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
-    createNewChat();
-    getAndSetChatData();
-    writeActiveChat();
+    //Für Groupchat gibt es zwei Möglichkeiten
+    // 1. connectedId
+    // 2. ChatId
+
+    createNewChat(); // no
+    getAndSetChatData(); //no
+    writeActiveChat(); //done
     setScrollbarListener();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
@@ -144,8 +152,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   writeActiveChat() {
-    ProfilDatabase()
-        .updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+    if(widget.isChatgroup){
+      ChatDatabase().updateChatGroup(
+          "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
+          "WHERE id = '${widget.chatId}'");
+    }else{
+      ProfilDatabase()
+          .updateProfil("activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+    }
+
   }
 
   setScrollbarListener() {
