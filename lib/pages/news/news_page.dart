@@ -79,7 +79,6 @@ class _NewsPageState extends State<NewsPage> {
     return newProfil;
   }
 
-
   getMyLastLocationChangeDate() {
     var lastLocationChangeDate = "";
 
@@ -580,6 +579,7 @@ class _NewsPageState extends State<NewsPage> {
                               builder: (_) => NewsPageSettingsPage(
                                   settingsProfil: ownSettingProfil)))
                       .whenComplete(() => setState(() {})),
+
                 ),
               )
             : null,

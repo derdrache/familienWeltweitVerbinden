@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -467,7 +468,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               customTextInput(
                   AppLocalizations.of(context).neueBeschreibungEingeben,
                   newBeschreibungKontroller,
-                  moreLines: 5,
+                  moreLines: 20,
                   textInputAction: TextInputAction.newline),
               const SizedBox(height: 15),
               _windowOptions(
@@ -920,7 +921,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
             child: TextWithHyperlinkDetection(
-                text: widget.community["beschreibung"]
+                text: widget.community["beschreibung"],
+              onTextTab: () => isCreator ? _changeBeschreibungWindow(): null,
             )
 
           ),
@@ -971,6 +973,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           appBar: CustomAppBar(
             title: widget.community["name"],
             buttons: [
+              IconButton(
+                icon: const Icon(Icons.chat),
+                onPressed: () => global_func.changePage(context, ChatDetailsPage(
+                  connectedId: widget.community["id"],
+                  isChatgroup: true,
+                )),
+              ),
               IconButton(
                 icon: const Icon(Icons.link),
                 onPressed: () => _linkTeilenWindow(),
