@@ -392,5 +392,8 @@
     "chatEinstellung": "Chat Einstellungen",
     "keineErgebnisse": "Keine Ergebnisse",
     "schwarzesBrett": "Schwarzes Brett",
-    "geloeschteNachricht": "Gelöschte Nachricht"
+    "geloeschteNachricht": "Gelöschte Nachricht",
+    "alle": "Alle",
+    "private": "Persönliche",
+    "gruppen": "Gruppen"
 }

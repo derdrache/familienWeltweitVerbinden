@@ -12,10 +12,9 @@ import '../global/global_functions.dart'as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
-
 
 class ProfilDatabase{
 
@@ -357,6 +356,163 @@ class ChatDatabase{
 
   deleteAllMessages(chatId){
     _deleteInTable("messages", "chatId", chatId);
+  }
+
+}
+
+class ChatGroupsDatabase{
+
+  addNewChatGroup(user, connected) async {
+    var date = DateTime.now().millisecondsSinceEpoch;
+    var groupData = {
+      "date" : date,
+      "lastMessage" : "</neuer Chat",
+      "users": json.encode(user == null ? {} : {user : {"newMessages": 0}}),
+      "connected": connected ?? ""
+    };
+
+    var url = Uri.parse(databaseUrl + "database/chatGroups/newChatGroup.php");
+    await http.post(url, body: json.encode(groupData));
+  }
+
+  getChatData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "chat_groups"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+    return responseBody;
+  }
+
+  updateChatGroup(whatData,queryEnd) async {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "chat_groups",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+  }
+
+  getAllChatMessages(chatId) async {
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": "*",
+      "queryEnd": "WHERE chatId = '$chatId'",
+      "table": "group_messages"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    return responseBody;
+
+  }
+
+  updateMessage(whatData,queryEnd) async{
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "group_messages",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+  addNewMessageAndNotification(chatgroupData, messageData, isBlocked)async {
+    var chatID = chatgroupData["id"];
+    var date = DateTime.now().millisecondsSinceEpoch;
+
+    messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
+
+    var url = Uri.parse(databaseUrl + "database/chats/newMessage2.php");
+    await http.post(url, body: json.encode({
+      "chatId": chatID,
+      "date": date,
+      "message": messageData["message"],
+      "von": messageData["von"],
+      "zu": messageData["zu"],
+      "responseId": messageData["responseId"],
+      "forward": messageData["forward"]
+    }));
+
+    if(isBlocked) return;
+
+    _addNotificationCounterAndSendNotification(messageData, chatgroupData);
+  }
+
+  _addNotificationCounterAndSendNotification(message, chatData) async{
+    var allUser = chatData["users"];
+
+    for(var user in allUser){
+      var userId = user.keys[0];
+      var isActive = user["isActive"];
+
+      if(isActive) continue;
+
+      chatData["users"][userId]["newMessages"] += 1;
+
+      prepareChatNotification(
+          chatId: chatData["id"],
+          vonId: message["von"],
+          toId: message["zu"],
+          inhalt: message["message"]
+      );
+    }
+
+    ChatGroupsDatabase().updateChatGroup(
+        "users = '${json.encode(chatData["users"])}'",
+        "WHERE id = '${chatData["id"]}'"
+    );
+  }
+
+  deleteChat(chatId){
+    _deleteInTable("chat_groups", "id", chatId);
+  }
+
+  deleteMessages(messageId){
+    _deleteInTable("group_messages", "id", messageId);
+  }
+
+  deleteAllMessages(chatId){
+    _deleteInTable("group_messages", "chatId", chatId);
   }
 
 }
@@ -1085,8 +1241,16 @@ refreshHiveChats() async {
   var myChatData = await ChatDatabase().getChatData(
       "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
       returnList: true);
+  if(myChatData == false) myChatData = [];
 
   Hive.box("secureBox").put("myChats", myChatData);
+
+  var myGroupChats = await ChatGroupsDatabase().getChatData(
+      "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+      returnList: true);
+  if(myGroupChats == false) myGroupChats = [];
+
+  Hive.box("secureBox").put("myGroupChats", myGroupChats);
 }
 
 refreshHiveEvents() async{
