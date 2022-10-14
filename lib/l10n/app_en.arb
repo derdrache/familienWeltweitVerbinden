@@ -392,6 +392,9 @@
     "chatEinstellung": "chat settings",
     "keineErgebnisse": "No results",
     "schwarzesBrett": "Bulletin board",
-    "geloeschteNachricht": "deleted message"
+    "geloeschteNachricht": "deleted message",
+    "alle": "All",
+    "private": "Personal",
+    "gruppen": "Groups"
 }
 
