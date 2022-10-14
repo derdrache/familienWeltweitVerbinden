@@ -20,7 +20,7 @@ class ChangeChildrenPage extends StatelessWidget {
 
     saveButton(){
       return IconButton(
-        icon: Icon(Icons.done),
+        icon: const Icon(Icons.done),
         onPressed: () async{
           bool allFilled = true;
 

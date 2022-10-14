@@ -100,7 +100,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
 
   saveButton(){
     return IconButton(
-        icon: Icon(Icons.done),
+        icon: const Icon(Icons.done),
         onPressed: () => saveFunction()
     );
   }
@@ -120,14 +120,14 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
       }
 
       return Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Container(
           width: 600,
           child: Row(children: [
-            Text(text, style: TextStyle(fontSize: 20),),
-            SizedBox(width: 10),
+            Text(text, style: const TextStyle(fontSize: 20),),
+            const SizedBox(width: 10),
             ElevatedButton(
-              child: Text(aufreiseString, style: TextStyle(fontSize: 20)),
+              child: Text(aufreiseString, style: const TextStyle(fontSize: 20)),
               onPressed: () async{
                 reiseDatum = await showDatePicker(
                   context: context,
@@ -164,12 +164,12 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
             aufreiseBox(AppLocalizations.of(context).bis, widget.aufreiseBis, "bis"),
           if(aufreiseDropdownButton.selected == aufreise[2]
           || aufreiseDropdownButton.selected == aufreiseEnglisch[2]) Container(
-            margin: EdgeInsets.only(left: 10),
+            margin: const EdgeInsets.only(left: 10),
             width: 600,
             child: Row(children: [
-              Text(AppLocalizations.of(context).bis, style: TextStyle(fontSize: 20)),
-              SizedBox(width: 20),
-              Text(AppLocalizations.of(context).offen, style: TextStyle(fontSize: 20)),
+              Text(AppLocalizations.of(context).bis, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 20),
+              Text(AppLocalizations.of(context).offen, style: const TextStyle(fontSize: 20)),
             ],),
           )
         ])
