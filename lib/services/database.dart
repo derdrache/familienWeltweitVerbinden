@@ -462,13 +462,12 @@ class ChatGroupsDatabase{
 
     messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
 
-    var url = Uri.parse(databaseUrl + "database/chats/newMessage2.php");
+    var url = Uri.parse(databaseUrl + "database/chatGroups/newMessage.php");
     await http.post(url, body: json.encode({
       "chatId": chatID,
       "date": date,
       "message": messageData["message"],
       "von": messageData["von"],
-      "zu": messageData["zu"],
       "responseId": messageData["responseId"],
       "forward": messageData["forward"]
     }));
@@ -492,7 +491,7 @@ class ChatGroupsDatabase{
       prepareChatNotification(
           chatId: chatData["id"],
           vonId: message["von"],
-          toId: message["zu"],
+          toId: userId,
           inhalt: message["message"]
       );
     }
@@ -1232,6 +1231,23 @@ getEventFromHive(eventId){
     if(event["id"] == eventId) return event;
   }
 }
+
+getCommunityFromHive(communityId){
+  var communities = Hive.box('secureBox').get("communities");
+
+  for(var community in communities){
+    if(community["id"] == communityId) return community;
+  }
+}
+
+getCityNameFromHive(cityId){
+  var stadtInfos = Hive.box('secureBox').get("stadtinfo");
+
+  for(var stadtInfo in stadtInfos){
+    if(stadtInfo["id"] == cityId) return stadtInfo["ort"];
+  }
+}
+
 
 refreshHiveChats() async {
   String userId = FirebaseAuth.instance.currentUser?.uid;
