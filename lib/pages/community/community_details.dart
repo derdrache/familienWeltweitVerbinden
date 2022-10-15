@@ -976,7 +976,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               IconButton(
                 icon: const Icon(Icons.chat),
                 onPressed: () => global_func.changePage(context, ChatDetailsPage(
-                  connectedId: widget.community["id"],
+                  connectedId: "</community="+widget.community["id"],
                   isChatgroup: true,
                 )),
               ),

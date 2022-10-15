@@ -96,21 +96,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   refreshChatDataFromDb() async {
-    var newDbData = await ChatDatabase().getChatData(
-        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
-        returnList: true);
-    if (newDbData == false) newDbData = [];
-    Hive.box("secureBox").put("myChats", newDbData);
-    myChats = newDbData;
-
-    var newChatGroupData = await ChatGroupsDatabase().getChatData(
-        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
-        returnList: true);
-    if (newChatGroupData == false) newChatGroupData = [];
-    Hive.box("secureBox").put("myGroupChats", newChatGroupData);
-    myGroupChats = newChatGroupData;
-
-
+    refreshHiveChats();
     setState(() {
       isLoaded = true;
     });
@@ -438,37 +424,56 @@ class _ChatPageState extends State<ChatPage> {
       var chatData = getSelectedChatData();
 
       for (dynamic group in chatData) {
-        String chatPartnerName = "";
+        String chatName = "";
         Map chatPartnerProfil;
         String chatPartnerId;
         var users = group["users"];
+        var isNotChatGroup = group["connected"] == null;
+        var chatData;
 
-        users.forEach((key, value) async {
-          if (key != userId) {
-            chatPartnerId = key;
+        if(isNotChatGroup){
+          users.forEach((key, value) async {
+            if (key != userId) {
+              chatPartnerId = key;
+            }
+          });
+
+          for (var profil in dbProfilData) {
+            if (profil["id"] == chatPartnerId) {
+              chatName = profil["name"];
+              chatPartnerProfil = profil;
+              break;
+            }
           }
-        });
 
-        for (var profil in dbProfilData) {
-          if (profil["id"] == chatPartnerId) {
-            chatPartnerName = profil["name"];
-            chatPartnerProfil = profil;
-            break;
+          if (chatName.isEmpty) {
+            chatName = AppLocalizations.of(context).geloeschterUser;
+          }
+
+          if (chatPartnerProfil == null) continue;
+
+          var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
+          if (group["lastMessage"].isEmpty ||
+              group["users"][userId] == null ||
+              isBlocked) {
+            continue;
+          }
+        } else{
+          var connectedId = group["connected"].split("=")[1];
+
+          if(group["connected"].contains("event")){
+            chatData = getEventFromHive(connectedId);
+            chatName = chatData["name"];
+          } else if(group["connected"].contains("community")){
+            chatData = getCommunityFromHive(connectedId);
+            chatName = chatData["name"];
+          } else if(group["connected"].contains("stadt")){
+            chatName = getCityNameFromHive(connectedId)["name"];
+          } else{
+            chatName = AppLocalizations.of(context).weltChat;
           }
         }
 
-        if (chatPartnerName.isEmpty) {
-          chatPartnerName = AppLocalizations.of(context).geloeschterUser;
-        }
-
-        if (chatPartnerProfil == null) continue;
-
-        var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
-        if (group["lastMessage"].isEmpty ||
-            group["users"][userId] == null ||
-            isBlocked) {
-          continue;
-        }
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
@@ -511,7 +516,7 @@ class _ChatPageState extends State<ChatPage> {
                       context,
                       MaterialPageRoute(
                           builder: (_) => ChatDetailsPage(
-                                chatPartnerName: chatPartnerName,
+                                chatPartnerName: chatName,
                                 groupChatData: group,
                               ))).whenComplete(() => setState(() {}));
                 }
@@ -536,7 +541,8 @@ class _ChatPageState extends State<ChatPage> {
                     children: [
                       Stack(
                         children: [
-                          ProfilImage(chatPartnerProfil),
+                          if(chatPartnerProfil != null) ProfilImage(chatPartnerProfil),
+                          if(chatData != null) ProfilImage(chatData),
                           if (selectedChats.contains(group["id"]))
                             const Positioned(
                                 bottom: 0,
@@ -557,7 +563,7 @@ class _ChatPageState extends State<ChatPage> {
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(chatPartnerName,
+                              Text(chatName,
                                   style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold)),
