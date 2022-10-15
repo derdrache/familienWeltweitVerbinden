@@ -12,8 +12,8 @@ import '../global/global_functions.dart'as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 
@@ -1085,6 +1085,7 @@ refreshHiveChats() async {
   var myChatData = await ChatDatabase().getChatData(
       "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
       returnList: true);
+  if(myChatData == false) myChatData = [];
 
   Hive.box("secureBox").put("myChats", myChatData);
 }
