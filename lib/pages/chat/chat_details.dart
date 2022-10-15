@@ -80,6 +80,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var isTextSearching = false;
   var searchTextIndex = 0;
   var highlightMessages = [];
+  var connectedData = {};
+  var pageDetailsPage;
 
   @override
   void initState() {
@@ -121,7 +123,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (state == AppLifecycleState.resumed) {
       if(widget.isChatgroup) {
         ChatGroupsDatabase().updateChatGroup(
-            "users = JSON_SET(users, '\$.$userId.isActive', ${false})",
+            "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
             "WHERE id = '${widget.chatId}'");
       }else{
         ProfilDatabase().updateProfil(
@@ -155,27 +157,42 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getAndSetChatData() {
-    widget.chatPartnerId ??=
-        getProfilFromHive(profilName: widget.chatPartnerName, getIdOnly: true);
-    widget.chatPartnerName ??=
-        getProfilFromHive(profilId: widget.chatPartnerId, getNameOnly: true);
+    if(!widget.isChatgroup){
+      widget.chatPartnerId ??=
+          getProfilFromHive(profilName: widget.chatPartnerName, getIdOnly: true);
+      widget.chatPartnerName ??=
+          getProfilFromHive(profilId: widget.chatPartnerId, getNameOnly: true);
+      chatPartnerProfil = getProfilFromHive(profilId: widget.chatPartnerId);
+      if (widget.groupChatData["users"][userId] == null) {
+        widget.groupChatData["users"][userId] = {"newMessages": 0};
+        ChatDatabase().updateChatGroup(
+            "users = JSON_MERGE(users, '${json.encode({
+              userId: {"newMessages": 0}
+            })}')",
+            "WHERE id = '${widget.groupChatData["id"]}'");
+      }
+    }else if(widget.isChatgroup){
+      var chatGroupId = widget.connectedId.split("=")[1];
+      widget.groupChatData ??= getChatGroupFromHive(chatGroupId);
 
-    widget.chatId ??= widget.groupChatData["id"];
-    chatPartnerProfil = getProfilFromHive(profilId: widget.chatPartnerId);
-
-    if (widget.groupChatData["users"][userId] == null) {
-      widget.groupChatData["users"][userId] = {"newMessages": 0};
-      ChatDatabase().updateChatGroup(
-          "users = JSON_MERGE(users, '${json.encode({
-                userId: {"newMessages": 0}
-              })}')",
-          "WHERE id = '${widget.groupChatData["id"]}'");
+      if(widget.connectedId.contains("event")){
+        connectedData = getEventFromHive(chatGroupId);
+        pageDetailsPage = EventDetailsPage(event: connectedData,);
+      }else if(widget.connectedId.contains("community")){
+        connectedData= getCommunityFromHive(chatGroupId);
+        pageDetailsPage = CommunityDetails(community: connectedData,);
+      }else if(widget.connectedId.contains("stadt")){
+        connectedData = getCityNameFromHive(chatGroupId);
+        pageDetailsPage = StadtinformationsPage(ortName: connectedData,);
+      }
     }
+
+    widget.chatId ??= widget.groupChatData["id"].toString();
   }
 
   writeActiveChat() {
     if(widget.isChatgroup){
-      ChatDatabase().updateChatGroup(
+      ChatGroupsDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
           "WHERE id = '${widget.chatId}'");
     }else{
@@ -212,8 +229,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   getAllDbMessages() async {
     var chatId = widget.chatId ?? widget.groupChatData["id"];
-    List<dynamic> allDbMessages =
-        await ChatDatabase().getAllChatMessages(chatId);
+    List<dynamic> allDbMessages = widget.isChatgroup
+      ? await ChatGroupsDatabase().getAllChatMessages(chatId)
+      : await ChatDatabase().getAllChatMessages(chatId);
+
     allDbMessages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
     setState(() {
@@ -314,33 +333,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   openProfil() async {
     if (chatPartnerProfil == false) return;
 
+    if(widget.isChatgroup){
+      global_functions.changePage(context,pageDetailsPage);
+      return;
+    }
+
     global_functions.changePage(
         context,
         ShowProfilPage(
           profil: chatPartnerProfil,
         ));
-  }
-
-  openSpezialPage(){
-    if(widget.connectedId.isEmpty) return;
-
-    var connectedIdSplit = widget.connectedId.split("=");
-    var pageTyp = connectedIdSplit[0];
-    var pageId = connectedIdSplit[1];
-    var openPage;
-
-    if(pageTyp.contains("event")){
-      var event = getEventFromHive(pageId);
-      openPage = EventDetailsPage(event: event,);
-    }else if(pageTyp.contains("community")){
-      var community = getCommunityFromHive(pageId);
-      openPage = CommunityDetails(community: community,);
-    }else if(pageTyp.contains("stadt")){
-      var citName = getCityNameFromHive(pageId);
-      openPage = StadtinformationsPage(ortName: citName,);
-    }
-
-    global_functions.changePage(context,openPage);
   }
 
   removeAllNewLineAtTheEnd(message) {
@@ -2009,7 +2011,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ]);
       } else if (chatPartnerProfil != false) {
         return CustomAppBar(
-          title: widget.chatPartnerName ?? "",
+          title: widget.chatPartnerName ?? connectedData["name"],
           leading: widget.backToChatPage
               ? IconButton(
                   icon: const Icon(Icons.arrow_back_sharp),
@@ -2020,7 +2022,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       )))
               : null,
           profilBildProfil: chatPartnerProfil,
-          onTap: () => widget.isChatgroup ? openSpezialPage(): openProfil(),
+          onTap: () => openProfil(),
           buttons: [
             IconButton(
                 onPressed: () {

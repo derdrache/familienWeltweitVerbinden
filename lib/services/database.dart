@@ -474,7 +474,7 @@ class ChatGroupsDatabase{
 
     if(isBlocked) return;
 
-    _addNotificationCounterAndSendNotification(messageData, chatgroupData);
+    //_addNotificationCounterAndSendNotification(messageData, chatgroupData);
   }
 
   _addNotificationCounterAndSendNotification(message, chatData) async{
@@ -1224,6 +1224,14 @@ getChatFromHive(chatId){
   }
 }
 
+getChatGroupFromHive(connectedId){
+  var chatGroups = Hive.box('secureBox').get("chatGroups");
+
+  for(var chatGroup in chatGroups){
+    if(chatGroup["connected"].contains(connectedId)) return chatGroup;
+  }
+}
+
 getEventFromHive(eventId){
   var events = Hive.box('secureBox').get("events");
 
@@ -1261,12 +1269,19 @@ refreshHiveChats() async {
 
   Hive.box("secureBox").put("myChats", myChatData);
 
-  var myGroupChats = await ChatGroupsDatabase().getChatData(
-      "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
+  var chatGroups = await ChatGroupsDatabase().getChatData(
+      "*", "ORDER BY lastMessageDate DESC",
       returnList: true);
-  if(myGroupChats == false) myGroupChats = [];
+  if(chatGroups == false) chatGroups = [];
+
+  var myGroupChats = [];
+
+  for(var chat in chatGroups){
+    if(chat["users"].keys.contains(userId)) myGroupChats.add(chat);
+  }
 
   Hive.box("secureBox").put("myGroupChats", myGroupChats);
+  Hive.box("secureBox").put("chatGroups", chatGroups);
 }
 
 refreshHiveEvents() async{
