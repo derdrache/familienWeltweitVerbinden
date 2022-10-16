@@ -57,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch172D),
                 _patch(patch171D),
                 _patch(patch170D),
                 _patch(patch162D),
@@ -79,6 +80,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch172E),
                 _patch(patch171E),
                 _patch(patch170E),
                 _patch(patch162E),
@@ -114,6 +116,21 @@ var patchVorlage={
   ]
 };
 
+var patch172E={
+  "title" : "1.7.2 - 15.10.2022",
+  "inhalt": [
+
+  ]
+};
+var patch172D={
+  "title" : "1.7.2 - 15.10.2022",
+  "inhalt": [
+    "Chat - Fehler beim Nachrichten löschen wurde behoben",
+    "Chat - Lange Nachrichten beim antworten werden nun korrekt angezeigt",
+    "Profil besuchte Länder - Ein Fehler in der Eingabebox wurde behoben",
+    ""
+  ]
+};
 
 var patch171E={
   "title" : "1.7.1 - 15.10.2022",
