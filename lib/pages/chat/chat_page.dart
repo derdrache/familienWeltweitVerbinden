@@ -385,7 +385,11 @@ class _ChatPageState extends State<ChatPage> {
 
   getSelectedChatData(){
     if(mainSlider == 0){
-      return myChats + myGroupChats;
+      var bothChats = myChats + myGroupChats;
+
+      bothChats.sort((a, b) => (b['lastMessageDate']).compareTo(a['lastMessageDate']));
+
+      return bothChats;
     } else if(mainSlider == 1){
       return myChats;
     } else if(mainSlider == 2){
@@ -458,7 +462,7 @@ class _ChatPageState extends State<ChatPage> {
               isBlocked) {
             continue;
           }
-        } else{
+        } else if(group["connected"].isNotEmpty){
           var connectedId = group["connected"].split("=")[1];
 
           if(group["connected"].contains("event")){
@@ -469,10 +473,16 @@ class _ChatPageState extends State<ChatPage> {
             chatName = chatData["name"];
           } else if(group["connected"].contains("stadt")){
             chatName = getCityNameFromHive(connectedId)["name"];
-          } else{
-            chatName = AppLocalizations.of(context).weltChat;
           }
+          //chatData["bild"] = [chatData["bild"]];
+        } else {
+          chatName = AppLocalizations.of(context).weltChat;
+          chatData = {
+            "bild": ["https://families-worldwide.com/bilder/Wildgänse_scaled_Wildgänse.png"]
+          };
         }
+
+
 
 
         var lastMessage = cutMessage(group["lastMessage"]);
@@ -487,6 +497,8 @@ class _ChatPageState extends State<ChatPage> {
         if (isPinned) sortIndex = 0;
         if (lastMessage == "<weiterleitung>") {
           lastMessage = AppLocalizations.of(context).weitergeleitet;
+        }else if(lastMessage == "</neuer Chat"){
+          lastMessage = AppLocalizations.of(context).neuerChat;
         }
 
         chatGroupContainers.insert(
@@ -516,8 +528,9 @@ class _ChatPageState extends State<ChatPage> {
                       context,
                       MaterialPageRoute(
                           builder: (_) => ChatDetailsPage(
-                                chatPartnerName: chatName,
+                                chatPartnerName: isNotChatGroup ? chatPartnerProfil["name"] : null,
                                 groupChatData: group,
+                                isChatgroup: !isNotChatGroup
                               ))).whenComplete(() => setState(() {}));
                 }
               },

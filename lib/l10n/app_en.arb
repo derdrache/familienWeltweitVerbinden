@@ -396,6 +396,10 @@
     "alle": "All",
     "private": "Personal",
     "gruppen": "Groups",
-    "weltChat": "World Chat"
+    "weltChat": "World Chat",
+    "teilnehmerSimple": " Participant",
+    "gruppeVerlassen": "Leave group",
+    "gruppeWirklichVerlassen": "Do you really want to leave the group?",
+    "neuerChat": "New Chat"
 }
 

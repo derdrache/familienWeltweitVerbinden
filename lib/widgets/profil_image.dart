@@ -295,7 +295,8 @@ class OwnProfilImage extends StatelessWidget {
                       placeholder: (context, url) => Container(
                             color: Colors.black12,
                           ))
-                  : Image.asset(profil["bild"][0],
+
+                  : Image.asset(profil["bild"],
                       width: 60, height: 60, fit: BoxFit.cover)),
         ));
   }
