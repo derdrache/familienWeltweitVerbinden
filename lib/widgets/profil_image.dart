@@ -270,6 +270,8 @@ class OwnProfilImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var image = profil["bild"][0] ?? profil["bild"];
+
     showBigImage() {
       showDialog(
           context: context,
@@ -286,17 +288,17 @@ class OwnProfilImage extends StatelessWidget {
           padding: const EdgeInsets.only(right: 5, left: 5),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
-              child: profil["bild"][0].contains("http")
+              child: image.contains("http")
                   ? CachedNetworkImage(
                       width: 60,
                       height: 60,
                       fit: BoxFit.cover,
-                      imageUrl: profil["bild"][0],
+                      imageUrl: image,
                       placeholder: (context, url) => Container(
                             color: Colors.black12,
                           ))
 
-                  : Image.asset(profil["bild"],
+                  : Image.asset(image,
                       width: 60, height: 60, fit: BoxFit.cover)),
         ));
   }
