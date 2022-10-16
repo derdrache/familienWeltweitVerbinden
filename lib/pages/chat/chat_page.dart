@@ -478,7 +478,7 @@ class _ChatPageState extends State<ChatPage> {
         } else {
           chatName = AppLocalizations.of(context).weltChat;
           chatData = {
-            "bild": ["https://families-worldwide.com/bilder/Wildgänse_scaled_Wildgänse.png"]
+            "bild": "https://families-worldwide.com/bilder/Wildgänse_scaled_Wildgänse.png"
           };
         }
 
