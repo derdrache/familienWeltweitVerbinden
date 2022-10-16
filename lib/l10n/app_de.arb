@@ -396,5 +396,9 @@
     "alle": "Alle",
     "private": "Persönliche",
     "gruppen": "Gruppen",
-    "weltChat": "Welt Chat"
+    "weltChat": "Welt Chat",
+    "teilnehmerSimple": " Teilnehmer",
+    "gruppeVerlassen": "Gruppe verlassen",
+    "gruppeWirklichVerlassen": "Möchtest du die Gruppe wirklich verlassen?",
+    "neuerChat": "Neuer Chat"
 }
