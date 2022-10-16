@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -43,6 +44,9 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
     await ProfilDatabase().updateProfil(
         "besuchteLaender = '${jsonEncode(selectedCountries)}'",
         "WHERE id = '${widget.userId}'");
+
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
+    ownProfil["besuchteLaender"] = selectedCountries;
 
     customSnackbar(context, AppLocalizations.of(context).besuchteLaenderUpdate,
         color: Colors.green);
