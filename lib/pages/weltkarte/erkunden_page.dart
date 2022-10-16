@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'dart:io';
 import 'package:familien_suche/global/custom_widgets.dart';
+import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/community/community_card.dart';
 import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
@@ -1208,53 +1209,67 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     createMenuButtons() {
-      return Row(
+      return Column(
         mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (currentMapZoom > minMapZoom)
-            FloatingActionButton(
-                heroTag: "zoom out 1",
-                child: const Icon(Icons.zoom_out_map),
-                onPressed: () => zoomOut()),
-          SizedBox(width: createMenuIsOpen ? 20 : 10),
-          if (createMenuIsOpen)
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              FloatingActionButton(
-                  heroTag: "create community",
-                  child: const Icon(Icons.cottage),
-                  onPressed: () =>
-                      changePage(context, const CommunityErstellen())),
-              const SizedBox(width: 10),
-              FloatingActionButton(
-                  heroTag: "create event",
-                  child: const Icon(Icons.calendar_today),
-                  onPressed: () => changePage(context, const EventErstellen())),
-              const SizedBox(width: 10),
-              FloatingActionButton(
-                  heroTag: "create cityInformation 1",
-                  child: const Icon(Icons.location_city),
-                  onPressed: () =>
-                      changePage(context, const CreateStadtinformationsPage())),
-              const SizedBox(width: 10),
-            ]),
-          if (!createMenuIsOpen)
-            FloatingActionButton(
-                heroTag: "open menu",
-                child: const Icon(Icons.create),
-                onPressed: () {
-                  createMenuIsOpen = true;
-                  setState(() {});
-                }),
-          if (createMenuIsOpen)
-            FloatingActionButton(
-                mini: true,
-                backgroundColor: Colors.red,
-                heroTag: "close menu",
-                child: const Icon(Icons.close, size: 20),
-                onPressed: () {
-                  createMenuIsOpen = false;
-                  setState(() {});
-                }),
+          FloatingActionButton(
+              heroTag: "worldchat",
+              child: const Icon(Icons.message),
+              onPressed: () => global_functions.changePage(context, ChatDetailsPage(
+                chatId: "5",
+                isChatgroup: true,
+              ))),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (currentMapZoom > minMapZoom)
+                FloatingActionButton(
+                    heroTag: "zoom out 1",
+                    child: const Icon(Icons.zoom_out_map),
+                    onPressed: () => zoomOut()),
+              SizedBox(width: createMenuIsOpen ? 20 : 10),
+              if (createMenuIsOpen)
+                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  FloatingActionButton(
+                      heroTag: "create community",
+                      child: const Icon(Icons.cottage),
+                      onPressed: () =>
+                          changePage(context, const CommunityErstellen())),
+                  const SizedBox(width: 10),
+                  FloatingActionButton(
+                      heroTag: "create event",
+                      child: const Icon(Icons.calendar_today),
+                      onPressed: () => changePage(context, const EventErstellen())),
+                  const SizedBox(width: 10),
+                  FloatingActionButton(
+                      heroTag: "create cityInformation 1",
+                      child: const Icon(Icons.location_city),
+                      onPressed: () =>
+                          changePage(context, const CreateStadtinformationsPage())),
+                  const SizedBox(width: 10),
+                ]),
+              if (!createMenuIsOpen)
+                FloatingActionButton(
+                    heroTag: "open menu",
+                    child: const Icon(Icons.create),
+                    onPressed: () {
+                      createMenuIsOpen = true;
+                      setState(() {});
+                    }),
+              if (createMenuIsOpen)
+                FloatingActionButton(
+                    mini: true,
+                    backgroundColor: Colors.red,
+                    heroTag: "close menu",
+                    child: const Icon(Icons.close, size: 20),
+                    onPressed: () {
+                      createMenuIsOpen = false;
+                      setState(() {});
+                    }),
+            ],
+          ),
         ],
       );
     }
