@@ -360,9 +360,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "von": userId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": selectedUserId,
-      "forward": "userId:" + (forwardMessage.isEmpty
-          ? message["von"]
-          : forwardMessage.split(":")[1].toString()),
+      "forward": "userId:" +
+          (forwardMessage.isEmpty
+              ? message["von"]
+              : forwardMessage.split(":")[1].toString()),
       "responseId": "0"
     };
 
@@ -566,7 +567,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   checkAndRemovePinnedMessage(message) {
     var pinnedMessages =
-        widget.groupChatData["users"][userId]["pinnedMessages"];
+        widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
     if (pinnedMessages.runtimeType == String) json.decode(pinnedMessages);
     pinnedMessages.remove(int.parse(message["id"]));
 
@@ -1252,6 +1253,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           Container(
                             padding: const EdgeInsets.only(
                                 top: 5, left: 10, bottom: 7, right: 10),
+                            constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.785),
                             child: Wrap(
                               children: [
                                 TextWithHyperlinkDetection(
