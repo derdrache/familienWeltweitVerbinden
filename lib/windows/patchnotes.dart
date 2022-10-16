@@ -113,6 +113,8 @@ var patchVorlage={
 
   ]
 };
+
+
 var patch171E={
   "title" : "1.7.1 - 15.10.2022",
   "inhalt": [
