@@ -709,6 +709,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     communities.remove(widget.community);
 
                     await CommunityDatabase().delete(widget.community["id"]);
+                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(widget.community["id"]));
 
                     DbDeleteImage(widget.community["bild"]);
 

@@ -166,22 +166,27 @@ class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
 
   setInteresse() async {
-    widget.hasIntereset = widget.hasIntereset ? false : true;
-
-    setState(() {});
-
-    var interesseList = await CommunityDatabase()
-        .getData("interesse", "WHERE id = '${widget.id}'");
+    //zum Chat hinzufügen bzw. entfernen?
+    setState(() {
+      widget.hasIntereset = !widget.hasIntereset;
+    });
 
     if (widget.hasIntereset) {
-      interesseList.add(userId);
-    } else {
-      interesseList.remove(userId);
-    }
+      await CommunityDatabase().update(
+          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
+          "WHERE id ='${widget.id}'");
 
-    await CommunityDatabase().update(
-        "interesse = '${json.encode(interesseList)}'",
-        "WHERE id ='${widget.id}'");
+      ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+          "WHERE connected LIKE '%${widget.id}%'");
+    } else {
+      await CommunityDatabase().update(
+          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+          "WHERE id ='${widget.id}'");
+      ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_REMOVE(users, '\$.$userId')",
+          "WHERE connected LIKE '%${widget.id}%'");
+    }
 
     widget.afterFavorite();
   }
