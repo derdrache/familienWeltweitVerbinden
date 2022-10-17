@@ -226,6 +226,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     setState(() {
       messages.add(messageData);
+      widget.groupChatData["lastMessage"] = message;
     });
 
     var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
@@ -568,7 +569,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   checkAndRemovePinnedMessage(message) {
     var pinnedMessages =
         widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
-    if (pinnedMessages.runtimeType == String) json.decode(pinnedMessages);
+    if (pinnedMessages.runtimeType == String) pinnedMessages= json.decode(pinnedMessages);
     pinnedMessages.remove(int.parse(message["id"]));
 
     widget.groupChatData["users"][userId]["pinnedMessages"] = pinnedMessages;
