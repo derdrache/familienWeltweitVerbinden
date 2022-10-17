@@ -13,7 +13,7 @@ import 'locationsService.dart';
 import 'notification.dart';
 
 //var databaseUrl = "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/puffer/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 class ProfilDatabase{
@@ -421,11 +421,12 @@ class ChatGroupsDatabase{
   updateChatGroup(whatData,queryEnd) async {
     var url = Uri.parse(databaseUrl + "database/update.php");
 
-    await http.post(url, body: json.encode({
+    var test = await http.post(url, body: json.encode({
       "table": "chat_groups",
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
+    print(test.body);
   }
 
   getAllChatMessages(chatId) async {
@@ -474,32 +475,39 @@ class ChatGroupsDatabase{
 
     if(isBlocked) return;
 
-    //_addNotificationCounterAndSendNotification(messageData, chatgroupData);
+    _addNotificationCounterAndSendNotification(messageData, chatgroupData);
   }
 
   _addNotificationCounterAndSendNotification(message, chatData) async{
     var allUser = chatData["users"];
+    var test = "users = JSON_SET(users"; //'\$.$userId.newMessages', '${!chatIsMute}')";
 
-    for(var user in allUser){
-      var userId = user.keys[0];
-      var isActive = user["isActive"];
 
-      if(isActive) continue;
+    allUser.forEach((userId, data){
+      var isActive = data["isActive"] ?? false;
 
-      chatData["users"][userId]["newMessages"] += 1;
+      if(!isActive){
+        chatData["users"][userId]["newMessages"] += 1;
+        test += ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
 
-      prepareChatNotification(
-          chatId: chatData["id"],
-          vonId: message["von"],
-          toId: userId,
-          inhalt: message["message"]
-      );
-    }
+        prepareChatNotification(
+            chatId: chatData["id"],
+            vonId: message["von"],
+            toId: userId,
+            inhalt: message["message"]
+        );
+      }
+
+
+    });
+
+    test += ")";
 
     ChatGroupsDatabase().updateChatGroup(
-        "users = '${json.encode(chatData["users"])}'",
+        test,
         "WHERE id = '${chatData["id"]}'"
     );
+
   }
 
   deleteChat(chatId){
@@ -1238,6 +1246,8 @@ getEventFromHive(eventId){
   for(var event in events){
     if(event["id"] == eventId) return event;
   }
+
+  return {};
 }
 
 getCommunityFromHive(communityId){
@@ -1246,6 +1256,8 @@ getCommunityFromHive(communityId){
   for(var community in communities){
     if(community["id"] == communityId) return community;
   }
+
+  return {};
 }
 
 getCityNameFromHive(cityId){
@@ -1256,6 +1268,15 @@ getCityNameFromHive(cityId){
   }
 }
 
+
+refreshHiveAllgemein() async {
+  var dbAllgemein = await AllgemeinDatabase().getData("*", "WHERE id ='1'");
+  if (dbAllgemein == false) dbAllgemein = [];
+
+  Hive.box('secureBox').put("allgemein", dbAllgemein);
+
+  return dbAllgemein;
+}
 
 refreshHiveChats() async {
   String userId = FirebaseAuth.instance.currentUser?.uid;
