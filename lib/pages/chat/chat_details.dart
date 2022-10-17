@@ -175,7 +175,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             "WHERE id = '${widget.groupChatData["id"]}'");
       }
     } else if (widget.isChatgroup) {
-      var connectedId = widget.connectedId.split("=")[1];
+      var connectedId = widget.connectedId.isEmpty ? "" : widget.connectedId.split("=")[1];
       widget.groupChatData ??= getChatGroupFromHive(connectedId);
 
       if (widget.connectedId.contains("event")) {
@@ -298,6 +298,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     setState(() {
       messages.add(messageData);
+      widget.groupChatData["lastMessage"] = message;
     });
 
     var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
@@ -434,8 +435,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   forwardedMessage(message) async {
-    //selectedChatId kann Private aber auch Groupchat sein
-
     var allUserSelectWindow = AllUserSelectWindow(
         context: context,
         title: AppLocalizations.of(context).empfaengerWaehlen);
@@ -690,9 +689,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   checkAndRemovePinnedMessage(message) {
-    var pinnedMessages =
-        widget.groupChatData["users"][userId]["pinnedMessages"];
-    if (pinnedMessages.runtimeType == String) json.decode(pinnedMessages);
+    var pinnedMessages = widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
+    if (pinnedMessages.runtimeType == String) pinnedMessages = json.decode(pinnedMessages);
     pinnedMessages.remove(int.parse(message["id"]));
 
     widget.groupChatData["users"][userId]["pinnedMessages"] = pinnedMessages;
@@ -1385,6 +1383,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           Container(
                             padding: const EdgeInsets.only(
                                 top: 5, left: 10, bottom: 7, right: 10),
+                            constraints: BoxConstraints(
+                                maxWidth:
+                                MediaQuery.of(context).size.width *
+                                    0.785),
                             child: Wrap(
                               children: [
                                 TextWithHyperlinkDetection(
@@ -2114,12 +2116,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   ))
             ]);
       } else if (chatPartnerProfil != false) {
+        var chatImage = widget.isChatgroup
+            ? connectedData.isEmpty
+                ? {"bild": Hive.box('secureBox').get("allgemein")["worldChat"]}
+                : connectedData
+            : chatPartnerProfil;
+
         return CustomAppBar(
           title: widget.isChatgroup
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.chatPartnerName ?? connectedData["name"]),
+                    Text(widget.chatPartnerName ?? connectedData["name"] ?? AppLocalizations.of(context).weltChat),
                     const SizedBox(height: 3),
                     Text(
                       widget.groupChatData["users"].length.toString() +
@@ -2138,8 +2146,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         selectedIndex: 4,
                       )))
               : null,
-          profilBildProfil:
-              widget.isChatgroup ? connectedData : chatPartnerProfil,
+          profilBildProfil: chatImage,
           onTap: () => openProfil(),
           buttons: [
             IconButton(

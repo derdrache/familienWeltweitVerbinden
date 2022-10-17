@@ -270,7 +270,7 @@ class OwnProfilImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var image = profil["bild"][0] ?? profil["bild"];
+    var image = profil["bild"] is String ? profil["bild"] : profil["bild"][0];
 
     showBigImage() {
       showDialog(
