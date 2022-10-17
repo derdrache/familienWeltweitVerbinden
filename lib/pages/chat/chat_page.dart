@@ -96,7 +96,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   refreshChatDataFromDb() async {
-    refreshHiveChats();
+    await refreshHiveChats();
     setState(() {
       isLoaded = true;
     });
@@ -435,6 +435,10 @@ class _ChatPageState extends State<ChatPage> {
         var isNotChatGroup = group["connected"] == null;
         var chatData;
 
+        if(group["lastMessage"] is int){
+          group["lastMessage"] = group["lastMessage"].toString();
+        }
+
         if(isNotChatGroup){
           users.forEach((key, value) async {
             if (key != userId) {
@@ -474,11 +478,10 @@ class _ChatPageState extends State<ChatPage> {
           } else if(group["connected"].contains("stadt")){
             chatName = getCityNameFromHive(connectedId)["name"];
           }
-          //chatData["bild"] = [chatData["bild"]];
         } else {
           chatName = AppLocalizations.of(context).weltChat;
           chatData = {
-            "bild": "https://families-worldwide.com/bilder/Wildgänse_scaled_Wildgänse.png"
+            "bild": Hive.box('secureBox').get("allgemein")["worldChat"]
           };
         }
 
