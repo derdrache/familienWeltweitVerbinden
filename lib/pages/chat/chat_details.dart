@@ -191,7 +191,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           community: connectedData,
         );
       } else if (widget.connectedId.contains("stadt")) {
-        connectedData = getCityNameFromHive(connectedId);
+        connectedData = {
+          "name": getCityNameFromHive(connectedId),
+          "bild": Hive.box('secureBox').get("allgemein")["cityImage"],
+          "erstelltVon": ""
+        };
+
         pageDetailsPage = StadtinformationsPage(
           ortName: connectedData,
         );

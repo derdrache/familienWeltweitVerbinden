@@ -465,10 +465,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         "id", "WHERE connected = '</stadt=${cityInformation["id"]}'");
     if (checkChatGroup != false) return;
 
-    await ChatGroupsDatabase().addNewChatGroup(
-        userId,
-        "</stadt=${cityInformation["id"]}"
-    );
+    await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=${cityInformation["id"]}");
 
   }
 
