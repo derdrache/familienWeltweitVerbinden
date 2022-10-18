@@ -1217,7 +1217,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
               heroTag: "worldchat",
               child: const Icon(Icons.message),
               onPressed: () => global_functions.changePage(context, ChatDetailsPage(
-                chatId: "5",
+                connectedId: "",
+                chatId: "1",
                 isChatgroup: true,
               ))),
           const SizedBox(height: 10),
@@ -1283,15 +1284,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
         }),
         child: DraggableScrollableSheet(
             initialChildSize: 0.5,
-            minChildSize: 0.3,
-            maxChildSize: 0.8,
+            minChildSize: 0.27,
+            maxChildSize: 0.83,
             builder: (context, controller) {
               return Stack(
                 alignment: Alignment.topCenter,
                 clipBehavior: Clip.none,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: 60),
+                    padding: const EdgeInsets.only(top: 130),
                     child: ClipRRect(
                       borderRadius:
                           const BorderRadius.vertical(top: Radius.circular(20)),
@@ -1303,7 +1304,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   ),
                   Positioned(
                     right: 0,
-                    top: 60,
+                    top: 130,
                     child: IconButton(
                       icon: const Icon(
                         Icons.close,
@@ -1319,7 +1320,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   if (popupTyp == "profils")
                     Positioned(
                       left: 5,
-                      top: 60,
+                      top: 130,
                       child: IconButton(
                         icon: const Icon(
                           Icons.feed,
@@ -1328,7 +1329,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                         onPressed: () => openSelectCityWindow(),
                       ),
                     ),
-                  Positioned(top: -10, right: 10, child: createMenuButtons())
+                  Positioned(top: 0, right: 10, child: createMenuButtons())
                 ],
               );
             }),
