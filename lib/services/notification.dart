@@ -63,9 +63,6 @@ prepareChatNotification({chatId, vonId, toId, inhalt}) async {
     "typ": "chat",
   };
 
-  sendNotification(notificationInformation);
-
-
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
     var dbData =
