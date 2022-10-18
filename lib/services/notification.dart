@@ -27,9 +27,9 @@ sendEmail(notificationInformation) async {
 sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
 
-  notificationInformation["to"] = "dedYCgdWR4-X2oIlS8YisF:APA91bG1vfYYgHvrKTmzPNr8xzGDivQhmQweTO7Z9a0GXJ5IlIeELHdbfeRUGxNsSihb_1ftyiD-uR69pba_PNrUICG__W13TQoDtMqZfrjdJIfoNrk7f7DzZMCJ8mvEHf7w28J--K3R";
+  notificationInformation["token"] = "fDxRYNQCSNyN3z1ZwC2DoR:APA91bFvfqYP1Nbm15yl2IG5wPdTPjp0W5RAmgrsil-R5g_uB1ACM_pFCiCWfgUWj1_7oZ2CDgTIrwNSDv4thETu6uiAmgabe53OjJL4MgQ5WmwWORI3BKFxPH14N-HjeIj0oDCoRVFu";
 
-  http.post(url,
+  await http.post(url,
       body: json.encode({
         "to": notificationInformation["token"],
         "title": notificationInformation["title"],
