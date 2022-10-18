@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart';
+import '../../global/global_functions.dart' as global_func;
 import '../../services/translation.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
@@ -126,7 +127,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         if (profil["id"] == family){
           name = profil["name"];
           familiesList.add(InkWell(
-            onTap: () => changePage(
+            onTap: () => global_func.changePage(
                 context, ShowProfilPage(userName: name, profil: profil)),
             child: Container(
                 padding: const EdgeInsets.all(10),
@@ -456,6 +457,21 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     setState(() {});
   }
 
+  createChatGroup() async {
+    var chatGroup = getChatGroupFromHive(cityInformation["id"].toString());
+    if (chatGroup != null) return;
+
+    var checkChatGroup = await ChatGroupsDatabase().getChatData(
+        "id", "WHERE connected = '</stadt=${cityInformation["id"]}'");
+    if (checkChatGroup != false) return;
+
+    await ChatGroupsDatabase().addNewChatGroup(
+        userId,
+        "</stadt=${cityInformation["id"]}"
+    );
+
+  }
+
   @override
   Widget build(BuildContext context) {
     usersCityInformation = sortThumb(usersCityInformation);
@@ -766,7 +782,23 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: CustomAppBar(title: widget.ortName, leading: widget.newEntry != null ? StartPage() : null),
+      appBar: CustomAppBar(
+          title: widget.ortName,
+          leading: widget.newEntry != null ? StartPage() : null,
+          buttons: [
+            IconButton(
+              icon: Icon(Icons.message),
+              onPressed: () async {
+                await createChatGroup();
+
+                global_func.changePage(context, ChatDetailsPage(
+                  isChatgroup: true,
+                  connectedId: "</stadt=${cityInformation["id"]}",
+                ));
+              },
+            )
+          ],
+      ),
       body: Column(
         children: [
           allgemeineInfoBox(),
