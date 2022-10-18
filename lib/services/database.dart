@@ -372,7 +372,11 @@ class ChatGroupsDatabase{
     };
 
     var url = Uri.parse(databaseUrl + "database/chatGroups/newChatGroup.php");
-    await http.post(url, body: json.encode(groupData));
+    var test = await http.post(url, body: json.encode(groupData));
+
+    if(test.body.isEmpty) return null;
+
+    return test.body;
   }
 
   getChatData(whatData, queryEnd, {returnList = false}) async{
@@ -421,12 +425,11 @@ class ChatGroupsDatabase{
   updateChatGroup(whatData,queryEnd) async {
     var url = Uri.parse(databaseUrl + "database/update.php");
 
-    var test = await http.post(url, body: json.encode({
+    await http.post(url, body: json.encode({
       "table": "chat_groups",
       "whatData": whatData,
       "queryEnd": queryEnd
     }));
-    print(test.body);
   }
 
   getAllChatMessages(chatId) async {
@@ -480,12 +483,10 @@ class ChatGroupsDatabase{
 
   _addNotificationCounterAndSendNotification(message, chatData) async{
     var allUser = chatData["users"];
-    var test = "users = JSON_SET(users"; //'\$.$userId.newMessages', '${!chatIsMute}')";
-
+    var test = "users = JSON_SET(users";
 
     allUser.forEach((userId, data){
       var isActive = data["isActive"] ?? false;
-
       if(!isActive){
         chatData["users"][userId]["newMessages"] += 1;
         test += ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
@@ -497,8 +498,6 @@ class ChatGroupsDatabase{
             inhalt: message["message"]
         );
       }
-
-
     });
 
     test += ")";
@@ -1226,17 +1225,28 @@ getProfilFromHive({profilId, profilName, getNameOnly = false, getIdOnly = false}
 
 getChatFromHive(chatId){
   var myChats = Hive.box('secureBox').get("myChats");
+  var myChatGroups = Hive.box('secureBox').get("myGroupChats");
 
   for(var myChat in myChats){
     if(myChat["id"] == chatId) return myChat;
+  }
+
+  for(var myChatGroup in myChatGroups){
+    if(myChatGroup["id"] == chatId) return myChatGroup;
   }
 }
 
 getChatGroupFromHive(connectedId){
   var chatGroups = Hive.box('secureBox').get("chatGroups");
 
+  if(connectedId.isEmpty){
+    var worldChat = chatGroups.singleWhere((chatGroup) => chatGroup["id"] == 1);
+    return worldChat;
+  }
+
   for(var chatGroup in chatGroups){
-    if(chatGroup["connected"].contains(connectedId)) return chatGroup;
+    if(chatGroup["connected"].isEmpty) continue;
+    if(chatGroup["connected"].split("=")[1] == connectedId) return chatGroup;
   }
 }
 
