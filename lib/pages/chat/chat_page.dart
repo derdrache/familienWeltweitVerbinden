@@ -458,7 +458,7 @@ class _ChatPageState extends State<ChatPage> {
             chatName = AppLocalizations.of(context).geloeschterUser;
           }
 
-          if (chatPartnerProfil == null) continue;
+          if (chatPartnerProfil == null || users[userId] == null) continue;
 
           var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
           if (group["lastMessage"].isEmpty ||
@@ -476,17 +476,17 @@ class _ChatPageState extends State<ChatPage> {
             chatData = getCommunityFromHive(connectedId);
             chatName = chatData["name"];
           } else if(group["connected"].contains("stadt")){
-            chatName = getCityNameFromHive(connectedId)["name"];
+            chatName = getCityNameFromHive(connectedId);
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
+            };
           }
         } else {
           chatName = AppLocalizations.of(context).weltChat;
           chatData = {
-            "bild": Hive.box('secureBox').get("allgemein")["worldChat"]
+            "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
           };
         }
-
-
-
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages = users[userId]["newMessages"];
