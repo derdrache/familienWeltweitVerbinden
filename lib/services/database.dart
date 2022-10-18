@@ -1274,7 +1274,7 @@ getCityNameFromHive(cityId){
   var stadtInfos = Hive.box('secureBox').get("stadtinfo");
 
   for(var stadtInfo in stadtInfos){
-    if(stadtInfo["id"] == cityId) return stadtInfo["ort"];
+    if(stadtInfo["id"] == int.parse(cityId)) return stadtInfo["ort"];
   }
 }
 
