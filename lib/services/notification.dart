@@ -27,7 +27,7 @@ sendEmail(notificationInformation) async {
 sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
 
-  notificationInformation["token"] = "fDxRYNQCSNyN3z1ZwC2DoR:APA91bFvfqYP1Nbm15yl2IG5wPdTPjp0W5RAmgrsil-R5g_uB1ACM_pFCiCWfgUWj1_7oZ2CDgTIrwNSDv4thETu6uiAmgabe53OjJL4MgQ5WmwWORI3BKFxPH14N-HjeIj0oDCoRVFu";
+  notificationInformation["token"] = "dBm4gmXvQs-msUflxwtn81:APA91bFZMz7KlIs6cbtB_Pxa4CIpykVElVQivfNyFaMGFZtbP_6eAThG-CWtxjtTF7Dwyo5g42fZ0B_pCk8ZIWLDgCy5ieONAOllq_uAfwgYe7b3piQbJFbwyQerw7ZZeDPCZYyG7Ucm";
 
   await http.post(url,
       body: json.encode({
@@ -40,7 +40,7 @@ sendNotification(notificationInformation) async {
       }));
 }
 
-prepareChatNotification({chatId, vonId, toId, inhalt}) async {
+prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
   var dbData = await ProfilDatabase().getData(
       "activeChat, notificationstatus, chatNotificationOn, token",
       "WHERE id = '$toId'");
@@ -49,13 +49,14 @@ prepareChatNotification({chatId, vonId, toId, inhalt}) async {
   var notificationsAllowed = dbData["notificationstatus"];
   var chatNotificationOn = dbData["chatNotificationOn"];
 
+
   if (notificationsAllowed == 0 ||
       chatNotificationOn == 0 ||
       toActiveChat == chatId || blockList.contains(toId)) return;
 
 
-
-  var title = await ProfilDatabase().getData("name", "WHERE id = '$vonId'");
+  if(chatGroup.isNotEmpty) chatGroup += " - ";
+  var title = chatGroup + await ProfilDatabase().getData("name", "WHERE id = '$vonId'");
 
   var notificationInformation = {
     "token": dbData["token"],
