@@ -397,8 +397,16 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  searchChats(){
+    // zwei Spalten
+    // 1. Spalte alle bestehenden Chats anzeigen
+    // 2. Spalte Groupchats(chats) entdecken => ersetzen des Stiftes?
+  }
+
   @override
   Widget build(BuildContext context) {
+    myChats = Hive.box("secureBox").get("myChats") ?? [];
+    myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     newMessageAndPinnedBox(newMessages, isPinned) {
       if (newMessages == 0 && !isPinned) return const SizedBox(height: 30);
 
@@ -476,7 +484,8 @@ class _ChatPageState extends State<ChatPage> {
             chatData = getCommunityFromHive(connectedId);
             chatName = chatData["name"];
           } else if(group["connected"].contains("stadt")){
-            chatName = getCityNameFromHive(connectedId);
+            chatName = getCityFromHive(cityId: connectedId, getName: true);
+
             chatData = {
               "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
             };
@@ -659,8 +668,12 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ),
               withLeading: false,
-              buttons: const [
-                IconButton(onPressed: null, icon: Icon(Icons.search))
+              buttons: [
+                IconButton(
+                    onPressed: ()=> searchChats(),
+                    icon: const Icon(Icons.search, size: 30, color: Colors.black,)
+                ),
+                SizedBox(width: 10,)
               ],
             ),
       body: myChats.isNotEmpty

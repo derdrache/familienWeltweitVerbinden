@@ -162,6 +162,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   updateStadtInfoDatabase(ortMapData, userId) async {
     await StadtinfoDatabase().addNewCity(ortMapData);
+    ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"]);
     await StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
         "WHERE ort LIKE '${ortMapData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
