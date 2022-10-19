@@ -460,7 +460,7 @@ class ChatGroupsDatabase{
 
   }
 
-  addNewMessageAndNotification(chatgroupData, messageData, isBlocked)async {
+  addNewMessageAndNotification(chatgroupData, messageData, isBlocked, chatGroupName)async {
     var chatID = chatgroupData["id"];
     var date = DateTime.now().millisecondsSinceEpoch;
 
@@ -478,10 +478,10 @@ class ChatGroupsDatabase{
 
     if(isBlocked) return;
 
-    _addNotificationCounterAndSendNotification(messageData, chatgroupData);
+    _addNotificationCounterAndSendNotification(messageData, chatgroupData, chatGroupName);
   }
 
-  _addNotificationCounterAndSendNotification(message, chatData) async{
+  _addNotificationCounterAndSendNotification(message, chatData, chatGroupName) async{
     var allUser = chatData["users"];
     var test = "users = JSON_SET(users";
 
@@ -495,7 +495,8 @@ class ChatGroupsDatabase{
             chatId: chatData["id"],
             vonId: message["von"],
             toId: userId,
-            inhalt: message["message"]
+            inhalt: message["message"],
+            chatGroup: chatGroupName
         );
       }
     });
@@ -520,6 +521,52 @@ class ChatGroupsDatabase{
   deleteAllMessages(chatId){
     _deleteInTable("group_messages", "chatId", chatId);
   }
+
+  joinAndCreateCityChat(cityName) async{
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    var city = getCityFromHive(cityName: cityName);
+    var cityId = city["id"];
+    var chatGroupData = getChatGroupFromHive("</stadt=$cityId");
+
+    if(chatGroupData == null){
+      chatGroupData = await ChatGroupsDatabase().getChatData(
+          "*", "WHERE connected = '</stadt=$cityId'");
+      if(chatGroupData == false){
+        var chatId = await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$cityId");
+        chatGroupData = {
+          "id": chatId,
+          "users": {},
+          "lastMessage": "</neuer Chat",
+          "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
+          "connected": "</stadt=$cityId"
+        };
+      }
+    }
+
+    var newUserInformation = {"newMessages": 0};
+    chatGroupData["users"][userId] = newUserInformation;
+
+    await ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_MERGE_PATCH(users, '${json.encode({userId : newUserInformation})}')",
+        "WHERE id = ${chatGroupData["id"]}"
+    );
+
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.add(chatGroupData);
+  }
+
+  leaveChat(chatId){
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    myGroupChats.removeWhere((item) => item["id"].toString() == chatId);
+
+    ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_REMOVE(users, '\$.$userId')",
+        "WHERE id = '${chatId}'");
+  }
+
 
 }
 
@@ -1270,11 +1317,18 @@ getCommunityFromHive(communityId){
   return {};
 }
 
-getCityNameFromHive(cityId){
+getCityFromHive({cityId, cityName, getName= false}){
   var stadtInfos = Hive.box('secureBox').get("stadtinfo");
+  cityName ??= "XXXXXX";
 
   for(var stadtInfo in stadtInfos){
-    if(stadtInfo["id"] == int.parse(cityId)) return stadtInfo["ort"];
+    if(stadtInfo["id"].toString() == cityId || stadtInfo["ort"].contains(cityName)){
+      if(getName){
+        return stadtInfo["ort"];
+      }
+
+      return stadtInfo;
+    }
   }
 }
 

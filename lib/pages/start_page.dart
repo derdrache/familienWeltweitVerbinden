@@ -201,9 +201,14 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
       var locationData = await LocationService()
           .getDatabaseLocationdataFromGoogleResult(geoData);
+      var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
+      var leaveChatId = getCityFromHive(cityName: oldLocation)["id"];
+      ChatGroupsDatabase().leaveChat(leaveChatId);
 
       ProfilDatabase().updateProfilLocation(userId, locationData);
       await StadtinfoDatabase().addNewCity(locationData);
+
+      ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
       StadtinfoDatabase().update(
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
           "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"

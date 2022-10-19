@@ -579,7 +579,6 @@ class _NewsPageState extends State<NewsPage> {
                               builder: (_) => NewsPageSettingsPage(
                                   settingsProfil: ownSettingProfil)))
                       .whenComplete(() => setState(() {})),
-
                 ),
               )
             : null,
