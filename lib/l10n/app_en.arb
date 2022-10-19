@@ -400,6 +400,7 @@
     "teilnehmerSimple": " Participant",
     "gruppeVerlassen": "Leave group",
     "gruppeWirklichVerlassen": "Do you really want to leave the group?",
-    "neuerChat": "New Chat"
+    "neuerChat": "New Chat",
+    "gruppeBeitreten": "Join group"
 }
 
