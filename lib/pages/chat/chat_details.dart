@@ -22,6 +22,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../auth/secrets.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
@@ -83,6 +84,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var highlightMessages = [];
   var connectedData = {};
   var pageDetailsPage;
+  var adminList = [mainAdmin];
 
   @override
   void initState() {
@@ -185,21 +187,28 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         pageDetailsPage = EventDetailsPage(
           event: connectedData,
         );
+        adminList.add(connectedData["erstelltVon"]);
       } else if (widget.connectedId.contains("community")) {
         connectedData = getCommunityFromHive(connectedId);
         pageDetailsPage = CommunityDetails(
           community: connectedData,
         );
+        adminList.add(connectedData["erstelltVon"]);
       } else if (widget.connectedId.contains("stadt")) {
         connectedData = {
-          "name": getCityNameFromHive(connectedId),
+          "name": getCityFromHive(cityId: connectedId, getName: true),
           "bild": Hive.box('secureBox').get("allgemein")["cityImage"],
           "erstelltVon": ""
         };
-
         pageDetailsPage = StadtinformationsPage(
           ortName: connectedData,
         );
+      }else {
+        connectedData = {
+          "name": AppLocalizations
+              .of(context)
+              .weltChat
+        };
       }
     }
 
@@ -312,7 +321,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
     if (widget.isChatgroup) {
       ChatGroupsDatabase().addNewMessageAndNotification(
-          widget.groupChatData, messageData, isBlocked);
+          widget.groupChatData, messageData, isBlocked, connectedData["name"]);
     } else {
       ChatDatabase().addNewMessageAndSendNotification(
           widget.groupChatData, messageData, isBlocked);
@@ -936,7 +945,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               ],
             ),
           ),
-          if (isMyMessage)
+          if (isMyMessage || adminList.contains(userId))
             PopupMenuItem(
               onTap: () {
                 checkAndRemovePinnedMessage(message);
@@ -1767,7 +1776,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   offset: const Offset(0, 3), // changes position of shadow
                 ),
               ]),
-            child: const Center(child: Text("Gruppe beitreten"))
+            child: Center(child: Text(AppLocalizations.of(context).gruppeBeitreten))
           ),
         );
       }else{
@@ -2071,11 +2080,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     child: Text(AppLocalizations.of(context).gruppeVerlassen),
                     onPressed: () async {
                       Navigator.pop(context);
-                      myGroupChats.removeWhere((item) => item["id"].toString() == widget.chatId);
 
-                      ChatGroupsDatabase().updateChatGroup(
-                          "users = JSON_REMOVE(users, '\$.$userId')",
-                          "WHERE id = '${widget.chatId}'");
+                      ChatGroupsDatabase().leaveChat(widget.chatId);
 
                       setState(() {
                         widget.groupChatData["users"].removeWhere((key, value) => key == userId);
