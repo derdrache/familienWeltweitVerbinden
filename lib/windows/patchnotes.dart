@@ -117,20 +117,23 @@ var patchVorlage={
 };
 
 var patch172E={
-  "title" : "1.7.2 - 15.10.2022",
+  "title" : "1.7.2 - 21.10.2022",
   "inhalt": [
-
+    "Android Notification - Due to an error, the notification was always sent twice",
+    "Chat - Error when deleting messages has been fixed",
+    "Chat - Long messages when replying are now displayed correctly",
+    "Chat Page - Quick edit when long pressing on chat now works correctly",
+    "Profile Visited Countries - An error in the input box has been fixed"
   ]
 };
 var patch172D={
-  "title" : "1.7.2 - 15.10.2022",
+  "title" : "1.7.2 - 21.10.2022",
   "inhalt": [
     "Android Notification - Durch ein Fehler wurde die Notification immer zwei Mal versendet",
     "Chat - Fehler beim Nachrichten löschen wurde behoben",
     "Chat - Lange Nachrichten beim antworten werden nun korrekt angezeigt",
     "Chat Page - Schnell Bearbeitung bei langem drücken auf den Chat funktioniert nun fehlerfrei",
     "Profil besuchte Länder - Ein Fehler in der Eingabebox wurde behoben",
-
   ]
 };
 
