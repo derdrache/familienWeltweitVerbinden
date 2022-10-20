@@ -105,7 +105,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     setSearchAutocomplete();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    WidgetsBinding.instance?.addPostFrameCallback((_) => mounted = true);
     super.initState();
   }
 
@@ -217,10 +217,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     for (var profil in deleteProfils) {
       profils.remove(profil);
     }
-  }
-
-  _asyncMethod() async {
-    mounted = true;
   }
 
   sortProfils(profils) {
@@ -1140,6 +1136,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("reload");
     List<Marker> allMarker = [];
     searchAutocomplete.hintText = AppLocalizations.of(context).filterErkunden;
 
@@ -1526,12 +1523,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
           maxZoom: maxZoom,
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed) {
-            if (mounted) {
               mapPosition = position.center;
-              currentMapZoom = position.zoom;
               FocusScope.of(context).unfocus();
-              changeProfil(currentMapZoom);
-            }
+
+              if(currentMapZoom != position.zoom){
+                currentMapZoom = position.zoom;
+                changeProfil(currentMapZoom);
+                // setState nur wenn eine Zoomebene verändert werden muss
+                // nur die Marker berechnen, die auch angezeigt werden?
+              }
           },
         ),
         layers: [
@@ -1733,7 +1733,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   reiseplanungOn = false;
                   setProfilsFromHive();
                   createAndSetZoomLevels(profils, "profils");
-                  setState(() {});
                 } else {
                   openSelectReiseplanungsDateWindow();
                 }
