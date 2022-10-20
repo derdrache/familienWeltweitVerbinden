@@ -1136,7 +1136,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("reload");
     List<Marker> allMarker = [];
     searchAutocomplete.hintText = AppLocalizations.of(context).filterErkunden;
 
