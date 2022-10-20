@@ -15,7 +15,6 @@ class SearchAutocomplete extends StatelessWidget {
       this.onRemove,
       this.hintText = ""}) : super(key: key);
 
-
   getSelected() {
     if (selected.isEmpty) return [];
 
@@ -102,4 +101,7 @@ class SearchAutocomplete extends StatelessWidget {
     );
   }
 }
+
+
+
 
