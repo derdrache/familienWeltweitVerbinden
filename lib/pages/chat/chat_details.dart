@@ -106,7 +106,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     messageInputNode.dispose();
 
     if (widget.isChatgroup) {
-      widget.groupChatData["isActive"] = false;
+      widget.groupChatData["users"][userId]["isActive"] = false;
       ChatGroupsDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.isActive', ${false})",
           "WHERE id = '${widget.chatId}'");
@@ -124,7 +124,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       if (widget.isChatgroup) {
-        widget.groupChatData["isActive"] = true;
+        widget.groupChatData["users"][userId]["isActive"] = true;
         ChatGroupsDatabase().updateChatGroup(
             "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
             "WHERE id = '${widget.chatId}'");
@@ -134,7 +134,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     } else {
       if (widget.isChatgroup) {
-        widget.groupChatData["isActive"] = false;
+        widget.groupChatData["users"][userId]["isActive"] = false;
         ChatGroupsDatabase().updateChatGroup(
             "users = JSON_SET(users, '\$.$userId.isActive', ${false})",
             "WHERE id = '${widget.chatId}'");
@@ -205,9 +205,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         );
       }else {
         connectedData = {
-          "name": AppLocalizations
-              .of(context)
-              .weltChat
+          "name": AppLocalizations.of(context).weltChat
         };
       }
     }
@@ -217,7 +215,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   writeActiveChat() {
     if (widget.isChatgroup) {
-      widget.groupChatData["isActive"] = true;
+      widget.groupChatData["users"][userId]["isActive"] = true;
       ChatGroupsDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
           "WHERE id = '${widget.chatId}'");

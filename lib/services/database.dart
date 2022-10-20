@@ -490,7 +490,6 @@ class ChatGroupsDatabase{
       if(!isActive){
         chatData["users"][userId]["newMessages"] += 1;
         test += ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
-
         prepareChatNotification(
             chatId: chatData["id"],
             vonId: message["von"],
@@ -498,6 +497,7 @@ class ChatGroupsDatabase{
             inhalt: message["message"],
             chatGroup: chatGroupName
         );
+
       }
     });
 
