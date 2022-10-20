@@ -1360,19 +1360,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
           width: size,
           height: size,
           point: position,
-          builder: (ctx) => numberText != "0"
-              ? FloatingActionButton(
+          builder: (ctx) => FloatingActionButton(
                   heroTag: "MapMarker" + position.toString(),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   mini: true,
                   child: Center(child: Text(numberText)),
                   onPressed: buttonFunction)
-              : FloatingActionButton(
-                  heroTag: "MapMarker" + position.toString(),
-                  mini: true,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: const Center(child: Icon(Icons.info)),
-                  onPressed: buttonFunction));
+
+
+      );
     }
 
     createProfilMarker() {
@@ -1529,18 +1525,17 @@ class _ErkundenPageState extends State<ErkundenPage> {
               if(currentMapZoom != position.zoom){
                 currentMapZoom = position.zoom;
                 changeProfil(currentMapZoom);
-                // setState nur wenn eine Zoomebene verändert werden muss
-                // nur die Marker berechnen, die auch angezeigt werden?
               }
           },
         ),
-        layers: [
-          TileLayerOptions(
-              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              subdomains: ['a', 'b', 'c']),
-          MarkerLayerOptions(
-            markers: allMarker,
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.app',
           ),
+          MarkerLayer(
+            markers: allMarker,
+          )
         ],
       );
     }
