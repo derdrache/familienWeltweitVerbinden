@@ -21,6 +21,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:translator/translator.dart';
 
 import '../../auth/secrets.dart';
 import '../../widgets/custom_appbar.dart';
@@ -85,6 +86,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var connectedData = {};
   var pageDetailsPage;
   var adminList = [mainAdmin];
+  final translator = GoogleTranslator();
 
   @override
   void initState() {
@@ -1570,7 +1572,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       messageBoxInformation["messageEdit"] +
                           messageBoxInformation["messageTime"],
                       style: TextStyle(color: timeStampColor)),
-                )
+                ),
+                Positioned(right: 0, bottom: 0,child: TextButton(
+                  child: Text("übersetzen"),
+                  onPressed: () async {
+                    var languageCheck = await translator.translate(message["message"]);
+                    var languageCode = languageCheck.sourceLanguage.code;
+                    var translation2 = await translator.translate(
+                        message["message"],
+                        to: languageCode == "de" ? "en": "de");
+                    print(translation2);
+                  }
+                ))
               ],
             ),
           ),
