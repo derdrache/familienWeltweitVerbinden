@@ -464,6 +464,7 @@ class ChatGroupsDatabase{
     var chatID = chatgroupData["id"];
     var date = DateTime.now().millisecondsSinceEpoch;
 
+
     messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
 
     var url = Uri.parse(databaseUrl + "database/chatGroups/newMessage.php");
@@ -473,7 +474,8 @@ class ChatGroupsDatabase{
       "message": messageData["message"],
       "von": messageData["von"],
       "responseId": messageData["responseId"],
-      "forward": messageData["forward"]
+      "forward": messageData["forward"],
+      "language": messageData["language"]
     }));
 
     if(isBlocked) return;
