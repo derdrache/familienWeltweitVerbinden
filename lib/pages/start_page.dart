@@ -69,6 +69,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   }
 
   _asyncMethod() async {
+    await refreshHiveAllgemein(); // muss nicht jedesmal gemacht werden!
     if (!kIsWeb){
       var newUpdate = await checkForceUpdate();
       if(newUpdate) return;
@@ -221,7 +222,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   }
 
   checkForceUpdate() async {
-    var dbAllgemeinData = await refreshHiveAllgemein();
+    var dbAllgemeinData = Hive.box('secureBox').get("allgemein");
     var importantUpdateNumber = dbAllgemeinData["importantUpdate"];
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
