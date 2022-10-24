@@ -82,16 +82,22 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
         || aufreiseDropdownButton.selected == aufreiseEnglisch[0]){
       ProfilDatabase().updateProfil(
           "aufreiseSeit = NULL, aufreiseBis = NULL", "WHERE id = '$userId'");
+      updateHiveProfil("aufreiseSeit", null);
+      updateHiveProfil("aufreiseBis", null);
     } else if(aufreiseDropdownButton.selected == aufreise[2]
         || aufreiseDropdownButton.selected == aufreiseEnglisch[2]){
       ProfilDatabase().updateProfil(
           "aufreiseSeit = '${widget.aufreiseSeit.toString()}', aufreiseBis = NULL",
           "WHERE id = '$userId'");
+      updateHiveProfil("aufreiseSeit", widget.aufreiseSeit.toString());
+      updateHiveProfil("aufreiseBis", null);
     } else{
       ProfilDatabase().updateProfil(
           "aufreiseSeit = '${widget.aufreiseSeit.toString()}'"
               "aufreiseBis = '${widget.aufreiseBis.toString()}'",
           "WHERE id = '$userId'");
+      updateHiveProfil("aufreiseSeit", widget.aufreiseSeit.toString());
+      updateHiveProfil("aufreiseBis", widget.aufreiseBis.toString());
     }
 
     Navigator.pop(context);

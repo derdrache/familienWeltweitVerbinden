@@ -465,8 +465,15 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         "id", "WHERE connected = '</stadt=${cityInformation["id"]}'");
     if (checkChatGroup != false) return;
 
-    await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=${cityInformation["id"]}");
-
+    var newChatId = await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=${cityInformation["id"]}");
+    var hiveChatGroups = Hive.box('secureBox').get("chatGroups");
+    hiveChatGroups.add({
+      "id": newChatId,
+      "users": {},
+      "lastMessage": "</neuer Chat",
+      "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
+      "connected": "</stadt=${cityInformation["id"]}"
+    });
   }
 
   @override

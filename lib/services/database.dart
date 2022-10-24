@@ -1034,11 +1034,28 @@ class FamiliesDatabase{
 
 class NewsPageDatabase{
   addNewNews(news) async{
+    var alreadyAvailable = _checkIfInDatabase(news);
+    if(alreadyAvailable) return;
+
     var url = Uri.parse(databaseUrl + "database/newsPage/newNews.php");
     news["erstelltAm"] = DateTime.now().toString();
     news["erstelltVon"] = FirebaseAuth.instance.currentUser.uid;
 
     await http.post(url, body: json.encode(news));
+  }
+
+  _checkIfInDatabase(newNews) async{
+    var userId = FirebaseAuth.instance.currentUser.uid;
+    var allMyNews = getData("*", "WHERE userId = '$userId'");
+
+    //innerhalb des selben Tages oder selben zwei Tagen??
+    for(var news in allMyNews){
+      var dateDifference = DateTime.now()
+          .difference(DateTime.parse(news["erstelltAm"])).inDays;
+      if(news == newNews && dateDifference < 2) return true;
+    }
+
+    return false;
   }
 
   update(whatData, queryEnd) async  {
@@ -1332,6 +1349,11 @@ getCityFromHive({cityId, cityName, getName= false}){
       return stadtInfo;
     }
   }
+}
+
+updateHiveProfil(changeTyp, changeData){
+  var ownProfil = Hive.box("secureBox").get("ownProfil");
+  ownProfil[changeTyp] = changeData;
 }
 
 
