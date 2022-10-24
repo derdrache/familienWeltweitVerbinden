@@ -98,9 +98,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
     changeAllCitiesAndCreateCityNames();
     //changeProfilToFamilyProfil();
     removeProfilsAndCreateAllUserName();
+    sortProfils(profils);
 
     profilsBackup = profils;
-
     createAndSetZoomLevels(profils, "profils");
     createAndSetZoomLevels(communities, "communities");
 
@@ -226,7 +226,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   sortProfils(profils) {
     var allCountries = LocationService().getAllCountries();
-
     profils.sort((a, b) {
       var profilALand = a['land'];
       var profilBLand = b['land'];
@@ -240,11 +239,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
         profilBLand = allCountries["ger"][index];
       }
 
-      int compareCountry = (profilBLand).compareTo(profilALand) as int;
 
-      if (compareCountry != 0) return compareCountry;
+      int compareCountry = profilBLand.compareTo(profilALand) as int;
 
-      return b["ort"].compareTo(a["ort"]) as int;
+      if (compareCountry == 0) return a["ort"].compareTo(b["ort"]) as int;
+
+      return compareCountry;
     });
 
     return profils;
