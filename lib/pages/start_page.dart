@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -182,11 +181,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
         ProfilDatabase().updateProfilLocation(userId, locationData);
 
-        NewsPageDatabase().addNewNews({
-          "typ": "ortswechsel",
-          "information": json.encode(locationData),
-        });
-
         return;
       } else if (automaticLocationStatus == standortbestimmung[2] ||
           automaticLocationStatus == standortbestimmungEnglisch[2]) {
@@ -214,10 +208,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
           "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
       );
-      NewsPageDatabase().addNewNews({
-        "typ": "ortswechsel",
-        "information": json.encode(locationData),
-      });
     }
   }
 

@@ -36,6 +36,10 @@ class ChangeChildrenPage extends StatelessWidget {
             await ProfilDatabase().updateProfil(
               "kinder = '${jsonEncode(childrenBirthdatePickerBox.getDates())}'",
               "WHERE id = '$userId'");
+
+            updateHiveProfil("kinder", childrenBirthdatePickerBox.getDates());
+
+
             customSnackbar(context,
                 AppLocalizations.of(context).anzahlUndAlterKinder +" "+
                     AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
