@@ -24,6 +24,9 @@ class ChangeTradePage extends StatelessWidget {
             await ProfilDatabase().updateProfil(
                 "tradeNotize = '${textKontroller.text}'",
                 "WHERE id = '$userId'");
+
+            updateHiveProfil("tradeNotize", textKontroller.text);
+
             customSnackbar(
                 context,
                 AppLocalizations.of(context).verkaufenTauschenSchenken +

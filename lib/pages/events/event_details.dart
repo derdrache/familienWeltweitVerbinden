@@ -286,7 +286,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   child: const Text("Ok"),
                   onPressed: () {
                     EventDatabase().delete(widget.event["id"]);
-                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(widget.event["id"]));
+                    ChatGroupsDatabase()
+                        .deleteChat(getChatGroupFromHive(widget.event["id"]));
                     DbDeleteImage(widget.event["bild"]);
                     global_func.changePageForever(
                         context, StartPage(selectedIndex: 2));
@@ -791,12 +792,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             icon: const Icon(Icons.link),
             onPressed: () => linkTeilenWindow(),
           ),
-          if (!isCreator)
-            IconButton(
+          IconButton(
               icon: const Icon(Icons.message),
-              onPressed: () => global_func.changePage(context,
-                  ChatDetailsPage(chatPartnerId: widget.event["erstelltVon"])),
-            ),
+              onPressed: () => global_func.changePage(
+                    context,
+                    ChatDetailsPage(
+                      connectedId: "</event=" + widget.event["id"],
+                      isChatgroup: true,
+                    ),
+                  )),
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () => moreMenu(),
