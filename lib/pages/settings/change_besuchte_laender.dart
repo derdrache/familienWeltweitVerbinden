@@ -44,6 +44,8 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
         "besuchteLaender = '${jsonEncode(selectedCountries)}'",
         "WHERE id = '${widget.userId}'");
 
+    updateHiveProfil("besuchteLaender", selectedCountries);
+
     customSnackbar(context, AppLocalizations.of(context).besuchteLaenderUpdate,
         color: Colors.green);
   }

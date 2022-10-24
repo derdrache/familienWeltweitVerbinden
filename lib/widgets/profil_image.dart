@@ -290,8 +290,8 @@ class OwnProfilImage extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               child: image.contains("http")
                   ? CachedNetworkImage(
-                      width: 60,
-                      height: 60,
+                      width: 55,
+                      height: 55,
                       fit: BoxFit.cover,
                       imageUrl: image,
                       placeholder: (context, url) => Container(
@@ -299,7 +299,7 @@ class OwnProfilImage extends StatelessWidget {
                           ))
 
                   : Image.asset(image,
-                      width: 60, height: 60, fit: BoxFit.cover)),
+                      width: 55, height: 55, fit: BoxFit.cover)),
         ));
   }
 }

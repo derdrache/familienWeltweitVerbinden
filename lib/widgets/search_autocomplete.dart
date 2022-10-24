@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class SearchAutocomplete extends StatelessWidget {
+class SearchAutocomplete extends StatefulWidget {
   List searchableItems = [];
-  var filterList = [];
   Function onConfirm;
   String hintText;
-  var selected = "";
   Function onRemove;
+  var selected = "";
+  final TextEditingController _textEditingController = TextEditingController();
 
   SearchAutocomplete(
       {Key key,
@@ -21,6 +21,28 @@ class SearchAutocomplete extends StatelessWidget {
     return [selected];
   }
 
+  getInput(){
+    return _textEditingController.text;
+  }
+
+  clearInput(){
+    _textEditingController.clear();
+  }
+
+  @override
+  State<SearchAutocomplete> createState() => _SearchAutocompleteState();
+}
+
+class _SearchAutocompleteState extends State<SearchAutocomplete> {
+  var filterList = [];
+
+
+
+
+  final FocusNode _focusNode = FocusNode();
+
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -31,72 +53,89 @@ class SearchAutocomplete extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(5)),
           border: Border.all()
       ),
-      child: Autocomplete(
-        optionsBuilder: (TextEditingValue textEditingValue) {
-          return textEditingValue.text.isNotEmpty ? searchableItems.where((item) => item.toLowerCase()
-              .contains(textEditingValue.text.toLowerCase())) : [];
-        },
-        optionsViewBuilder: (
-            BuildContext context,
-            AutocompleteOnSelected onSelected,
-            Iterable options
-            ) {
-          return Align(
-            alignment: Alignment.topLeft,
-            child: Material(
-              child: Container(
-                width: MediaQuery.of(context).size.width - 21,
-                height: 300,
-                decoration: const BoxDecoration(
-                  border: Border(
-                      left: BorderSide(),
-                      right: BorderSide(),
-                    bottom: BorderSide()
-                  )
-                ),
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(10.0),
-                  itemCount: options.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final option = options.elementAt(index);
-                    return GestureDetector(
-                      onTap: () {
-                        onSelected(option);
-                        selected = option;
-                        onConfirm();
+      child: Stack(
+        children: [
+          RawAutocomplete(
+            textEditingController: widget._textEditingController,
+            focusNode: _focusNode,
+            optionsBuilder: (TextEditingValue textEditingValue) {
+              return textEditingValue.text.isNotEmpty ? widget.searchableItems.where((item) => item.toLowerCase()
+                  .contains(textEditingValue.text.toLowerCase())) : [];
+            },
+            optionsViewBuilder: (
+                BuildContext context,
+                AutocompleteOnSelected onSelected,
+                Iterable options
+                ) {
+              return Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 21,
+                    height: 300,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                          left: BorderSide(),
+                          right: BorderSide(),
+                        bottom: BorderSide()
+                      )
+                    ),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(10.0),
+                      itemCount: options.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final option = options.elementAt(index);
+                        return GestureDetector(
+                          onTap: () {
+                            onSelected(option);
+                            widget.selected = option;
+                            widget.onConfirm();
+                          },
+                          child: ListTile(
+                            title: Text(option, style: const TextStyle(color: Colors.black)),
+                          ),
+                        );
                       },
-                      child: ListTile(
-                        title: Text(option, style: const TextStyle(color: Colors.black)),
-                      ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
-        fieldViewBuilder: (BuildContext context,
-            TextEditingController textEditingController,
-            FocusNode focusNode,
-            VoidCallback onFieldSubmitted) {
-          return TextFormField(
-            controller: textEditingController,
-            decoration: InputDecoration(
-                hintText: hintText,
-              contentPadding: const EdgeInsets.all(10.0),
-            ),
-            focusNode: focusNode,
-            onChanged: (value){
-              if(value.isEmpty){
-                selected = "";
-                if(onRemove != null) onRemove();
-              }
+              );
             },
-            onFieldSubmitted: (String value) {
-              onFieldSubmitted();
+            fieldViewBuilder: (BuildContext context,
+                TextEditingController textEditingController,
+                FocusNode focusNode,
+                VoidCallback onFieldSubmitted) {
+              return TextFormField(
+                controller: textEditingController,
+                decoration: InputDecoration(
+                    hintText: widget.hintText,
+                  contentPadding: const EdgeInsets.all(10.0),
+                ),
+                focusNode: focusNode,
+                onChanged: (value){
+                  if(value.isEmpty){
+                    widget. selected = "";
+                    if(widget.onRemove != null) widget.onRemove();
+                  }
+                  setState(() {
+
+                  });
+                },
+                onFieldSubmitted: (String value) {
+                  onFieldSubmitted();
+                },
+              );
             },
-          );
-        },
+          ),
+          if(widget._textEditingController.text.isNotEmpty) Positioned(
+              right: 0, top: 0,
+              child: CloseButton(
+                onPressed: (){
+                  widget.clearInput();
+                  widget.onRemove();
+                },
+              ))
+        ],
       ),
     );
   }
