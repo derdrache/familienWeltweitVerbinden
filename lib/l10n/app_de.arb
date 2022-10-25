@@ -403,5 +403,9 @@
     "neuerChat": "Neuer Chat",
     "gruppeBeitreten": "Gruppe beitreten",
     "globaleSuche": "Globale Suche",
-    "uebersetzen": "Übersetzen"
+    "uebersetzen": "Übersetzen",
+    "uebersetzungSchliessen": "Übersetzung schließen",
+    "newsLocationBegruessung": "Herzlich Willkommen in ",
+    "erfahrungenTeilen": "Teile mit anderen Familien deine Erfahrung über den Ort",
+    "erfahrungenAnschauenUndTeilen": "Schau dir die Erfahrungen von anderen Familien an und ergänze sie noch mit deinen eigenen"
 }
