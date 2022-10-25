@@ -771,6 +771,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           withLeading: false,
+          //backgroundColor: Colors.white,
           buttons: [
             IconButton(
                 onPressed: () {
@@ -794,7 +795,7 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: showAppBar(),
       resizeToAvoidBottomInset: false,
-      body: myChats.isNotEmpty
+      body: SafeArea(child: myChats.isNotEmpty
           ? MediaQuery.removePadding(
               removeTop: true,
               context: context,
@@ -854,7 +855,8 @@ class _ChatPageState extends State<ChatPage> {
                   child: Text(
                       AppLocalizations.of(context).nochKeineChatsVorhanden,
                       style:
-                          const TextStyle(fontSize: 20, color: Colors.grey))),
+                          const TextStyle(fontSize: 20, color: Colors.grey)))
+      ),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
         child: const Icon(Icons.create),

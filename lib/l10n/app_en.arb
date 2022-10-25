@@ -403,6 +403,10 @@
     "neuerChat": "New Chat",
     "gruppeBeitreten": "Join group",
     "globaleSuche": "Global search",
-    "uebersetzen": "Translate"
+    "uebersetzen": "Translate",
+    "uebersetzungSchliessen": "Close translation",
+    "newsLocationBegruessung": "Welcome in ",
+    "erfahrungenTeilen": "Share with other families your experience about the place",
+    "erfahrungenAnschauenUndTeilen": "Look at the experiences of other families and complement them with your own experiences"
 }
 

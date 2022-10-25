@@ -136,10 +136,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             await ProfilDatabase().getData("*", "WHERE id = '$userID'");
         Hive.box('secureBox').put("ownProfil", ownProfil);
 
+        await ChatGroupsDatabase().updateChatGroup(
+            "users = JSON_MERGE_PATCH(users, '${json.encode({userID : {"newMessages": 0}})}')",
+            "WHERE id = '1'");
+
         NewsPageDatabase().addNewNews({
           "typ": "ortswechsel",
           "information": json.encode(ortMapData),
         });
+
+
 
         global_functions.changePageForever(context, StartPage());
       } catch (_) {
