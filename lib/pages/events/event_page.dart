@@ -152,13 +152,15 @@ class _EventPageState extends State<EventPage> {
     }
 
     return Scaffold(
-      body: Container(
-          padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
-          child: Column(children: [
-            Expanded(child: meineInteressiertenEventsBox()),
-            Expanded(child: meineErstellenEventsBox()),
-            const SizedBox(height: 50)
-          ])),
+      body: SafeArea(
+        child: Container(
+            padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
+            child: Column(children: [
+              Expanded(child: meineInteressiertenEventsBox()),
+              Expanded(child: meineErstellenEventsBox()),
+              const SizedBox(height: 50)
+            ])),
+      ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
