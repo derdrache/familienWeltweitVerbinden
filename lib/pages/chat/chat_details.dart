@@ -91,7 +91,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
-    if(!widget.isChatgroup) createNewChat();
+    if (!widget.isChatgroup) createNewChat();
 
     getAndSetChatData();
     writeActiveChat();
@@ -181,7 +181,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             "WHERE id = '${widget.groupChatData["id"]}'");
       }
     } else if (widget.isChatgroup) {
-      var connectedId = widget.connectedId.isEmpty ? "" : widget.connectedId.split("=")[1];
+      var connectedId =
+          widget.connectedId.isEmpty ? "" : widget.connectedId.split("=")[1];
 
       widget.groupChatData ??= getChatGroupFromHive(connectedId);
 
@@ -206,9 +207,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         pageDetailsPage = StadtinformationsPage(
           ortName: connectedData,
         );
-      }else {
-
-      }
+      } else {}
     }
 
     widget.chatId ??= widget.groupChatData["id"].toString();
@@ -216,7 +215,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   writeActiveChat() {
     if (widget.isChatgroup) {
-      if(widget.groupChatData["users"][userId] == null) return;
+      if (widget.groupChatData["users"][userId] == null) return;
       widget.groupChatData["users"][userId]["isActive"] = true;
       ChatGroupsDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
@@ -269,7 +268,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   resetNewMessageCounter() async {
     var users = widget.groupChatData["users"];
-    if(widget.groupChatData["users"][userId] == null) return;
+    if (widget.groupChatData["users"][userId] == null) return;
 
     var usersChatNewMessages = users[userId]["newMessages"];
 
@@ -713,8 +712,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   checkAndRemovePinnedMessage(message) {
-    var pinnedMessages = widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
-    if (pinnedMessages.runtimeType == String) pinnedMessages = json.decode(pinnedMessages);
+    var pinnedMessages =
+        widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
+    if (pinnedMessages.runtimeType == String)
+      pinnedMessages = json.decode(pinnedMessages);
     pinnedMessages.remove(int.parse(message["id"]));
 
     widget.groupChatData["users"][userId]["pinnedMessages"] = pinnedMessages;
@@ -738,11 +739,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var timeStampColor = Colors.grey[600];
     var userJoinedChat = widget.groupChatData["users"][userId] != null;
     connectedData["name"] ??= AppLocalizations.of(context).weltChat;
-    connectedData["bild"] ??= Hive.box('secureBox').get("allgemein")["worldChatImage"];
+    connectedData["bild"] ??=
+        Hive.box('secureBox').get("allgemein")["worldChatImage"];
     var _tabPosition;
 
     angehefteteNachrichten() {
-      if(widget.groupChatData["users"][userId] == null) return const SizedBox.shrink();
+      if (widget.groupChatData["users"][userId] == null)
+        return const SizedBox.shrink();
 
       var chatAngeheftet =
           widget.groupChatData["users"][userId]["pinnedMessages"];
@@ -861,13 +864,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var isInPinned = false;
       var angehefteteMessages = [];
 
-      if(userJoinedChat && widget.groupChatData["users"][userId]["pinnedMessages"] != null){
-        var pinnedMessages = widget.groupChatData["users"][userId]["pinnedMessages"];
+      if (userJoinedChat &&
+          widget.groupChatData["users"][userId]["pinnedMessages"] != null) {
+        var pinnedMessages =
+            widget.groupChatData["users"][userId]["pinnedMessages"];
         angehefteteMessages = pinnedMessages is String
             ? json.decode(pinnedMessages)
             : pinnedMessages;
       }
-
 
       for (var pinId in angehefteteMessages) {
         if (pinId.toString() == message["id"]) {
@@ -880,45 +884,46 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       showMenu(
         context: context,
         position: RelativeRect.fromRect(
-            _tabPosition & const Size(40, 40),
-            Offset.zero & overlay.size
-            ),
+            _tabPosition & const Size(40, 40), Offset.zero & overlay.size),
         items: [
-          if(userJoinedChat) PopupMenuItem(
-            onTap: () {
-              var replyUser = getProfilFromHive(
-                  profilId: message["von"], getNameOnly: true);
+          if (userJoinedChat)
+            PopupMenuItem(
+              onTap: () {
+                var replyUser = getProfilFromHive(
+                    profilId: message["von"], getNameOnly: true);
 
-              extraInputInformationBox = inputInformationBox(
-                  Icons.reply, replyUser, message["message"]);
+                extraInputInformationBox = inputInformationBox(
+                    Icons.reply, replyUser, message["message"]);
 
-              replyMessage(message);
-            },
-            child: Row(
-              children: [
-                const Icon(Icons.reply),
-                const SizedBox(width: 20),
-                Text(AppLocalizations.of(context).antworten),
-              ],
+                replyMessage(message);
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.reply),
+                  const SizedBox(width: 20),
+                  Text(AppLocalizations.of(context).antworten),
+                ],
+              ),
             ),
-          ),
-          if(userJoinedChat) PopupMenuItem(
-            onTap: () => isInPinned
-                ? detachMessage(message, index)
-                : pinMessage(message),
-            child: Row(
-              children: [
-                isInPinned
-                    ? StrikeThroughIcon(child: const Icon(Icons.push_pin))
-                    : const Icon(Icons.push_pin),
-                const SizedBox(width: 20),
-                Text(isInPinned
-                    ? AppLocalizations.of(context).losloesen
-                    : AppLocalizations.of(context).anheften),
-              ],
+          if (userJoinedChat)
+            PopupMenuItem(
+              onTap: () => isInPinned
+                  ? detachMessage(message, index)
+                  : pinMessage(message),
+              child: Row(
+                children: [
+                  isInPinned
+                      ? StrikeThroughIcon(child: const Icon(Icons.push_pin))
+                      : const Icon(Icons.push_pin),
+                  const SizedBox(width: 20),
+                  Text(isInPinned
+                      ? AppLocalizations.of(context).losloesen
+                      : AppLocalizations.of(context).anheften),
+                ],
+              ),
             ),
-          ),
-          if (isMyMessage) PopupMenuItem(
+          if (isMyMessage)
+            PopupMenuItem(
               onTap: () {
                 extraInputInformationBox = inputInformationBox(Icons.edit,
                     AppLocalizations.of(context).nachrichtBearbeiten, "");
@@ -943,18 +948,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               ],
             ),
           ),
-          if(userJoinedChat) PopupMenuItem(
-            onTap: () => Future.delayed(
-                const Duration(seconds: 0), () => forwardedMessage(message)),
-            child: Row(
-              children: [
-                const Icon(Icons.forward),
-                const SizedBox(width: 20),
-                Text(AppLocalizations.of(context).weiterleiten),
-              ],
+          if (userJoinedChat)
+            PopupMenuItem(
+              onTap: () => Future.delayed(
+                  const Duration(seconds: 0), () => forwardedMessage(message)),
+              child: Row(
+                children: [
+                  const Icon(Icons.forward),
+                  const SizedBox(width: 20),
+                  Text(AppLocalizations.of(context).weiterleiten),
+                ],
+              ),
             ),
-          ),
-          if (isMyMessage || adminList.contains(userId)) PopupMenuItem(
+          if (isMyMessage || adminList.contains(userId))
+            PopupMenuItem(
               onTap: () {
                 checkAndRemovePinnedMessage(message);
                 deleteMessage(message["id"]);
@@ -967,7 +974,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 ],
               ),
             ),
-          if (!isMyMessage && userJoinedChat) PopupMenuItem(
+          if (!isMyMessage && userJoinedChat)
+            PopupMenuItem(
               onTap: () => reportMessage(message),
               child: Row(
                 children: [
@@ -982,40 +990,67 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    translationButton(message){
-      return Positioned(right: 5, bottom: -10,child: TextButton(
-          child: Text(AppLocalizations.of(context).uebersetzen),
-          onPressed: () async {
-            var translation = await translator.translate(
-                message["message"],
-                from: "auto",
-                to: myLanguage);
+    translationButton(message) {
+      return Positioned(
+          right: 5,
+          bottom: -10,
+          child: TextButton(
+              child: Text(AppLocalizations.of(context).uebersetzen),
+              onPressed: () async {
+                var translation = await translator.translate(message["message"],
+                    from: "auto", to: myLanguage);
 
-
-            showModalBottomSheet<void>(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                context: context,
-                builder: (BuildContext context) {
-                  return Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(top: 30, left: 30, bottom: 20, right: 15),
-                        child: ListView(
-                          children: [
-                            Text(AppLocalizations.of(context).uebersetzen, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 15),
-                            Text(translation.toString(), style: const TextStyle(fontSize: 18),),
-                          ],
-                        ),
-                      ),
-                      const Positioned(top: 0, right: 0,child: CloseButton(color: Colors.red,))
-                    ],
-                  );
-                });
-          }
-      ));
+                showModalBottomSheet<void>(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Stack(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 30, left: 30, bottom: 20, right: 15),
+                            child: Column(
+                              children: [
+                                Text(AppLocalizations.of(context).uebersetzen,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 15),
+                                Expanded(
+                                  child: ListView(
+                                    shrinkWrap: true,
+                                    children: [
+                                      Text(
+                                        translation.toString(),
+                                        style: const TextStyle(fontSize: 18),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                SizedBox(
+                                  width: double.maxFinite,
+                                  child: FloatingActionButton.extended(
+                                    onPressed: () => Navigator.pop(context),
+                                    label: Text(AppLocalizations.of(context)
+                                        .uebersetzungSchliessen),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          const Positioned(
+                              top: 0,
+                              right: 0,
+                              child: CloseButton(
+                                color: Colors.red,
+                              ))
+                        ],
+                      );
+                    });
+              }));
     }
 
     eventMessage(index, message, messageBoxInformation) {
@@ -1358,7 +1393,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
-      return Listener(behavior: HitTestBehavior.opaque,
+      return Listener(
+        behavior: HitTestBehavior.opaque,
         onPointerHover: (details) => _tabPosition = details.position,
         child: AnimatedContainer(
           color: highlightMessages.contains(index)
@@ -1377,9 +1413,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     onTap: () => openMessageMenu(message, index),
                     child: Container(
                         margin: EdgeInsets.only(
-                            left: 10, right: 10, top: 10,
-                            bottom: message["showTranslationButton"] ? 25 :10
-                        ),
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: message["showTranslationButton"] ? 25 : 10),
                         decoration: BoxDecoration(
                             color: messageBoxInformation["messageBoxColor"],
                             border: Border.all(),
@@ -1406,9 +1443,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     child: Container(
                                       height: 35,
                                       constraints: BoxConstraints(
-                                          maxWidth:
-                                              MediaQuery.of(context).size.width *
-                                                  0.785),
+                                          maxWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.785),
                                       child: replyFromId != null
                                           ? Column(
                                               crossAxisAlignment:
@@ -1422,7 +1460,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                 Flexible(
                                                   child: Text(
                                                     cardData["name"] == null
-                                                        ? replyMessage["message"]
+                                                        ? replyMessage[
+                                                            "message"]
                                                         : textAddition +
                                                             cardData["name"],
                                                     maxLines: 1,
@@ -1452,8 +1491,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               padding: const EdgeInsets.only(
                                   top: 5, left: 10, bottom: 7, right: 10),
                               constraints: BoxConstraints(
-                                  maxWidth:
-                                  MediaQuery.of(context).size.width *
+                                  maxWidth: MediaQuery.of(context).size.width *
                                       0.785),
                               child: Wrap(
                                 children: [
@@ -1485,7 +1523,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             messageBoxInformation["messageTime"],
                         style: TextStyle(color: timeStampColor)),
                   ),
-                  if(message["showTranslationButton"]) translationButton(message)
+                  if (message["showTranslationButton"])
+                    translationButton(message)
                 ],
               ),
               if (messageBoxInformation["textAlign"] == Alignment.centerLeft)
@@ -1500,7 +1539,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var messageAutorId = message["forward"].split(":")[1];
       var forwardProfil = getProfilFromHive(profilId: messageAutorId);
 
-      return Listener(behavior: HitTestBehavior.opaque,
+      return Listener(
+        behavior: HitTestBehavior.opaque,
         onPointerHover: (details) => _tabPosition = details.position,
         child: AnimatedContainer(
           color: highlightMessages.contains(index)
@@ -1515,10 +1555,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 Container(
                     constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.85),
-            margin: EdgeInsets.only(
-                left: 10, right: 10, top: 10,
-                bottom: message["showTranslationButton"] ? 25 :10
-            ),
+                    margin: EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                        top: 10,
+                        bottom: message["showTranslationButton"] ? 25 : 10),
                     decoration: BoxDecoration(
                         color: messageBoxInformation["messageBoxColor"],
                         border: Border.all(),
@@ -1539,7 +1580,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             child: Text(
                               AppLocalizations.of(context).weitergeleitetVon +
                                   forwardProfil["name"],
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -1561,8 +1603,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   messageBoxInformation["messageEdit"] +
                                       " " +
                                       messageBoxInformation["messageTime"],
-                                  style:
-                                      const TextStyle(color: Colors.transparent))
+                                  style: const TextStyle(
+                                      color: Colors.transparent))
                             ],
                           ),
                         ),
@@ -1577,7 +1619,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           messageBoxInformation["messageTime"],
                       style: TextStyle(color: timeStampColor)),
                 ),
-                if(message["showTranslationButton"]) translationButton(message)
+                if (message["showTranslationButton"]) translationButton(message)
               ],
             ),
           ),
@@ -1586,8 +1628,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     normalMessage(index, message, messageBoxInformation) {
-      return Listener(behavior: HitTestBehavior.opaque,
-          onPointerHover: (details) => _tabPosition = details.position,
+      return Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerHover: (details) => _tabPosition = details.position,
         child: GestureDetector(
           onTap: () => openMessageMenu(message, index),
           child: AnimatedContainer(
@@ -1604,9 +1647,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * 0.85),
                       margin: EdgeInsets.only(
-                          left: 10, right: 10, top: 10,
-                          bottom: message["showTranslationButton"] ? 25 :10
-                      ),
+                          left: 10,
+                          right: 10,
+                          top: 10,
+                          bottom: message["showTranslationButton"] ? 25 : 10),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                           color: messageBoxInformation["messageBoxColor"],
@@ -1635,7 +1679,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             messageBoxInformation["messageTime"],
                         style: TextStyle(color: timeStampColor)),
                   ),
-                  if(message["showTranslationButton"]) translationButton(message)
+                  if (message["showTranslationButton"])
+                    translationButton(message)
                 ],
               ),
             ),
@@ -1667,8 +1712,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
         if (message["message"] == "") continue;
 
-        var checkTextAndPersonalLanguage = myLanguage == (message["language"] == "auto" ? "en" : message["language"]);
-        message["showTranslationButton"] = widget.isChatgroup && !checkTextAndPersonalLanguage;
+        var checkTextAndPersonalLanguage = myLanguage ==
+            (message["language"] == "auto" ? "en" : message["language"]);
+        message["showTranslationButton"] =
+            widget.isChatgroup && !checkTextAndPersonalLanguage;
 
         message["message"] = removeAllNewLineAtTheEnd(message["message"]);
 
@@ -1813,7 +1860,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ],
           ),
         );
-      }else if (widget.groupChatData["users"][userId] == null){
+      } else if (widget.groupChatData["users"][userId] == null) {
         return GestureDetector(
           onTap: () async {
             var newUserInformation = {"newMessages": 0};
@@ -1823,18 +1870,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             });
 
             await ChatGroupsDatabase().updateChatGroup(
-              "users = JSON_MERGE_PATCH(users, '${json.encode({userId : newUserInformation})}')",
-              "WHERE id = ${widget.chatId}"
-            );
+                "users = JSON_MERGE_PATCH(users, '${json.encode({
+                      userId: newUserInformation
+                    })}')",
+                "WHERE id = ${widget.chatId}");
 
             myGroupChats.add(widget.groupChatData);
             Hive.box("secureBox").put("myGroupChats", myGroupChats);
-
           },
           child: Container(
-            constraints: const BoxConstraints(
-              minHeight: 60,
-            ),
+              constraints: const BoxConstraints(
+                minHeight: 60,
+              ),
               decoration: BoxDecoration(color: Colors.white, boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
@@ -1843,10 +1890,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   offset: const Offset(0, 3), // changes position of shadow
                 ),
               ]),
-            child: Center(child: Text(AppLocalizations.of(context).gruppeBeitreten))
-          ),
+              child: Center(
+                  child: Text(AppLocalizations.of(context).gruppeBeitreten))),
         );
-      }else{
+      } else {
         return Container(
             constraints: const BoxConstraints(
               minHeight: 60,
@@ -1858,14 +1905,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     : null,
                 boxShadow: extraInputInformationBox.runtimeType == SizedBox
                     ? [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset:
-                    const Offset(0, 3), // changes position of shadow
-                  ),
-                ]
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
+                        ),
+                      ]
                     : []),
             child: Row(
               children: [
@@ -1890,31 +1937,31 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 ),
                 changeMessageInputModus != "edit"
                     ? IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      messageToDbAndClearMessageInput(
-                          nachrichtController.text);
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          messageToDbAndClearMessageInput(
+                              nachrichtController.text);
 
-                      resetExtraInputInformation();
+                          resetExtraInputInformation();
 
-                      _scrollController.jumpTo(index: 0);
+                          _scrollController.jumpTo(index: 0);
 
-                      setState(() {
-                        nachrichtController.clear();
-                      });
-                    },
-                    icon: Icon(Icons.send,
-                        size: 34,
-                        color: Theme.of(context).colorScheme.secondary))
+                          setState(() {
+                            nachrichtController.clear();
+                          });
+                        },
+                        icon: Icon(Icons.send,
+                            size: 34,
+                            color: Theme.of(context).colorScheme.secondary))
                     : IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {
-                      saveEditMessage();
-                      resetExtraInputInformation();
-                    },
-                    icon: Icon(Icons.done,
-                        size: 38,
-                        color: Theme.of(context).colorScheme.secondary))
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          saveEditMessage();
+                          resetExtraInputInformation();
+                        },
+                        icon: Icon(Icons.done,
+                            size: 38,
+                            color: Theme.of(context).colorScheme.secondary))
               ],
             ));
       }
@@ -1936,7 +1983,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             textSearchIsActive = true;
           });
 
-            searchInputNode.requestFocus();
+          searchInputNode.requestFocus();
         },
       );
     }
@@ -1955,25 +2002,24 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
           List<Widget> mitgliederList = [];
 
-          widget.groupChatData["users"].forEach((memberUserId, data){
+          widget.groupChatData["users"].forEach((memberUserId, data) {
             var userProfil = getProfilFromHive(profilId: memberUserId);
             var userName = userProfil["name"];
 
-            mitgliederList.add(
-              GestureDetector(
-                onTap: () => global_functions.changePage(context, ShowProfilPage(
-                  userName: userName,
-                  profil: userProfil,
-                  ownProfil: memberUserId == userId,
-                )),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  child: Text(userName),
-                ),
-              )
-            );
+            mitgliederList.add(GestureDetector(
+              onTap: () => global_functions.changePage(
+                  context,
+                  ShowProfilPage(
+                    userName: userName,
+                    profil: userProfil,
+                    ownProfil: memberUserId == userId,
+                  )),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                child: Text(userName),
+              ),
+            ));
           });
-
 
           showDialog(
               context: context,
@@ -2064,7 +2110,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           children: [
             const Icon(Icons.delete, color: Colors.red),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).chatLoeschen, style: const TextStyle(color: Colors.red),),
+            Text(
+              AppLocalizations.of(context).chatLoeschen,
+              style: const TextStyle(color: Colors.red),
+            ),
           ],
         ),
         onPressed: () {
@@ -2124,45 +2173,47 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           children: [
             const Icon(Icons.logout, color: Colors.red),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).gruppeVerlassen, style: const TextStyle(color: Colors.red),),
+            Text(
+              AppLocalizations.of(context).gruppeVerlassen,
+              style: const TextStyle(color: Colors.red),
+            ),
           ],
         ),
         onPressed: () {
           Navigator.pop(context);
 
           showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return CustomAlertDialog(
-                title: AppLocalizations.of(context).gruppeVerlassen,
-                height: 100,
-                children: [
-                  Center(
-                      child: Text(AppLocalizations.of(context)
-                          .gruppeWirklichVerlassen)),
+              context: context,
+              builder: (BuildContext context) {
+                return CustomAlertDialog(
+                  title: AppLocalizations.of(context).gruppeVerlassen,
+                  height: 100,
+                  children: [
+                    Center(
+                        child: Text(AppLocalizations.of(context)
+                            .gruppeWirklichVerlassen)),
+                  ],
+                  actions: [
+                    TextButton(
+                      child: Text(AppLocalizations.of(context).gruppeVerlassen),
+                      onPressed: () async {
+                        Navigator.pop(context);
 
-                ],
-                actions: [
-                  TextButton(
-                    child: Text(AppLocalizations.of(context).gruppeVerlassen),
-                    onPressed: () async {
-                      Navigator.pop(context);
+                        ChatGroupsDatabase().leaveChat(widget.chatId);
 
-                      ChatGroupsDatabase().leaveChat(widget.chatId);
-
-                      setState(() {
-                        widget.groupChatData["users"].removeWhere((key, value) => key == userId);
-                      });
-
-                    },
-                  ),
-                  TextButton(
-                    child: Text(AppLocalizations.of(context).abbrechen),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
-              );
-            });
+                        setState(() {
+                          widget.groupChatData["users"]
+                              .removeWhere((key, value) => key == userId);
+                        });
+                      },
+                    ),
+                    TextButton(
+                      child: Text(AppLocalizations.of(context).abbrechen),
+                      onPressed: () => Navigator.pop(context),
+                    )
+                  ],
+                );
+              });
         },
       );
     }
@@ -2182,11 +2233,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
                       searchMessageDialog(),
-                      if(widget.isChatgroup) mitgliederDialog(),
-                      if(userJoinedChat) pinChatDialog(),
-                      if(userJoinedChat) muteDialog(),
+                      if (widget.isChatgroup) mitgliederDialog(),
+                      if (userJoinedChat) pinChatDialog(),
+                      if (userJoinedChat) muteDialog(),
                       if (!widget.isChatgroup) deleteDialog(),
-                      if(connectedData["erstelltVon"] != userId && userJoinedChat) leaveDialog(),
+                      if (connectedData["erstelltVon"] != userId &&
+                          userJoinedChat)
+                        leaveDialog(),
                       const SizedBox(height: 5)
                     ],
                   ),
@@ -2247,26 +2300,27 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   ))
             ]);
       } else if (chatPartnerProfil != false) {
-        var chatImage = widget.isChatgroup
-            ? connectedData
-            : chatPartnerProfil;
+        var chatImage = widget.isChatgroup ? connectedData : chatPartnerProfil;
 
         return CustomAppBar(
           title: widget.isChatgroup
               ? Expanded(
-                child: Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.chatPartnerName ?? connectedData["name"] ?? AppLocalizations.of(context).weltChat),
+                      Text(widget.chatPartnerName ??
+                          connectedData["name"] ??
+                          AppLocalizations.of(context).weltChat),
                       const SizedBox(height: 3),
                       Text(
                         widget.groupChatData["users"].length.toString() +
                             AppLocalizations.of(context).teilnehmerSimple,
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 14, color: Colors.grey),
                       )
                     ],
                   ),
-              )
+                )
               : widget.chatPartnerName ?? connectedData["name"],
           leading: widget.backToChatPage
               ? IconButton(

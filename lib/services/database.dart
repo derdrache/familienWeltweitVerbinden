@@ -1351,6 +1351,17 @@ getCityFromHive({cityId, cityName, getName= false}){
   }
 }
 
+getCityUserInfoFromHive(cityName){
+  var stadtUserInfos = Hive.box('secureBox').get("stadtinfoUser");
+  var infos = [];
+
+  for(var info in stadtUserInfos){
+    if(cityName.contains(info["ort"])) infos.add(info);
+  }
+
+  return infos;
+}
+
 updateHiveProfil(changeTyp, changeData){
   var ownProfil = Hive.box("secureBox").get("ownProfil");
   ownProfil[changeTyp] = changeData;

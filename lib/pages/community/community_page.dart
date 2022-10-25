@@ -296,15 +296,15 @@ class _CommunityPageState extends State<CommunityPage> {
 
     return Scaffold(
       floatingActionButton: floatingActionButtons(),
-      body: Padding(
-          padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
-          child: Column(
-            children: [
-              suchleiste,
-              Expanded(child: showCommunities()),
-              if (getInvite) showInvite(),
-            ],
-          )),
+      body: SafeArea(
+        child: Column(
+          children: [
+            suchleiste,
+            Expanded(child: showCommunities()),
+            if (getInvite) showInvite(),
+          ],
+        ),
+      ),
     );
   }
 }
