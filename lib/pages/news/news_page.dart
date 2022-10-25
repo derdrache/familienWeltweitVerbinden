@@ -171,6 +171,7 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   Widget build(BuildContext context) {
+
     friendsDisplay(news) {
       var userAdded = news["information"].split(" ")[1];
       var newsUserId = news["erstelltVon"];
@@ -560,10 +561,51 @@ class _NewsPageState extends State<NewsPage> {
       }
     }
 
+    addLocationWelcome(){
+      var ownLocation = ownProfil["ort"];
+      var locationUserInfos = getCityUserInfoFromHive(ownLocation);
+
+      newsFeed.add({"newsWidget":InkWell(
+        onTap: () {
+          global_func.changePage(context, StadtinformationsPage(ortName: ownLocation,));
+        },
+        child: Align(
+          child: Container(
+              width: 800,
+              margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Text(AppLocalizations.of(context).newsLocationBegruessung + ownLocation,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 5),
+                  locationUserInfos.length == 0
+                    ? Text(AppLocalizations.of(context).erfahrungenTeilen)
+                    : Text(AppLocalizations.of(context).erfahrungenAnschauenUndTeilen)
+                ],
+              )),
+        ),
+      )});
+    }
+
     getSettingProfilOrAddNew();
     createNewsFeed();
     sortNewsFeed();
     updateHiveUserNewsContent();
+    addLocationWelcome();
 
     return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.endTop,

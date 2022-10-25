@@ -10,6 +10,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   var leading;
   var profilBildProfil;
   var withLeading;
+  var backgroundColor;
 
   CustomAppBar(
       {Key key,
@@ -19,7 +20,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.withLeading = true,
       this.onTap,
       this.leading,
-      this.profilBildProfil})
+      this.profilBildProfil,
+      this.backgroundColor
+      })
       : super(key: key);
 
   @override
@@ -92,8 +95,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         title
                       ],
                     )),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      elevation: elevation,
+      backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.primary,
+      elevation: backgroundColor != null ? 0 :elevation,
       iconTheme: const IconThemeData(color: Colors.white),
       actions: buttons,
       automaticallyImplyLeading: withLeading,
