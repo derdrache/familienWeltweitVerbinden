@@ -451,6 +451,7 @@ class _ChatPageState extends State<ChatPage> {
 
     createChatGroupContainers(spezialData) {
       List<Widget> chatGroupContainers = [];
+
       var chatData = spezialData ?? getSelectedChatData();
 
       for (dynamic group in chatData) {
@@ -647,6 +648,7 @@ class _ChatPageState extends State<ChatPage> {
     showAppBar() {
       if (activeChatSearch) {
         return CustomAppBar(
+            backgroundColor: Colors.white,
             title: TextField(
               cursorColor: Colors.black,
               focusNode: seachSearchInputNode,
@@ -722,6 +724,7 @@ class _ChatPageState extends State<ChatPage> {
         return CustomAppBar(
           title: "",
           withLeading: false,
+          backgroundColor: Colors.white,
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
@@ -749,6 +752,7 @@ class _ChatPageState extends State<ChatPage> {
         );
       } else {
         return CustomAppBar(
+          backgroundColor: Colors.white,
           title: Center(
             child: CupertinoSlidingSegmentedControl(
               children: {

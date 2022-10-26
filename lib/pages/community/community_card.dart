@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../global/global_functions.dart' as global_func;
 
 import 'community_details.dart';
 
@@ -45,14 +46,10 @@ class _CommunityCardState extends State<CommunityCard> {
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) =>
-                        CommunityDetails(community: widget.community)))
-            .whenComplete(() => widget.afterPageVisit());
-      },
+      onTap: () => global_func.changePage(
+          context, 
+          CommunityDetails(community: widget.community),
+          whenComplete: widget.afterPageVisit()),
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
           height: screenHeight / 3.2 * bigMultiplikator,
