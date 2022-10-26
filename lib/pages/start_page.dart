@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -126,10 +127,22 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
       _setAutomaticLoaction(automaticLocation);
     }
 
+    await oldUserAutomaticJoinWorldAndCityChat(ownProfil["ort"]);
+
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
 
+  }
 
+  oldUserAutomaticJoinWorldAndCityChat(ort) async{
+    var lastLogin = await ProfilDatabase().getData("lastLogin", "WHERE id = '$userId'");
+
+    if(DateTime.parse(lastLogin).isBefore(DateTime.parse("2022-10-24"))) {
+      await ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+          "WHERE id = '1'");
+      await ChatGroupsDatabase().joinAndCreateCityChat(ort);
+    }
   }
 
   checkProfilExist() async {

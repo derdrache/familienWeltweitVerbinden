@@ -205,7 +205,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "erstelltVon": ""
         };
         pageDetailsPage = StadtinformationsPage(
-          ortName: connectedData,
+          ortName: connectedData["name"],
         );
       } else {}
     }

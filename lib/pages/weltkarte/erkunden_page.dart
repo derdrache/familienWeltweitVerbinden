@@ -96,7 +96,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     setEvents();
 
     changeAllCitiesAndCreateCityNames();
-    //changeProfilToFamilyProfil();
+    changeProfilToFamilyProfil();
     removeProfilsAndCreateAllUserName();
     sortProfils(profils);
 
@@ -195,24 +195,50 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       var members = familyProfil["members"];
       var membersFound = 0;
+      var familyName = (spracheIstDeutsch ? "Familie:" : "family") + " " + familyProfil["name"];
 
       for (var i = 0; i < profils.length; i++) {
+        if(profils[i]["id"] == familyProfil["mainProfil"]){
+          membersFound += 1;
+          profils[i]["family"] = {
+            "name": familyName,
+            "status": "main"
+          };
+        } else if(members.contains(profils[i]["id"])){
+          membersFound += 1;
+          profils[i]["family"] = {
+            "name": familyName,
+            "status": "member"
+          };
+        }
+        if (membersFound == members.length) break;
+
+/*
         if (members.contains(userId) && members.contains(profils[i]["id"])) {
           membersFound += 1;
-          deleteProfils.add(profils[i]);
+          profils[i]["family"] = {
+            "name": familyName,
+            "status": "member"
+          };
+          //deleteProfils.add(profils[i]);
         } else if (members.contains(profils[i]["id"])) {
           membersFound += 1;
 
           if (profils[i]["id"] == familyProfil["mainProfil"]) {
-            var family = spracheIstDeutsch ? "Familie:" : "family";
-            profils[i]["name"] = family + " " + familyProfil["name"];
-          } else {
-            deleteProfils.add(profils[i]);
+            profils[i]["family"] = {
+              "name": familyName,
+              "status": "main"
+            };
+          } else { // macht das Sinn??
+            //deleteProfils.add(profils[i]);
           }
         }
 
         if (membersFound == members.length) break;
+
+ */
       }
+
     }
 
     for (var profil in deleteProfils) {
@@ -419,6 +445,17 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (typ == "profils") addCityProfils();
 
     for (var mainItem in mainList) {
+      if(mainItem["family"] != null && typ == "profils"){
+        print(mainItem["name"]);
+        if(mainItem["family"]["status"] == "main"){
+          mainItem["name"] = mainItem["family"]["name"];
+        } else {
+          continue;
+        }
+      }
+
+      if(mainItem["name"] == "PinkGrapefruit") print("false");
+
       pufferCountries =
           await createCountriesZoomLevel(pufferCountries, mainItem);
       pufferContinents =
