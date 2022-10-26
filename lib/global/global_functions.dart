@@ -50,11 +50,11 @@ checkValidationMultiTextForm(context){
   };
 }
 
-changePage(context, page){
+changePage(context, page, {whenComplete}){
   Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => page)
-  );
+  ).whenComplete(whenComplete == null ? null :() => whenComplete());
 }
 
 changePageForever(context, page){
