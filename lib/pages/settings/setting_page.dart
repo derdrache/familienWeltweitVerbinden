@@ -463,19 +463,22 @@ class _SettingPageState extends State<SettingPage> {
             icon: const Icon(Icons.more_vert, color: Colors.black))
       ]),
       body: SafeArea(
-          child: ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-          PointerDeviceKind.touch,
-          PointerDeviceKind.mouse,
-        }),
-        child: ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
-          nameContainer(),
-          profilContainer(),
-          settingContainer(),
-          aboutAppContainer(),
-        ]),
+          child: Container(
+        margin: const EdgeInsets.only(top: 10),
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          }),
+          child:
+              ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
+            nameContainer(),
+            profilContainer(),
+            settingContainer(),
+            aboutAppContainer(),
+          ]),
+        ),
       )),
     );
-
   }
 }
