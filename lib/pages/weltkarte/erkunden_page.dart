@@ -175,6 +175,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
           profil["land"].isEmpty) {
         removeProfils.add(profil);
       } else {
+        if(profil["family"] != null && profil["family"]["status"] == "main"){
+          allUserName.add(profil["family"]["name"]);
+        }
         allUserName.add(profil["name"]);
       }
     }
@@ -196,7 +199,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var members = familyProfil["members"];
       var membersFound = 0;
       var familyName = (spracheIstDeutsch ? "Familie:" : "family") + " " + familyProfil["name"];
-
       for (var i = 0; i < profils.length; i++) {
         if(profils[i]["id"] == familyProfil["mainProfil"]){
           membersFound += 1;
@@ -213,30 +215,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
         }
         if (membersFound == members.length) break;
 
-/*
-        if (members.contains(userId) && members.contains(profils[i]["id"])) {
-          membersFound += 1;
-          profils[i]["family"] = {
-            "name": familyName,
-            "status": "member"
-          };
-          //deleteProfils.add(profils[i]);
-        } else if (members.contains(profils[i]["id"])) {
-          membersFound += 1;
-
-          if (profils[i]["id"] == familyProfil["mainProfil"]) {
-            profils[i]["family"] = {
-              "name": familyName,
-              "status": "main"
-            };
-          } else { // macht das Sinn??
-            //deleteProfils.add(profils[i]);
-          }
-        }
-
-        if (membersFound == members.length) break;
-
- */
       }
 
     }
@@ -313,7 +291,18 @@ class _ErkundenPageState extends State<ErkundenPage> {
       filterProfils = profilsBackup;
     }else{
       for (var profil in Hive.box('secureBox').get("profils") ?? []) {
-        if (checkIfInFilter(profil)) filterProfils.add(profil);
+        if (checkIfInFilter(profil)){
+          filterProfils.add(profil);
+        }else{
+          for(var family in familyProfils){
+            var familyName = (spracheIstDeutsch ? "Familie:" : "family") + " " + family["name"];
+            if(family["mainProfil"] == profil["id"] && filterList.contains(familyName)){
+              var familyProfil = Map.from(profil);
+              familyProfil["name"] = familyName;
+              filterProfils.add(familyProfil);
+            }
+          }
+        }
       }
     }
 
@@ -446,7 +435,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     for (var mainItem in mainList) {
       if(mainItem["family"] != null && typ == "profils"){
-        print(mainItem["name"]);
         if(mainItem["family"]["status"] == "main"){
           mainItem["name"] = mainItem["family"]["name"];
         } else {
@@ -1019,7 +1007,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     popupItems.add(SliverAppBar(
-      toolbarHeight: kIsWeb ? 40 : 30,
+      toolbarHeight: kIsWeb ? 60 : 50,
       backgroundColor: Colors.white,
       flexibleSpace: Container(
         alignment: Alignment.center,
@@ -1181,7 +1169,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     List<Marker> allMarker = [];
     searchAutocomplete.hintText = AppLocalizations.of(context).filterErkunden;
 
-    createPopupEvents({event, community, spezialActivation = false}) {
+    createPopupCards({event, community, spezialActivation = false}) {
       double screenWidth = MediaQuery.of(context).size.width;
       var eventCrossAxisCount = screenWidth / 190;
       popupItems = [];
@@ -1189,7 +1177,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       var showItems = event ?? community;
 
       popupItems.add(SliverAppBar(
-        toolbarHeight: 30,
+        toolbarHeight: 50,
         backgroundColor: Colors.white,
         flexibleSpace: Center(
             child: Text(
@@ -1229,7 +1217,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                     }
 
                     lastEventPopup["profils"] = refreshEvents;
-                    createPopupEvents(event: lastEventPopup);
+                    createPopupCards(event: lastEventPopup);
                     setState(() {});
                   });
             } else {
@@ -1498,7 +1486,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         allMarker.add(eventMarker(event["name"], position, () {
           lastEventPopup = event;
           popupActive = true;
-          createPopupEvents(event: event);
+          createPopupCards(event: event);
           setState(() {});
         }, isOnline));
       }
@@ -1554,7 +1542,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
         allMarker.add(communityMarker(community["name"], position, () {
           popupActive = true;
-          createPopupEvents(community: community);
+          createPopupCards(community: community);
           setState(() {});
         }));
       }
@@ -1692,7 +1680,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
                 if (newEvents.isNotEmpty) {
                   popupActive = true;
-                  createPopupEvents(
+                  createPopupCards(
                       event: {"profils": newEvents}, spezialActivation: true);
                   Hive.box('secureBox').put("lastLoginEvents", events);
                 }
@@ -1758,7 +1746,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
                 if (newCommunity.isNotEmpty) {
                   popupActive = true;
-                  createPopupEvents(
+                  createPopupCards(
                       community: {"profils": newCommunity},
                       spezialActivation: true);
                   Hive.box('secureBox').put("lastLoginCommunity", communities);

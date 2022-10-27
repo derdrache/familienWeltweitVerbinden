@@ -50,10 +50,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   double healineTextSize = 18;
   var monthsUntilInactive = 3;
   var timeDifferenceLastLogin;
+  bool isFamily = false;
 
   @override
   void initState() {
     checkIsOwnProfil();
+    checkFamilyMember();
     checkAccessReiseplanung();
     timeDifferenceLastLogin = Duration(
         microseconds: (DateTime.now().microsecondsSinceEpoch -
@@ -70,6 +72,26 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   checkIsOwnProfil() {
     if (widget.profil["id"] == userID) widget.ownProfil = true;
+  }
+
+  checkFamilyMember(){
+    var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
+    var familyName = "";
+    var familyMainId = "";
+
+    for(var family in familyProfils){
+      if(family["members"].contains(widget.profil["id"])){
+        familyName = family["name"];
+        familyMainId = family["mainProfil"];
+      }
+    }
+
+    if(familyMainId.isEmpty) return;
+
+    isFamily = true;
+    var familyProfil = getProfilFromHive(profilId: familyMainId);
+    familyProfil["name"] = (spracheIstDeutsch ? "Familie:" : "family") + " " + familyName;
+    widget.profil = familyProfil;
   }
 
   checkAccessReiseplanung() {
