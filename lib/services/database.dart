@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io' as io;
 import 'dart:ui' as ui;
 import 'package:encrypt/encrypt.dart';
+import 'package:flutter/foundation.dart' as foundation;
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
@@ -543,6 +544,8 @@ class ChatGroupsDatabase{
           "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
           "connected": "</stadt=$cityId"
         };
+        var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+        myGroupChats.add(chatGroupData);
       }
     }
 
@@ -558,15 +561,18 @@ class ChatGroupsDatabase{
     myGroupChats.add(chatGroupData);
   }
 
-  leaveChat(chatId){
+  leaveChat(connectedId){
     var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     var userId = FirebaseAuth.instance.currentUser.uid;
 
-    myGroupChats.removeWhere((item) => item["id"].toString() == chatId);
+    myGroupChats.removeWhere((chat) {
+      chat["connected"].split("=")[1] == connectedId;
+    });
 
     ChatGroupsDatabase().updateChatGroup(
         "users = JSON_REMOVE(users, '\$.$userId')",
-        "WHERE id = '${chatId}'");
+        "WHERE connected LIKE '%$connectedId%'");
+
   }
 
 
@@ -743,7 +749,17 @@ class StadtinfoDatabase{
     if(! await _checkIfNew(city)) return false;
 
     var url = Uri.parse(databaseUrl + "database/stadtinfo/newCity.php");
-    await http.post(url, body: json.encode(city));
+    var cityId = await http.post(url, body: json.encode(city));
+
+    var stadtInfos = Hive.box('secureBox').get("stadtinfo");
+    stadtInfos.add({
+      "id": cityId,
+      "ort": city["ort"],
+      "land": city["land"],
+      "latt": city["latt"],
+      "longt": city["longt"],
+      "isCity": 1
+    });
 
     return true;
   }
@@ -1034,7 +1050,7 @@ class FamiliesDatabase{
 
 class NewsPageDatabase{
   addNewNews(news) async{
-    var alreadyAvailable = _checkIfInDatabase(news);
+    var alreadyAvailable = await _checkIfInDatabase(news);
     if(alreadyAvailable) return;
 
     var url = Uri.parse(databaseUrl + "database/newsPage/newNews.php");
@@ -1046,13 +1062,19 @@ class NewsPageDatabase{
 
   _checkIfInDatabase(newNews) async{
     var userId = FirebaseAuth.instance.currentUser.uid;
-    var allMyNews = getData("*", "WHERE userId = '$userId'");
+    var allMyNews = await getData("*", "WHERE erstelltVon = '$userId'");
 
     //innerhalb des selben Tages oder selben zwei Tagen??
     for(var news in allMyNews){
+
       var dateDifference = DateTime.now()
           .difference(DateTime.parse(news["erstelltAm"])).inDays;
-      if(news == newNews && dateDifference < 2) return true;
+      news.removeWhere((key, value) => key == "id"|| key =="erstelltAm" || key == "erstelltVon");
+      var checkNewNews = Map<String,dynamic>.of(newNews);
+      checkNewNews["information"] = json.decode(checkNewNews["information"]);
+      var equality = foundation.mapEquals(news["information"], checkNewNews["information"]);
+
+      if(equality && dateDifference < 2) return true;
     }
 
     return false;
