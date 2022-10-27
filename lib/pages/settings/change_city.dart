@@ -40,10 +40,12 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
         "WHERE ort LIKE '%${locationDict["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
     );
 
+
     NewsPageDatabase().addNewNews({
       "typ": "ortswechsel",
       "information": json.encode(locationDict),
     });
+
   }
 
   saveLocation() async {
@@ -51,8 +53,9 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       isLoading = true;
     });
 
-    var locationData = autoComplete.getGoogleLocationData();
-
+    //var locationData = autoComplete.getGoogleLocationData();
+    var locationData = {"city": "Guwahati", "longt": 91.7085933, "latt": 26.1157917, "countryname": "India", "ort": "Guwahati", "land": "India"};
+    //var locationData = {"city": "Puerto Morelos", "countryname": "Mexico", "longt": -86.87553419999999, "latt": 20.8478084, "adress": "Puerto Morelos , Quintana Roo , Mexico"};
 
     if(locationData["city"] == null) {
       setState(() {
@@ -87,9 +90,11 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
   databaseOperations(locationDict) async{
     var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
-    var leaveChatId = getCityFromHive(cityName: oldLocation)["id"];
+    var leaveCity = getCityFromHive(cityName: oldLocation);
+    var chatConnectId;
+    if(leaveCity != null ) chatConnectId = leaveCity["id"];
 
-    ChatGroupsDatabase().leaveChat(leaveChatId);
+    ChatGroupsDatabase().leaveChat(chatConnectId);
     await pushLocationDataToDB(locationDict);
     ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
   }

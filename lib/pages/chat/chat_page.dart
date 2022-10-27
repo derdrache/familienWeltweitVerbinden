@@ -505,16 +505,17 @@ class _ChatPageState extends State<ChatPage> {
             chatName = chatData["name"];
           } else if (group["connected"].contains("stadt")) {
             chatName = getCityFromHive(cityId: connectedId, getName: true);
-
             chatData = {
               "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
             };
+          } else if (group["connected"].contains("world")) {
+            chatName = AppLocalizations
+                .of(context)
+                .weltChat;
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
+            };
           }
-        } else {
-          chatName = AppLocalizations.of(context).weltChat;
-          chatData = {
-            "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
-          };
         }
 
         var lastMessage = cutMessage(group["lastMessage"]);
