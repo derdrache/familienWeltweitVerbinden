@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:collection/collection.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
@@ -29,6 +30,11 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   var ortInput = GoogleAutoComplete();
 
   saveInDatabase() {
+    if(checkDuplicateEntry()){
+      widget.reiseplanung.removeLast();
+      customSnackbar(context, "Doppelter Eintrag");
+    }
+
     ProfilDatabase().updateProfil(
         "reisePlanung = '${jsonEncode(widget.reiseplanung)}'",
         "WHERE id = '${widget.userId}'");
@@ -38,6 +44,19 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
       "typ": "reiseplanung",
       "information": json.encode(widget.reiseplanung.last),
     });
+  }
+
+  checkDuplicateEntry(){
+    var allReiseplanung = List.of(widget.reiseplanung);
+    var checkReiseplanung = allReiseplanung.last;
+    allReiseplanung.removeLast();
+
+    for(var reiseplanung in allReiseplanung){
+      var isEqual = const DeepCollectionEquality().equals(checkReiseplanung,reiseplanung);
+      if(isEqual) return true;
+    }
+
+    return false;
   }
 
   checkOverlappingPeriods(newPlan) {
