@@ -53,9 +53,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       isLoading = true;
     });
 
-    //var locationData = autoComplete.getGoogleLocationData();
-    var locationData = {"city": "Guwahati", "longt": 91.7085933, "latt": 26.1157917, "countryname": "India", "ort": "Guwahati", "land": "India"};
-    //var locationData = {"city": "Puerto Morelos", "countryname": "Mexico", "longt": -86.87553419999999, "latt": 20.8478084, "adress": "Puerto Morelos , Quintana Roo , Mexico"};
+    var locationData = autoComplete.getGoogleLocationData();
 
     if(locationData["city"] == null) {
       setState(() {

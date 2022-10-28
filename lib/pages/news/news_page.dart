@@ -171,7 +171,6 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   Widget build(BuildContext context) {
-
     friendsDisplay(news) {
       var userAdded = news["information"].split(" ")[1];
       var newsUserId = news["erstelltVon"];
@@ -200,7 +199,8 @@ class _NewsPageState extends State<NewsPage> {
           child: Container(
               width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 10, bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(),
@@ -253,7 +253,9 @@ class _NewsPageState extends State<NewsPage> {
           locationTimeCheck >= 0 &&
           ownSettingProfil["showNewFamilyLocation"];
 
-      if (newsUserProfil == null || newsOrt == null || newsLand == null ||
+      if (newsUserProfil == null ||
+          newsOrt == null ||
+          newsLand == null ||
           !ownSettingProfil["showFriendChangedLocation"] ||
           !ownSettingProfil["showNewFamilyLocation"] ||
           !(isFriend || samePlaceAndTime)) {
@@ -261,7 +263,7 @@ class _NewsPageState extends State<NewsPage> {
       }
 
       var newsOrtInfo =
-      newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
+          newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"]) {
         text = newsUserProfil["name"] +
@@ -286,7 +288,8 @@ class _NewsPageState extends State<NewsPage> {
           child: Container(
               width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 10, bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(),
@@ -359,7 +362,8 @@ class _NewsPageState extends State<NewsPage> {
           child: Container(
               width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 10, bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(),
@@ -414,7 +418,8 @@ class _NewsPageState extends State<NewsPage> {
 
       if (!checkOfflineEvent && !checkOnlineEvent ||
           !ownSettingProfil["showInterestingEvents"] ||
-          event["erstelltVon"] == userId || isPrivate) {
+          event["erstelltVon"] == userId ||
+          isPrivate) {
         return const SizedBox.shrink();
       }
 
@@ -481,7 +486,8 @@ class _NewsPageState extends State<NewsPage> {
           child: Container(
               width: 800,
               margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 10, bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(),
@@ -561,44 +567,54 @@ class _NewsPageState extends State<NewsPage> {
       }
     }
 
-    addLocationWelcome(){
+    addLocationWelcome() {
       var ownLocation = ownProfil["ort"];
       var locationUserInfos = getCityUserInfoFromHive(ownLocation);
 
-      newsFeed.add({"newsWidget":InkWell(
-        onTap: () {
-          global_func.changePage(context, StadtinformationsPage(ortName: ownLocation,));
-        },
-        child: Align(
-          child: Container(
-              width: 800,
-              margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-              padding: const EdgeInsets.only(left:20, right: 20, top: 10, bottom: 10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Text(AppLocalizations.of(context).newsLocationBegruessung + ownLocation,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 5),
-                  locationUserInfos.length == 0
-                    ? Text(AppLocalizations.of(context).erfahrungenTeilen)
-                    : Text(AppLocalizations.of(context).erfahrungenAnschauenUndTeilen)
-                ],
-              )),
-        ),
-      )});
+      newsFeed.add({
+        "newsWidget": InkWell(
+          onTap: () {
+            global_func.changePage(
+                context,
+                StadtinformationsPage(
+                  ortName: ownLocation,
+                ));
+          },
+          child: Align(
+            child: Container(
+                width: 800,
+                margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+                padding: const EdgeInsets.only(
+                    left: 20, right: 20, top: 10, bottom: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                        AppLocalizations.of(context).newsLocationBegruessung +
+                            ownLocation,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 5),
+                    locationUserInfos.length == 0
+                        ? Text(AppLocalizations.of(context).erfahrungenTeilen)
+                        : Text(AppLocalizations.of(context)
+                            .erfahrungenAnschauenUndTeilen)
+                  ],
+                )),
+          ),
+        )
+      });
     }
 
     getSettingProfilOrAddNew();
@@ -608,7 +624,9 @@ class _NewsPageState extends State<NewsPage> {
     addLocationWelcome();
 
     return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+        floatingActionButtonLocation: scrollbarOnBottom
+            ? FloatingActionButtonLocation.endTop
+            : FloatingActionButtonLocation.endDocked,
         floatingActionButton: scrollbarOnBottom
             ? Container(
                 margin: const EdgeInsets.only(top: 5),
@@ -623,7 +641,17 @@ class _NewsPageState extends State<NewsPage> {
                       .whenComplete(() => setState(() {})),
                 ),
               )
-            : null,
+            : Container(
+                margin: const EdgeInsets.only(bottom: 15),
+                child: FloatingActionButton(
+                  heroTag: "first Position",
+                  onPressed: () {
+                    _controller.jumpTo(0);
+                    setState(() {});
+                  },
+                  child: const Icon(Icons.arrow_downward),
+                ),
+              ),
         body: Container(
             padding: const EdgeInsets.only(top: 24),
             child: ListView(controller: _controller, reverse: true, children: [
