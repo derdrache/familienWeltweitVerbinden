@@ -15,6 +15,7 @@ import '../../global/global_functions.dart' as global_func;
 import '../../services/translation.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
+import '../../widgets/text_with_hyperlink_detection.dart';
 import '../start_page.dart';
 
 class StadtinformationsPage extends StatefulWidget {
@@ -651,7 +652,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             ),
             Container(
                 margin: const EdgeInsets.only(left: 10, right: 10),
-                child: Text(showInformation)),
+                child: TextWithHyperlinkDetection(text:showInformation, fontsize: 16,)),
             if (translationIn != null)
               Padding(
                 padding: const EdgeInsets.only(right: 5, top: 2),
@@ -784,36 +785,38 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     refreshCityUserInfo();
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: CustomAppBar(
-          title: widget.ortName,
-          leading: widget.newEntry != null ? StartPage() : null,
-          buttons: [
-            IconButton(
-              icon: Icon(Icons.message),
-              onPressed: () async {
-                await createChatGroup();
+    return SelectionArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: CustomAppBar(
+            title: widget.ortName,
+            leading: widget.newEntry != null ? StartPage() : null,
+            buttons: [
+              IconButton(
+                icon: Icon(Icons.message),
+                onPressed: () async {
+                  await createChatGroup();
 
-                global_func.changePage(context, ChatDetailsPage(
-                  isChatgroup: true,
-                  connectedId: "</stadt=${cityInformation["id"]}",
-                ));
-              },
-            )
+                  global_func.changePage(context, ChatDetailsPage(
+                    isChatgroup: true,
+                    connectedId: "</stadt=${cityInformation["id"]}",
+                  ));
+                },
+              )
+            ],
+        ),
+        body: Column(
+          children: [
+            allgemeineInfoBox(),
+            const SizedBox(height: 10),
+            Expanded(child: userInfoBox())
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+            heroTag: "create Stadtinformation",
+            child: const Icon(Icons.create),
+            onPressed: () => addInformationWindow()),
       ),
-      body: Column(
-        children: [
-          allgemeineInfoBox(),
-          const SizedBox(height: 10),
-          Expanded(child: userInfoBox())
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-          heroTag: "create Stadtinformation",
-          child: const Icon(Icons.create),
-          onPressed: () => addInformationWindow()),
     );
   }
 }
