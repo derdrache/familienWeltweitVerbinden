@@ -565,9 +565,7 @@ class ChatGroupsDatabase{
     var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     var userId = FirebaseAuth.instance.currentUser.uid;
 
-    myGroupChats.removeWhere((chat) {
-      chat["connected"].split("=")[1] == connectedId;
-    });
+    myGroupChats.removeWhere((chat) => chat["connected"].split("=")[1] == connectedId.toString());
 
     ChatGroupsDatabase().updateChatGroup(
         "users = JSON_REMOVE(users, '\$.$userId')",
@@ -844,7 +842,6 @@ class StadtinfoUserDatabase{
 
   addNewInformation(stadtinformation) async {
     var userId = FirebaseAuth.instance.currentUser.uid;
-
     var url = Uri.parse(databaseUrl + "database/stadtinfoUser/newInformation.php");
     stadtinformation["erstelltVon"] = userId;
 
