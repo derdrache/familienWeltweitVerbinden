@@ -9,7 +9,6 @@ import 'package:translator/translator.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
-import '../../services/translation.dart';
 import '../../widgets/custom_appbar.dart';
 
 class CreateStadtinformationsPage extends StatefulWidget {
@@ -50,8 +49,7 @@ class _CreateStadtinformationsPageState
 
 
   save() async {
-    //var ortData = ortEingabe.getGoogleLocationData();
-    var ortData = {"city": "Gurugram", "countryname": "India", "longt": 77.0266383, "latt": 28.4594965, "adress": "Gurugram"};
+    var ortData = ortEingabe.getGoogleLocationData();
 
     String titel = titleKontroller.text;
     String beschreibung = beschreibungKontroller.text;
