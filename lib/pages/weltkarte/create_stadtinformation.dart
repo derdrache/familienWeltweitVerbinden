@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:translator/translator.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart';
@@ -25,6 +26,7 @@ class _CreateStadtinformationsPageState
   var titleKontroller = TextEditingController();
   var beschreibungKontroller = TextEditingController();
   var onLoading = false;
+  final translator = GoogleTranslator();
 
   checkValidation() {
     if (ortEingabe.getGoogleLocationData() == null) {
@@ -46,8 +48,11 @@ class _CreateStadtinformationsPageState
     return true;
   }
 
+
   save() async {
-    var ortData = ortEingabe.getGoogleLocationData();
+    //var ortData = ortEingabe.getGoogleLocationData();
+    var ortData = {"city": "Gurugram", "countryname": "India", "longt": 77.0266383, "latt": 28.4594965, "adress": "Gurugram"};
+
     String titel = titleKontroller.text;
     String beschreibung = beschreibungKontroller.text;
     DateTime now = DateTime.now();
@@ -66,34 +71,35 @@ class _CreateStadtinformationsPageState
       return;
     }
 
-    var textLanguage = await TranslationServices().getLanguage(titel);
+    await StadtinfoDatabase().addNewCity(ortData);
 
-    if (textLanguage == "en") {
+    var languageCheck = await translator.translate(beschreibung);
+    var languageCode = languageCheck.sourceLanguage.code;
+    if(languageCode == "auto") languageCode = "en";
+
+    if (languageCode == "en") {
       titleEng = titel;
       informationEng = beschreibung;
-      titleGer =
-          await TranslationServices().getTextTranslation(titel, "en", "de");
-      informationGer = await TranslationServices()
-          .getTextTranslation(beschreibung, "en", "de");
+      var titleTranslation = await translator.translate(titel,
+          from: "en", to: "de");
+      titleGer = titleTranslation.toString();
+      var informationTranslation = await translator.translate(beschreibung,
+          from: "en", to: "de");
+      informationGer = informationTranslation.toString();
     } else {
       titleGer = titel;
       informationGer = beschreibung;
-      titleEng = "";
-      informationEng = "";
-      titleEng =
-          await TranslationServices().getTextTranslation(titel, "de", "en");
-      informationEng = await TranslationServices()
-          .getTextTranslation(beschreibung, "de", "en");
+      var titleTranslation = await translator.translate(titel,
+          from: "de", to: "en");
+      titleEng = titleTranslation.toString();
+      var informationTranslation = await translator.translate(beschreibung,
+          from: "de", to: "en");
+      informationEng = informationTranslation.toString();
     }
-
-    await StadtinfoDatabase().addNewCity(ortData);
-    var stadtInfo =
-        await StadtinfoDatabase().getData("*", "", returnList: true);
-    Hive.box("secureBox").put("stadtinfo", stadtInfo);
 
     var newUserInformation = {
       "ort": ortData["city"],
-      "sprache": textLanguage,
+      "sprache": languageCode,
       "titleGer": titleGer,
       "informationGer": informationGer,
       "titleEng": titleEng,
@@ -103,15 +109,16 @@ class _CreateStadtinformationsPageState
       "thumbDown": []
     };
 
+
     StadtinfoUserDatabase().addNewInformation(newUserInformation);
 
     var secureBox =Hive.box("secureBox");
     var allInformations = secureBox.get("stadtinfoUser");
     allInformations.add(newUserInformation);
-    await secureBox.put("stadtinfoUser", allInformations);
 
     Navigator.pop(context);
     changePage(context, StadtinformationsPage(ortName: ortData["city"], newEntry: true,));
+
   }
 
   @override
