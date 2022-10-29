@@ -748,18 +748,19 @@ class StadtinfoDatabase{
 
     var url = Uri.parse(databaseUrl + "database/stadtinfo/newCity.php");
     var cityId = await http.post(url, body: json.encode(city));
-
-    var stadtInfos = Hive.box('secureBox').get("stadtinfo");
-    stadtInfos.add({
+    var newCityInfo = {
       "id": cityId,
       "ort": city["ort"],
       "land": city["land"],
       "latt": city["latt"],
       "longt": city["longt"],
       "isCity": 1
-    });
+    };
 
-    return true;
+    var stadtInfos = Hive.box('secureBox').get("stadtinfo");
+    stadtInfos.add(newCityInfo);
+
+    return newCityInfo;
   }
 
   getData(whatData, queryEnd, {returnList = false}) async {

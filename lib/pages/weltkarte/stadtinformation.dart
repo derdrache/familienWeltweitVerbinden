@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:translator/translator.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_func;
@@ -34,6 +35,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
   bool canEnglish = false;
   var cityInformation = {};
   var usersCityInformation = [];
+  final translator = GoogleTranslator();
 
 
   @override
@@ -47,9 +49,9 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       }
     }
 
-    cityInformation["familien"].remove(userId);
+    //cityInformation["familien"].remove(userId);
 
-    refreshCityUserInfo();
+    //refreshCityUserInfo();
 
     super.initState();
   }
@@ -414,29 +416,35 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       return;
     }
 
-    var textLanguage = await TranslationServices().getLanguage(title);
+    var languageCheck = await translator.translate(inhalt);
+    var languageCode = languageCheck.sourceLanguage.code;
+    if(languageCode == "auto") languageCode = "en";
 
-    if (textLanguage == "en") {
+    if (languageCode == "en") {
       titleEng = title;
       informationEng = inhalt;
-      titleGer =
-          await TranslationServices().getTextTranslation(title, "en", "de");
-      informationEng =
-          await TranslationServices().getTextTranslation(inhalt, "en", "de");
+      var titleTranslation =await translator.translate(title,
+          from: "en", to: "de");
+      titleGer = titleTranslation.toString();
+      var informationTranslation = await translator.translate(inhalt,
+          from: "en", to: "de");
+      informationGer = informationTranslation.toString();
     } else {
       titleGer = title;
       informationGer = inhalt;
       titleEng = "";
       informationEng = "";
-      titleEng =
-          await TranslationServices().getTextTranslation(title, "de", "en");
-      informationEng =
-          await TranslationServices().getTextTranslation(inhalt, "de", "en");
+      var titleTranslation = await translator.translate(title,
+          from: "de", to: "en");
+      titleEng = titleTranslation.toString();
+      var informationTranslation = await translator.translate(inhalt,
+          from: "de", to: "en");
+      informationEng = informationTranslation.toString();
     }
 
     var newUserInformation = {
       "ort": widget.ortName,
-      "sprache": textLanguage,
+      "sprache": languageCode,
       "titleGer": titleGer,
       "informationGer": informationGer,
       "titleEng": titleEng,
@@ -480,7 +488,6 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
   @override
   Widget build(BuildContext context) {
     usersCityInformation = sortThumb(usersCityInformation);
-
     allgemeineInfoBox() {
       String internetSpeedText = cityInformation["internet"] == null
           ? "?"
@@ -617,6 +624,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       var showTitle = informationText["title"];
       var showInformation = informationText["information"];
       var translationIn = informationText["translationIn"];
+      var creatorProfil = getProfilFromHive(profilId: information["erstelltVon"]);
 
       return Container(
         margin: const EdgeInsets.all(10),
@@ -690,20 +698,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                               ? Colors.red
                               : Colors.grey)),
                   const Expanded(child: SizedBox()),
-                  FutureBuilder(
-                      future: ProfilDatabase().getData(
-                          "name", "WHERE id='${information["erstelltVon"]}'"),
-                      builder: (context, snapshot) {
-                        var name = snapshot.data;
-                        if (!snapshot.hasData || snapshot.data == false) {
-                          name = "";
-                        }
-
-                        return Text(
-                          name + " " +information["erstelltAm"].split("-").reversed.join("-"),
-                          style: const TextStyle(color: Colors.black),
-                        );
-                      }),
+                  GestureDetector(
+                    onTap: ()=> global_func.changePage(context, ShowProfilPage(profil: creatorProfil,)),
+                    child: Text(creatorProfil["name"] + " " +information["erstelltAm"].split("-").reversed.join("-"),
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                  ),
                   const SizedBox(width: 5)
                 ],
               ),
@@ -762,7 +762,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                   const SizedBox(height: 10),
                   customTextInput(AppLocalizations.of(context).beschreibung,
                       informationTextKontroller,
-                      moreLines: 10, textInputAction: TextInputAction.newline),
+                      moreLines: 8, textInputAction: TextInputAction.newline),
                   const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
