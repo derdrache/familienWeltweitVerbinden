@@ -40,7 +40,8 @@ class TextWithHyperlinkDetection extends StatelessWidget {
               child: Text(text,
                   style: TextStyle(
                       color: hyperlinkColor,
-                      fontSize: fontsize-3)))));
+                      fontSize: fontsize-2)))));
+      addNormalText(" ");
     }
 
     for (var word in beschreibungsList) {
@@ -82,7 +83,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
                       Text(hyperLinkLine,
                           style: TextStyle(
                               color: hyperlinkColor,
-                              fontSize: fontsize)),
+                              fontSize: fontsize -2 )),
                     ],
                   ))));
 

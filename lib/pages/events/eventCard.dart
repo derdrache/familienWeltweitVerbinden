@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../../global/variablen.dart' as global_var;
 import 'event_details.dart';
@@ -337,9 +338,45 @@ class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
 
   setInteresse() async {
-    widget.hasIntereset = widget.hasIntereset ? false : true;
+    var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
+    var eventData = getEventFromHive(widget.id);
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    widget.hasIntereset = !widget.hasIntereset;
 
-    setState(() {});
+    if (widget.hasIntereset) {
+      eventData["interesse"].add(userId);
+      myInterestedEvents.add(eventData);
+      EventDatabase().update(
+          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
+          "WHERE id ='${widget.id}'");
+
+      myGroupChats.add(getChatGroupFromHive(widget.id));
+      ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+          "WHERE connected LIKE '%${widget.id}%'");
+    } else {
+      eventData["interesse"].remove(userId);
+      myInterestedEvents.removeWhere((event) => event["id"] == widget.id);
+      EventDatabase().update(
+          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+          "WHERE id ='${widget.id}'");
+
+      myGroupChats.removeWhere((chatGroup){
+        chatGroup["connected"].contains(widget.id);
+      });
+      ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_REMOVE(users, '\$.$userId')",
+          "WHERE connected LIKE '%${widget.id}%'");
+    }
+
+    setState(() {   });
+
+
+
+
+    /*
+    widget.hasIntereset = widget.hasIntereset ? false : true;
+    var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
 
     var interesseList =
         await EventDatabase().getData("interesse", "WHERE id = '${widget.id}'");
@@ -350,8 +387,14 @@ class _InteresseButtonState extends State<InteresseButton> {
       interesseList.remove(userId);
     }
 
+    setState(() {});
+
     EventDatabase().update("interesse = '${json.encode(interesseList)}'",
         "WHERE id ='${widget.id}'");
+
+
+
+     */
   }
 
   @override

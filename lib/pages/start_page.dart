@@ -172,6 +172,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
             .difference(DateTime.parse(ownProfil["lastLogin"]))
             .inDays >
         0) {
+      print("test2");
       var newLocation = "";
       var currentPosition = await LocationService().getCurrentUserLocation();
 
