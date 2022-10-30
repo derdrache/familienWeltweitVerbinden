@@ -214,18 +214,10 @@ class _CommunityPageState extends State<CommunityPage> {
                 StartPage(
                   selectedIndex: 3,
                 )),
-            afterFavorite: () {
-              for (var i = 0; i < allCommunities.length; i++) {
-                if (community["id"] == allCommunities[i]["id"]) {
-                  if (allCommunities[i]["interesse"].contains(userId)) {
-                    allCommunities[i]["interesse"].remove(userId);
-                  } else {
-                    allCommunities[i]["interesse"].add(userId);
-                  }
-                  setState(() {});
-                }
-              }
-            }));
+            afterFavorite: (){
+              setState(() {});
+            })
+        );
       }
 
       return SingleChildScrollView(

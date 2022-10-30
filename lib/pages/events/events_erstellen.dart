@@ -146,7 +146,7 @@ class _EventErstellenState extends State<EventErstellen> {
     var dbEventData =
         await EventDatabase().getData("*", "WHERE id = '$eventId'");
     ChatGroupsDatabase().addNewChatGroup(
-        userID, "</community=$eventId"
+        userID, "</event=$eventId"
     );
 
     if (dbEventData == false) return;
