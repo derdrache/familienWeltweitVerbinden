@@ -1283,26 +1283,36 @@ class _InteresseButtonState extends State<InteresseButton> {
       right: 28,
       child: GestureDetector(
           onTap: () async {
-            setState(() {
-              widget.hasIntereset = !widget.hasIntereset;
-            });
+            var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
+            var eventData = getEventFromHive(widget.id);
+            var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+            widget.hasIntereset = !widget.hasIntereset;
 
             if (widget.hasIntereset) {
+              eventData["interesse"].add(userId);
+              myInterestedEvents.add(eventData);
               EventDatabase().update(
                   "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
                   "WHERE id ='${widget.id}'");
+
+              myGroupChats.add(getChatGroupFromHive(widget.id));
               ChatGroupsDatabase().updateChatGroup(
                   "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
                   "WHERE connected LIKE '%${widget.id}%'");
             } else {
+              eventData["interesse"].remove(userId);
+              myInterestedEvents.removeWhere((event) => event["id"] == widget.id);
               EventDatabase().update(
                   "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
                   "WHERE id ='${widget.id}'");
+
+              myGroupChats.removeWhere((chatGroup) => chatGroup["connected"].contains(widget.id));
               ChatGroupsDatabase().updateChatGroup(
                   "users = JSON_REMOVE(users, '\$.$userId')",
                   "WHERE connected LIKE '%${widget.id}%'");
             }
 
+            setState(() {});
 
           },
           child: Icon(

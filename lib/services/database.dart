@@ -581,6 +581,9 @@ class EventDatabase{
   addNewEvent(eventData) async {
     var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
     await http.post(url, body: json.encode(eventData));
+
+    var myOwnEvents = Hive.box('secureBox').get("myEvents") ?? [];
+    myOwnEvents.add(eventData);
   }
 
   update(whatData, queryEnd) async  {
@@ -660,6 +663,9 @@ class CommunityDatabase{
   addNewCommunity(communityData) async {
     var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
     await http.post(url, body: json.encode(communityData));
+
+    var allCommunities = Hive.box('secureBox').get("communities") ?? [];
+    allCommunities.add(communityData);
   }
 
   update(whatData, queryEnd) async  {
@@ -1400,8 +1406,6 @@ refreshHiveAllgemein() async {
 refreshHiveChats() async {
   String userId = FirebaseAuth.instance.currentUser?.uid;
 
-  if (userId == null) return;
-
   var myChatData = await ChatDatabase().getChatData(
       "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
       returnList: true);
@@ -1414,14 +1418,18 @@ refreshHiveChats() async {
       returnList: true);
   if(chatGroups == false) chatGroups = [];
 
+  Hive.box("secureBox").put("chatGroups", chatGroups);
+
   var myGroupChats = [];
+
+  if (userId == null) return;
 
   for(var chat in chatGroups){
     if(chat["users"].keys.contains(userId)) myGroupChats.add(chat);
   }
 
   Hive.box("secureBox").put("myGroupChats", myGroupChats);
-  Hive.box("secureBox").put("chatGroups", chatGroups);
+
 }
 
 refreshHiveEvents() async{

@@ -64,7 +64,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     var secureBox = Hive.box("secureBox");
     var ownProfil = secureBox.get("ownProfil");
     ownProfil["reiseplanungPrivacy"] = reiseplanungPrivacyAuswahl;
-    secureBox.put("ownProfil", ownProfil);
+
 
 
     ProfilDatabase().updateProfil(

@@ -217,6 +217,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   writeActiveChat() {
     if (widget.isChatgroup) {
       if (widget.groupChatData["users"][userId] == null) return;
+
       widget.groupChatData["users"][userId]["isActive"] = true;
       ChatGroupsDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
@@ -732,6 +733,25 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "users = JSON_SET(users, '\$.$userId.pinnedMessages', '$pinnedMessages')",
           "WHERE id = '${message["chatId"]}'");
     }
+  }
+
+  joinChatGroup() async{
+    var newUserInformation = {"newMessages": 0};
+
+    setState(() {
+      widget.groupChatData["users"][userId] = newUserInformation;
+    });
+
+    await ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_MERGE_PATCH(users, '${json.encode({
+          userId: newUserInformation
+        })}')",
+        "WHERE id = ${widget.chatId}");
+
+    myGroupChats.add(widget.groupChatData);
+    Hive.box("secureBox").put("myGroupChats", myGroupChats);
+
+    writeActiveChat();
   }
 
   @override
@@ -1466,7 +1486,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             if (widget.isChatgroup && message["von"] != userId) Container(
                 width: 50,
                 height: 50,
-                margin: EdgeInsets.only(left: 5, bottom: 10),
+                margin: EdgeInsets.only(left: 5, bottom: message["showTranslationButton"] ? 25 : 10),
                 child: ProfilImage(creatorData)
             ),
             Expanded(
@@ -1636,16 +1656,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         behavior: HitTestBehavior.opaque,
         onPointerHover: (details) => _tabPosition = details.position,
         child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: messageBoxInformation["textAlign"] ==
                 Alignment.centerLeft
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
         if (widget.isChatgroup && message["von"] != userId) Container(
           width: 50,
           height: 50,
-          margin: EdgeInsets.only(left: 5, bottom: 10),
+          margin: EdgeInsets.only(left: 5, bottom: message["showTranslationButton"] ? 25 : 10),
           child: ProfilImage(creatorData)
       ),
             AnimatedContainer(
@@ -1762,7 +1782,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             if (widget.isChatgroup && message["von"] != userId) Container(
                 width: 50,
                 height: 50,
-                margin: EdgeInsets.only(left: 5, bottom: 10),
+                margin: EdgeInsets.only(left: 5, bottom: message["showTranslationButton"] ? 25 : 10),
                 child: ProfilImage(creatorData)
             ),
             GestureDetector(
@@ -2015,22 +2035,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         );
       } else if (widget.groupChatData["users"][userId] == null) {
         return GestureDetector(
-          onTap: () async {
-            var newUserInformation = {"newMessages": 0};
-
-            setState(() {
-              widget.groupChatData["users"][userId] = newUserInformation;
-            });
-
-            await ChatGroupsDatabase().updateChatGroup(
-                "users = JSON_MERGE_PATCH(users, '${json.encode({
-                      userId: newUserInformation
-                    })}')",
-                "WHERE id = ${widget.chatId}");
-
-            myGroupChats.add(widget.groupChatData);
-            Hive.box("secureBox").put("myGroupChats", myGroupChats);
-          },
+          onTap: () async => joinChatGroup(),
           child: Container(
               constraints: const BoxConstraints(
                 minHeight: 60,
