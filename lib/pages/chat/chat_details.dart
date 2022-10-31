@@ -1027,6 +1027,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
+                    isScrollControlled: true,
                     context: context,
                     builder: (BuildContext context) {
                       return Stack(
@@ -1035,24 +1036,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             padding: const EdgeInsets.only(
                                 top: 30, left: 30, bottom: 20, right: 15),
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(AppLocalizations.of(context).uebersetzen,
                                     style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 15),
-                                Expanded(
-                                  child: ListView(
-                                    shrinkWrap: true,
-                                    children: [
-                                      Text(
-                                        translation.toString(),
-                                        style: const TextStyle(fontSize: 18),
-                                      ),
-                                    ],
-                                  ),
+                                ListView(
+                                  shrinkWrap: true,
+                                  children: [
+                                    Text(
+                                      translation.toString(),
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 15),
+                                const SizedBox(height: 30),
                                 SizedBox(
                                   width: double.maxFinite,
                                   child: FloatingActionButton.extended(

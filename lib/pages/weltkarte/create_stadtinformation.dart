@@ -50,13 +50,15 @@ class _CreateStadtinformationsPageState
 
   save() async {
     var ortData = ortEingabe.getGoogleLocationData();
-
     String titel = titleKontroller.text;
     String beschreibung = beschreibungKontroller.text;
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('yyyy-MM-dd');
     String nowFormatted = formatter.format(now);
     String titleGer, informationGer, titleEng, informationEng;
+
+    titel = titel.trim();
+    beschreibung = beschreibung.trim();
 
     setState(() {
       onLoading = true;

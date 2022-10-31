@@ -760,7 +760,8 @@ class StadtinfoDatabase{
       "land": city["land"],
       "latt": city["latt"],
       "longt": city["longt"],
-      "isCity": 1
+      "isCity": 1,
+      "familien": []
     };
 
     var stadtInfos = Hive.box('secureBox').get("stadtinfo");

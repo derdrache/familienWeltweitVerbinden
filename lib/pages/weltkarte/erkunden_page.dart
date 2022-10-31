@@ -13,6 +13,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../services/notification.dart';
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';
 import '../community/community_erstellen.dart';
@@ -605,6 +606,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
           LocationService().getCountryLocation(list[i]["countryname"]);
       var profilCountryLocation =
           LocationService().getCountryLocation(profil["land"]);
+
+      if(profilCountryLocation == null){
+        sendEmail({
+          "title": "Problem mit Land ${profil["land"]}",
+          "inhalt": "Folgender User hat dieses Problem: $userId"
+        });
+        continue;
+      }
 
       if (listCountryLocation["latt"] == profilCountryLocation["latt"] &&
           listCountryLocation["longt"] == profilCountryLocation["longt"]) {
