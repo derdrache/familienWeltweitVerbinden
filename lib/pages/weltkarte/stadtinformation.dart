@@ -13,7 +13,6 @@ import 'package:translator/translator.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_func;
-import '../../services/translation.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
@@ -65,6 +64,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         usersCityInformation.add(city);
       }
     }
+
+    usersCityInformation = sortThumb(usersCityInformation);
   }
 
   setThumb(thumb, index) async {
@@ -125,8 +126,6 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       var name = "";
 
       for (var profil in allProfils) {
-        if(profil["name"] == "Likes2travel") print("good");
-
         if (profil["id"] == family){
           name = profil["name"];
           familiesList.add(InkWell(
@@ -183,7 +182,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                     const SizedBox(height: 10),
                     customTextInput(AppLocalizations.of(context).beschreibung,
                         informationTextKontroller,
-                        moreLines: 10,
+                        moreLines: 8,
                         textInputAction: TextInputAction.newline),
                     const SizedBox(height: 20),
                     Row(
@@ -209,6 +208,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
   changeInformation({information, newTitle, newInformation}) async {
     String titleGer, informationGer, titleEng, informationEng;
+    newTitle = newTitle.trim();
+    newInformation = newInformation.trim();
 
     if (newTitle.isEmpty) {
       customSnackbar(
@@ -217,30 +218,36 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     } else if (newTitle.length > 100) {
       customSnackbar(context, AppLocalizations.of(context).titleZuLang);
       return;
-    } else if (newTitle.isEmpty) {
+    } else if (newInformation.isEmpty) {
       customSnackbar(context,
           AppLocalizations.of(context).beschreibungStadtinformationEingeben);
       return;
     }
 
-    var textLanguage = await TranslationServices().getLanguage(newTitle);
+    var languageCheck = await translator.translate(newInformation);
+    var languageCode = languageCheck.sourceLanguage.code;
+    if(languageCode == "auto") languageCode = "en";
 
-    if (textLanguage == "en") {
+    if (languageCode == "en") {
       titleEng = newTitle;
       informationEng = newInformation;
-      titleGer =
-          await TranslationServices().getTextTranslation(newTitle, "en", "de");
-      informationEng = await TranslationServices()
-          .getTextTranslation(newInformation, "en", "de");
+      var titleTranslation = await translator.translate(newTitle,
+          from: "en", to: "de");
+      titleGer = titleTranslation.toString();
+      var informationTranslation = await translator.translate(newInformation,
+          from: "en", to: "de");
+      informationGer = informationTranslation.toString();
     } else {
       titleGer = newTitle;
       informationGer = newInformation;
       titleEng = "";
       informationEng = "";
-      titleEng =
-          await TranslationServices().getTextTranslation(newTitle, "de", "en");
-      informationEng = await TranslationServices()
-          .getTextTranslation(newInformation, "de", "en");
+      var titleTranslation = await translator.translate(newTitle,
+          from: "de", to: "en");
+      titleEng = titleTranslation.toString();
+      var informationTranslation = await translator.translate(newInformation,
+          from: "de", to: "en");
+      informationEng = informationTranslation.toString();
     }
 
     var secureBox = Hive.box("secureBox");
@@ -248,7 +255,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     for (var i = 0; i < allInformations.length; i++) {
       if (allInformations[i]["id"] == information["id"]) {
-        allInformations[i]["sprache"] = textLanguage;
+        allInformations[i]["sprache"] = languageCode;
         allInformations[i]["titleGer"] = titleGer;
         allInformations[i]["informationGer"] = informationGer;
         allInformations[i]["titleEng"] = titleEng;
@@ -263,7 +270,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     Navigator.pop(context);
 
     StadtinfoUserDatabase().update(
-        "sprache ='$textLanguage',  "
+        "sprache ='$languageCode',  "
             "titleGer = '$titleGer', "
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
@@ -487,7 +494,6 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
   @override
   Widget build(BuildContext context) {
-    usersCityInformation = sortThumb(usersCityInformation);
     allgemeineInfoBox() {
       String internetSpeedText = cityInformation["internet"] == null
           ? "?"
@@ -793,7 +799,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             leading: widget.newEntry != null ? StartPage() : null,
             buttons: [
               IconButton(
-                icon: Icon(Icons.message),
+                icon: const Icon(Icons.message),
                 onPressed: () async {
                   await createChatGroup();
 
