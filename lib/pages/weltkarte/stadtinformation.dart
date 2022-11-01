@@ -39,18 +39,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
   @override
   void initState() {
-    var stadtinfoData = Hive.box("secureBox").get("stadtinfo");
-
-    for (var city in stadtinfoData) {
-      if (city["ort"].contains(widget.ortName)) {
-        cityInformation = city;
-        break;
-      }
-    }
-
-    //cityInformation["familien"].remove(userId);
-
-    //refreshCityUserInfo();
+    cityInformation = getCityFromHive(cityName: widget.ortName);
+    cityInformation["familien"].remove(userId);
 
     super.initState();
   }
@@ -123,11 +113,9 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     List<Widget> familiesList = [];
 
     for (var family in cityInformation["familien"]) {
-      var name = "";
-
       for (var profil in allProfils) {
         if (profil["id"] == family){
-          name = profil["name"];
+          var name = profil["name"];
           familiesList.add(InkWell(
             onTap: () => global_func.changePage(
                 context, ShowProfilPage(userName: name, profil: profil)),
@@ -162,12 +150,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             }));
   }
 
-  changeInformationWindow(information) {
+  changeInformationDialog(information) {
     var informationData = getInsiderInfoText(information);
-    var titleTextKontroller =
-        TextEditingController(text: informationData["title"]);
-    var informationTextKontroller =
-        TextEditingController(text: informationData["information"]);
+    var titleTextKontroller = TextEditingController(
+        text: informationData["title"]);
+    var informationTextKontroller = TextEditingController(
+        text: informationData["information"]);
 
     Future<void>.delayed(
         const Duration(),
@@ -278,7 +266,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         "WHERE id ='${information["id"]}'");
   }
 
-  deleteInformation(information) async {
+  deleteInformationDialog(information) async {
     Future<void>.delayed(
         const Duration(),
         () => showDialog(
@@ -318,7 +306,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             }));
   }
 
-  reportInformation(information) {
+  reportInformationDialog(information) {
     var reportTextKontroller = TextEditingController();
 
     Future<void>.delayed(
@@ -473,7 +461,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     setState(() {});
   }
 
-  createChatGroup() async {
+  createNewChatGroup() async {
     var chatGroup = getChatGroupFromHive(cityInformation["id"].toString());
     if (chatGroup != null) return;
 
@@ -609,17 +597,17 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             if (canChange)
               PopupMenuItem(
                 child: Text(AppLocalizations.of(context).bearbeiten),
-                onTap: () => changeInformationWindow(information),
+                onTap: () => changeInformationDialog(information),
               ),
             PopupMenuItem(
               child: Text(AppLocalizations.of(context).melden),
-              onTap: () => reportInformation(information),
+              onTap: () => reportInformationDialog(information),
             ),
             if (canChange)
               PopupMenuItem(
                   child: Text(AppLocalizations.of(context).loeschen),
                   onTap: () {
-                    deleteInformation(information);
+                    deleteInformationDialog(information);
                   }),
           ]);
     }
@@ -801,7 +789,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
               IconButton(
                 icon: const Icon(Icons.message),
                 onPressed: () async {
-                  await createChatGroup();
+                  await createNewChatGroup();
 
                   global_func.changePage(context, ChatDetailsPage(
                     isChatgroup: true,

@@ -1,7 +1,14 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../global/global_functions.dart' as global_func;
 
 bool _isLink(String input) {
+  if(input.contains("http") || input.contains("www.")){
+    var first4Letters = input.substring(0,4);
+
+    if(!(first4Letters == "http" && first4Letters == "www.")) return false;
+  }
+
   final matcher = RegExp(
       r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)");
 
@@ -23,9 +30,59 @@ class TextWithHyperlinkDetection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<TextSpan> newTextList = [];
     var beschreibungsList = text.split(" ");
     var hasLink = false;
-    var newText = "";
+
+    addNormalText(text){
+      newTextList.add(TextSpan(
+          text: text,
+          recognizer: TapGestureRecognizer()..onTap = onTextTab == null ? null :() => onTextTab(),
+          style: const TextStyle(
+        color: Colors.black,
+      )));
+    }
+
+    addHyperlinkText(text){
+      newTextList.add(TextSpan(
+          text: text + " ",
+          recognizer: TapGestureRecognizer()..onTap = () => global_func.openURL(text.trim()),
+          style: const TextStyle(
+        color: Colors.blue,
+      )));
+    }
+
+    for (var word in beschreibungsList) {
+      if(_isLink(word) || word.contains("http")){
+        hasLink = true;
+        var wordArray = word.split("\n");
+
+        if(wordArray.length == 1){
+          addHyperlinkText(word +" ");
+        }else{
+          for(var line in wordArray){
+            if(_isLink(line) || line.contains("http")){
+              addHyperlinkText(line);
+              addNormalText("\n");
+            }else{
+              addNormalText(line);
+              addNormalText("\n");
+            }
+          }
+          newTextList.removeLast();
+          addNormalText(" ");
+        }
+
+      }else{
+        addNormalText(word +" ");
+      }
+    }
+
+    if(!hasLink) addNormalText(text);
+
+    return RichText(text: TextSpan(children: newTextList));
+
+    /*
 
     addNormalText(text){
       textSpanList.add(WidgetSpan(
@@ -75,6 +132,8 @@ class TextWithHyperlinkDetection extends StatelessWidget {
               (checkWord) => _isLink(checkWord) || checkWord.contains("http"));
           var hyperLinkLine = wordArray[hyperLinkIndex];
 
+          addHyperLinkText(hyperLinkLine);
+/*
           textSpanList.add(WidgetSpan(
               child: GestureDetector(
                   onTap: () => global_func.openURL(hyperLinkLine),
@@ -86,6 +145,8 @@ class TextWithHyperlinkDetection extends StatelessWidget {
                               fontSize: fontsize -2 )),
                     ],
                   ))));
+
+ */
 
           var lastWord = wordArray
               .sublist(
@@ -115,5 +176,9 @@ class TextWithHyperlinkDetection extends StatelessWidget {
     }
 
     return RichText(text: TextSpan(children: textSpanList));
+
+     */
   }
+
+
 }
