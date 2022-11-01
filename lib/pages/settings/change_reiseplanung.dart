@@ -38,7 +38,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     ProfilDatabase().updateProfil(
         "reisePlanung = '${jsonEncode(widget.reiseplanung)}'",
         "WHERE id = '${widget.userId}'");
-    updateHiveProfil("reisePlanung", widget.reiseplanung);
+    updateHiveOwnProfil("reisePlanung", widget.reiseplanung);
 
     NewsPageDatabase().addNewNews({
       "typ": "reiseplanung",

@@ -150,9 +150,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
 
       if (condition || hasCityUserInfo) {
-        allCitiesNames.add(city["ort"]);
         newAllCities.add(city);
       }
+      allCitiesNames.add(city["ort"]);
     }
 
     allCities = newAllCities;

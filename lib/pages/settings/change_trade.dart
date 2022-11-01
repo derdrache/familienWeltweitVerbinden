@@ -25,7 +25,7 @@ class ChangeTradePage extends StatelessWidget {
                 "tradeNotize = '${textKontroller.text}'",
                 "WHERE id = '$userId'");
 
-            updateHiveProfil("tradeNotize", textKontroller.text);
+            updateHiveOwnProfil("tradeNotize", textKontroller.text);
 
             customSnackbar(
                 context,

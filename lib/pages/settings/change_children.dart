@@ -37,7 +37,7 @@ class ChangeChildrenPage extends StatelessWidget {
               "kinder = '${jsonEncode(childrenBirthdatePickerBox.getDates())}'",
               "WHERE id = '$userId'");
 
-            updateHiveProfil("kinder", childrenBirthdatePickerBox.getDates());
+            updateHiveOwnProfil("kinder", childrenBirthdatePickerBox.getDates());
 
 
             customSnackbar(context,
