@@ -340,11 +340,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       return;
     }
 
+    updateHiveCommunity(widget.community["id"], "name", newName);
+
     setState(() {
       widget.community["name"] = newName;
     });
-
-    Navigator.pop(context);
 
     CommunityDatabase()
         .update("name = '$newName'", "WHERE id = '${widget.community["id"]}'");
@@ -383,7 +383,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["longt"] = newLocationData["longt"];
     });
 
-    Navigator.pop(context);
+    updateHiveCommunity(widget.community["id"], "ort", newLocationData["city"]);
+    updateHiveCommunity(widget.community["id"], "land", newLocationData["land"]);
+    updateHiveCommunity(widget.community["id"], "latt", newLocationData["latt"]);
+    updateHiveCommunity(widget.community["id"], "longt", newLocationData["longt"]);
 
     CommunityDatabase().updateLocation(widget.community["id"], newLocationData);
   }
@@ -449,7 +452,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["link"] = newLink;
     });
 
-    Navigator.pop(context);
+    updateHiveCommunity(widget.community["id"], "link", newLink);
 
     CommunityDatabase()
         .update("link = '$newLink'", "WHERE id = '${widget.community["id"]}'");
@@ -488,8 +491,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     setState(() {
       widget.community["beschreibung"] = newBeschreibung;
     });
-
-    Navigator.pop(context);
 
     CommunityDatabase().update("beschreibung = '$newBeschreibung'",
         "WHERE id = '${widget.community["id"]}'");
@@ -583,6 +584,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     setState(() {
       widget.community["einladung"].add(newMemberId);
     });
+
+    updateHiveCommunity(widget.community["id"], "einladung", widget.community["einladung"]);
 
     CommunityDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",

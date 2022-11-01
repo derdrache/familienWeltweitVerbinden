@@ -66,7 +66,7 @@ class ChangeEmailPage extends StatelessWidget {
       await ProfilDatabase().updateProfil(
           "email = '${emailKontroller.text}'", "WHERE id = '$userId'");
 
-      updateHiveProfil("email", emailKontroller.text);
+      updateHiveOwnProfil("email", emailKontroller.text);
 
 
       customSnackbar(

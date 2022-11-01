@@ -1389,9 +1389,19 @@ getCityUserInfoFromHive(cityName){
   return infos;
 }
 
-updateHiveProfil(changeTyp, changeData){
+updateHiveOwnProfil(changeTyp, changeData){
   var ownProfil = Hive.box("secureBox").get("ownProfil");
   ownProfil[changeTyp] = changeData;
+}
+
+updateHiveCommunity(id, changeTyp, changeData){
+  var community = getCommunityFromHive(id);
+  community[changeTyp] = changeData;
+}
+
+updateHiveEvent(id, changeTyp, changeData){
+  var event = getEventFromHive(id);
+  event[changeTyp] = changeData;
 }
 
 
