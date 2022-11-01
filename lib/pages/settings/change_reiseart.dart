@@ -36,7 +36,7 @@ class ChangeReiseartPage extends StatelessWidget {
             await ProfilDatabase().updateProfil(
                 "reiseart = '${reiseArtInput.getSelected()}'",
                 "WHERE id = '$userId'");
-            updateHiveProfil("reiseart", reiseArtInput.getSelected());
+            updateHiveOwnProfil("reiseart", reiseArtInput.getSelected());
 
             customSnackbar(
                 context,

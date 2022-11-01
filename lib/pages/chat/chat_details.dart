@@ -1692,18 +1692,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          GestureDetector(
-                            onTap: () => global_functions.changePage(context, ShowProfilPage(profil: creatorData,)),
-                            child: Container(
-                                margin: const EdgeInsets.only(bottom: 5),
-                                child: Text(
-                                  creatorName,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(creatorColor)),
-                                )),
-                          ),
                           Container(
                             padding:
                                 const EdgeInsets.only(top: 5, left: 10, right: 5),
