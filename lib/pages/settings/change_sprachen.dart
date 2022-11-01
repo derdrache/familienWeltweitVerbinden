@@ -38,7 +38,7 @@ class ChangeSprachenPage extends StatelessWidget {
                 "sprachen = '${jsonEncode(sprachenInputBox.getSelected())}'",
                 "WHERE id = '$userId'");
 
-            updateHiveProfil("sprachen", sprachenInputBox.getSelected());
+            updateHiveOwnProfil("sprachen", sprachenInputBox.getSelected());
 
             customSnackbar(
                 context,
