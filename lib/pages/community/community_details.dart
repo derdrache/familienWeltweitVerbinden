@@ -317,7 +317,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _changeNameWindow() {
-    var newNameKontroller = TextEditingController();
+    var newNameKontroller = TextEditingController(text: widget.community["name"]);
 
     showDialog(
         context: context,
@@ -378,13 +378,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     setState(() {
       widget.community["ort"] = newLocationData["city"];
-      widget.community["land"] = newLocationData["land"];
+      widget.community["land"] = newLocationData["countryname"];
       widget.community["latt"] = newLocationData["latt"];
       widget.community["longt"] = newLocationData["longt"];
     });
 
     updateHiveCommunity(widget.community["id"], "ort", newLocationData["city"]);
-    updateHiveCommunity(widget.community["id"], "land", newLocationData["land"]);
+    updateHiveCommunity(widget.community["id"], "land", newLocationData["countryname"]);
     updateHiveCommunity(widget.community["id"], "latt", newLocationData["latt"]);
     updateHiveCommunity(widget.community["id"], "longt", newLocationData["longt"]);
 
@@ -420,7 +420,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _changeLinkWindow() {
-    var newLinkKontroller = TextEditingController();
+    var newLinkKontroller = TextEditingController(text: widget.community["link"]);
 
     showDialog(
         context: context,
@@ -467,13 +467,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             title: AppLocalizations.of(context).beschreibungAendern,
+            height: 400,
             children: [
               customTextInput(
                   AppLocalizations.of(context).neueBeschreibungEingeben,
                   newBeschreibungKontroller,
-                  moreLines: 20,
+                  moreLines: 13,
                   textInputAction: TextInputAction.newline),
-              const SizedBox(height: 15),
               _windowOptions(
                   () => _saveChangeBeschreibung(newBeschreibungKontroller.text))
             ],
@@ -709,7 +709,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   onPressed: () async {
 
                     var communities = Hive.box('secureBox').get("communities");
-                    communities.remove(widget.community);
+                    communities.removeWhere((community) => community["id"] == widget.community["id"]);
 
                     await CommunityDatabase().delete(widget.community["id"]);
                     ChatGroupsDatabase().deleteChat(getChatGroupFromHive(widget.community["id"]));

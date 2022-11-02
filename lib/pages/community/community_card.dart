@@ -47,10 +47,10 @@ class _CommunityCardState extends State<CommunityCard> {
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
     return GestureDetector(
-      onTap: () => global_func.changePage(
+     onTap: () => global_func.changePage(
           context, 
           CommunityDetails(community: widget.community),
-          whenComplete: widget.afterPageVisit()),
+          whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
           height: screenHeight / 3.2 * bigMultiplikator,

@@ -46,11 +46,7 @@ class _EventPageState extends State<EventPage> {
             EventCard(
                 event: event,
                 withInteresse: withInteresse,
-                afterPageVisit: () => changePage(
-                    context,
-                    StartPage(
-                      selectedIndex: 2,
-                    ))),
+                afterPageVisit: () => setState((){})),
             if (isOwner)
               Positioned(
                 right: 10,

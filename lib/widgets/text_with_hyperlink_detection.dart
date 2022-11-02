@@ -2,19 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../global/global_functions.dart' as global_func;
 
-bool _isLink(String input) {
-  if(input.contains("http") || input.contains("www.")){
-    var first4Letters = input.substring(0,4);
-
-    if(!(first4Letters == "http" && first4Letters == "www.")) return false;
-  }
-
-  final matcher = RegExp(
-      r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)");
-
-  return matcher.hasMatch(input);
-}
-
 class TextWithHyperlinkDetection extends StatelessWidget {
   String text;
   double fontsize;
@@ -53,7 +40,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
     }
 
     for (var word in beschreibungsList) {
-      if(_isLink(word) || word.contains("http")){
+      if(global_func.isLink(word) || word.contains("http")){
         hasLink = true;
         var wordArray = word.split("\n");
 
@@ -61,7 +48,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
           addHyperlinkText(word +" ");
         }else{
           for(var line in wordArray){
-            if(_isLink(line) || line.contains("http")){
+            if(global_func.isLink(line) || line.contains("http")){
               addHyperlinkText(line);
               addNormalText("\n");
             }else{
