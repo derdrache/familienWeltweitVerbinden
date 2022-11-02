@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
 import '../../global/variablen.dart' as global_var;
+import '../../global/global_functions.dart' as global_func;
 import 'event_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
@@ -186,13 +187,10 @@ class _EventCardState extends State<EventCard> {
       onLongPressStart: widget.isCreator || forTeilnahmeFreigegeben
           ? (tapdownDetails) => cardMenu(tapdownDetails.globalPosition)
           : null,
-      onTap: () {
-        Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => EventDetailsPage(event: widget.event)))
-            .whenComplete(() => widget.afterPageVisit());
-      },
+        onTap: () => global_func.changePage(
+            context,
+            EventDetailsPage(event: widget.event),
+            whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
           height: screenHeight / 3.2 * bigMultiplikator,
@@ -370,31 +368,6 @@ class _InteresseButtonState extends State<InteresseButton> {
     }
 
     setState(() {   });
-
-
-
-
-    /*
-    widget.hasIntereset = widget.hasIntereset ? false : true;
-    var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
-
-    var interesseList =
-        await EventDatabase().getData("interesse", "WHERE id = '${widget.id}'");
-
-    if (widget.hasIntereset) {
-      interesseList.add(userId);
-    } else {
-      interesseList.remove(userId);
-    }
-
-    setState(() {});
-
-    EventDatabase().update("interesse = '${json.encode(interesseList)}'",
-        "WHERE id ='${widget.id}'");
-
-
-
-     */
   }
 
   @override
