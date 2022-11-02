@@ -111,6 +111,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
           "WHERE id ='${widget.event["id"]}'");
     }
+
+    updateHiveEvent(widget.event["id"], "freischalten", widget.event["freischalten"]);
   }
 
   convertIntoMyDate() {
@@ -159,6 +161,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   widget.event["tags"].add(newValue);
                   changeState(() {});
 
+                  updateHiveEvent(widget.event["id"], "tags", widget.event["tags"]);
+
                   await EventDatabase().update(
                       "tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')",
                       "WHERE id = '${widget.event["id"]}'");
@@ -176,6 +180,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
         onTap: () async {
           widget.event["tags"].remove(tag);
           changeState(() {});
+
+          updateHiveEvent(widget.event["id"], "tags", widget.event["tags"]);
 
           await EventDatabase().update(
               "tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))",
@@ -256,7 +262,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
         children: [
           Stack(
             children: [
-              ImageGalerie(
+              EventImageGalerie(
                 isCreator: widget.isCreator,
                 event: widget.event,
                 child: ClipRRect(
@@ -701,7 +707,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
         validationText = AppLocalizations.of(context).usernameZuLang;
       }
     } else if (widget.databaseKennzeichnung == "link") {
-      if (data.substring(0, 4) != "http" && data.substring(0, 3) != "www") {
+      if (global_func.isLink(data)) {
         validationText = AppLocalizations.of(context).eingabeKeinLink;
       }
     }
@@ -712,7 +718,9 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
   changeRowData(data) {
     if (widget.databaseKennzeichnung == "location") {
       widget.rowData = data["city"] + ", " + data["countryname"];
-    } else {
+    } else if(widget.databaseKennzeichnung == "sprache"){
+      widget.rowData = data.join(" , ");
+    }else {
       widget.rowData = data;
     }
   }
@@ -733,9 +741,14 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     setState(() {});
 
     if (widget.databaseKennzeichnung == "location") {
+      updateHiveEvent(widget.eventId, "stadt", data["city"]);
+      updateHiveEvent(widget.eventId, "land", data["countryname"]);
+      updateHiveEvent(widget.eventId, "latt", data["latt"]);
+      updateHiveEvent(widget.eventId, "longt", data["longt"]);
       await EventDatabase().updateLocation(widget.eventId, data);
       StadtinfoDatabase().addNewCity(data);
     } else {
+      updateHiveEvent(widget.eventId, widget.databaseKennzeichnung, data);
       await EventDatabase().update("${widget.databaseKennzeichnung} = '$data'",
           "WHERE id = '${widget.eventId}'");
     }
@@ -748,7 +761,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
     inputBox() {
       if (widget.modus == "textInput") {
         return customTextInput(widget.inputHintText, inputKontroller,
-            moreLines: widget.multiLines ? 7 : 1,
+            moreLines: widget.multiLines ? 13 : 1,
             textInputAction: TextInputAction.newline);
       }
       if (widget.modus == "dropdown") return dropdownInput;
@@ -765,7 +778,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                 height: widget.multiLines ||
                         widget.modus == "googleAutoComplete" ||
                         widget.modus == "date"
-                    ? 300
+                    ? 400
                     : 180,
                 children: [
                   inputBox(),
@@ -844,7 +857,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
                   ),
                 ),
                 onTap: widget.databaseKennzeichnung != "link"
-                    ? null
+                    ? () => openChangeWindow()
                     : () {
                         if (widget.isCreator) {
                           if(widget.rowData.isEmpty){
@@ -866,10 +879,13 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
             ? TextWithHyperlinkDetection(
                 text: widget.rowData,
                 onTextTab: widget.isCreator ? () => openChangeWindow() : null)
-            : Text(widget.rowData,
-                style: TextStyle(
-                    fontSize: fontsize + 8, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center);
+            : GestureDetector(
+              onTap: widget.isCreator ? () => openChangeWindow() : null,
+              child: Text(widget.rowData,
+                  style: TextStyle(
+                      fontSize: fontsize + 8, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center),
+            );
   }
 }
 
@@ -924,7 +940,11 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
           .toString()
           .substring(0, 16);
     }
-    await EventDatabase().update("wann = '$newWannDate', bis = '$newBisDate'",
+
+    updateHiveEvent(widget.event["id"], "wann", "newWannDate");
+    updateHiveEvent(widget.event["id"], "bis", "newBisDate");
+
+    EventDatabase().update("wann = '$newWannDate', bis = '$newBisDate'",
         "WHERE id = '${widget.event["id"]}'");
 
     setState(() {
