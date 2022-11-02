@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 import '../../global/global_functions.dart';
 import '../../global/variablen.dart' as global_var;
 
@@ -285,6 +286,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () {
+                    var events = Hive.box('secureBox').get("communities");
+                    events.removeWhere((event) => event["id"] == widget.event["id"]);
+
                     EventDatabase().delete(widget.event["id"]);
                     ChatGroupsDatabase()
                         .deleteChat(getChatGroupFromHive(widget.event["id"]));

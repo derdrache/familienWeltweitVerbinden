@@ -54,7 +54,7 @@ changePage(context, page, {whenComplete}){
   Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => page)
-  ).whenComplete(whenComplete == null ? null :() => whenComplete());
+  ).whenComplete(whenComplete ?? (){});
 }
 
 changePageForever(context, page){
@@ -194,4 +194,17 @@ openURL(url){
   } else{
     launch("http://"+url);
   }
+}
+
+bool isLink(String input) {
+  if(input.contains("http") || input.contains("www.")){
+    var first4Letters = input.substring(0,4);
+
+    if(!(first4Letters == "http" && first4Letters == "www.")) return false;
+  }
+
+  final matcher = RegExp(
+      r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)");
+
+  return matcher.hasMatch(input);
 }
