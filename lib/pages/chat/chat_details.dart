@@ -323,14 +323,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       widget.groupChatData["lastMessage"] = message;
     });
 
-    var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
-    if (widget.isChatgroup) {
-      ChatGroupsDatabase().addNewMessageAndNotification(
-          widget.groupChatData, messageData, isBlocked, connectedData["name"]);
-    } else {
-      ChatDatabase().addNewMessageAndSendNotification(
-          widget.groupChatData, messageData, isBlocked);
-    }
+    saveMessageinDBAndRefresh(messageData);
+
 
     var groupText = messageData["message"];
 
@@ -357,6 +351,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.chatId}'");
     }
+  }
+
+  saveMessageinDBAndRefresh(messageData) async{
+    var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
+    if (widget.isChatgroup) {
+      await ChatGroupsDatabase().addNewMessageAndNotification(
+          widget.groupChatData, messageData, isBlocked, connectedData["name"]);
+    } else {
+      await ChatDatabase().addNewMessageAndSendNotification(
+          widget.groupChatData, messageData, isBlocked);
+    }
+
+    getAllDbMessages();
   }
 
   openProfil() async {
@@ -1474,7 +1481,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       return Listener(
-        behavior: HitTestBehavior.opaque,
         onPointerHover: (details) => _tabPosition = details.position,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -1649,11 +1655,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var messageAutorId = message["forward"].split(":")[1];
       var forwardProfil = getProfilFromHive(profilId: messageAutorId);
       var creatorData = getProfilFromHive(profilId: message["von"]);
-      var creatorName = creatorData["name"];
-      var creatorColor = creatorData["bildStandardFarbe"];
 
       return Listener(
-        behavior: HitTestBehavior.opaque,
         onPointerHover: (details) => _tabPosition = details.position,
         child: Row(
             mainAxisAlignment: messageBoxInformation["textAlign"] ==
@@ -1758,8 +1761,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorColor = creatorData["bildStandardFarbe"];
 
       return Listener(
-        behavior: HitTestBehavior.opaque,
-        onPointerHover: (details) => _tabPosition = details.position,
+        onPointerHover: (details) {
+          _tabPosition = details.position;
+        },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: messageBoxInformation["textAlign"] ==
@@ -1817,7 +1821,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               alignment: WrapAlignment.end,
                               children: [
                                 TextWithHyperlinkDetection(
-                                    text: message["message"] ?? "",
+                                    text:  message["message"] ??"",
                                     fontsize: 16,
                                     onTextTab: () =>
                                         openMessageMenu(message, index)),
@@ -1883,6 +1887,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         if (message["von"] == userId) {
           messageBoxInformation["textAlign"] = Alignment.centerRight;
           messageBoxInformation["messageBoxColor"] = ownMessageBoxColor;
+          message["showTranslationButton"] = false;
         }
 
         if (newMessageDate == null) {
