@@ -16,7 +16,7 @@ import '../../widgets/dialogWindow.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import '../../global/variablen.dart' as global_var;
-import '../../widgets/image_galerie.dart';
+import '../../widgets/event_image_galerie.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
 
 /*
