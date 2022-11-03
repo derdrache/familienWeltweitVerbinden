@@ -283,11 +283,16 @@ class _ImageEventGalerieState extends State<EventImageGalerie> {
           width: double.infinity,
           child: imageLoading
               ? Center(
-                  child: Container(
-                      margin: const EdgeInsets.all(10),
-                      width: 100,
-                      height: 100,
-                      child: const CircularProgressIndicator()))
+                  child: Column(
+                    children: [
+                      Container(
+                          margin: const EdgeInsets.all(10),
+                          width: 80,
+                          height: 80,
+                          child: const CircularProgressIndicator()),
+                      Center(child: Text(AppLocalizations.of(context).bildLadezeit))
+                    ],
+                  ))
               : widget.child,
         ),
         onTapDown: !widget.isCreator
