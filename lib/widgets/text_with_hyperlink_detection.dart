@@ -65,7 +65,10 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       }
     }
 
-    if(!hasLink) addNormalText(text);
+    if(!hasLink){
+      newTextList = [];
+      addNormalText(text);
+    }
 
     return RichText(text: TextSpan(children: newTextList));
 
