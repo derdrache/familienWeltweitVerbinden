@@ -269,9 +269,7 @@ class _NewsPageState extends State<NewsPage> {
         text = newsUserProfil["name"] +
             AppLocalizations.of(context).freundOrtsWechsel +
             newsOrtInfo;
-      } else if (ownOrt == newsOrt &&
-          locationTimeCheck >= 0 &&
-          ownSettingProfil["showNewFamilyLocation"]) {
+      } else if (ownOrt == newsOrt && samePlaceAndTime) {
         text = newsUserProfil["name"] +
             AppLocalizations.of(context).familieInDeinemOrt;
       }
@@ -567,7 +565,7 @@ class _NewsPageState extends State<NewsPage> {
       }
     }
 
-    addLocationWelcome() {
+    addLatestLocationWelcome() {
       var ownLocation = ownProfil["ort"];
       var locationUserInfos = getCityUserInfoFromHive(ownLocation);
 
@@ -621,9 +619,10 @@ class _NewsPageState extends State<NewsPage> {
     createNewsFeed();
     sortNewsFeed();
     updateHiveUserNewsContent();
-    addLocationWelcome();
+    addLatestLocationWelcome();
 
     return Scaffold(
+        floatingActionButtonAnimator: NoScalingAnimation(),
         floatingActionButtonLocation: scrollbarOnBottom
             ? FloatingActionButtonLocation.endTop
             : FloatingActionButtonLocation.endDocked,
@@ -631,7 +630,6 @@ class _NewsPageState extends State<NewsPage> {
             ? Container(
                 margin: const EdgeInsets.only(top: 5),
                 child: FloatingActionButton(
-                  mini: true,
                   child: const Icon(Icons.settings),
                   onPressed: () => Navigator.push(
                           context,
@@ -649,13 +647,31 @@ class _NewsPageState extends State<NewsPage> {
                     _controller.jumpTo(0);
                     setState(() {});
                   },
-                  child: const Icon(Icons.arrow_downward),
+                  child: const Icon(Icons.arrow_upward),
                 ),
               ),
         body: Container(
-            padding: const EdgeInsets.only(top: 24),
-            child: ListView(controller: _controller, reverse: true, children: [
+            padding: const EdgeInsets.only(top: 50),
+            child: ListView(controller: _controller, children: [
               ...getNewsWidgetList().reversed.toList(),
             ])));
+  }
+}
+
+
+class NoScalingAnimation extends FloatingActionButtonAnimator {
+  @override
+  Offset getOffset({Offset begin, Offset end, double progress}) {
+    return end;
+  }
+
+  @override
+  Animation<double> getRotationAnimation({Animation<double> parent}) {
+    return Tween<double>(begin: 1.0, end: 1.0).animate(parent);
+  }
+
+  @override
+  Animation<double> getScaleAnimation({Animation<double> parent}) {
+    return Tween<double>(begin: 1.0, end: 1.0).animate(parent);
   }
 }

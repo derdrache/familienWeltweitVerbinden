@@ -671,7 +671,7 @@ class _ChatPageState extends State<ChatPage> {
                 searchListAllChatgroups = [];
 
                 if (value.isEmpty) {
-                  setState(() {});
+                  //setState(() {});
                   return;
                 }
 
@@ -685,6 +685,7 @@ class _ChatPageState extends State<ChatPage> {
 
                   if (isChatGroup) {
                     chatName = getChatGroupName(chat["connected"]);
+                    chatName ??= AppLocalizations.of(context).weltChat;
                   } else {
                     var chatUsers = chat["users"].keys.toList();
                     var userPartnerId =
@@ -704,9 +705,13 @@ class _ChatPageState extends State<ChatPage> {
                 for (var chatGroup in allChatGroups) {
                   var chatConnected = chatGroup["connected"];
                   var chatName = getChatGroupName(chatConnected);
+                  chatName ??= AppLocalizations.of(context).weltChat;
 
-                  if (chatName.contains(value) ||
-                      chatName.contains(firstLetterBig)) {
+                  var containCondition = chatName.contains(value) ||
+                      chatName.contains(firstLetterBig);
+                  var memberOfItCondition = chatGroup["users"][userId] != null;
+
+                  if (containCondition && !memberOfItCondition) {
                     searchListAllChatgroups.add(chatGroup);
                   }
                 }
@@ -715,8 +720,10 @@ class _ChatPageState extends State<ChatPage> {
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_sharp),
+              color: Colors.black,
               onPressed: () {
                 setState(() {
+                  searchTextKontroller.text = "";
                   activeChatSearch = false;
                 });
               },
