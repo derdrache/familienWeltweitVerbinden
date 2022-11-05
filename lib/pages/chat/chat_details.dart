@@ -914,7 +914,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       showMenu(
         context: context,
         position: RelativeRect.fromRect(
-            _tabPosition & const Size(40, 40), Offset.zero & overlay.size),
+            (_tabPosition ?? Offset(20,250)) & const Size(40, 40), Offset.zero & overlay.size),
         items: [
           if (userJoinedChat)
             PopupMenuItem(
