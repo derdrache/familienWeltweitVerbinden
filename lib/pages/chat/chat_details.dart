@@ -351,6 +351,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.chatId}'");
     }
+
+    messageExtraInformationId = null;
   }
 
   saveMessageinDBAndRefresh(messageData) async{
@@ -435,9 +437,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   replyMessage(message) {
-    messageExtraInformationId = message["id"];
-
     setState(() {
+      messageExtraInformationId = message["id"];
       changeMessageInputModus = "reply";
     });
 
@@ -604,7 +605,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   resetExtraInputInformation() {
-    messageExtraInformationId = null;
     extraInputInformationBox = const SizedBox.shrink();
     nachrichtController.clear();
     changeMessageInputModus = null;
@@ -1123,7 +1123,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           if (widget.isChatgroup && message["von"] != userId) Container(
               width: 50,
               height: 50,
-              margin: EdgeInsets.only(left: 5, bottom: 10),
+              margin: const EdgeInsets.only(left: 5, bottom: 10),
               child: ProfilImage(creatorData)
           ),
           AnimatedContainer(
@@ -1291,7 +1291,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           if (widget.isChatgroup && message["von"] != userId) Container(
               width: 50,
               height: 50,
-              margin: EdgeInsets.only(left: 5, bottom: 10),
+              margin: const EdgeInsets.only(left: 5, bottom: 10),
               child: ProfilImage(creatorData)
           ),
           AnimatedContainer(
@@ -1630,11 +1630,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         Positioned(
                           right: 20,
                           bottom: message["showTranslationButton"] ? 30 : 15,
-                          child: Text(
-                              messageBoxInformation["messageEdit"] +
-                                  " " +
-                                  messageBoxInformation["messageTime"],
-                              style: TextStyle(color: timeStampColor)),
+                          child: GestureDetector(
+                            onTap: () => openMessageMenu(message, index),
+                            child: Text(
+                                messageBoxInformation["messageEdit"] +
+                                    " " +
+                                    messageBoxInformation["messageTime"],
+                                style: TextStyle(color: timeStampColor)),
+                          ),
                         ),
                         if (message["showTranslationButton"])
                           translationButton(message)
