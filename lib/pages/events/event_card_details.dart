@@ -252,6 +252,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     if (screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
     double cardHeight = screenHeight / 1.34;
+
     widget.event["eventInterval"] = isGerman
         ? global_func.changeEnglishToGerman(widget.event["eventInterval"])
         : global_func.changeGermanToEnglish(widget.event["eventInterval"]);
@@ -1044,6 +1045,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
   @override
   void initState() {
+
     wannDateInputButton = DateButton(
       getDate: true,
       eventDatum: DateTime.parse(widget.event["wann"]),

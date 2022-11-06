@@ -408,14 +408,14 @@ class _ChatPageState extends State<ChatPage> {
     myChats = Hive.box("secureBox").get("myChats") ?? [];
     myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
 
-    getChatGroupName(chatConnected,{withPrivateEvents}) {
+    getChatGroupName(chatConnected, {withPrivateEvents}) {
       if (chatConnected.isEmpty) return AppLocalizations.of(context).weltChat;
 
       var connectedId = chatConnected.split("=")[1];
       if (chatConnected.contains("event")) {
         var eventData = getEventFromHive(connectedId);
-        var isPrivate = ["privat","private"].contains(eventData["art"]);
-        return isPrivate ? "": eventData["name"];
+        var isPrivate = ["privat", "private"].contains(eventData["art"]);
+        return isPrivate ? "" : eventData["name"];
       }
       if (chatConnected.contains("community")) {
         return getCommunityFromHive(connectedId)["name"];
@@ -509,9 +509,7 @@ class _ChatPageState extends State<ChatPage> {
               "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
             };
           } else if (group["connected"].contains("world")) {
-            chatName = AppLocalizations
-                .of(context)
-                .weltChat;
+            chatName = AppLocalizations.of(context).weltChat;
             chatData = {
               "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
             };
@@ -807,68 +805,82 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: showAppBar(),
       resizeToAvoidBottomInset: false,
-      body: SafeArea(child: myChats.isNotEmpty
-          ? MediaQuery.removePadding(
-              removeTop: true,
-              context: context,
-              child: ScrollConfiguration(
-                behavior:
-                    ScrollConfiguration.of(context).copyWith(dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                }),
-                child: searchTextKontroller.text.isEmpty
-                    ? ListView(
-                        shrinkWrap: true,
-                        children: createChatGroupContainers(null))
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                              width: double.infinity,
-                              decoration: const BoxDecoration(
-                                  border: Border(top: BorderSide())),
-                              padding: const EdgeInsets.all(10),
-                              child: const Text("Chats",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20))),
-                          Expanded(
-                            child: ListView(
-                              shrinkWrap: true,
-                              children:
-                                  createChatGroupContainers(searchListMyGroups),
-                            ),
+      body: SafeArea(
+          child: myChats.isNotEmpty
+              ? MediaQuery.removePadding(
+                  removeTop: true,
+                  context: context,
+                  child: ScrollConfiguration(
+                    behavior:
+                        ScrollConfiguration.of(context).copyWith(dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    }),
+                    child: searchTextKontroller.text.isEmpty
+                        ? ListView(
+                            shrinkWrap: true,
+                            children: createChatGroupContainers(null))
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                  width: double.infinity,
+                                  decoration: const BoxDecoration(
+                                      border: Border(top: BorderSide())),
+                                  padding: const EdgeInsets.all(10),
+                                  child: const Text("Chats",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20))),
+                              Expanded(
+                                child: searchListMyGroups.isNotEmpty
+                                    ? ListView(
+                                        shrinkWrap: true,
+                                        children: createChatGroupContainers(
+                                            searchListMyGroups),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                        AppLocalizations.of(context)
+                                            .keineErgebnisse,
+                                        style: TextStyle(fontSize: 20),
+                                      )),
+                              ),
+                              Container(
+                                  width: double.infinity,
+                                  decoration: const BoxDecoration(
+                                      border: Border(top: BorderSide())),
+                                  padding: const EdgeInsets.all(10),
+                                  child: Text(
+                                      AppLocalizations.of(context).globaleSuche,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20))),
+                              Expanded(
+                                child: searchListAllChatgroups.isNotEmpty
+                                    ? ListView(
+                                        shrinkWrap: true,
+                                        children: createChatGroupContainers(
+                                            searchListAllChatgroups),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                            AppLocalizations.of(context)
+                                                .keineErgebnisse,
+                                            style: TextStyle(fontSize: 20))),
+                              ),
+                            ],
                           ),
-                          Container(
-                              width: double.infinity,
-                              decoration: const BoxDecoration(
-                                  border: Border(top: BorderSide())),
-                              padding: const EdgeInsets.all(10),
-                              child: Text(AppLocalizations.of(context).globaleSuche,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20))),
-                          Expanded(
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: createChatGroupContainers(
-                                  searchListAllChatgroups),
-                            ),
-                          ),
-                        ],
-                      ),
-              ),
-            )
-          : !isLoaded
-              ? const Center(child: CircularProgressIndicator())
-              : Center(
-                  heightFactor: 20,
-                  child: Text(
-                      AppLocalizations.of(context).nochKeineChatsVorhanden,
-                      style:
-                          const TextStyle(fontSize: 20, color: Colors.grey)))
-      ),
+                  ),
+                )
+              : !isLoaded
+                  ? const Center(child: CircularProgressIndicator())
+                  : Center(
+                      heightFactor: 20,
+                      child: Text(
+                          AppLocalizations.of(context).nochKeineChatsVorhanden,
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.grey)))),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
         child: const Icon(Icons.create),
