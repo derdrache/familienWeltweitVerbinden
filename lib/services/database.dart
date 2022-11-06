@@ -363,21 +363,31 @@ class ChatDatabase{
 
 class ChatGroupsDatabase{
 
-  addNewChatGroup(user, connected) async {
+  addNewChatGroup(user, connectedString) async {
     var date = DateTime.now().millisecondsSinceEpoch;
     var groupData = {
-      "date" : date,
+      "lastMessageDate" : date,
       "lastMessage" : "</neuer Chat",
       "users": json.encode(user == null ? {} : {user : {"newMessages": 0}}),
-      "connected": connected ?? ""
+      "connected": connectedString ?? ""
     };
 
     var url = Uri.parse(databaseUrl + "database/chatGroups/newChatGroup.php");
-    var test = await http.post(url, body: json.encode(groupData));
+    var response = await http.post(url, body: json.encode(groupData));
+    var chatGroupId = response.body;
 
-    if(test.body.isEmpty) return null;
+    if(chatGroupId.isEmpty) return null;
 
-    return test.body;
+    groupData["id"] = chatGroupId;
+    groupData["users"] = user == null ? {} : {user : {"newMessages": 0}};
+
+    var chatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
+    chatGroups.add(groupData);
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.add(groupData);
+
+
+    return groupData;
   }
 
   getChatData(whatData, queryEnd, {returnList = false}) async{
@@ -515,6 +525,12 @@ class ChatGroupsDatabase{
 
   deleteChat(chatId){
     _deleteInTable("chat_groups", "id", chatId);
+
+    var chatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
+    chatGroups.removeWhere((chatGroup) => chatGroup["id"] == chatId);
+
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.removeWhere((chatGroup) => chatGroup["id"] == chatId);
   }
 
   deleteMessages(messageId){
@@ -536,16 +552,7 @@ class ChatGroupsDatabase{
       chatGroupData = await ChatGroupsDatabase().getChatData(
           "*", "WHERE connected = '</stadt=$cityId'");
       if(chatGroupData == false){
-        var chatId = await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$cityId");
-        chatGroupData = {
-          "id": chatId,
-          "users": {},
-          "lastMessage": "</neuer Chat",
-          "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
-          "connected": "</stadt=$cityId"
-        };
-        var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-        myGroupChats.add(chatGroupData);
+        chatGroupData = await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$cityId");
       }
     }
 
@@ -582,8 +589,20 @@ class EventDatabase{
     var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
     await http.post(url, body: json.encode(eventData));
 
+    eventData["freischalten"] = [];
+    eventData["eventInterval"] = eventData["interval"];
+    eventData["bis"] = eventData["bis"] == "null" ? null : eventData["bis"];
+    eventData["absage"] = [];
+    eventData["zusage"] = [];
+    eventData["freigegeben"] = [];
+    eventData["sprache"] = jsonDecode(eventData["sprache"]);
+    eventData["interesse"] = jsonDecode(eventData["interesse"]);
+    eventData["tags"] = [];
+
     var myOwnEvents = Hive.box('secureBox').get("myEvents") ?? [];
     myOwnEvents.add(eventData);
+    var events = Hive.box('secureBox').get("events") ?? [];
+    events.add(eventData);
   }
 
   update(whatData, queryEnd) async  {
@@ -655,6 +674,9 @@ class EventDatabase{
 
   delete(eventId){
     _deleteInTable("events", "id", eventId);
+
+    List myEvents = Hive.box('secureBox').get("myEvents") ?? [];
+    myEvents.removeWhere((event) => event["id"] == eventId);
   }
 
 }
@@ -663,6 +685,11 @@ class CommunityDatabase{
   addNewCommunity(communityData) async {
     var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
     await http.post(url, body: json.encode(communityData));
+
+    communityData["bild"] = "assets/bilder/village.jpg";
+    communityData["interesse"] = [];
+    communityData["members"] = [];
+    communityData["einladung"] = [];
 
     var allCommunities = Hive.box('secureBox').get("communities") ?? [];
     allCommunities.add(communityData);
@@ -755,7 +782,7 @@ class StadtinfoDatabase{
     var url = Uri.parse(databaseUrl + "database/stadtinfo/newCity.php");
     var cityId = await http.post(url, body: json.encode(city));
     var newCityInfo = {
-      "id": cityId,
+      "id": cityId.body,
       "ort": city["ort"],
       "land": city["land"],
       "latt": city["latt"],

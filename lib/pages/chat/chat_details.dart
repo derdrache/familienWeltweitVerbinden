@@ -110,7 +110,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     messageInputNode.dispose();
 
     if (widget.isChatgroup && widget.groupChatData["users"][userId] != null) {
-      widget.groupChatData["users"][userId]["isActive"] = false;
+      widget.groupChatData["users"][userId]["isActive"] = 0;
       ChatGroupsDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.isActive', ${false})",
           "WHERE id = '${widget.chatId}'");
@@ -128,7 +128,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       if (widget.isChatgroup) {
-        widget.groupChatData["users"][userId]["isActive"] = true;
+        widget.groupChatData["users"][userId]["isActive"] = 1;
         ChatGroupsDatabase().updateChatGroup(
             "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
             "WHERE id = '${widget.chatId}'");
@@ -138,7 +138,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     } else {
       if (widget.isChatgroup) {
-        widget.groupChatData["users"][userId]["isActive"] = false;
+        widget.groupChatData["users"][userId]["isActive"] = 0;
         ChatGroupsDatabase().updateChatGroup(
             "users = JSON_SET(users, '\$.$userId.isActive', ${false})",
             "WHERE id = '${widget.chatId}'");
@@ -218,7 +218,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (widget.isChatgroup) {
       if (widget.groupChatData["users"][userId] == null) return;
 
-      widget.groupChatData["users"][userId]["isActive"] = true;
+      widget.groupChatData["users"][userId]["isActive"] = 1;
       ChatGroupsDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
           "WHERE id = '${widget.chatId}'");
