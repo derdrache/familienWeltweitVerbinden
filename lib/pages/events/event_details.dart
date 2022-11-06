@@ -286,12 +286,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () {
-                    var events = Hive.box('secureBox').get("communities");
+                    var events = Hive.box('secureBox').get("events");
                     events.removeWhere((event) => event["id"] == widget.event["id"]);
 
                     EventDatabase().delete(widget.event["id"]);
-                    ChatGroupsDatabase()
-                        .deleteChat(getChatGroupFromHive(widget.event["id"]));
+
+                    var chatGroupId = getChatGroupFromHive(widget.event["id"])["id"];
+                    ChatGroupsDatabase().deleteChat(chatGroupId);
+
                     DbDeleteImage(widget.event["bild"]);
                     global_func.changePageForever(
                         context, StartPage(selectedIndex: 2));
