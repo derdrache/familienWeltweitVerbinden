@@ -100,7 +100,7 @@ class _EventCardState extends State<EventCard> {
         widget.event["wann"].split(" ")[0].split("-").reversed.join(".");
     var datetimeWann = DateTime.parse(widget.event["wann"]);
 
-    if(widget.event["bis"] == null) return datetimeText;
+    if(widget.event["bis"] == null || widget.event["bis"] =="null") return datetimeText;
     var datetimeBis = DateTime.parse(widget.event["bis"]);
 
     if (DateTime.now().compareTo(datetimeWann) > 0 && datetimeBis.year.toString() == "0000") {
@@ -116,7 +116,9 @@ class _EventCardState extends State<EventCard> {
   }
 
   createOnlineEventTime() {
-    var eventZeitzone = widget.event["zeitzone"];
+    var eventZeitzone = widget.event["zeitzone"] is String
+        ? int.parse(widget.event["zeitzone"])
+        : widget.event["zeitzone"];
     var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
     var eventBeginn = widget.event["wann"];
 
