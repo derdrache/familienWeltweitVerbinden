@@ -67,10 +67,11 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
     "typ": "chat",
   };
 
+
   sendNotification(notificationInformation);
 
   return;
-
+  
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
     var dbData =
