@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,12 +9,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:translator/translator.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart';
-import '../../services/translation.dart';
+import '../../global/global_functions.dart' as global_func;
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
+import '../../widgets/text_with_hyperlink_detection.dart';
 import '../start_page.dart';
 
 class StadtinformationsPage extends StatefulWidget {
@@ -32,22 +34,13 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
   bool canEnglish = false;
   var cityInformation = {};
   var usersCityInformation = [];
+  final translator = GoogleTranslator();
 
 
   @override
   void initState() {
-    var stadtinfoData = Hive.box("secureBox").get("stadtinfo");
-
-    for (var city in stadtinfoData) {
-      if (city["ort"].contains(widget.ortName)) {
-        cityInformation = city;
-        break;
-      }
-    }
-
+    cityInformation = getCityFromHive(cityName: widget.ortName);
     cityInformation["familien"].remove(userId);
-
-    refreshCityUserInfo();
 
     super.initState();
   }
@@ -61,6 +54,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         usersCityInformation.add(city);
       }
     }
+
+    usersCityInformation = sortThumb(usersCityInformation);
   }
 
   setThumb(thumb, index) async {
@@ -118,15 +113,11 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     List<Widget> familiesList = [];
 
     for (var family in cityInformation["familien"]) {
-      var name = "";
-
       for (var profil in allProfils) {
-        if(profil["name"] == "Likes2travel") print("good");
-
         if (profil["id"] == family){
-          name = profil["name"];
+          var name = profil["name"];
           familiesList.add(InkWell(
-            onTap: () => changePage(
+            onTap: () => global_func.changePage(
                 context, ShowProfilPage(userName: name, profil: profil)),
             child: Container(
                 padding: const EdgeInsets.all(10),
@@ -159,12 +150,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             }));
   }
 
-  changeInformationWindow(information) {
+  changeInformationDialog(information) {
     var informationData = getInsiderInfoText(information);
-    var titleTextKontroller =
-        TextEditingController(text: informationData["title"]);
-    var informationTextKontroller =
-        TextEditingController(text: informationData["information"]);
+    var titleTextKontroller = TextEditingController(
+        text: informationData["title"]);
+    var informationTextKontroller = TextEditingController(
+        text: informationData["information"]);
 
     Future<void>.delayed(
         const Duration(),
@@ -179,7 +170,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                     const SizedBox(height: 10),
                     customTextInput(AppLocalizations.of(context).beschreibung,
                         informationTextKontroller,
-                        moreLines: 10,
+                        moreLines: 8,
                         textInputAction: TextInputAction.newline),
                     const SizedBox(height: 20),
                     Row(
@@ -205,6 +196,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
   changeInformation({information, newTitle, newInformation}) async {
     String titleGer, informationGer, titleEng, informationEng;
+    newTitle = newTitle.trim();
+    newInformation = newInformation.trim();
 
     if (newTitle.isEmpty) {
       customSnackbar(
@@ -213,30 +206,36 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     } else if (newTitle.length > 100) {
       customSnackbar(context, AppLocalizations.of(context).titleZuLang);
       return;
-    } else if (newTitle.isEmpty) {
+    } else if (newInformation.isEmpty) {
       customSnackbar(context,
           AppLocalizations.of(context).beschreibungStadtinformationEingeben);
       return;
     }
 
-    var textLanguage = await TranslationServices().getLanguage(newTitle);
+    var languageCheck = await translator.translate(newInformation);
+    var languageCode = languageCheck.sourceLanguage.code;
+    if(languageCode == "auto") languageCode = "en";
 
-    if (textLanguage == "en") {
+    if (languageCode == "en") {
       titleEng = newTitle;
       informationEng = newInformation;
-      titleGer =
-          await TranslationServices().getTextTranslation(newTitle, "en", "de");
-      informationEng = await TranslationServices()
-          .getTextTranslation(newInformation, "en", "de");
+      var titleTranslation = await translator.translate(newTitle,
+          from: "en", to: "de");
+      titleGer = titleTranslation.toString();
+      var informationTranslation = await translator.translate(newInformation,
+          from: "en", to: "de");
+      informationGer = informationTranslation.toString();
     } else {
       titleGer = newTitle;
       informationGer = newInformation;
       titleEng = "";
       informationEng = "";
-      titleEng =
-          await TranslationServices().getTextTranslation(newTitle, "de", "en");
-      informationEng = await TranslationServices()
-          .getTextTranslation(newInformation, "de", "en");
+      var titleTranslation = await translator.translate(newTitle,
+          from: "de", to: "en");
+      titleEng = titleTranslation.toString();
+      var informationTranslation = await translator.translate(newInformation,
+          from: "de", to: "en");
+      informationEng = informationTranslation.toString();
     }
 
     var secureBox = Hive.box("secureBox");
@@ -244,7 +243,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     for (var i = 0; i < allInformations.length; i++) {
       if (allInformations[i]["id"] == information["id"]) {
-        allInformations[i]["sprache"] = textLanguage;
+        allInformations[i]["sprache"] = languageCode;
         allInformations[i]["titleGer"] = titleGer;
         allInformations[i]["informationGer"] = informationGer;
         allInformations[i]["titleEng"] = titleEng;
@@ -259,7 +258,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     Navigator.pop(context);
 
     StadtinfoUserDatabase().update(
-        "sprache ='$textLanguage',  "
+        "sprache ='$languageCode',  "
             "titleGer = '$titleGer', "
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
@@ -267,7 +266,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         "WHERE id ='${information["id"]}'");
   }
 
-  deleteInformation(information) async {
+  deleteInformationDialog(information) async {
     Future<void>.delayed(
         const Duration(),
         () => showDialog(
@@ -307,7 +306,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             }));
   }
 
-  reportInformation(information) {
+  reportInformationDialog(information) {
     var reportTextKontroller = TextEditingController();
 
     Future<void>.delayed(
@@ -412,29 +411,35 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       return;
     }
 
-    var textLanguage = await TranslationServices().getLanguage(title);
+    var languageCheck = await translator.translate(inhalt);
+    var languageCode = languageCheck.sourceLanguage.code;
+    if(languageCode == "auto") languageCode = "en";
 
-    if (textLanguage == "en") {
+    if (languageCode == "en") {
       titleEng = title;
       informationEng = inhalt;
-      titleGer =
-          await TranslationServices().getTextTranslation(title, "en", "de");
-      informationEng =
-          await TranslationServices().getTextTranslation(inhalt, "en", "de");
+      var titleTranslation =await translator.translate(title,
+          from: "en", to: "de");
+      titleGer = titleTranslation.toString();
+      var informationTranslation = await translator.translate(inhalt,
+          from: "en", to: "de");
+      informationGer = informationTranslation.toString();
     } else {
       titleGer = title;
       informationGer = inhalt;
       titleEng = "";
       informationEng = "";
-      titleEng =
-          await TranslationServices().getTextTranslation(title, "de", "en");
-      informationEng =
-          await TranslationServices().getTextTranslation(inhalt, "de", "en");
+      var titleTranslation = await translator.translate(title,
+          from: "de", to: "en");
+      titleEng = titleTranslation.toString();
+      var informationTranslation = await translator.translate(inhalt,
+          from: "de", to: "en");
+      informationEng = informationTranslation.toString();
     }
 
     var newUserInformation = {
       "ort": widget.ortName,
-      "sprache": textLanguage,
+      "sprache": languageCode,
       "titleGer": titleGer,
       "informationGer": informationGer,
       "titleEng": titleEng,
@@ -456,10 +461,27 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     setState(() {});
   }
 
+  createNewChatGroup() async {
+    var chatGroup = getChatGroupFromHive(cityInformation["id"].toString());
+    if (chatGroup != null) return;
+
+    var checkChatGroup = await ChatGroupsDatabase().getChatData(
+        "id", "WHERE connected = '</stadt=${cityInformation["id"]}'");
+    if (checkChatGroup != false) return;
+
+    var newChatId = await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=${cityInformation["id"]}");
+    var hiveChatGroups = Hive.box('secureBox').get("chatGroups");
+    hiveChatGroups.add({
+      "id": newChatId,
+      "users": {},
+      "lastMessage": "</neuer Chat",
+      "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
+      "connected": "</stadt=${cityInformation["id"]}"
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    usersCityInformation = sortThumb(usersCityInformation);
-
     allgemeineInfoBox() {
       String internetSpeedText = cityInformation["internet"] == null
           ? "?"
@@ -575,17 +597,17 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             if (canChange)
               PopupMenuItem(
                 child: Text(AppLocalizations.of(context).bearbeiten),
-                onTap: () => changeInformationWindow(information),
+                onTap: () => changeInformationDialog(information),
               ),
             PopupMenuItem(
               child: Text(AppLocalizations.of(context).melden),
-              onTap: () => reportInformation(information),
+              onTap: () => reportInformationDialog(information),
             ),
             if (canChange)
               PopupMenuItem(
                   child: Text(AppLocalizations.of(context).loeschen),
                   onTap: () {
-                    deleteInformation(information);
+                    deleteInformationDialog(information);
                   }),
           ]);
     }
@@ -596,6 +618,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
       var showTitle = informationText["title"];
       var showInformation = informationText["information"];
       var translationIn = informationText["translationIn"];
+      var creatorProfil = getProfilFromHive(profilId: information["erstelltVon"]);
 
       return Container(
         margin: const EdgeInsets.all(10),
@@ -631,7 +654,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
             ),
             Container(
                 margin: const EdgeInsets.only(left: 10, right: 10),
-                child: Text(showInformation)),
+                child: TextWithHyperlinkDetection(text:showInformation, fontsize: 16,)),
             if (translationIn != null)
               Padding(
                 padding: const EdgeInsets.only(right: 5, top: 2),
@@ -669,20 +692,12 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                               ? Colors.red
                               : Colors.grey)),
                   const Expanded(child: SizedBox()),
-                  FutureBuilder(
-                      future: ProfilDatabase().getData(
-                          "name", "WHERE id='${information["erstelltVon"]}'"),
-                      builder: (context, snapshot) {
-                        var name = snapshot.data;
-                        if (!snapshot.hasData || snapshot.data == false) {
-                          name = "";
-                        }
-
-                        return Text(
-                          name + " " +information["erstelltAm"].split("-").reversed.join("-"),
-                          style: const TextStyle(color: Colors.black),
-                        );
-                      }),
+                  GestureDetector(
+                    onTap: ()=> global_func.changePage(context, ShowProfilPage(profil: creatorProfil,)),
+                    child: Text(creatorProfil["name"] + " " +information["erstelltAm"].split("-").reversed.join("-"),
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                  ),
                   const SizedBox(width: 5)
                 ],
               ),
@@ -741,7 +756,7 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                   const SizedBox(height: 10),
                   customTextInput(AppLocalizations.of(context).beschreibung,
                       informationTextKontroller,
-                      moreLines: 10, textInputAction: TextInputAction.newline),
+                      moreLines: 8, textInputAction: TextInputAction.newline),
                   const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -764,20 +779,38 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
 
     refreshCityUserInfo();
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: CustomAppBar(title: widget.ortName, leading: widget.newEntry != null ? StartPage() : null),
-      body: Column(
-        children: [
-          allgemeineInfoBox(),
-          const SizedBox(height: 10),
-          Expanded(child: userInfoBox())
-        ],
+    return SelectionArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: CustomAppBar(
+            title: widget.ortName,
+            leading: widget.newEntry != null ? StartPage() : null,
+            buttons: [
+              IconButton(
+                icon: const Icon(Icons.message),
+                onPressed: () async {
+                  await createNewChatGroup();
+
+                  global_func.changePage(context, ChatDetailsPage(
+                    isChatgroup: true,
+                    connectedId: "</stadt=${cityInformation["id"]}",
+                  ));
+                },
+              )
+            ],
+        ),
+        body: Column(
+          children: [
+            allgemeineInfoBox(),
+            const SizedBox(height: 10),
+            Expanded(child: userInfoBox())
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+            heroTag: "create Stadtinformation",
+            child: const Icon(Icons.create),
+            onPressed: () => addInformationWindow()),
       ),
-      floatingActionButton: FloatingActionButton(
-          heroTag: "create Stadtinformation",
-          child: const Icon(Icons.create),
-          onPressed: () => addInformationWindow()),
     );
   }
 }

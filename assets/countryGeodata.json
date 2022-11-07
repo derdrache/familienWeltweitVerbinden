@@ -1,456 +1,1758 @@
-{"data": [
-  {
-    "nameGer": "Andorra", "nameEng": "Andorra", "latt": 42.5, "longt": 1.5, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Vereinigte Arabische Emirate", "nameEng": "United Arab Emirates", "latt": 24.0, "longt": 54.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Afghanistan", "nameEng": "Afghanistan", "latt": 33.0, "longt": 65.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
-  {
-    "nameGer": "Antigua und Barbuda", "nameEng": "Antigua and Barbuda", "latt": 17.05, "longt": -61.8, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Anguilla", "nameEng": "Anguilla", "latt": 18.25, "longt": -63.17, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Albanien", "nameEng": "Albania", "latt": 41.0, "longt": 20.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Armenien", "nameEng": "Armenia", "latt": 40.0, "longt": 45.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Niederländische Antillen", "nameEng": "Netherlands Antilles", "latt": 12.25, "longt": -68.75, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Angola", "nameEng": "Angola", "latt": -12.5, "longt": 18.5, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Antarktis", "nameEng": "Antarctica", "latt": -90.0, "longt": 0.0},
-  {
-    "nameGer": "Argentinien", "nameEng": "Argentina", "latt": -34.0, "longt": -64.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Amerikanisch-Samoa", "nameEng": "American Samoa", "latt": -14.33, "longt": -170.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Österreich", "nameEng": "Austria", "latt": 47.33, "longt": 13.33, "kontinentGer": "Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "Australien", "nameEng": "Australia", "latt": -27.0, "longt": 133.0},
-  {
-    "nameGer": "Aruba", "nameEng": "Aruba", "latt": 12.5, "longt": -69.97, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Aserbaidschan", "nameEng": "Azerbaijan", "latt": 40.5, "longt": 47.5, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Bosnien und Herzegowina", "nameEng": "Bosnia and Herzegovina", "latt": 44.0, "longt": 18.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Barbados", "nameEng": "Barbados", "latt": 13.17, "longt": -59.53, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Bangladesch", "nameEng": "Bangladesh", "latt": 24.0, "longt": 90.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Belgien", "nameEng": "Belgium", "latt": 50.83, "longt": 4.0, "kontinentGer":"Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "Burkina Faso", "nameEng": "Burkina Faso", "latt": 13.0, "longt": -2.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Bulgarien", "nameEng": "Bulgaria", "latt": 43.0, "longt": 25.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Bahrain", "nameEng": "Bahrain", "latt": 26.0, "longt": 50.55, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Burundi", "nameEng": "Burundi", "latt": -3.5, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Benin", "nameEng": "Benin", "latt": 9.5, "longt": 2.25, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Bermuda", "nameEng": "Bermuda", "latt": 32.33, "longt": -64.75, "kontinentGer": "Nordamerika", "kontinentEng": "North America"},
-  {
-    "nameGer": "Brunei Darussalam", "nameEng": "Brunei Darussalam", "latt": 4.5, "longt": 114.67, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Bolivien", "nameEng": "Bolivia", "latt": -17.0, "longt": -65.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Brasilien", "nameEng": "Brazil", "latt": -10.0, "longt": -55.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Bahamas", "nameEng": "Bahamas", "latt": 24.25, "longt": -76.0, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Bhutan", "nameEng": "Bhutan", "latt": 27.5, "longt": 90.5, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Bouvet-Insel", "nameEng": "Bouvet Island", "latt": -54.43, "longt": 3.4},
-  {
-    "nameGer": "Botsuana", "nameEng": "Botswana", "latt": -22.0, "longt": 24.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Weißrussland", "nameEng": "Belarus", "latt": 53.0, "longt": 28.0, "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe"},
-  {
-    "nameGer": "Belize", "nameEng": "Belize", "latt": 17.25, "longt": -88.75, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Kanada", "nameEng": "Canada", "latt": 60.0, "longt": -95.0},
-  {
-    "nameGer": "Kokosinseln (Keelinginseln)", "nameEng": "Cocos (Keeling) Islands", "latt": -12.5, "longt": 96.83},
-  {
-    "nameGer": "Zentralafrikanische Republik", "nameEng": "Central African Republic", "latt": 7.0, "longt": 21.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Demokratische Republik Kongo", "nameEng": "Democratic Republic of Congo", "latt": -1.0, "longt": 15.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Schweiz", "nameEng": "Switzerland", "latt": 47.0, "longt": 8.0, "kontinentGer": "Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "Elfenbeinküste", "nameEng": "Cote d'Ivoire", "latt": 8.0, "longt": -5.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Cookinseln", "nameEng": "Cook Islands", "latt": -21.23, "longt": -159.77},
-  {
-    "nameGer": "Chile", "nameEng": "Chile", "latt": -30.0, "longt": -71.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Kamerun", "nameEng": "Cameroon", "latt": 6.0, "longt": 12.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "China", "nameEng": "China", "latt": 35.0, "longt": 105.0},
-  {
-    "nameGer": "Kolumbien", "nameEng": "Colombia", "latt": 4.0, "longt": -72.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Costa Rica ", "nameEng": "Costa Rica", "latt": 10.0, "longt": -84.0, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Kuba", "nameEng": "Cuba", "latt": 21.5, "longt": -80.0, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Kap Verde", "nameEng": "Cape Verde", "latt": 16.0, "longt": -24.0, "kontinentGer": "Nordamerika", "kontinentEng": "North America"},
-  {
-    "nameGer": "Weihnachtsinsel", "nameEng": "Christmas Island", "latt": -10.5, "longt": 105.67},
-  {
-    "nameGer": "Zypern", "nameEng": "Cyprus", "latt": 35.0, "longt": 33.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Tschechien", "nameEng": "Czech Republic", "latt": 49.75, "longt": 15.5, "kontinentGer":"Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "Deutschland", "nameEng": "Germany", "latt": 51.0, "longt": 9.0, "kontinentGer": "Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "Dschibuti", "nameEng": "Djibouti", "latt": 11.5, "longt": 43.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Dänemark", "nameEng": "Denmark", "latt": 56.0, "longt": 10.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
-  {
-    "nameGer": "Dominica", "nameEng": "Dominica", "latt": 15.42, "longt": -61.33, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Dominikanische Republik", "nameEng": "Dominican Republic", "latt": 19.0, "longt": -70.67, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Algerien", "nameEng": "Algeria", "latt": 28.0, "longt": 3.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Ecuador", "nameEng": "Ecuador", "latt": -2.0, "longt": -77.5, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Estland", "nameEng": "Estonia", "latt": 59.0, "longt": 26.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
-  {
-    "nameGer": "Ägypten", "nameEng": "Egypt", "latt": 27.0, "longt": 30.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Westsahara", "nameEng": "Western Sahara", "latt": 24.5, "longt": -13.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Eritrea", "nameEng": "Eritrea", "latt": 15.0, "longt": 39.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Spanien", "nameEng": "Spain", "latt": 40.0, "longt": -4.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Äthiopien", "nameEng": "Ethiopia", "latt": 8.0, "longt": 38.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Finnland", "nameEng": "Finland", "latt": 64.0, "longt": 26.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
-  {
-    "nameGer": "Fidschi", "nameEng": "Fiji", "latt": -18.0, "longt": 175.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Falklandinseln (Malvinas)", "nameEng": "Falkland Islands (Malvinas)", "latt": -51.75, "longt": -59.0},
-  {
-    "nameGer": "Mikronesien", "nameEng": "Micronesia", "latt": 6.92, "longt": 158.25},
-  {
-    "nameGer": "Färöer", "nameEng": "Faroe Islands", "latt": 62.0, "longt": -7.0},
-  {
-    "nameGer": "Frankreich", "nameEng": "France", "latt": 46.0, "longt": 2.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Gabun", "nameEng": "Gabon", "latt": -1.0, "longt": 11.75, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Vereinigtes Königreich", "nameEng": "UK", "latt": 54.0, "longt": -2.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Grenada", "nameEng": "Grenada", "latt": 12.12, "longt": -61.67, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Georgien", "nameEng": "Georgia", "latt": 42.0, "longt": 43.5, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Französisch-Guyana", "nameEng": "French Guiana", "latt": 4.0, "longt": -53.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Ghana", "nameEng": "Ghana", "latt": 8.0, "longt": -2.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Gibraltar", "nameEng": "Gibraltar", "latt": 36.18, "longt": -5.37, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Grönland", "nameEng": "Greenland", "latt": 72.0, "longt": -40.0},
-  {
-    "nameGer": "Gambia", "nameEng": "Gambia", "latt": 13.47, "longt": -16.57, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Guinea", "nameEng": "Guinea", "latt": 11.0, "longt": -10.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Guadeloupe", "nameEng": "Guadeloupe", "latt": 16.25, "longt": -61.58, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Äquatorialguinea", "nameEng": "Equatorial Guinea", "latt": 2.0, "longt": 10.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Griechenland", "nameEng": "Greece", "latt": 39.0, "longt": 22.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Guatemala", "nameEng": "Guatemala", "latt": 15.5, "longt": -90.25, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Guam", "nameEng": "Guam", "latt": 13.47, "longt": 144.78},
-  {
-    "nameGer": "Guinea-Bissau", "nameEng": "Guinea-Bissau", "latt": 12.0, "longt": -15.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Guyana", "nameEng": "Guyana", "latt": 5.0, "longt": -59.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Hongkong", "nameEng": "Hong Kong", "latt": 22.25, "longt": 114.17, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Honduras", "nameEng": "Honduras", "latt": 15.0, "longt": -86.5, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Kroatien", "nameEng": "Croatia", "latt": 45.17, "longt": 15.5,"kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Haiti", "nameEng": "Haiti", "latt": 19.0, "longt": -72.42},
-  {
-    "nameGer": "Ungarn", "nameEng": "Hungary", "latt": 47.0, "longt": 20.0, "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe"},
-  {
-    "nameGer": "Indonesien", "nameEng": "Indonesia", "latt": -5.0, "longt": 120.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Irland", "nameEng": "Ireland", "latt": 53.0, "longt": -8.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Israel", "nameEng": "Israel", "latt": 31.5, "longt": 34.75, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Indien", "nameEng": "India", "latt": 20.0, "longt": 77.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
-  {
-    "nameGer": "Irak", "nameEng": "Iraq", "latt": 33.0, "longt": 44.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Iran", "nameEng": "Iran", "latt": 32.0, "longt": 53.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Island", "nameEng": "Iceland", "latt": 65.0, "longt": -18.0},
-  {
-    "nameGer": "Italien", "nameEng": "Italy", "latt": 39.83, "longt": 12.83, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Jamaika", "nameEng": "Jamaica", "latt": 18.25, "longt": -77.5, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Jordanien", "nameEng": "Jordan", "latt": 31.0, "longt": 36.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Japan", "nameEng": "Japan", "latt": 36.0, "longt": 138.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Kenia", "nameEng": "Kenya", "latt": 1.0, "longt": 38.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Kirgisistan", "nameEng": "Kyrgyzstan", "latt": 41.0, "longt": 75.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
-  {
-    "nameGer": "Kambodscha", "nameEng": "Cambodia", "latt": 13.0, "longt": 105.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Kiribati", "nameEng": "Kiribati", "latt": 1.42, "longt": 173.0},
-  {
-    "nameGer": "Komoren", "nameEng": "Comoros", "latt": -12.17, "longt": 44.25},
-  {
-    "nameGer": "St. Kitts und Nevis", "nameEng": "Saint Kitts and Nevis", "latt": 17.33, "longt": -62.75, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Südkorea", "nameEng": "South Korea", "latt": 37.0, "longt": 127.5, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Kuwait", "nameEng": "Kuwait", "latt": 29.34, "longt": 47.66, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Kaimaninseln", "nameEng": "Cayman Islands", "latt": 19.5, "longt": -80.5, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Kasachstan", "nameEng": "Kazakhstan", "latt": 48.0, "longt": 68.0},
-  {
-    "nameGer": "Laos", "nameEng": "Lao", "latt": 18.0, "longt": 105.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Libanon", "nameEng": "Lebanon", "latt": 33.83, "longt": 35.83, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "St. Lucia", "nameEng": "Saint Lucia", "latt": 13.88, "longt": -61.13, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Liechtenstein", "nameEng": "Liechtenstein", "latt": 47.17, "longt": 9.53, "kontinentGer": "Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "Sri Lanka", "nameEng": "Sri Lanka", "latt": 7.0, "longt": 81.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
-  {
-    "nameGer": "Liberia", "nameEng": "Liberia", "latt": 6.5, "longt": -9.5, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Lesotho", "nameEng": "Lesotho", "latt": -29.5, "longt": 28.5, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Litauen", "nameEng": "Lithuania", "latt": 56.0, "longt": 24.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
-  {
-    "nameGer": "Luxemburg", "nameEng": "Luxembourg", "latt": 49.75, "longt": 6.17, "kontinentGer":"Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "Lettland", "nameEng": "Latvia", "latt": 57.0, "longt": 25.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
-  {
-    "nameGer": "Libyen", "nameEng": "Libya", "latt": 25.0, "longt": 17.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Marokko", "nameEng": "Morocco", "latt": 32.0, "longt": -5.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Monaco", "nameEng": "Monaco", "latt": 43.73, "longt": 7.4, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Moldawien", "nameEng": "Moldova", "latt": 47.0, "longt": 29.0, "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe"},
-  {
-    "nameGer": "Montenegro", "nameEng": "Montenegro", "latt": 42.0, "longt": 19.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Madagaskar", "nameEng": "Madagascar", "latt": -20.0, "longt": 47.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Marshallinseln", "nameEng": "Marshall Islands", "latt": 9.0, "longt": 168.0},
-  {
-    "nameGer": "Nordmazedonien", "nameEng": "North Macedonia", "latt": 41.83, "longt": 22.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Mali", "nameEng": "Mali", "latt": 17.0, "longt": -4.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Myanmar (Birma)", "nameEng": "Myanmar", "latt": 22.0, "longt": 98.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Mongolei", "nameEng": "Mongolia", "latt": 46.0, "longt": 105.0},
-  {
-    "nameGer": "Macau", "nameEng": "Macao", "latt": 22.17, "longt": 113.55, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Nördliche Marianneninseln", "nameEng": "Northern Mariana Islands", "latt": 15.2, "longt": 145.75},
-  {
-    "nameGer": "Martinique", "nameEng": "Martinique", "latt": 14.67, "longt": -61.0, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Mauretanien", "nameEng": "Mauritania", "latt": 20.0, "longt": -12.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Montserrat", "nameEng": "Montserrat", "latt": 16.75, "longt": -62.2, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Malta", "nameEng": "Malta", "latt": 35.83, "longt": 14.58, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Mauritius", "nameEng": "Mauritius", "latt": -20.28, "longt": 57.55},
-  {
-    "nameGer": "Malediven", "nameEng": "Maldives", "latt": 3.25, "longt": 73.0},
-  {
-    "nameGer": "Malawi", "nameEng": "Malawi", "latt": -13.5, "longt": 34.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Mexiko", "nameEng": "Mexico", "latt": 23.0, "longt": -102.0},
-  {
-    "nameGer": "Malaysia", "nameEng": "Malaysia", "latt": 2.5, "longt": 112.5, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Mosambik", "nameEng": "Mozambique", "latt": -18.25, "longt": 35.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Namibia", "nameEng": "Namibia", "latt": -22.0, "longt": 17.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Neukaledonien", "nameEng": "New Caledonia", "latt": -21.5, "longt": 165.5, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Niger", "nameEng": "Niger", "latt": 16.0, "longt": 8.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Norfolkinsel", "nameEng": "Norfolk Island", "latt": -29.03, "longt": 167.95},
-  {
-    "nameGer": "Nigeria", "nameEng": "Nigeria", "latt": 10.0, "longt": 8.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Nicaragua", "nameEng": "Nicaragua", "latt": 13.0, "longt": -85.0, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Niederlande", "nameEng": "Netherlands", "latt": 52.5, "longt": 5.75, "kontinentGer":"Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "Norwegen", "nameEng": "Norway", "latt": 62.0, "longt": 10.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
-  {
-    "nameGer": "Nepal", "nameEng": "Nepal", "latt": 28.0, "longt": 84.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Nauru", "nameEng": "Nauru", "latt": -0.53, "longt": 166.92},
-  {
-    "nameGer": "Niue", "nameEng": "Niue", "latt": -19.03, "longt": -169.87},
-  {
-    "nameGer": "Neuseeland", "nameEng": "New Zealand", "latt": -41.0, "longt": 174.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Oman", "nameEng": "Oman", "latt": 21.0, "longt": 57.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Panama", "nameEng": "Panama", "latt": 9.0, "longt": -80.0, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Peru", "nameEng": "Peru", "latt": -10.0, "longt": -76.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Französisch-Polynesien", "nameEng": "French Polynesia", "latt": -15.0, "longt": -140.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Papua-Neuguinea", "nameEng": "Papua New Guinea", "latt": -6.0, "longt": 147.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Philippinen", "nameEng": "Philippines", "latt": 13.0, "longt": 122.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Pakistan", "nameEng": "Pakistan", "latt": 30.0, "longt": 70.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
-  {
-    "nameGer": "Polen", "nameEng": "Poland", "latt": 52.0, "longt": 20.0, "kontinentGer":"Mitteleuropa", "kontinentEng": "Central Europe"},
-  {
-    "nameGer": "St. Pierre und Miquelon", "nameEng": "Saint Pierre and Miquelon", "latt": 46.83, "longt": -56.33, "kontinentGer": "Nordamerika", "kontinentEng": "North America"},
-  {
-    "nameGer": "Puerto Rico", "nameEng": "Puerto Rico", "latt": 18.25, "longt": -66.5, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Portugal", "nameEng": "Portugal", "latt": 39.5, "longt": -8.0, "kontinentGer": "Westeuropa", "kontinentEng": "Western Europe"},
-  {
-    "nameGer": "Palau", "nameEng": "Palau", "latt": 7.5, "longt": 134.5, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Paraguay", "nameEng": "Paraguay", "latt": -23.0, "longt": -58.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Katar", "nameEng": "Qatar", "latt": 25.5, "longt": 51.25, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Réunion", "nameEng": "Reunion", "latt": -21.1, "longt": 55.6, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Rumänien", "nameEng": "Romania", "latt": 46.0, "longt": 25.0, "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe"},
-  {
-    "nameGer": "Serbien", "nameEng": "Serbia", "latt": 44.0, "longt": 21.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Russland", "nameEng": "Russia", "latt": 55.0, "longt": 45.0},
-  {
-    "nameGer": "Ruanda", "nameEng": "Rwanda", "latt": -2.0, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Saudi-Arabien", "nameEng": "Saudi Arabia", "latt": 25.0, "longt": 45.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Salomonen", "nameEng": "Solomon Islands", "latt": -8.0, "longt": 159.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Seychellen", "nameEng": "Seychelles", "latt": -4.58, "longt": 55.67,"kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Sudan", "nameEng": "Sudan", "latt": 15.0, "longt": 30.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Schweden", "nameEng": "Sweden", "latt": 62.0, "longt": 15.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
-  {
-    "nameGer": "Singapur", "nameEng": "Singapore", "latt": 1.37, "longt": 103.8, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "St. Helena", "nameEng": "Saint Helena", "latt": -15.93, "longt": -5.7, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Slowenien", "nameEng": "Slovenia", "latt": 46.0, "longt": 15.0, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Svalbard und Jan Mayen", "nameEng": "Svalbard and Jan Mayen", "latt": 78.0, "longt": 20.0, "kontinentGer": "Nordeuropa", "kontinentEng": "Northern Europe"},
-  {
-    "nameGer": "Slowakei", "nameEng": "Slovakia", "latt": 48.67, "longt": 19.5, "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe"},
-  {
-    "nameGer": "Sierra Leone", "nameEng": "Sierra Leone", "latt": 8.5, "longt": -11.5, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "San Marino", "nameEng": "San Marino", "latt": 43.77, "longt": 12.42, "kontinentGer": "Südeuropa", "kontinentEng": "Southern Europe"},
-  {
-    "nameGer": "Senegal", "nameEng": "Senegal", "latt": 14.0, "longt": -14.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Somalia", "nameEng": "Somalia", "latt": 10.0, "longt": 49.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Surinam", "nameEng": "Suriname", "latt": 4.0, "longt": -56.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "São Tomé und Príncipe", "nameEng": "Sao Tome and Principe", "latt": 1.0, "longt": 7.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "El Salvador", "nameEng": "El Salvador", "latt": 13.83, "longt": -88.92, "kontinentGer": "Mittelamerika", "kontinentEng": "Central America"},
-  {
-    "nameGer": "Syrien", "nameEng": "Syria", "latt": 35.0, "longt": 38.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Swasiland", "nameEng": "Swaziland", "latt": -26.5, "longt": 31.5, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Tschad", "nameEng": "Chad", "latt": 15.0, "longt": 19.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Togo", "nameEng": "Togo", "latt": 8.0, "longt": 1.17, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Thailand", "nameEng": "Thailand", "latt": 15.0, "longt": 100.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Tadschikistan", "nameEng": "Tajikistan", "latt": 39.0, "longt": 71.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
-  {
-    "nameGer": "Tokelau", "nameEng": "Tokelau", "latt": -9.0, "longt": -172.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Turkmenistan", "nameEng": "Turkmenistan", "latt": 40.0, "longt": 60.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
-  {
-    "nameGer": "Tunesien", "nameEng": "Tunisia", "latt": 34.0, "longt": 9.0, "kontinentGer": "Nordafrika", "kontinentEng": "North Africa"},
-  {
-    "nameGer": "Tonga", "nameEng": "Tonga", "latt": -20.0, "longt": -175.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Türkei", "nameEng": "Turkey", "latt": 39.0, "longt": 35.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Trinidad und Tobago", "nameEng": "Trinidad and Tobago", "latt": 11.0, "longt": -61.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Tuvalu", "nameEng": "Tuvalu", "latt": -8.0, "longt": 178.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Taiwan", "nameEng": "Taiwan", "latt": 23.5, "longt": 121.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Tansania", "nameEng": "Tanzania", "latt": -6.0, "longt": 35.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Ukraine", "nameEng": "Ukraine", "latt": 49.0, "longt": 32.0, "kontinentGer": "Osteuropa", "kontinentEng": "Eastern Europe"},
-  {
-    "nameGer": "Uganda", "nameEng": "Uganda", "latt": 1.0, "longt": 32.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "USA", "nameEng": "USA", "latt": 38.0, "longt": -97.0},
-  {
-    "nameGer": "Uruguay", "nameEng": "Uruguay", "latt": -33.0, "longt": -56.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Usbekistan", "nameEng": "Uzbekistan", "latt": 41.0, "longt": 64.0, "kontinentGer": "Zentralasien", "kontinentEng": "Central Asia"},
-  {
-    "nameGer": "Venezuela", "nameEng": "Venezuela", "latt": 8.0, "longt": -66.0, "kontinentGer": "Südamerika", "kontinentEng": "South America"},
-  {
-    "nameGer": "Vietnam", "nameEng": "Vietnam", "latt": 16.0, "longt": 106.0, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Vanuatu", "nameEng": "Vanuatu", "latt": -16.0, "longt": 167.0, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Wallis und Futuna", "nameEng": "Wallis and Futuna", "latt": -13.3, "longt": -176.2, "kontinentGer": "Ozeanien", "kontinentEng": "Oceania"},
-  {
-    "nameGer": "Samoa", "nameEng": "Samoa", "latt": -13.58, "longt": -172.33},
-  {
-    "nameGer": "Jemen", "nameEng": "Yemen", "latt": 15.0, "longt": 48.0, "kontinentGer": "Westasien", "kontinentEng": "West Asia"},
-  {
-    "nameGer": "Mayotte", "nameEng": "Mayotte", "latt": -12.83, "longt": 45.17},
-  {
-    "nameGer": "Südafrika", "nameEng": "South Africa", "latt": -29.0, "longt": 24.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Sambia", "nameEng": "Zambia", "latt": -15.0, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Simbabwe", "nameEng": "Zimbabwe", "latt": -20.0, "longt": 30.0, "kontinentGer": "Südafrika", "kontinentEng": "South Africa"},
-  {
-    "nameGer": "Brunei", "nameEng": "Brunei", "latt": 4.535277, "longt": 114.727669, "kontinentGer": "Ostasien", "kontinentEng": "East Asia"},
-  {
-    "nameGer": "Online", "nameEng": "Online", "latt": 30.1, "longt": -50.1, "kontinentGer": "Online", "kontinentEng": "Online"}
-]}
+{
+  "data": [
+    {
+      "nameGer": "Andorra",
+      "nameEng": "Andorra",
+      "latt": 42.5,
+      "longt": 1.5,
+      "kontinentGer": "Westeuropa",
+      "kontinentEng": "Western Europe"
+    },
+    {
+      "nameGer": "Vereinigte Arabische Emirate",
+      "nameEng": "United Arab Emirates",
+      "latt": 24.0,
+      "longt": 54.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Afghanistan",
+      "nameEng": "Afghanistan",
+      "latt": 33.0,
+      "longt": 65.0,
+      "kontinentGer": "Zentralasien",
+      "kontinentEng": "Central Asia"
+    },
+    {
+      "nameGer": "Antigua und Barbuda",
+      "nameEng": "Antigua and Barbuda",
+      "latt": 17.05,
+      "longt": -61.8,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Anguilla",
+      "nameEng": "Anguilla",
+      "latt": 18.25,
+      "longt": -63.17,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Albanien",
+      "nameEng": "Albania",
+      "latt": 41.0,
+      "longt": 20.0,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Armenien",
+      "nameEng": "Armenia",
+      "latt": 40.0,
+      "longt": 45.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Niederländische Antillen",
+      "nameEng": "Netherlands Antilles",
+      "latt": 12.25,
+      "longt": -68.75,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Angola",
+      "nameEng": "Angola",
+      "latt": -12.5,
+      "longt": 18.5,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Antarktis",
+      "nameEng": "Antarctica",
+      "latt": -90.0,
+      "longt": 0.0
+    },
+    {
+      "nameGer": "Argentinien",
+      "nameEng": "Argentina",
+      "latt": -34.0,
+      "longt": -64.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Amerikanisch-Samoa",
+      "nameEng": "American Samoa",
+      "latt": -14.33,
+      "longt": -170.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Österreich",
+      "nameEng": "Austria",
+      "latt": 47.33,
+      "longt": 13.33,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "Australien",
+      "nameEng": "Australia",
+      "latt": -27.0,
+      "longt": 133.0
+    },
+    {
+      "nameGer": "Aruba",
+      "nameEng": "Aruba",
+      "latt": 12.5,
+      "longt": -69.97,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Aserbaidschan",
+      "nameEng": "Azerbaijan",
+      "latt": 40.5,
+      "longt": 47.5,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Bosnien und Herzegowina",
+      "nameEng": "Bosnia and Herzegovina",
+      "latt": 44.0,
+      "longt": 18.0,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Barbados",
+      "nameEng": "Barbados",
+      "latt": 13.17,
+      "longt": -59.53,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Bangladesch",
+      "nameEng": "Bangladesh",
+      "latt": 24.0,
+      "longt": 90.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Belgien",
+      "nameEng": "Belgium",
+      "latt": 50.83,
+      "longt": 4.0,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "Burkina Faso",
+      "nameEng": "Burkina Faso",
+      "latt": 13.0,
+      "longt": -2.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Bulgarien",
+      "nameEng": "Bulgaria",
+      "latt": 43.0,
+      "longt": 25.0,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Bahrain",
+      "nameEng": "Bahrain",
+      "latt": 26.0,
+      "longt": 50.55,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Burundi",
+      "nameEng": "Burundi",
+      "latt": -3.5,
+      "longt": 30.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Benin",
+      "nameEng": "Benin",
+      "latt": 9.5,
+      "longt": 2.25,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Bermuda",
+      "nameEng": "Bermuda",
+      "latt": 32.33,
+      "longt": -64.75,
+      "kontinentGer": "Nordamerika",
+      "kontinentEng": "North America"
+    },
+    {
+      "nameGer": "Brunei Darussalam",
+      "nameEng": "Brunei Darussalam",
+      "latt": 4.5,
+      "longt": 114.67,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Bolivien",
+      "nameEng": "Bolivia",
+      "latt": -17.0,
+      "longt": -65.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Brasilien",
+      "nameEng": "Brazil",
+      "latt": -10.0,
+      "longt": -55.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Bahamas",
+      "nameEng": "Bahamas",
+      "latt": 24.25,
+      "longt": -76.0,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Bhutan",
+      "nameEng": "Bhutan",
+      "latt": 27.5,
+      "longt": 90.5,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Bouvet-Insel",
+      "nameEng": "Bouvet Island",
+      "latt": -54.43,
+      "longt": 3.4
+    },
+    {
+      "nameGer": "Botsuana",
+      "nameEng": "Botswana",
+      "latt": -22.0,
+      "longt": 24.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Weißrussland",
+      "nameEng": "Belarus",
+      "latt": 53.0,
+      "longt": 28.0,
+      "kontinentGer": "Osteuropa",
+      "kontinentEng": "Eastern Europe"
+    },
+    {
+      "nameGer": "Belize",
+      "nameEng": "Belize",
+      "latt": 17.25,
+      "longt": -88.75,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Kanada",
+      "nameEng": "Canada",
+      "latt": 60.0,
+      "longt": -95.0
+    },
+    {
+      "nameGer": "Kokosinseln (Keelinginseln)",
+      "nameEng": "Cocos (Keeling) Islands",
+      "latt": -12.5,
+      "longt": 96.83
+    },
+    {
+      "nameGer": "Zentralafrikanische Republik",
+      "nameEng": "Central African Republic",
+      "latt": 7.0,
+      "longt": 21.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Demokratische Republik Kongo",
+      "nameEng": "Democratic Republic of Congo",
+      "latt": -1.0,
+      "longt": 15.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Schweiz",
+      "nameEng": "Switzerland",
+      "latt": 47.0,
+      "longt": 8.0,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "Elfenbeinküste",
+      "nameEng": "Cote d'Ivoire",
+      "latt": 8.0,
+      "longt": -5.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Cookinseln",
+      "nameEng": "Cook Islands",
+      "latt": -21.23,
+      "longt": -159.77
+    },
+    {
+      "nameGer": "Chile",
+      "nameEng": "Chile",
+      "latt": -30.0,
+      "longt": -71.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Kamerun",
+      "nameEng": "Cameroon",
+      "latt": 6.0,
+      "longt": 12.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "China",
+      "nameEng": "China",
+      "latt": 35.0,
+      "longt": 105.0
+    },
+    {
+      "nameGer": "Kolumbien",
+      "nameEng": "Colombia",
+      "latt": 4.0,
+      "longt": -72.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Costa Rica ",
+      "nameEng": "Costa Rica",
+      "latt": 10.0,
+      "longt": -84.0,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Kuba",
+      "nameEng": "Cuba",
+      "latt": 21.5,
+      "longt": -80.0,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Kap Verde",
+      "nameEng": "Cape Verde",
+      "latt": 16.0,
+      "longt": -24.0,
+      "kontinentGer": "Nordamerika",
+      "kontinentEng": "North America"
+    },
+    {
+      "nameGer": "Weihnachtsinsel",
+      "nameEng": "Christmas Island",
+      "latt": -10.5,
+      "longt": 105.67
+    },
+    {
+      "nameGer": "Zypern",
+      "nameEng": "Cyprus",
+      "latt": 35.0,
+      "longt": 33.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Tschechien",
+      "nameEng": "Czech Republic",
+      "latt": 49.75,
+      "longt": 15.5,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "Deutschland",
+      "nameEng": "Germany",
+      "latt": 51.0,
+      "longt": 9.0,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "Dschibuti",
+      "nameEng": "Djibouti",
+      "latt": 11.5,
+      "longt": 43.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Dänemark",
+      "nameEng": "Denmark",
+      "latt": 56.0,
+      "longt": 10.0,
+      "kontinentGer": "Nordeuropa",
+      "kontinentEng": "Northern Europe"
+    },
+    {
+      "nameGer": "Dominica",
+      "nameEng": "Dominica",
+      "latt": 15.42,
+      "longt": -61.33,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Dominikanische Republik",
+      "nameEng": "Dominican Republic",
+      "latt": 19.0,
+      "longt": -70.67,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Algerien",
+      "nameEng": "Algeria",
+      "latt": 28.0,
+      "longt": 3.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Ecuador",
+      "nameEng": "Ecuador",
+      "latt": -2.0,
+      "longt": -77.5,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Estland",
+      "nameEng": "Estonia",
+      "latt": 59.0,
+      "longt": 26.0,
+      "kontinentGer": "Nordeuropa",
+      "kontinentEng": "Northern Europe"
+    },
+    {
+      "nameGer": "Ägypten",
+      "nameEng": "Egypt",
+      "latt": 27.0,
+      "longt": 30.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Westsahara",
+      "nameEng": "Western Sahara",
+      "latt": 24.5,
+      "longt": -13.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Eritrea",
+      "nameEng": "Eritrea",
+      "latt": 15.0,
+      "longt": 39.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Spanien",
+      "nameEng": "Spain",
+      "latt": 40.0,
+      "longt": -4.0,
+      "kontinentGer": "Westeuropa",
+      "kontinentEng": "Western Europe"
+    },
+    {
+      "nameGer": "Äthiopien",
+      "nameEng": "Ethiopia",
+      "latt": 8.0,
+      "longt": 38.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Finnland",
+      "nameEng": "Finland",
+      "latt": 64.0,
+      "longt": 26.0,
+      "kontinentGer": "Nordeuropa",
+      "kontinentEng": "Northern Europe"
+    },
+    {
+      "nameGer": "Fidschi",
+      "nameEng": "Fiji",
+      "latt": -18.0,
+      "longt": 175.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Falklandinseln (Malvinas)",
+      "nameEng": "Falkland Islands (Malvinas)",
+      "latt": -51.75,
+      "longt": -59.0
+    },
+    {
+      "nameGer": "Mikronesien",
+      "nameEng": "Micronesia",
+      "latt": 6.92,
+      "longt": 158.25
+    },
+    {
+      "nameGer": "Färöer",
+      "nameEng": "Faroe Islands",
+      "latt": 62.0,
+      "longt": -7.0
+    },
+    {
+      "nameGer": "Frankreich",
+      "nameEng": "France",
+      "latt": 46.0,
+      "longt": 2.0,
+      "kontinentGer": "Westeuropa",
+      "kontinentEng": "Western Europe"
+    },
+    {
+      "nameGer": "Gabun",
+      "nameEng": "Gabon",
+      "latt": -1.0,
+      "longt": 11.75,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Vereinigtes Königreich",
+      "nameEng": "UK",
+      "latt": 54.0,
+      "longt": -2.0,
+      "kontinentGer": "Westeuropa",
+      "kontinentEng": "Western Europe"
+    },
+    {
+      "nameGer": "Grenada",
+      "nameEng": "Grenada",
+      "latt": 12.12,
+      "longt": -61.67,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Georgien",
+      "nameEng": "Georgia",
+      "latt": 42.0,
+      "longt": 43.5,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Französisch-Guyana",
+      "nameEng": "French Guiana",
+      "latt": 4.0,
+      "longt": -53.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Ghana",
+      "nameEng": "Ghana",
+      "latt": 8.0,
+      "longt": -2.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Gibraltar",
+      "nameEng": "Gibraltar",
+      "latt": 36.18,
+      "longt": -5.37,
+      "kontinentGer": "Westeuropa",
+      "kontinentEng": "Western Europe"
+    },
+    {
+      "nameGer": "Grönland",
+      "nameEng": "Greenland",
+      "latt": 72.0,
+      "longt": -40.0
+    },
+    {
+      "nameGer": "Gambia",
+      "nameEng": "Gambia",
+      "latt": 13.47,
+      "longt": -16.57,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Guinea",
+      "nameEng": "Guinea",
+      "latt": 11.0,
+      "longt": -10.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Guadeloupe",
+      "nameEng": "Guadeloupe",
+      "latt": 16.25,
+      "longt": -61.58,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Äquatorialguinea",
+      "nameEng": "Equatorial Guinea",
+      "latt": 2.0,
+      "longt": 10.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Griechenland",
+      "nameEng": "Greece",
+      "latt": 39.0,
+      "longt": 22.0,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Guatemala",
+      "nameEng": "Guatemala",
+      "latt": 15.5,
+      "longt": -90.25,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Guam",
+      "nameEng": "Guam",
+      "latt": 13.47,
+      "longt": 144.78
+    },
+    {
+      "nameGer": "Guinea-Bissau",
+      "nameEng": "Guinea-Bissau",
+      "latt": 12.0,
+      "longt": -15.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Guyana",
+      "nameEng": "Guyana",
+      "latt": 5.0,
+      "longt": -59.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Hongkong",
+      "nameEng": "Hong Kong",
+      "latt": 22.25,
+      "longt": 114.17,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Honduras",
+      "nameEng": "Honduras",
+      "latt": 15.0,
+      "longt": -86.5,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Kroatien",
+      "nameEng": "Croatia",
+      "latt": 45.17,
+      "longt": 15.5,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Haiti",
+      "nameEng": "Haiti",
+      "latt": 19.0,
+      "longt": -72.42
+    },
+    {
+      "nameGer": "Ungarn",
+      "nameEng": "Hungary",
+      "latt": 47.0,
+      "longt": 20.0,
+      "kontinentGer": "Osteuropa",
+      "kontinentEng": "Eastern Europe"
+    },
+    {
+      "nameGer": "Indonesien",
+      "nameEng": "Indonesia",
+      "latt": -5.0,
+      "longt": 120.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Irland",
+      "nameEng": "Ireland",
+      "latt": 53.0,
+      "longt": -8.0,
+      "kontinentGer": "Westeuropa",
+      "kontinentEng": "Western Europe"
+    },
+    {
+      "nameGer": "Israel",
+      "nameEng": "Israel",
+      "latt": 31.5,
+      "longt": 34.75,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Indien",
+      "nameEng": "India",
+      "latt": 20.0,
+      "longt": 77.0,
+      "kontinentGer": "Zentralasien",
+      "kontinentEng": "Central Asia"
+    },
+    {
+      "nameGer": "Irak",
+      "nameEng": "Iraq",
+      "latt": 33.0,
+      "longt": 44.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Iran",
+      "nameEng": "Iran",
+      "latt": 32.0,
+      "longt": 53.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Island",
+      "nameEng": "Iceland",
+      "latt": 65.0,
+      "longt": -18.0
+    },
+    {
+      "nameGer": "Italien",
+      "nameEng": "Italy",
+      "latt": 39.83,
+      "longt": 12.83,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Jamaika",
+      "nameEng": "Jamaica",
+      "latt": 18.25,
+      "longt": -77.5,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Jordanien",
+      "nameEng": "Jordan",
+      "latt": 31.0,
+      "longt": 36.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Japan",
+      "nameEng": "Japan",
+      "latt": 36.0,
+      "longt": 138.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Kenia",
+      "nameEng": "Kenya",
+      "latt": 1.0,
+      "longt": 38.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Kirgisistan",
+      "nameEng": "Kyrgyzstan",
+      "latt": 41.0,
+      "longt": 75.0,
+      "kontinentGer": "Zentralasien",
+      "kontinentEng": "Central Asia"
+    },
+    {
+      "nameGer": "Kambodscha",
+      "nameEng": "Cambodia",
+      "latt": 13.0,
+      "longt": 105.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Kiribati",
+      "nameEng": "Kiribati",
+      "latt": 1.42,
+      "longt": 173.0
+    },
+    {
+      "nameGer": "Komoren",
+      "nameEng": "Comoros",
+      "latt": -12.17,
+      "longt": 44.25
+    },
+    {
+      "nameGer": "St. Kitts und Nevis",
+      "nameEng": "Saint Kitts and Nevis",
+      "latt": 17.33,
+      "longt": -62.75,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Südkorea",
+      "nameEng": "South Korea",
+      "latt": 37.0,
+      "longt": 127.5,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Kuwait",
+      "nameEng": "Kuwait",
+      "latt": 29.34,
+      "longt": 47.66,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Kaimaninseln",
+      "nameEng": "Cayman Islands",
+      "latt": 19.5,
+      "longt": -80.5,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Kasachstan",
+      "nameEng": "Kazakhstan",
+      "latt": 48.0,
+      "longt": 68.0
+    },
+    {
+      "nameGer": "Laos",
+      "nameEng": "Lao",
+      "latt": 18.0,
+      "longt": 105.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Libanon",
+      "nameEng": "Lebanon",
+      "latt": 33.83,
+      "longt": 35.83,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "St. Lucia",
+      "nameEng": "Saint Lucia",
+      "latt": 13.88,
+      "longt": -61.13,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Liechtenstein",
+      "nameEng": "Liechtenstein",
+      "latt": 47.17,
+      "longt": 9.53,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "Sri Lanka",
+      "nameEng": "Sri Lanka",
+      "latt": 7.0,
+      "longt": 81.0,
+      "kontinentGer": "Zentralasien",
+      "kontinentEng": "Central Asia"
+    },
+    {
+      "nameGer": "Liberia",
+      "nameEng": "Liberia",
+      "latt": 6.5,
+      "longt": -9.5,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Lesotho",
+      "nameEng": "Lesotho",
+      "latt": -29.5,
+      "longt": 28.5,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Litauen",
+      "nameEng": "Lithuania",
+      "latt": 56.0,
+      "longt": 24.0,
+      "kontinentGer": "Nordeuropa",
+      "kontinentEng": "Northern Europe"
+    },
+    {
+      "nameGer": "Luxemburg",
+      "nameEng": "Luxembourg",
+      "latt": 49.75,
+      "longt": 6.17,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "Lettland",
+      "nameEng": "Latvia",
+      "latt": 57.0,
+      "longt": 25.0,
+      "kontinentGer": "Nordeuropa",
+      "kontinentEng": "Northern Europe"
+    },
+    {
+      "nameGer": "Libyen",
+      "nameEng": "Libya",
+      "latt": 25.0,
+      "longt": 17.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Marokko",
+      "nameEng": "Morocco",
+      "latt": 32.0,
+      "longt": -5.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Monaco",
+      "nameEng": "Monaco",
+      "latt": 43.73,
+      "longt": 7.4,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Moldawien",
+      "nameEng": "Moldova",
+      "latt": 47.0,
+      "longt": 29.0,
+      "kontinentGer": "Osteuropa",
+      "kontinentEng": "Eastern Europe"
+    },
+    {
+      "nameGer": "Montenegro",
+      "nameEng": "Montenegro",
+      "latt": 42.0,
+      "longt": 19.0,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Madagaskar",
+      "nameEng": "Madagascar",
+      "latt": -20.0,
+      "longt": 47.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Marshallinseln",
+      "nameEng": "Marshall Islands",
+      "latt": 9.0,
+      "longt": 168.0
+    },
+    {
+      "nameGer": "Nordmazedonien",
+      "nameEng": "North Macedonia",
+      "latt": 41.83,
+      "longt": 22.0,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Mali",
+      "nameEng": "Mali",
+      "latt": 17.0,
+      "longt": -4.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Myanmar (Birma)",
+      "nameEng": "Myanmar",
+      "latt": 22.0,
+      "longt": 98.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Mongolei",
+      "nameEng": "Mongolia",
+      "latt": 46.0,
+      "longt": 105.0
+    },
+    {
+      "nameGer": "Macau",
+      "nameEng": "Macao",
+      "latt": 22.17,
+      "longt": 113.55,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Nördliche Marianneninseln",
+      "nameEng": "Northern Mariana Islands",
+      "latt": 15.2,
+      "longt": 145.75
+    },
+    {
+      "nameGer": "Martinique",
+      "nameEng": "Martinique",
+      "latt": 14.67,
+      "longt": -61.0,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Mauretanien",
+      "nameEng": "Mauritania",
+      "latt": 20.0,
+      "longt": -12.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Montserrat",
+      "nameEng": "Montserrat",
+      "latt": 16.75,
+      "longt": -62.2,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Malta",
+      "nameEng": "Malta",
+      "latt": 35.83,
+      "longt": 14.58,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Mauritius",
+      "nameEng": "Mauritius",
+      "latt": -20.28,
+      "longt": 57.55
+    },
+    {
+      "nameGer": "Malediven",
+      "nameEng": "Maldives",
+      "latt": 3.25,
+      "longt": 73.0
+    },
+    {
+      "nameGer": "Malawi",
+      "nameEng": "Malawi",
+      "latt": -13.5,
+      "longt": 34.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Mexiko",
+      "nameEng": "Mexico",
+      "latt": 23.0,
+      "longt": -102.0
+    },
+    {
+      "nameGer": "Malaysia",
+      "nameEng": "Malaysia",
+      "latt": 2.5,
+      "longt": 112.5,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Mosambik",
+      "nameEng": "Mozambique",
+      "latt": -18.25,
+      "longt": 35.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Namibia",
+      "nameEng": "Namibia",
+      "latt": -22.0,
+      "longt": 17.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Neukaledonien",
+      "nameEng": "New Caledonia",
+      "latt": -21.5,
+      "longt": 165.5,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Niger",
+      "nameEng": "Niger",
+      "latt": 16.0,
+      "longt": 8.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Norfolkinsel",
+      "nameEng": "Norfolk Island",
+      "latt": -29.03,
+      "longt": 167.95
+    },
+    {
+      "nameGer": "Nigeria",
+      "nameEng": "Nigeria",
+      "latt": 10.0,
+      "longt": 8.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Nicaragua",
+      "nameEng": "Nicaragua",
+      "latt": 13.0,
+      "longt": -85.0,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Niederlande",
+      "nameEng": "Netherlands",
+      "latt": 52.5,
+      "longt": 5.75,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "Norwegen",
+      "nameEng": "Norway",
+      "latt": 62.0,
+      "longt": 10.0,
+      "kontinentGer": "Nordeuropa",
+      "kontinentEng": "Northern Europe"
+    },
+    {
+      "nameGer": "Nepal",
+      "nameEng": "Nepal",
+      "latt": 28.0,
+      "longt": 84.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Nauru",
+      "nameEng": "Nauru",
+      "latt": -0.53,
+      "longt": 166.92
+    },
+    {
+      "nameGer": "Niue",
+      "nameEng": "Niue",
+      "latt": -19.03,
+      "longt": -169.87
+    },
+    {
+      "nameGer": "Neuseeland",
+      "nameEng": "New Zealand",
+      "latt": -41.0,
+      "longt": 174.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Oman",
+      "nameEng": "Oman",
+      "latt": 21.0,
+      "longt": 57.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Panama",
+      "nameEng": "Panama",
+      "latt": 9.0,
+      "longt": -80.0,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Peru",
+      "nameEng": "Peru",
+      "latt": -10.0,
+      "longt": -76.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Französisch-Polynesien",
+      "nameEng": "French Polynesia",
+      "latt": -15.0,
+      "longt": -140.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Papua-Neuguinea",
+      "nameEng": "Papua New Guinea",
+      "latt": -6.0,
+      "longt": 147.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Philippinen",
+      "nameEng": "Philippines",
+      "latt": 13.0,
+      "longt": 122.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Pakistan",
+      "nameEng": "Pakistan",
+      "latt": 30.0,
+      "longt": 70.0,
+      "kontinentGer": "Zentralasien",
+      "kontinentEng": "Central Asia"
+    },
+    {
+      "nameGer": "Polen",
+      "nameEng": "Poland",
+      "latt": 52.0,
+      "longt": 20.0,
+      "kontinentGer": "Mitteleuropa",
+      "kontinentEng": "Central Europe"
+    },
+    {
+      "nameGer": "St. Pierre und Miquelon",
+      "nameEng": "Saint Pierre and Miquelon",
+      "latt": 46.83,
+      "longt": -56.33,
+      "kontinentGer": "Nordamerika",
+      "kontinentEng": "North America"
+    },
+    {
+      "nameGer": "Puerto Rico",
+      "nameEng": "Puerto Rico",
+      "latt": 18.25,
+      "longt": -66.5,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Portugal",
+      "nameEng": "Portugal",
+      "latt": 39.5,
+      "longt": -8.0,
+      "kontinentGer": "Westeuropa",
+      "kontinentEng": "Western Europe"
+    },
+    {
+      "nameGer": "Palau",
+      "nameEng": "Palau",
+      "latt": 7.5,
+      "longt": 134.5,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Paraguay",
+      "nameEng": "Paraguay",
+      "latt": -23.0,
+      "longt": -58.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Katar",
+      "nameEng": "Qatar",
+      "latt": 25.5,
+      "longt": 51.25,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Réunion",
+      "nameEng": "Reunion",
+      "latt": -21.1,
+      "longt": 55.6,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Rumänien",
+      "nameEng": "Romania",
+      "latt": 46.0,
+      "longt": 25.0,
+      "kontinentGer": "Osteuropa",
+      "kontinentEng": "Eastern Europe"
+    },
+    {
+      "nameGer": "Serbien",
+      "nameEng": "Serbia",
+      "latt": 44.0,
+      "longt": 21.0,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Russland",
+      "nameEng": "Russia",
+      "latt": 55.0,
+      "longt": 45.0
+    },
+    {
+      "nameGer": "Ruanda",
+      "nameEng": "Rwanda",
+      "latt": -2.0,
+      "longt": 30.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Saudi-Arabien",
+      "nameEng": "Saudi Arabia",
+      "latt": 25.0,
+      "longt": 45.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Salomonen",
+      "nameEng": "Solomon Islands",
+      "latt": -8.0,
+      "longt": 159.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Seychellen",
+      "nameEng": "Seychelles",
+      "latt": -4.58,
+      "longt": 55.67,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Sudan",
+      "nameEng": "Sudan",
+      "latt": 15.0,
+      "longt": 30.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Schweden",
+      "nameEng": "Sweden",
+      "latt": 62.0,
+      "longt": 15.0,
+      "kontinentGer": "Nordeuropa",
+      "kontinentEng": "Northern Europe"
+    },
+    {
+      "nameGer": "Singapur",
+      "nameEng": "Singapore",
+      "latt": 1.37,
+      "longt": 103.8,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "St. Helena",
+      "nameEng": "Saint Helena",
+      "latt": -15.93,
+      "longt": -5.7,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Slowenien",
+      "nameEng": "Slovenia",
+      "latt": 46.0,
+      "longt": 15.0,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Svalbard und Jan Mayen",
+      "nameEng": "Svalbard and Jan Mayen",
+      "latt": 78.0,
+      "longt": 20.0,
+      "kontinentGer": "Nordeuropa",
+      "kontinentEng": "Northern Europe"
+    },
+    {
+      "nameGer": "Slowakei",
+      "nameEng": "Slovakia",
+      "latt": 48.67,
+      "longt": 19.5,
+      "kontinentGer": "Osteuropa",
+      "kontinentEng": "Eastern Europe"
+    },
+    {
+      "nameGer": "Sierra Leone",
+      "nameEng": "Sierra Leone",
+      "latt": 8.5,
+      "longt": -11.5,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "San Marino",
+      "nameEng": "San Marino",
+      "latt": 43.77,
+      "longt": 12.42,
+      "kontinentGer": "Südeuropa",
+      "kontinentEng": "Southern Europe"
+    },
+    {
+      "nameGer": "Senegal",
+      "nameEng": "Senegal",
+      "latt": 14.0,
+      "longt": -14.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Somalia",
+      "nameEng": "Somalia",
+      "latt": 10.0,
+      "longt": 49.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Surinam",
+      "nameEng": "Suriname",
+      "latt": 4.0,
+      "longt": -56.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "São Tomé und Príncipe",
+      "nameEng": "Sao Tome and Principe",
+      "latt": 1.0,
+      "longt": 7.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "El Salvador",
+      "nameEng": "El Salvador",
+      "latt": 13.83,
+      "longt": -88.92,
+      "kontinentGer": "Mittelamerika",
+      "kontinentEng": "Central America"
+    },
+    {
+      "nameGer": "Syrien",
+      "nameEng": "Syria",
+      "latt": 35.0,
+      "longt": 38.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Swasiland",
+      "nameEng": "Swaziland",
+      "latt": -26.5,
+      "longt": 31.5,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Tschad",
+      "nameEng": "Chad",
+      "latt": 15.0,
+      "longt": 19.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Togo",
+      "nameEng": "Togo",
+      "latt": 8.0,
+      "longt": 1.17,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Thailand",
+      "nameEng": "Thailand",
+      "latt": 15.0,
+      "longt": 100.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Tadschikistan",
+      "nameEng": "Tajikistan",
+      "latt": 39.0,
+      "longt": 71.0,
+      "kontinentGer": "Zentralasien",
+      "kontinentEng": "Central Asia"
+    },
+    {
+      "nameGer": "Tokelau",
+      "nameEng": "Tokelau",
+      "latt": -9.0,
+      "longt": -172.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Turkmenistan",
+      "nameEng": "Turkmenistan",
+      "latt": 40.0,
+      "longt": 60.0,
+      "kontinentGer": "Zentralasien",
+      "kontinentEng": "Central Asia"
+    },
+    {
+      "nameGer": "Tunesien",
+      "nameEng": "Tunisia",
+      "latt": 34.0,
+      "longt": 9.0,
+      "kontinentGer": "Nordafrika",
+      "kontinentEng": "North Africa"
+    },
+    {
+      "nameGer": "Tonga",
+      "nameEng": "Tonga",
+      "latt": -20.0,
+      "longt": -175.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Türkei",
+      "nameEng": "Turkey",
+      "latt": 39.0,
+      "longt": 35.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Trinidad und Tobago",
+      "nameEng": "Trinidad and Tobago",
+      "latt": 11.0,
+      "longt": -61.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Tuvalu",
+      "nameEng": "Tuvalu",
+      "latt": -8.0,
+      "longt": 178.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Taiwan",
+      "nameEng": "Taiwan",
+      "latt": 23.5,
+      "longt": 121.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Tansania",
+      "nameEng": "Tanzania",
+      "latt": -6.0,
+      "longt": 35.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Ukraine",
+      "nameEng": "Ukraine",
+      "latt": 49.0,
+      "longt": 32.0,
+      "kontinentGer": "Osteuropa",
+      "kontinentEng": "Eastern Europe"
+    },
+    {
+      "nameGer": "Uganda",
+      "nameEng": "Uganda",
+      "latt": 1.0,
+      "longt": 32.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "USA",
+      "nameEng": "USA",
+      "latt": 38.0,
+      "longt": -97.0
+    },
+    {
+      "nameGer": "Uruguay",
+      "nameEng": "Uruguay",
+      "latt": -33.0,
+      "longt": -56.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Usbekistan",
+      "nameEng": "Uzbekistan",
+      "latt": 41.0,
+      "longt": 64.0,
+      "kontinentGer": "Zentralasien",
+      "kontinentEng": "Central Asia"
+    },
+    {
+      "nameGer": "Venezuela",
+      "nameEng": "Venezuela",
+      "latt": 8.0,
+      "longt": -66.0,
+      "kontinentGer": "Südamerika",
+      "kontinentEng": "South America"
+    },
+    {
+      "nameGer": "Vietnam",
+      "nameEng": "Vietnam",
+      "latt": 16.0,
+      "longt": 106.0,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Vanuatu",
+      "nameEng": "Vanuatu",
+      "latt": -16.0,
+      "longt": 167.0,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Wallis und Futuna",
+      "nameEng": "Wallis and Futuna",
+      "latt": -13.3,
+      "longt": -176.2,
+      "kontinentGer": "Ozeanien",
+      "kontinentEng": "Oceania"
+    },
+    {
+      "nameGer": "Samoa",
+      "nameEng": "Samoa",
+      "latt": -13.58,
+      "longt": -172.33
+    },
+    {
+      "nameGer": "Jemen",
+      "nameEng": "Yemen",
+      "latt": 15.0,
+      "longt": 48.0,
+      "kontinentGer": "Westasien",
+      "kontinentEng": "West Asia"
+    },
+    {
+      "nameGer": "Mayotte",
+      "nameEng": "Mayotte",
+      "latt": -12.83,
+      "longt": 45.17
+    },
+    {
+      "nameGer": "Südafrika",
+      "nameEng": "South Africa",
+      "latt": -29.0,
+      "longt": 24.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Sambia",
+      "nameEng": "Zambia",
+      "latt": -15.0,
+      "longt": 30.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Simbabwe",
+      "nameEng": "Zimbabwe",
+      "latt": -20.0,
+      "longt": 30.0,
+      "kontinentGer": "Südafrika",
+      "kontinentEng": "South Africa"
+    },
+    {
+      "nameGer": "Brunei",
+      "nameEng": "Brunei",
+      "latt": 4.535277,
+      "longt": 114.727669,
+      "kontinentGer": "Ostasien",
+      "kontinentEng": "East Asia"
+    },
+    {
+      "nameGer": "Online",
+      "nameEng": "Online",
+      "latt": 30.1,
+      "longt": -50.1,
+      "kontinentGer": "Online",
+      "kontinentEng": "Online"
+    }
+  ]
+}

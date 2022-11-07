@@ -6,16 +6,16 @@ import 'dart:convert';
 import 'dart:io' as io;
 import 'dart:ui' as ui;
 import 'package:encrypt/encrypt.dart';
+import 'package:flutter/foundation.dart' as foundation;
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart'as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/puffer/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
-
 
 class ProfilDatabase{
 
@@ -361,11 +361,248 @@ class ChatDatabase{
 
 }
 
+class ChatGroupsDatabase{
+
+  addNewChatGroup(user, connectedString) async {
+    var date = DateTime.now().millisecondsSinceEpoch;
+    var groupData = {
+      "lastMessageDate" : date,
+      "lastMessage" : "</neuer Chat",
+      "users": json.encode(user == null ? {} : {user : {"newMessages": 0}}),
+      "connected": connectedString ?? ""
+    };
+
+    var url = Uri.parse(databaseUrl + "database/chatGroups/newChatGroup.php");
+    var response = await http.post(url, body: json.encode(groupData));
+    var chatGroupId = response.body;
+
+    if(chatGroupId.isEmpty) return null;
+
+    groupData["id"] = chatGroupId;
+    groupData["users"] = user == null ? {} : {user : {"newMessages": 0}};
+
+    var chatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
+    chatGroups.add(groupData);
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.add(groupData);
+
+
+    return groupData;
+  }
+
+  getChatData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": whatData,
+      "queryEnd": queryEnd,
+      "table": "chat_groups"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+    if(responseBody.isEmpty) return false;
+
+    for(var i = 0; i < responseBody.length; i++){
+
+      if(responseBody[i].keys.toList().length == 1){
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for(var key in responseBody[i].keys.toList()){
+
+        try{
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        }catch(_){
+
+        }
+
+      }
+    }
+
+    if(responseBody.length == 1 && !returnList){
+      responseBody = responseBody[0];
+      try{
+        responseBody = jsonDecode(responseBody);
+      }catch(_){}
+    }
+
+    return responseBody;
+  }
+
+  updateChatGroup(whatData,queryEnd) async {
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "chat_groups",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+  }
+
+  getAllChatMessages(chatId) async {
+    var url = Uri.parse(databaseUrl + "database/getData2.php");
+
+    var res = await http.post(url, body: json.encode({
+      "whatData": "*",
+      "queryEnd": "WHERE chatId = '$chatId'",
+      "table": "group_messages"
+    }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    return responseBody;
+
+  }
+
+  updateMessage(whatData,queryEnd) async{
+    var url = Uri.parse(databaseUrl + "database/update.php");
+
+    await http.post(url, body: json.encode({
+      "table": "group_messages",
+      "whatData": whatData,
+      "queryEnd": queryEnd
+    }));
+
+  }
+
+  addNewMessageAndNotification(chatgroupData, messageData, isBlocked, chatGroupName)async {
+    var chatID = chatgroupData["id"];
+    var date = DateTime.now().millisecondsSinceEpoch;
+
+
+    messageData["message"] = messageData["message"].replaceAll("'" , "\\'");
+
+    var url = Uri.parse(databaseUrl + "database/chatGroups/newMessage.php");
+    await http.post(url, body: json.encode({
+      "chatId": chatID,
+      "date": date,
+      "message": messageData["message"],
+      "von": messageData["von"],
+      "responseId": messageData["responseId"],
+      "forward": messageData["forward"],
+      "language": messageData["language"]
+    }));
+
+    if(isBlocked) return;
+
+    _addNotificationCounterAndSendNotification(messageData, chatgroupData, chatGroupName);
+  }
+
+  _addNotificationCounterAndSendNotification(message, chatData, chatGroupName) async{
+    var allUser = chatData["users"];
+    var test = "users = JSON_SET(users";
+
+    allUser.forEach((userId, data){
+      var isActive = data["isActive"] ?? false;
+      if(!isActive){
+        chatData["users"][userId]["newMessages"] += 1;
+        test += ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
+        prepareChatNotification(
+            chatId: chatData["id"],
+            vonId: message["von"],
+            toId: userId,
+            inhalt: message["message"],
+            chatGroup: chatGroupName
+        );
+
+      }
+    });
+
+    test += ")";
+
+    ChatGroupsDatabase().updateChatGroup(
+        test,
+        "WHERE id = '${chatData["id"]}'"
+    );
+
+  }
+
+  deleteChat(chatId){
+    _deleteInTable("chat_groups", "id", chatId);
+
+    var chatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
+    chatGroups.removeWhere((chatGroup) => chatGroup["id"] == chatId);
+
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.removeWhere((chatGroup) => chatGroup["id"] == chatId);
+  }
+
+  deleteMessages(messageId){
+    _deleteInTable("group_messages", "id", messageId);
+  }
+
+  deleteAllMessages(chatId){
+    _deleteInTable("group_messages", "chatId", chatId);
+  }
+
+  joinAndCreateCityChat(cityName) async{
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    var city = getCityFromHive(cityName: cityName);
+    var cityId = city["id"];
+    var chatGroupData = getChatGroupFromHive("</stadt=$cityId");
+
+    if(chatGroupData == null){
+      chatGroupData = await ChatGroupsDatabase().getChatData(
+          "*", "WHERE connected = '</stadt=$cityId'");
+      if(chatGroupData == false){
+        chatGroupData = await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$cityId");
+      }
+    }
+
+    var newUserInformation = {"newMessages": 0};
+    chatGroupData["users"][userId] = newUserInformation;
+
+    await ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_MERGE_PATCH(users, '${json.encode({userId : newUserInformation})}')",
+        "WHERE id = ${chatGroupData["id"]}"
+    );
+
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.add(chatGroupData);
+  }
+
+  leaveChat(connectedId){
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    myGroupChats.removeWhere((chat) => chat["connected"].split("=")[1] == connectedId.toString());
+
+    ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_REMOVE(users, '\$.$userId')",
+        "WHERE connected LIKE '%$connectedId%'");
+
+  }
+
+
+}
+
 class EventDatabase{
 
   addNewEvent(eventData) async {
     var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
     await http.post(url, body: json.encode(eventData));
+
+    eventData["freischalten"] = [];
+    eventData["eventInterval"] = eventData["interval"];
+    eventData["bis"] = eventData["bis"] == "null" ? null : eventData["bis"];
+    eventData["absage"] = [];
+    eventData["zusage"] = [];
+    eventData["freigegeben"] = [];
+    eventData["sprache"] = jsonDecode(eventData["sprache"]);
+    eventData["interesse"] = jsonDecode(eventData["interesse"]);
+    eventData["tags"] = [];
+
+    var myOwnEvents = Hive.box('secureBox').get("myEvents") ?? [];
+    myOwnEvents.add(eventData);
+    var events = Hive.box('secureBox').get("events") ?? [];
+    events.add(eventData);
   }
 
   update(whatData, queryEnd) async  {
@@ -437,6 +674,9 @@ class EventDatabase{
 
   delete(eventId){
     _deleteInTable("events", "id", eventId);
+
+    List myEvents = Hive.box('secureBox').get("myEvents") ?? [];
+    myEvents.removeWhere((event) => event["id"] == eventId);
   }
 
 }
@@ -445,6 +685,14 @@ class CommunityDatabase{
   addNewCommunity(communityData) async {
     var url = Uri.parse(databaseUrl + "database/communities/newCommunity.php");
     await http.post(url, body: json.encode(communityData));
+
+    communityData["bild"] = "assets/bilder/village.jpg";
+    communityData["interesse"] = [];
+    communityData["members"] = [];
+    communityData["einladung"] = [];
+
+    var allCommunities = Hive.box('secureBox').get("communities") ?? [];
+    allCommunities.add(communityData);
   }
 
   update(whatData, queryEnd) async  {
@@ -532,9 +780,21 @@ class StadtinfoDatabase{
     if(! await _checkIfNew(city)) return false;
 
     var url = Uri.parse(databaseUrl + "database/stadtinfo/newCity.php");
-    await http.post(url, body: json.encode(city));
+    var cityId = await http.post(url, body: json.encode(city));
+    var newCityInfo = {
+      "id": cityId.body,
+      "ort": city["ort"],
+      "land": city["land"],
+      "latt": city["latt"],
+      "longt": city["longt"],
+      "isCity": 1,
+      "familien": []
+    };
 
-    return true;
+    var stadtInfos = Hive.box('secureBox').get("stadtinfo");
+    stadtInfos.add(newCityInfo);
+
+    return newCityInfo;
   }
 
   getData(whatData, queryEnd, {returnList = false}) async {
@@ -617,7 +877,6 @@ class StadtinfoUserDatabase{
 
   addNewInformation(stadtinformation) async {
     var userId = FirebaseAuth.instance.currentUser.uid;
-
     var url = Uri.parse(databaseUrl + "database/stadtinfoUser/newInformation.php");
     stadtinformation["erstelltVon"] = userId;
 
@@ -823,11 +1082,35 @@ class FamiliesDatabase{
 
 class NewsPageDatabase{
   addNewNews(news) async{
+    var alreadyAvailable = await _checkIfInDatabase(news);
+    if(alreadyAvailable) return;
+
     var url = Uri.parse(databaseUrl + "database/newsPage/newNews.php");
     news["erstelltAm"] = DateTime.now().toString();
     news["erstelltVon"] = FirebaseAuth.instance.currentUser.uid;
 
     await http.post(url, body: json.encode(news));
+  }
+
+  _checkIfInDatabase(newNews) async{
+    var userId = FirebaseAuth.instance.currentUser.uid;
+    var allMyNews = await getData("*", "WHERE erstelltVon = '$userId'");
+    if(allMyNews == false) allMyNews = [];
+
+    //innerhalb des selben Tages oder selben zwei Tagen??
+    for(var news in allMyNews){
+
+      var dateDifference = DateTime.now()
+          .difference(DateTime.parse(news["erstelltAm"])).inDays;
+      news.removeWhere((key, value) => key == "id"|| key =="erstelltAm" || key == "erstelltVon");
+      var checkNewNews = Map<String,dynamic>.of(newNews);
+      checkNewNews["information"] = json.decode(checkNewNews["information"]);
+      var equality = foundation.mapEquals(news["information"], checkNewNews["information"]);
+
+      if(equality && dateDifference < 2) return true;
+    }
+
+    return false;
   }
 
   update(whatData, queryEnd) async  {
@@ -1063,9 +1346,28 @@ getProfilFromHive({profilId, profilName, getNameOnly = false, getIdOnly = false}
 
 getChatFromHive(chatId){
   var myChats = Hive.box('secureBox').get("myChats");
+  var myChatGroups = Hive.box('secureBox').get("myGroupChats");
 
   for(var myChat in myChats){
     if(myChat["id"] == chatId) return myChat;
+  }
+
+  for(var myChatGroup in myChatGroups){
+    if(myChatGroup["id"] == chatId) return myChatGroup;
+  }
+}
+
+getChatGroupFromHive(connectedId){
+  var chatGroups = Hive.box('secureBox').get("chatGroups");
+
+  if(connectedId.isEmpty){
+    var worldChat = chatGroups.singleWhere((chatGroup) => chatGroup["id"] == 1);
+    return worldChat;
+  }
+
+  for(var chatGroup in chatGroups){
+    if(chatGroup["connected"].isEmpty) continue;
+    if(chatGroup["connected"].split("=")[1] == connectedId) return chatGroup;
   }
 }
 
@@ -1075,12 +1377,73 @@ getEventFromHive(eventId){
   for(var event in events){
     if(event["id"] == eventId) return event;
   }
+
+  return {};
+}
+
+getCommunityFromHive(communityId){
+  var communities = Hive.box('secureBox').get("communities");
+
+  for(var community in communities){
+    if(community["id"] == communityId) return community;
+  }
+
+  return {};
+}
+
+getCityFromHive({cityId, cityName, getName= false}){
+  var stadtInfos = Hive.box('secureBox').get("stadtinfo");
+  cityName ??= "XXXXXX";
+
+  for(var stadtInfo in stadtInfos){
+    if(stadtInfo["id"].toString() == cityId || stadtInfo["ort"].contains(cityName)){
+      if(getName){
+        return stadtInfo["ort"];
+      }
+
+      return stadtInfo;
+    }
+  }
+}
+
+getCityUserInfoFromHive(cityName){
+  var stadtUserInfos = Hive.box('secureBox').get("stadtinfoUser");
+  var infos = [];
+
+  for(var info in stadtUserInfos){
+    if(cityName.contains(info["ort"])) infos.add(info);
+  }
+
+  return infos;
+}
+
+updateHiveOwnProfil(changeTyp, changeData){
+  var ownProfil = Hive.box("secureBox").get("ownProfil");
+  ownProfil[changeTyp] = changeData;
+}
+
+updateHiveCommunity(id, changeTyp, changeData){
+  var community = getCommunityFromHive(id);
+  community[changeTyp] = changeData;
+}
+
+updateHiveEvent(id, changeTyp, changeData){
+  var event = getEventFromHive(id);
+  event[changeTyp] = changeData;
+}
+
+
+refreshHiveAllgemein() async {
+  var dbAllgemein = await AllgemeinDatabase().getData("*", "WHERE id ='1'");
+  if (dbAllgemein == false) dbAllgemein = [];
+
+  Hive.box('secureBox').put("allgemein", dbAllgemein);
+
+  return dbAllgemein;
 }
 
 refreshHiveChats() async {
   String userId = FirebaseAuth.instance.currentUser?.uid;
-
-  if (userId == null) return;
 
   var myChatData = await ChatDatabase().getChatData(
       "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
@@ -1088,6 +1451,24 @@ refreshHiveChats() async {
   if(myChatData == false) myChatData = [];
 
   Hive.box("secureBox").put("myChats", myChatData);
+
+  var chatGroups = await ChatGroupsDatabase().getChatData(
+      "*", "ORDER BY lastMessageDate DESC",
+      returnList: true);
+  if(chatGroups == false) chatGroups = [];
+
+  Hive.box("secureBox").put("chatGroups", chatGroups);
+
+  var myGroupChats = [];
+
+  if (userId == null) return;
+
+  for(var chat in chatGroups){
+    if(chat["users"].keys.contains(userId)) myGroupChats.add(chat);
+  }
+
+  Hive.box("secureBox").put("myGroupChats", myGroupChats);
+
 }
 
 refreshHiveEvents() async{

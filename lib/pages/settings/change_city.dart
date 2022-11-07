@@ -11,8 +11,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class ChangeCityPage extends StatefulWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-
   ChangeCityPage({Key key}) : super(key: key);
 
   @override
@@ -20,6 +18,7 @@ class ChangeCityPage extends StatefulWidget {
 }
 
 class _ChangeCityPageState extends State<ChangeCityPage> {
+  var userId = FirebaseAuth.instance.currentUser.uid;
   var ortChangeKontroller = TextEditingController();
   var suggestedCities = [];
   List<Widget> suggestedCitiesList = [];
@@ -34,12 +33,13 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   }
 
   pushLocationDataToDB(locationDict) async {
-    await ProfilDatabase().updateProfilLocation(widget.userId, locationDict);
+    await ProfilDatabase().updateProfilLocation(userId, locationDict);
     await StadtinfoDatabase().addNewCity(locationDict);
     await StadtinfoDatabase().update(
-        "familien = JSON_ARRAY_APPEND(familien, '\$', '${widget.userId}')",
-        "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"${widget.userId}\"') < 1"
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
+        "WHERE ort LIKE '%${locationDict["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
     );
+
 
     NewsPageDatabase().addNewNews({
       "typ": "ortswechsel",
@@ -54,7 +54,6 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     });
 
     var locationData = autoComplete.getGoogleLocationData();
-
 
     if(locationData["city"] == null) {
       setState(() {
@@ -72,7 +71,8 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       "countryname": locationData["countryname"],
     };
 
-    pushLocationDataToDB(locationDict);
+    databaseOperations(locationDict);
+
 
     var ownProfil = Hive.box("secureBox").get("ownProfil");
     ownProfil["ort"] = locationDict["city"];
@@ -84,6 +84,17 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     AppLocalizations.of(context).aktuelleOrt +" "+
             AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
     Navigator.pop(context);
+  }
+
+  databaseOperations(locationDict) async{
+    var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
+    var leaveCity = getCityFromHive(cityName: oldLocation);
+    var chatConnectId;
+    if(leaveCity != null ) chatConnectId = leaveCity["id"];
+
+    ChatGroupsDatabase().leaveChat(chatConnectId);
+    await pushLocationDataToDB(locationDict);
+    ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
   }
 
 

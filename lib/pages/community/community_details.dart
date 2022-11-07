@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -316,7 +317,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _changeNameWindow() {
-    var newNameKontroller = TextEditingController();
+    var newNameKontroller = TextEditingController(text: widget.community["name"]);
 
     showDialog(
         context: context,
@@ -339,11 +340,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       return;
     }
 
+    updateHiveCommunity(widget.community["id"], "name", newName);
+
     setState(() {
       widget.community["name"] = newName;
     });
-
-    Navigator.pop(context);
 
     CommunityDatabase()
         .update("name = '$newName'", "WHERE id = '${widget.community["id"]}'");
@@ -377,12 +378,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     setState(() {
       widget.community["ort"] = newLocationData["city"];
-      widget.community["land"] = newLocationData["land"];
+      widget.community["land"] = newLocationData["countryname"];
       widget.community["latt"] = newLocationData["latt"];
       widget.community["longt"] = newLocationData["longt"];
     });
 
-    Navigator.pop(context);
+    updateHiveCommunity(widget.community["id"], "ort", newLocationData["city"]);
+    updateHiveCommunity(widget.community["id"], "land", newLocationData["countryname"]);
+    updateHiveCommunity(widget.community["id"], "latt", newLocationData["latt"]);
+    updateHiveCommunity(widget.community["id"], "longt", newLocationData["longt"]);
 
     CommunityDatabase().updateLocation(widget.community["id"], newLocationData);
   }
@@ -416,7 +420,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _changeLinkWindow() {
-    var newLinkKontroller = TextEditingController();
+    var newLinkKontroller = TextEditingController(text: widget.community["link"]);
 
     showDialog(
         context: context,
@@ -448,7 +452,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["link"] = newLink;
     });
 
-    Navigator.pop(context);
+    updateHiveCommunity(widget.community["id"], "link", newLink);
 
     CommunityDatabase()
         .update("link = '$newLink'", "WHERE id = '${widget.community["id"]}'");
@@ -463,13 +467,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             title: AppLocalizations.of(context).beschreibungAendern,
+            height: 400,
             children: [
               customTextInput(
                   AppLocalizations.of(context).neueBeschreibungEingeben,
                   newBeschreibungKontroller,
-                  moreLines: 5,
+                  moreLines: 13,
                   textInputAction: TextInputAction.newline),
-              const SizedBox(height: 15),
               _windowOptions(
                   () => _saveChangeBeschreibung(newBeschreibungKontroller.text))
             ],
@@ -487,8 +491,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     setState(() {
       widget.community["beschreibung"] = newBeschreibung;
     });
-
-    Navigator.pop(context);
 
     CommunityDatabase().update("beschreibung = '$newBeschreibung'",
         "WHERE id = '${widget.community["id"]}'");
@@ -582,6 +584,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     setState(() {
       widget.community["einladung"].add(newMemberId);
     });
+
+    updateHiveCommunity(widget.community["id"], "einladung", widget.community["einladung"]);
 
     CommunityDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",
@@ -705,9 +709,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   onPressed: () async {
 
                     var communities = Hive.box('secureBox').get("communities");
-                    communities.remove(widget.community);
+                    communities.removeWhere((community) => community["id"] == widget.community["id"]);
 
                     await CommunityDatabase().delete(widget.community["id"]);
+                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(widget.community["id"]));
 
                     DbDeleteImage(widget.community["bild"]);
 
@@ -920,7 +925,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
             child: TextWithHyperlinkDetection(
-                text: widget.community["beschreibung"]
+                text: widget.community["beschreibung"],
+              onTextTab: () => isCreator ? _changeBeschreibungWindow(): null,
             )
 
           ),
@@ -971,6 +977,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           appBar: CustomAppBar(
             title: widget.community["name"],
             buttons: [
+              IconButton(
+                icon: const Icon(Icons.chat),
+                onPressed: () => global_func.changePage(context, ChatDetailsPage(
+                  connectedId: "</community="+widget.community["id"],
+                  isChatgroup: true,
+                )),
+              ),
               IconButton(
                 icon: const Icon(Icons.link),
                 onPressed: () => _linkTeilenWindow(),

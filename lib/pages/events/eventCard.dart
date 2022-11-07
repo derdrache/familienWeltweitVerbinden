@@ -5,8 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../../global/variablen.dart' as global_var;
+import '../../global/global_functions.dart' as global_func;
 import 'event_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
@@ -98,7 +100,7 @@ class _EventCardState extends State<EventCard> {
         widget.event["wann"].split(" ")[0].split("-").reversed.join(".");
     var datetimeWann = DateTime.parse(widget.event["wann"]);
 
-    if(widget.event["bis"] == null) return datetimeText;
+    if(widget.event["bis"] == null || widget.event["bis"] =="null") return datetimeText;
     var datetimeBis = DateTime.parse(widget.event["bis"]);
 
     if (DateTime.now().compareTo(datetimeWann) > 0 && datetimeBis.year.toString() == "0000") {
@@ -114,7 +116,9 @@ class _EventCardState extends State<EventCard> {
   }
 
   createOnlineEventTime() {
-    var eventZeitzone = widget.event["zeitzone"];
+    var eventZeitzone = widget.event["zeitzone"] is String
+        ? int.parse(widget.event["zeitzone"])
+        : widget.event["zeitzone"];
     var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
     var eventBeginn = widget.event["wann"];
 
@@ -185,13 +189,10 @@ class _EventCardState extends State<EventCard> {
       onLongPressStart: widget.isCreator || forTeilnahmeFreigegeben
           ? (tapdownDetails) => cardMenu(tapdownDetails.globalPosition)
           : null,
-      onTap: () {
-        Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => EventDetailsPage(event: widget.event)))
-            .whenComplete(() => widget.afterPageVisit());
-      },
+        onTap: () => global_func.changePage(
+            context,
+            EventDetailsPage(event: widget.event),
+            whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
           height: screenHeight / 3.2 * bigMultiplikator,
@@ -337,21 +338,38 @@ class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
 
   setInteresse() async {
-    widget.hasIntereset = widget.hasIntereset ? false : true;
-
-    setState(() {});
-
-    var interesseList =
-        await EventDatabase().getData("interesse", "WHERE id = '${widget.id}'");
+    var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
+    var eventData = getEventFromHive(widget.id);
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    widget.hasIntereset = !widget.hasIntereset;
 
     if (widget.hasIntereset) {
-      interesseList.add(userId);
+      eventData["interesse"].add(userId);
+      myInterestedEvents.add(eventData);
+      EventDatabase().update(
+          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
+          "WHERE id ='${widget.id}'");
+
+      myGroupChats.add(getChatGroupFromHive(widget.id));
+      ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+          "WHERE connected LIKE '%${widget.id}%'");
     } else {
-      interesseList.remove(userId);
+      eventData["interesse"].remove(userId);
+      myInterestedEvents.removeWhere((event) => event["id"] == widget.id);
+      EventDatabase().update(
+          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+          "WHERE id ='${widget.id}'");
+
+      myGroupChats.removeWhere((chatGroup){
+        chatGroup["connected"].contains(widget.id);
+      });
+      ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_REMOVE(users, '\$.$userId')",
+          "WHERE connected LIKE '%${widget.id}%'");
     }
 
-    EventDatabase().update("interesse = '${json.encode(interesseList)}'",
-        "WHERE id ='${widget.id}'");
+    setState(() {   });
   }
 
   @override

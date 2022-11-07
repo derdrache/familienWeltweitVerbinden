@@ -52,6 +52,9 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     if (!checkValidationAndSendError(communityData)) return false;
 
     await CommunityDatabase().addNewCommunity(communityData);
+    ChatGroupsDatabase().addNewChatGroup(
+        userId, "</community=$communityId"
+    );
 
     return true;
   }
