@@ -199,7 +199,7 @@ class MyApp extends StatelessWidget {
                   scaffoldBackgroundColor: Colors.white,
                   colorScheme: ColorScheme.fromSwatch().copyWith(
                     primary: const Color(0xFFBF1D53),
-                    secondary: const Color(0xAA3CB28F),
+                    secondary: const Color(0xFF3CB28F),
                   ),
                   iconTheme: const IconThemeData(color: Color(0xAA3CB28F))),
               localizationsDelegates: AppLocalizations.localizationsDelegates,

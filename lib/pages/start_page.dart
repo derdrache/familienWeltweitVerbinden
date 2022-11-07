@@ -226,8 +226,9 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   }
 
   checkForceUpdate() async {
-    var dbAllgemeinData = Hive.box('secureBox').get("allgemein");
-    var importantUpdateNumber = dbAllgemeinData["importantUpdate"];
+
+    var importantUpdateNumber =
+    await AllgemeinDatabase().getData("importantUpdate", "");
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var buildNumber = int.parse(packageInfo.buildNumber);
