@@ -408,6 +408,8 @@
     "newsLocationBegruessung": "Welcome in ",
     "erfahrungenTeilen": "Share with other families your experience about the place",
     "erfahrungenAnschauenUndTeilen": "Have a Look at the experiences of other families and complement them with your own experiences",
-    "bildLadezeit": "Loading the image can take a little time"
+    "bildLadezeit": "Loading the image can take a little time",
+    "nachrichtLoeschen": "delete message ?",
+    "nachrichtWirklichLoeschen": "Do you really want to delete this message ?"
 }
 
