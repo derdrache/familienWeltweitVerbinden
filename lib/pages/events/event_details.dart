@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 import '../../global/global_functions.dart';
 import '../../global/variablen.dart' as global_var;
 
@@ -285,7 +286,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () {
+                    var events = Hive.box('secureBox').get("events");
+                    events.removeWhere((event) => event["id"] == widget.event["id"]);
+
                     EventDatabase().delete(widget.event["id"]);
+
+                    var chatGroupId = getChatGroupFromHive(widget.event["id"])["id"];
+                    ChatGroupsDatabase().deleteChat(chatGroupId);
+
                     DbDeleteImage(widget.event["bild"]);
                     global_func.changePageForever(
                         context, StartPage(selectedIndex: 2));
@@ -790,12 +798,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             icon: const Icon(Icons.link),
             onPressed: () => linkTeilenWindow(),
           ),
-          if (!isCreator)
-            IconButton(
+          IconButton(
               icon: const Icon(Icons.message),
-              onPressed: () => global_func.changePage(context,
-                  ChatDetailsPage(chatPartnerId: widget.event["erstelltVon"])),
-            ),
+              onPressed: () => global_func.changePage(
+                    context,
+                    ChatDetailsPage(
+                      connectedId: "</event=" + widget.event["id"],
+                      isChatgroup: true,
+                    ),
+                  )),
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () => moreMenu(),

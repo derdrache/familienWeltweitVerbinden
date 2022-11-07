@@ -37,6 +37,7 @@ class ChangeInteressenPage extends StatelessWidget {
             await ProfilDatabase().updateProfil(
                 "interessen = '${jsonEncode(interessenInputBox.getSelected())}'",
                 "WHERE id = '$userId'");
+            updateHiveOwnProfil("interessen", interessenInputBox.getSelected());
 
             customSnackbar(
                 context,

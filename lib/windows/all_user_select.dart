@@ -19,15 +19,15 @@ class AllUserSelectWindow {
 
   AllUserSelectWindow({this.context, this.title});
 
-  setAllUserData(){
-      var allProfilData = Hive.box("secureBox").get("profils");
+  setAllUserData() {
+    var allProfilData = Hive.box("secureBox").get("profils");
 
-      for (var profil in allProfilData) {
-        if(ownProfil["geblocktVon"].contains(profil["id"])) continue;
+    for (var profil in allProfilData) {
+      if (ownProfil["geblocktVon"].contains(profil["id"])) continue;
 
-        allUserNames.add(profil["name"]);
-        allUserIds.add(profil["id"]);
-      }
+      allUserNames.add(profil["name"]);
+      allUserIds.add(profil["id"]);
+    }
   }
 
   setSearchAutocomplete(){
