@@ -1095,6 +1095,7 @@ class NewsPageDatabase{
   _checkIfInDatabase(newNews) async{
     var userId = FirebaseAuth.instance.currentUser.uid;
     var allMyNews = await getData("*", "WHERE erstelltVon = '$userId'");
+    if(allMyNews == false) allMyNews = [];
 
     //innerhalb des selben Tages oder selben zwei Tagen??
     for(var news in allMyNews){
