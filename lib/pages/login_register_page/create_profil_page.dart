@@ -138,6 +138,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             await ProfilDatabase().getData("*", "WHERE id = '$userID'");
         Hive.box('secureBox').put("ownProfil", ownProfil);
 
+        var allProfils = Hive.box('secureBox').get("profils");
+        allProfils.add(ownProfil);
+
         global_functions.changePageForever(context, StartPage());
       } catch (_) {
         customSnackbar(
@@ -167,6 +170,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     ChatGroupsDatabase().updateChatGroup(
         "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
         "WHERE id = '1'");
+    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.add(getChatGroupFromHive(""));
 
     NewsPageDatabase().addNewNews({
       "typ": "ortswechsel",
