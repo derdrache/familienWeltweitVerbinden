@@ -297,11 +297,17 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     }
 
     chatIcon() {
-      var ownProfil = Hive.box('secureBox').get("ownProfil");
+      var newMessageCount = 0;
+      List myChats = Hive.box("secureBox").get("myChats") ?? [];
+      List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+
+      for(var chat in myChats + myGroupChats){
+        newMessageCount += chat["users"][userId]["newMessages"];
+      }
 
       return BadgeIcon(
           icon: Icons.chat,
-          text: ownProfil["newMessages"] > 0 ? ownProfil["newMessages"].toString() : "");
+          text: newMessageCount > 0 ? newMessageCount.toString() : "");
     }
 
     Future<bool> showAddHomePageDialog(BuildContext context) async {

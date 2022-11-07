@@ -171,11 +171,9 @@ class MyApp extends StatelessWidget {
 
   _changeToProfil(profilId) async {
     var profilData = getProfilFromHive(profilId: profilId);
-    var ownName = FirebaseAuth.instance.currentUser.displayName;
 
     navigatorKey.currentState?.push(MaterialPageRoute(
         builder: (_) => ShowProfilPage(
-              userName: ownName,
               profil: profilData,
             )));
   }
