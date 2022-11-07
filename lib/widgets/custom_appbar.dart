@@ -10,6 +10,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   var leading;
   var profilBildProfil;
   var withLeading;
+  var backgroundColor;
 
   CustomAppBar(
       {Key key,
@@ -19,7 +20,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.withLeading = true,
       this.onTap,
       this.leading,
-      this.profilBildProfil})
+      this.profilBildProfil,
+      this.backgroundColor
+      })
       : super(key: key);
 
   @override
@@ -33,38 +36,66 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 0,
       leading: leading == null
           ? null
-          : leading.runtimeType == IconButton ? leading : Builder(
-        builder: (BuildContext context) {
-          return IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              changePage(context, leading);
-            },
-            tooltip:
-            MaterialLocalizations.of(context).openAppDrawerTooltip,
-          );
-        },
-      ),
-      title: title.runtimeType == String ? SizedBox(
-        height: 50,
-        child: Row(children: [
-          if (profilBildProfil != null)
-            Padding(
-                padding: const EdgeInsets.only(top: 3, right: 10),
-                child: ProfilImage(
-                  profilBildProfil,
-                  fullScreenWindow: true,
-                )),
-          Expanded(
-            child: GestureDetector(
+          : leading.runtimeType == IconButton
+              ? leading
+              : Builder(
+                  builder: (BuildContext context) {
+                    return IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        changePage(context, leading);
+                      },
+                      tooltip: MaterialLocalizations.of(context)
+                          .openAppDrawerTooltip,
+                    );
+                  },
+                ),
+      title: title.runtimeType == String
+          ? SizedBox(
+              height: 50,
+              child: Row(children: [
+                if (profilBildProfil != null)
+                  Padding(
+                      padding: const EdgeInsets.only(top: 3, right: 5),
+                      child: SizedBox(
+                        height: 50,
+                        width: 60,
+                        child: ProfilImage(
+                          profilBildProfil,
+                          fullScreenWindow: true,
+                        ),
+                      )),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: onTap,
+                    child: Text(title,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 20)),
+                  ),
+                )
+              ]),
+            )
+          : GestureDetector(
               onTap: onTap,
-              child: Text(title,
-                  style: const TextStyle(color: Colors.white, fontSize: 20)),
-            ),
-          )
-        ]),
-      ) : title,
-      backgroundColor: Theme.of(context).colorScheme.primary,
+              child: profilBildProfil == null
+                  ? title
+                  : Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 3, right: 5),
+                          child: SizedBox(
+                            height: 50,
+                            width: 60,
+                            child: ProfilImage(
+                              profilBildProfil,
+                              fullScreenWindow: true,
+                            ),
+                          ),
+                        ),
+                        title
+                      ],
+                    )),
+      backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.primary,
       elevation: elevation,
       iconTheme: const IconThemeData(color: Colors.white),
       actions: buttons,

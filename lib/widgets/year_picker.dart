@@ -298,7 +298,6 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
     else
       callback = () => null;
 
-
     return TextButton(
       onPressed: callback,
       style: TextButton.styleFrom(
@@ -307,8 +306,8 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
       child: Text(
         DateFormat.y(locale).format(DateTime(year)),
         style: TextStyle(color: year == selectedDate.year
-            ? theme.accentTextTheme.button.color
-            : year == DateTime.now().year ? theme.accentColor : null),
+            ? theme.colorScheme.secondary
+            : null)
       ),
     );
   }

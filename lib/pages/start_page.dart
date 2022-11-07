@@ -69,6 +69,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   }
 
   _asyncMethod() async {
+    await refreshHiveAllgemein(); // muss nicht jedesmal gemacht werden!
     if (!kIsWeb){
       var newUpdate = await checkForceUpdate();
       if(newUpdate) return;
@@ -126,10 +127,22 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
       _setAutomaticLoaction(automaticLocation);
     }
 
+    await oldUserAutomaticJoinWorldAndCityChat(ownProfil["ort"]);
+
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
 
+  }
 
+  oldUserAutomaticJoinWorldAndCityChat(ort) async{
+    var lastLogin = await ProfilDatabase().getData("lastLogin", "WHERE id = '$userId'");
+
+    if(DateTime.parse(lastLogin).isBefore(DateTime.parse("2022-10-24"))) {
+      await ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+          "WHERE id = '1'");
+      await ChatGroupsDatabase().joinAndCreateCityChat(ort);
+    }
   }
 
   checkProfilExist() async {
@@ -159,6 +172,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
             .difference(DateTime.parse(ownProfil["lastLogin"]))
             .inDays >
         0) {
+
       var newLocation = "";
       var currentPosition = await LocationService().getCurrentUserLocation();
 
@@ -181,11 +195,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
         ProfilDatabase().updateProfilLocation(userId, locationData);
 
-        NewsPageDatabase().addNewNews({
-          "typ": "ortswechsel",
-          "information": json.encode(locationData),
-        });
-
         return;
       } else if (automaticLocationStatus == standortbestimmung[2] ||
           automaticLocationStatus == standortbestimmungEnglisch[2]) {
@@ -201,23 +210,26 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
       var locationData = await LocationService()
           .getDatabaseLocationdataFromGoogleResult(geoData);
+      var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
+      var leaveChatId = getCityFromHive(cityName: oldLocation)["id"];
+      ChatGroupsDatabase().leaveChat(leaveChatId);
 
       ProfilDatabase().updateProfilLocation(userId, locationData);
       await StadtinfoDatabase().addNewCity(locationData);
+
+      ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
       StadtinfoDatabase().update(
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
           "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
       );
-      NewsPageDatabase().addNewNews({
-        "typ": "ortswechsel",
-        "information": json.encode(locationData),
-      });
     }
   }
 
   checkForceUpdate() async {
+
     var importantUpdateNumber =
     await AllgemeinDatabase().getData("importantUpdate", "");
+
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var buildNumber = int.parse(packageInfo.buildNumber);
 
@@ -286,11 +298,17 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     }
 
     chatIcon() {
-      var ownProfil = Hive.box('secureBox').get("ownProfil");
+      var newMessageCount = 0;
+      List myChats = Hive.box("secureBox").get("myChats") ?? [];
+      List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+
+      for(var chat in myChats + myGroupChats){
+        newMessageCount += chat["users"][userId]["newMessages"];
+      }
 
       return BadgeIcon(
           icon: Icons.chat,
-          text: ownProfil["newMessages"] > 0 ? ownProfil["newMessages"].toString() : "");
+          text: newMessageCount > 0 ? newMessageCount.toString() : "");
     }
 
     Future<bool> showAddHomePageDialog(BuildContext context) async {

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -28,14 +29,21 @@ class _ChatPageState extends State<ChatPage> {
   var searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
+  List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   List allName, userFriendlist;
   bool changeBarOn = false;
   var selectedChats = [];
-  var firstSelectedIsPinned = false;
-  var firstSelectedIsMute = false;
-  var bothDelete = false;
-  var isLoaded = false;
+  bool firstSelectedIsPinned = false;
+  bool firstSelectedIsMute = false;
+  bool bothDelete = false;
+  bool isLoaded = false;
+  var mainSlider = 0;
+  bool activeChatSearch = false;
+  var seachSearchInputNode = FocusNode();
+  var searchTextKontroller = TextEditingController();
+  var searchListMyGroups = [];
+  var searchListAllChatgroups = [];
 
   @override
   void initState() {
@@ -93,14 +101,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   refreshChatDataFromDb() async {
-    var newDbData = await ChatDatabase().getChatData(
-        "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",
-        returnList: true);
-    if (newDbData == false) newDbData = [];
-
-    Hive.box("secureBox").put("myChats", newDbData);
-    myChats = newDbData;
-
+    await refreshHiveChats();
     setState(() {
       isLoaded = true;
     });
@@ -387,8 +388,42 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  getSelectedChatData() {
+    if (mainSlider == 0) {
+      var bothChats = myChats + myGroupChats;
+
+      bothChats.sort(
+          (a, b) => (b['lastMessageDate']).compareTo(a['lastMessageDate']));
+
+      return bothChats;
+    } else if (mainSlider == 1) {
+      return myChats;
+    } else if (mainSlider == 2) {
+      return myGroupChats;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    myChats = Hive.box("secureBox").get("myChats") ?? [];
+    myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+
+    getChatGroupName(chatConnected, {withPrivateEvents}) {
+      if (chatConnected.isEmpty) return AppLocalizations.of(context).weltChat;
+
+      var connectedId = chatConnected.split("=")[1];
+      if (chatConnected.contains("event")) {
+        var eventData = getEventFromHive(connectedId);
+        var isPrivate = ["privat", "private"].contains(eventData["art"]);
+        return isPrivate ? "" : eventData["name"];
+      }
+      if (chatConnected.contains("community")) {
+        return getCommunityFromHive(connectedId)["name"];
+      }
+      if (chatConnected.contains("stadt")) {
+        return getCityFromHive(cityId: connectedId, getName: true);
+      }
+    }
 
     newMessageAndPinnedBox(newMessages, isPinned) {
       if (newMessages == 0 && !isPinned) return const SizedBox(height: 30);
@@ -414,47 +449,79 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
 
-    createChatGroupContainers(groupdata) {
+    createChatGroupContainers(spezialData) {
       List<Widget> chatGroupContainers = [];
 
-      for (dynamic group in groupdata) {
-        String chatPartnerName = "";
+      var chatData = spezialData ?? getSelectedChatData();
+
+      for (dynamic group in chatData) {
+        String chatName = "";
         Map chatPartnerProfil;
         String chatPartnerId;
+
         var users = group["users"];
+        var isNotChatGroup = group["connected"] == null;
+        var chatData;
 
-        users.forEach((key, value) async {
-          if (key != userId) {
-            chatPartnerId = key;
-          }
-        });
-
-        for (var profil in dbProfilData) {
-          if (profil["id"] == chatPartnerId) {
-            chatPartnerName = profil["name"];
-            chatPartnerProfil = profil;
-            break;
-          }
+        if (group["lastMessage"] is int) {
+          group["lastMessage"] = group["lastMessage"].toString();
         }
 
-        if (chatPartnerName.isEmpty) {
-          chatPartnerName = AppLocalizations.of(context).geloeschterUser;
-        }
+        if (isNotChatGroup) {
+          users.forEach((key, value) async {
+            if (key != userId) {
+              chatPartnerId = key;
+            }
+          });
 
-        if (chatPartnerProfil == null) continue;
+          for (var profil in dbProfilData) {
+            if (profil["id"] == chatPartnerId) {
+              chatName = profil["name"];
+              chatPartnerProfil = profil;
+              break;
+            }
+          }
 
-        var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
-        if (group["lastMessage"].isEmpty ||
-            group["users"][userId] == null ||
-            isBlocked) {
-          continue;
+          if (chatName.isEmpty) {
+            chatName = AppLocalizations.of(context).geloeschterUser;
+          }
+
+          if (chatPartnerProfil == null || users[userId] == null) continue;
+
+          var isBlocked = chatPartnerProfil["geblocktVon"].contains(userId);
+          if (group["lastMessage"].isEmpty ||
+              group["users"][userId] == null ||
+              isBlocked) {
+            continue;
+          }
+        } else if (group["connected"].isNotEmpty) {
+          var connectedId = group["connected"].split("=")[1];
+
+          if (group["connected"].contains("event")) {
+            chatData = getEventFromHive(connectedId);
+            chatName = chatData["name"];
+          } else if (group["connected"].contains("community")) {
+            chatData = getCommunityFromHive(connectedId);
+            chatName = chatData["name"];
+          } else if (group["connected"].contains("stadt")) {
+            chatName = getCityFromHive(cityId: connectedId, getName: true);
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
+            };
+          } else if (group["connected"].contains("world")) {
+            chatName = AppLocalizations.of(context).weltChat;
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
+            };
+          }
         }
 
         var lastMessage = cutMessage(group["lastMessage"]);
-        var ownChatNewMessages = users[userId]["newMessages"];
+        var ownChatNewMessages =
+            users[userId] != null ? users[userId]["newMessages"] : 0;
 
-        var isPinned = users[userId]["pinned"] == "true" ||
-            users[userId]["pinned"] == true;
+        var isPinned =
+            users[userId] != null ? users[userId]["pinned"] ?? false : false;
         var lastMessageTime =
             DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
         var sortIndex = chatGroupContainers.length;
@@ -462,6 +529,8 @@ class _ChatPageState extends State<ChatPage> {
         if (isPinned) sortIndex = 0;
         if (lastMessage == "<weiterleitung>") {
           lastMessage = AppLocalizations.of(context).weitergeleitet;
+        } else if (lastMessage == "</neuer Chat") {
+          lastMessage = AppLocalizations.of(context).neuerChat;
         }
 
         chatGroupContainers.insert(
@@ -488,18 +557,24 @@ class _ChatPageState extends State<ChatPage> {
                   });
                 } else {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => ChatDetailsPage(
-                                chatPartnerName: chatPartnerName,
-                                groupChatData: group,
-                              ))).whenComplete(() => setState(() {}));
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => ChatDetailsPage(
+                                  chatPartnerName: isNotChatGroup
+                                      ? chatPartnerProfil["name"]
+                                      : null,
+                                  groupChatData: group,
+                                  isChatgroup: !isNotChatGroup)))
+                      .whenComplete(() => setState(() {}));
                 }
               },
               onLongPress: () {
                 setState(() {
                   changeBarOn = true;
-                  firstSelectedIsPinned = group["users"][userId]["pinned"]??false;
+
+                  firstSelectedIsPinned =
+                      group["users"][userId]["pinned"] ?? false;
+
                   firstSelectedIsMute = group["users"][userId]["mute"] ?? false;
                   selectedChats.add(group["id"]);
                 });
@@ -516,7 +591,9 @@ class _ChatPageState extends State<ChatPage> {
                     children: [
                       Stack(
                         children: [
-                          ProfilImage(chatPartnerProfil),
+                          if (chatPartnerProfil != null)
+                            ProfilImage(chatPartnerProfil),
+                          if (chatData != null) ProfilImage(chatData),
                           if (selectedChats.contains(group["id"]))
                             const Positioned(
                                 bottom: 0,
@@ -537,7 +614,7 @@ class _ChatPageState extends State<ChatPage> {
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(chatPartnerName,
+                              Text(chatName,
                                   style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold)),
@@ -569,66 +646,243 @@ class _ChatPageState extends State<ChatPage> {
       return chatGroupContainers;
     }
 
-    return Scaffold(
-      appBar: changeBarOn
-          ? CustomAppBar(
-              title: "",
-              withLeading: false,
-              leading: IconButton(
-                icon: const Icon(Icons.close),
+    showAppBar() {
+      if (activeChatSearch) {
+        return CustomAppBar(
+            backgroundColor: Colors.white,
+            title: TextField(
+              cursorColor: Colors.black,
+              focusNode: seachSearchInputNode,
+              controller: searchTextKontroller,
+              textInputAction: TextInputAction.search,
+              maxLines: 1,
+              style: const TextStyle(fontSize: 18),
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: AppLocalizations.of(context).suche,
+                  suffixIcon: CloseButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      searchTextKontroller.clear();
+                    },
+                  )),
+              onChanged: (value) {
+                searchListMyGroups = [];
+                searchListAllChatgroups = [];
+
+                if (value.isEmpty) {
+                  //setState(() {});
+                  return;
+                }
+
+                var firstLetterBig = value[0].toUpperCase();
+                if (value.length > 1) firstLetterBig += value.substring(1);
+
+                List allMyChats = myChats + myGroupChats;
+                for (var chat in allMyChats) {
+                  bool isChatGroup = chat["connected"] != null;
+                  var chatName = "";
+
+                  if (isChatGroup) {
+                    chatName = getChatGroupName(chat["connected"]);
+                    chatName ??= AppLocalizations.of(context).weltChat;
+                  } else {
+                    var chatUsers = chat["users"].keys.toList();
+                    var userPartnerId =
+                        chatUsers[0] != userId ? chatUsers[0] : chatUsers[1];
+                    chatName = getProfilFromHive(
+                        profilId: userPartnerId, getNameOnly: true);
+                  }
+
+                  if (chatName.contains(value) ||
+                      chatName.contains(firstLetterBig)) {
+                    searchListMyGroups.add(chat);
+                  }
+                }
+
+                List allChatGroups =
+                    Hive.box("secureBox").get("chatGroups") ?? [];
+                for (var chatGroup in allChatGroups) {
+                  var chatConnected = chatGroup["connected"];
+                  var chatName = getChatGroupName(chatConnected);
+                  chatName ??= AppLocalizations.of(context).weltChat;
+
+                  var containCondition = chatName.contains(value) ||
+                      chatName.contains(firstLetterBig);
+                  var memberOfItCondition = chatGroup["users"][userId] != null;
+
+                  if (containCondition && !memberOfItCondition) {
+                    searchListAllChatgroups.add(chatGroup);
+                  }
+                }
+                setState(() {});
+              },
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_sharp),
+              color: Colors.black,
+              onPressed: () {
+                setState(() {
+                  searchTextKontroller.text = "";
+                  activeChatSearch = false;
+                });
+              },
+            ));
+      } else if (changeBarOn) {
+        return CustomAppBar(
+          title: "",
+          withLeading: false,
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              setState(() {
+                changeBarOn = false;
+                selectedChats = [];
+              });
+            },
+          ),
+          buttons: [
+            IconButton(
+                onPressed: () => muteChat(),
+                icon: selectedChats.length == 1 && firstSelectedIsMute
+                    ? const Icon(Icons.notifications_active)
+                    : const Icon(Icons.notifications_off)),
+            IconButton(
+                onPressed: () => pinChat(),
+                icon: selectedChats.length == 1 && firstSelectedIsPinned
+                    ? StrikeThroughIcon(child: const Icon(Icons.push_pin))
+                    : const Icon(Icons.push_pin)),
+            IconButton(
+                onPressed: () => deleteChatDialog(""),
+                icon: const Icon(Icons.delete))
+          ],
+        );
+      } else {
+        return CustomAppBar(
+          backgroundColor: Colors.white,
+          title: Center(
+            child: CupertinoSlidingSegmentedControl(
+              children: {
+                0: Text(
+                  AppLocalizations.of(context).alle,
+                  style: const TextStyle(color: Colors.black),
+                ),
+                1: Text(AppLocalizations.of(context).private,
+                    style: const TextStyle(color: Colors.black)),
+                2: Text(AppLocalizations.of(context).gruppen,
+                    style: const TextStyle(color: Colors.black))
+              },
+              backgroundColor: Colors.transparent,
+              groupValue: mainSlider,
+              onValueChanged: (value) {
+                setState(() {
+                  mainSlider = value;
+                });
+              },
+            ),
+          ),
+          withLeading: false,
+          //backgroundColor: Colors.white,
+          buttons: [
+            IconButton(
                 onPressed: () {
                   setState(() {
-                    changeBarOn = false;
-                    selectedChats = [];
+                    activeChatSearch = true;
                   });
                 },
-              ),
-              buttons: [
-                IconButton(
-                    onPressed: () => muteChat(),
-                    icon: selectedChats.length == 1 && firstSelectedIsMute
-                        ? const Icon(Icons.notifications_active)
-                        : const Icon(Icons.notifications_off)),
-                IconButton(
-                    onPressed: () => pinChat(),
-                    icon: selectedChats.length == 1 && firstSelectedIsPinned
-                        ? StrikeThroughIcon(child: const Icon(Icons.push_pin))
-                        : const Icon(Icons.push_pin)),
-                IconButton(
-                    onPressed: () => deleteChatDialog(""),
-                    icon: const Icon(Icons.delete))
-              ],
+                icon: const Icon(
+                  Icons.search,
+                  size: 30,
+                  color: Colors.black,
+                )),
+            const SizedBox(
+              width: 10,
             )
-          : CustomAppBar(
-              title: "",
-              withLeading: false,
-              buttons: const [
-                IconButton(onPressed: null, icon: Icon(Icons.search))
-              ],
-            ),
-      body: myChats.isNotEmpty
-          ? MediaQuery.removePadding(
-              removeTop: true,
-              context: context,
-              child: ScrollConfiguration(
-                behavior:
-                    ScrollConfiguration.of(context).copyWith(dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                }),
-                child: ListView(
-                    shrinkWrap: true,
-                    children: createChatGroupContainers(myChats)),
-              ),
-            )
-          : !isLoaded
-              ? const Center(child: CircularProgressIndicator())
-              : Center(
-                  heightFactor: 20,
-                  child: Text(
-                      AppLocalizations.of(context).nochKeineChatsVorhanden,
-                      style:
-                          const TextStyle(fontSize: 20, color: Colors.grey))),
+          ],
+        );
+      }
+    }
+
+    return Scaffold(
+      appBar: showAppBar(),
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+          child: myChats.isNotEmpty
+              ? MediaQuery.removePadding(
+                  removeTop: true,
+                  context: context,
+                  child: ScrollConfiguration(
+                    behavior:
+                        ScrollConfiguration.of(context).copyWith(dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    }),
+                    child: searchTextKontroller.text.isEmpty
+                        ? ListView(
+                            shrinkWrap: true,
+                            children: createChatGroupContainers(null))
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                  width: double.infinity,
+                                  decoration: const BoxDecoration(
+                                      border: Border(top: BorderSide())),
+                                  padding: const EdgeInsets.all(10),
+                                  child: const Text("Chats",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20))),
+                              Expanded(
+                                child: searchListMyGroups.isNotEmpty
+                                    ? ListView(
+                                        shrinkWrap: true,
+                                        children: createChatGroupContainers(
+                                            searchListMyGroups),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                        AppLocalizations.of(context)
+                                            .keineErgebnisse,
+                                        style: TextStyle(fontSize: 20),
+                                      )),
+                              ),
+                              Container(
+                                  width: double.infinity,
+                                  decoration: const BoxDecoration(
+                                      border: Border(top: BorderSide())),
+                                  padding: const EdgeInsets.all(10),
+                                  child: Text(
+                                      AppLocalizations.of(context).globaleSuche,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20))),
+                              Expanded(
+                                child: searchListAllChatgroups.isNotEmpty
+                                    ? ListView(
+                                        shrinkWrap: true,
+                                        children: createChatGroupContainers(
+                                            searchListAllChatgroups),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                            AppLocalizations.of(context)
+                                                .keineErgebnisse,
+                                            style: TextStyle(fontSize: 20))),
+                              ),
+                            ],
+                          ),
+                  ),
+                )
+              : !isLoaded
+                  ? const Center(child: CircularProgressIndicator())
+                  : Center(
+                      heightFactor: 20,
+                      child: Text(
+                          AppLocalizations.of(context).nochKeineChatsVorhanden,
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.grey)))),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
         child: const Icon(Icons.create),

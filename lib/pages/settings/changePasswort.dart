@@ -52,8 +52,6 @@ class ChangePasswortPage extends StatelessWidget {
               return;
             }
             if (newPasswort != newPasswortCheck) {
-              print(newPasswort);
-              print(newPasswortCheck);
               customSnackbar(context,
                   AppLocalizations.of(context).passwortStimmtNichtMitNeuem);
               return;

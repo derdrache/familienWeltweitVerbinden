@@ -50,14 +50,18 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   double healineTextSize = 18;
   var monthsUntilInactive = 3;
   var timeDifferenceLastLogin;
+  bool isFamily = false;
+  Map profil;
 
   @override
   void initState() {
+    profil = Map.of(widget.profil);
     checkIsOwnProfil();
+    checkFamilyMember();
     checkAccessReiseplanung();
     timeDifferenceLastLogin = Duration(
         microseconds: (DateTime.now().microsecondsSinceEpoch -
-                DateTime.parse(widget.profil["lastLogin"].toString())
+                DateTime.parse(profil["lastLogin"].toString())
                     .microsecondsSinceEpoch)
             .abs());
 
@@ -69,26 +73,46 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   }
 
   checkIsOwnProfil() {
-    if (widget.profil["id"] == userID) widget.ownProfil = true;
+    if (profil["id"] == userID) widget.ownProfil = true;
+  }
+
+  checkFamilyMember(){
+    var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
+    var familyName = "";
+    var familyMainId = "";
+
+    for(var family in familyProfils){
+      if(family["members"].contains(profil["id"])){
+        familyName = family["name"];
+        familyMainId = family["mainProfil"];
+      }
+    }
+
+    if(familyMainId.isEmpty) return;
+
+    isFamily = true;
+    var familyProfil = Map.of(getProfilFromHive(profilId: familyMainId));
+    familyProfil["name"] = (spracheIstDeutsch ? "Familie:" : "family") + " " + familyName;
+    profil = familyProfil;
   }
 
   checkAccessReiseplanung() {
     var hasReiseplanungAccess = false;
-    var reiseplanungSetting = widget.profil["reiseplanungPrivacy"];
+    var reiseplanungSetting = profil["reiseplanungPrivacy"];
 
-    if (widget.profil["reisePlanung"].isEmpty) return false;
+    if (profil["reisePlanung"].isEmpty) return false;
 
     if (reiseplanungSetting == privacySetting[0] ||
         reiseplanungSetting == privacySettingEnglisch[0]) {
       hasReiseplanungAccess = true;
     } else if ((reiseplanungSetting == privacySetting[1] ||
             reiseplanungSetting == privacySettingEnglisch[1]) &&
-        (widget.ownProfil["friendlist"].contains(widget.profil["id"]))) {
+        (widget.ownProfil["friendlist"].contains(profil["id"]))) {
       hasReiseplanungAccess = true;
     } else if ((reiseplanungSetting == privacySetting[2] ||
             reiseplanungSetting == privacySettingEnglisch[2]) &&
-        (widget.ownProfil["friendlist"].contains(widget.profil["id"])) &&
-        (widget.profil["friendlist"].contains(widget.ownProfil["id"]))) {
+        (widget.ownProfil["friendlist"].contains(profil["id"])) &&
+        (profil["friendlist"].contains(widget.ownProfil["id"]))) {
       hasReiseplanungAccess = true;
     }
 
@@ -96,8 +120,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   }
 
   getMonthDifference() {
-    widget.profil["lastLogin"] =
-        widget.profil["lastLogin"] ?? DateTime.parse("2022-02-13");
+    profil["lastLogin"] =
+        profil["lastLogin"] ?? DateTime.parse("2022-02-13");
     return timeDifferenceLastLogin.inDays / 30.44;
   }
 
@@ -120,18 +144,18 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
 
     for(var profil in localProfils){
-      if(profil["id"] == widget.profil["id"]){
+      if(profil["id"] == profil["id"]){
         profilData = profil;
       }
     }
 
-    widget.profil = profilData;
+    profil = Map.of(profilData);
   }
 
   openBesuchteLaenderWindow() {
     List<Widget> besuchteLaenderList = [];
 
-    for (var land in widget.profil["besuchteLaender"]) {
+    for (var land in profil["besuchteLaender"]) {
       besuchteLaenderList
           .add(Container(margin: const EdgeInsets.all(10), child: Text(land)));
     }
@@ -168,7 +192,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     if (groupChatData == false) {
       groupChatData = {
         "users": {
-          chatpartnerId: {"name": widget.profil["name"], "newMessages": 0},
+          chatpartnerId: {"name": profil["name"], "newMessages": 0},
           userID: {"name": widget.userName, "newMessages": 0}
         }
       };
@@ -192,7 +216,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           icon: const Icon(Icons.message),
           onPressed: () async {
             var name =
-                widget.userName ?? widget.profil["name"].replaceAll("'", "''");
+                widget.userName ?? profil["name"].replaceAll("'", "''");
             var checkFamily = name.split(" ").contains("family") || name.split(" ").contains("Familie");
 
             if (checkFamily) {
@@ -203,7 +227,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
               for (var searchFamilyProfil in familyProfils) {
                 if (searchFamilyProfil["members"]
-                    .contains(widget.profil["id"])) {
+                    .contains(profil["id"])) {
                   familyProfil = searchFamilyProfil;
                 }
               }
@@ -246,13 +270,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                     );
                   });
             } else {
-              openChat(widget.profil["id"], widget.profil["name"]);
+              openChat(profil["id"], profil["name"]);
             }
           });
     }
 
     friendlistButton() {
-      var onFriendlist = userFriendlist.contains(widget.profil["id"]);
+      var onFriendlist = userFriendlist.contains(profil["id"]);
 
       return SimpleDialogOption(
           child: Row(
@@ -272,23 +296,23 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             };
 
             if (onFriendlist) {
-              userFriendlist.remove(widget.profil["id"]);
-              snackbarText = widget.profil["name"] +
+              userFriendlist.remove(profil["id"]);
+              snackbarText = profil["name"] +
                   AppLocalizations.of(context).friendlistEntfernt;
 
-              newsData["information"] = "added " + widget.profil["id"];
+              newsData["information"] = "added " + profil["id"];
               NewsPageDatabase().addNewNews(newsData);
             } else {
-              userFriendlist.add(widget.profil["id"]);
-              snackbarText = widget.profil["name"] +
+              userFriendlist.add(profil["id"]);
+              snackbarText = profil["name"] +
                   AppLocalizations.of(context).friendlistHinzugefuegt;
 
 
               prepareFriendNotification(
                   newFriendId: userID,
-                  toId: widget.profil["id"],
-                  toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
-                      widget.profil["sprachen"].contains("german"));
+                  toId: profil["id"],
+                  toCanGerman: profil["sprachen"].contains("Deutsch") ||
+                      profil["sprachen"].contains("german"));
             }
 
             var localBox = Hive.box('secureBox');
@@ -312,7 +336,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     userBlockierenButton() {
       var ownId = FirebaseAuth.instance.currentUser.uid;
-      var onBlockList = widget.profil["geblocktVon"].contains(ownId);
+      var onBlockList = profil["geblocktVon"].contains(ownId);
 
       return SimpleDialogOption(
           child: Row(
@@ -330,20 +354,20 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             String databaseQuery = "";
 
             if (onBlockList) {
-              widget.profil["geblocktVon"].remove(ownId);
+              profil["geblocktVon"].remove(ownId);
               databaseQuery =
                   "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
               snackbarText = AppLocalizations.of(context).benutzerFreigegeben;
             } else {
-              widget.profil["geblocktVon"].add(ownId);
+              profil["geblocktVon"].add(ownId);
               databaseQuery =
                   "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
               snackbarText = AppLocalizations.of(context).benutzerBlockieren;
             }
 
             for (var profil in allProfils) {
-              if (widget.profil["id"] == profil["id"]) {
-                profil["blockiertVon"] = widget.profil["geblocktVon"];
+              if (profil["id"] == profil["id"]) {
+                profil["blockiertVon"] = profil["geblocktVon"];
               }
             }
 
@@ -352,7 +376,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             customSnackbar(context, snackbarText, color: Colors.green);
 
             ProfilDatabase().updateProfil(
-                databaseQuery, "WHERE id = '${widget.profil["id"]}'");
+                databaseQuery, "WHERE id = '${profil["id"]}'");
 
             Navigator.pop(context);
             setState(() {});
@@ -388,7 +412,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                           onPressed: () {
                             ReportsDatabase().add(
                                 userID,
-                                "Melde User id: " + widget.profil["id"],
+                                "Melde User id: " + profil["id"],
                                 meldeTextKontroller.text);
                             Navigator.pop(context);
                             customSnackbar(context,
@@ -433,7 +457,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     titelBox() {
-      var profil = Map.of(widget.profil);
       if (widget.userName != null) profil["name"] = widget.userName;
       return Container(
         alignment: Alignment.center,
@@ -464,7 +487,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           ),
           Flexible(
               child: Text(
-            widget.profil["ort"],
+                profil["ort"],
             style: TextStyle(fontSize: textSize),
             maxLines: 2,
           ))
@@ -475,11 +498,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     travelTypBox() {
       var themaText = AppLocalizations.of(context).artDerReise + ": ";
       var inhaltText =
-          global_functions.changeGermanToEnglish(widget.profil["reiseart"]);
+          global_functions.changeGermanToEnglish(profil["reiseart"]);
 
       if (spracheIstDeutsch) {
         inhaltText =
-            global_functions.changeEnglishToGerman(widget.profil["reiseart"]);
+            global_functions.changeEnglishToGerman(profil["reiseart"]);
       }
 
       return Row(children: [
@@ -490,10 +513,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     aufreiseBox() {
-      if (widget.profil["aufreiseSeit"] == null) return const SizedBox.shrink();
+      if (profil["aufreiseSeit"] == null) return const SizedBox.shrink();
 
       var themenText = AppLocalizations.of(context).aufReise + ": ";
-      var seitText = widget.profil["aufreiseSeit"]
+      var seitText = profil["aufreiseSeit"]
           .split("-")
           .take(2)
           .toList()
@@ -501,10 +524,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           .join("-");
       var inhaltText = "";
 
-      if (widget.profil["aufreiseBis"] == null) {
+      if (profil["aufreiseBis"] == null) {
         inhaltText = seitText + " - " + AppLocalizations.of(context).offen;
       } else {
-        var bisText = widget.profil["aufreiseBis"]
+        var bisText = profil["aufreiseBis"]
             .split("-")
             .take(2)
             .toList()
@@ -527,12 +550,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     sprachenBox() {
       var themenText = AppLocalizations.of(context).sprachen + ": ";
       var inhaltText = global_functions
-          .changeGermanToEnglish(widget.profil["sprachen"])
+          .changeGermanToEnglish(profil["sprachen"])
           .join(", ");
 
       if (spracheIstDeutsch) {
         inhaltText = global_functions
-            .changeEnglishToGerman(widget.profil["sprachen"])
+            .changeEnglishToGerman(profil["sprachen"])
             .join(", ");
       }
 
@@ -544,7 +567,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     kinderBox() {
-      var childrenProfilList = widget.profil["kinder"];
+      var childrenProfilList = profil["kinder"];
       childrenProfilList.sort();
       var childrenList = [];
       var alterZusatz = spracheIstDeutsch ? "J" : "y";
@@ -569,12 +592,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     interessenBox() {
       var themenText = AppLocalizations.of(context).interessen + ": ";
       var inhaltText = global_functions
-          .changeGermanToEnglish(widget.profil["interessen"])
+          .changeGermanToEnglish(profil["interessen"])
           .join(", ");
 
       if (spracheIstDeutsch) {
         inhaltText = global_functions
-            .changeEnglishToGerman(widget.profil["interessen"])
+            .changeEnglishToGerman(profil["interessen"])
             .join(", ");
       }
 
@@ -603,7 +626,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             ),
             const SizedBox(height: 5),
             TextWithHyperlinkDetection(
-              text: widget.profil["aboutme"],
+              text: profil["aboutme"],
               fontsize: textSize,
             )
           ],
@@ -623,7 +646,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             ),
             const SizedBox(height: 5),
             Text(
-              widget.profil["tradeNotize"],
+              profil["tradeNotize"],
               style: TextStyle(fontSize: textSize),
             ),
           ],
@@ -634,13 +657,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     reisePlanungBox() {
       var reiseplanung = [];
       var reiseplanungPrivacy = spracheIstDeutsch
-          ? changeEnglishToGerman(widget.profil["reiseplanungPrivacy"])
-          : changeGermanToEnglish(widget.profil["reiseplanungPrivacy"]);
+          ? changeEnglishToGerman(profil["reiseplanungPrivacy"])
+          : changeGermanToEnglish(profil["reiseplanungPrivacy"]);
 
-      widget.profil["reisePlanung"]
+      profil["reisePlanung"]
           .sort((a, b) => a["von"].compareTo(b["von"]) as int);
 
-      for (var reiseplan in widget.profil["reisePlanung"]) {
+      for (var reiseplan in profil["reisePlanung"]) {
         String ortText = reiseplan["ortData"]["city"];
 
         if (reiseplan["ortData"]["city"] !=
@@ -695,7 +718,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             Text(AppLocalizations.of(context).besuchteLaender + ": ",
                 style:
                     TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-            Text(widget.profil["besuchteLaender"].length.toString(),
+            Text(profil["besuchteLaender"].length.toString(),
                 style: TextStyle(fontSize: textSize))
           ]),
         ),
@@ -754,8 +777,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               besuchteLaenderBox(),
               if (checkAccessReiseplanung() || widget.ownProfil)
                 reisePlanungBox(),
-              if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
-              if (widget.profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
+              if (profil["aboutme"].isNotEmpty) aboutmeBox(),
+              if (profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
               interessenBox(),
               SizedBox(height: columnAbstand),
             ],
@@ -777,10 +800,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            widget.profil["emailAnzeigen"] == 1
+            profil["emailAnzeigen"] == 1
                 ? FutureBuilder(
                     future: ProfilDatabase().getData(
-                        "email", "WHERE id = '${widget.profil["id"]}'"),
+                        "email", "WHERE id = '${profil["id"]}'"),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return Row(children: [
@@ -822,7 +845,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 const SizedBox(height: 10),
                 infoProfil(),
                 const SizedBox(height: 15),
-                if (widget.profil["emailAnzeigen"] == 1) kontaktProfil(),
+                if (profil["emailAnzeigen"] == 1) kontaktProfil(),
               ]),
             ),
           ),
