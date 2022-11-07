@@ -571,8 +571,10 @@ class _ChatPageState extends State<ChatPage> {
               onLongPress: () {
                 setState(() {
                   changeBarOn = true;
+
                   firstSelectedIsPinned =
                       group["users"][userId]["pinned"] ?? false;
+
                   firstSelectedIsMute = group["users"][userId]["mute"] ?? false;
                   selectedChats.add(group["id"]);
                 });

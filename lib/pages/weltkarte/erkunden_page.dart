@@ -107,7 +107,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     setSearchAutocomplete();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    WidgetsBinding.instance?.addPostFrameCallback((_) => mounted = true);
     super.initState();
   }
 
@@ -223,10 +223,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     for (var profil in deleteProfils) {
       profils.remove(profil);
     }
-  }
-
-  _asyncMethod() async {
-    mounted = true;
   }
 
   sortProfils(profils) {
@@ -1413,19 +1409,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
           width: size,
           height: size,
           point: position,
-          builder: (ctx) => numberText != "0"
-              ? FloatingActionButton(
+          builder: (ctx) => FloatingActionButton(
                   heroTag: "MapMarker" + position.toString(),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   mini: true,
                   child: Center(child: Text(numberText)),
                   onPressed: buttonFunction)
-              : FloatingActionButton(
-                  heroTag: "MapMarker" + position.toString(),
-                  mini: true,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  child: const Center(child: Icon(Icons.info)),
-                  onPressed: buttonFunction));
+
+
+      );
     }
 
     createProfilMarker() {
@@ -1576,21 +1568,23 @@ class _ErkundenPageState extends State<ErkundenPage> {
           maxZoom: maxZoom,
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed) {
-            if (mounted) {
               mapPosition = position.center;
-              currentMapZoom = position.zoom;
               FocusScope.of(context).unfocus();
-              changeProfil(currentMapZoom);
-            }
+
+              if(currentMapZoom != position.zoom){
+                currentMapZoom = position.zoom;
+                changeProfil(currentMapZoom);
+              }
           },
         ),
-        layers: [
-          TileLayerOptions(
-              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              subdomains: ['a', 'b', 'c']),
-          MarkerLayerOptions(
-            markers: allMarker,
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.app',
           ),
+          MarkerLayer(
+            markers: allMarker,
+          )
         ],
       );
     }
@@ -1783,7 +1777,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   reiseplanungOn = false;
                   setProfilsFromHive();
                   createAndSetZoomLevels(profils, "profils");
-                  setState(() {});
                 } else {
                   openSelectReiseplanungsDateWindow();
                 }
