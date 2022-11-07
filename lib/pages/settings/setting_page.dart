@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
+import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
@@ -66,7 +67,6 @@ class _SettingPageState extends State<SettingPage> {
 
     super.initState();
   }
-
 
   void setData() async {
     List childrenAgeTimestamp = [];
@@ -140,13 +140,11 @@ class _SettingPageState extends State<SettingPage> {
                   },
                   child: Text(AppLocalizations.of(context).familyProfil,
                       style: TextStyle(color: textColor)))),
-
           PopupMenuItem(
               child: TextButton(
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
-                    global_func.changePageForever(
-                        context, LoginPage());
+                    global_func.changePageForever(context, LoginPage());
                   },
                   child: Text(AppLocalizations.of(context).abmelden,
                       style: TextStyle(color: textColor)))),
@@ -192,25 +190,6 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     var headLineColor = Theme.of(context).colorScheme.primary;
     userProfil = Hive.box("secureBox").get("ownProfil");
-
-    menuBar() {
-      return SizedBox(
-          height: 70,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                TextButton(
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ))),
-                  child: const Icon(Icons.more_vert, color: Colors.black),
-                  onPressed: () => openSettingWindow(),
-                )
-              ]));
-    }
 
     nameContainer() {
       return Container(
@@ -275,7 +254,8 @@ class _SettingPageState extends State<SettingPage> {
 
     profilContainer() {
       var reisePlanung = userProfil["reisePlanung"];
-      List<String> besuchteLaender = List<String>.from(userProfil["besuchteLaender"] ?? []);
+      List<String> besuchteLaender =
+          List<String>.from(userProfil["besuchteLaender"] ?? []);
 
       return Container(
           width: double.maxFinite,
@@ -476,28 +456,29 @@ class _SettingPageState extends State<SettingPage> {
           ));
     }
 
-    return Column(
-      children: [
-        menuBar(),
-        Expanded(
-          child: ScrollConfiguration(
-            behavior:
-            ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            }),
-            child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                children: [
-                  nameContainer(),
-                  profilContainer(),
-                  settingContainer(),
-                  aboutAppContainer(),
-                ]),
-          ),
-        )
-      ],
+    return Scaffold(
+      appBar: CustomAppBar(title: "", backgroundColor: Colors.white, buttons: [
+        IconButton(
+            onPressed: () => openSettingWindow(),
+            icon: const Icon(Icons.more_vert, color: Colors.black))
+      ]),
+      body: SafeArea(
+          child: Container(
+        margin: const EdgeInsets.only(top: 10),
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          }),
+          child:
+              ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
+            nameContainer(),
+            profilContainer(),
+            settingContainer(),
+            aboutAppContainer(),
+          ]),
+        ),
+      )),
     );
   }
 }

@@ -209,23 +209,11 @@ class _CommunityPageState extends State<CommunityPage> {
             margin: const EdgeInsets.all(10),
             community: community,
             withFavorite: true,
-            afterPageVisit: () => changePage(
-                context,
-                StartPage(
-                  selectedIndex: 3,
-                )),
-            afterFavorite: () {
-              for (var i = 0; i < allCommunities.length; i++) {
-                if (community["id"] == allCommunities[i]["id"]) {
-                  if (allCommunities[i]["interesse"].contains(userId)) {
-                    allCommunities[i]["interesse"].remove(userId);
-                  } else {
-                    allCommunities[i]["interesse"].add(userId);
-                  }
-                  setState(() {});
-                }
-              }
-            }));
+            afterPageVisit: () => setState(() {}),
+            afterFavorite: (){
+              setState(() {});
+            })
+        );
       }
 
       return SingleChildScrollView(
@@ -296,15 +284,15 @@ class _CommunityPageState extends State<CommunityPage> {
 
     return Scaffold(
       floatingActionButton: floatingActionButtons(),
-      body: Padding(
-          padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
-          child: Column(
-            children: [
-              suchleiste,
-              Expanded(child: showCommunities()),
-              if (getInvite) showInvite(),
-            ],
-          )),
+      body: SafeArea(
+        child: Column(
+          children: [
+            suchleiste,
+            Expanded(child: showCommunities()),
+            if (getInvite) showInvite(),
+          ],
+        ),
+      ),
     );
   }
 }

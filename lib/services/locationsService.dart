@@ -231,9 +231,6 @@ class LocationService {
       countriesListEng.add(country["nameEng"]);
     }
 
-    countriesListGer.sort();
-    countriesListEng.sort();
-
     return {"ger": countriesListGer, "eng": countriesListEng};
   }
 

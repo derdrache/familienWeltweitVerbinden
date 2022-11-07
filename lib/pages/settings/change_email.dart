@@ -66,6 +66,9 @@ class ChangeEmailPage extends StatelessWidget {
       await ProfilDatabase().updateProfil(
           "email = '${emailKontroller.text}'", "WHERE id = '$userId'");
 
+      updateHiveOwnProfil("email", emailKontroller.text);
+
+
       customSnackbar(
           context, AppLocalizations.of(context).neueEmailVerifizieren,
           color: Colors.green);

@@ -11,19 +11,19 @@ import 'package:image/image.dart' as image_pack;
 import '../global/custom_widgets.dart';
 import '../services/database.dart';
 
-class ImageGalerie extends StatefulWidget {
+class EventImageGalerie extends StatefulWidget {
   var isCreator;
   var event;
   var child;
 
-  ImageGalerie({Key key, this.child, this.isCreator, this.event})
+  EventImageGalerie({Key key, this.child, this.isCreator, this.event})
       : super(key: key);
 
   @override
-  _ImageGalerieState createState() => _ImageGalerieState();
+  _ImageEventGalerieState createState() => _ImageEventGalerieState();
 }
 
-class _ImageGalerieState extends State<ImageGalerie> {
+class _ImageEventGalerieState extends State<EventImageGalerie> {
   var isWebDesktop = kIsWeb &&
       (defaultTargetPlatform != TargetPlatform.iOS ||
           defaultTargetPlatform != TargetPlatform.android);
@@ -72,11 +72,14 @@ class _ImageGalerieState extends State<ImageGalerie> {
       widget.child = Image.asset(selectedImage, fit: BoxFit.fitWidth);
     }
 
+    updateHiveEvent(widget.event["id"],"bild",  selectedImage);
+
     setState(() {
       imageLoading = false;
     });
 
     DbDeleteImage(oldImage);
+
 
     EventDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.event["id"]}'");
@@ -86,6 +89,8 @@ class _ImageGalerieState extends State<ImageGalerie> {
     var eventName = widget.event["name"] + "_";
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
+
+    if(pickedImage == null) return;
 
     setState(() {
       imageLoading = true;
@@ -278,11 +283,16 @@ class _ImageGalerieState extends State<ImageGalerie> {
           width: double.infinity,
           child: imageLoading
               ? Center(
-                  child: Container(
-                      margin: const EdgeInsets.all(10),
-                      width: 100,
-                      height: 100,
-                      child: const CircularProgressIndicator()))
+                  child: Column(
+                    children: [
+                      Container(
+                          margin: const EdgeInsets.all(10),
+                          width: 80,
+                          height: 80,
+                          child: const CircularProgressIndicator()),
+                      Center(child: Text(AppLocalizations.of(context).bildLadezeit))
+                    ],
+                  ))
               : widget.child,
         ),
         onTapDown: !widget.isCreator

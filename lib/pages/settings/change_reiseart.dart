@@ -36,6 +36,8 @@ class ChangeReiseartPage extends StatelessWidget {
             await ProfilDatabase().updateProfil(
                 "reiseart = '${reiseArtInput.getSelected()}'",
                 "WHERE id = '$userId'");
+            updateHiveOwnProfil("reiseart", reiseArtInput.getSelected());
+
             customSnackbar(
                 context,
                 AppLocalizations.of(context).artDerReise +

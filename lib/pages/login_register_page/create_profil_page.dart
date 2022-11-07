@@ -130,16 +130,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "aboutme": aboutusKontroller.text
       };
 
+
+
       try {
         await ProfilDatabase().addNewProfil(data);
         var ownProfil =
             await ProfilDatabase().getData("*", "WHERE id = '$userID'");
         Hive.box('secureBox').put("ownProfil", ownProfil);
 
-        NewsPageDatabase().addNewNews({
-          "typ": "ortswechsel",
-          "information": json.encode(ortMapData),
-        });
+        var allProfils = Hive.box('secureBox').get("profils");
+        allProfils.add(ownProfil);
 
         global_functions.changePageForever(context, StartPage());
       } catch (_) {
@@ -154,17 +154,29 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         return;
       }
 
-      updateStadtInfoDatabase(ortMapData, userID);
+      additionalDatabaseOperations(ortMapData, userID);
     }
 
     changeLoading();
   }
 
-  updateStadtInfoDatabase(ortMapData, userId) async {
+  additionalDatabaseOperations(ortMapData, userId) async {
     await StadtinfoDatabase().addNewCity(ortMapData);
-    await StadtinfoDatabase().update(
+    StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
         "WHERE ort LIKE '${ortMapData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+
+    ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"]);
+    ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+        "WHERE id = '1'");
+    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.add(getChatGroupFromHive(""));
+
+    NewsPageDatabase().addNewNews({
+      "typ": "ortswechsel",
+      "information": json.encode(ortMapData),
+    });
   }
 
   childrenInputValidation() {

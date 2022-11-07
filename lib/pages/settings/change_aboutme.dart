@@ -24,6 +24,8 @@ class ChangeAboutmePage extends StatelessWidget {
         onPressed: () async {
           await ProfilDatabase().updateProfil("aboutme = '${textKontroller.text}'",
               "WHERE id = '$userId'");
+          updateHiveOwnProfil("aboutme", textKontroller.text);
+
           customSnackbar(context,
               AppLocalizations.of(context).ueberMich + " "+
                   AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);

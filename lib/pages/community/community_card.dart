@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
+import '../../global/global_functions.dart' as global_func;
 
 import 'community_details.dart';
 
@@ -45,14 +47,10 @@ class _CommunityCardState extends State<CommunityCard> {
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) =>
-                        CommunityDetails(community: widget.community)))
-            .whenComplete(() => widget.afterPageVisit());
-      },
+     onTap: () => global_func.changePage(
+          context, 
+          CommunityDetails(community: widget.community),
+          whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
           height: screenHeight / 3.2 * bigMultiplikator,
@@ -166,22 +164,36 @@ class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
 
   setInteresse() async {
-    widget.hasIntereset = widget.hasIntereset ? false : true;
-
-    setState(() {});
-
-    var interesseList = await CommunityDatabase()
-        .getData("interesse", "WHERE id = '${widget.id}'");
+    var allCommunities = Hive.box('secureBox').get("communities") ?? [];
+    var communityIndex = allCommunities.indexWhere((community) => community["id"] == widget.id);
+    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    widget.hasIntereset = !widget.hasIntereset;
 
     if (widget.hasIntereset) {
-      interesseList.add(userId);
+      allCommunities[communityIndex]["interesse"].add(userId);
+      CommunityDatabase().update(
+          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
+          "WHERE id ='${widget.id}'");
+
+      myGroupChats.add(getChatGroupFromHive(widget.id));
+      ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+          "WHERE connected LIKE '%${widget.id}%'");
     } else {
-      interesseList.remove(userId);
+      allCommunities[communityIndex]["interesse"].remove(userId);
+      CommunityDatabase().update(
+          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+          "WHERE id ='${widget.id}'");
+
+      myGroupChats.removeWhere((chatGroup){
+        chatGroup["connected"].contains(widget.id);
+      });
+      ChatGroupsDatabase().updateChatGroup(
+          "users = JSON_REMOVE(users, '\$.$userId')",
+          "WHERE connected LIKE '%${widget.id}%'");
     }
 
-    await CommunityDatabase().update(
-        "interesse = '${json.encode(interesseList)}'",
-        "WHERE id ='${widget.id}'");
+    setState(() {});
 
     widget.afterFavorite();
   }

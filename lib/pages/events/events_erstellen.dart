@@ -120,7 +120,7 @@ class _EventErstellenState extends State<EventErstellen> {
       "id": eventId,
       "name": eventNameKontroller.text,
       "erstelltAm": DateTime.now().toString(),
-      "erstelltVon": FirebaseAuth.instance.currentUser.uid,
+      "erstelltVon": userID,
       "beschreibung": eventBeschreibungKontroller.text,
       "stadt": locationData["city"],
       "art": eventArtDropdown.getSelected(),
@@ -145,10 +145,13 @@ class _EventErstellenState extends State<EventErstellen> {
     StadtinfoDatabase().addNewCity(locationData);
     var dbEventData =
         await EventDatabase().getData("*", "WHERE id = '$eventId'");
+    ChatGroupsDatabase().addNewChatGroup(
+        userID, "</event=$eventId"
+    );
 
     if (dbEventData == false) return;
 
-    global_functions.changePage(context, StartPage(selectedIndex: 1));
+    global_functions.changePage(context, StartPage(selectedIndex: 2));
     global_functions.changePage(context, EventDetailsPage(event: dbEventData));
   }
 

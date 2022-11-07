@@ -32,6 +32,7 @@ class ChangeNamePage extends StatelessWidget {
         if (checkUserProfilExist == false) {
           await ProfilDatabase()
               .updateProfilName(userId, userName, newUserName);
+          updateHiveOwnProfil("name", newUserName);
 
           Navigator.pop(context);
         } else if (newUserName.length > 40) {

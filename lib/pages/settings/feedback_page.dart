@@ -36,7 +36,7 @@ class FeedbackPage extends StatelessWidget {
     beschreibungsText(){
       return Center(
         child: Container(
-          margin: EdgeInsets.all(30),
+          margin: const EdgeInsets.all(30),
           child: Text(AppLocalizations.of(context).feedbackText)
         ),
       );
@@ -55,7 +55,7 @@ class FeedbackPage extends StatelessWidget {
       return Align(
         child: Container(
           width: 200,
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
           child: FloatingActionButton.extended(
               onPressed: () => feedbackSendenAndClose(context),
               label: Text(AppLocalizations.of(context).senden)
