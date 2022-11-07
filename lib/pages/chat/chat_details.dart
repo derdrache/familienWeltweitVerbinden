@@ -750,9 +750,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   checkAndRemovePinnedMessage(message) {
     var pinnedMessages =
         widget.groupChatData["users"][userId]["pinnedMessages"] ?? [];
+
     if (pinnedMessages.runtimeType == String) {
       pinnedMessages = json.decode(pinnedMessages);
     }
+
     pinnedMessages.remove(int.parse(message["id"]));
 
     widget.groupChatData["users"][userId]["pinnedMessages"] = pinnedMessages;
@@ -1743,6 +1745,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               ),
                             ),
                           ),
+
                           GestureDetector(
                             onTap: () => openMessageMenu(message, index),
                             child: Wrap(

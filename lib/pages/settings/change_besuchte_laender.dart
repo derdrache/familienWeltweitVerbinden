@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -29,9 +30,16 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
   @override
   void initState() {
     var allCountries = LocationService().getAllCountries();
+    var allCountriesLanguage;
+
+    if((widget.selected.isEmpty && widget.isGerman) || (widget.selected.isNotEmpty && allCountries["ger"].contains(widget.selected[0]))){
+      allCountriesLanguage = allCountries["ger"];
+    }else{
+      allCountriesLanguage = allCountries["eng"];
+    }
+
     besuchteLaenderDropdown = CustomMultiTextForm(
-        auswahlList:
-            widget.isGerman ? allCountries["ger"] : allCountries["eng"],
+        auswahlList: allCountriesLanguage,
         selected: widget.selected,);
 
     super.initState();
@@ -43,6 +51,7 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
     await ProfilDatabase().updateProfil(
         "besuchteLaender = '${jsonEncode(selectedCountries)}'",
         "WHERE id = '${widget.userId}'");
+
 
     updateHiveOwnProfil("besuchteLaender", selectedCountries);
 
