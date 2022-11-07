@@ -1529,7 +1529,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     GestureDetector(
                                       onTap: () => global_functions.changePage(context, ShowProfilPage(profil: creatorData,)),
                                       child: Container(
-                                          margin: const EdgeInsets.only(bottom: 5),
+                                          margin: const EdgeInsets.only(left: 10, top: 10),
                                           child: Text(
                                             creatorName,
                                             style: TextStyle(
@@ -1546,7 +1546,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                       }
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.only(left: 10, top: 5),
                                       child: Container(
                                           padding: const EdgeInsets.only(left: 5),
                                           decoration: BoxDecoration(
