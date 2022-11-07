@@ -408,5 +408,7 @@
     "newsLocationBegruessung": "Herzlich Willkommen in ",
     "erfahrungenTeilen": "Teile mit anderen Familien deine Erfahrung über den Ort",
     "erfahrungenAnschauenUndTeilen": "Schau dir die Erfahrungen von anderen Familien an und ergänze sie noch mit deinen eigenen",
-    "bildLadezeit": "Das Laden vom Bild kann ein wenig Zeit in Anspruch nehmen"
+    "bildLadezeit": "Das Laden vom Bild kann ein wenig Zeit in Anspruch nehmen",
+    "nachrichtLoeschen": "Nachricht löschen ?",
+    "nachrichtWirklichLoeschen": "Möchtest du diese Nachricht wirklich löschen ?"
 }

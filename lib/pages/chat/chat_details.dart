@@ -506,15 +506,42 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   deleteMessage(messageId) {
-    if (widget.isChatgroup) {
-      ChatGroupsDatabase().deleteMessages(messageId);
-    } else {
-      ChatDatabase().deleteMessages(messageId);
-    }
+    Future.delayed(
+        const Duration(seconds: 0), () => showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CustomAlertDialog(
+            title: AppLocalizations.of(context).nachrichtLoeschen,
+            height: 100,
+            children: [
+              Center(
+                  child: Text(
+                      AppLocalizations.of(context).nachrichtWirklichLoeschen))
+            ],
+            actions: [
+              TextButton(
+                child: Text(AppLocalizations.of(context).loeschen),
+                onPressed: () {
+                  if (widget.isChatgroup) {
+                    ChatGroupsDatabase().deleteMessages(messageId);
+                  } else {
+                    ChatDatabase().deleteMessages(messageId);
+                  }
 
-    messages.removeWhere((element) => element["id"] == messageId);
+                  messages.removeWhere((element) => element["id"] == messageId);
 
-    setState(() {});
+                  setState(() {});
+
+                  Navigator.pop(context);
+                },
+              ),
+              TextButton(
+                child: Text(AppLocalizations.of(context).abbrechen),
+                onPressed: () => Navigator.pop(context),
+              )
+            ],
+          );
+        }));
   }
 
   reportMessage(message) {
@@ -1245,7 +1272,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     messageBoxInformation["messageEdit"] +
                                         messageBoxInformation["messageTime"],
                                     style: TextStyle(color: timeStampColor)),
-                              )
+                              ),
+
                             ],
                           ),
                         )

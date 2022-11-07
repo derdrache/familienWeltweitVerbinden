@@ -407,11 +407,10 @@ class _NewsPageState extends State<NewsPage> {
     eventsDisplay(event, myLastLocationDate) {
       var locationTimeCheck = DateTime.parse(event["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
-      var checkOfflineEvent = event["typ"] == "offline" &&
-          locationTimeCheck >= 0 &&
+      var isOnline = event["typ"] == "online";
+      var checkOfflineEvent = !isOnline && locationTimeCheck >= 0 &&
           event["stadt"] == ownProfil["ort"];
-      var checkOnlineEvent =
-          event["typ"] == "online" && evenTagMatch(event["tags"]);
+      var checkOnlineEvent = isOnline && evenTagMatch(event["tags"]);
       var isPrivate = event["art"] == "privat" || event["art"] == "private";
 
       if (!checkOfflineEvent && !checkOnlineEvent ||
@@ -449,7 +448,7 @@ class _NewsPageState extends State<NewsPage> {
                       child: Icon(
                         Icons.fiber_new,
                         size: 30,
-                      ))
+                      )),
               ],
             ),
           ));
