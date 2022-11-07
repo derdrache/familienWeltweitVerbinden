@@ -91,7 +91,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   void initState() {
-    var hiveProfils = Hive.box('secureBox').get("profils") ?? [];
+    var hiveProfils = List.of(Hive.box('secureBox').get("profils") ?? []);
     profils = [for (var profil in hiveProfils) Map.of(profil)];
 
     setEvents();
