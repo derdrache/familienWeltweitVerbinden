@@ -57,6 +57,8 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch172D),
+                _patch(patch171D),
                 _patch(patch170D),
                 _patch(patch162D),
                 _patch(patch161D),
@@ -78,6 +80,8 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch172E),
+                _patch(patch171E),
                 _patch(patch170E),
                 _patch(patch162E),
                 _patch(patch161E),
@@ -112,13 +116,41 @@ var patchVorlage={
   ]
 };
 
-var patch170E={
-  "title" : "1.7.0 - 13.10.2022",
+var patch172E={
+  "title" : "1.7.2 - 21.10.2022",
   "inhalt": [
-    "optimizations to decrease server crashes"
+    "Android Notification - Due to an error, the notification was always sent twice",
+    "Chat - Error when deleting messages has been fixed",
+    "Chat - Long messages when replying are now displayed correctly",
+    "Chat Page - Quick edit when long pressing on chat now works correctly",
+    "Profile Visited Countries - An error in the input box has been fixed"
   ]
 };
-var patch170D={
+var patch172D={
+  "title" : "1.7.2 - 21.10.2022",
+  "inhalt": [
+    "Android Notification - Durch ein Fehler wurde die Notification immer zwei Mal versendet",
+    "Chat - Fehler beim Nachrichten löschen wurde behoben",
+    "Chat - Lange Nachrichten beim antworten werden nun korrekt angezeigt",
+    "Chat Page - Schnell Bearbeitung bei langem drücken auf den Chat funktioniert nun fehlerfrei",
+    "Profil besuchte Länder - Ein Fehler in der Eingabebox wurde behoben",
+  ]
+};
+
+var patch171E={
+  "title" : "1.7.1 - 15.10.2022",
+  "inhalt": [
+    "Fixed chat bug - For the users without chats, the chat page crashed",
+  ]
+};
+var patch171D={
+  "title" : "1.7.1 - 15.10.2022",
+  "inhalt": [
+    "Fehler beim Chat behoben - Bei den Benutzern ohne Chats, ist die Chatseite abgestürzt",
+  ]
+};
+
+var patch170E={
   "title" : "1.7.0 - 13.10.2022",
   "inhalt": [
     "Chat system has been greatly improved",
@@ -128,6 +160,18 @@ var patch170D={
     "News page - crash problems have been fixed (gray screen)",
     "various small improvements",
     "various small bug fixes"
+  ]
+};
+var patch170D={
+  "title" : "1.7.0 - 13.10.2022",
+  "inhalt": [
+    "Chatsystem wurde stark verbessert",
+    "Profil - Besuchte Länder kann wieder gespeichert werden",
+    "Profil - Nach dem ändern der Location, wird die Veränderung wieder sofort sichtbar",
+    "Profil - kleine Änderungen bei der Reiseplanung",
+    "News page - Absturzprobleme wurden behoben (grauer Bildschirm)",
+    "verschiedene kleine Verbesserungen",
+    "verschiedene kleine Fehlerbehebungen"
   ]
 };
 
