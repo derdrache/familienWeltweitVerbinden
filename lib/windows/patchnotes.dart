@@ -115,6 +115,18 @@ var patchVorlage={
 
   ]
 };
+var patch180E={
+  "title" : "1.8.0 - 13.11.2022",
+  "inhalt": [
+
+  ]
+};
+var patch180D={
+  "title" : "1.8.0 - 13.11.2022",
+  "inhalt": [
+
+  ]
+};
 
 var patch172E={
   "title" : "1.7.2 - 21.10.2022",
