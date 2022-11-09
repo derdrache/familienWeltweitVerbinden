@@ -410,6 +410,8 @@
     "erfahrungenAnschauenUndTeilen": "Have a Look at the experiences of other families and complement them with your own experiences",
     "bildLadezeit": "Loading the image can take a little time",
     "nachrichtLoeschen": "delete message ?",
-    "nachrichtWirklichLoeschen": "Do you really want to delete this message ?"
+    "nachrichtWirklichLoeschen": "Do you really want to delete this message ?",
+    "newsPageOnlineEventVorschlag": "Suggested to you because of the following interest: ",
+    "newsPageOfflineEventVorschlag": "New event in your location"
 }
 

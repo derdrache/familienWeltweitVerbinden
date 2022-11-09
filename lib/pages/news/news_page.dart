@@ -100,11 +100,9 @@ class _NewsPageState extends State<NewsPage> {
     for (var interesse in ownInteressen) {
       if (tags.contains(global_func.changeGermanToEnglish(interesse)) ||
           tags.contains(global_func.changeEnglishToGerman(interesse))) {
-        return true;
+        return interesse;
       }
     }
-
-    return false;
   }
 
   sortNewsFeed() {
@@ -409,14 +407,21 @@ class _NewsPageState extends State<NewsPage> {
       var checkOfflineEvent = !isOnline &&
           locationTimeCheck >= 0 &&
           event["stadt"] == ownProfil["ort"];
-      var checkOnlineEvent = isOnline && evenTagMatch(event["tags"]);
+      var checkOnlineEvent = isOnline && evenTagMatch(event["tags"]) != null;
       var isPrivate = event["art"] == "privat" || event["art"] == "private";
+      var eventText = "";
 
       if (!checkOfflineEvent && !checkOnlineEvent ||
           !ownSettingProfil["showInterestingEvents"] ||
           event["erstelltVon"] == userId ||
           isPrivate) {
         return const SizedBox.shrink();
+      }
+
+      if(isOnline){
+        eventText = AppLocalizations.of(context).newsPageOnlineEventVorschlag + evenTagMatch(event["tags"]).toString();
+      }else{
+        eventText = AppLocalizations.of(context).newsPageOfflineEventVorschlag;
       }
 
       userNewsContent.add(
@@ -426,28 +431,31 @@ class _NewsPageState extends State<NewsPage> {
           alignment: Alignment.center,
           child: Container(
             margin: const EdgeInsets.only(bottom: 20),
-            child: Stack(
-              clipBehavior: Clip.none,
+            child: Column(
               children: [
                 EventCard(
                   margin: const EdgeInsets.all(15),
                   event: event,
                   withInteresse: true,
                 ),
-                Positioned(
-                  bottom: 20,
-                  right: -70,
-                  child: Text(event["erstelltAm"].split(" ")[0],
-                      style: TextStyle(color: Colors.grey[600])),
-                ),
-                if (checkIfNew(event["beschreibung"], event["erstelltVon"]))
-                  const Positioned(
-                      bottom: 20,
-                      left: -70,
-                      child: Icon(
-                        Icons.fiber_new,
-                        size: 30,
-                      )),
+                Row(
+                  children: [
+                    SizedBox(width: 10),
+                    Icon(
+                      Icons.fiber_new,
+                      size: 30,
+                      color: checkIfNew(event["beschreibung"], event["erstelltVon"])
+                          ? null
+                          : Colors.transparent,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(child: Text(eventText)),
+                    SizedBox(width: 10),
+                    Text(event["erstelltAm"].split(" ")[0],
+                        style: TextStyle(color: Colors.grey[600])),
+                    SizedBox(width: 10),
+                  ],
+                )
               ],
             ),
           ));
