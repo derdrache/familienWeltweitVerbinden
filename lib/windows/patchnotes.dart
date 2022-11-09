@@ -118,13 +118,25 @@ var patchVorlage={
 var patch180E={
   "title" : "1.8.0 - 13.11.2022",
   "inhalt": [
-
+    "Chats - Chat groups have been added. There are now the following chat groups: cities, events, communities and a world chat",
+    "Chats - Chat page has been revised to keep it clear despite chat groups",
+    "News page - There is now a welcome entry when changing locations",
+    "City information - user information has been improved",
+    "Family profile - The display of the family profile has been improved",
+    "many small improvements",
+    "many small bug fixes"
   ]
 };
 var patch180D={
   "title" : "1.8.0 - 13.11.2022",
   "inhalt": [
-
+    "Chats - Chatgruppen wurden eingebaut. Es gibt jetzt folgende Chatgruppen: Städte, Events, Gemeinschaften und einen Worldchat",
+    "Chats - Chatseite wurde überarbeitet, damit es trotz Chatgruppen übersichtlich bleibt",
+    "Newsseite - Bei Ortwechsel gibt es jetzt einen Willkommenseintrag",
+    "Stadtinformation - Benutzerinformationen wurden verbessert",
+    "Familienprofil - Die Anzeige des Familienprofils wurde verbessert",
+    "viele kleine Verbesserungen",
+    "viele kleine Fehlerbehebungen"
   ]
 };
 

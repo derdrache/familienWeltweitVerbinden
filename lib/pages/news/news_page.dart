@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../events/eventCard.dart';
@@ -202,7 +203,8 @@ class _NewsPageState extends State<NewsPage> {
             children: [
               Container(
                   width: 800,
-                  margin: const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                  margin:
+                      const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                   padding: const EdgeInsets.only(
                       left: 20, right: 20, top: 15, bottom: 15),
                   decoration: BoxDecoration(
@@ -214,17 +216,23 @@ class _NewsPageState extends State<NewsPage> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 5,
                         blurRadius: 7,
-                        offset: const Offset(0, 3), // changes position of shadow
+                        offset:
+                            const Offset(0, 3), // changes position of shadow
                       ),
                     ],
                   ),
-                  child: Text(text, textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize))),
-          Positioned(
-            bottom: 20,
-            right: 35,
-            child: NewsStamp(date: news["erstelltAm"], isNew: checkIfNew(news["information"], news["erstelltVon"]))
-          )
+                  child: Text(text,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: titleFontSize))),
+              Positioned(
+                  bottom: 20,
+                  right: 35,
+                  child: NewsStamp(
+                      date: news["erstelltAm"],
+                      isNew:
+                          checkIfNew(news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -259,7 +267,8 @@ class _NewsPageState extends State<NewsPage> {
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"]) {
         text = newsUserProfil["name"] +
-            AppLocalizations.of(context).freundOrtsWechsel+"\n" +
+            AppLocalizations.of(context).freundOrtsWechsel +
+            "\n" +
             newsOrtInfo;
       } else if (ownOrt == newsOrt && samePlaceAndTime) {
         text = newsUserProfil["name"] +
@@ -279,7 +288,8 @@ class _NewsPageState extends State<NewsPage> {
             children: [
               Container(
                   width: 800,
-                  margin: const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                  margin:
+                      const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                   padding: const EdgeInsets.only(
                       left: 20, right: 20, top: 15, bottom: 15),
                   decoration: BoxDecoration(
@@ -291,18 +301,23 @@ class _NewsPageState extends State<NewsPage> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 5,
                         blurRadius: 7,
-                        offset: const Offset(0, 3), // changes position of shadow
+                        offset:
+                            const Offset(0, 3), // changes position of shadow
                       ),
                     ],
                   ),
-                  child: Text(text, textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize))
-              ),
+                  child: Text(text,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: titleFontSize))),
               Positioned(
                   bottom: 20,
                   right: 35,
-                  child: NewsStamp(date: news["erstelltAm"], isNew: checkIfNew(news["information"], news["erstelltVon"]))
-              )
+                  child: NewsStamp(
+                      date: news["erstelltAm"],
+                      isNew:
+                          checkIfNew(news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -344,7 +359,8 @@ class _NewsPageState extends State<NewsPage> {
             children: [
               Container(
                   width: 800,
-                  margin: const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                  margin:
+                      const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                   padding: const EdgeInsets.only(
                       left: 20, right: 20, top: 15, bottom: 15),
                   decoration: BoxDecoration(
@@ -356,7 +372,8 @@ class _NewsPageState extends State<NewsPage> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 5,
                         blurRadius: 7,
-                        offset: const Offset(0, 3), // changes position of shadow
+                        offset:
+                            const Offset(0, 3), // changes position of shadow
                       ),
                     ],
                   ),
@@ -364,7 +381,9 @@ class _NewsPageState extends State<NewsPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(textTitle,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: titleFontSize)),
                       const SizedBox(height: 10),
                       Text(textDate),
                       Text(textLocation),
@@ -373,8 +392,10 @@ class _NewsPageState extends State<NewsPage> {
               Positioned(
                   bottom: 20,
                   right: 35,
-                  child: NewsStamp(date: news["erstelltAm"], isNew: checkIfNew(news["information"], news["erstelltVon"]))
-              )
+                  child: NewsStamp(
+                      date: news["erstelltAm"],
+                      isNew:
+                          checkIfNew(news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -385,7 +406,8 @@ class _NewsPageState extends State<NewsPage> {
       var locationTimeCheck = DateTime.parse(event["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
       var isOnline = event["typ"] == "online";
-      var checkOfflineEvent = !isOnline && locationTimeCheck >= 0 &&
+      var checkOfflineEvent = !isOnline &&
+          locationTimeCheck >= 0 &&
           event["stadt"] == ownProfil["ort"];
       var checkOnlineEvent = isOnline && evenTagMatch(event["tags"]);
       var isPrivate = event["art"] == "privat" || event["art"] == "private";
@@ -461,7 +483,8 @@ class _NewsPageState extends State<NewsPage> {
             children: [
               Container(
                   width: 800,
-                  margin: const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                  margin:
+                      const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                   padding: const EdgeInsets.only(
                       left: 20, right: 20, top: 15, bottom: 15),
                   decoration: BoxDecoration(
@@ -473,7 +496,8 @@ class _NewsPageState extends State<NewsPage> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 5,
                         blurRadius: 7,
-                        offset: const Offset(0, 3), // changes position of shadow
+                        offset:
+                            const Offset(0, 3), // changes position of shadow
                       ),
                     ],
                   ),
@@ -481,7 +505,9 @@ class _NewsPageState extends State<NewsPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(textHeader,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: titleFontSize)),
                       const SizedBox(height: 10),
                       Text(textBody),
                     ],
@@ -489,16 +515,18 @@ class _NewsPageState extends State<NewsPage> {
               Positioned(
                   bottom: 20,
                   right: 35,
-                  child: NewsStamp(date: info["erstelltAm"], isNew: checkIfNew(textBody, info["erstelltVon"]))
-              )
+                  child: NewsStamp(
+                      date: info["erstelltAm"],
+                      isNew: checkIfNew(textBody, info["erstelltVon"])))
             ],
           ),
         ),
       );
     }
 
-    addLocationWelcome(news){
-      var condition = news["typ"] == "ortswechsel" && news["erstelltVon"].contains(userId);
+    addLocationWelcome(news) {
+      var condition =
+          news["typ"] == "ortswechsel" && news["erstelltVon"].contains(userId);
       if (!condition) return;
 
       userNewsContent
@@ -522,7 +550,8 @@ class _NewsPageState extends State<NewsPage> {
               children: [
                 Container(
                     width: 800,
-                    margin: const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                    margin:
+                        const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
@@ -534,21 +563,26 @@ class _NewsPageState extends State<NewsPage> {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 5,
                           blurRadius: 7,
-                          offset: const Offset(0, 3), // changes position of shadow
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
                         ),
                       ],
                     ),
                     child: Column(
                       children: [
                         Text(
-                            AppLocalizations.of(context).newsLocationBegruessung +
+                            AppLocalizations.of(context)
+                                    .newsLocationBegruessung +
                                 ortsName,
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: titleFontSize)),
                         const SizedBox(height: 5),
                         locationUserInfos.length == 0
-                            ? Text(AppLocalizations.of(context).erfahrungenTeilen)
+                            ? Text(
+                                AppLocalizations.of(context).erfahrungenTeilen)
                             : Text(AppLocalizations.of(context)
-                            .erfahrungenAnschauenUndTeilen)
+                                .erfahrungenAnschauenUndTeilen)
                       ],
                     )),
                 Positioned(
@@ -556,14 +590,58 @@ class _NewsPageState extends State<NewsPage> {
                     right: 35,
                     child: NewsStamp(
                         date: news["erstelltAm"],
-                        isNew: checkIfNew(news["information"], news["erstelltVon"])
-                    )
-                )
+                        isNew: checkIfNew(
+                            news["information"], news["erstelltVon"])))
               ],
             ),
           ),
         ),
       });
+    }
+
+    addMonthYearDivider() {
+      var latestMonthYear;
+
+      for (var news in List.of(newsFeed)) {
+        if (news["newsWidget"] is SizedBox) continue;
+
+        var newsMonthYear =
+            DateFormat.yMMMM().format(DateTime.parse(news["date"]));
+
+        if (latestMonthYear == null || latestMonthYear != newsMonthYear) {
+          var newDate = DateTime.parse(news["date"].split(" ")[0]);
+
+          newsFeed.add({
+            "date": newDate.toString(),
+            "newsWidget": Center(
+              child: Container(
+                margin: EdgeInsets.only(bottom: 30),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: Text(
+                  newsMonthYear,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+          });
+          latestMonthYear = newsMonthYear;
+        }
+      }
     }
 
     createNewsFeed() {
@@ -582,15 +660,12 @@ class _NewsPageState extends State<NewsPage> {
             "newsWidget": changePlaceDisplay(news, myLastLocationChangeDate),
             "date": news["erstelltAm"]
           });
-
         } else if (news["typ"] == "reiseplanung") {
           newsFeed.add({
             "newsWidget": friendsNewTravelPlanDisplay(news),
             "date": news["erstelltAm"]
           });
         }
-
-
       }
 
       for (var event in events) {
@@ -607,6 +682,8 @@ class _NewsPageState extends State<NewsPage> {
           "date": info["erstelltAm"]
         });
       }
+
+      addMonthYearDivider();
     }
 
     getSettingProfilOrAddNew();
@@ -651,7 +728,6 @@ class _NewsPageState extends State<NewsPage> {
   }
 }
 
-
 class NoScalingAnimation extends FloatingActionButtonAnimator {
   @override
   Offset getOffset({Offset begin, Offset end, double progress}) {
@@ -672,6 +748,7 @@ class NoScalingAnimation extends FloatingActionButtonAnimator {
 class NewsStamp extends StatelessWidget {
   var date;
   bool isNew;
+
   NewsStamp({this.date, this.isNew, Key key}) : super(key: key);
 
   @override
@@ -679,14 +756,13 @@ class NewsStamp extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if(isNew)
+        if (isNew)
           const Icon(
             Icons.fiber_new,
             size: 30,
           ),
         SizedBox(width: 10),
-        Text(date.split(" ")[0],
-            style: TextStyle(color: Colors.grey[600]))
+        Text(date.split(" ")[0], style: TextStyle(color: Colors.grey[600]))
       ],
     );
   }

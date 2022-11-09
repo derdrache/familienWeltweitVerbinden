@@ -165,6 +165,26 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     }
   }
 
+  databaseOperations(locationData, {exactLocation = false}) async {
+    var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
+    var leaveChatId = getCityFromHive(cityName: oldLocation)["id"];
+
+    ProfilDatabase().updateProfilLocation(userId, locationData);
+    NewsPageDatabase().addNewNews({
+      "typ": "ortswechsel",
+      "information": json.encode(locationData),
+    });
+
+    ChatGroupsDatabase().leaveChat(leaveChatId);
+    ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
+
+    if(!exactLocation) await StadtinfoDatabase().addNewCity(locationData);
+    StadtinfoDatabase().update(
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
+        "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
+    );
+  }
+
   _setAutomaticLoaction(automaticLocationStatus) async {
     var ownProfil = Hive.box('secureBox').get("ownProfil");
 
@@ -193,7 +213,9 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
           "latt": currentPosition.latitude,
         };
 
-        ProfilDatabase().updateProfilLocation(userId, locationData);
+        if(ownProfil["city"] == locationData["city"]) return;
+
+        databaseOperations(locationData, exactLocation: true);
 
         return;
       } else if (automaticLocationStatus == standortbestimmung[2] ||
@@ -210,18 +232,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
       var locationData = await LocationService()
           .getDatabaseLocationdataFromGoogleResult(geoData);
-      var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
-      var leaveChatId = getCityFromHive(cityName: oldLocation)["id"];
-      ChatGroupsDatabase().leaveChat(leaveChatId);
 
-      ProfilDatabase().updateProfilLocation(userId, locationData);
-      await StadtinfoDatabase().addNewCity(locationData);
-
-      ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
-      StadtinfoDatabase().update(
-          "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-          "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
-      );
+      databaseOperations(locationData, exactLocation: false);
     }
   }
 
