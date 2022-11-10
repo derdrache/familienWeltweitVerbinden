@@ -299,9 +299,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               userFriendlist.remove(profil["id"]);
               snackbarText = profil["name"] +
                   AppLocalizations.of(context).friendlistEntfernt;
-
-              newsData["information"] = "added " + profil["id"];
-              NewsPageDatabase().addNewNews(newsData);
             } else {
               userFriendlist.add(profil["id"]);
               snackbarText = profil["name"] +
@@ -313,6 +310,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                   toId: profil["id"],
                   toCanGerman: profil["sprachen"].contains("Deutsch") ||
                       profil["sprachen"].contains("german"));
+
+              newsData["information"] = "added " + profil["id"];
+              NewsPageDatabase().addNewNews(newsData);
             }
 
             var localBox = Hive.box('secureBox');
