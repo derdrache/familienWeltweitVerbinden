@@ -412,8 +412,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                 modus: "dropdown",
                 databaseKennzeichnung: "eventInterval",
                 saveFunction: () async {
-                  widget.event = await EventDatabase()
-                      .getData("*", "WHERE id = '${widget.event["id"]}'");
+                  widget.event = getEventFromHive(widget.event["id"]);
                   setState(() {});
                 },
               ),
@@ -1128,8 +1127,7 @@ class _CardFeetState extends State<CardFeet> {
   }
 
   setOrganisatorText() async {
-    organisatorProfil = await ProfilDatabase()
-        .getData("*", "WHERE id = '${widget.organisator}'");
+    organisatorProfil = getProfilFromHive(profilId: widget.organisator);
 
     organisatorText = Text(organisatorProfil["name"],
         style: TextStyle(

@@ -2411,7 +2411,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 SizedBox(
-                  width: 180,
+                  width: 205,
                   child: SimpleDialog(
                     contentPadding: EdgeInsets.zero,
                     insetPadding:
@@ -2423,7 +2423,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       if (userJoinedChat) muteDialog(),
                       if (!widget.isChatgroup) deleteDialog(),
                       if (connectedData["erstelltVon"] != userId &&
-                          userJoinedChat)
+                          userJoinedChat && widget.isChatgroup)
                         leaveDialog(),
                       const SizedBox(height: 5)
                     ],

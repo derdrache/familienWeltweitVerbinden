@@ -130,8 +130,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "aboutme": aboutusKontroller.text
       };
 
-
-
       try {
         await ProfilDatabase().addNewProfil(data);
         var ownProfil =
@@ -140,6 +138,14 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
         var allProfils = Hive.box('secureBox').get("profils");
         allProfils.add(ownProfil);
+
+        var newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
+        newsFeedData.add({
+          "typ": "ortswechsel",
+          "information": ortMapData,
+          "erstelltAm": DateTime.now().toString(),
+          "erstelltVon": FirebaseAuth.instance.currentUser.uid
+        });
 
         global_functions.changePageForever(context, StartPage());
       } catch (_) {

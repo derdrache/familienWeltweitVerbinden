@@ -45,7 +45,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   var isApproved;
   var searchAutocomplete;
   var allName;
-  var userFriendlist;
+  var userFriendlist = Hive.box("secureBox").get("ownProfil")["friendlist"];
   var eventDetails = {};
   var isNotPublic;
   var isRepeating;
@@ -70,10 +70,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   getDatabaseData() async {
-    allName = await ProfilDatabase().getData("name", "");
-
-    userFriendlist =
-        await ProfilDatabase().getData("friendlist", "WHERE id = '$userId'");
+    allName = getAllProfilNames();
   }
 
   freischalten(user, angenommen, windowState) async {
@@ -83,10 +80,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     widget.event["freigegeben"].add(user);
     windowState(() {});
 
-    var dbDaten = await EventDatabase()
-        .getData("freischalten, freigegeben", "WHERE id = '$eventId'");
+    var eventData = getEventFromHive(eventId);
 
-    var freischaltenList = dbDaten["freischalten"];
+    var freischaltenList = eventData["freischalten"];
     freischaltenList.remove(user);
     await EventDatabase().update(
         "freischalten = '${json.encode(freischaltenList)}'",
@@ -94,7 +90,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     if (!angenommen) return;
 
-    var freigegebenListe = dbDaten["freigegeben"];
+    var freigegebenListe = eventData["freigegeben"];
     freigegebenListe.add(user);
     await EventDatabase().update(
         "freigegeben = '${json.encode(freigegebenListe)}'",
@@ -116,8 +112,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       widget.event["freigegeben"].remove(user);
     });
 
-    var freigegebenList =
-        await EventDatabase().getData("freigegeben", "WHERE id = '$eventId'");
+    var freigegebenList = getEventFromHive(eventId)["freigegeben"];
     freigegebenList.remove(user);
     EventDatabase().update("freigegeben = '${json.encode(freigegebenList)}'",
         "WHERE id = '$eventId'");
@@ -178,8 +173,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     Navigator.pop(context);
                     var isInitiator = await newOrganisatorIsOwnerWindow();
 
-                    var selectedUserId = await ProfilDatabase().getData(
-                        "id", "WHERE name = '${inputKontroller.text}'");
+                    var selectedUserId = getProfilFromHive(profilName: inputKontroller.text, getIdOnly: true);
 
                     setState(() {
                       widget.event["erstelltVon"] = selectedUserId;
@@ -225,12 +219,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       });
     }
 
-    var dbData = await EventDatabase().getData(
-        "absage, zusage, interesse", "WHERE id = '${widget.event["id"]}'");
-
-    var zusageList = dbData["zusage"];
-    var absageList = dbData["absage"];
-    var interessenList = dbData["interesse"];
+    var eventData = getEventFromHive(widget.event["id"]);
+    var zusageList = eventData["zusage"];
+    var absageList = eventData["absage"];
+    var interessenList = eventData["interesse"];
 
     if (confirm) {
       if (!interessenList.contains(userId)) interessenList.add(userId);
