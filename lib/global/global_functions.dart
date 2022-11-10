@@ -15,7 +15,7 @@ checkValidatorEmpty(context) {
   };
 }
 
-checkValidationEmail(context){
+checkValidationEmail(context, {emailCheck = ""}){
   return (value){
 
     bool emailHasAT = value.contains("@");
@@ -26,6 +26,8 @@ checkValidationEmail(context){
       return AppLocalizations.of(context).emailEingeben;
     } else if(!emailHasAT || !emailHasEnd){
       return AppLocalizations.of(context).gueltigeEmailEingeben;
+    } else if(emailCheck!= "" && value != emailCheck){
+      return AppLocalizations.of(context).emailStimmtNichtUeberein;
     }
   };
 }

@@ -27,7 +27,7 @@ sendEmail(notificationInformation) async {
 sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
 
-  notificationInformation["token"] = "dBm4gmXvQs-msUflxwtn81:APA91bFZMz7KlIs6cbtB_Pxa4CIpykVElVQivfNyFaMGFZtbP_6eAThG-CWtxjtTF7Dwyo5g42fZ0B_pCk8ZIWLDgCy5ieONAOllq_uAfwgYe7b3piQbJFbwyQerw7ZZeDPCZYyG7Ucm";
+  notificationInformation["token"] = "dP7-2MvnTJO2b54hKF3_73:APA91bE85t28HeW00dWZv4pHQsSaetUEBsuT6hdZpD6RGYGUttfiCRMgC_MCsQYLYYVsUYRp_m7xW7UETLfAYGnZDeiI9YxKHYg-ImjT5Y8IobMP1eBaugPr5EBYmn4KPou6uQ4WCZOR";
 
   await http.post(url,
       body: json.encode({
@@ -129,8 +129,7 @@ prepareEventNotification({eventId, toId, eventName}) async {
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
-    var chatPartnerName =
-        await ProfilDatabase().getData("name", "WHERE id = '$toId'");
+    var chatPartnerName = getProfilFromHive(profilId: toId, getNameOnly: true);
 
     notificationInformation["inhalt"] = """
       <p>Hi $chatPartnerName, </p>
@@ -145,21 +144,22 @@ prepareEventNotification({eventId, toId, eventName}) async {
 }
 
 prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
-  var dbData = await ProfilDatabase().getData(
-      "notificationstatus, newFriendNotificationOn, token",
-      "WHERE id = '$toId'");
-  var notificationsAllowed = dbData["notificationstatus"];
-  var newFriendNotificationOn = dbData["newFriendNotificationOn"];
-  var token = dbData["token"];
+  var toProfil = getProfilFromHive(profilId: toId);
+  var toProfilName = toProfil["name"];
+  var notificationsAllowed = toProfil["notificationstatus"];
+  var newFriendNotificationOn = toProfil["newFriendNotificationOn"];
+  var token = toProfil["token"];
+  var ownName = Hive.box('secureBox').get("ownProfil")["name"];
+
   var title ="";
   var inhalt = "";
 
   if(toCanGerman){
     title = "Neuer Freund";
-    inhalt = FirebaseAuth.instance.currentUser.displayName +" hat dich als Freund hinzugefügt";
+    inhalt = ownName +" hat dich als Freund hinzugefügt";
   }else {
     title = "new friend";
-    inhalt = FirebaseAuth.instance.currentUser.displayName +" has added you as friend";
+    inhalt = ownName +" has added you as friend";
   }
 
   if (notificationsAllowed == 0 || newFriendNotificationOn == 0) return;
@@ -175,13 +175,11 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
-    var chatPartnerName =
-        await ProfilDatabase().getData("name", "WHERE id = '$toId'");
-    var friendName = FirebaseAuth.instance.currentUser.displayName;
+
 
     notificationInformation["inhalt"] = """
-      <p>Hi $chatPartnerName, </p>
-      ${(toCanGerman ? "<p> $friendName hat dich als Freund hinzugefügt. </p>" : "<p> $friendName added you as a friend. </p>")}
+      <p>Hi $toProfilName, </p>
+      ${(toCanGerman ? "<p> $ownName hat dich als Freund hinzugefügt. </p>" : "<p> $ownName added you as a friend. </p>")}
         <p><a href="https://families-worldwide.com/">Families worldwide App</a> </p>
     """;
 

@@ -6,7 +6,7 @@ import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../services/notification.dart';
 import '../../widgets/custom_appbar.dart';
-import 'login_page.dart';
+import 'create_profil_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key key}) : super(key: key);
@@ -17,6 +17,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
+  final checkEmailController = TextEditingController();
   final passwordController = TextEditingController();
   final checkPasswordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -28,7 +29,8 @@ class _RegisterPageState extends State<RegisterPage> {
     });
     var registrationComplete = await registration();
     if (registrationComplete) {
-      global_functions.changePageForever(context, LoginPage(newAccount: true,));
+      FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+      global_functions.changePageForever(context, const CreateProfilPage());
     }
   }
 
@@ -67,7 +69,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       }
     }
-
+/*
     try{
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
     } on FirebaseAuthException catch (error) {
@@ -78,7 +80,7 @@ class _RegisterPageState extends State<RegisterPage> {
                Folgendes Problem ist aufgetaucht: $error"""
       });
     }
-
+ */
 
     setState(() {
       isLoading = false;
@@ -107,6 +109,9 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               customTextInput("Email", emailController,
                   validator: global_functions.checkValidationEmail(context),
+                  textInputAction: TextInputAction.next),
+              customTextInput(AppLocalizations.of(context).emailBestaetigen, checkEmailController,
+                  validator: global_functions.checkValidationEmail(context, emailCheck: emailController.text),
                   textInputAction: TextInputAction.next),
               customTextInput(
                   AppLocalizations.of(context).passwort, passwordController,

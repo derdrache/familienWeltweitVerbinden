@@ -412,6 +412,8 @@
     "nachrichtLoeschen": "delete message ?",
     "nachrichtWirklichLoeschen": "Do you really want to delete this message ?",
     "newsPageOnlineEventVorschlag": "Suggested to you because of the following interest: ",
-    "newsPageOfflineEventVorschlag": "New event in your location"
+    "newsPageOfflineEventVorschlag": "New event in your location",
+    "emailBestaetigen": "Email confirm",
+    "emailStimmtNichtUeberein" : "Email does not match"
 }
 
