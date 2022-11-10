@@ -1104,8 +1104,13 @@ class NewsPageDatabase{
           .difference(DateTime.parse(news["erstelltAm"])).inDays;
       news.removeWhere((key, value) => key == "id"|| key =="erstelltAm" || key == "erstelltVon");
       var checkNewNews = Map<String,dynamic>.of(newNews);
-      checkNewNews["information"] = json.decode(checkNewNews["information"]);
-      var equality = foundation.mapEquals(news["information"], checkNewNews["information"]);
+      var equality;
+      try{
+        checkNewNews["information"] = json.decode(checkNewNews["information"]);
+        equality = foundation.mapEquals(news["information"], checkNewNews["information"]);
+      } catch(_){
+        equality = checkNewNews["information"] == news["information"];
+      }
 
       if(equality && dateDifference < 2) return true;
     }
@@ -1328,6 +1333,7 @@ getProfilFromHive({profilId, profilName, getNameOnly = false, getIdOnly = false}
   if(profilId != null){
     for(var profil in allProfils){
       if(profilId == profil["id"]){
+
         if(getNameOnly) return profil["name"];
         return profil;
       }
@@ -1342,6 +1348,17 @@ getProfilFromHive({profilId, profilName, getNameOnly = false, getIdOnly = false}
     }
   }
 
+}
+
+getAllProfilNames(){
+  var allNames = [];
+
+  var allProfils = Hive.box('secureBox').get("profils");
+  for(var profil in allProfils){
+    allNames.add(profil["name"]);
+  }
+
+  return allNames;
 }
 
 getChatFromHive(chatId){
@@ -1433,6 +1450,7 @@ updateHiveEvent(id, changeTyp, changeData){
 }
 
 
+
 refreshHiveAllgemein() async {
   var dbAllgemein = await AllgemeinDatabase().getData("*", "WHERE id ='1'");
   if (dbAllgemein == false) dbAllgemein = [];
@@ -1494,7 +1512,6 @@ refreshHiveProfils() async{
   List<dynamic> dbProfils =
   await ProfilDatabase().getData("*", "WHERE name != 'googleView' ORDER BY ort ASC");
   if (dbProfils == false) dbProfils = [];
-
   dbProfils = sortProfils(dbProfils);
 
 

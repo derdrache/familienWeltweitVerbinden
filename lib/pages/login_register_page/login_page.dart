@@ -1,4 +1,3 @@
-import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +8,6 @@ import 'package:hive/hive.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
-import '../../services/notification.dart';
 import 'create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
@@ -18,8 +16,7 @@ import '../../services/database.dart';
 import 'impressum.dart';
 
 class LoginPage extends StatefulWidget {
-  bool newAccount;
-  LoginPage({this.newAccount = false, Key key}) : super(key: key);
+  LoginPage({Key key}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -37,10 +34,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      if(widget.newAccount) showEmailBestaetigungsInformation();
-    });
-
     super.initState();
   }
 
@@ -61,37 +54,27 @@ class _LoginPageState extends State<LoginPage> {
       passwort = passwortController.text;
     });
 
-    if (kIsWeb && angemeldetBleiben) {
-      FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
-    }
-
     try {
       email = email.replaceAll(' ', '');
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: passwort);
 
-      bool emailVerified =
-          FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+      if (kIsWeb && angemeldetBleiben) {
+        FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+      }
 
-      if (emailVerified) {
-        var userId = FirebaseAuth.instance.currentUser.uid;
-        var ownProfil =
-            await ProfilDatabase().getData("*", "WHERE id = '$userId'");
-        Hive.box('secureBox').put("ownProfil", ownProfil);
-        await refreshHiveEvents();
+      var userId = FirebaseAuth.instance.currentUser.uid;
+      var ownProfil =
+          await ProfilDatabase().getData("*", "WHERE id = '$userId'");
+      Hive.box('secureBox').put("ownProfil", ownProfil);
+      await refreshHiveEvents();
 
-        if (ownProfil != false) {
+      if (ownProfil != false) {
           global_functions.changePageForever(context, StartPage());
         } else {
           global_functions.changePageForever(context, const CreateProfilPage());
         }
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-        customSnackbar(
-            context, AppLocalizations.of(context).emailNichtBestaetigt);
-      }
+
     } on FirebaseAuthException catch (error) {
       setState(() {
         isLoading = false;
@@ -143,28 +126,6 @@ class _LoginPageState extends State<LoginPage> {
     final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
     return data.size.shortestSide < 600 ? true : false;
   }
-
-  showEmailBestaetigungsInformation(){
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CustomAlertDialog(
-          title: "Email Bestätigen",
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10, right: 10),
-              child: Text("Wir haben dir gerade eine E-Mail gesendet und bitten dich, deine E-Mail Adresse zu bestätigen. \nEs kann bis zu 15 Minuten dauern bis du die Nachricht bekommst."),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: Text("Prüfe bitte gegebenenfalls deinen Spam Ordner.",style: TextStyle(fontStyle: FontStyle.italic),),
-            )
-          ],
-        );
-      },
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -235,31 +196,6 @@ class _LoginPageState extends State<LoginPage> {
           Text(AppLocalizations.of(context).angemeldetBleiben)
         ],
       );
-    }
-
-    Widget resendVerificationEmailButton() {
-      return TextButton(
-          style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.all(Colors.black)),
-          child: Text(
-              AppLocalizations.of(context).verifizierungsEmailNochmalSenden),
-          onPressed: () async {
-            if (FirebaseAuth.instance.currentUser?.emailVerified ?? false) {
-              return;
-            }
-            try {
-              await FirebaseAuth.instance.currentUser?.sendEmailVerification();
-              customSnackbar(
-                  context, AppLocalizations.of(context).emailErneutVersendet);
-            } catch (error) {
-              sendEmail({
-                "title": "Firebase auth Problem",
-                "inhalt": """
-                  Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
-                  Folgendes Problem ist aufgetaucht: $error"""
-              });
-            }
-          });
     }
 
     Widget forgetPassButton() {
@@ -363,7 +299,6 @@ class _LoginPageState extends State<LoginPage> {
                 if (kIsWeb) angemeldetBleibenBox(),
                 const SizedBox(height: 10),
                 forgetPassButton(),
-                resendVerificationEmailButton(),
                 const SizedBox(height: 10),
                 isLoading
                     ? loadingBox()
