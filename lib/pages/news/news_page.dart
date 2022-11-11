@@ -448,7 +448,7 @@ class _NewsPageState extends State<NewsPage> {
                           ? null
                           : Colors.transparent,
                     ),
-                    SizedBox(width: 10),
+                    SizedBox(width: 70),
                     Expanded(child: Text(eventText)),
                     SizedBox(width: 10),
                     Text(event["erstelltAm"].split(" ")[0],
