@@ -50,8 +50,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   double healineTextSize = 18;
   var monthsUntilInactive = 3;
   var timeDifferenceLastLogin;
-  bool isFamily = false;
   Map profil;
+  var familyProfil;
 
   @override
   void initState() {
@@ -77,23 +77,14 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   }
 
   checkFamilyMember(){
-    var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
-    var familyName = "";
-    var familyMainId = "";
+    familyProfil = getFamilyProfil(familyMember: profil["id"]);
 
-    for(var family in familyProfils){
-      if(family["members"].contains(profil["id"])){
-        familyName = family["name"];
-        familyMainId = family["mainProfil"];
-      }
-    }
+    if(familyProfil == null) return;
 
-    if(familyMainId.isEmpty) return;
-
-    isFamily = true;
-    var familyProfil = Map.of(getProfilFromHive(profilId: familyMainId));
-    familyProfil["name"] = (spracheIstDeutsch ? "Familie:" : "family") + " " + familyName;
-    profil = familyProfil;
+    var familyName = familyProfil["name"];
+    var mainMemberProfil = Map.of(getProfilFromHive(profilId: familyProfil["mainProfil"]));
+    mainMemberProfil["name"] = (spracheIstDeutsch ? "Familie:" : "family") + " " + familyName;
+    profil = mainMemberProfil;
   }
 
   checkAccessReiseplanung() {
@@ -201,7 +192,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     global_functions.changePage(
         context,
         ChatDetailsPage(
-          chatPartnerName: chatpartnerName,
           chatPartnerId: chatpartnerId,
           groupChatData: groupChatData,
         ));
@@ -457,21 +447,42 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
 
     titelBox() {
+      var familyMemberName = "";
       if (widget.userName != null) profil["name"] = widget.userName;
+
+      if(familyProfil != null){
+        var familyMember = familyProfil["members"];
+        for(var member in familyMember){
+          familyMemberName += getProfilFromHive(profilId: member, getNameOnly: true);
+          familyMemberName += ", ";
+        }
+      }
+
       return Container(
         alignment: Alignment.center,
         padding:
             const EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ProfilImage(profil, fullScreenWindow: true),
-            const SizedBox(width: 10),
-            Flexible(
-              child: Text(
-                profil["name"],
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 24),
-              ),
+            Row(
+              children: [
+                ProfilImage(profil, fullScreenWindow: true),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      profil["name"],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    if(familyProfil != null) const SizedBox(height: 5),
+                    if(familyProfil != null) Text(familyMemberName
+                    )
+                  ],
+                ),
+              ],
             ),
           ],
         ),
