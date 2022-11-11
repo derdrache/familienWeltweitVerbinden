@@ -285,12 +285,13 @@ class OwnProfilImage extends StatelessWidget {
     return InkWell(
         onTap: fullScreenWindow ? () => showBigImage() : null,
         child: Padding(
-          padding: const EdgeInsets.only(right: 5, left: 5),
+          padding: EdgeInsets.zero,
+          //padding: const EdgeInsets.only(right: 5, left: 5),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: image.contains("http")
                   ? CachedNetworkImage(
-                      width: 55,
+                      width:55,
                       height: 55,
                       fit: BoxFit.cover,
                       imageUrl: image,

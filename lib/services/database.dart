@@ -1434,6 +1434,16 @@ getCityUserInfoFromHive(cityName){
   return infos;
 }
 
+getFamilyProfil({familyId, familyMember}){
+  var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
+
+  for(var familyProfil in familyProfils){
+    if(familyId != null && familyId == familyProfil["id"]) return familyProfil;
+
+    if(familyMember != null && familyProfil["members"].contains(familyMember)) return familyProfil;
+  }
+}
+
 updateHiveOwnProfil(changeTyp, changeData){
   var ownProfil = Hive.box("secureBox").get("ownProfil");
   ownProfil[changeTyp] = changeData;
