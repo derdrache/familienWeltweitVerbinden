@@ -414,6 +414,7 @@
     "newsPageOnlineEventVorschlag": "Suggested to you because of the following interest: ",
     "newsPageOfflineEventVorschlag": "New event in your location",
     "emailBestaetigen": "Email confirm",
-    "emailStimmtNichtUeberein" : "Email does not match"
+    "emailStimmtNichtUeberein" : "Email does not match",
+    "familienmitglieder": "Family members: "
 }
 

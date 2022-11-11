@@ -414,5 +414,6 @@
     "newsPageOnlineEventVorschlag": "Wird dir wegen folgendem Interesse vorgeschlagen: ",
     "newsPageOfflineEventVorschlag": "Neues Event in deiner Stadt",
     "emailBestaetigen": "Email bestätigen",
-    "emailStimmtNichtUeberein" : "Email stimmt nicht überein"
+    "emailStimmtNichtUeberein" : "Email stimmt nicht überein",
+    "familienmitglieder": "Familienmitglieder: "
 }

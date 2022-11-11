@@ -943,7 +943,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       showMenu(
         context: context,
         position: RelativeRect.fromRect(
-            (_tabPosition ?? Offset(20,250)) & const Size(40, 40), Offset.zero & overlay.size),
+            (_tabPosition ?? const Offset(20,250)) & const Size(40, 40), Offset.zero & overlay.size),
         items: [
           if (userJoinedChat)
             PopupMenuItem(
@@ -1589,7 +1589,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                 maxWidth: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.785),
+                                                    0.7),
                                             child: replyFromId != null
                                                 ? Column(
                                                     crossAxisAlignment:
@@ -1632,10 +1632,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   ),
                                   Container(
                                     padding: const EdgeInsets.only(
-                                        top: 5, left: 10, bottom: 7, right: 10),
+                                        top: 5, left: 10, bottom: 7, right: 5),
                                     constraints: BoxConstraints(
                                         maxWidth: MediaQuery.of(context).size.width *
-                                            0.785),
+                                            0.75),
                                     child: Wrap(
                                       children: [
                                         TextWithHyperlinkDetection(
@@ -1699,8 +1699,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
         if (widget.isChatgroup && message["von"] != userId) Container(
-          width: 50,
-          height: 50,
+
           margin: EdgeInsets.only(left: 5, bottom: message["showTranslationButton"] ? 25 : 10),
           child: ProfilImage(creatorData)
       ),
@@ -1823,7 +1822,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   children: [
                     Container(
                         constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * (widget.isChatgroup && message["von"] != userId ? 0.7:0.85)),
+                            maxWidth: MediaQuery.of(context).size.width * (widget.isChatgroup && message["von"] != userId ? 0.75 : 0.85)),
                         margin: EdgeInsets.only(
                             left: 10,
                             right: 10,
