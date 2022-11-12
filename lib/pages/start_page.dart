@@ -132,6 +132,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
 
+    ownProfil["lastLogin"] = DateTime.now().toString();
+
   }
 
   oldUserAutomaticJoinWorldAndCityChat(ort) async{
@@ -315,6 +317,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
       List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
 
       for(var chat in myChats + myGroupChats){
+        if(chat["users"][userId] == null) continue;
         newMessageCount += chat["users"][userId]["newMessages"];
       }
 

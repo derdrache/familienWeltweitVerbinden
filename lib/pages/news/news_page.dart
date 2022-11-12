@@ -122,8 +122,8 @@ class _NewsPageState extends State<NewsPage> {
 
     if (isEmptyWidgetList(widgetList)) {
       widgetList.add(Center(
-          child: SizedBox(
-              height: screenHeight / 2,
+          child: Container(
+              padding: EdgeInsets.only(top: screenHeight/3),
               child: Text(
                 AppLocalizations.of(context).keineNewsVorhanden,
                 style: const TextStyle(fontSize: 20),

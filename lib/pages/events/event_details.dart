@@ -307,7 +307,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-                height: 500,
+                height: 380,
                 title: AppLocalizations.of(context).eventMelden,
                 children: [
                   customTextInput(AppLocalizations.of(context).eventMeldenFrage,
