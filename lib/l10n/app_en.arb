@@ -415,6 +415,10 @@
     "newsPageOfflineEventVorschlag": "New event in your location",
     "emailBestaetigen": "Email confirm",
     "emailStimmtNichtUeberein" : "Email does not match",
-    "familienmitglieder": "Family members: "
+    "familienmitglieder": "Family members: ",
+    "hilfe": "Help",
+    "hilfeVorschlag": "How can we help you ?",
+    "ungeleseneNachrichten": "unread messages"
+
 }
 

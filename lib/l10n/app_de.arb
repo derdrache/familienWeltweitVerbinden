@@ -415,5 +415,8 @@
     "newsPageOfflineEventVorschlag": "Neues Event in deiner Stadt",
     "emailBestaetigen": "Email bestätigen",
     "emailStimmtNichtUeberein" : "Email stimmt nicht überein",
-    "familienmitglieder": "Familienmitglieder: "
+    "familienmitglieder": "Familienmitglieder: ",
+    "hilfe": "Hilfe",
+    "hilfeVorschlag": "Wie können wir dir helfen ?",
+    "ungeleseneNachrichten": "ungelesene Nachrichten"
 }

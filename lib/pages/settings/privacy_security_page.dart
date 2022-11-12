@@ -178,7 +178,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 style: TextStyle(fontSize: fontsize),
               ),
             ),
-            SizedBox(width: 150, child: automaticLocationDropdown)
+            SizedBox(width: 170, child: automaticLocationDropdown)
           ],
         ),
       );
@@ -194,7 +194,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 style: TextStyle(fontSize: fontsize),
               ),
             ),
-            SizedBox(width: 150,child: exactLocationDropdown)
+            SizedBox(width: 170,child: exactLocationDropdown)
           ],)
       );
     }
@@ -209,7 +209,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
               style: TextStyle(fontSize: fontsize),
             ),
           ),
-          SizedBox(width: 150,child: reiseplanungDropdown)
+          SizedBox(width: 170,child: reiseplanungDropdown)
         ],)
       );
     }

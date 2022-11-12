@@ -1444,6 +1444,14 @@ getFamilyProfil({familyId, familyMember}){
   }
 }
 
+getNewsId(information){
+  var newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
+
+  for(var news in newsFeedData){
+    if(news["information"] == information) return news["id"];
+  }
+}
+
 updateHiveOwnProfil(changeTyp, changeData){
   var ownProfil = Hive.box("secureBox").get("ownProfil");
   ownProfil[changeTyp] = changeData;
