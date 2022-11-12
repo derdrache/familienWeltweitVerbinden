@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-//import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:multiselect/multiselect.dart';
 
 double sideSpace = 10;
@@ -229,39 +228,38 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-        Container(
-          width: widget.width ?? webWidth,
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.only(left: 10, right: 10),
-          decoration: BoxDecoration(
-              border: Border.all(width: 1),
-              borderRadius: const BorderRadius.all(Radius.circular(5))
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButtonFormField<String>(
-              isExpanded: true,
-              value: widget.selected == "" ? null : widget.selected,
-              hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
-              elevation: 16,
-              style: const TextStyle(color: Colors.black),
-              icon: const Icon(Icons.arrow_downward, color: Colors.black,),
-              decoration: widget.labelText != "" ? InputDecoration(
-                labelText: widget.labelText,
-              ) :const InputDecoration() ,
-              onChanged: (newValue){
+    return Container(
+      width: widget.width ?? webWidth,
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.only(left: 10),
+      constraints: new BoxConstraints(
+        minHeight: 50.0,
+        maxHeight: 70.0,
+      ),
+      decoration: BoxDecoration(
+          border: Border.all(width: 1),
+          borderRadius: const BorderRadius.all(Radius.circular(5))
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          value: widget.selected == "" ? null : widget.selected,
+          hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
+          elevation: 16,
+          style: const TextStyle(color: Colors.black),
+          decoration: widget.labelText != "" ? InputDecoration(
+            labelText: widget.labelText,
+          ) :const InputDecoration() ,
+          onChanged: (newValue){
 
-                setState(() {
-                  widget.selected = newValue;
-                });
-                if(widget.onChange != null) widget.onChange();
-              },
-              items: createDropdownItems(),
-            ),
-          ),
-        )
-      ]),
+            setState(() {
+              widget.selected = newValue;
+            });
+            if(widget.onChange != null) widget.onChange();
+          },
+          items: createDropdownItems(),
+        ),
+      ),
     );
 
 

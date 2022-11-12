@@ -1115,27 +1115,17 @@ class CardFeet extends StatefulWidget {
 }
 
 class _CardFeetState extends State<CardFeet> {
-  var organisatorText = const Text("");
   Map organisatorProfil;
   var ownName = FirebaseAuth.instance.currentUser.displayName;
   var teilnehmerAnzahl = "";
 
   @override
   void initState() {
-    setOrganisatorText();
+    organisatorProfil = getProfilFromHive(profilId: widget.organisator);
+
     super.initState();
   }
 
-  setOrganisatorText() async {
-    organisatorProfil = getProfilFromHive(profilId: widget.organisator);
-
-    organisatorText = Text(organisatorProfil["name"],
-        style: TextStyle(
-            color: Theme.of(context).colorScheme.secondary,
-            fontSize: fontsize));
-
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1206,7 +1196,11 @@ class _CardFeetState extends State<CardFeet> {
             ),
             const Expanded(child: SizedBox()),
             InkWell(
-              child: organisatorText,
+              child: Text(organisatorProfil["name"] ?? "",
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                      fontSize: fontsize)
+              ),
               onTap: () {
                 global_func.changePage(
                     context,

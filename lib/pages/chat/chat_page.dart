@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:familien_suche/global/global_functions.dart';
+import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/cupertino.dart';
@@ -142,7 +144,7 @@ class _ChatPageState extends State<ChatPage> {
             builder: (_) => ChatDetailsPage(
                   chatPartnerId: chatPartnerId,
                   chatPartnerName: chatPartnerName,
-                ))).whenComplete(() => setState(() {}));
+                ))).whenComplete(() => changePageForever(context, StartPage(selectedIndex: 4,)));
   }
 
   List<Widget> createFriendlistBox(userFriendlist) {
@@ -565,7 +567,7 @@ class _ChatPageState extends State<ChatPage> {
                                       : null,
                                   groupChatData: group,
                                   isChatgroup: !isNotChatGroup)))
-                      .whenComplete(() => setState(() {}));
+                      .whenComplete(() => changePageForever(context, StartPage(selectedIndex: 4,)));
                 }
               },
               onLongPress: () {
