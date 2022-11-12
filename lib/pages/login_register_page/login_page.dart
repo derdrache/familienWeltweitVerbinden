@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
+import '../../widgets/dialogWindow.dart';
 import 'create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
@@ -200,12 +201,54 @@ class _LoginPageState extends State<LoginPage> {
 
     Widget forgetPassButton() {
       return TextButton(
-          style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.all(Colors.black)),
+          style: TextButton.styleFrom(
+              minimumSize: Size.zero,
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              foregroundColor: Colors.black),
           child: Text(AppLocalizations.of(context).passwortVergessen),
           onPressed: () {
             passwortController.text = "";
             global_functions.changePage(context, const ForgetPasswordPage());
+          });
+    }
+
+    Widget hilfeButton() {
+      return TextButton(
+          style: TextButton.styleFrom(
+              minimumSize: Size.zero,
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              foregroundColor: Colors.black),
+          child: Text(AppLocalizations.of(context).hilfe),
+          onPressed: () {
+            var reportController = TextEditingController();
+
+            showDialog(
+                context: context,
+                builder: (BuildContext buildContext) {
+                  return CustomAlertDialog(
+                      height: 390,
+                      title: AppLocalizations.of(context).hilfe,
+                      children: [
+                        customTextInput(
+                            AppLocalizations.of(context).hilfeVorschlag,
+                            reportController,
+                            moreLines: 10),
+                        Container(
+                          margin: const EdgeInsets.only(left: 30, top: 10, right: 30),
+                          child: FloatingActionButton.extended(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                ReportsDatabase().add(
+                                    "Login",
+                                    "Hilfe",
+                                    reportController.text);
+                              },
+                              label: Text(AppLocalizations.of(context).senden)),
+                        )
+                      ]);
+                });
           });
     }
 
@@ -297,9 +340,9 @@ class _LoginPageState extends State<LoginPage> {
                     textInputAction: TextInputAction.done,
                     onSubmit: () => userLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
-                const SizedBox(height: 10),
+                const SizedBox(height: 15),
                 forgetPassButton(),
-                const SizedBox(height: 10),
+                const SizedBox(height: 15),
                 isLoading
                     ? loadingBox()
                     : kIsWeb && !isPhone()
@@ -322,8 +365,11 @@ class _LoginPageState extends State<LoginPage> {
                   global_functions.changePage(context, const RegisterPage());
                 }),
                 googleLoginButton(),
-                const SizedBox(height: 30),
-                if (kIsWeb) footer()
+                const SizedBox(height: 15),
+                hilfeButton(),
+                const SizedBox(height: 15),
+                if (kIsWeb) footer(),
+
               ],
             )));
   }

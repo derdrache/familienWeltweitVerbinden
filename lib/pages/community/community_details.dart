@@ -736,7 +736,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-                height: 500,
+                height: 380,
                 title: AppLocalizations.of(context).communityMelden,
                 children: [
                   customTextInput(

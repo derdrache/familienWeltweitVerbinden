@@ -65,8 +65,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                     .microsecondsSinceEpoch)
             .abs());
 
-    getAllProfilNamesAndId();
-
     if(widget.reiseplanungSpezial) setNormalProfil();
 
     super.initState();
@@ -161,19 +159,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         });
   }
 
-  getAllProfilNamesAndId() {
-    var allProfils = Hive.box('secureBox').get("profils");
-    var allIds = [];
-    var allNames = [];
-
-    for (var profil in allProfils) {
-      allIds.add(profil["id"]);
-      allNames.add(profil["name"]);
-    }
-
-    return {"ids": allIds, "names": allNames};
-  }
-
   openChat(chatpartnerId, chatpartnerName) async {
     var chatId = global_functions.getChatID(chatpartnerId);
 
@@ -205,38 +190,23 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return IconButton(
           icon: const Icon(Icons.message),
           onPressed: () async {
-            var name =
-                widget.userName ?? profil["name"].replaceAll("'", "''");
-            var checkFamily = name.split(" ").contains("family") || name.split(" ").contains("Familie");
 
-            if (checkFamily) {
-              var familyProfils = Hive.box("secureBox").get("familyProfils");
-              Map familyProfil;
+            if (familyProfil != null) {
               List<Widget> menuList = [];
-              var allNamesAndIds = getAllProfilNamesAndId();
-
-              for (var searchFamilyProfil in familyProfils) {
-                if (searchFamilyProfil["members"]
-                    .contains(profil["id"])) {
-                  familyProfil = searchFamilyProfil;
-                }
-              }
 
               familyProfil["members"].remove(userID);
 
               for (var memberId in familyProfil["members"]) {
-                var nameIndex = allNamesAndIds["ids"].indexOf(memberId);
-                if (nameIndex < 0) continue;
-                var name = allNamesAndIds["names"][nameIndex];
+                var memberName = getProfilFromHive(profilId: memberId, getNameOnly: true);
 
                 menuList.add(SimpleDialogOption(
                   child: Row(
                     children: [
-                      Text(name),
+                      Text(memberName),
                     ],
                   ),
                   onPressed: () {
-                    openChat(memberId, name);
+                    openChat(memberId, memberName);
                   },
                 ));
               }
@@ -248,7 +218,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         SizedBox(
-                          width: 250,
+                          width: 200,
                           child: SimpleDialog(
                             contentPadding: EdgeInsets.zero,
                             insetPadding: const EdgeInsets.only(
@@ -289,6 +259,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               userFriendlist.remove(profil["id"]);
               snackbarText = profil["name"] +
                   AppLocalizations.of(context).friendlistEntfernt;
+
+              var newsId = getNewsId("added " + profil["id"]);
+
+              if(newsId != null) NewsPageDatabase().delete(newsId);
             } else {
               userFriendlist.add(profil["id"]);
               snackbarText = profil["name"] +
