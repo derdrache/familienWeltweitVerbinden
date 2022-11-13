@@ -496,13 +496,16 @@ class ChatGroupsDatabase{
 
   _addNotificationCounterAndSendNotification(message, chatData, chatGroupName) async{
     var allUser = chatData["users"];
-    var test = "users = JSON_SET(users";
+    var whatQuery = "users = JSON_SET(users";
 
     allUser.forEach((userId, data){
       var isActive = data["isActive"] ?? false;
+      if(isActive == 1) isActive = true;
+      if(isActive == 0) isActive = false;
+
       if(!isActive){
         chatData["users"][userId]["newMessages"] += 1;
-        test += ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
+        whatQuery += ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
         prepareChatNotification(
             chatId: chatData["id"],
             vonId: message["von"],
@@ -514,10 +517,10 @@ class ChatGroupsDatabase{
       }
     });
 
-    test += ")";
+    whatQuery += ")";
 
     ChatGroupsDatabase().updateChatGroup(
-        test,
+        whatQuery,
         "WHERE id = '${chatData["id"]}'"
     );
 
@@ -525,6 +528,7 @@ class ChatGroupsDatabase{
 
   deleteChat(chatId){
     _deleteInTable("chat_groups", "id", chatId);
+    _deleteInTable("group_messages", "chatId", chatId);
 
     var chatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
     chatGroups.removeWhere((chatGroup) => chatGroup["id"] == chatId);
@@ -579,8 +583,6 @@ class ChatGroupsDatabase{
         "WHERE connected LIKE '%$connectedId%'");
 
   }
-
-
 }
 
 class EventDatabase{

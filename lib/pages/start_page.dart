@@ -177,14 +177,16 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
       "information": json.encode(locationData),
     });
 
-    ChatGroupsDatabase().leaveChat(leaveChatId);
-    ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
-
     if(!exactLocation) await StadtinfoDatabase().addNewCity(locationData);
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
         "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
     );
+
+    ChatGroupsDatabase().leaveChat(leaveChatId);
+    ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
+
+
   }
 
   _setAutomaticLoaction(automaticLocationStatus) async {
