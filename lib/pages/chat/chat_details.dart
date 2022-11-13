@@ -1534,28 +1534,28 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       return Listener(
         onPointerHover: (details) => _tabPosition = details.position,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment:
-              messageBoxInformation["textAlign"] == Alignment.centerLeft
-                  ? MainAxisAlignment.start
-                  : MainAxisAlignment.end,
-          children: [
-            if (widget.isChatgroup && message["von"] != userId)
-              Container(
-                  width: 50,
-                  height: 50,
-                  margin: EdgeInsets.only(
-                      left: 5,
-                      bottom: message["showTranslationButton"] ? 25 : 10),
-                  child: ProfilImage(creatorData)),
-            Expanded(
-              child: AnimatedContainer(
-                color: highlightMessages.contains(index)
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.white,
-                duration: const Duration(seconds: 1),
-                curve: Curves.easeIn,
+        child: AnimatedContainer(
+          color: highlightMessages.contains(index)
+              ? Theme.of(context).colorScheme.primary
+              : Colors.white,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeIn,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment:
+                messageBoxInformation["textAlign"] == Alignment.centerLeft
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.end,
+            children: [
+              if (widget.isChatgroup && message["von"] != userId)
+                Container(
+                    width: 50,
+                    height: 50,
+                    margin: EdgeInsets.only(
+                        left: 5,
+                        bottom: message["showTranslationButton"] ? 25 : 10),
+                    child: ProfilImage(creatorData)),
+              Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -1722,8 +1722,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -1735,26 +1735,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       return Listener(
         onPointerHover: (details) => _tabPosition = details.position,
-        child: Row(
-          mainAxisAlignment:
-              messageBoxInformation["textAlign"] == Alignment.centerLeft
-                  ? MainAxisAlignment.start
-                  : MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (widget.isChatgroup && message["von"] != userId)
-              Container(
-                  margin: EdgeInsets.only(
-                      left: 5,
-                      bottom: message["showTranslationButton"] ? 25 : 10),
-                  child: ProfilImage(creatorData)),
-            AnimatedContainer(
-              color: highlightMessages.contains(index)
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white,
-              duration: const Duration(seconds: 1),
-              curve: Curves.easeIn,
-              child: Stack(
+        child: AnimatedContainer(
+          color: highlightMessages.contains(index)
+              ? Theme.of(context).colorScheme.primary
+              : Colors.white,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeIn,
+          child: Row(
+            mainAxisAlignment:
+                messageBoxInformation["textAlign"] == Alignment.centerLeft
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (widget.isChatgroup && message["von"] != userId)
+                Container(
+                    margin: EdgeInsets.only(
+                        left: 5,
+                        bottom: message["showTranslationButton"] ? 25 : 10),
+                    child: ProfilImage(creatorData)),
+              Stack(
                 children: [
                   Container(
                       constraints: BoxConstraints(
@@ -1827,8 +1827,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     translationButton(message)
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -1842,29 +1842,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         onPointerHover: (details) {
           _tabPosition = details.position;
         },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment:
-              messageBoxInformation["textAlign"] == Alignment.centerLeft
-                  ? MainAxisAlignment.start
-                  : MainAxisAlignment.end,
-          children: [
-            if (widget.isChatgroup && message["von"] != userId)
-              Container(
-                  width: 50,
-                  height: 50,
-                  margin: EdgeInsets.only(
-                      left: 5,
-                      bottom: message["showTranslationButton"] ? 25 : 10),
-                  child: ProfilImage(creatorData)),
-            GestureDetector(
-              onTap: () => openMessageMenu(message, index),
-              child: AnimatedContainer(
-                color: highlightMessages.contains(index)
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.white,
-                duration: const Duration(seconds: 1),
-                curve: Curves.easeIn,
+        child: AnimatedContainer(
+          color: highlightMessages.contains(index)
+              ? Theme.of(context).colorScheme.primary
+              : Colors.white,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeIn,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment:
+                messageBoxInformation["textAlign"] == Alignment.centerLeft
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.end,
+            children: [
+              if (widget.isChatgroup && message["von"] != userId)
+                Container(
+                    width: 50,
+                    height: 50,
+                    margin: EdgeInsets.only(
+                        left: 5,
+                        bottom: message["showTranslationButton"] ? 25 : 10),
+                    child: ProfilImage(creatorData)),
+              GestureDetector(
+                onTap: () => openMessageMenu(message, index),
                 child: Stack(
                   children: [
                     Container(
@@ -1935,8 +1935,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
