@@ -67,7 +67,6 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
     "typ": "chat",
   };
 
-
   sendNotification(notificationInformation);
 
   return;
