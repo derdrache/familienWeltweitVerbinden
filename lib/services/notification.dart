@@ -41,13 +41,11 @@ sendNotification(notificationInformation) async {
 }
 
 prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
-  var dbData = await ProfilDatabase().getData(
-      "activeChat, notificationstatus, chatNotificationOn, token",
-      "WHERE id = '$toId'");
+  var toProfil = getProfilFromHive(profilId: toId);
   var blockList = Hive.box('secureBox').get("ownProfil")["geblocktVon"];
-  var toActiveChat = dbData["activeChat"];
-  var notificationsAllowed = dbData["notificationstatus"];
-  var chatNotificationOn = dbData["chatNotificationOn"];
+  var toActiveChat = toProfil["activeChat"];
+  var notificationsAllowed = toProfil["notificationstatus"];
+  var chatNotificationOn = toProfil["chatNotificationOn"];
 
 
   if (notificationsAllowed == 0 ||
@@ -59,7 +57,7 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
   var title = chatGroup + await ProfilDatabase().getData("name", "WHERE id = '$vonId'");
 
   var notificationInformation = {
-    "token": dbData["token"],
+    "token": toProfil["token"],
     "title": title,
     "inhalt": inhalt,
     "zu": toId,
@@ -128,7 +126,12 @@ prepareEventNotification({eventId, toId, eventName}) async {
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
-    var chatPartnerName = getProfilFromHive(profilId: toId, getNameOnly: true);
+    var chatPartnerProfil = getProfilFromHive(profilId: toId, getNameOnly: true);
+    var chatPartnerName = chatPartnerProfil["name"];
+
+    var wantNotifikations = chatPartnerProfil["eventNotificationOn"] == 1 ? true : false;
+
+    if(!wantNotifikations) return;
 
     notificationInformation["inhalt"] = """
       <p>Hi $chatPartnerName, </p>
@@ -174,7 +177,9 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
+    var wantNotifikations = toProfil["newFriendNotificationOn"] == 1 ? true : false;
 
+    if(!wantNotifikations) return;
 
     notificationInformation["inhalt"] = """
       <p>Hi $toProfilName, </p>

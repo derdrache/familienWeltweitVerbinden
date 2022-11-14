@@ -299,12 +299,16 @@ class ChatDatabase{
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
-    prepareChatNotification(
-      chatId: chatID,
-      vonId: messageData["von"],
-      toId: messageData["zu"],
-      inhalt: messageData["message"]
-    );
+    var isMute = chatgroupData["users"][messageData["zu"]]["mute"];
+
+    if(isMute == null || !isMute){
+      prepareChatNotification(
+          chatId: chatID,
+          vonId: messageData["von"],
+          toId: messageData["zu"],
+          inhalt: messageData["message"]
+      );
+    }
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async{
@@ -506,14 +510,17 @@ class ChatGroupsDatabase{
       if(!isActive){
         chatData["users"][userId]["newMessages"] += 1;
         whatQuery += ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
-        prepareChatNotification(
-            chatId: chatData["id"],
-            vonId: message["von"],
-            toId: userId,
-            inhalt: message["message"],
-            chatGroup: chatGroupName
-        );
+        var isMute = chatData["users"][userId]["mute"];
 
+        if(isMute == null || !isMute){
+          prepareChatNotification(
+              chatId: chatData["id"],
+              vonId: message["von"],
+              toId: userId,
+              inhalt: message["message"],
+              chatGroup: chatGroupName
+          );
+        }
       }
     });
 
@@ -549,6 +556,9 @@ class ChatGroupsDatabase{
     var userId = FirebaseAuth.instance.currentUser.uid;
 
     var city = getCityFromHive(cityName: cityName);
+
+    if(city == null) return;
+
     var cityId = city["id"];
     var chatGroupData = getChatGroupFromHive("</stadt=$cityId");
 
