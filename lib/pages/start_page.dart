@@ -41,6 +41,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var userName = FirebaseAuth.instance.currentUser?.displayName;
   var userAuthEmail = FirebaseAuth.instance.currentUser?.email;
+  var ownProfil = Hive.box("secureBox").get("ownProfil");
   var hasInternet = true;
   var localBox = Hive.box('secureBox');
   var checkedA2HS = false;
@@ -99,11 +100,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   }
 
   _checkAndUpdateProfil() async {
-    if (userName == null) return;
-
-    var ownProfil = Hive.box("secureBox").get("ownProfil");
-
-    if(ownProfil == null) return;
+    if (userName == null || ownProfil == null) return;
 
     var userDBEmail = ownProfil["email"];
     var userDeviceTokenDb = ownProfil["token"];
@@ -127,7 +124,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
       _setAutomaticLoaction(automaticLocation);
     }
 
-    await oldUserAutomaticJoinWorldAndCityChat(ownProfil["ort"]);
+    await oldUserAutomaticJoinChats(ownProfil["ort"]);
 
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
@@ -136,10 +133,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   }
 
-  oldUserAutomaticJoinWorldAndCityChat(ort) async{
-    var lastLogin = await ProfilDatabase().getData("lastLogin", "WHERE id = '$userId'");
-
-    if(DateTime.parse(lastLogin).isBefore(DateTime.parse("2022-10-24"))) {
+  oldUserAutomaticJoinChats(ort) async{
+    if(DateTime.parse(ownProfil["lastLogin"]).isBefore(DateTime.parse("2022-10-24"))) {
       await ChatGroupsDatabase().updateChatGroup(
           "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
           "WHERE id = '1'");
@@ -167,9 +162,11 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     }
   }
 
-  databaseOperations(locationData, {exactLocation = false}) async {
+  databaseOperations(locationData, {exactLocation = false, nearstLocationData = null}) async {
     var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
     var leaveChatId = getCityFromHive(cityName: oldLocation)["id"];
+
+    databaseOperationsHiveUpdate(locationData);
 
     ProfilDatabase().updateProfilLocation(userId, locationData);
     NewsPageDatabase().addNewNews({
@@ -177,7 +174,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
       "information": json.encode(locationData),
     });
 
-    if(!exactLocation) await StadtinfoDatabase().addNewCity(locationData);
+    if(exactLocation){
+      locationData["latt"] = nearstLocationData["latt"];
+      locationData["longt"] = nearstLocationData["longt"];
+    }
+    await StadtinfoDatabase().addNewCity(locationData);
+
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
         "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
@@ -187,6 +189,22 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
 
 
+  }
+
+  databaseOperationsHiveUpdate(locationData){
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
+    ownProfil["ort"] = locationData["city"];
+    ownProfil["longt"] =locationData["longt"];
+    ownProfil["latt"] =locationData["latt"];
+    ownProfil["land"] =locationData["countryname"];
+
+    var newsFeed = Hive.box("secureBox").get("newsFeed");
+    newsFeed.add({
+      "typ": "ortswechsel",
+      "information": locationData,
+      "erstelltVon": userId,
+      "erstelltAm": DateTime.now().toString()
+    });
   }
 
   _setAutomaticLoaction(automaticLocationStatus) async {
@@ -219,7 +237,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
         if(ownProfil["city"] == locationData["city"]) return;
 
-        databaseOperations(locationData, exactLocation: true);
+        databaseOperations(locationData, exactLocation: true, nearstLocationData: nearstLocationData);
 
         return;
       } else if (automaticLocationStatus == standortbestimmung[2] ||

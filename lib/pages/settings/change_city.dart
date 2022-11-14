@@ -80,6 +80,14 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     ownProfil["latt"] =locationDict["latt"];
     ownProfil["land"] =locationDict["countryname"];
 
+    var newsFeed = Hive.box("secureBox").get("newsFeed");
+    newsFeed.add({
+      "typ": "ortswechsel",
+      "information": locationDict,
+      "erstelltVon": userId,
+      "erstelltAm": DateTime.now().toString()
+    });
+
     customSnackbar(context,
     AppLocalizations.of(context).aktuelleOrt +" "+
             AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
