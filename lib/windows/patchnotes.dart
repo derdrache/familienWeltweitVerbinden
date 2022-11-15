@@ -116,9 +116,9 @@ var patchVorlage={
   ]
 };
 var patch180E={
-  "title" : "1.8.0 - 13.11.2022",
+  "title" : "1.8.0 - 16.11.2022",
   "inhalt": [
-    "Chats - Chat groups have been added. There are now the following chat groups: cities, events, communities and a world chat",
+    "Chats - chat groups have been added. There are now the following chat groups: cities, events, communities and a world chat. In the groups, each participant can write in their own language, and the other participants can have any language translated into theirs by pressing a button.",
     "Chats - Chat page has been revised to keep it clear despite chat groups",
     "News page - There is now a welcome entry when changing locations",
     "News page - Some improvements have been implemented",
@@ -129,9 +129,9 @@ var patch180E={
   ]
 };
 var patch180D={
-  "title" : "1.8.0 - 13.11.2022",
+  "title" : "1.8.0 - 16.11.2022",
   "inhalt": [
-    "Chats - Chatgruppen wurden eingebaut. Es gibt jetzt folgende Chatgruppen: Städte, Events, Gemeinschaften und einen Worldchat",
+    "Chats - Chatgruppen wurden eingebaut. Es gibt jetzt folgende Chatgruppen: Städte, Events, Gemeinschaften und einen Worldchat. In den Gruppen kann jeder Teilnehmer in seiner Sprache schreiben, die anderen Teilnehmer können jede Sprache per Knopfdruck in ihre Übersetzen lassen",
     "Chats - Chatseite wurde überarbeitet, damit es trotz Chatgruppen übersichtlich bleibt",
     "Newsseite - Bei Ortwechsel gibt es jetzt einen Willkommenseintrag",
     "Newsseite - Es wurden einige Verbesserungen eingebaut",

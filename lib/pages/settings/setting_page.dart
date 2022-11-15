@@ -457,7 +457,7 @@ class _SettingPageState extends State<SettingPage> {
     }
 
     return Scaffold(
-      appBar: CustomAppBar(title: "", backgroundColor: Colors.white, buttons: [
+      appBar: CustomAppBar(title: "", backgroundColor: Theme.of(context).colorScheme.primary, buttons: [
         IconButton(
             onPressed: () => openSettingWindow(),
             icon: const Icon(Icons.more_vert, color: Colors.black))

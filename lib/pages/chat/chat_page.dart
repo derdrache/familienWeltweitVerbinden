@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:familien_suche/global/global_functions.dart';
-import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/cupertino.dart';
@@ -144,7 +142,7 @@ class _ChatPageState extends State<ChatPage> {
             builder: (_) => ChatDetailsPage(
                   chatPartnerId: chatPartnerId,
                   chatPartnerName: chatPartnerName,
-                ))).whenComplete(() => changePageForever(context, StartPage(selectedIndex: 4,)));
+                ))).whenComplete(() => refreshChatDataFromDb());
   }
 
   List<Widget> createFriendlistBox(userFriendlist) {
@@ -567,7 +565,7 @@ class _ChatPageState extends State<ChatPage> {
                                       : null,
                                   groupChatData: group,
                                   isChatgroup: !isNotChatGroup)))
-                      .whenComplete(() => changePageForever(context, StartPage(selectedIndex: 4,)));
+                      .whenComplete(() => refreshChatDataFromDb());
                 }
               },
               onLongPress: () {
@@ -651,7 +649,7 @@ class _ChatPageState extends State<ChatPage> {
     showAppBar() {
       if (activeChatSearch) {
         return CustomAppBar(
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             title: TextField(
               cursorColor: Colors.black,
               focusNode: seachSearchInputNode,
@@ -734,7 +732,7 @@ class _ChatPageState extends State<ChatPage> {
         return CustomAppBar(
           title: "",
           withLeading: false,
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
@@ -762,7 +760,7 @@ class _ChatPageState extends State<ChatPage> {
         );
       } else {
         return CustomAppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           title: Center(
             child: CupertinoSlidingSegmentedControl(
               children: {
