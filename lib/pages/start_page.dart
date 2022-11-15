@@ -164,7 +164,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   databaseOperations(locationData, {exactLocation = false, nearstLocationData = null}) async {
     var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
-    var leaveChatId = getCityFromHive(cityName: oldLocation)["id"];
+    var leaveChat = getCityFromHive(cityName: oldLocation);
+    var leaveChatId = leaveChat != null ? leaveChat["id"] : "0";
 
     databaseOperationsHiveUpdate(locationData);
 
@@ -222,6 +223,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
           await LocationService().getNearstLocationData(currentPosition);
       nearstLocationData =
           LocationService().transformNearstLocation(nearstLocationData);
+
 
       if(nearstLocationData["country"].isEmpty || nearstLocationData["city"].isEmpty) return;
 

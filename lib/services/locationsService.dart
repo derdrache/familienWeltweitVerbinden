@@ -145,11 +145,16 @@ class LocationService {
     var city = "";
     var region = "";
     var country = "";
+
     for (var item in nearstLocationData["address_components"]) {
-      if (item["types"].contains("locality")) {
+      if (item["types"].contains("locality") && city.isEmpty) {
         city = item["long_name"];
       }
-      else if(item["types"].contains("administrative_area_level_3")){ ///!!!!
+      else if(item["types"].contains("administrative_area_level_3")&& city.isEmpty){
+        city = item["long_name"];
+      }else if(item["types"].contains("administrative_area_level_2")&& city.isEmpty){
+        city = item["long_name"];
+      }else if(item["types"].contains("administrative_area_level_1")&& city.isEmpty){
         city = item["long_name"];
       }
 
