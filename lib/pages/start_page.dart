@@ -134,7 +134,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   }
 
   oldUserAutomaticJoinChats(ort) async{
-    if(DateTime.parse(ownProfil["lastLogin"]).isBefore(DateTime.parse("2022-10-24"))) {
+    if(DateTime.parse(ownProfil["lastLogin"]).isBefore(DateTime.parse("2022-11-16"))) {
       await ChatGroupsDatabase().updateChatGroup(
           "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
           "WHERE id = '1'");

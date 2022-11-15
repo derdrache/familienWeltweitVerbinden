@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,12 +8,9 @@ import 'database.dart';
 var databaseUrl = "https://families-worldwide.com/";
 
 sendEmail(notificationInformation) async {
-  return;
   var url = Uri.parse(databaseUrl + "services/sendEmail2.php");
   var emailAdresse = await ProfilDatabase()
       .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
-
-  if(emailAdresse == false) emailAdresse = "dominik.mast.11@gmail.com";
 
   http.post(url,
       body: json.encode({
@@ -26,8 +22,6 @@ sendEmail(notificationInformation) async {
 
 sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
-
-  notificationInformation["token"] = "dP7-2MvnTJO2b54hKF3_73:APA91bE85t28HeW00dWZv4pHQsSaetUEBsuT6hdZpD6RGYGUttfiCRMgC_MCsQYLYYVsUYRp_m7xW7UETLfAYGnZDeiI9YxKHYg-ImjT5Y8IobMP1eBaugPr5EBYmn4KPou6uQ4WCZOR";
 
   await http.post(url,
       body: json.encode({
@@ -65,10 +59,7 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
     "typ": "chat",
   };
 
-  sendNotification(notificationInformation);
 
-  return;
-  
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
     var dbData =
