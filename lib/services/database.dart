@@ -590,7 +590,7 @@ class ChatGroupsDatabase{
 
     ChatGroupsDatabase().updateChatGroup(
         "users = JSON_REMOVE(users, '\$.$userId')",
-        "WHERE connected LIKE '%$connectedId%'");
+        "WHERE connected LIKE '%$connectedId'");
 
   }
 }
