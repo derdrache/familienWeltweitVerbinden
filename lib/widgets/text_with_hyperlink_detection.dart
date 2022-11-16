@@ -65,6 +65,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       }
     }
 
+
     if(!hasLink){
       newTextList = [];
       addNormalText(text);
