@@ -439,8 +439,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
         }
       }
 
-      if(mainItem["name"] == "PinkGrapefruit") print("false");
-
       pufferCountries =
           await createCountriesZoomLevel(pufferCountries, mainItem);
       pufferContinents =

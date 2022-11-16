@@ -202,7 +202,8 @@ bool isLink(String input) {
   if(input.contains("http") || input.contains("www.")){
     var first4Letters = input.substring(0,4);
 
-    if(!(first4Letters == "http" && first4Letters == "www.")) return false;
+    return !(first4Letters == "http" && first4Letters == "www.");
+
   }
 
   final matcher = RegExp(
