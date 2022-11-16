@@ -77,9 +77,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   checkFamilyMember(){
     familyProfil = getFamilyProfil(familyMember: profil["id"]);
 
-    if(familyProfil == null) return;
+    if(familyProfil == null || familyProfil["mainProfil"].isEmpty || familyProfil["name"].isEmpty){
+      familyProfil = null;
+      return;
+    }
 
     var familyName = familyProfil["name"];
+
     var mainMemberProfil = Map.of(getProfilFromHive(profilId: familyProfil["mainProfil"]));
     mainMemberProfil["name"] = (spracheIstDeutsch ? "Familie:" : "family") + " " + familyName;
     profil = mainMemberProfil;
@@ -610,9 +614,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            TextWithHyperlinkDetection(
-              text: profil["aboutme"],
-              fontsize: textSize,
+            Container(
+              child: TextWithHyperlinkDetection(
+                text: profil["aboutme"],
+                fontsize: textSize,
+              ),
             )
           ],
         ),
