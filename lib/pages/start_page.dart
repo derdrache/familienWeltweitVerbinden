@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:in_app_update/in_app_update.dart';
+import 'package:upgrader/upgrader.dart';
 import "package:universal_html/js.dart" as js;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -70,33 +70,17 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   }
 
   _asyncMethod() async {
-    await refreshHiveAllgemein(); // muss nicht jedesmal gemacht werden!
+    await refreshHiveAllgemein();
     if (!kIsWeb){
       var newUpdate = await checkForceUpdate();
       if(newUpdate) return;
     }
-
-    await _checkNewVersion();
 
     await checkProfilExist();
 
     await _checkAndUpdateProfil();
 
     await _showPatchnotes();
-  }
-
-  _checkNewVersion() async{
-    if(kIsWeb) return;
-
-    try{
-      var updateInfo = await InAppUpdate.checkForUpdate();
-
-      if(updateInfo?.updateAvailability ==
-          UpdateAvailability.updateAvailable){
-        await InAppUpdate.startFlexibleUpdate();
-        await InAppUpdate.completeFlexibleUpdate();
-      }
-    }catch(_){}
   }
 
   _checkAndUpdateProfil() async {
@@ -424,42 +408,45 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     checkA2HS();
 
 
-    return Scaffold(
-        body: Center(
-          child: tabPages.elementAt(widget.selectedIndex),
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          currentIndex: widget.selectedIndex,
-          selectedItemColor: Colors.white,
-          onTap: _onItemTapped,
-          items: <BottomNavigationBarItem>[
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.feed),
-              label: 'News',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.map),
-              label: 'World',
-            ),
-            BottomNavigationBarItem(
-              icon: eventIcon(),
-              label: 'Events',
-            ),
-            BottomNavigationBarItem(
-              icon: communityIcon(),
-              label: 'Community',
-            ),
-            BottomNavigationBarItem(
-              icon: chatIcon(),
-              label: 'Chat',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
-          ],
-        ));
+    return UpgradeAlert(
+      upgrader: Upgrader(shouldPopScope: () => true),
+      child: Scaffold(
+          body: Center(
+            child: tabPages.elementAt(widget.selectedIndex),
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            currentIndex: widget.selectedIndex,
+            selectedItemColor: Colors.white,
+            onTap: _onItemTapped,
+            items: <BottomNavigationBarItem>[
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.feed),
+                label: 'News',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.map),
+                label: 'World',
+              ),
+              BottomNavigationBarItem(
+                icon: eventIcon(),
+                label: 'Events',
+              ),
+              BottomNavigationBarItem(
+                icon: communityIcon(),
+                label: 'Community',
+              ),
+              BottomNavigationBarItem(
+                icon: chatIcon(),
+                label: 'Chat',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            ],
+          )),
+    );
   }
 }
