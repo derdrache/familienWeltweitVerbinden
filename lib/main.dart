@@ -113,7 +113,9 @@ class MyApp extends StatelessWidget {
     final FlutterLocalNotificationsPlugin _notificationsPlugin =
         FlutterLocalNotificationsPlugin();
     var initializationSettings = const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'));
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: IOSInitializationSettings()
+    );
 
     _notificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (payload) async {
