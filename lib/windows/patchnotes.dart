@@ -57,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch181D),
                 _patch(patch180D),
                 _patch(patch172D),
                 _patch(patch171D),
@@ -81,6 +82,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch181E),
                 _patch(patch180E),
                 _patch(patch172E),
                 _patch(patch171E),
@@ -117,6 +119,21 @@ var patchVorlage={
 
   ]
 };
+var patch181E={
+  "title" : "",
+  "inhalt": [
+
+  ]
+};
+var patch181D={
+  "title" : "",
+  "inhalt": [
+    "Weltkarte - Fehler der zum Absturz geführt hat wurde behoben"
+    "Profil - Profile mit einem Familienprofil können wieder geöffnet werden"
+    "Chat - kleine Fehler wurden behoben"
+  ]
+};
+
 var patch180E={
   "title" : "1.8.0 - 16.11.2022",
   "inhalt": [
