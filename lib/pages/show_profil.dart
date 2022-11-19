@@ -24,15 +24,11 @@ import '../widgets/text_with_hyperlink_detection.dart';
 class ShowProfilPage extends StatefulWidget {
   String userName;
   Map profil;
-  var ownProfil;
-  var reiseplanungSpezial;
 
   ShowProfilPage(
       {Key key,
       this.userName,
-      this.profil,
-      this.ownProfil = false,
-      this.reiseplanungSpezial = false})
+      this.profil})
       : super(key: key);
 
   @override
@@ -44,7 +40,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   var spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
   double columnAbstand = 15;
   double textSize = 16;
   double healineTextSize = 18;
@@ -52,11 +47,13 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   var timeDifferenceLastLogin;
   Map profil;
   var familyProfil;
+  var isOwnProfil;
 
   @override
   void initState() {
     profil = Map.of(widget.profil);
-    checkIsOwnProfil();
+    isOwnProfil = profil["id"] == userID;
+
     checkFamilyMember();
     checkAccessReiseplanung();
     timeDifferenceLastLogin = Duration(
@@ -65,14 +62,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                     .microsecondsSinceEpoch)
             .abs());
 
-    if(widget.reiseplanungSpezial) setNormalProfil();
-
     super.initState();
   }
 
-  checkIsOwnProfil() {
-    if (profil["id"] == userID) widget.ownProfil = true;
-  }
 
   checkFamilyMember(){
     familyProfil = getFamilyProfil(familyMember: profil["id"]);
@@ -92,6 +84,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   checkAccessReiseplanung() {
     var hasReiseplanungAccess = false;
     var reiseplanungSetting = profil["reiseplanungPrivacy"];
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
 
     if (profil["reisePlanung"].isEmpty) return false;
 
@@ -100,12 +93,12 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       hasReiseplanungAccess = true;
     } else if ((reiseplanungSetting == privacySetting[1] ||
             reiseplanungSetting == privacySettingEnglisch[1]) &&
-        (widget.ownProfil["friendlist"].contains(profil["id"]))) {
+        (ownProfil["friendlist"].contains(profil["id"]))) {
       hasReiseplanungAccess = true;
     } else if ((reiseplanungSetting == privacySetting[2] ||
             reiseplanungSetting == privacySettingEnglisch[2]) &&
-        (widget.ownProfil["friendlist"].contains(profil["id"])) &&
-        (profil["friendlist"].contains(widget.ownProfil["id"]))) {
+        (ownProfil["friendlist"].contains(profil["id"])) &&
+        (profil["friendlist"].contains(ownProfil["id"]))) {
       hasReiseplanungAccess = true;
     }
 
@@ -131,20 +124,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     }
   }
 
-  setNormalProfil(){
-    var localProfils = Hive.box('secureBox').get("profils") ?? [];
-    var profilData;
-
-
-    for(var profil in localProfils){
-      if(profil["id"] == profil["id"]){
-        profilData = profil;
-      }
-    }
-
-    profil = Map.of(profilData);
-  }
-
   openBesuchteLaenderWindow() {
     List<Widget> besuchteLaenderList = [];
 
@@ -163,266 +142,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         });
   }
 
-  openChat(chatpartnerId, chatpartnerName) async {
-    var chatId = global_functions.getChatID(chatpartnerId);
-
-    var groupChatData =
-        await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
-
-    if (groupChatData == false) {
-      groupChatData = {
-        "users": {
-          chatpartnerId: {"name": profil["name"], "newMessages": 0},
-          userID: {"name": widget.userName, "newMessages": 0}
-        }
-      };
-    }
-
-    global_functions.changePage(
-        context,
-        ChatDetailsPage(
-          chatPartnerId: chatpartnerId,
-          groupChatData: groupChatData,
-        ));
-  }
 
   @override
   Widget build(BuildContext context) {
     var monthDifference = getMonthDifference();
-
-    openChatButton() {
-      return IconButton(
-          icon: const Icon(Icons.message),
-          onPressed: () async {
-
-            if (familyProfil != null) {
-              List<Widget> menuList = [];
-
-              familyProfil["members"].remove(userID);
-
-              for (var memberId in familyProfil["members"]) {
-                var memberName = getProfilFromHive(profilId: memberId, getNameOnly: true);
-
-                menuList.add(SimpleDialogOption(
-                  child: Row(
-                    children: [
-                      Text(memberName),
-                    ],
-                  ),
-                  onPressed: () {
-                    openChat(memberId, memberName);
-                  },
-                ));
-              }
-
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          width: 200,
-                          child: SimpleDialog(
-                            contentPadding: EdgeInsets.zero,
-                            insetPadding: const EdgeInsets.only(
-                                top: 40, left: 0, right: 10),
-                            children: menuList,
-                          ),
-                        ),
-                      ],
-                    );
-                  });
-            } else {
-              openChat(profil["id"], profil["name"]);
-            }
-          });
-    }
-
-    friendlistButton() {
-      var onFriendlist = userFriendlist.contains(profil["id"]);
-
-      return SimpleDialogOption(
-          child: Row(
-            children: [
-              Icon(onFriendlist ? Icons.person_remove : Icons.person_add),
-              const SizedBox(width: 10),
-              Text(onFriendlist
-                  ? AppLocalizations.of(context).freundEntfernen
-                  : AppLocalizations.of(context).freundHinzufuegen)
-            ],
-          ),
-          onPressed: () {
-            var snackbarText = "";
-            var newsData = {
-              "typ": "friendlist",
-              "information": "",
-            };
-
-            if (onFriendlist) {
-              userFriendlist.remove(profil["id"]);
-              snackbarText = profil["name"] +
-                  AppLocalizations.of(context).friendlistEntfernt;
-
-              var newsId = getNewsId("added " + profil["id"]);
-
-              if(newsId != null) NewsPageDatabase().delete(newsId);
-            } else {
-              userFriendlist.add(profil["id"]);
-              snackbarText = profil["name"] +
-                  AppLocalizations.of(context).friendlistHinzugefuegt;
-
-
-              prepareFriendNotification(
-                  newFriendId: userID,
-                  toId: profil["id"],
-                  toCanGerman: profil["sprachen"].contains("Deutsch") ||
-                      profil["sprachen"].contains("german"));
-
-              newsData["information"] = "added " + profil["id"];
-              NewsPageDatabase().addNewNews(newsData);
-            }
-
-            var localBox = Hive.box('secureBox');
-            var ownProfil = localBox.get("ownProfil");
-
-            ownProfil["friendlist"] = userFriendlist;
-            localBox.put("ownProfil", ownProfil);
-
-            customSnackbar(context, snackbarText, color: Colors.green);
-
-            ProfilDatabase().updateProfil(
-                "friendlist = '${jsonEncode(userFriendlist)}'",
-                "WHERE id = '$userID'");
-
-
-
-            Navigator.pop(context);
-            setState(() {});
-          });
-    }
-
-    userBlockierenButton() {
-      var ownId = FirebaseAuth.instance.currentUser.uid;
-      var onBlockList = profil["geblocktVon"].contains(ownId);
-
-      return SimpleDialogOption(
-          child: Row(
-            children: [
-              Icon(onBlockList ? Icons.do_not_touch : Icons.back_hand),
-              const SizedBox(width: 10),
-              Text(onBlockList
-                  ? AppLocalizations.of(context).freigeben
-                  : AppLocalizations.of(context).blockieren)
-            ],
-          ),
-          onPressed: () {
-            String snackbarText = "";
-            var allProfils = Hive.box('secureBox').get("profils");
-            String databaseQuery = "";
-
-            if (onBlockList) {
-              profil["geblocktVon"].remove(ownId);
-              databaseQuery =
-                  "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
-              snackbarText = AppLocalizations.of(context).benutzerFreigegeben;
-            } else {
-              profil["geblocktVon"].add(ownId);
-              databaseQuery =
-                  "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
-              snackbarText = AppLocalizations.of(context).benutzerBlockieren;
-            }
-
-            for (var profil in allProfils) {
-              if (profil["id"] == profil["id"]) {
-                profil["blockiertVon"] = profil["geblocktVon"];
-              }
-            }
-
-            Hive.box('secureBox').put("profils", allProfils);
-
-            customSnackbar(context, snackbarText, color: Colors.green);
-
-            ProfilDatabase().updateProfil(
-                databaseQuery, "WHERE id = '${profil["id"]}'");
-
-            Navigator.pop(context);
-            setState(() {});
-          });
-    }
-
-    meldeUserButton() {
-      return SimpleDialogOption(
-          child: Row(
-            children: [
-              const Icon(Icons.report),
-              const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).melden),
-            ],
-          ),
-          onPressed: () {
-            var meldeTextKontroller = TextEditingController();
-            Navigator.pop(context);
-
-            showDialog(
-                context: context,
-                builder: (BuildContext buildContext) {
-                  return CustomAlertDialog(
-                    height: 380,
-                    title: AppLocalizations.of(context).benutzerMelden,
-                    children: [
-                      customTextInput(
-                          AppLocalizations.of(context).benutzerMeldenFrage,
-                          meldeTextKontroller,
-                          moreLines: 10),
-                      const SizedBox(height: 20),
-                      FloatingActionButton.extended(
-                          onPressed: () {
-                            ReportsDatabase().add(
-                                userID,
-                                "Melde User id: " + profil["id"],
-                                meldeTextKontroller.text);
-                            Navigator.pop(context);
-                            customSnackbar(context,
-                                AppLocalizations.of(context).benutzerGemeldet,
-                                color: Colors.green);
-                          },
-                          label: Text(AppLocalizations.of(context).senden))
-                    ],
-                  );
-                });
-          });
-    }
-
-    moreMenuButton() {
-      return IconButton(
-        icon: const Icon(Icons.more_vert),
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 220,
-                      child: SimpleDialog(
-                        contentPadding: EdgeInsets.zero,
-                        insetPadding:
-                            const EdgeInsets.only(top: 40, left: 0, right: 10),
-                        children: [
-                          friendlistButton(),
-                          userBlockierenButton(),
-                          meldeUserButton()
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              });
-        },
-      );
-    }
 
     titelBox() {
       var familyMemberName = "";
@@ -656,6 +379,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
       for (var reiseplan in profil["reisePlanung"]) {
         String ortText = reiseplan["ortData"]["city"];
+        var dateReiseplanBis = DateTime.parse(reiseplan["bis"]);
+        var dateNow = DateTime(DateTime.now().year, DateTime.now().month);
+
+        if(dateReiseplanBis.isBefore(dateNow)) continue;
 
         if (reiseplan["ortData"]["city"] !=
             reiseplan["ortData"]["countryname"]) {
@@ -687,7 +414,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               AppLocalizations.of(context).reisePlanung + ": ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
-            if (widget.ownProfil)
+            if (isOwnProfil)
               Text("(" +
                   AppLocalizations.of(context).fuer +
                   reiseplanungPrivacy +
@@ -766,7 +493,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               SizedBox(height: columnAbstand),
               kinderBox(),
               besuchteLaenderBox(),
-              if (checkAccessReiseplanung() || widget.ownProfil)
+              if (checkAccessReiseplanung() || isOwnProfil)
                 reisePlanungBox(),
               if (profil["aboutme"].isNotEmpty) aboutmeBox(),
               if (profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
@@ -819,10 +546,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
     return SelectionArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: "", buttons: [
-          widget.ownProfil ? const SizedBox.shrink() : openChatButton(),
-          widget.ownProfil ? const SizedBox.shrink() : moreMenuButton()
-        ]),
+        appBar: _AppBar(
+          profil: profil,
+          familyProfil: familyProfil,
+        ),
         body: SizedBox(
           width: double.maxFinite,
           child: Scrollbar(
@@ -845,3 +572,299 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     );
   }
 }
+
+class _AppBar extends StatefulWidget implements PreferredSizeWidget{
+  final Map profil;
+  final Map familyProfil;
+
+  _AppBar({Key key, this.profil, this.familyProfil}) : super(key: key);
+
+  @override
+  State<_AppBar> createState() => _AppBarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(60.0);
+}
+
+class _AppBarState extends State<_AppBar> {
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
+  String _userName;
+  bool _isOwnProfil;
+
+  @override
+  void initState() {
+    _isOwnProfil = widget.profil["id"] == userId;
+    _userName = widget.profil["name"];
+    super.initState();
+  }
+
+  openChat(chatpartnerId, chatpartnerName) async {
+    var chatId = global_functions.getChatID(chatpartnerId);
+
+    var groupChatData =
+    await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
+
+    if (groupChatData == false) {
+      groupChatData = {
+        "users": {
+          chatpartnerId: {"name": widget.profil["name"], "newMessages": 0},
+          userId: {"name": _userName, "newMessages": 0}
+        }
+      };
+    }
+
+    global_functions.changePage(
+        context,
+        ChatDetailsPage(
+          chatPartnerId: chatpartnerId,
+          groupChatData: groupChatData,
+        ));
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    openChatButton() {
+      return IconButton(
+          icon: const Icon(Icons.message),
+          onPressed: () async {
+
+            if (widget.familyProfil != null) {
+              List<Widget> menuList = [];
+
+              widget.familyProfil["members"].remove(userId);
+
+              for (var memberId in widget.familyProfil["members"]) {
+                var memberName = getProfilFromHive(profilId: memberId, getNameOnly: true);
+
+                menuList.add(SimpleDialogOption(
+                  child: Row(
+                    children: [
+                      Text(memberName),
+                    ],
+                  ),
+                  onPressed: () {
+                    openChat(memberId, memberName);
+                  },
+                ));
+              }
+
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        SizedBox(
+                          width: 200,
+                          child: SimpleDialog(
+                            contentPadding: EdgeInsets.zero,
+                            insetPadding: const EdgeInsets.only(
+                                top: 40, left: 0, right: 10),
+                            children: menuList,
+                          ),
+                        ),
+                      ],
+                    );
+                  });
+            } else {
+              openChat(widget.profil["id"], widget.profil["name"]);
+            }
+          });
+    }
+
+    friendlistButton() {
+      var onFriendlist = userFriendlist.contains(widget.profil["id"]);
+
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              Icon(onFriendlist ? Icons.person_remove : Icons.person_add),
+              const SizedBox(width: 10),
+              Text(onFriendlist
+                  ? AppLocalizations.of(context).freundEntfernen
+                  : AppLocalizations.of(context).freundHinzufuegen)
+            ],
+          ),
+          onPressed: () {
+            var snackbarText = "";
+            var newsData = {
+              "typ": "friendlist",
+              "information": "",
+            };
+
+            if (onFriendlist) {
+              userFriendlist.remove(widget.profil["id"]);
+              snackbarText = _userName +
+                  AppLocalizations.of(context).friendlistEntfernt;
+
+              var newsId = getNewsId("added " + widget.profil["id"]);
+
+              if(newsId != null) NewsPageDatabase().delete(newsId);
+            } else {
+              userFriendlist.add(widget.profil["id"]);
+              snackbarText = _userName +
+                  AppLocalizations.of(context).friendlistHinzugefuegt;
+
+
+              prepareFriendNotification(
+                  newFriendId: userId,
+                  toId: widget.profil["id"],
+                  toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
+                      widget.profil["sprachen"].contains("german"));
+
+              newsData["information"] = "added " + widget.profil["id"];
+              NewsPageDatabase().addNewNews(newsData);
+            }
+
+            var localBox = Hive.box('secureBox');
+            var ownProfil = localBox.get("ownProfil");
+
+            ownProfil["friendlist"] = userFriendlist;
+            localBox.put("ownProfil", ownProfil);
+
+            customSnackbar(context, snackbarText, color: Colors.green);
+
+            ProfilDatabase().updateProfil(
+                "friendlist = '${jsonEncode(userFriendlist)}'",
+                "WHERE id = '$userId'");
+
+            Navigator.pop(context);
+            setState(() {});
+          });
+    }
+
+    userBlockierenButton() {
+      var ownId = FirebaseAuth.instance.currentUser.uid;
+      var onBlockList = widget.profil["geblocktVon"].contains(ownId);
+
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              Icon(onBlockList ? Icons.do_not_touch : Icons.back_hand),
+              const SizedBox(width: 10),
+              Text(onBlockList
+                  ? AppLocalizations.of(context).freigeben
+                  : AppLocalizations.of(context).blockieren)
+            ],
+          ),
+          onPressed: () {
+            String snackbarText = "";
+            var allProfils = Hive.box('secureBox').get("profils");
+            String databaseQuery = "";
+
+            if (onBlockList) {
+              widget.profil["geblocktVon"].remove(ownId);
+              databaseQuery =
+              "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
+              snackbarText = AppLocalizations.of(context).benutzerFreigegeben;
+            } else {
+              widget.profil["geblocktVon"].add(ownId);
+              databaseQuery =
+              "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
+              snackbarText = AppLocalizations.of(context).benutzerBlockieren;
+            }
+
+            for (var profil in allProfils) {
+              if (profil["id"] == profil["id"]) {
+                profil["blockiertVon"] = profil["geblocktVon"];
+              }
+            }
+
+            Hive.box('secureBox').put("profils", allProfils);
+
+            customSnackbar(context, snackbarText, color: Colors.green);
+
+            ProfilDatabase().updateProfil(
+                databaseQuery, "WHERE id = '${widget.profil["id"]}'");
+
+            Navigator.pop(context);
+            setState(() {});
+          });
+    }
+
+    meldeUserButton() {
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              const Icon(Icons.report),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).melden),
+            ],
+          ),
+          onPressed: () {
+            var meldeTextKontroller = TextEditingController();
+            Navigator.pop(context);
+
+            showDialog(
+                context: context,
+                builder: (BuildContext buildContext) {
+                  return CustomAlertDialog(
+                    height: 380,
+                    title: AppLocalizations.of(context).benutzerMelden,
+                    children: [
+                      customTextInput(
+                          AppLocalizations.of(context).benutzerMeldenFrage,
+                          meldeTextKontroller,
+                          moreLines: 10),
+                      const SizedBox(height: 20),
+                      FloatingActionButton.extended(
+                          onPressed: () {
+                            ReportsDatabase().add(
+                                userId,
+                                "Melde User id: " + widget.profil["id"],
+                                meldeTextKontroller.text);
+                            Navigator.pop(context);
+                            customSnackbar(context,
+                                AppLocalizations.of(context).benutzerGemeldet,
+                                color: Colors.green);
+                          },
+                          label: Text(AppLocalizations.of(context).senden))
+                    ],
+                  );
+                });
+          });
+    }
+
+    moreMenuButton() {
+      return IconButton(
+        icon: const Icon(Icons.more_vert),
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: 220,
+                      child: SimpleDialog(
+                        contentPadding: EdgeInsets.zero,
+                        insetPadding:
+                        const EdgeInsets.only(top: 40, left: 0, right: 10),
+                        children: [
+                          friendlistButton(),
+                          userBlockierenButton(),
+                          meldeUserButton()
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              });
+        },
+      );
+    }
+
+
+    return CustomAppBar(title: "", buttons: [
+      _isOwnProfil ? const SizedBox.shrink() : openChatButton(),
+      _isOwnProfil ? const SizedBox.shrink() : moreMenuButton()
+    ]);
+  }
+}
+
+
+
