@@ -582,8 +582,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                       userName: AppLocalizations.of(context).familie +
                           " " +
                           familyProfil["name"],
-                      profil: mainProfil,
-                      ownProfil: true)),
+                      profil: mainProfil)),
               child: Container(
                 margin: const EdgeInsets.all(10),
                 child: Row(

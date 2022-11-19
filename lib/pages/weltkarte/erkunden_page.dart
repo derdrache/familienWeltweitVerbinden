@@ -13,7 +13,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../../services/notification.dart';
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';
 import '../community/community_erstellen.dart';
@@ -602,10 +601,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           LocationService().getCountryLocation(profil["land"]);
 
       if(profilCountryLocation == null){
-        sendEmail({
-          "title": "Problem mit Land ${profil["land"]}",
-          "inhalt": "Folgender User hat dieses Problem: $userId"
-        });
+        checkNewCountry = false;
         continue;
       }
 
@@ -641,6 +637,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var newPoint = true;
 
     var landGedataProfil = LocationService().getCountryLocation(profil["land"]);
+    if(landGedataProfil == null) return list;
+
     landGedataProfil["kontinentGer"] ??= landGedataProfil["nameGer"];
     landGedataProfil["kontinentEng"] ??= landGedataProfil["nameEng"];
 
@@ -1058,10 +1056,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           onTap: () {
             global_functions.changePage(
                 context,
-                ShowProfilPage(
-                  profil: profilData,
-                  reiseplanungSpezial: reiseplanungOn,
-                ));
+                ShowProfilPage(profil: profilData,));
           },
           child: Container(
               padding: const EdgeInsets.all(10),
