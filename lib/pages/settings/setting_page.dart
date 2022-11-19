@@ -280,7 +280,7 @@ class _SettingPageState extends State<SettingPage> {
                 GestureDetector(
                     onTap: () {
                       global_func.changePage(context,
-                          ShowProfilPage(profil: userProfil, ownProfil: true));
+                          ShowProfilPage(profil: userProfil));
                     },
                     child: const Icon(
                       Icons.preview,

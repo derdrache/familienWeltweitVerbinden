@@ -135,7 +135,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             "WHERE id = '${widget.chatId}'");
       } else {
         ProfilDatabase().updateProfil(
-            "activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+            "activeChat = '${widget.chatId}'", "WHERE id = '$userId'");
       }
     } else {
       if (widget.isChatgroup) {
@@ -229,7 +229,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "WHERE id = '${widget.chatId}'");
     } else {
       ProfilDatabase().updateProfil(
-          "activeChat = '$widget.chatId'", "WHERE id = '$userId'");
+          "activeChat = '${widget.chatId}'", "WHERE id = '$userId'");
     }
   }
 
@@ -1147,6 +1147,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
+      if(eventData == null) return SizedBox.shrink();
+
       return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment:
@@ -1323,6 +1325,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           break;
         }
       }
+
+      if(communityData == null) return SizedBox.shrink();
 
       return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -2259,7 +2263,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   ShowProfilPage(
                     userName: userName,
                     profil: userProfil,
-                    ownProfil: memberUserId == userId,
                   )),
               child: Container(
                 padding: const EdgeInsets.all(10),

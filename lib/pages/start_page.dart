@@ -28,6 +28,7 @@ import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
 
+//ignore: must_be_immutable
 class StartPage extends StatefulWidget {
   int selectedIndex;
 
@@ -45,6 +46,14 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   var hasInternet = true;
   var localBox = Hive.box('secureBox');
   var checkedA2HS = false;
+  List<Widget> tabPages = <Widget>[
+    const NewsPage(),
+    const ErkundenPage(),
+    const EventPage(),
+    const CommunityPage(),
+    const ChatPage(),
+    const SettingPage()
+  ];
 
   @override
   void initState() {
@@ -146,7 +155,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     }
   }
 
-  databaseOperations(locationData, {exactLocation = false, nearstLocationData = null}) async {
+  databaseOperations(locationData, {exactLocation = false, nearstLocationData}) async {
     var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
     var leaveChat = getCityFromHive(cityName: oldLocation);
     var leaveChatId = leaveChat != null ? leaveChat["id"] : "0";
@@ -263,16 +272,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> tabPages = <Widget>[
-      const NewsPage(),
-      const ErkundenPage(),
-      const EventPage(),
-      const CommunityPage(),
-      const ChatPage(),
-      const SettingPage()
-    ];
-
-
     void hasNetwork() async {
       try {
         await InternetAddress.lookup('example.com');
@@ -291,45 +290,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
       setState(() {
         widget.selectedIndex = index;
       });
-    }
-
-    eventIcon() {
-      var userFreischalten = 0;
-      var myEvents = Hive.box('secureBox').get("myEvents")?? [];
-
-      for(var event in myEvents){
-        userFreischalten += event["freischalten"].length;
-      }
-
-      return BadgeIcon(
-          icon: Icons.event, text: userFreischalten > 0 ? userFreischalten.toString() : "");
-    }
-
-    communityIcon(){
-      var communityInvite = 0;
-      var allCommunities = Hive.box('secureBox').get("communities")?? [];
-
-      for(var community in allCommunities){
-        if(community["einladung"].contains(userId)) communityInvite += 1;
-      }
-
-      return BadgeIcon(
-          icon: Icons.cottage, text: communityInvite > 0 ? communityInvite.toString() : "");
-    }
-
-    chatIcon() {
-      var newMessageCount = 0;
-      List myChats = Hive.box("secureBox").get("myChats") ?? [];
-      List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-
-      for(var chat in myChats + myGroupChats){
-        if(chat["users"][userId] == null) continue;
-        newMessageCount += chat["users"][userId]["newMessages"];
-      }
-
-      return BadgeIcon(
-          icon: Icons.chat,
-          text: newMessageCount > 0 ? newMessageCount.toString() : "");
     }
 
     Future<bool> showAddHomePageDialog(BuildContext context) async {
@@ -407,46 +367,102 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
     checkA2HS();
 
-
     return UpgradeAlert(
       upgrader: Upgrader(shouldPopScope: () => true),
       child: Scaffold(
           body: Center(
             child: tabPages.elementAt(widget.selectedIndex),
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            currentIndex: widget.selectedIndex,
-            selectedItemColor: Colors.white,
-            onTap: _onItemTapped,
-            items: <BottomNavigationBarItem>[
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.feed),
-                label: 'News',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.map),
-                label: 'World',
-              ),
-              BottomNavigationBarItem(
-                icon: eventIcon(),
-                label: 'Events',
-              ),
-              BottomNavigationBarItem(
-                icon: communityIcon(),
-                label: 'Community',
-              ),
-              BottomNavigationBarItem(
-                icon: chatIcon(),
-                label: 'Chat',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: 'Settings',
-              ),
-            ],
+          bottomNavigationBar: CustomBottomNavigationBar(
+            onNavigationItemTapped: _onItemTapped,
+            selectNavigationItem: widget.selectedIndex,
           )),
     );
   }
 }
+
+class CustomBottomNavigationBar extends StatelessWidget {
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final Function onNavigationItemTapped;
+  final int selectNavigationItem;
+
+  CustomBottomNavigationBar({Key key, this.onNavigationItemTapped, this.selectNavigationItem}) : super(key: key);
+
+  eventIcon() {
+    var userFreischalten = 0;
+    var myEvents = Hive.box('secureBox').get("myEvents")?? [];
+
+    for(var event in myEvents){
+      userFreischalten += event["freischalten"].length;
+    }
+
+    return BadgeIcon(
+        icon: Icons.event, text: userFreischalten > 0 ? userFreischalten.toString() : "");
+  }
+
+  communityIcon(){
+    var communityInvite = 0;
+    var allCommunities = Hive.box('secureBox').get("communities")?? [];
+
+    for(var community in allCommunities){
+      if(community["einladung"].contains(userId)) communityInvite += 1;
+    }
+
+    return BadgeIcon(
+        icon: Icons.cottage, text: communityInvite > 0 ? communityInvite.toString() : "");
+  }
+
+  chatIcon() {
+    var newMessageCount = 0;
+    List myChats = Hive.box("secureBox").get("myChats") ?? [];
+    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+
+    for(var chat in myChats + myGroupChats){
+      if(chat["users"][userId] == null) continue;
+      newMessageCount += chat["users"][userId]["newMessages"];
+    }
+
+    return BadgeIcon(
+        icon: Icons.chat,
+        text: newMessageCount > 0 ? newMessageCount.toString() : "");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      currentIndex: selectNavigationItem,
+      selectedItemColor: Colors.white,
+      onTap: onNavigationItemTapped,
+      items: <BottomNavigationBarItem>[
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.feed),
+          label: 'News',
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.map),
+          label: 'World',
+        ),
+        BottomNavigationBarItem(
+          icon: eventIcon(),
+          label: 'Events',
+        ),
+        BottomNavigationBarItem(
+          icon: communityIcon(),
+          label: 'Community',
+        ),
+        BottomNavigationBarItem(
+          icon: chatIcon(),
+          label: 'Chat',
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.settings),
+          label: 'Settings',
+        ),
+      ],
+    );
+  }
+}
+
+
