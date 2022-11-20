@@ -20,536 +20,61 @@ import '../widgets/custom_appbar.dart';
 import '../widgets/profil_image.dart';
 import '../widgets/text_with_hyperlink_detection.dart';
 
+var userId = FirebaseAuth.instance.currentUser.uid;
+double columnSpacing = 15;
+double textSize = 16;
+double headlineTextSize = 18;
+
 // ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
   String userName;
   Map profil;
 
-  ShowProfilPage(
-      {Key key,
-      this.userName,
-      this.profil})
-      : super(key: key);
+  ShowProfilPage({Key key, this.userName, this.profil}) : super(key: key);
 
   @override
   _ShowProfilPageState createState() => _ShowProfilPageState();
 }
 
 class _ShowProfilPageState extends State<ShowProfilPage> {
-  var userID = FirebaseAuth.instance.currentUser.uid;
-  var spracheIstDeutsch = kIsWeb
-      ? window.locale.languageCode == "de"
-      : Platform.localeName == "de_DE";
-  double columnAbstand = 15;
-  double textSize = 16;
-  double healineTextSize = 18;
-  var monthsUntilInactive = 3;
-  var timeDifferenceLastLogin;
   Map profil;
-  var familyProfil;
-  var isOwnProfil;
+  Map familyProfil;
 
   @override
   void initState() {
     profil = Map.of(widget.profil);
-    isOwnProfil = profil["id"] == userID;
 
-    checkFamilyMember();
-    checkAccessReiseplanung();
-    timeDifferenceLastLogin = Duration(
-        microseconds: (DateTime.now().microsecondsSinceEpoch -
-                DateTime.parse(profil["lastLogin"].toString())
-                    .microsecondsSinceEpoch)
-            .abs());
+    checkIfIsFamilyMember();
 
     super.initState();
   }
 
-
-  checkFamilyMember(){
+  checkIfIsFamilyMember() {
+    var spracheIstDeutsch = kIsWeb
+        ? window.locale.languageCode == "de"
+        : Platform.localeName == "de_DE";
     familyProfil = getFamilyProfil(familyMember: profil["id"]);
 
-    if(familyProfil == null || familyProfil["mainProfil"].isEmpty || familyProfil["name"].isEmpty){
+    if (familyProfil == null ||
+        familyProfil["mainProfil"].isEmpty ||
+        familyProfil["name"].isEmpty) {
       familyProfil = null;
       return;
     }
 
     var familyName = familyProfil["name"];
-
     var mainMemberProfil = Map.of(getProfilFromHive(profilId: familyProfil["mainProfil"]));
-    mainMemberProfil["name"] = (spracheIstDeutsch ? "Familie:" : "family") + " " + familyName;
+    mainMemberProfil["name"] =
+        (spracheIstDeutsch ? "Familie:" : "family") + " " + familyName;
     profil = mainMemberProfil;
   }
 
-  checkAccessReiseplanung() {
-    var hasReiseplanungAccess = false;
-    var reiseplanungSetting = profil["reiseplanungPrivacy"];
-    var ownProfil = Hive.box("secureBox").get("ownProfil");
-
-    if (profil["reisePlanung"].isEmpty) return false;
-
-    if (reiseplanungSetting == privacySetting[0] ||
-        reiseplanungSetting == privacySettingEnglisch[0]) {
-      hasReiseplanungAccess = true;
-    } else if ((reiseplanungSetting == privacySetting[1] ||
-            reiseplanungSetting == privacySettingEnglisch[1]) &&
-        (ownProfil["friendlist"].contains(profil["id"]))) {
-      hasReiseplanungAccess = true;
-    } else if ((reiseplanungSetting == privacySetting[2] ||
-            reiseplanungSetting == privacySettingEnglisch[2]) &&
-        (ownProfil["friendlist"].contains(profil["id"])) &&
-        (profil["friendlist"].contains(ownProfil["id"]))) {
-      hasReiseplanungAccess = true;
-    }
-
-    return hasReiseplanungAccess;
-  }
-
-  getMonthDifference() {
-    profil["lastLogin"] =
-        profil["lastLogin"] ?? DateTime.parse("2022-02-13");
-    return timeDifferenceLastLogin.inDays / 30.44;
-  }
-
-  transformDateToText(dateString, {onlyMonth = false}) {
-    DateTime date = DateTime.parse(dateString);
-
-    if ((date.month > DateTime.now().month &&
-            date.year == DateTime.now().year) ||
-        date.year > DateTime.now().year ||
-        onlyMonth) {
-      return date.month.toString() + "." + date.year.toString();
-    } else {
-      return AppLocalizations.of(context).jetzt;
-    }
-  }
-
-  openBesuchteLaenderWindow() {
-    List<Widget> besuchteLaenderList = [];
-
-    for (var land in profil["besuchteLaender"]) {
-      besuchteLaenderList
-          .add(Container(margin: const EdgeInsets.all(10), child: Text(land)));
-    }
-
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            title: AppLocalizations.of(context).besuchteLaender,
-            children: besuchteLaenderList,
-          );
-        });
-  }
-
-
   @override
   Widget build(BuildContext context) {
-    var monthDifference = getMonthDifference();
-
-    titelBox() {
-      var familyMemberName = "";
-      if (widget.userName != null) profil["name"] = widget.userName;
-
-      if(familyProfil != null){
-        var familyMember = familyProfil["members"];
-        for(var member in familyMember){
-          familyMemberName += getProfilFromHive(profilId: member, getNameOnly: true);
-          familyMemberName += ", ";
-        }
-      }
-
-      return Container(
-        alignment: Alignment.center,
-        padding:
-            const EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                ProfilImage(profil, fullScreenWindow: true),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      profil["name"],
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    if(familyProfil != null) const SizedBox(height: 5),
-                    if(familyProfil != null) Text(familyMemberName
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
-    }
-
-    locationBox() {
-      return Row(
-        children: [
-          Text(
-            AppLocalizations.of(context).aktuelleOrt + ": ",
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
-          ),
-          Flexible(
-              child: Text(
-                profil["ort"],
-            style: TextStyle(fontSize: textSize),
-            maxLines: 2,
-          ))
-        ],
-      );
-    }
-
-    travelTypBox() {
-      var themaText = AppLocalizations.of(context).artDerReise + ": ";
-      var inhaltText =
-          global_functions.changeGermanToEnglish(profil["reiseart"]);
-
-      if (spracheIstDeutsch) {
-        inhaltText =
-            global_functions.changeEnglishToGerman(profil["reiseart"]);
-      }
-
-      return Row(children: [
-        Text(themaText,
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: textSize))
-      ]);
-    }
-
-    aufreiseBox() {
-      if (profil["aufreiseSeit"] == null) return const SizedBox.shrink();
-
-      var themenText = AppLocalizations.of(context).aufReise + ": ";
-      var seitText = profil["aufreiseSeit"]
-          .split("-")
-          .take(2)
-          .toList()
-          .reversed
-          .join("-");
-      var inhaltText = "";
-
-      if (profil["aufreiseBis"] == null) {
-        inhaltText = seitText + " - " + AppLocalizations.of(context).offen;
-      } else {
-        var bisText = profil["aufreiseBis"]
-            .split("-")
-            .take(2)
-            .toList()
-            .reversed
-            .join("-");
-        inhaltText = seitText + " - " + bisText;
-      }
-
-      return Column(children: [
-        Row(children: [
-          Text(themenText,
-              style:
-                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-          Text(inhaltText, style: TextStyle(fontSize: textSize))
-        ]),
-        SizedBox(height: columnAbstand),
-      ]);
-    }
-
-    sprachenBox() {
-      var themenText = AppLocalizations.of(context).sprachen + ": ";
-      var inhaltText = global_functions
-          .changeGermanToEnglish(profil["sprachen"])
-          .join(", ");
-
-      if (spracheIstDeutsch) {
-        inhaltText = global_functions
-            .changeEnglishToGerman(profil["sprachen"])
-            .join(", ");
-      }
-
-      return Row(children: [
-        Text(themenText,
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: textSize))
-      ]);
-    }
-
-    kinderBox() {
-      var childrenProfilList = profil["kinder"];
-      childrenProfilList.sort();
-      var childrenList = [];
-      var alterZusatz = spracheIstDeutsch ? "J" : "y";
-
-      childrenProfilList.forEach((child) {
-        childrenList.add(
-            global_functions.ChangeTimeStamp(child).intoYears().toString() +
-                alterZusatz);
-      });
-
-      return Row(
-        children: [
-          Text(AppLocalizations.of(context).kinder + ": ",
-              style:
-                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-          Text(childrenList.reversed.join(" , "),
-              style: TextStyle(fontSize: textSize))
-        ],
-      );
-    }
-
-    interessenBox() {
-      var themenText = AppLocalizations.of(context).interessen + ": ";
-      var inhaltText = global_functions
-          .changeGermanToEnglish(profil["interessen"])
-          .join(", ");
-
-      if (spracheIstDeutsch) {
-        inhaltText = global_functions
-            .changeEnglishToGerman(profil["interessen"])
-            .join(", ");
-      }
-
-      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(themenText,
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 5),
-        Text(
-          inhaltText,
-          style: TextStyle(fontSize: textSize),
-          maxLines: 4,
-          overflow: TextOverflow.ellipsis,
-        )
-      ]);
-    }
-
-    aboutmeBox() {
-      return Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppLocalizations.of(context).ueberMich + ": ",
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5),
-            Container(
-              child: TextWithHyperlinkDetection(
-                text: profil["aboutme"],
-                fontsize: textSize,
-              ),
-            )
-          ],
-        ),
-      );
-    }
-
-    tradeNotizeBox() {
-      return Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppLocalizations.of(context).verkaufenTauschenSchenken + ": ",
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              profil["tradeNotize"],
-              style: TextStyle(fontSize: textSize),
-            ),
-          ],
-        ),
-      );
-    }
-
-    reisePlanungBox() {
-      var reiseplanung = [];
-      var reiseplanungPrivacy = spracheIstDeutsch
-          ? changeEnglishToGerman(profil["reiseplanungPrivacy"])
-          : changeGermanToEnglish(profil["reiseplanungPrivacy"]);
-
-      profil["reisePlanung"]
-          .sort((a, b) => a["von"].compareTo(b["von"]) as int);
-
-      for (var reiseplan in profil["reisePlanung"]) {
-        String ortText = reiseplan["ortData"]["city"];
-        var dateReiseplanBis = DateTime.parse(reiseplan["bis"]);
-        var dateNow = DateTime(DateTime.now().year, DateTime.now().month);
-
-        if(dateReiseplanBis.isBefore(dateNow)) continue;
-
-        if (reiseplan["ortData"]["city"] !=
-            reiseplan["ortData"]["countryname"]) {
-          ortText += " / " + reiseplan["ortData"]["countryname"];
-        }
-
-        reiseplanung.add(Container(
-          margin: const EdgeInsets.only(bottom: 5),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                    transformDateToText(reiseplan["von"]) +
-                        " - " +
-                        transformDateToText(reiseplan["bis"], onlyMonth: true) +
-                        " in " +
-                        ortText,
-                    style: TextStyle(fontSize: textSize)),
-              ),
-            ],
-          ),
-        ));
-      }
-
-      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(
-          children: [
-            Text(
-              AppLocalizations.of(context).reisePlanung + ": ",
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
-            ),
-            if (isOwnProfil)
-              Text("(" +
-                  AppLocalizations.of(context).fuer +
-                  reiseplanungPrivacy +
-                  ")")
-          ],
-        ),
-        const SizedBox(height: 5),
-        ...reiseplanung,
-        const SizedBox(height: 5)
-      ]);
-    }
-
-    besuchteLaenderBox() {
-      return InkWell(
-        onTap: () => openBesuchteLaenderWindow(),
-        child: Container(
-          margin: EdgeInsets.only(top: columnAbstand, bottom: columnAbstand),
-          child: Row(children: [
-            Text(AppLocalizations.of(context).besuchteLaender + ": ",
-                style:
-                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-            Text(profil["besuchteLaender"].length.toString(),
-                style: TextStyle(fontSize: textSize))
-          ]),
-        ),
-      );
-    }
-
-    createZuletztOnlineText() {
-      var text = "";
-      var color = Colors.grey;
-      var size = textSize - 2;
-      var daysOffline = timeDifferenceLastLogin.inDays;
-
-      if (monthDifference >= monthsUntilInactive) {
-        text = AppLocalizations.of(context).inaktiv;
-        size = healineTextSize;
-      } else if (daysOffline > 30) {
-        text = AppLocalizations.of(context).langeZeitNichtGesehen;
-      } else if (daysOffline > 7) {
-        text = AppLocalizations.of(context).innerhalbMonatsGesehen;
-      } else if (daysOffline > 1) {
-        text = AppLocalizations.of(context).innerhalbWocheGesehen;
-      } else {
-        text = AppLocalizations.of(context).kuerzlichGesehen;
-      }
-
-      return Text(text, style: TextStyle(color: color, fontSize: size));
-    }
-
-    infoProfil() {
-      return Container(
-          padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
-          decoration: BoxDecoration(
-              border: Border(
-                  top: BorderSide(color: global_variablen.borderColorGrey))),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: [
-                Text("Info",
-                    style: TextStyle(
-                        fontSize: healineTextSize,
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold)),
-                const Expanded(child: SizedBox.shrink()),
-                createZuletztOnlineText()
-              ]),
-              SizedBox(height: columnAbstand),
-              locationBox(),
-              SizedBox(height: columnAbstand),
-              travelTypBox(),
-              SizedBox(height: columnAbstand),
-              aufreiseBox(),
-              sprachenBox(),
-              SizedBox(height: columnAbstand),
-              kinderBox(),
-              besuchteLaenderBox(),
-              if (checkAccessReiseplanung() || isOwnProfil)
-                reisePlanungBox(),
-              if (profil["aboutme"].isNotEmpty) aboutmeBox(),
-              if (profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
-              interessenBox(),
-              SizedBox(height: columnAbstand),
-            ],
-          ));
-    }
-
-    kontaktProfil() {
-      return Container(
-        margin: const EdgeInsets.only(top: 10),
-        padding: const EdgeInsets.only(left: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppLocalizations.of(context).kontakt,
-              style: TextStyle(
-                  fontSize: healineTextSize,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            profil["emailAnzeigen"] == 1
-                ? FutureBuilder(
-                    future: ProfilDatabase().getData(
-                        "email", "WHERE id = '${profil["id"]}'"),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Row(children: [
-                          Text(
-                            "Email: ",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: textSize),
-                          ),
-                          Text(snapshot.data,
-                              style: TextStyle(fontSize: textSize))
-                        ]);
-                      }
-                      return Container();
-                    })
-                : const SizedBox.shrink(),
-            SizedBox(height: columnAbstand)
-          ],
-        ),
-      );
-    }
 
     return SelectionArea(
       child: Scaffold(
-        appBar: _AppBar(
-          profil: profil,
-          familyProfil: familyProfil,
-        ),
+        appBar: _AppBar(profil: profil, familyProfil: familyProfil),
         body: SizedBox(
           width: double.maxFinite,
           child: Scrollbar(
@@ -559,11 +84,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 PointerDeviceKind.mouse,
               }),
               child: ListView(children: [
-                titelBox(),
+                _UserNameDisplay(profil: profil, familyProfil: familyProfil),
                 const SizedBox(height: 10),
-                infoProfil(),
+                _UserInformationDisplay(profil: profil),
                 const SizedBox(height: 15),
-                if (profil["emailAnzeigen"] == 1) kontaktProfil(),
+                _UserSozialMediaBox(profil: profil),
               ]),
             ),
           ),
@@ -573,11 +98,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   }
 }
 
-class _AppBar extends StatefulWidget implements PreferredSizeWidget{
+class _AppBar extends StatefulWidget implements PreferredSizeWidget {
   final Map profil;
   final Map familyProfil;
 
-  _AppBar({Key key, this.profil, this.familyProfil}) : super(key: key);
+  const _AppBar({Key key, this.profil, this.familyProfil}) : super(key: key);
 
   @override
   State<_AppBar> createState() => _AppBarState();
@@ -587,14 +112,16 @@ class _AppBar extends StatefulWidget implements PreferredSizeWidget{
 }
 
 class _AppBarState extends State<_AppBar> {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
   var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
   String _userName;
   bool _isOwnProfil;
 
   @override
   void initState() {
-    _isOwnProfil = widget.profil["id"] == userId;
+    bool isFmailyMember = widget.familyProfil != null
+        && widget.familyProfil["members"].contains(userId);
+    _isOwnProfil = widget.profil["id"] == userId || isFmailyMember;
+
     _userName = widget.profil["name"];
     super.initState();
   }
@@ -603,7 +130,7 @@ class _AppBarState extends State<_AppBar> {
     var chatId = global_functions.getChatID(chatpartnerId);
 
     var groupChatData =
-    await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
+        await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
 
     if (groupChatData == false) {
       groupChatData = {
@@ -622,22 +149,20 @@ class _AppBarState extends State<_AppBar> {
         ));
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     openChatButton() {
       return IconButton(
           icon: const Icon(Icons.message),
           onPressed: () async {
-
             if (widget.familyProfil != null) {
               List<Widget> menuList = [];
 
               widget.familyProfil["members"].remove(userId);
 
               for (var memberId in widget.familyProfil["members"]) {
-                var memberName = getProfilFromHive(profilId: memberId, getNameOnly: true);
+                var memberName =
+                    getProfilFromHive(profilId: memberId, getNameOnly: true);
 
                 menuList.add(SimpleDialogOption(
                   child: Row(
@@ -697,17 +222,16 @@ class _AppBarState extends State<_AppBar> {
 
             if (onFriendlist) {
               userFriendlist.remove(widget.profil["id"]);
-              snackbarText = _userName +
-                  AppLocalizations.of(context).friendlistEntfernt;
+              snackbarText =
+                  _userName + AppLocalizations.of(context).friendlistEntfernt;
 
               var newsId = getNewsId("added " + widget.profil["id"]);
 
-              if(newsId != null) NewsPageDatabase().delete(newsId);
+              if (newsId != null) NewsPageDatabase().delete(newsId);
             } else {
               userFriendlist.add(widget.profil["id"]);
               snackbarText = _userName +
                   AppLocalizations.of(context).friendlistHinzugefuegt;
-
 
               prepareFriendNotification(
                   newFriendId: userId,
@@ -758,12 +282,12 @@ class _AppBarState extends State<_AppBar> {
             if (onBlockList) {
               widget.profil["geblocktVon"].remove(ownId);
               databaseQuery =
-              "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
+                  "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
               snackbarText = AppLocalizations.of(context).benutzerFreigegeben;
             } else {
               widget.profil["geblocktVon"].add(ownId);
               databaseQuery =
-              "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
+                  "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
               snackbarText = AppLocalizations.of(context).benutzerBlockieren;
             }
 
@@ -843,7 +367,7 @@ class _AppBarState extends State<_AppBar> {
                       child: SimpleDialog(
                         contentPadding: EdgeInsets.zero,
                         insetPadding:
-                        const EdgeInsets.only(top: 40, left: 0, right: 10),
+                            const EdgeInsets.only(top: 40, left: 0, right: 10),
                         children: [
                           friendlistButton(),
                           userBlockierenButton(),
@@ -858,7 +382,6 @@ class _AppBarState extends State<_AppBar> {
       );
     }
 
-
     return CustomAppBar(title: "", buttons: [
       _isOwnProfil ? const SizedBox.shrink() : openChatButton(),
       _isOwnProfil ? const SizedBox.shrink() : moreMenuButton()
@@ -866,5 +389,486 @@ class _AppBarState extends State<_AppBar> {
   }
 }
 
+// ignore: must_be_immutable
+class _UserNameDisplay extends StatelessWidget {
+  Map profil;
+  Map familyProfil;
 
+  _UserNameDisplay({Key key, this.profil, this.familyProfil}) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    getFamilyMemberNames() {
+      var familyMemberName = "";
+
+      if (familyProfil != null) {
+        var familyMember = familyProfil["members"];
+        for (var member in familyMember) {
+          familyMemberName +=
+              getProfilFromHive(profilId: member, getNameOnly: true);
+          familyMemberName += ", ";
+        }
+      }
+
+      return familyMemberName;
+    }
+
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              ProfilImage(profil, fullScreenWindow: true),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    profil["name"],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  if (familyProfil != null) const SizedBox(height: 5),
+                  if (familyProfil != null) Text(getFamilyMemberNames())
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UserInformationDisplay extends StatelessWidget {
+  final Map profil;
+
+  checkAccessReiseplanung() {
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
+    var hasAccess = false;
+    var reiseplanungSetting = profil["reiseplanungPrivacy"];
+    var isPrivacyLevel1 = reiseplanungSetting == privacySetting[0] ||
+        reiseplanungSetting == privacySettingEnglisch[0];
+    var isPrivacyLevel2 = reiseplanungSetting == privacySetting[1] ||
+        reiseplanungSetting == privacySettingEnglisch[1];
+    var isPrivacyLevel3 = reiseplanungSetting == privacySetting[2] ||
+        reiseplanungSetting == privacySettingEnglisch[2];
+
+    if (profil["reisePlanung"].isEmpty) return false;
+
+    if (isPrivacyLevel1) {
+      hasAccess = true;
+    } else if (isPrivacyLevel2 &&
+        (ownProfil["friendlist"].contains(profil["id"]))) {
+      hasAccess = true;
+    } else if (isPrivacyLevel3 &&
+        ownProfil["friendlist"].contains(profil["id"]) &&
+        profil["friendlist"].contains(ownProfil["id"])) {
+      hasAccess = true;
+    }
+
+    return hasAccess;
+  }
+
+  const _UserInformationDisplay({Key key, this.profil}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var isOwnProfil = profil["id"] == userId;
+    profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
+
+    transformDateToText(dateString, {onlyMonth = false}) {
+      DateTime date = DateTime.parse(dateString);
+
+      if ((date.month > DateTime.now().month &&
+              date.year == DateTime.now().year) ||
+          date.year > DateTime.now().year ||
+          onlyMonth) {
+        return date.month.toString() + "." + date.year.toString();
+      } else {
+        return AppLocalizations.of(context).jetzt;
+      }
+    }
+
+    openBesuchteLaenderWindow() {
+      List<Widget> besuchteLaenderList = [];
+
+      for (var land in profil["besuchteLaender"]) {
+        besuchteLaenderList.add(
+            Container(margin: const EdgeInsets.all(10), child: Text(land)));
+      }
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).besuchteLaender,
+              children: besuchteLaenderList,
+            );
+          });
+    }
+
+    locationBox() {
+      return Row(
+        children: [
+          Text(
+            AppLocalizations.of(context).aktuelleOrt + ": ",
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+          ),
+          Flexible(
+              child: Text(
+            profil["ort"],
+            style: TextStyle(fontSize: textSize),
+            maxLines: 2,
+          ))
+        ],
+      );
+    }
+
+    travelTypBox() {
+      var themaText = AppLocalizations.of(context).artDerReise + ": ";
+      var inhaltText =
+          global_functions.changeGermanToEnglish(profil["reiseart"]);
+
+      if (spracheIstDeutsch) {
+        inhaltText = global_functions.changeEnglishToGerman(profil["reiseart"]);
+      }
+
+      return Row(children: [
+        Text(themaText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: textSize))
+      ]);
+    }
+
+    aufreiseBox() {
+      if (profil["aufreiseSeit"] == null) return const SizedBox.shrink();
+
+      var themenText = AppLocalizations.of(context).aufReise + ": ";
+      var seitText =
+          profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+      var inhaltText = "";
+
+      if (profil["aufreiseBis"] == null) {
+        inhaltText = seitText + " - " + AppLocalizations.of(context).offen;
+      } else {
+        var bisText = profil["aufreiseBis"]
+            .split("-")
+            .take(2)
+            .toList()
+            .reversed
+            .join("-");
+        inhaltText = seitText + " - " + bisText;
+      }
+
+      return Column(children: [
+        Row(children: [
+          Text(themenText,
+              style:
+                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+          Text(inhaltText, style: TextStyle(fontSize: textSize))
+        ]),
+        SizedBox(height: columnSpacing),
+      ]);
+    }
+
+    sprachenBox() {
+      var themenText = AppLocalizations.of(context).sprachen + ": ";
+      var inhaltText =
+          global_functions.changeGermanToEnglish(profil["sprachen"]).join(", ");
+
+      if (spracheIstDeutsch) {
+        inhaltText = global_functions
+            .changeEnglishToGerman(profil["sprachen"])
+            .join(", ");
+      }
+
+      return Row(children: [
+        Text(themenText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: textSize))
+      ]);
+    }
+
+    kinderBox() {
+      var childrenProfilList = profil["kinder"];
+      childrenProfilList.sort();
+      var childrenList = [];
+      var alterZusatz = spracheIstDeutsch ? "J" : "y";
+
+      childrenProfilList.forEach((child) {
+        childrenList.add(
+            global_functions.ChangeTimeStamp(child).intoYears().toString() +
+                alterZusatz);
+      });
+
+      return Row(
+        children: [
+          Text(AppLocalizations.of(context).kinder + ": ",
+              style:
+                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+          Text(childrenList.reversed.join(" , "),
+              style: TextStyle(fontSize: textSize))
+        ],
+      );
+    }
+
+    interessenBox() {
+      var themenText = AppLocalizations.of(context).interessen + ": ";
+      var inhaltText = global_functions
+          .changeGermanToEnglish(profil["interessen"])
+          .join(", ");
+
+      if (spracheIstDeutsch) {
+        inhaltText = global_functions
+            .changeEnglishToGerman(profil["interessen"])
+            .join(", ");
+      }
+
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(themenText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 5),
+        Text(
+          inhaltText,
+          style: TextStyle(fontSize: textSize),
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+        )
+      ]);
+    }
+
+    aboutmeBox() {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).ueberMich + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 5),
+            TextWithHyperlinkDetection(
+              text: profil["aboutme"],
+              fontsize: textSize-1,
+            )
+          ],
+        ),
+      );
+    }
+
+    tradeNotizeBox() {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).verkaufenTauschenSchenken + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              profil["tradeNotize"],
+              style: TextStyle(fontSize: textSize),
+            ),
+          ],
+        ),
+      );
+    }
+
+    reisePlanungBox() {
+      var reiseplanung = [];
+      var reiseplanungPrivacy = spracheIstDeutsch
+          ? changeEnglishToGerman(profil["reiseplanungPrivacy"])
+          : changeGermanToEnglish(profil["reiseplanungPrivacy"]);
+
+      profil["reisePlanung"]
+          .sort((a, b) => a["von"].compareTo(b["von"]) as int);
+
+      for (var reiseplan in profil["reisePlanung"]) {
+        String ortText = reiseplan["ortData"]["city"];
+        var dateReiseplanBis = DateTime.parse(reiseplan["bis"]);
+        var dateNow = DateTime(DateTime.now().year, DateTime.now().month);
+
+        if (dateReiseplanBis.isBefore(dateNow)) continue;
+
+        if (reiseplan["ortData"]["city"] !=
+            reiseplan["ortData"]["countryname"]) {
+          ortText += " / " + reiseplan["ortData"]["countryname"];
+        }
+
+        reiseplanung.add(Container(
+          margin: const EdgeInsets.only(bottom: 5),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                    transformDateToText(reiseplan["von"]) +
+                        " - " +
+                        transformDateToText(reiseplan["bis"], onlyMonth: true) +
+                        " in " +
+                        ortText,
+                    style: TextStyle(fontSize: textSize)),
+              ),
+            ],
+          ),
+        ));
+      }
+
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(
+          children: [
+            Text(
+              AppLocalizations.of(context).reisePlanung + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            if (isOwnProfil)
+              Text("(" +
+                  AppLocalizations.of(context).fuer +
+                  reiseplanungPrivacy +
+                  ")")
+          ],
+        ),
+        const SizedBox(height: 5),
+        ...reiseplanung,
+        const SizedBox(height: 5)
+      ]);
+    }
+
+    besuchteLaenderBox() {
+      return InkWell(
+        onTap: () => openBesuchteLaenderWindow(),
+        child: Container(
+          margin: EdgeInsets.only(top: columnSpacing, bottom: columnSpacing),
+          child: Row(children: [
+            Text(AppLocalizations.of(context).besuchteLaender + ": ",
+                style:
+                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+            Text(profil["besuchteLaender"].length.toString(),
+                style: TextStyle(fontSize: textSize))
+          ]),
+        ),
+      );
+    }
+
+    createZuletztOnlineText() {
+      var text = "";
+      var color = Colors.grey;
+      var size = textSize - 2;
+      var monthsUntilInactive = 3;
+      var timeDifferenceLastLogin = Duration(
+          microseconds: (DateTime.now().microsecondsSinceEpoch -
+                  DateTime.parse(profil["lastLogin"].toString())
+                      .microsecondsSinceEpoch)
+              .abs());
+      var daysOffline = timeDifferenceLastLogin.inDays;
+      var monthDifference = timeDifferenceLastLogin.inDays / 30.44;
+
+      if (monthDifference >= monthsUntilInactive) {
+        text = AppLocalizations.of(context).inaktiv;
+        size = headlineTextSize;
+      } else if (daysOffline > 30) {
+        text = AppLocalizations.of(context).langeZeitNichtGesehen;
+      } else if (daysOffline > 7) {
+        text = AppLocalizations.of(context).innerhalbMonatsGesehen;
+      } else if (daysOffline > 1) {
+        text = AppLocalizations.of(context).innerhalbWocheGesehen;
+      } else {
+        text = AppLocalizations.of(context).kuerzlichGesehen;
+      }
+
+      return Text(text, style: TextStyle(color: color, fontSize: size));
+    }
+
+    return Container(
+        padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
+        decoration: BoxDecoration(
+            border: Border(
+                top: BorderSide(color: global_variablen.borderColorGrey))),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Text("Info",
+                  style: TextStyle(
+                      fontSize: headlineTextSize,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold)),
+              const Expanded(child: SizedBox.shrink()),
+              createZuletztOnlineText()
+            ]),
+            SizedBox(height: columnSpacing),
+            locationBox(),
+            SizedBox(height: columnSpacing),
+            travelTypBox(),
+            SizedBox(height: columnSpacing),
+            aufreiseBox(),
+            sprachenBox(),
+            SizedBox(height: columnSpacing),
+            kinderBox(),
+            besuchteLaenderBox(),
+            if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
+            if (profil["aboutme"].isNotEmpty) aboutmeBox(),
+            if (profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
+            interessenBox(),
+            SizedBox(height: columnSpacing),
+          ],
+        ));
+  }
+}
+
+class _UserSozialMediaBox extends StatelessWidget {
+  final Map profil;
+
+  const _UserSozialMediaBox({Key key, this.profil}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return profil["emailAnzeigen"] == 1
+        ? Container(
+            margin: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.only(left: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context).kontakt,
+                  style: TextStyle(
+                      fontSize: headlineTextSize,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                profil["emailAnzeigen"] == 1
+                    ? FutureBuilder(
+                        future: ProfilDatabase()
+                            .getData("email", "WHERE id = '${profil["id"]}'"),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Row(children: [
+                              Text(
+                                "Email: ",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: textSize),
+                              ),
+                              Text(snapshot.data,
+                                  style: TextStyle(fontSize: textSize))
+                            ]);
+                          }
+                          return Container();
+                        })
+                    : const SizedBox.shrink(),
+                SizedBox(height: columnSpacing)
+              ],
+            ),
+          )
+        : const SizedBox.shrink();
+  }
+}

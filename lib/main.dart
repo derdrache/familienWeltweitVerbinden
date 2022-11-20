@@ -20,8 +20,6 @@ import 'services/database.dart';
 import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 
-var appIcon = '@mipmap/ic_launcher';
-
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -33,14 +31,16 @@ hiveInit() async {
 
   await Hive.openBox("secureBox",
       encryptionCipher: HiveAesCipher(boxEncrpytionKey), crashRecovery: false);
+}
 
+setGeoData() async{
   var countryJsonText =
-      await rootBundle.loadString('assets/countryGeodata.json');
+  await rootBundle.loadString('assets/countryGeodata.json');
   var geodata = json.decode(countryJsonText)["data"];
   Hive.box('secureBox').put("countryGeodata", geodata);
 
   var continentsJsonText =
-      await rootBundle.loadString('assets/continentsGeodata.json');
+  await rootBundle.loadString('assets/continentsGeodata.json');
   var continentsGeodata = json.decode(continentsJsonText)["data"];
   Hive.box('secureBox').put("kontinentGeodata", continentsGeodata);
 }
@@ -70,17 +70,15 @@ void main() async {
   }
 
   await hiveInit();
+  await setGeoData();
 
   refreshHiveData();
-
 
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   String userId = FirebaseAuth.instance.currentUser?.uid;
-  bool emailVerified =
-      FirebaseAuth.instance.currentUser?.emailVerified ?? false;
   BuildContext pageContext;
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -91,7 +89,6 @@ class MyApp extends StatelessWidget {
     if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
       userId = FirebaseAuth.instance.currentUser.uid;
-      emailVerified = FirebaseAuth.instance.currentUser?.emailVerified ?? false;
     }
 
     if (kIsWeb) return;
@@ -211,7 +208,7 @@ class MyApp extends StatelessWidget {
               ],
               navigatorKey: navigatorKey,
               debugShowCheckedModeBanner: false,
-              home: FirebaseAuth.instance.currentUser != null && emailVerified
+              home: FirebaseAuth.instance.currentUser != null
                   ? StartPage()
                   : LoginPage());
         });

@@ -21,6 +21,8 @@ import '../../widgets/badge_icon.dart';
 import '../show_profil.dart';
 import '../start_page.dart';
 
+var userId = FirebaseAuth.instance.currentUser.uid;
+
 class EventDetailsPage extends StatefulWidget {
   var event;
   var teilnahme;

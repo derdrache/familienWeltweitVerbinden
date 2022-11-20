@@ -13,6 +13,8 @@ import '../../widgets/search_autocomplete.dart';
 import 'community_card.dart';
 import 'community_erstellen.dart';
 
+final String userId = FirebaseAuth.instance.currentUser?.uid;
+
 class CommunityPage extends StatefulWidget {
   const CommunityPage({Key key}) : super(key: key);
 
