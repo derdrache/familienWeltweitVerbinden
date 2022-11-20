@@ -255,7 +255,7 @@ class DefaultProfilImage extends StatelessWidget {
           child: Text(
         imageText.toUpperCase(),
         style: const TextStyle(
-            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
       )),
     );
   }
@@ -286,7 +286,6 @@ class OwnProfilImage extends StatelessWidget {
         onTap: fullScreenWindow ? () => showBigImage() : null,
         child: Padding(
           padding: EdgeInsets.zero,
-          //padding: const EdgeInsets.only(right: 5, left: 5),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: image.contains("http")

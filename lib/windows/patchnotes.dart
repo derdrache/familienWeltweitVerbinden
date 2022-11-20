@@ -120,16 +120,20 @@ var patchVorlage={
   ]
 };
 var patch181E={
-  "title" : "",
+  "title" : "1.8.1 - 20.11.2022",
   "inhalt": [
-
+    "Login - The login error for new users has been fixed",
+    "World Map - The database error that caused the world map to crash has been fixed",
+    "Profile - profiles with a family profile can be opened again",
+    "Chat - small bugs were fixed"
   ]
 };
 var patch181D={
-  "title" : "",
+  "title" : "1.8.1 - 20.11.2022",
   "inhalt": [
-    "Weltkarte - Fehler der zum Absturz geführt hat wurde behoben"
-    "Profil - Profile mit einem Familienprofil können wieder geöffnet werden"
+    "Login - Der Loginfehler für neue User wurde behoben",
+    "Weltkarte - Der Datenbankfehler der zum Absturz der Weltkarte geführt hat wurde behoben",
+    "Profil - Profile mit einem Familienprofil können wieder geöffnet werden",
     "Chat - kleine Fehler wurden behoben"
   ]
 };

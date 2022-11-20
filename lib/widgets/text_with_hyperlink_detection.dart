@@ -25,18 +25,16 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       newTextList.add(TextSpan(
           text: text,
           recognizer: TapGestureRecognizer()..onTap = onTextTab == null ? null :() => onTextTab(),
-          style: const TextStyle(
-        color: Colors.black,
-      )));
+          style: TextStyle(fontSize: fontsize, color: Colors.black,)
+      ));
     }
 
     addHyperlinkText(text){
       newTextList.add(TextSpan(
           text: text + " ",
           recognizer: TapGestureRecognizer()..onTap = () => global_func.openURL(text.trim()),
-          style: const TextStyle(
-        color: Colors.blue,
-      )));
+          style: TextStyle(fontSize: fontsize, color: Colors.blue,)
+      ));
     }
 
     for (var word in beschreibungsList) {
