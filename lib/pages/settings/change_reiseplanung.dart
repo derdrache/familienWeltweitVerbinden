@@ -12,7 +12,7 @@ import '../../widgets/google_autocomplete.dart';
 import '../../widgets/month_picker.dart';
 
 class ChangeReiseplanungPage extends StatefulWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
   List reiseplanung;
   bool isGerman;
 
@@ -29,16 +29,21 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   var bisDate = MonthPickerBox();
   var ortInput = GoogleAutoComplete();
 
-  saveInDatabase() {
-    if(checkDuplicateEntry()){
-      widget.reiseplanung.removeLast();
-      customSnackbar(context, "Doppelter Eintrag");
-    }
-
+  saveProfilReiseplanung(){
     ProfilDatabase().updateProfil(
         "reisePlanung = '${jsonEncode(widget.reiseplanung)}'",
         "WHERE id = '${widget.userId}'");
     updateHiveOwnProfil("reisePlanung", widget.reiseplanung);
+  }
+
+  saveInDatabase(){
+    if(checkDuplicateEntry()){
+      widget.reiseplanung.removeLast();
+      customSnackbar(context, "Doppelter Eintrag");
+      return;
+    }
+
+    saveProfilReiseplanung();
 
     NewsPageDatabase().addNewNews({
       "typ": "reiseplanung",
@@ -47,8 +52,8 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   }
 
   checkDuplicateEntry(){
-    var allReiseplanung = List.of(widget.reiseplanung);
-    var checkReiseplanung = allReiseplanung.last;
+    List allReiseplanung = List.of(widget.reiseplanung);
+    Map checkReiseplanung = allReiseplanung.last;
     allReiseplanung.removeLast();
 
     for(var reiseplanung in allReiseplanung){
@@ -60,12 +65,12 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   }
 
   checkOverlappingPeriods(newPlan) {
-    var vonDateNewPlan = DateTime.parse(newPlan["von"]);
-    var bisDateNewPlan = DateTime.parse(newPlan["bis"]);
+    DateTime vonDateNewPlan = DateTime.parse(newPlan["von"]);
+    DateTime bisDateNewPlan = DateTime.parse(newPlan["bis"]);
 
     for (var plan in widget.reiseplanung) {
-      var vonDatePlan = DateTime.parse(plan["von"]);
-      var bisDatePlan = DateTime.parse(plan["bis"]);
+      DateTime vonDatePlan = DateTime.parse(plan["von"]);
+      DateTime bisDatePlan = DateTime.parse(plan["bis"]);
 
       if(vonDateNewPlan.isBefore(bisDatePlan) && vonDateNewPlan.isAfter(vonDatePlan)) return true;
 
@@ -117,7 +122,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   deleteReiseplan(reiseplan) {
     widget.reiseplanung.remove(reiseplan);
 
-    saveInDatabase();
+    saveProfilReiseplanung();
 
     setState(() {});
   }
@@ -132,7 +137,6 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
       DateTime date = DateTime.parse(dateString);
 
       return date.month.toString() + "." + date.year.toString();
-
     }
 
     addNewPlanBox() {
@@ -151,9 +155,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
                       bisDate,
                     ],
                   ),
-
                 ],
-
               ),
               Expanded(
                 child: IconButton(
@@ -212,26 +214,16 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
       );
     }
 
-
     return Scaffold(
       appBar: CustomAppBar(
         title: AppLocalizations.of(context).reisePlanungVeraendern,
       ),
-      body: Stack(alignment: Alignment.center,children: [
-        Container(margin:const EdgeInsets.only(top: 200), child: showReiseplanung()),
-        Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      body: Column(
+        children: [
           addNewPlanBox(),
-          const SizedBox(height: 10),
-          Container(
-              margin: const EdgeInsets.all(10),
-              child: Text(
-                AppLocalizations.of(context).reisePlanung + ": ",
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold),
-              )),
-        ],)
-      ],),
+          Expanded(child: showReiseplanung())
+        ],
+      )
     );
-
   }
 }

@@ -10,32 +10,37 @@ import '../../widgets/custom_appbar.dart';
 
 
 class ChangeAufreisePage extends StatefulWidget {
-  bool isGerman;
-  var aufreiseSeit;
-  var aufreiseBis;
+  final bool isGerman;
+  DateTime aufreiseSeit;
+  DateTime aufreiseBis;
 
-  ChangeAufreisePage({this.aufreiseSeit, this.aufreiseBis, this.isGerman, Key key}) : super(key: key);
+  ChangeAufreisePage({
+    this.aufreiseSeit,
+    this.aufreiseBis,
+    this.isGerman,
+    Key key}) : super(key: key);
 
   @override
   _ChangeAufreisePageState createState() => _ChangeAufreisePageState();
 }
 
 class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
-  var reiseStatus = "";
+  String reiseStatus;
   var aufreiseDropdownButton = CustomDropDownButton();
+  bool noTraveling;
+  bool pastTravler;
+  bool stillTraveling;
 
   @override
   void initState() {
-    setReiseStatus();
+    reiseStatus = getReiseStatus();
 
     aufreiseDropdownButton = CustomDropDownButton(
       items: widget.isGerman ? aufreise : aufreiseEnglisch,
       selected: reiseStatus,
-      onChange: (){
-        setState(() {
-
-        });
-      },
+      onChange: () {
+        setState(() {});
+      }
     );
 
 
@@ -43,81 +48,73 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
     super.initState();
   }
 
-  setReiseStatus(){
+  getReiseStatus(){
     if(widget.aufreiseSeit == null){
-      reiseStatus = reiseStatus = widget.isGerman ? aufreise[0] : aufreiseEnglisch[0];
+      return widget.isGerman ? aufreise[0] : aufreiseEnglisch[0];
     } else if(widget.aufreiseBis == null){
-      reiseStatus = reiseStatus = widget.isGerman ? aufreise[2] : aufreiseEnglisch[2];
+      return widget.isGerman ? aufreise[2] : aufreiseEnglisch[2];
     } else{
-      reiseStatus = reiseStatus = widget.isGerman ? aufreise[1] : aufreiseEnglisch[1];
+      return widget.isGerman ? aufreise[1] : aufreiseEnglisch[1];
     }
   }
 
   checkValidation(){
-    if(aufreiseDropdownButton.selected == aufreise[0]
-        || aufreiseDropdownButton.selected == aufreiseEnglisch[0]) return true;
+    if(noTraveling) return true;
 
     if(widget.aufreiseSeit == null) {
       customSnackbar(context, AppLocalizations.of(context).eingebenSeitWannReise);
       return false;
     }
 
-    if(widget.aufreiseBis == null && (aufreiseDropdownButton.selected == aufreise[1]
-        || aufreiseDropdownButton.selected == aufreiseEnglisch[1] )){
+    if(widget.aufreiseBis == null && pastTravler){
       customSnackbar(context, AppLocalizations.of(context).eingebenBisWannReise);
       return false;
     }
-
 
     return true;
   }
 
   saveFunction() async{
-    var userId = FirebaseAuth.instance.currentUser.uid;
-    var validation = checkValidation();
+    final String userId = FirebaseAuth.instance.currentUser.uid;
+    bool validation = checkValidation();
 
-    if(validation == false) return;
+    if(!validation) return;
 
-    if(aufreiseDropdownButton.selected == aufreise[0]
-        || aufreiseDropdownButton.selected == aufreiseEnglisch[0]){
+    if(noTraveling) {
       ProfilDatabase().updateProfil(
           "aufreiseSeit = NULL, aufreiseBis = NULL", "WHERE id = '$userId'");
       updateHiveOwnProfil("aufreiseSeit", null);
       updateHiveOwnProfil("aufreiseBis", null);
-    } else if(aufreiseDropdownButton.selected == aufreise[2]
-        || aufreiseDropdownButton.selected == aufreiseEnglisch[2]){
-      ProfilDatabase().updateProfil(
-          "aufreiseSeit = '${widget.aufreiseSeit.toString()}', aufreiseBis = NULL",
-          "WHERE id = '$userId'");
-      updateHiveOwnProfil("aufreiseSeit", widget.aufreiseSeit.toString());
-      updateHiveOwnProfil("aufreiseBis", null);
-    } else{
+    } else if(pastTravler){
       ProfilDatabase().updateProfil(
           "aufreiseSeit = '${widget.aufreiseSeit.toString()}'"
               "aufreiseBis = '${widget.aufreiseBis.toString()}'",
           "WHERE id = '$userId'");
       updateHiveOwnProfil("aufreiseSeit", widget.aufreiseSeit.toString());
       updateHiveOwnProfil("aufreiseBis", widget.aufreiseBis.toString());
+    } else{
+      ProfilDatabase().updateProfil(
+          "aufreiseSeit = '${widget.aufreiseSeit.toString()}', aufreiseBis = NULL",
+          "WHERE id = '$userId'");
+      updateHiveOwnProfil("aufreiseSeit", widget.aufreiseSeit.toString());
+      updateHiveOwnProfil("aufreiseBis", null);
     }
 
     Navigator.pop(context);
-
   }
-
-  saveButton(){
-    return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () => saveFunction()
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
+    noTraveling = aufreiseDropdownButton.selected == aufreise[0]
+        || aufreiseDropdownButton.selected == aufreiseEnglisch[0];
+    pastTravler = aufreiseDropdownButton.selected == aufreise[1]
+        || aufreiseDropdownButton.selected == aufreiseEnglisch[1];
+    stillTraveling = aufreiseDropdownButton.selected == aufreise[2]
+        || aufreiseDropdownButton.selected == aufreiseEnglisch[2];
 
 
-    aufreiseBox(text, reiseDatum, reiseDatumTyp){
-      var aufreiseString = AppLocalizations.of(context).datumAuswaehlen;
+    aufreiseBox(text, reiseDatum){
+      String aufreiseString = AppLocalizations.of(context).datumAuswaehlen;
 
       if(reiseDatum != null) {
         var dateFormat = DateFormat('MM-yyyy');
@@ -127,7 +124,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
 
       return Padding(
         padding: const EdgeInsets.all(10),
-        child: Container(
+        child: SizedBox(
           width: 600,
           child: Row(children: [
             Text(text, style: const TextStyle(fontSize: 20),),
@@ -142,8 +139,8 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
                   firstDate: DateTime(DateTime.now().year - 100),
                 );
 
-                if(reiseDatumTyp == "seit") widget.aufreiseSeit = reiseDatum;
-                if(reiseDatumTyp == "bis") widget.aufreiseBis = reiseDatum;
+                if(text == AppLocalizations.of(context).seit) widget.aufreiseSeit = reiseDatum;
+                if(text == AppLocalizations.of(context).bis) widget.aufreiseBis = reiseDatum;
 
                 setState(() {});
               },
@@ -153,23 +150,27 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
       );
     }
 
-
-
     return Scaffold(
         appBar: CustomAppBar(
             title: AppLocalizations.of(context).aufReiseAendern,
-            buttons: <Widget>[saveButton()]
+            buttons: <Widget>[
+              IconButton(
+                  icon: const Icon(Icons.done),
+                  onPressed: () => saveFunction()
+              )
+            ]
         ),
         body: Column(children: [
           aufreiseDropdownButton,
-          if(aufreiseDropdownButton.selected != aufreise[0]
-              && aufreiseDropdownButton.selected != aufreiseEnglisch[0])
-            aufreiseBox(AppLocalizations.of(context).seit, widget.aufreiseSeit, "seit"),
-          if(aufreiseDropdownButton.selected == aufreise[1]
-              || aufreiseDropdownButton.selected == aufreiseEnglisch[1])
-            aufreiseBox(AppLocalizations.of(context).bis, widget.aufreiseBis, "bis"),
-          if(aufreiseDropdownButton.selected == aufreise[2]
-          || aufreiseDropdownButton.selected == aufreiseEnglisch[2]) Container(
+          if(!noTraveling) aufreiseBox(
+              AppLocalizations.of(context).seit,
+              widget.aufreiseSeit,
+          ),
+          if(pastTravler) aufreiseBox(
+              AppLocalizations.of(context).bis,
+              widget.aufreiseBis,
+          ),
+          if(stillTraveling) Container(
             margin: const EdgeInsets.only(left: 10),
             width: 600,
             child: Row(children: [

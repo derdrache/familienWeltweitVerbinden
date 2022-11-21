@@ -13,8 +13,8 @@ import '../global/global_functions.dart'as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb ? ui.window.locale.languageCode == "de" : io.Platform.localeName == "de_DE";
 
 class ProfilDatabase{
@@ -98,7 +98,7 @@ class ProfilDatabase{
 
   }
 
-  updateProfilName(userId, oldName, newName) async{
+  updateProfilName(userId, newName) async{
     FirebaseAuth.instance.currentUser.updateDisplayName(newName);
 
     updateProfil("name = '$newName'", "WHERE id = '$userId'");

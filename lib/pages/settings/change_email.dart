@@ -7,10 +7,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeEmailPage extends StatelessWidget {
-  var userId = FirebaseAuth.instance.currentUser?.uid;
-  var userEmail = FirebaseAuth.instance.currentUser?.email;
-  var emailKontroller = TextEditingController();
-  var passwortKontroller = TextEditingController();
+  final String userId = FirebaseAuth.instance.currentUser?.uid;
+  final String userEmail = FirebaseAuth.instance.currentUser?.email;
+  TextEditingController emailKontroller = TextEditingController();
+  TextEditingController passwortKontroller = TextEditingController();
 
   ChangeEmailPage({Key key}) : super(key: key);
 
@@ -29,66 +29,69 @@ class ChangeEmailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    saveFunction() async {
-      if (emailKontroller.text == "") {
+
+    checkValidationAndError() async {
+      if (emailKontroller.text.isEmpty) {
         customSnackbar(context, AppLocalizations.of(context).emailEingeben);
-        return;
+        return false;
       }
-      if (passwortKontroller.text == "") {
+      if (passwortKontroller.text.isEmpty) {
         customSnackbar(context, AppLocalizations.of(context).passwortEingeben);
-        return;
+        return false;
       }
 
       bool emailIsValid = RegExp(
-              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(emailKontroller.text);
       if (!emailIsValid) {
         customSnackbar(context, AppLocalizations.of(context).emailUngueltig);
-        return;
+        return false;
       }
 
       var emailInUse = await ProfilDatabase()
           .getData("id", "WHERE email = '${emailKontroller.text}'");
       if (emailInUse != false) {
         customSnackbar(context, AppLocalizations.of(context).emailInBenutzung);
-        return;
+        return false;
       }
 
       var loginUser = await userLogin(passwortKontroller.text);
       if (loginUser == null) {
         customSnackbar(
             context, AppLocalizations.of(context).emailOderPasswortFalsch);
-        return;
+        return false;
       }
+
+      return true;
+    }
+
+    saveFunction() async {
+
+      bool isValid = await checkValidationAndError();
+      if(!isValid) return;
 
       FirebaseAuth.instance.currentUser
           .verifyBeforeUpdateEmail(emailKontroller.text);
-      await ProfilDatabase().updateProfil(
-          "email = '${emailKontroller.text}'", "WHERE id = '$userId'");
-
       updateHiveOwnProfil("email", emailKontroller.text);
-
+      ProfilDatabase().updateProfil(
+          "email = '${emailKontroller.text}'", "WHERE id = '$userId'");
 
       customSnackbar(
           context, AppLocalizations.of(context).neueEmailVerifizieren,
           color: Colors.green);
 
-      customSnackbar(
-          context, "Email " + AppLocalizations.of(context).erfolgreichGeaender,
-          color: Colors.green);
-
       Navigator.pop(context);
-    }
-
-    saveButton() {
-      return IconButton(
-          icon: const Icon(Icons.done), onPressed: () => saveFunction());
     }
 
     return Scaffold(
         appBar: CustomAppBar(
             title: AppLocalizations.of(context).emailAendern,
-            buttons: [saveButton()]),
+            buttons: [
+              IconButton(
+                  icon: const Icon(Icons.done),
+                  onPressed: () => saveFunction()
+              )
+            ]),
         body: Container(
           margin: const EdgeInsets.only(top: 20),
           child: Column(
