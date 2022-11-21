@@ -10,10 +10,10 @@ import '../../global/variablen.dart' as global_variablen;
 import '../../widgets/custom_appbar.dart';
 
 class ChangeInteressenPage extends StatelessWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var selected;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  List selected;
   var interessenInputBox;
-  var isGerman;
+  final bool isGerman;
 
   ChangeInteressenPage({Key key, this.selected, this.isGerman})
       : interessenInputBox = CustomMultiTextForm(
@@ -25,37 +25,40 @@ class ChangeInteressenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    saveButton() {
-      return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () async {
-          if (interessenInputBox.getSelected() == null ||
-              interessenInputBox.getSelected().isEmpty) {
-            customSnackbar(
-                context, AppLocalizations.of(context).interessenAuswaehlen);
-          } else {
-            await ProfilDatabase().updateProfil(
-                "interessen = '${jsonEncode(interessenInputBox.getSelected())}'",
-                "WHERE id = '$userId'");
-            updateHiveOwnProfil("interessen", interessenInputBox.getSelected());
 
-            customSnackbar(
-                context,
-                AppLocalizations.of(context).interessen +
-                    " " +
-                    AppLocalizations.of(context).erfolgreichGeaender,
-                color: Colors.green);
+    save(){
+      if (interessenInputBox.getSelected() == null ||
+          interessenInputBox.getSelected().isEmpty) {
+        customSnackbar(
+            context, AppLocalizations.of(context).interessenAuswaehlen);
+        return;
+      }
 
-            Navigator.pop(context);
-          }
-        },
-      );
+      ProfilDatabase().updateProfil(
+          "interessen = '${jsonEncode(interessenInputBox.getSelected())}'",
+          "WHERE id = '$userId'");
+      updateHiveOwnProfil("interessen", interessenInputBox.getSelected());
+
+      customSnackbar(
+          context,
+          AppLocalizations.of(context).interessen +
+              " " +
+              AppLocalizations.of(context).erfolgreichGeaender,
+          color: Colors.green);
+
+      Navigator.pop(context);
     }
 
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).interessenVeraendern,
-          buttons: [saveButton()]),
+          buttons: [
+            IconButton(
+                icon: const Icon(Icons.done),
+                onPressed: () => save()
+            )
+          ]
+      ),
       body: interessenInputBox,
     );
   }

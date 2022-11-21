@@ -10,7 +10,7 @@ import '../../services/locationsService.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeBesuchteLaenderPage extends StatefulWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
   var selected;
   bool isGerman;
 
@@ -28,10 +28,13 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
 
   @override
   void initState() {
-    var allCountries = LocationService().getAllCountries();
-    var allCountriesLanguage;
+    Map allCountries = LocationService().getAllCountries();
+    List allCountriesLanguage;
+    bool unselectedAndGerman = widget.selected.isEmpty && widget.isGerman;
+    bool selectedIsGerman = widget.selected.isNotEmpty
+        && allCountries["ger"].contains(widget.selected[0]);
 
-    if((widget.selected.isEmpty && widget.isGerman) || (widget.selected.isNotEmpty && allCountries["ger"].contains(widget.selected[0]))){
+    if(unselectedAndGerman || selectedIsGerman){
       allCountriesLanguage = allCountries["ger"];
     }else{
       allCountriesLanguage = allCountries["eng"];
@@ -52,7 +55,6 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
         "besuchteLaender = '${jsonEncode(selectedCountries)}'",
         "WHERE id = '${widget.userId}'");
 
-
     updateHiveOwnProfil("besuchteLaender", selectedCountries);
 
     customSnackbar(context, AppLocalizations.of(context).besuchteLaenderUpdate,
@@ -65,8 +67,8 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
         AppLocalizations.of(context).laenderAuswahl;
 
     besuchteLaenderBox() {
-      var visitedCountriesWidgetlist = [];
-      var visitedCountries = besuchteLaenderDropdown.getSelected();
+      List visitedCountriesWidgetlist = [];
+      List visitedCountries = besuchteLaenderDropdown.getSelected();
 
       for (var country in visitedCountries) {
         visitedCountriesWidgetlist.add(Container(
@@ -78,22 +80,18 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
       return visitedCountriesWidgetlist;
     }
 
-    saveButton() {
-      return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () {
-          saveInDB();
-          setState(() {
-
-          });
-        }
-      );
-    }
-
     return Scaffold(
         appBar: CustomAppBar(
           title: AppLocalizations.of(context).besucheLaenderVeraendern,
-          buttons: [saveButton()],
+          buttons: [
+            IconButton(
+              icon: const Icon(Icons.done),
+              onPressed: () {
+                saveInDB();
+                setState(() {});
+              }
+            )
+          ],
         ),
         body: ListView(
           children: [
