@@ -7,52 +7,53 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeNamePage extends StatelessWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var oldName;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String oldName;
+  TextEditingController nameKontroller = TextEditingController();
 
-  ChangeNamePage({Key key, this.oldName})
-      : nameKontroller = TextEditingController(text: oldName);
-  var nameKontroller;
+  ChangeNamePage({Key key, this.oldName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     nameKontroller.text = oldName;
 
     saveFunction() async {
-      if (nameKontroller.text == "") {
+      if (nameKontroller.text.isEmpty) {
         customSnackbar(
             context, AppLocalizations.of(context).neuenNamenEingeben);
-      } else {
-        var userName = FirebaseAuth.instance.currentUser.displayName;
-        var newUserName = nameKontroller.text;
-        newUserName = newUserName.replaceAll("'", "\\'");
-
-        var checkUserProfilExist = await ProfilDatabase()
-            .getData("id", "WHERE name = '${newUserName}'");
-        if (checkUserProfilExist == false) {
-          await ProfilDatabase()
-              .updateProfilName(userId, userName, newUserName);
-          updateHiveOwnProfil("name", newUserName);
-
-          Navigator.pop(context);
-        } else if (newUserName.length > 40) {
-          customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
-        } else {
-          customSnackbar(
-              context, AppLocalizations.of(context).usernameInVerwendung);
-        }
+        return;
       }
-    }
 
-    saveButton() {
-      return IconButton(
-          icon: const Icon(Icons.done), onPressed: () => saveFunction());
+      var newUserName = nameKontroller.text.replaceAll("'", "\\'");
+
+      if (newUserName.length > 40) {
+        customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
+        return;
+      }
+
+      var checkUserProfilExist =
+          await ProfilDatabase().getData("id", "WHERE name = '$newUserName'");
+      if (checkUserProfilExist != false) {
+        customSnackbar(
+            context, AppLocalizations.of(context).usernameInVerwendung);
+        return;
+      }
+
+      await ProfilDatabase().updateProfilName(userId, newUserName);
+      updateHiveOwnProfil("name", newUserName);
+
+      Navigator.pop(context);
     }
 
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).nameAendern,
-          buttons: [saveButton()]),
+          buttons: [
+            IconButton(
+                icon: const Icon(Icons.done),
+                onPressed: () => saveFunction()
+            )
+          ]),
       body: Container(
         margin: const EdgeInsets.only(top: 20),
         child: Column(children: [
