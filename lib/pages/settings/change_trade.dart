@@ -7,9 +7,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeTradePage extends StatelessWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var oldText;
-  var textKontroller = TextEditingController();
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String oldText;
+  TextEditingController textKontroller = TextEditingController();
 
   ChangeTradePage({Key key, this.oldText}) : super(key: key);
 
@@ -17,30 +17,30 @@ class ChangeTradePage extends StatelessWidget {
   Widget build(BuildContext context) {
     textKontroller.text = oldText;
 
-    saveButton() {
-      return IconButton(
-          icon: const Icon(Icons.done),
-          onPressed: () async {
-            await ProfilDatabase().updateProfil(
-                "tradeNotize = '${textKontroller.text}'",
-                "WHERE id = '$userId'");
+    save(){
+      ProfilDatabase().updateProfil(
+          "tradeNotize = '${textKontroller.text}'",
+          "WHERE id = '$userId'");
 
-            updateHiveOwnProfil("tradeNotize", textKontroller.text);
+      updateHiveOwnProfil("tradeNotize", textKontroller.text);
 
-            customSnackbar(
-                context,
-                AppLocalizations.of(context).verkaufenTauschenSchenken +
-                    " " +
-                    AppLocalizations.of(context).erfolgreichGeaender,
-                color: Colors.green);
-            Navigator.pop(context);
-          });
+      customSnackbar(
+          context,
+          AppLocalizations.of(context).verkaufenTauschenSchenken +
+              " " +
+              AppLocalizations.of(context).erfolgreichGeaender,
+          color: Colors.green);
+      Navigator.pop(context);
     }
 
     return Scaffold(
         appBar: CustomAppBar(
             title: AppLocalizations.of(context).tradeVeraendern,
-            buttons: [saveButton()]),
+            buttons: [
+              IconButton(
+                  icon: const Icon(Icons.done),
+                  onPressed: () => save())
+            ]),
         body: Column(
           children: [
             customTextInput(
