@@ -6,88 +6,92 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangePasswortPage extends StatelessWidget {
-  var passwortOldKontroller = TextEditingController();
-  var passwortNewKontroller = TextEditingController();
-  var passwortNewCheckKontroller = TextEditingController();
+  TextEditingController passwortOldKontroller = TextEditingController();
+  TextEditingController passwortNewKontroller = TextEditingController();
+  TextEditingController passwortNewCheckKontroller = TextEditingController();
 
   ChangePasswortPage({Key key}) : super(key: key);
 
-  userLogin(passwort) async {
-    var userEmail = FirebaseAuth.instance.currentUser.email;
-    var loginUser;
-    try {
-      loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: userEmail ?? "", password: passwort);
-    } on FirebaseAuthException catch (e) {
-      print(e);
-      loginUser = null;
-    }
-
-    return loginUser;
-  }
-
   @override
   Widget build(BuildContext context) {
-    saveButton() {
-      return IconButton(
-          icon: const Icon(Icons.done),
-          onPressed: () async {
-            var newPasswort = passwortNewKontroller.text;
-            var newPasswortCheck = passwortNewCheckKontroller.text;
-            var oldPasswort = passwortOldKontroller.text;
 
-            if (newPasswort == "" || newPasswort == oldPasswort) {
-              customSnackbar(
-                  context, AppLocalizations.of(context).neuesPasswortEingeben);
-              return;
-            }
-            if (newPasswortCheck == "") {
-              customSnackbar(context,
-                  AppLocalizations.of(context).neuesPasswortWiederholen);
-              return;
-            }
-            if (oldPasswort == "") {
-              customSnackbar(
-                  context, AppLocalizations.of(context).altesPasswortEingeben);
-              return;
-            }
-            if (newPasswort != newPasswortCheck) {
-              customSnackbar(context,
-                  AppLocalizations.of(context).passwortStimmtNichtMitNeuem);
-              return;
-            }
+    validationAndError(newPasswort, newPasswortCheck, oldPasswort){
+      if (newPasswort == "" || newPasswort == oldPasswort) {
+        customSnackbar(
+            context, AppLocalizations.of(context).neuesPasswortEingeben);
+        return false;
+      }
+      if (newPasswortCheck == "") {
+        customSnackbar(context,
+            AppLocalizations.of(context).neuesPasswortWiederholen);
+        return false;
+      }
+      if (oldPasswort == "") {
+        customSnackbar(
+            context, AppLocalizations.of(context).altesPasswortEingeben);
+        return false;
+      }
+      if (newPasswort != newPasswortCheck) {
+        customSnackbar(context,
+            AppLocalizations.of(context).passwortStimmtNichtMitNeuem);
+        return false;
+      }
 
-            try {
-              var loginTest = await userLogin(oldPasswort);
+      return true;
+    }
 
-              if (loginTest == null) {
-                customSnackbar(
-                    context, AppLocalizations.of(context).altesPasswortFalsch);
-                return;
-              }
+    userLogin(passwort) async {
+      var userEmail = FirebaseAuth.instance.currentUser.email;
+      var loginUser;
+      try {
+        loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: userEmail ?? "", password: passwort);
+      } on FirebaseAuthException catch (_) {
+        customSnackbar(
+            context, AppLocalizations.of(context).altesPasswortFalsch);
+        loginUser = null;
+      }
 
-              await FirebaseAuth.instance.currentUser
-                  ?.updatePassword(newPasswort);
+      return loginUser;
+    }
 
-              customSnackbar(
-                  context,
-                  AppLocalizations.of(context).passwort +
-                      " " +
-                      AppLocalizations.of(context).erfolgreichGeaender,
-                  color: Colors.green);
+    save() async{
+      String newPasswort = passwortNewKontroller.text;
+      String newPasswortCheck = passwortNewCheckKontroller.text;
+      String oldPasswort = passwortOldKontroller.text;
 
-              Navigator.pop(context);
-            } catch (error) {
-              customSnackbar(
-                  context, AppLocalizations.of(context).neuesPasswortSchwach);
-            }
-          });
+      bool isValid = validationAndError(
+          newPasswort, newPasswortCheck, oldPasswort);
+      var loginUser = await userLogin(oldPasswort);
+
+      if(!isValid || loginUser == null) return;
+
+      try {
+        await FirebaseAuth.instance.currentUser
+            ?.updatePassword(newPasswort);
+
+        customSnackbar(
+            context,
+            AppLocalizations.of(context).passwort +
+                " " +
+                AppLocalizations.of(context).erfolgreichGeaender,
+            color: Colors.green);
+
+        Navigator.pop(context);
+      } catch (error) {
+        customSnackbar(
+            context, AppLocalizations.of(context).neuesPasswortSchwach);
+      }
     }
 
     return Scaffold(
         appBar: CustomAppBar(
             title: AppLocalizations.of(context).passwortVeraendern,
-            buttons: [saveButton()]),
+            buttons: [
+              IconButton(
+                  icon: const Icon(Icons.done),
+                  onPressed: () => save())
+            ]),
         body: Container(
           margin: const EdgeInsets.only(top: 20),
           child: Column(

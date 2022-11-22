@@ -2,14 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 
 class NotificationsOptionsPage extends StatefulWidget {
-  var profil;
-
-  NotificationsOptionsPage({Key key, this.profil}) : super(key: key);
+  const NotificationsOptionsPage({Key key}) : super(key: key);
 
   @override
   _NotificationsOptionsPageState createState() =>
@@ -17,6 +16,7 @@ class NotificationsOptionsPage extends StatefulWidget {
 }
 
 class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
+  Map ownProfil = Hive.box("secureBox").get("ownProfil");
   var userId = FirebaseAuth.instance.currentUser.uid;
 
   allNotificationSetting() {
@@ -31,14 +31,14 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
-            value: widget.profil["notificationstatus"] == 1 ? true : false,
+            value: ownProfil["notificationstatus"] == 1 ? true : false,
             onChanged: (value) {
               setState(() {
-                widget.profil["notificationstatus"] = value == true ? 1 : 0;
+                ownProfil["notificationstatus"] = value == true ? 1 : 0;
               });
 
               ProfilDatabase().updateProfil(
-                  "notificationstatus = '${widget.profil["notificationstatus"]}'",
+                  "notificationstatus = '${ownProfil["notificationstatus"]}'",
                   "WHERE id = '$userId'");
             })
       ],
@@ -56,13 +56,13 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
-            value: widget.profil["chatNotificationOn"] == 1 ? true : false,
+            value: ownProfil["chatNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
               setState(() {
-                widget.profil["chatNotificationOn"] = value == true ? 1 : 0;
+                ownProfil["chatNotificationOn"] = value == true ? 1 : 0;
               });
               ProfilDatabase().updateProfil("chatNotificationOn = '$value'",
-                  "WHERE id = '${widget.profil["chatNotificationOn"]}'");
+                  "WHERE id = '${ownProfil["chatNotificationOn"]}'");
             })
       ],
     );
@@ -79,13 +79,13 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
-            value: widget.profil["eventNotificationOn"] == 1 ? true : false,
+            value: ownProfil["eventNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
               setState(() {
-                widget.profil["eventNotificationOn"] = value == true ? 1 : 0;
+                ownProfil["eventNotificationOn"] = value == true ? 1 : 0;
               });
               ProfilDatabase().updateProfil("eventNotificationOn = '$value'",
-                  "WHERE id = '${widget.profil["eventNotificationOn"]}'");
+                  "WHERE id = '${ownProfil["eventNotificationOn"]}'");
             })
       ],
     );
@@ -102,15 +102,15 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
-            value: widget.profil["newFriendNotificationOn"] == 1 ? true : false,
+            value: ownProfil["newFriendNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
               setState(() {
-                widget.profil["newFriendNotificationOn"] =
+                ownProfil["newFriendNotificationOn"] =
                     value == true ? 1 : 0;
               });
               ProfilDatabase().updateProfil(
                   "newFriendNotificationOn = '$value'",
-                  "WHERE id = '${widget.profil["newFriendNotificationOn"]}'");
+                  "WHERE id = '${ownProfil["newFriendNotificationOn"]}'");
             })
       ],
     );
@@ -120,18 +120,20 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:
-          CustomAppBar(title: AppLocalizations.of(context).benachrichtigungen),
+          CustomAppBar(
+              title: AppLocalizations.of(context).benachrichtigungen
+          ),
       body: Column(
         children: [
           const SizedBox(
             height: 20,
           ),
           allNotificationSetting(),
-          if (widget.profil["notificationstatus"] == 1)
+          if (ownProfil["notificationstatus"] == 1)
             chatNotificationSetting(),
-          if (widget.profil["notificationstatus"] == 1)
+          if (ownProfil["notificationstatus"] == 1)
             eventNotificationSetting(),
-          if (widget.profil["notificationstatus"] == 1)
+          if (ownProfil["notificationstatus"] == 1)
             newFriendNotificationSetting(),
         ],
       ),

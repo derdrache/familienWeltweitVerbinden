@@ -430,13 +430,13 @@ class _SettingSection extends StatelessWidget {
                 AppLocalizations.of(context).privatsphaereSicherheit,
                 Icons.lock,
                 () => global_func.changePage(
-                    context, PrivacySecurityPage(profil: userProfil))),
+                    context, PrivacySecurityPage())),
             const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context).benachrichtigungen,
                 Icons.notifications,
                 () => global_func.changePage(
-                    context, NotificationsOptionsPage(profil: userProfil))),
+                    context, NotificationsOptionsPage())),
           ],
         ));
   }
