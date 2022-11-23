@@ -41,14 +41,12 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
   var notificationsAllowed = toProfil["notificationstatus"];
   var chatNotificationOn = toProfil["chatNotificationOn"];
 
-
   if (notificationsAllowed == 0 ||
       chatNotificationOn == 0 ||
       toActiveChat == chatId || blockList.contains(toId)) return;
 
-
   if(chatGroup.isNotEmpty) chatGroup += " - ";
-  var title = chatGroup + await ProfilDatabase().getData("name", "WHERE id = '$vonId'");
+  var title = chatGroup + getProfilFromHive(profilId: vonId, getNameOnly: true);
 
   var notificationInformation = {
     "token": toProfil["token"],
@@ -59,11 +57,9 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
     "typ": "chat",
   };
 
-
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
-    var dbData =
-        await ProfilDatabase().getData("name,sprachen", "WHERE id = '$toId'");
+    var dbData = getProfilFromHive(profilId: toId);
     var chatPartnerName = dbData["name"];
     var toCanGerman = dbData["sprachen"].contains("Deutsch") || dbData["sprachen"].contains("german");
 

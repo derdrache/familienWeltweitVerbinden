@@ -158,7 +158,9 @@ class MyApp extends StatelessWidget {
     var groupChatData = getChatFromHive(chatId);
 
     navigatorKey.currentState?.push(MaterialPageRoute(
-        builder: (_) => ChatDetailsPage(groupChatData: groupChatData)));
+        builder: (_) => ChatDetailsPage(
+            groupChatData: groupChatData,
+        )));
   }
 
   _changeToEvent(eventId) async {
