@@ -34,7 +34,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   saveChatGroups(locationDict, oldLocation) async{
 
     final Map leaveCity = getCityFromHive(cityName: oldLocation) ?? {};
-    String chatConnectId = leaveCity["id"];
+    String chatConnectId = leaveCity["id"].toString();
 
     ChatGroupsDatabase().leaveChat(chatConnectId);
     ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
