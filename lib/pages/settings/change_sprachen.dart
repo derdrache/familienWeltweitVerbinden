@@ -10,52 +10,51 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeSprachenPage extends StatelessWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var selected;
-  var isGerman;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final List selected;
+  final bool isGerman;
 
   ChangeSprachenPage({Key key, this.selected, this.isGerman})
       : sprachenInputBox = CustomMultiTextForm(
             selected: selected,
             auswahlList: isGerman
                 ? global_variablen.sprachenListe
-                : global_variablen.sprachenListeEnglisch);
+                : global_variablen.sprachenListeEnglisch),
+        super(key: key);
 
   var sprachenInputBox;
 
   @override
   Widget build(BuildContext context) {
-    saveButton() {
-      return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () async {
-          if (sprachenInputBox.getSelected() == null ||
-              sprachenInputBox.getSelected().isEmpty) {
-            customSnackbar(
-                context, AppLocalizations.of(context).spracheAuswaehlen);
-          } else {
-            await ProfilDatabase().updateProfil(
-                "sprachen = '${jsonEncode(sprachenInputBox.getSelected())}'",
-                "WHERE id = '$userId'");
 
-            updateHiveOwnProfil("sprachen", sprachenInputBox.getSelected());
+    save() {
+      if (sprachenInputBox.getSelected() == null ||
+          sprachenInputBox.getSelected().isEmpty) {
+        customSnackbar(context, AppLocalizations.of(context).spracheAuswaehlen);
+        return;
+      }
 
-            customSnackbar(
-                context,
-                AppLocalizations.of(context).sprachen +
-                    " " +
-                    AppLocalizations.of(context).erfolgreichGeaender,
-                color: Colors.green);
-            Navigator.pop(context);
-          }
-        },
-      );
+      ProfilDatabase().updateProfil(
+          "sprachen = '${jsonEncode(sprachenInputBox.getSelected())}'",
+          "WHERE id = '$userId'");
+
+      updateHiveOwnProfil("sprachen", sprachenInputBox.getSelected());
+
+      customSnackbar(
+          context,
+          AppLocalizations.of(context).sprachen +
+              " " +
+              AppLocalizations.of(context).erfolgreichGeaender,
+          color: Colors.green);
+      Navigator.pop(context);
     }
 
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).spracheVeraendern,
-          buttons: [saveButton()]),
+          buttons: [
+            IconButton(icon: const Icon(Icons.done), onPressed: () => save())
+          ]),
       body: sprachenInputBox,
     );
   }

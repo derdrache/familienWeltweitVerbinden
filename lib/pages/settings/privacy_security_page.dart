@@ -18,35 +18,34 @@ import '../../widgets/dialogWindow.dart';
 import '../login_register_page/login_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
-  var profil;
-
-  PrivacySecurityPage({Key key, this.profil}) : super(key: key);
+  const PrivacySecurityPage({Key key}) : super(key: key);
 
   @override
   _PrivacySecurityPageState createState() => _PrivacySecurityPageState();
 }
 
 class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  double fontsize = 20;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  Map ownProfil = Hive.box("secureBox").get("ownProfil");
+  final double fontsize = 20;
   var automaticLocationDropdown = CustomDropDownButton();
   var reiseplanungDropdown = CustomDropDownButton();
   var exactLocationDropdown = CustomDropDownButton();
-  var spracheIstDeutsch = kIsWeb
+  final bool spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
   
   saveAutomaticLocation() async {
-    if(widget.profil["reiseart"] == "fixed location" || widget.profil["reiseart"] == "Fester Standort"){
+    if(ownProfil["reiseart"] == "fixed location" || ownProfil["reiseart"] == "Fester Standort"){
       customSnackbar(context, AppLocalizations.of(context).automatischerStandortNichtMoeglich);
       return;
     }
 
-    var locationAuswahl = automaticLocationDropdown.getSelected();
+    var automaticLocationOption = automaticLocationDropdown.getSelected();
 
-    if (locationAuswahl != standortbestimmung[0] &&
-        locationAuswahl != standortbestimmungEnglisch[0]) {
+    if (automaticLocationOption != standortbestimmung[0] &&
+        automaticLocationOption != standortbestimmungEnglisch[0]) {
       LocationPermission permission = await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
@@ -54,18 +53,16 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       }
     }
 
+    ownProfil["automaticLocation"] = automaticLocationOption;
+
     ProfilDatabase().updateProfil(
-        "automaticLocation ='$locationAuswahl'", "WHERE id ='$userId'");
+        "automaticLocation ='$automaticLocationOption'", "WHERE id ='$userId'");
   }
 
   saveReiseplanung() async{
     var reiseplanungPrivacyAuswahl = reiseplanungDropdown.getSelected();
 
-    var secureBox = Hive.box("secureBox");
-    var ownProfil = secureBox.get("ownProfil");
     ownProfil["reiseplanungPrivacy"] = reiseplanungPrivacyAuswahl;
-
-
 
     ProfilDatabase().updateProfil(
         "reiseplanungPrivacy = '$reiseplanungPrivacyAuswahl'",
@@ -76,11 +73,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   saveExactLocation() async{
     var exactLocationPrivacyAuswahl = exactLocationDropdown.getSelected();
 
-    var secureBox = Hive.box("secureBox");
-    var ownProfil = secureBox.get("ownProfil");
     ownProfil["genauerStandortPrivacy"] = exactLocationPrivacyAuswahl;
-    secureBox.put("ownProfil", ownProfil);
-
 
     ProfilDatabase().updateProfil(
         "genauerStandortPrivacy = '$exactLocationPrivacyAuswahl'",
@@ -91,10 +84,10 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   setAutomaticLocationDropdown(){
     var locationList = spracheIstDeutsch ?
       standortbestimmung : standortbestimmungEnglisch;
-    var selected = widget.profil["automaticLocation"] != null ?
+    var selected = ownProfil["automaticLocation"] != null ?
       (spracheIstDeutsch ?
-      global_func.changeEnglishToGerman(widget.profil["automaticLocation"]) :
-      global_func.changeGermanToEnglish(widget.profil["automaticLocation"])) :
+      global_func.changeEnglishToGerman(ownProfil["automaticLocation"]) :
+      global_func.changeGermanToEnglish(ownProfil["automaticLocation"])) :
       (spracheIstDeutsch
           ? standortbestimmung[0]
           : standortbestimmungEnglisch[0]);
@@ -109,8 +102,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   setExactLocationDropdown(){
     var items = spracheIstDeutsch ? privacySetting : privacySettingEnglisch;
     var selected = spracheIstDeutsch ?
-    global_func.changeEnglishToGerman(widget.profil["genauerStandortPrivacy"]) :
-    global_func.changeGermanToEnglish(widget.profil["genauerStandortPrivacy"]);
+    global_func.changeEnglishToGerman(ownProfil["genauerStandortPrivacy"]) :
+    global_func.changeGermanToEnglish(ownProfil["genauerStandortPrivacy"]);
 
     exactLocationDropdown = CustomDropDownButton(
       items: items,
@@ -122,8 +115,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   setReiseplanungDropdown(){
     var items = spracheIstDeutsch ? privacySetting : privacySettingEnglisch;
     var selected = spracheIstDeutsch ?
-    global_func.changeEnglishToGerman(widget.profil["reiseplanungPrivacy"]) :
-    global_func.changeGermanToEnglish(widget.profil["reiseplanungPrivacy"]);
+    global_func.changeEnglishToGerman(ownProfil["reiseplanungPrivacy"]) :
+    global_func.changeGermanToEnglish(ownProfil["reiseplanungPrivacy"]);
 
     reiseplanungDropdown = CustomDropDownButton(
         items: items,
@@ -151,15 +144,15 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             ),
             const Expanded(child: SizedBox(width: 20)),
             Switch(
-                value: widget.profil["emailAnzeigen"] == 1 ? true : false,
+                value: ownProfil["emailAnzeigen"] == 1 ? true : false,
                 inactiveThumbColor: Colors.grey[700],
                 activeColor: Theme.of(context).colorScheme.primary,
                 onChanged: (value) {
                   setState(() {
-                    widget.profil["emailAnzeigen"] = value == true ? 1 : 0;
+                    ownProfil["emailAnzeigen"] = value == true ? 1 : 0;
                   });
                   ProfilDatabase().updateProfil(
-                      "emailAnzeigen = '${widget.profil["emailAnzeigen"]}'",
+                      "emailAnzeigen = '${ownProfil["emailAnzeigen"]}'",
                       "WHERE id = '$userId'");
                 })
           ],
@@ -231,8 +224,8 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () {
-                    ProfilDatabase().deleteProfil(widget.profil["id"]);
-                    DbDeleteImage(widget.profil["bild"]);
+                    ProfilDatabase().deleteProfil(ownProfil["id"]);
+                    DbDeleteImage(ownProfil["bild"]);
                     setState(() {});
                     global_functions.changePageForever(
                         context, LoginPage());

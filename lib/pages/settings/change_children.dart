@@ -9,49 +9,52 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeChildrenPage extends StatelessWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
   var childrenBirthdatePickerBox;
 
   ChangeChildrenPage({Key key,this.childrenBirthdatePickerBox}) : super(key: key);
 
 
+
   @override
   Widget build(BuildContext context) {
 
-    saveButton(){
-      return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () async{
-          bool allFilled = true;
+    save() async {
+      bool allFilled = true;
 
-          for(var kindAge in childrenBirthdatePickerBox.getDates()){
-            if (kindAge == null){
-              allFilled = false;
-            }
-          }
+      for(var kindAge in childrenBirthdatePickerBox.getDates()){
+        if (kindAge == null){
+          allFilled = false;
+        }
+      }
 
-          if(!allFilled || childrenBirthdatePickerBox.getDates().isEmpty){
-            customSnackbar(context, AppLocalizations.of(context).geburtsdatumEingeben);
-          } else{
-            await ProfilDatabase().updateProfil(
-              "kinder = '${jsonEncode(childrenBirthdatePickerBox.getDates())}'",
-              "WHERE id = '$userId'");
+      if(!allFilled || childrenBirthdatePickerBox.getDates().isEmpty){
+        customSnackbar(context, AppLocalizations.of(context).geburtsdatumEingeben);
+      } else{
+        await ProfilDatabase().updateProfil(
+            "kinder = '${jsonEncode(childrenBirthdatePickerBox.getDates())}'",
+            "WHERE id = '$userId'");
 
-            updateHiveOwnProfil("kinder", childrenBirthdatePickerBox.getDates());
+        updateHiveOwnProfil("kinder", childrenBirthdatePickerBox.getDates());
 
 
-            customSnackbar(context,
-                AppLocalizations.of(context).anzahlUndAlterKinder +" "+
-                    AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
-            Navigator.pop(context);
-          }
-        },
-
-      );
+        customSnackbar(context,
+            AppLocalizations.of(context).anzahlUndAlterKinder +" "+
+                AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+        Navigator.pop(context);
+      }
     }
 
     return Scaffold(
-      appBar: CustomAppBar(title: AppLocalizations.of(context).kinderAendern, buttons: [saveButton()]),
+      appBar: CustomAppBar(
+          title: AppLocalizations.of(context).kinderAendern,
+          buttons: [
+            IconButton(
+              icon: const Icon(Icons.done),
+              onPressed: () => save(),
+            )
+          ]
+      ),
       body: childrenBirthdatePickerBox,
     );
   }

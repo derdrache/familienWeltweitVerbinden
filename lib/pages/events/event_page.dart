@@ -1,5 +1,4 @@
 import 'package:familien_suche/pages/events/events_suchen.dart';
-import 'package:familien_suche/pages/start_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,6 @@ import 'package:hive/hive.dart';
 
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
-import '../../global/global_functions.dart';
 import '../../widgets/badge_icon.dart';
 import 'eventCard.dart';
 import 'events_erstellen.dart';
@@ -45,6 +43,7 @@ class _EventPageState extends State<EventPage> {
           children: [
             EventCard(
                 event: event,
+                margin: const EdgeInsets.only(top: 10, bottom: 0, right: 20, left: 10),
                 withInteresse: withInteresse,
                 afterPageVisit: () => setState((){})),
             if (isOwner)
