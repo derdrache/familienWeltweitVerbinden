@@ -8,11 +8,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeReiseartPage extends StatelessWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var oldInput;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  String oldInput;
   var reiseArtInput;
-  var selected;
-  var isGerman;
+  final bool isGerman;
 
   ChangeReiseartPage({Key key, this.oldInput, this.isGerman})
       : reiseArtInput = CustomDropDownButton(
@@ -24,36 +23,40 @@ class ChangeReiseartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    saveButton() {
-      return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () async {
-          if (reiseArtInput.getSelected() == null ||
-              reiseArtInput.getSelected().isEmpty) {
-            customSnackbar(
-                context, AppLocalizations.of(context).reiseartAuswaehlen);
-          } else if (reiseArtInput.getSelected() != oldInput) {
-            await ProfilDatabase().updateProfil(
-                "reiseart = '${reiseArtInput.getSelected()}'",
-                "WHERE id = '$userId'");
-            updateHiveOwnProfil("reiseart", reiseArtInput.getSelected());
 
-            customSnackbar(
-                context,
-                AppLocalizations.of(context).artDerReise +
-                    " " +
-                    AppLocalizations.of(context).erfolgreichGeaender,
-                color: Colors.green);
-            Navigator.pop(context);
-          }
-        },
-      );
+    save() {
+      if (reiseArtInput.getSelected() == null ||
+          reiseArtInput
+              .getSelected()
+              .isEmpty) {
+        customSnackbar(
+            context, AppLocalizations
+            .of(context)
+            .reiseartAuswaehlen);
+      } else if (reiseArtInput.getSelected() != oldInput) {
+        ProfilDatabase().updateProfil(
+            "reiseart = '${reiseArtInput.getSelected()}'",
+            "WHERE id = '$userId'");
+        updateHiveOwnProfil("reiseart", reiseArtInput.getSelected());
+
+        customSnackbar(
+            context,
+            AppLocalizations.of(context).artDerReise
+                + " " + AppLocalizations.of(context).erfolgreichGeaender,
+            color: Colors.green);
+        Navigator.pop(context);
+      }
     }
 
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).reiseartAendern,
-          buttons: [saveButton()]),
+          buttons: [
+            IconButton(
+                icon: const Icon(Icons.done),
+                onPressed: () => save()
+            )
+          ]),
       body: reiseArtInput,
     );
   }

@@ -23,19 +23,18 @@ class FamilieProfilPage extends StatefulWidget {
 }
 
 class _FamilieProfilPageState extends State<FamilieProfilPage> {
-  var ownProfil = Hive.box('secureBox').get("ownProfil");
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  final Map ownProfil = Hive.box('secureBox').get("ownProfil");
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  var allProfils = Hive.box('secureBox').get("profils");
   bool familyProfilIsActive = false;
-  var familyMembersCount = 0;
-  var dballProfilIdAndName = [];
-  var allProfilsName = [];
+  int familyMembersCount = 0;
   var searchAutocomplete = SearchAutocomplete();
   var familyProfil;
   var inviteFamilyProfil;
-  var nameFamilyKontroller = TextEditingController();
+  TextEditingController nameFamilyKontroller = TextEditingController();
   var mainProfilDropdown = CustomDropDownButton();
-  var isLoding = true;
-  var mainProfil;
+  bool isLoding = true;
+  Map mainProfil;
   FocusNode nameFocusNode = FocusNode();
 
   @override
@@ -52,7 +51,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   }
 
   setData() async {
-    await getAllProfilName();
     await checkIfFamilyExist();
 
     if (familyProfil != null) {
@@ -65,13 +63,14 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     });
   }
 
-  getAllProfilName() async {
-    dballProfilIdAndName = await ProfilDatabase().getData("id, name", "");
-    allProfilsName = [];
+  getAllProfilName(){
+    List allProfilsName = [];
 
-    for (var profil in dballProfilIdAndName) {
+    for (var profil in allProfils) {
       allProfilsName.add(profil["name"]);
     }
+
+    return allProfilsName;
   }
 
   checkIfFamilyExist() async {
@@ -89,7 +88,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   }
 
   setMainProfil(mainProfilId) {
-    var allProfils = Hive.box('secureBox').get("profils");
     for (var profil in allProfils) {
       if (profil["id"] == mainProfilId) {
         mainProfil = profil;
@@ -137,17 +135,11 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   }
 
   addMember({member}) async {
-    var idIndex = -1;
-
     if (searchAutocomplete.getSelected().isEmpty && member == null) return;
 
-    if (searchAutocomplete.getSelected().isNotEmpty) {
-      idIndex = allProfilsName.indexOf(searchAutocomplete.getSelected()[0]);
-    } else {
-      idIndex = allProfilsName.indexOf(member);
-    }
+    member ??= searchAutocomplete.getSelected()[0];
 
-    var memberId = dballProfilIdAndName[idIndex]["id"];
+    var memberId = getProfilFromHive(profilName: member, getIdOnly: true);
 
     if (familyProfil["members"].contains(memberId)) {
       customSnackbar(context,
@@ -233,7 +225,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       var userFriendlist = ownProfil["friendlist"];
 
       for (var i = 0; i < userFriendlist.length; i++) {
-        for (var profil in dballProfilIdAndName) {
+        for (var profil in allProfils) {
           if (profil["id"] == userFriendlist[i]) {
             userFriendlist[i] = profil["name"];
             break;
@@ -288,7 +280,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     addMemberWindow() {
       searchAutocomplete = SearchAutocomplete(
         hintText: AppLocalizations.of(context).personSuchen,
-        searchableItems: allProfilsName,
+        searchableItems: getAllProfilName(),
         onConfirm: () {},
       );
 
@@ -341,7 +333,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
         for (var profil in Hive.box('secureBox').get("profils")) {
           if (member == profil["id"]) {
             allMemberName.add(Container(
-                margin: EdgeInsets.all(10), child: Text(profil["name"])));
+                margin: const EdgeInsets.all(10), child: Text(profil["name"])));
             break;
           }
         }
@@ -475,7 +467,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       List<String> allMembersName = [];
 
       for (var member in allMembersId) {
-        for (var profil in dballProfilIdAndName) {
+        for (var profil in allProfils) {
           if (member == profil["id"]) {
             if (selectedId == member) selectedName = profil["name"];
             allMembersName.add(profil["name"]);

@@ -4,6 +4,8 @@ import 'dart:ui';
 
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
+import 'package:familien_suche/global/variablen.dart'
+    as global_var;
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/chat/pin_messages.dart';
 import 'package:familien_suche/pages/community/community_card.dart';
@@ -101,7 +103,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     WidgetsBinding.instance.addObserver(this);
-
     super.initState();
   }
 
@@ -110,14 +111,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     timer.cancel();
     messageInputNode.dispose();
 
-    if (widget.isChatgroup && widget.groupChatData["users"][userId] != null) {
+    if (widget.groupChatData["users"][userId] != null) {
+      Function databaseUpdate = widget.isChatgroup
+          ? ChatGroupsDatabase().updateChatGroup
+          : ChatDatabase().updateChatGroup;
+
       widget.groupChatData["users"][userId]["isActive"] = 0;
-      ChatGroupsDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.isActive', ${false})",
+      databaseUpdate(
+          "users = JSON_SET(users, '\$.$userId.isActive', ${0})",
           "WHERE id = '${widget.chatId}'");
-    } else {
-      ProfilDatabase()
-          .updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
     }
 
     WidgetsBinding.instance.removeObserver(this);
@@ -127,26 +129,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    Function databaseUpdate = widget.isChatgroup
+        ? ChatGroupsDatabase().updateChatGroup
+        : ChatDatabase().updateChatGroup;
+
     if (state == AppLifecycleState.resumed) {
-      if (widget.isChatgroup) {
-        widget.groupChatData["users"][userId]["isActive"] = 1;
-        ChatGroupsDatabase().updateChatGroup(
-            "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
-            "WHERE id = '${widget.chatId}'");
-      } else {
-        ProfilDatabase().updateProfil(
-            "activeChat = '${widget.chatId}'", "WHERE id = '$userId'");
-      }
+      widget.groupChatData["users"][userId]["isActive"] = 1;
+      databaseUpdate(
+          "users = JSON_SET(users, '\$.$userId.isActive', ${1})",
+          "WHERE id = '${widget.chatId}'");
     } else {
-      if (widget.isChatgroup) {
-        widget.groupChatData["users"][userId]["isActive"] = 0;
-        ChatGroupsDatabase().updateChatGroup(
-            "users = JSON_SET(users, '\$.$userId.isActive', ${false})",
-            "WHERE id = '${widget.chatId}'");
-      } else {
-        ProfilDatabase()
-            .updateProfil("activeChat = '" "'", "WHERE id = '$userId'");
-      }
+      widget.groupChatData["users"][userId]["isActive"] = 0;
+      databaseUpdate(
+          "users = JSON_SET(users, '\$.$userId.isActive', ${0})",
+          "WHERE id = '${widget.chatId}'");
     }
   }
 
@@ -167,10 +163,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   getAndSetChatData() {
     widget.connectedId ??= widget.groupChatData["connected"];
+    widget.isChatgroup = widget.connectedId != null;
 
     if (!widget.isChatgroup) {
-      widget.chatPartnerId ??= getProfilFromHive(
-          profilName: widget.chatPartnerName, getIdOnly: true);
+      var userIds = widget.groupChatData["id"].split("_");
+      userIds.remove(userId);
+
+      widget.chatPartnerId ??= userIds[0];
       widget.chatPartnerName ??=
           getProfilFromHive(profilId: widget.chatPartnerId, getNameOnly: true);
       chatPartnerProfil = getProfilFromHive(profilId: widget.chatPartnerId);
@@ -209,10 +208,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         pageDetailsPage = StadtinformationsPage(
           ortName: connectedData["name"],
         );
-      } else {}
+      }
     }
 
-    if(widget.groupChatData != null && widget.groupChatData["users"][userId] != null){
+    if (widget.groupChatData != null &&
+        widget.groupChatData["users"][userId] != null) {
       unreadMessages += widget.groupChatData["users"][userId]["newMessages"];
     }
 
@@ -220,17 +220,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   writeActiveChat() {
-    if (widget.isChatgroup) {
-      if (widget.groupChatData["users"][userId] == null) return;
+    Function databaseUpdate = widget.isChatgroup
+        ? ChatGroupsDatabase().updateChatGroup
+        : ChatDatabase().updateChatGroup;
 
-      widget.groupChatData["users"][userId]["isActive"] = 1;
-      ChatGroupsDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.isActive', ${true})",
-          "WHERE id = '${widget.chatId}'");
-    } else {
-      ProfilDatabase().updateProfil(
-          "activeChat = '${widget.chatId}'", "WHERE id = '$userId'");
-    }
+    if (widget.groupChatData["users"][userId] == null) return;
+
+    widget.groupChatData["users"][userId]["isActive"] = 1;
+
+    databaseUpdate(
+        "users = JSON_SET(users, '\$.$userId.isActive', ${1})",
+        "WHERE id = '${widget.chatId}'");
   }
 
   setScrollbarListener() {
@@ -360,10 +360,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
     if (widget.isChatgroup) {
       await ChatGroupsDatabase().addNewMessageAndNotification(
-          widget.groupChatData, messageData, isBlocked, connectedData["name"]);
+          widget.groupChatData["id"], messageData, isBlocked, connectedData["name"]);
     } else {
       await ChatDatabase().addNewMessageAndSendNotification(
-          widget.groupChatData, messageData, isBlocked);
+          widget.groupChatData["id"], messageData, isBlocked);
     }
 
     getAllDbMessages();
@@ -374,11 +374,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var chatgroupWithoutProfil = widget.isChatgroup && pageDetailsPage == null;
 
     if (noChatPartnerProfil || chatgroupWithoutProfil) return;
-
-    if (widget.isChatgroup) {
-      global_functions.changePage(context, pageDetailsPage);
-      return;
-    }
 
     global_functions.changePage(
         context,
@@ -496,7 +491,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     var isBlocked = ownProfil["geblocktVon"].contains(userId);
     await ChatDatabase().addNewMessageAndSendNotification(
-        chatGroupData, messageData, isBlocked);
+        chatGroupData["id"], messageData, isBlocked);
 
     global_functions.changePage(
         context,
@@ -646,17 +641,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     for (var message in messages) {
       if (message["id"] == messageExtraInformationId) {
         message["message"] = nachrichtController.text;
-        message["editDate"] = DateTime.now().millisecondsSinceEpoch;
+        message["editDate"] = DateTime.now();
       }
     }
 
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateMessage(
-          "message = '${nachrichtController.text}', editDate = '${DateTime.now().millisecondsSinceEpoch}'",
+          "message = '${nachrichtController.text}', editDate = '${DateTime.now()}'",
           "WHERE id = '$messageExtraInformationId'");
     } else {
       ChatDatabase().updateMessage(
-          "message = '${nachrichtController.text}', editDate = '${DateTime.now().millisecondsSinceEpoch}'",
+          "message = '${nachrichtController.text}', editDate = '${DateTime.now()}'",
           "WHERE id = '$messageExtraInformationId'");
     }
   }
@@ -1147,7 +1142,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
-      if(eventData == null) return SizedBox.shrink();
+      if (eventData == null) return const SizedBox.shrink();
 
       return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -1326,7 +1321,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
-      if(communityData == null) return SizedBox.shrink();
+      if (communityData == null) return const SizedBox.shrink();
 
       return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -1558,7 +1553,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     margin: EdgeInsets.only(
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
-                    child: ProfilImage(creatorData)),
+                    child: GestureDetector(
+                        child: ProfilImage(creatorData),
+                        onTap: () => global_functions.changePage(context, ShowProfilPage(
+                          profil: creatorData,
+                        )),
+                    )),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -1757,7 +1757,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     margin: EdgeInsets.only(
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
-                    child: ProfilImage(creatorData)),
+                    child: GestureDetector(
+                        child: ProfilImage(creatorData),
+                        onTap: () => global_functions.changePage(context, ShowProfilPage(
+                          profil: creatorData,
+                        )),
+                      )
+                    ),
               Stack(
                 children: [
                   Container(
@@ -1866,7 +1872,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     margin: EdgeInsets.only(
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
-                    child: ProfilImage(creatorData)),
+                    child: GestureDetector(
+                      child: ProfilImage(creatorData),
+                      onTap: () => global_functions.changePage(context, ShowProfilPage(
+                        profil: creatorData,
+                      )),
+                    )
+                ),
               GestureDetector(
                 onTap: () => openMessageMenu(message, index),
                 child: Stack(
@@ -1970,6 +1982,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
         var checkTextAndPersonalLanguage = myLanguage ==
             (message["language"] == "auto" ? "en" : message["language"]);
+
         message["showTranslationButton"] =
             widget.isChatgroup && !checkTextAndPersonalLanguage;
 
@@ -2003,12 +2016,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           newMessageDate = messageDate;
         }
 
-        if(unreadMessages != 0 && (i == messages.length - 1 - unreadMessages)){
+        if (unreadMessages != 0 &&
+            (i == messages.length - 1 - unreadMessages)) {
           messageBox.add(Center(
               child: Text(
-                AppLocalizations.of(context).ungeleseneNachrichten,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )));
+            AppLocalizations.of(context).ungeleseneNachrichten,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          )));
         }
 
         if (message["message"].contains("</eventId=")) {
@@ -2046,7 +2060,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             PointerDeviceKind.mouse,
           }),
           child: ScrollablePositionedList.builder(
-            initialScrollIndex: unreadMessages != 0 ? unreadMessages -1 : 0,
+            initialScrollIndex: unreadMessages != 0 ? unreadMessages - 1 : 0,
             itemScrollController: _scrollController,
             itemPositionsListener: itemPositionListener,
             reverse: true,
@@ -2239,6 +2253,58 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
+    mitgliederWindow(){
+      List<Widget> mitgliederList = [];
+      var detailsButtonName = "Information";
+
+      widget.groupChatData["users"].forEach((memberUserId, data) {
+        var userProfil = getProfilFromHive(profilId: memberUserId);
+        var userName = userProfil["name"];
+
+        mitgliederList.add(GestureDetector(
+          onTap: () => global_functions.changePage(
+              context,
+              ShowProfilPage(
+                userName: userName,
+                profil: userProfil,
+              )),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 1.0, color: global_var.borderColorGrey),
+              ),
+            ),
+            child: Text(userName),
+          ),
+        ));
+      });
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: connectedData["name"],
+              children: [
+                if (widget.chatId != "1") Container(
+                  width: 100,
+                  height: 40,
+                  margin: const EdgeInsets.only(bottom: 30, top: 10),
+                  child: FittedBox(
+                    child: FloatingActionButton.extended(
+                      label: Text(detailsButtonName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                      onPressed: () => global_functions.changePage(context, pageDetailsPage),
+                    ),
+                  ),
+                ),
+                Text(AppLocalizations.of(context).member, style: const TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                ...mitgliederList
+              ],
+            );
+          });
+    }
+
     mitgliederDialog() {
       return SimpleDialogOption(
         child: Row(
@@ -2250,35 +2316,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ),
         onPressed: () {
           Navigator.pop(context);
-
-          List<Widget> mitgliederList = [];
-
-          widget.groupChatData["users"].forEach((memberUserId, data) {
-            var userProfil = getProfilFromHive(profilId: memberUserId);
-            var userName = userProfil["name"];
-
-            mitgliederList.add(GestureDetector(
-              onTap: () => global_functions.changePage(
-                  context,
-                  ShowProfilPage(
-                    userName: userName,
-                    profil: userProfil,
-                  )),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                child: Text(userName),
-              ),
-            ));
-          });
-
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return CustomAlertDialog(
-                  title: AppLocalizations.of(context).member,
-                  children: mitgliederList,
-                );
-              });
+          mitgliederWindow();
         },
       );
     }
@@ -2449,7 +2487,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       onPressed: () async {
                         Navigator.pop(context);
 
-                        ChatGroupsDatabase().leaveChat(widget.chatId);
+                        ChatGroupsDatabase().leaveChat(widget.connectedId);
 
                         setState(() {
                           widget.groupChatData["users"]
@@ -2560,8 +2598,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(widget.chatPartnerName ??
-                          connectedData["name"] ??
-                          AppLocalizations.of(context).weltChat),
+                          connectedData["name"]),
                       const SizedBox(height: 3),
                       Text(
                         widget.groupChatData["users"].length.toString() +
@@ -2583,7 +2620,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       )))
               : null,
           profilBildProfil: chatImage,
-          onTap: () => openProfil(),
+          onTap: () => widget.isChatgroup ? mitgliederWindow() : openProfil(),
           buttons: [
             IconButton(
                 onPressed: () => moreMenu(),

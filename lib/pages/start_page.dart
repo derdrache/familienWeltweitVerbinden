@@ -81,8 +81,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
     if (userName == null || ownProfil == null) return;
 
-    _updateOwnLastLogin();
     _oldUserAutomaticJoinChats(ownProfil["ort"]);
+    _updateOwnLastLogin();
     _updateAutomaticLocation();
     _updateOwnEmail();
     _updateOwnToken();
@@ -116,14 +116,19 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     if (buildNumber == Hive.box('secureBox').get("version")) return;
 
     PatchnotesWindow(context: context).openWindow();
-    Hive.box('secureBox').put("version", buildNumber);
   }
 
   _updateOwnLastLogin() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var buildNumber = int.parse(packageInfo.buildNumber);
+    Hive.box('secureBox').put("version", buildNumber);
+
     ProfilDatabase().updateProfil(
         "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
 
     ownProfil["lastLogin"] = DateTime.now().toString();
+
+
   }
 
   _updateOwnEmail() async {
@@ -272,10 +277,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   }
 
   _oldUserAutomaticJoinChats(ort) async {
-    var lastLoginBeforeUpdate = DateTime.parse(ownProfil["lastLogin"])
-        .isBefore(DateTime.parse("2022-11-16"));
+    var savedVersion = Hive.box('secureBox').get("version");
+    var lastLoginBeforeUpdate = savedVersion == null && DateTime.parse(ownProfil["lastLogin"])
+        .isBefore(DateTime.parse("2022-12-16"));
+    var versionBiggerThenChatGroupUpdate = savedVersion != null && savedVersion >= 34;
 
-    if (!lastLoginBeforeUpdate) return;
+    if (!lastLoginBeforeUpdate || versionBiggerThenChatGroupUpdate) return;
 
     await ChatGroupsDatabase().updateChatGroup(
         "users = JSON_MERGE_PATCH(users, '${json.encode({
