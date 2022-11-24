@@ -8,9 +8,9 @@ import '../../widgets/custom_appbar.dart';
 
 
 class ChangeAboutmePage extends StatelessWidget {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var oldText;
-  var textKontroller = TextEditingController();
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String oldText;
+  TextEditingController textKontroller = TextEditingController();
 
   ChangeAboutmePage({Key key,this.oldText}) : super(key: key);
 
@@ -18,40 +18,38 @@ class ChangeAboutmePage extends StatelessWidget {
   Widget build(BuildContext context) {
     textKontroller.text = oldText;
 
-    saveButton(){
-      return IconButton(
-        icon: const Icon(Icons.done),
-        onPressed: () async {
-          await ProfilDatabase().updateProfil("aboutme = '${textKontroller.text}'",
-              "WHERE id = '$userId'");
-          updateHiveOwnProfil("aboutme", textKontroller.text);
+    save() async{
+      await ProfilDatabase().updateProfil("aboutme = '${textKontroller.text}'",
+          "WHERE id = '$userId'");
+      updateHiveOwnProfil("aboutme", textKontroller.text);
 
-          customSnackbar(context,
-              AppLocalizations.of(context).ueberMich + " "+
-                  AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
-          Navigator.pop(context);
-        }
-      );
+      customSnackbar(context,
+          AppLocalizations.of(context).ueberMich + " "+
+              AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+      Navigator.pop(context);
     }
 
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).ueberMichVeraendern,
-          buttons: [saveButton()]
+          buttons: [
+            IconButton(
+                icon: const Icon(Icons.done),
+                onPressed: () => save()
+            )
+          ]
       ),
       body: Column(
         children: [
           customTextInput(
             AppLocalizations.of(context).ueberMich,
-              textKontroller,
+            textKontroller,
             moreLines: 10,
             hintText: AppLocalizations.of(context).aboutusHintText,
             textInputAction: TextInputAction.newline
           )
         ],
       )
-
-
     );
   }
 }
