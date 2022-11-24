@@ -75,21 +75,23 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     return SelectionArea(
       child: Scaffold(
         appBar: _AppBar(profil: profil, familyProfil: familyProfil),
-        body: SizedBox(
-          width: double.maxFinite,
-          child: Scrollbar(
-            child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-                PointerDeviceKind.touch,
-                PointerDeviceKind.mouse,
-              }),
-              child: ListView(children: [
-                _UserNameDisplay(profil: profil, familyProfil: familyProfil),
-                const SizedBox(height: 10),
-                _UserInformationDisplay(profil: profil),
-                const SizedBox(height: 15),
-                _UserSozialMediaBox(profil: profil),
-              ]),
+        body: SafeArea(
+          child: SizedBox(
+            width: double.maxFinite,
+            child: Scrollbar(
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                }),
+                child: ListView(children: [
+                  _UserNameDisplay(profil: profil, familyProfil: familyProfil),
+                  const SizedBox(height: 10),
+                  _UserInformationDisplay(profil: profil),
+                  const SizedBox(height: 15),
+                  _UserSozialMediaBox(profil: profil),
+                ]),
+              ),
             ),
           ),
         ),
