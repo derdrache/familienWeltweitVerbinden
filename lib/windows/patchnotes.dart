@@ -57,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch182D),
                 _patch(patch181D),
                 _patch(patch180D),
                 _patch(patch172D),
@@ -82,6 +83,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch182E),
                 _patch(patch181E),
                 _patch(patch180E),
                 _patch(patch172E),
@@ -119,6 +121,27 @@ var patchVorlage={
 
   ]
 };
+var patch182E={
+  "title" : "1.8.2 - 24.11.2022",
+  "inhalt": [
+    "Chatgroups - Clicking on the name now opens the member list. From there there is then the possibility to get into the details view of the event/community/city",
+    "Chat - When clicking on the profile picture next to the message, the profile now opens",
+    "Bug fixed - When clicking on the chat notification, the chat loads properly",
+    "Bug fixed - Messages to new people are now saved and sent again",
+    "Bug fixed - leaving chat group works again"
+  ]
+};
+var patch182D={
+  "title" : "1.8.2 - 24.11.2022",
+  "inhalt": [
+    "Chatgruppen - Beim klick auf den Namen geht jetzt die Mitgliederliste auf. Von dort gibt es dann die Möglichkeit in die Detailsansicht vom Event/Community/Stadt zu gelangen",
+    "Chat - Beim Klick auf das Profilbild neben der Nachricht, öffnet sich jetzt das Profil",
+    "Fehler behoben - Beim Klicken auf die Chatnotifikation, wird der Chat ordentlich geladen",
+    "Fehler behoben - Nachrichten an neuen Personen werden jetzt wieder gespeichert und gesendet",
+    "Fehler behoben - Chat Gruppe verlassen funktioniert wieder"
+  ]
+};
+
 var patch181E={
   "title" : "1.8.1 - 20.11.2022",
   "inhalt": [
