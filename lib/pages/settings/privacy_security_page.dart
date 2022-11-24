@@ -48,7 +48,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         automaticLocationOption != standortbestimmungEnglisch[0]) {
       LocationPermission permission = await Geolocator.checkPermission();
 
-      if (permission == LocationPermission.denied) {
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
         permission = await Geolocator.requestPermission();
       }
     }
@@ -250,16 +250,18 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).privatsphaereSicherheit),
-      body: Column(
-        children: [
-          emailSettingContainer(),
-          automaticLocationContainer(),
-          exactLocationBox(),
-          reiseplanungBox(),
-          const Expanded(child: SizedBox.shrink()),
-          deleteProfilContainer(),
-          const SizedBox(height: 10)
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            emailSettingContainer(),
+            automaticLocationContainer(),
+            exactLocationBox(),
+            reiseplanungBox(),
+            const Expanded(child: SizedBox.shrink()),
+            deleteProfilContainer(),
+            const SizedBox(height: 10)
+          ],
+        ),
       ),
     );
   }
