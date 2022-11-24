@@ -1553,7 +1553,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     margin: EdgeInsets.only(
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
-                    child: ProfilImage(creatorData)),
+                    child: GestureDetector(
+                        child: ProfilImage(creatorData),
+                        onTap: () => global_functions.changePage(context, ShowProfilPage(
+                          profil: creatorData,
+                        )),
+                    )),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -1752,7 +1757,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     margin: EdgeInsets.only(
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
-                    child: ProfilImage(creatorData)),
+                    child: GestureDetector(
+                        child: ProfilImage(creatorData),
+                        onTap: () => global_functions.changePage(context, ShowProfilPage(
+                          profil: creatorData,
+                        )),
+                      )
+                    ),
               Stack(
                 children: [
                   Container(
@@ -1861,7 +1872,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     margin: EdgeInsets.only(
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
-                    child: ProfilImage(creatorData)),
+                    child: GestureDetector(
+                      child: ProfilImage(creatorData),
+                      onTap: () => global_functions.changePage(context, ShowProfilPage(
+                        profil: creatorData,
+                      )),
+                    )
+                ),
               GestureDetector(
                 onTap: () => openMessageMenu(message, index),
                 child: Stack(
@@ -1965,6 +1982,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
         var checkTextAndPersonalLanguage = myLanguage ==
             (message["language"] == "auto" ? "en" : message["language"]);
+
         message["showTranslationButton"] =
             widget.isChatgroup && !checkTextAndPersonalLanguage;
 
