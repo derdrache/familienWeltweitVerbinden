@@ -11,55 +11,71 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class ChangeCityPage extends StatefulWidget {
-  ChangeCityPage({Key key}) : super(key: key);
+  const ChangeCityPage({Key key}) : super(key: key);
 
   @override
   _ChangeCityPageState createState() => _ChangeCityPageState();
 }
 
 class _ChangeCityPageState extends State<ChangeCityPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var ortChangeKontroller = TextEditingController();
-  var suggestedCities = [];
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  TextEditingController ortChangeKontroller = TextEditingController();
+  List suggestedCities = [];
   List<Widget> suggestedCitiesList = [];
   int selectedIndex = -1;
-  var locationData = {};
+  Map locationData = {};
   var autoComplete = GoogleAutoComplete();
-  var isLoading = false;
 
   @override
   void initState() {
     super.initState();
   }
 
-  pushLocationDataToDB(locationDict) async {
-    await ProfilDatabase().updateProfilLocation(userId, locationDict);
-    await StadtinfoDatabase().addNewCity(locationDict);
-    await StadtinfoDatabase().update(
-        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-        "WHERE ort LIKE '%${locationDict["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1"
-    );
+  saveChatGroups(locationDict, oldLocation) async{
 
+    final Map leaveCity = getCityFromHive(cityName: oldLocation) ?? {};
+    String chatConnectId = leaveCity["id"].toString();
 
+    ChatGroupsDatabase().leaveChat(chatConnectId);
+    ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
+  }
+
+  saveProfil(locationDict) async {
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
+    ownProfil["ort"] = locationDict["city"];
+    ownProfil["longt"] =locationDict["longt"];
+    ownProfil["latt"] =locationDict["latt"];
+    ownProfil["land"] =locationDict["countryname"];
+
+    ProfilDatabase().updateProfilLocation(userId, locationDict);
+  }
+
+  saveNewsPage(locationDict){
     NewsPageDatabase().addNewNews({
       "typ": "ortswechsel",
       "information": json.encode(locationDict),
     });
 
+    var newsFeed = Hive.box("secureBox").get("newsFeed");
+    newsFeed.add({
+      "typ": "ortswechsel",
+      "information": locationDict,
+      "erstelltVon": userId,
+      "erstelltAm": DateTime.now().toString()
+    });
   }
 
-  saveLocation() async {
-    setState(() {
-      isLoading = true;
-    });
+  saveCityInformation(locationDict){
+    StadtinfoDatabase().addNewCity(locationDict);
+    StadtinfoDatabase().update(
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
+        "WHERE ort LIKE '%${locationDict["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+  }
 
+  save() async {
     var locationData = autoComplete.getGoogleLocationData();
 
     if(locationData["city"] == null) {
-      setState(() {
-        isLoading = false;
-      });
-
       customSnackbar(context, AppLocalizations.of(context).ortEingeben);
       return;
     }
@@ -70,39 +86,17 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       "latt": locationData["latt"],
       "countryname": locationData["countryname"],
     };
+    final String oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
 
-    databaseOperations(locationDict);
-
-
-    var ownProfil = Hive.box("secureBox").get("ownProfil");
-    ownProfil["ort"] = locationDict["city"];
-    ownProfil["longt"] =locationDict["longt"];
-    ownProfil["latt"] =locationDict["latt"];
-    ownProfil["land"] =locationDict["countryname"];
-
-    var newsFeed = Hive.box("secureBox").get("newsFeed");
-    newsFeed.add({
-      "typ": "ortswechsel",
-      "information": locationDict,
-      "erstelltVon": userId,
-      "erstelltAm": DateTime.now().toString()
-    });
+    saveChatGroups(locationDict, oldLocation);
+    saveProfil(locationDict);
+    saveNewsPage(locationDict);
+    saveCityInformation(locationDict);
 
     customSnackbar(context,
     AppLocalizations.of(context).aktuelleOrt +" "+
             AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
     Navigator.pop(context);
-  }
-
-  databaseOperations(locationDict) async{
-    var oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
-    var leaveCity = getCityFromHive(cityName: oldLocation);
-    var chatConnectId;
-    if(leaveCity != null ) chatConnectId = leaveCity["id"];
-
-    ChatGroupsDatabase().leaveChat(chatConnectId);
-    await pushLocationDataToDB(locationDict);
-    ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
   }
 
 
@@ -114,17 +108,10 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).ortAendern,
           buttons: <Widget>[
-            if(!isLoading) IconButton(
+            IconButton(
                 icon: const Icon(Icons.done),
-                onPressed: () => saveLocation()
+                onPressed: () => save()
             ),
-            if(isLoading) Container(
-                width: 30,
-                padding: const EdgeInsets.only(top:20, right: 10, bottom: 20),
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
-                ))
-
           ]
       ),
       body: Column(
