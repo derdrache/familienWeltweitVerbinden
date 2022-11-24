@@ -994,31 +994,33 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               )
             ],
           ),
-          body: Stack(
-            children: [
-              Container(
-                height: screenHeight,
-                padding: EdgeInsets.only(bottom: 50),
-                child: ListView(
-                  controller: _controller,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  children: [
-                    imageLoading
-                        ? Center(
-                            child: Container(
-                                margin: const EdgeInsets.all(10),
-                                width: 100,
-                                height: 100,
-                                child: const CircularProgressIndicator()))
-                        : _communityImage(),
-                    SizedBox(height: 10),
-                    ..._communityInformation()
-                  ],
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Container(
+                  height: screenHeight,
+                  padding: EdgeInsets.only(bottom: 50),
+                  child: ListView(
+                    controller: _controller,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    children: [
+                      imageLoading
+                          ? Center(
+                              child: Container(
+                                  margin: const EdgeInsets.all(10),
+                                  width: 100,
+                                  height: 100,
+                                  child: const CircularProgressIndicator()))
+                          : _communityImage(),
+                      SizedBox(height: 10),
+                      ..._communityInformation()
+                    ],
+                  ),
                 ),
-              ),
-              Positioned(bottom: 0, child: _footbar())
-            ],
+                Positioned(bottom: 0, child: _footbar())
+              ],
+            ),
           )),
     );
   }

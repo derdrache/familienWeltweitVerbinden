@@ -2636,14 +2636,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return SelectionArea(
       child: Scaffold(
         appBar: showAppBar(),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            angehefteteNachrichten(),
-            Expanded(child: messageAnzeige()),
-            extraInputInformationBox,
-            textEingabeFeld(),
-          ],
+        body: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              angehefteteNachrichten(),
+              Expanded(child: messageAnzeige()),
+              extraInputInformationBox,
+              textEingabeFeld(),
+            ],
+          ),
         ),
       ),
     );

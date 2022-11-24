@@ -799,12 +799,14 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
               )
             ],
         ),
-        body: Column(
-          children: [
-            allgemeineInfoBox(),
-            const SizedBox(height: 10),
-            Expanded(child: userInfoBox())
-          ],
+        body: SafeArea(
+          child: Column(
+            children: [
+              allgemeineInfoBox(),
+              const SizedBox(height: 10),
+              Expanded(child: userInfoBox())
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
             heroTag: "create Stadtinformation",

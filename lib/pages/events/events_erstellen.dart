@@ -406,24 +406,26 @@ class _EventErstellenState extends State<EventErstellen> {
                 onPressed: () => saveEvent(),
                 icon: const Icon(Icons.done, size: 30))
           ]),
-      body: ListView(
-        children: [
-          customTextInput("Event Name", eventNameKontroller,
-              validator: global_functions.checkValidatorEmpty(context)),
-          Stack(
-            children: [eventArtDropdown, eventArtInformation()],
-          ),
-          ortTypDropdown,
-          Align(child: ortEingabeBox()),
-          sprachenAuswahlBox,
-          eventIntervalDropdown,
-          dateTimeBox(eventWannDatum, eventWannUhrzeit, "wann"),
-          dateTimeBox(eventBisDatum, eventBisUhrzeit, "bis"),
-          ownEventBox(),
-          customTextInput(AppLocalizations.of(context).eventBeschreibung,
-              eventBeschreibungKontroller,
-              moreLines: 8, textInputAction: TextInputAction.newline),
-        ],
+      body: SafeArea(
+        child: ListView(
+          children: [
+            customTextInput("Event Name", eventNameKontroller,
+                validator: global_functions.checkValidatorEmpty(context)),
+            Stack(
+              children: [eventArtDropdown, eventArtInformation()],
+            ),
+            ortTypDropdown,
+            Align(child: ortEingabeBox()),
+            sprachenAuswahlBox,
+            eventIntervalDropdown,
+            dateTimeBox(eventWannDatum, eventWannUhrzeit, "wann"),
+            dateTimeBox(eventBisDatum, eventBisUhrzeit, "bis"),
+            ownEventBox(),
+            customTextInput(AppLocalizations.of(context).eventBeschreibung,
+                eventBeschreibungKontroller,
+                moreLines: 8, textInputAction: TextInputAction.newline),
+          ],
+        ),
       ),
     );
   }

@@ -1043,7 +1043,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     popupItems.add(SliverFixedExtentList(
-      itemExtent: kIsWeb ? 90.0 : 80.0,
+      itemExtent: 90,
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         var profilData = selectUserProfils[index];
         var genauerStandortKondition = profilData["automaticLocation"] ==
