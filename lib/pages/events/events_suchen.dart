@@ -278,35 +278,37 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
 
     return Scaffold(
         appBar: CustomAppBar(title: AppLocalizations.of(context).alleEvents),
-        body: Container(
-            padding: const EdgeInsets.only(top: 10),
-            width: double.infinity,
-            height: double.infinity,
-            child: Stack(children: [
-              Container(
-                margin: const EdgeInsets.only(top: 80),
-                child: SingleChildScrollView(
-                  child: Center(
-                    child: allEvents.isEmpty
-                        ? Container(
-                            margin: const EdgeInsets.only(top: 50),
-                            child: isLoading
-                                ? const CircularProgressIndicator()
-                                : Text(
-                                    AppLocalizations.of(context)
-                                        .keineEventsVorhanden,
-                                    style: const TextStyle(fontSize: 30),
-                                  ))
-                        : Wrap(children: showEvents()),
+        body: SafeArea(
+          child: Container(
+              padding: const EdgeInsets.only(top: 10),
+              width: double.infinity,
+              height: double.infinity,
+              child: Stack(children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 80),
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: allEvents.isEmpty
+                          ? Container(
+                              margin: const EdgeInsets.only(top: 50),
+                              child: isLoading
+                                  ? const CircularProgressIndicator()
+                                  : Text(
+                                      AppLocalizations.of(context)
+                                          .keineEventsVorhanden,
+                                      style: const TextStyle(fontSize: 30),
+                                    ))
+                          : Wrap(children: showEvents()),
+                    ),
                   ),
                 ),
-              ),
-              searchAutocomplete,
-              Positioned(
-                top: 10,
-                right: 10,
-                child: filterButton(),
-              )
-            ])));
+                searchAutocomplete,
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: filterButton(),
+                )
+              ])),
+        ));
   }
 }

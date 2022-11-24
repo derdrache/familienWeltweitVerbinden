@@ -520,7 +520,7 @@ class _SupportInformation extends StatelessWidget {
 
               await launchUrl(
                   url,
-                  mode: LaunchMode.externalNonBrowserApplication
+                  mode: LaunchMode.inAppWebView
               );
             }),
             const SizedBox(height: 20),
