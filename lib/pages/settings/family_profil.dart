@@ -25,12 +25,11 @@ class FamilieProfilPage extends StatefulWidget {
 class _FamilieProfilPageState extends State<FamilieProfilPage> {
   final Map ownProfil = Hive.box('secureBox').get("ownProfil");
   final String userId = FirebaseAuth.instance.currentUser.uid;
-  var allProfils = Hive.box('secureBox').get("profils");
+  List allProfils = Hive.box('secureBox').get("profils");
   bool familyProfilIsActive = false;
-  int familyMembersCount = 0;
   var searchAutocomplete = SearchAutocomplete();
-  var familyProfil;
-  var inviteFamilyProfil;
+  Map familyProfil;
+  Map inviteFamilyProfil;
   TextEditingController nameFamilyKontroller = TextEditingController();
   var mainProfilDropdown = CustomDropDownButton();
   bool isLoding = true;
@@ -52,25 +51,11 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
   setData() async {
     await checkIfFamilyExist();
-
-    if (familyProfil != null) {
-      setMainProfil(familyProfil["mainProfil"]);
-      familyProfilIsActive = familyProfil["active"] == 1 ? true : false;
-    }
+    setProfilData();
 
     setState(() {
       isLoding = false;
     });
-  }
-
-  getAllProfilName(){
-    List allProfilsName = [];
-
-    for (var profil in allProfils) {
-      allProfilsName.add(profil["name"]);
-    }
-
-    return allProfilsName;
   }
 
   checkIfFamilyExist() async {
@@ -87,23 +72,33 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     return dbData != false;
   }
 
-  setMainProfil(mainProfilId) {
-    for (var profil in allProfils) {
-      if (profil["id"] == mainProfilId) {
-        mainProfil = profil;
-        break;
-      }
-    }
-  }
+  saveName() async {
+    var newName = nameFamilyKontroller.text.replaceAll("'", "''");
 
-  setProfilData() {
-    if (familyProfil == false || familyProfil == null) {
+    var nameIsUsed =
+    await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
+
+    if (nameIsUsed) {
+      customSnackbar(
+          context, AppLocalizations.of(context).usernameInVerwendung);
       return;
     }
 
-    familyProfilIsActive = familyProfil["active"] == 1 ? true : false;
-    familyMembersCount = familyProfil["members"].length;
+    setState(() {
+      familyProfil["name"] = newName;
+    });
+
+    FamiliesDatabase()
+        .update("name = '$newName'", "WHERE id = '${familyProfil["id"]}'");
   }
+
+  setProfilData() {
+    if (familyProfil == false || familyProfil == null) return;
+
+    mainProfil = getProfilFromHive(profilId: familyProfil["mainProfil"]);
+    familyProfilIsActive = familyProfil["active"] == 1 ? true : false;
+  }
+
 
   changeFamilyProfilStatus(active) async {
     FamiliesDatabase()
@@ -182,7 +177,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   }
 
   acceptFamilyInvite() async {
-    setMainProfil(inviteFamilyProfil["mainProfil"]);
+    mainProfil = getProfilFromHive(profilId: inviteFamilyProfil["mainProfil"]);
 
     setState(() {
       familyProfil = inviteFamilyProfil;
@@ -192,37 +187,27 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       familyProfilIsActive = true;
     });
 
-
     await FamiliesDatabase().update(
         "members = JSON_ARRAY_APPEND(members, '\$', '$userId'), einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
         "WHERE id = '${familyProfil["id"]}'");
   }
 
-  saveName() async {
-    var newName = nameFamilyKontroller.text;
-    newName = newName.replaceAll("'", "''");
+  getAllProfilName(){
+    List allProfilsName = [];
 
-    var nameIsUsed =
-        await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
-
-    if (nameIsUsed) {
-      customSnackbar(
-          context, AppLocalizations.of(context).usernameInVerwendung);
-      return;
+    for (var profil in allProfils) {
+      allProfilsName.add(profil["name"]);
     }
 
-    setState(() {
-      familyProfil["name"] = newName;
-    });
-
-    FamiliesDatabase()
-        .update("name = '$newName'", "WHERE id = '${familyProfil["id"]}'");
+    return allProfilsName;
   }
+
 
   @override
   Widget build(BuildContext context) {
+
     List<Widget> createFriendlistBox() {
-      var userFriendlist = ownProfil["friendlist"];
+      List userFriendlist = ownProfil["friendlist"];
 
       for (var i = 0; i < userFriendlist.length; i++) {
         for (var profil in allProfils) {
@@ -486,7 +471,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
             var selectedIndex = allMembersName.indexOf(selected);
             var selectedId = allMembersId[selectedIndex];
 
-            setMainProfil(selectedId);
+            mainProfil = getProfilFromHive(profilId: selectedId);
 
             setState(() {
               familyProfil["mainProfil"] = selectedId;
