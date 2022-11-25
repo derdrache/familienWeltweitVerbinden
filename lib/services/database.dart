@@ -13,7 +13,7 @@ import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-//var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = FirebaseAuth.instance.currentUser.uid == "BUw5puWtumVtAa8mpnDmhBvwdJo1" ? "http://test.families-worldwide.com/" : "https://families-worldwide.com/";
 var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb
     ? ui.window.locale.languageCode == "de"
