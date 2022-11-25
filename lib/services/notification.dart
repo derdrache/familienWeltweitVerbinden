@@ -4,10 +4,15 @@ import 'package:http/http.dart' as http;
 
 import '../auth/secrets.dart';
 import 'database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 var databaseUrl = "https://families-worldwide.com/";
+var userId = FirebaseAuth.instance.currentUser.uid;
 
 sendEmail(notificationInformation) async {
+  if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
+  return;
+
   var url = Uri.parse(databaseUrl + "services/sendEmail2.php");
   var emailAdresse = await ProfilDatabase()
       .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
@@ -22,6 +27,9 @@ sendEmail(notificationInformation) async {
 
 sendNotification(notificationInformation) async {
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
+
+  if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
+  notificationInformation["token"] ="d7jhOvKk-03zjuQJG3hnFf:APA91bH_fi3_VdtFVmOBLIczINnCYeTxXREsa4FWPhAgZ9SB9NFDIsPYr0KOEDE4vQ0rIabMQLHj87v349eBfDSN38XEWCS6ZK7gs5J4c2wNCDKbo5BkzRYRs_zPGLqJJayBKHHLR1Jn";
 
   await http.post(url,
       body: json.encode({

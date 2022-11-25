@@ -220,7 +220,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               foregroundColor: Colors.black),
-          child: Text(AppLocalizations.of(context).hilfe),
+          child: Text(AppLocalizations.of(context).hilfe, style: const TextStyle(color: Colors.blue),),
           onPressed: () {
             var reportController = TextEditingController();
 
