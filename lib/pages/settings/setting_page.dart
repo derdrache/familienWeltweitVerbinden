@@ -147,7 +147,10 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
           ]);
     }
 
-    return CustomAppBar(title: "", buttons: [
+    return CustomAppBar(
+        title: "",
+        withLeading: false,
+        buttons: [
       IconButton(
           onPressed: () => openSettingWindow(),
           icon: Icon(Icons.more_vert, color: textColor))

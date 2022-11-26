@@ -28,8 +28,8 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   List allProfils = Hive.box('secureBox').get("profils");
   bool familyProfilIsActive = false;
   var searchAutocomplete = SearchAutocomplete();
-  Map familyProfil;
-  Map inviteFamilyProfil;
+  var familyProfil;
+  var inviteFamilyProfil;
   TextEditingController nameFamilyKontroller = TextEditingController();
   var mainProfilDropdown = CustomDropDownButton();
   bool isLoding = true;
@@ -108,18 +108,22 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   createFamilyProfil() async {
     var uuid = const Uuid();
     var familieId = uuid.v4();
+    var newFamilyProfil = {
+      "id": familieId,
+      "members": [userId],
+      "name": "",
+      "active": "1"
+    };
 
     await FamiliesDatabase().addNewFamily({
       "id": familieId,
       "members": jsonEncode([userId]),
     });
 
-    return {
-      "id": familieId,
-      "members": [userId],
-      "name": "",
-      "active": "1"
-    };
+    var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
+    familyProfils.add(newFamilyProfil);
+
+    return newFamilyProfil;
   }
 
   checkHasFamilyProfil(user) async {
@@ -341,7 +345,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context).familyProfilloeschen,
-              height: 90,
+              height: 110,
               children: [
                 Center(
                     child: Text(
@@ -352,6 +356,9 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                   child: const Text("Ok"),
                   onPressed: ()  async {
                     await FamiliesDatabase().delete(familyProfil["id"]);
+
+                    var familyProfils = Hive.box('secureBox').get("familyProfils");
+                    familyProfils.removeWhere((item) => item["id"] == familyProfil["id"]);
 
                     Navigator.pop(context);
 
@@ -448,7 +455,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     chooseMainProfil() {
       var selectedId = familyProfil["mainProfil"];
       var selectedName = "";
-      var allMembersId = familyProfil["members"];
+      var allMembersId = familyProfil["members"] ?? [];
       List<String> allMembersName = [];
 
       for (var member in allMembersId) {
@@ -547,7 +554,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       bool profilComplete = false;
 
       if (familyProfil["name"].isNotEmpty &&
-          familyProfil["mainProfil"].isNotEmpty) {
+          (familyProfil["mainProfil"] != null && familyProfil["mainProfil"].isNotEmpty)) {
         profilComplete = true;
       }
 

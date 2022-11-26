@@ -30,8 +30,8 @@ class _LoginPageState extends State<LoginPage> {
   String email = "";
   String passwort = "";
   bool isLoading = false;
+  bool googleLoginLoading = false;
   bool angemeldetBleiben = true;
-
 
   @override
   void initState() {
@@ -64,13 +64,11 @@ class _LoginPageState extends State<LoginPage> {
         FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
       }
 
-      var userId = FirebaseAuth.instance.currentUser.uid;
-      var ownProfil =
-          await ProfilDatabase().getData("*", "WHERE id = '$userId'");
-      Hive.box('secureBox').put("ownProfil", ownProfil);
-      await refreshHiveEvents();
+      await _refreshHiveData();
 
-      if (ownProfil != false) {
+      var ownProfil = Hive.box("secureBox").get("ownProfil");
+
+      if (ownProfil != false && ownProfil.isNotEmpty) {
           global_functions.changePageForever(context, StartPage());
         } else {
           global_functions.changePageForever(context, const CreateProfilPage());
@@ -94,38 +92,68 @@ class _LoginPageState extends State<LoginPage> {
 
   signInWithGoogleWeb() async {
     await Firebase.initializeApp();
-    User user;
 
-    FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
-    GoogleAuthProvider authProvider = GoogleAuthProvider();
 
     try {
+      FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+      GoogleAuthProvider authProvider = GoogleAuthProvider();
       final UserCredential userCredential =
           await FirebaseAuth.instance.signInWithPopup(authProvider);
 
-      user = userCredential.user;
-    } catch (_) {}
+      User user = userCredential.user;
+      return user;
+    } catch (_) {
+      setState(() {
+        googleLoginLoading = false;
+      });
+    }
 
-    return user;
+
   }
 
   signInWithGoogleAndroid() async {
-    GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    try{
+      GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
 
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    }catch(_){
+
+    }
   }
 
   bool isPhone() {
     final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
     return data.size.shortestSide < 600 ? true : false;
+  }
+
+  _refreshHiveData() async {
+    var userId = FirebaseAuth.instance.currentUser?.uid;
+    if(userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1"){
+      databaseUrl = "http://test.families-worldwide.com/";
+    }
+    await refreshHiveProfils();
+
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
+    if(ownProfil == false || ownProfil.isEmpty) return;
+
+    await refreshHiveChats();
+    await refreshHiveEvents();
+
+    if(userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1"){
+      await refreshHiveCommunities();
+      await refreshHiveNewsPage();
+      await refreshHiveStadtInfo();
+      await refreshHiveStadtInfoUser();
+      await refreshHiveFamilyProfils();
+    }
   }
 
   @override
@@ -256,22 +284,31 @@ class _LoginPageState extends State<LoginPage> {
       return Align(
         child: InkWell(
           onTap: () async {
+            setState(() {
+              googleLoginLoading = true;
+            });
+
             if (kIsWeb) {
               await signInWithGoogleWeb();
             } else {
               await signInWithGoogleAndroid();
             }
-            var userId = FirebaseAuth.instance.currentUser.uid;
+            var userId = FirebaseAuth.instance.currentUser?.uid;
+            if (userId == null){
+              setState(() {
+                googleLoginLoading = false;
+              });
+              return;
+            }
 
-            if (userId == null) return;
-            var userExist =
-                await ProfilDatabase().getData("name", "WHERE id = '$userId'");
+            await _refreshHiveData();
+            var ownProfil = Hive.box("secureBox").get("ownProfil");
 
-            if (userExist == false) {
+            if (ownProfil != false && ownProfil.isNotEmpty) {
+              global_functions.changePageForever(context, StartPage());
+            } else {
               global_functions.changePageForever(
                   context, const CreateProfilPage());
-            } else {
-              global_functions.changePageForever(context, StartPage());
             }
           },
           child: Container(
@@ -283,7 +320,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: Theme.of(context).colorScheme.secondary,
                   borderRadius: const BorderRadius.all(Radius.circular(30))),
               child: Center(
-                  child: Row(
+                  child: !googleLoginLoading ? Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(
@@ -304,7 +341,9 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.white),
                   )
                 ],
-              ))),
+              ): const CircularProgressIndicator()
+              )),
+
         ),
       );
     }
