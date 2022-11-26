@@ -13,8 +13,8 @@ import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-//var databaseUrl = FirebaseAuth.instance.currentUser.uid == "BUw5puWtumVtAa8mpnDmhBvwdJo1" ? "http://test.families-worldwide.com/" : "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb
     ? ui.window.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
@@ -480,7 +480,7 @@ class ChatGroupsDatabase {
     allUser.forEach((userId, data) {
       var isActive = data["isActive"] ?? false;
       isActive = isActive == 1 ? true : false;
-      var isMute = chatData["users"][userId]["mute"];
+      var isMute = chatData["users"][userId]["mute"] ?? false;
 
       if (!isActive && !isMute) {
         chatData["users"][userId]["newMessages"] += 1;
