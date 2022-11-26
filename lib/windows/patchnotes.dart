@@ -57,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch183D),
                 _patch(patch182D),
                 _patch(patch181D),
                 _patch(patch180D),
@@ -83,6 +84,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch183E),
                 _patch(patch182E),
                 _patch(patch181E),
                 _patch(patch180E),
@@ -121,6 +123,21 @@ var patchVorlage={
 
   ]
 };
+var patch183E={
+  "title" : "1.8.3 - 26.11.2022",
+  "inhalt": [
+    "Fixed bug - location was requested even though automatic location is disabled",
+    "Fixed bug - chat group notification and indication that there are new messages are now displayed again"
+  ]
+};
+var patch183D={
+  "title" : "1.8.3 - 26.11.2022",
+  "inhalt": [
+    "Fehler behoben - Der Standort wurde abgefragt, obwohl der automatische Standort deaktiviert ist",
+    "Fehler behoben - Chatgruppen Notifikation und Anzeige das es neue Nachrichten gibt, werden nun wieder angezeigt"
+  ]
+};
+
 var patch182E={
   "title" : "1.8.2 - 24.11.2022",
   "inhalt": [

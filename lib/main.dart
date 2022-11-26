@@ -46,14 +46,19 @@ setGeoData() async{
 }
 
 refreshHiveData() async {
-  await refreshHiveProfils();
-  await refreshHiveChats();
-  await refreshHiveEvents();
+  String userId = FirebaseAuth.instance.currentUser?.uid;
+
   await refreshHiveCommunities();
   await refreshHiveNewsPage();
   await refreshHiveStadtInfo();
   await refreshHiveStadtInfoUser();
   await refreshHiveFamilyProfils();
+
+  if(userId == null) return;
+
+  await refreshHiveProfils();
+  await refreshHiveChats();
+  await refreshHiveEvents();
 }
 
 void main() async {
