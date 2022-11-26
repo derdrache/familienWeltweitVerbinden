@@ -154,7 +154,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   _updateAutomaticLocation() async {
     var automaticLocation = ownProfil["automaticLocation"];
-    bool automaticLocationOff = automaticLocation == standortbestimmung[0] &&
+    bool automaticLocationOff = automaticLocation == standortbestimmung[0] ||
         automaticLocation == standortbestimmungEnglisch[0];
     var dateDifference =
         DateTime.now().difference(DateTime.parse(ownProfil["lastLogin"]));
