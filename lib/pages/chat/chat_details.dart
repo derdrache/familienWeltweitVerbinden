@@ -2162,6 +2162,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         return Container(
             constraints: const BoxConstraints(
               minHeight: 60,
+              maxHeight: 200
             ),
             decoration: BoxDecoration(
                 color: Colors.white,
