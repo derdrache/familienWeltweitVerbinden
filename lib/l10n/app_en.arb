@@ -357,7 +357,7 @@
     "a2hsBody": "This will make the website look 100% like the app version",
     "ja": "yes",
     "nein": "no",
-    "frageTeilGemeinschaft": "Are you the creator or a community member ?",
+    "frageTeilGemeinschaft": "Are you a contact person for this community ?",
     "frageErstellerEvent": "Are you the initiator of this event?",
     "nichtTeilGemeinschaft": "The creator is not a part of this community",
     "nichtErstellerEvent" : "The creator is not the initiator of the event",
