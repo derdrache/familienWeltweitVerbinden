@@ -519,6 +519,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   TextButton(
                     child: Text(AppLocalizations.of(context).loeschen),
                     onPressed: () {
+                      checkIfLastMessageAndChangeChatGroup(messageId);
+
                       if (widget.isChatgroup) {
                         ChatGroupsDatabase().deleteMessages(messageId);
                       } else {
@@ -527,6 +529,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                       messages
                           .removeWhere((element) => element["id"] == messageId);
+
+
 
                       setState(() {});
 
@@ -540,6 +544,24 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 ],
               );
             }));
+  }
+
+  checkIfLastMessageAndChangeChatGroup(messageId){
+    var lastMessage = messages.last;
+    var secondLastMessage = messages[messages.length -2];
+
+    if(messageId != lastMessage["id"]) return;
+
+    if (widget.isChatgroup) {
+      ChatGroupsDatabase().updateChatGroup(
+          "lastMessage = '${secondLastMessage["message"]}' , lastMessageDate = '${secondLastMessage["date"]}'",
+          "WHERE id = '${widget.chatId}'");
+
+    } else {
+      ChatDatabase().updateChatGroup(
+          "lastMessage = '${secondLastMessage["message"]}' , lastMessageDate = '${secondLastMessage["date"]}'",
+          "WHERE id = '${widget.chatId}'");
+    }
   }
 
   reportMessage(message) {
@@ -1640,7 +1662,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                     children: [
                                                       Text(
                                                           messageFromProfil[
-                                                              "name"],
+                                                              "name"] ?? "gelöschter Account",
                                                           style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
@@ -1844,9 +1866,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     normalMessage(index, message, messageBoxInformation) {
-      var creatorData = getProfilFromHive(profilId: message["von"]);
+      var creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
       var creatorName = creatorData["name"];
       var creatorColor = creatorData["bildStandardFarbe"];
+
+      if(creatorData.isEmpty) return SizedBox.shrink();
 
       return Listener(
         onPointerHover: (details) {
@@ -2259,8 +2283,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var detailsButtonName = "Information";
 
       widget.groupChatData["users"].forEach((memberUserId, data) {
-        var userProfil = getProfilFromHive(profilId: memberUserId);
+        var userProfil = getProfilFromHive(profilId: memberUserId) ?? {};
         var userName = userProfil["name"];
+
+        if (userProfil.isEmpty) return;
 
         mitgliederList.add(GestureDetector(
           onTap: () => global_functions.changePage(
