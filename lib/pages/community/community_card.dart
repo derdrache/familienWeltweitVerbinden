@@ -52,7 +52,7 @@ class _CommunityCardState extends State<CommunityCard> {
           CommunityDetails(community: widget.community),
           whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
-          width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
+          width: (125 + ((screenHeight - 600) / 5)) * bigMultiplikator,
           height: screenHeight / 3.2 * bigMultiplikator,
           margin: widget.margin,
           decoration: BoxDecoration(
