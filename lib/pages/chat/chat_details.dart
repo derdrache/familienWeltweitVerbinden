@@ -1870,7 +1870,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorName = creatorData["name"];
       var creatorColor = creatorData["bildStandardFarbe"];
 
-      if(creatorData.isEmpty) return SizedBox.shrink();
+      if(creatorData.isEmpty) return const SizedBox.shrink();
 
       return Listener(
         onPointerHover: (details) {
