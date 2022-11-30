@@ -7,11 +7,10 @@ import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 var databaseUrl = "https://families-worldwide.com/";
-var userId = FirebaseAuth.instance.currentUser.uid;
 
 sendEmail(notificationInformation) async {
+  var userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
-  //return;
 
   var url = Uri.parse(databaseUrl + "services/sendEmail2.php");
   var emailAdresse = await ProfilDatabase()
@@ -26,6 +25,7 @@ sendEmail(notificationInformation) async {
 }
 
 sendNotification(notificationInformation) async {
+  var userId = FirebaseAuth.instance.currentUser?.uid;
   var url = Uri.parse(databaseUrl + "services/sendNotification.php");
 
   if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
