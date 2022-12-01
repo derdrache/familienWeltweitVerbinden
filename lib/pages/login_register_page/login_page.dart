@@ -156,6 +156,14 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  _sendeHilfe(reportController){
+    ChatDatabase().addAdminMessage(
+        reportController.text, "Login/Hilfe");
+
+    customSnackbar(context, AppLocalizations.of(context).hilfeVersendetText,
+        color: Colors.green);
+  }
+
   @override
   Widget build(BuildContext context) {
     double sideSpace = 20;
@@ -259,19 +267,23 @@ class _LoginPageState extends State<LoginPage> {
                       height: 390,
                       title: AppLocalizations.of(context).hilfe,
                       children: [
-                        customTextInput(
-                            AppLocalizations.of(context).hilfeVorschlag,
-                            reportController,
-                            moreLines: 10),
+                        TextField(
+                          controller: reportController,
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black),
+                            ),
+                            hintText: AppLocalizations.of(context).hilfeVorschlag,
+                            hintMaxLines: 10,
+                          ),
+                          maxLines: 10,
+                        ),
                         Container(
                           margin: const EdgeInsets.only(left: 30, top: 10, right: 30),
                           child: FloatingActionButton.extended(
                               onPressed: () {
                                 Navigator.pop(context);
-                                ReportsDatabase().add(
-                                    "Login",
-                                    "Hilfe",
-                                    reportController.text);
+                                _sendeHilfe(reportController);
                               },
                               label: Text(AppLocalizations.of(context).senden)),
                         )
