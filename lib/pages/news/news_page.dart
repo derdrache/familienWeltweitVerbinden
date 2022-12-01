@@ -22,22 +22,23 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
-  var events = Hive.box('secureBox').get("events") ?? [];
-  var cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
-  var ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
-  var userNewsContentHive = Hive.box('secureBox').get("userNewsContent") ?? [];
-  Map ownSettingProfil;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
+  List newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
+  List events = Hive.box('secureBox').get("events") ?? [];
+  List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
+  Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
+  List userNewsContentHive = Hive.box('secureBox').get("userNewsContent") ?? [];
+  Map ownSettingProfil = Hive.box('secureBox').get("ownNewsSetting");
   List newsFeed = [];
-  var newsFeedDateList = [];
+  List newsFeedDateList = [];
   final _controller = ScrollController();
-  var scrollbarOnBottom = true;
-  var userNewsContent = [];
+  bool scrollbarOnBottom = true;
+  List userNewsContent = [];
 
   @override
   void initState() {
-    ownSettingProfil = getSettingProfilOrAddNew();
+    ownSettingProfil ??= _addNewSettingProfil();
+
     _controller.addListener(() {
       bool isTop = _controller.position.pixels == 0;
       if (isTop) {
@@ -51,15 +52,7 @@ class _NewsPageState extends State<NewsPage> {
     super.initState();
   }
 
-  getSettingProfilOrAddNew() {
-    var newsSettings = Hive.box('secureBox').get("newsSettings") ?? [];
-    var ownProfil;
-    for (var newsSetting in newsSettings) {
-      if (newsSetting["id"] == userId) ownProfil = newsSetting;
-    }
-
-    if (ownProfil != null) return ownProfil;
-
+  _addNewSettingProfil(){
     var newProfil = {
       "id": userId,
       "showFriendAdded": true,
@@ -71,16 +64,12 @@ class _NewsPageState extends State<NewsPage> {
     };
 
     NewsSettingsDatabase().newProfil();
-    newsSettings.add(newProfil);
-
-    if (Hive.box('secureBox').get("newsSettings") == null) {
-      Hive.box('secureBox').put("newsSettings", newsSettings);
-    }
+    Hive.box('secureBox').put("ownNewsSetting", newProfil);
 
     return newProfil;
   }
 
-  getMyLastLocationChangeDate() {
+  _getMyLastLocationChangeDate() {
     var lastLocationChangeDate = "";
 
     for (var news in newsFeedData) {
@@ -89,13 +78,14 @@ class _NewsPageState extends State<NewsPage> {
       }
     }
 
-    if (lastLocationChangeDate.isEmpty) lastLocationChangeDate = "2022-08-01";
+    String newsPagePatchDate = "2022-08-01";
+    if (lastLocationChangeDate.isEmpty) lastLocationChangeDate = newsPagePatchDate;
 
     return lastLocationChangeDate;
   }
 
-  evenTagMatch(tags) {
-    var ownInteressen = ownProfil["interessen"];
+  _evenTagMatch(tags) {
+    List ownInteressen = ownProfil["interessen"];
 
     for (var interesse in ownInteressen) {
       if (tags.contains(global_func.changeGermanToEnglish(interesse)) ||
@@ -105,14 +95,14 @@ class _NewsPageState extends State<NewsPage> {
     }
   }
 
-  sortNewsFeed() {
+  _sortNewsFeed() {
     newsFeed.sort((a, b) {
       int compare = a["date"].compareTo(b["date"]);
       return compare;
     });
   }
 
-  getNewsWidgetList() {
+  _getNewsWidgetList() {
     double screenHeight = MediaQuery.of(context).size.height;
     var widgetList = [];
 
@@ -120,7 +110,7 @@ class _NewsPageState extends State<NewsPage> {
       widgetList.add(item["newsWidget"]);
     }
 
-    if (isEmptyWidgetList(widgetList)) {
+    if (_checkWidgetListIsEmpty(widgetList)) {
       widgetList.add(Center(
           child: Container(
               padding: EdgeInsets.only(top: screenHeight/3),
@@ -133,7 +123,7 @@ class _NewsPageState extends State<NewsPage> {
     return widgetList;
   }
 
-  checkIfNew(newsContent, erstelltVon) {
+  _checkIfNew(newsContent, erstelltVon) {
     for (var hiveNews in userNewsContentHive) {
       if (hiveNews["news"] == newsContent &&
           erstelltVon == hiveNews["ersteller"]) return false;
@@ -155,11 +145,11 @@ class _NewsPageState extends State<NewsPage> {
     return true;
   }
 
-  updateHiveUserNewsContent() {
+  _updateHiveUserNewsContent() {
     Hive.box('secureBox').put("userNewsContent", userNewsContent);
   }
 
-  isEmptyWidgetList(widgetList) {
+  _checkWidgetListIsEmpty(widgetList) {
     for (var widget in widgetList) {
       if (!(widget.runtimeType == SizedBox)) {
         return false;
@@ -170,17 +160,17 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   Widget build(BuildContext context) {
-    double titleFontSize = 15;
+    const double titleFontSize = 15;
 
     friendsDisplay(news) {
-      var userAdded = news["information"].split(" ")[1];
-      var newsUserId = news["erstelltVon"];
-      var friendProfil = getProfilFromHive(profilId: newsUserId);
-      var text = "";
+      String addedUser = news["information"].split(" ")[1];
+      String newsUserId = news["erstelltVon"];
+      Map friendProfil = getProfilFromHive(profilId: newsUserId);
+      String text = "";
 
       if (friendProfil == null ||
-          !userAdded.contains(userId) ||
-          !ownSettingProfil["showFriendAdded"]) {
+          !addedUser.contains(userId) ||
+          ownSettingProfil["showFriendAdded"] == 0) {
         return const SizedBox.shrink();
       }
 
@@ -230,7 +220,7 @@ class _NewsPageState extends State<NewsPage> {
                   child: NewsStamp(
                       date: news["erstelltAm"],
                       isNew:
-                          checkIfNew(news["information"], news["erstelltVon"])))
+                          _checkIfNew(news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -238,32 +228,32 @@ class _NewsPageState extends State<NewsPage> {
     }
 
     changePlaceDisplay(news, myLastLocationDate) {
-      var newsUserId = news["erstelltVon"];
-      var newsUserProfil = getProfilFromHive(profilId: newsUserId);
-      var isFriend = ownProfil["friendlist"].contains(newsUserId);
-      var text = "";
-      var newsOrt = news["information"]["city"];
-      var newsLand = news["information"]["countryname"];
-      var ownOrt = ownProfil["ort"];
+      String newsUserId = news["erstelltVon"];
+      Map newsUserProfil = getProfilFromHive(profilId: newsUserId);
+      bool isFriend = ownProfil["friendlist"].contains(newsUserId);
+      String text = "";
+      String newsOrt = news["information"]["city"];
+      String newsLand = news["information"]["countryname"];
+      String ownOrt = ownProfil["ort"];
       var locationTimeCheck = DateTime.parse(news["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
-      var samePlaceAndTime = ownOrt == newsOrt &&
+      bool samePlaceAndTime = ownOrt == newsOrt &&
           locationTimeCheck >= 0 &&
-          ownSettingProfil["showNewFamilyLocation"];
+          ownSettingProfil["showNewFamilyLocation"] == 1;
 
       if (newsUserProfil == null ||
           newsOrt == null ||
           newsLand == null ||
-          !ownSettingProfil["showFriendChangedLocation"] ||
-          !ownSettingProfil["showNewFamilyLocation"] ||
+          ownSettingProfil["showFriendChangedLocation"] == 0 ||
+          ownSettingProfil["showNewFamilyLocation"] == 0 ||
           !(isFriend || samePlaceAndTime)) {
         return const SizedBox.shrink();
       }
 
-      var newsOrtInfo =
+      String newsOrtInfo =
           newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
 
-      if (isFriend && ownSettingProfil["showFriendChangedLocation"]) {
+      if (isFriend && ownSettingProfil["showFriendChangedLocation"] == 1) {
         text = newsUserProfil["name"] +
             AppLocalizations.of(context).freundOrtsWechsel +
             "\n" +
@@ -306,7 +296,7 @@ class _NewsPageState extends State<NewsPage> {
                   ),
                   child: Text(text,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: titleFontSize))),
               Positioned(
@@ -315,7 +305,7 @@ class _NewsPageState extends State<NewsPage> {
                   child: NewsStamp(
                       date: news["erstelltAm"],
                       isNew:
-                          checkIfNew(news["information"], news["erstelltVon"])))
+                          _checkIfNew(news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -323,27 +313,27 @@ class _NewsPageState extends State<NewsPage> {
     }
 
     friendsNewTravelPlanDisplay(news) {
-      var newsUserId = news["erstelltVon"];
-      var friendProfil = getProfilFromHive(profilId: newsUserId);
-      var isFriend = ownProfil["friendlist"].contains(newsUserId);
+      String newsUserId = news["erstelltVon"];
+      Map friendProfil = getProfilFromHive(profilId: newsUserId);
+      bool isFriend = ownProfil["friendlist"].contains(newsUserId);
 
       if (!isFriend ||
           friendProfil == null ||
-          !ownSettingProfil["showFriendTravelPlan"]) {
+          ownSettingProfil["showFriendTravelPlan"] == 0) {
         return const SizedBox.shrink();
       }
 
-      var newTravelPlan = news["information"];
-      var travelPlanVon =
+      Map newTravelPlan = news["information"];
+      String travelPlanVon =
           newTravelPlan["von"].split(" ")[0].split("-").reversed.join("-");
-      var travelPlanbis =
+      String travelPlanbis =
           newTravelPlan["bis"].split(" ")[0].split("-").reversed.join("-");
-      var travelPlanCity = newTravelPlan["ortData"]["city"];
-      var travelPlanCountry = newTravelPlan["ortData"]["countryname"];
-      var textTitle = friendProfil["name"] +
+      String travelPlanCity = newTravelPlan["ortData"]["city"];
+      String travelPlanCountry = newTravelPlan["ortData"]["countryname"];
+      String textTitle = friendProfil["name"] +
           AppLocalizations.of(context).friendNewTravelPlan;
-      var textDate = travelPlanVon + " - " + travelPlanbis;
-      var textLocation = travelPlanCity + " / " + travelPlanCountry;
+      String textDate = travelPlanVon + " - " + travelPlanbis;
+      String textLocation = travelPlanCity + " / " + travelPlanCountry;
 
       userNewsContent
           .add({"news": news["information"], "ersteller": news["erstelltVon"]});
@@ -393,7 +383,7 @@ class _NewsPageState extends State<NewsPage> {
                   child: NewsStamp(
                       date: news["erstelltAm"],
                       isNew:
-                          checkIfNew(news["information"], news["erstelltVon"])))
+                          _checkIfNew(news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -403,23 +393,23 @@ class _NewsPageState extends State<NewsPage> {
     eventsDisplay(event, myLastLocationDate) {
       var locationTimeCheck = DateTime.parse(event["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
-      var isOnline = event["typ"] == "online";
-      var checkOfflineEvent = !isOnline &&
+      bool isOnline = event["typ"] == "online";
+      bool checkOfflineEvent = !isOnline &&
           locationTimeCheck >= 0 &&
           event["stadt"] == ownProfil["ort"];
-      var checkOnlineEvent = isOnline && evenTagMatch(event["tags"]) != null;
-      var isPrivate = event["art"] == "privat" || event["art"] == "private";
-      var eventText = "";
+      bool checkOnlineEvent = isOnline && _evenTagMatch(event["tags"]) != null;
+      bool isPrivate = event["art"] == "privat" || event["art"] == "private";
+      String eventText = "";
 
       if (!checkOfflineEvent && !checkOnlineEvent ||
-          !ownSettingProfil["showInterestingEvents"] ||
+          ownSettingProfil["showInterestingEvents"] == 0 ||
           event["erstelltVon"] == userId ||
           isPrivate) {
         return const SizedBox.shrink();
       }
 
       if(isOnline){
-        eventText = AppLocalizations.of(context).newsPageOnlineEventVorschlag + evenTagMatch(event["tags"]).toString();
+        eventText = AppLocalizations.of(context).newsPageOnlineEventVorschlag + _evenTagMatch(event["tags"]).toString();
       }else{
         eventText = AppLocalizations.of(context).newsPageOfflineEventVorschlag;
       }
@@ -444,7 +434,7 @@ class _NewsPageState extends State<NewsPage> {
                     Icon(
                       Icons.fiber_new,
                       size: 30,
-                      color: checkIfNew(event["beschreibung"], event["erstelltVon"])
+                      color: _checkIfNew(event["beschreibung"], event["erstelltVon"])
                           ? null
                           : Colors.transparent,
                     ),
@@ -467,16 +457,16 @@ class _NewsPageState extends State<NewsPage> {
 
       if (!(locationTimeCheck >= 0 && info["ort"] == ownProfil["ort"]) ||
           info["erstelltVon"] == userId ||
-          !ownSettingProfil["showCityInformation"]) {
+          ownSettingProfil["showCityInformation"] == 0) {
         return const SizedBox.shrink();
       }
 
-      var spracheIstDeutsch = kIsWeb
+      bool spracheIstDeutsch = kIsWeb
           ? window.locale.languageCode == "de"
           : Platform.localeName == "de_DE";
-      var textHeader =
+      String textHeader =
           info["ort"] + AppLocalizations.of(context).hatNeueStadtinformation;
-      var textBody =
+      String textBody =
           spracheIstDeutsch ? info["informationGer"] : info["informationEng"];
 
       userNewsContent.add({"news": textBody, "ersteller": info["erstelltVon"]});
@@ -525,7 +515,7 @@ class _NewsPageState extends State<NewsPage> {
                   right: 35,
                   child: NewsStamp(
                       date: info["erstelltAm"],
-                      isNew: checkIfNew(textBody, info["erstelltVon"])))
+                      isNew: _checkIfNew(textBody, info["erstelltVon"])))
             ],
           ),
         ),
@@ -533,7 +523,7 @@ class _NewsPageState extends State<NewsPage> {
     }
 
     addLocationWelcome(news) {
-      var condition =
+      bool condition =
           news["typ"] == "ortswechsel" && news["erstelltVon"].contains(userId);
       if (!condition) return;
 
@@ -598,7 +588,7 @@ class _NewsPageState extends State<NewsPage> {
                     right: 35,
                     child: NewsStamp(
                         date: news["erstelltAm"],
-                        isNew: checkIfNew(
+                        isNew: _checkIfNew(
                             news["information"], news["erstelltVon"])))
               ],
             ),
@@ -654,7 +644,7 @@ class _NewsPageState extends State<NewsPage> {
 
     createNewsFeed() {
       newsFeed = [];
-      var myLastLocationChangeDate = getMyLastLocationChangeDate();
+      var myLastLocationChangeDate = _getMyLastLocationChangeDate();
 
       for (var news in newsFeedData) {
         addLocationWelcome(news);
@@ -694,10 +684,9 @@ class _NewsPageState extends State<NewsPage> {
       addMonthYearDivider();
     }
 
-    getSettingProfilOrAddNew();
     createNewsFeed();
-    sortNewsFeed();
-    updateHiveUserNewsContent();
+    _sortNewsFeed();
+    _updateHiveUserNewsContent();
 
     return Scaffold(
         floatingActionButtonAnimator: NoScalingAnimation(),
@@ -731,7 +720,7 @@ class _NewsPageState extends State<NewsPage> {
         body: Container(
             padding: const EdgeInsets.only(top: 50),
             child: ListView(controller: _controller, children: [
-              ...getNewsWidgetList().reversed.toList(),
+              ..._getNewsWidgetList().reversed.toList(),
             ])));
   }
 }

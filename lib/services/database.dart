@@ -13,8 +13,8 @@ import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-//var databaseUrl = "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb
     ? ui.window.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
@@ -1257,6 +1257,7 @@ sortProfils(profils) {
   return profils;
 }
 
+
 getProfilFromHive(
     {profilId, profilName, getNameOnly = false, getIdOnly = false}) {
   var allProfils = Hive.box('secureBox').get("profils");
@@ -1382,6 +1383,7 @@ getNewsId(information) {
   }
 }
 
+
 updateHiveOwnProfil(changeTyp, changeData) {
   var ownProfil = Hive.box("secureBox").get("ownProfil");
   ownProfil[changeTyp] = changeData;
@@ -1396,6 +1398,7 @@ updateHiveEvent(id, changeTyp, changeData) {
   var event = getEventFromHive(id);
   event[changeTyp] = changeData;
 }
+
 
 refreshHiveAllgemein() async {
   var dbAllgemein = await AllgemeinDatabase().getData("*", "WHERE id ='1'");
@@ -1487,6 +1490,18 @@ refreshHiveNewsPage() async {
   if (dbNewsData == false) dbNewsData = [];
 
   Hive.box('secureBox').put("newsFeed", dbNewsData);
+
+  refreshHiveNewsSetting();
+
+}
+
+refreshHiveNewsSetting() async{
+  var userId = FirebaseAuth.instance.currentUser?.uid;
+  var ownNewsPageSetting = Hive.box('secureBox').get("ownNewsSetting");
+  if(userId == null || ownNewsPageSetting != null) return;
+  var ownNewsSetting = await NewsSettingsDatabase().getData("*", "WHERE id = '$userId'");
+
+  Hive.box('secureBox').put("ownNewsSetting", ownNewsSetting);
 }
 
 refreshHiveStadtInfo() async {
