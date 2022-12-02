@@ -1078,7 +1078,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           child: TextButton(
               child: Text(AppLocalizations.of(context).uebersetzen),
               onPressed: () async {
-                var translation = await translator.translate(message["message"],
+                var translationMessage = message["message"].replaceAll("'", "");
+
+                var translation = await translator.translate(translationMessage,
                     from: "auto", to: myLanguage);
 
                 showModalBottomSheet<void>(
