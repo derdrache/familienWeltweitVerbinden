@@ -144,6 +144,7 @@ class _LoginPageState extends State<LoginPage> {
     var ownProfil = Hive.box("secureBox").get("ownProfil");
     if(ownProfil == false || ownProfil.isEmpty) return;
 
+    refreshHiveNewsSetting();
     await refreshHiveChats();
     await refreshHiveEvents();
 
