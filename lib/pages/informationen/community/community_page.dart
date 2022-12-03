@@ -1,15 +1,15 @@
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../services/locationsService.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/search_autocomplete.dart';
+import '../../../services/locationsService.dart';
+import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/search_autocomplete.dart';
 import 'community_card.dart';
 import 'community_erstellen.dart';
 
@@ -223,28 +223,6 @@ class _CommunityPageState extends State<CommunityPage> {
       );
     }
 
-    floatingActionButtons() {
-      return Container(
-        alignment: Alignment.bottomRight,
-        margin: const EdgeInsets.all(10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-                heroTag: "show favorites",
-                child: const Icon(Icons.star),
-                onPressed: () => showFavoritesWindow()),
-            const SizedBox(height: 10),
-            FloatingActionButton(
-                heroTag: "create Community",
-                child: const Icon(Icons.add),
-                onPressed: () =>
-                    changePage(context, const CommunityErstellen())),
-          ],
-        ),
-      );
-    }
-
     showInvite() {
       return Container(
         padding: const EdgeInsets.all(10),
@@ -285,7 +263,22 @@ class _CommunityPageState extends State<CommunityPage> {
     }
 
     return Scaffold(
-      floatingActionButton: floatingActionButtons(),
+      appBar: CustomAppBar(
+        title: "Communities",
+        buttons: [
+          IconButton(
+              onPressed: ()=> showFavoritesWindow(),
+              icon: const Icon(
+                Icons.star,
+                size: 30,
+              ))
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+          heroTag: "create Community",
+          child: const Icon(Icons.add),
+          onPressed: () =>
+              changePage(context, const CommunityErstellen())),
       body: SafeArea(
         child: Column(
           children: [

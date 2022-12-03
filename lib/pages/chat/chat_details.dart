@@ -8,13 +8,8 @@ import 'package:familien_suche/global/variablen.dart'
     as global_var;
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/chat/pin_messages.dart';
-import 'package:familien_suche/pages/community/community_card.dart';
-import 'package:familien_suche/pages/community/community_details.dart';
-import 'package:familien_suche/pages/events/eventCard.dart';
-import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/pages/start_page.dart';
-import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,6 +20,11 @@ import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:translator/translator.dart';
 
+import '../informationen/community/community_card.dart';
+import '../informationen/community/community_details.dart';
+import '../informationen/stadtinformation/stadtinformation.dart';
+import '../informationen/events/eventCard.dart';
+import '../informationen/events/event_details.dart';
 import '../../auth/secrets.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
