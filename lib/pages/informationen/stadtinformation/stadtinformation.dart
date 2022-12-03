@@ -11,12 +11,12 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:translator/translator.dart';
 
-import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart' as global_func;
-import '../../widgets/custom_appbar.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/text_with_hyperlink_detection.dart';
-import '../start_page.dart';
+import '../../../global/custom_widgets.dart';
+import '../../../global/global_functions.dart' as global_func;
+import '../../../widgets/custom_appbar.dart';
+import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/text_with_hyperlink_detection.dart';
+import '../../start_page.dart';
 
 class StadtinformationsPage extends StatefulWidget {
   var ortName;

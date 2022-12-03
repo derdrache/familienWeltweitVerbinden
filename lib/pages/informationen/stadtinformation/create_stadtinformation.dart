@@ -1,4 +1,3 @@
-import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/google_autocomplete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -6,10 +5,11 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
-import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart';
-import '../../services/database.dart';
-import '../../widgets/custom_appbar.dart';
+import 'stadtinformation.dart';
+import '../../../global/custom_widgets.dart';
+import '../../../global/global_functions.dart';
+import '../../../services/database.dart';
+import '../../../widgets/custom_appbar.dart';
 
 class CreateStadtinformationsPage extends StatefulWidget {
   const CreateStadtinformationsPage({Key key}) : super(key: key);
