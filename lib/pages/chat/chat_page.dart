@@ -671,7 +671,6 @@ class _ChatPageState extends State<ChatPage> {
                 searchListAllChatgroups = [];
 
                 if (value.isEmpty) {
-                  //setState(() {});
                   return;
                 }
 
@@ -794,7 +793,6 @@ class _ChatPageState extends State<ChatPage> {
                 icon: const Icon(
                   Icons.search,
                   size: 30,
-                  color: Colors.black,
                 )),
             const SizedBox(
               width: 10,
