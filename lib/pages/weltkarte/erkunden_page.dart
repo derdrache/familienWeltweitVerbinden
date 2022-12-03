@@ -2,8 +2,6 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/community/community_card.dart';
-import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -13,20 +11,24 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../../widgets/badge_icon.dart';
-import '../../widgets/month_picker.dart';
-import '../community/community_erstellen.dart';
-import '../events/events_erstellen.dart';
-import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
-import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
+import '../../services/database.dart';
 import '../../services/locationsService.dart';
+import '../../widgets/badge_icon.dart';
+import '../../widgets/month_picker.dart';
+import '../informationen/community/community_erstellen.dart';
+import '../informationen/community/community_card.dart';
+import '../informationen/events/events_erstellen.dart';
+import '../informationen/stadtinformation/stadtinformation.dart';
+import '../informationen/stadtinformation/create_stadtinformation.dart';
+import '../informationen/events/eventCard.dart';
 import '../show_profil.dart';
-import '../events/eventCard.dart';
+
+
 
 class ErkundenPage extends StatefulWidget {
   const ErkundenPage({Key key}) : super(key: key);

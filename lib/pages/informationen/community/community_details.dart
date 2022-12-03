@@ -13,14 +13,14 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
 
-import '../../global/custom_widgets.dart';
-import '../../services/database.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/google_autocomplete.dart';
-import '../../widgets/search_autocomplete.dart';
-import '../../widgets/text_with_hyperlink_detection.dart';
-import '../start_page.dart';
-import '../../global/variablen.dart' as global_var;
+import '../../../global/custom_widgets.dart';
+import '../../../services/database.dart';
+import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/google_autocomplete.dart';
+import '../../../widgets/search_autocomplete.dart';
+import '../../../widgets/text_with_hyperlink_detection.dart';
+import '../../start_page.dart';
+import '../../../global/variablen.dart' as global_var;
 
 class CommunityDetails extends StatefulWidget {
   Map community;
