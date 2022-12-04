@@ -18,8 +18,6 @@ import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../widgets/badge_icon.dart';
 import '../windows/patchnotes.dart';
-import 'informationen/community/community_page.dart';
-import 'informationen/events/event_page.dart';
 import 'informationen/information.dart';
 import 'login_register_page/create_profil_page.dart';
 import 'news/news_page.dart';

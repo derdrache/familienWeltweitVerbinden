@@ -782,7 +782,6 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           withLeading: false,
-          //backgroundColor: Colors.white,
           buttons: [
             IconButton(
                 onPressed: () {
