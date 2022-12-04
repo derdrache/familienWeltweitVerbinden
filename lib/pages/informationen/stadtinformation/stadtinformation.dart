@@ -810,8 +810,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         ),
         floatingActionButton: FloatingActionButton(
             heroTag: "create Stadtinformation",
-            child: const Icon(Icons.create),
-            onPressed: () => addInformationWindow()),
+            child: const Icon(Icons.search),
+            onPressed: () => null),
       ),
     );
   }
