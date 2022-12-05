@@ -199,28 +199,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   confirmEvent(bool confirm) async {
-    if (confirm) {
-      var onInteresseList = widget.event["interesse"].contains(userId);
-
-      if (!onInteresseList) {
-        widget.event["interesse"].add(userId);
-      }
-
-      setState(() {
-        widget.teilnahme = true;
-        widget.absage = false;
-        widget.event["zusage"].add(userId);
-        widget.event["absage"].remove(userId);
-      });
-    } else {
-      setState(() {
-        widget.teilnahme = false;
-        widget.absage = true;
-        widget.event["zusage"].remove(userId);
-        widget.event["absage"].add(userId);
-      });
-    }
-
     var eventData = getEventFromHive(widget.event["id"]);
     var zusageList = eventData["zusage"];
     var absageList = eventData["absage"];
@@ -228,12 +206,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     if (confirm) {
       if (!interessenList.contains(userId)) interessenList.add(userId);
+      widget.teilnahme = true;
+      widget.absage = false;
       zusageList.add(userId);
       absageList.remove(userId);
     } else {
+      widget.teilnahme = false;
+      widget.absage = true;
       zusageList.remove(userId);
       absageList.add(userId);
     }
+
+    setState(() {});
 
     EventDatabase().update(
         "absage = '${json.encode(absageList)}', "

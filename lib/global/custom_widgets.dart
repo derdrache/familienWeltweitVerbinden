@@ -9,7 +9,7 @@ double webWidth = 600;
 
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
-  onSubmit, informationWindow, hintText, focusNode}){
+  onSubmit, informationWindow, hintText, focusNode, keyboardType}){
 
   return Stack(
     children: [
@@ -23,6 +23,7 @@ Widget customTextInput(text, controller, {validator, passwort = false,
                 onFieldSubmitted: (string) {
                   if(onSubmit != null)onSubmit();
                 },
+                keyboardType: keyboardType == null ? null :  TextInputType.emailAddress,
                 textInputAction: textInputAction,
                 textAlignVertical: TextAlignVertical.top,
                 maxLines: moreLines,
