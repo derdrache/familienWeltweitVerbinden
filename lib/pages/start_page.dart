@@ -160,8 +160,9 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
         DateTime.now().difference(DateTime.parse(ownProfil["lastLogin"]));
     var firstTimeOnDay = dateDifference.inDays > 0;
 
-    if (automaticLocation == null || automaticLocationOff || !firstTimeOnDay)
+    if (automaticLocation == null || automaticLocationOff || !firstTimeOnDay) {
       return;
+    }
 
     _setAutomaticLoaction(automaticLocation);
   }
@@ -177,6 +178,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     var currentPosition = await LocationService().getCurrentUserLocation();
     var nearstLocationData =
         await LocationService().getNearstLocationData(currentPosition);
+
     nearstLocationData =
         LocationService().transformNearstLocation(nearstLocationData);
 
