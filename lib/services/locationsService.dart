@@ -122,6 +122,10 @@ class LocationService {
   }
 
   getNearstLocationData(position) async {
+    var deviceLanguage =
+    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
+
     try {
       var url =
           "https://families-worldwide.com/services/googleGetNearstCity.php";
@@ -131,8 +135,10 @@ class LocationService {
             "google_maps_key": google_maps_key,
             "lat": position.latitude.toString(),
             "lng": position.longitude.toString(),
+            "sprache": sprache
           }));
       dynamic responseBody = res.body;
+
       var data = jsonDecode(responseBody);
 
       return data["results"][0];
@@ -171,8 +177,12 @@ class LocationService {
   }
 
   getLocationGeoData(location) async {
+    var deviceLanguage =
+    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
     location = location.replaceAll(" ", "_");
     location = Uri.encodeComponent(location);
+
     try {
       var url =
           "https://families-worldwide.com/services/googlegetGeodataFromLocationName.php";
@@ -181,6 +191,7 @@ class LocationService {
           body: json.encode({
             "googleKey": google_maps_key,
             "location": location,
+            "sprache": sprache
           }));
       dynamic responseBody = res.body;
 
