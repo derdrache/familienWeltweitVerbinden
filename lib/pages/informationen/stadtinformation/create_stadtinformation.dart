@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
-import 'stadtinformation.dart';
+import '../location/location_information.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
@@ -117,7 +117,7 @@ class _CreateStadtinformationsPageState
     allInformations.add(newUserInformation);
 
     Navigator.pop(context);
-    changePage(context, StadtinformationsPage(ortName: ortData["city"], newEntry: true,));
+    changePage(context, LocationInformationPage(ortName: ortData["city"], newEntry: true,));
 
   }
 

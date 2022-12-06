@@ -10,6 +10,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../services/locationsService.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/search_autocomplete.dart';
+import '../../../global/global_functions.dart' as global_functions;
 import 'community_card.dart';
 import 'community_erstellen.dart';
 
@@ -155,6 +156,7 @@ class _CommunityPageState extends State<CommunityPage> {
               context,
               StartPage(
                 selectedIndex: 3,
+                informationPageIndex: 2,
               )),
         ));
       }
@@ -265,6 +267,10 @@ class _CommunityPageState extends State<CommunityPage> {
     return Scaffold(
       appBar: CustomAppBar(
         title: "Communities",
+        leading: IconButton(
+          onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
+          icon: Icon(Icons.arrow_back),
+        ),
         buttons: [
           IconButton(
               onPressed: ()=> showFavoritesWindow(),
