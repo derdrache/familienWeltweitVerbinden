@@ -289,8 +289,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     ChatGroupsDatabase().deleteChat(chatGroupId);
 
                     DbDeleteImage(widget.event["bild"]);
+
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 2));
+                        context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
                   },
                 ),
                 TextButton(

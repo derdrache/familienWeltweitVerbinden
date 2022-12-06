@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../informationen/events/eventCard.dart';
-import '../informationen/stadtinformation/stadtinformation.dart';
+import '../informationen/location/location_information.dart';
 import 'news_page_settings.dart';
 
 class NewsPage extends StatefulWidget {
@@ -475,7 +475,7 @@ class _NewsPageState extends State<NewsPage> {
       return InkWell(
         onTap: () {
           global_func.changePage(
-              context, StadtinformationsPage(ortName: info["ort"]));
+              context, LocationInformationPage(ortName: info["ort"]));
         },
         child: Align(
           child: Stack(
@@ -540,7 +540,7 @@ class _NewsPageState extends State<NewsPage> {
           onTap: () {
             global_func.changePage(
                 context,
-                StadtinformationsPage(
+                LocationInformationPage(
                   ortName: ortsName,
                 ));
           },
