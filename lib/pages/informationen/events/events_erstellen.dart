@@ -151,7 +151,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
     if (dbEventData == false) return;
 
-    global_functions.changePage(context, StartPage(selectedIndex: 2));
+    global_functions.changePage(context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
     global_functions.changePage(context, EventDetailsPage(event: dbEventData));
   }
 

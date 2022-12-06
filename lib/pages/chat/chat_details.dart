@@ -22,7 +22,7 @@ import 'package:translator/translator.dart';
 
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
-import '../informationen/stadtinformation/stadtinformation.dart';
+import '../informationen/location/location_information.dart';
 import '../informationen/events/eventCard.dart';
 import '../informationen/events/event_details.dart';
 import '../../auth/secrets.dart';
@@ -205,7 +205,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "bild": Hive.box('secureBox').get("allgemein")["cityImage"],
           "erstelltVon": ""
         };
-        pageDetailsPage = StadtinformationsPage(
+        pageDetailsPage = LocationInformationPage(
           ortName: connectedData["name"],
         );
       }

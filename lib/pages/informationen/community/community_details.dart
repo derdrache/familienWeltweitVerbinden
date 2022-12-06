@@ -717,7 +717,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     DbDeleteImage(widget.community["bild"]);
 
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 3));
+                        context, StartPage(selectedIndex: 3, informationPageIndex: 2,));
                   },
                 ),
                 TextButton(

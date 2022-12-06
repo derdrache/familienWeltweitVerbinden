@@ -31,8 +31,9 @@ final String userId = FirebaseAuth.instance.currentUser?.uid;
 //ignore: must_be_immutable
 class StartPage extends StatefulWidget {
   int selectedIndex;
+  var informationPageIndex;
 
-  StartPage({Key key, this.selectedIndex = 0}) : super(key: key);
+  StartPage({Key key, this.selectedIndex = 0, this.informationPageIndex = 0}) : super(key: key);
 
   @override
   _StartPageState createState() => _StartPageState();
@@ -43,16 +44,18 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   bool hasInternet = true;
   var checkedA2HS = false;
-  List<Widget> tabPages = <Widget>[
-    const NewsPage(),
-    const ErkundenPage(),
-    const InformationPage(),
-    const ChatPage(),
-    const SettingPage()
-  ];
+  List<Widget> tabPages;
 
   @override
   void initState() {
+    tabPages = <Widget>[
+      const NewsPage(),
+      const ErkundenPage(),
+      InformationPage(pageSelection: widget.informationPageIndex),
+      const ChatPage(),
+      const SettingPage()
+    ];
+
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 

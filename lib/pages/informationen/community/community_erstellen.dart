@@ -121,7 +121,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                       .getData("*", "WHERE erstelltVon = '$userId'");
 
                   global_func.changePageForever(
-                      context, StartPage(selectedIndex: 3));
+                      context, StartPage(selectedIndex: 3, informationPageIndex: 2,));
                   global_func.changePage(
                       context, CommunityDetails(community: community));
                 },

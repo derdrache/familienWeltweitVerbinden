@@ -23,7 +23,7 @@ import '../../widgets/month_picker.dart';
 import '../informationen/community/community_erstellen.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/events/events_erstellen.dart';
-import '../informationen/stadtinformation/stadtinformation.dart';
+import '../informationen/location/location_information.dart';
 import '../informationen/stadtinformation/create_stadtinformation.dart';
 import '../informationen/events/eventCard.dart';
 import '../show_profil.dart';
@@ -745,7 +745,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     for (var city in popupCities) {
       cityAuswahl.add(InkWell(
         onTap: () => changePage(
-            context, StadtinformationsPage(ortName: city["names"].join(" / "))),
+            context, LocationInformationPage(ortName: city["names"].join(" / "))),
         child: Container(
             margin: const EdgeInsets.all(10),
             child: Text(city["names"].join(" / "))),
@@ -762,7 +762,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     if (popupCities.length == 1 && currentMapZoom >= cityZoom) {
       changePage(context,
-          StadtinformationsPage(ortName: popupCities[0]["names"].join(" / ")));
+          LocationInformationPage(ortName: popupCities[0]["names"].join(" / ")));
       return;
     }
 
@@ -1348,8 +1348,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       top: 130,
                       child: IconButton(
                         icon: const Icon(
-                          Icons.feed,
-                          size: 30,
+                          Icons.location_city,
                         ),
                         onPressed: () => openSelectCityWindow(),
                       ),

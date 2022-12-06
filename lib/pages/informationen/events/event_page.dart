@@ -8,6 +8,7 @@ import 'package:hive/hive.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
 import '../../../widgets/badge_icon.dart';
+import '../../start_page.dart';
 import 'events_suchen.dart';
 import 'eventCard.dart';
 import 'events_erstellen.dart';
@@ -150,6 +151,10 @@ class _EventPageState extends State<EventPage> {
     return Scaffold(
       appBar: CustomAppBar(
         title: "Events",
+        leading: IconButton(
+          onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
+          icon: Icon(Icons.arrow_back),
+        ),
         buttons: [
           IconButton(
               onPressed: ()=> Navigator.push(
@@ -169,7 +174,6 @@ class _EventPageState extends State<EventPage> {
             child: Column(children: [
               Expanded(child: meineInteressiertenEventsBox()),
               Expanded(child: meineErstellenEventsBox()),
-              const SizedBox(height: 50)
             ])),
       ),
       floatingActionButton: FloatingActionButton(

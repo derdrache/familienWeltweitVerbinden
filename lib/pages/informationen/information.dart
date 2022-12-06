@@ -1,26 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:familien_suche/global/global_functions.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../informationen/community/community_page.dart';
 import '../informationen/events/event_page.dart';
-import '../informationen/stadtinformation/city_page.dart';
+import 'location/location_page.dart';
 
 
 class InformationPage extends StatefulWidget {
-  const InformationPage({Key key}) : super(key: key);
+  var pageSelection;
+  InformationPage({Key key, this.pageSelection = 0}) : super(key: key);
 
   @override
   State<InformationPage> createState() => _InformationPageState();
 }
 
 class _InformationPageState extends State<InformationPage> {
+  var pageList = [
+    "",
+    EventPage(),
+    CommunityPage(),
+    LocationPage(forCity: true,),
+    LocationPage(forLand: true,)
+  ];
+
   @override
   Widget build(BuildContext context) {
 
-    pageCards(title, icon, image, page) {
+    pageCards(title, icon, image, pageIndex) {
       return GestureDetector(
-        onTap: () => changePage(context, page),
+        onTap: () {
+          setState(() {
+            widget.pageSelection = pageIndex;
+          });
+        },
         child: Container(
           margin:
           const EdgeInsets.only(left: 10, right: 10, top: 30, bottom: 30),
@@ -62,9 +74,9 @@ class _InformationPageState extends State<InformationPage> {
       );
     }
 
-    return EventPage();
+    //return EventPage();
 
-    return Scaffold(
+    return widget.pageSelection == 0 ? Scaffold(
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -76,12 +88,12 @@ class _InformationPageState extends State<InformationPage> {
                     "Events",
                     Icons.calendar_month,
                     "assets/bilder/museum.jpg",
-                    const EventPage()),
+                    1),
                 pageCards(
                     "Communities",
                     Icons.home,
                     "assets/bilder/village.jpg",
-                    const CommunityPage())
+                    2)
               ],
             ),
             Row(
@@ -91,14 +103,18 @@ class _InformationPageState extends State<InformationPage> {
                     AppLocalizations.of(context).cities,
                     Icons.location_city,
                     "assets/bilder/city.jpg",
-                    const CityPage()),
-                //pageCards("Länder", Icons.flag, null)
+                    3),
+                pageCards(
+                    AppLocalizations.of(context).countries,
+                    Icons.flag,
+                    "assets/bilder/land.jpg",
+                    4),
               ],
             )
           ],
         ),
       ),
-    );
+    ) : pageList[widget.pageSelection];
   }
 }
 
