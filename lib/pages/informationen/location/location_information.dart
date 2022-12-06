@@ -18,29 +18,37 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../start_page.dart';
 
-class StadtinformationsPage extends StatefulWidget {
+class LocationInformationPage extends StatefulWidget {
   var ortName;
   var newEntry;
+  var fromCityPage;
 
-  StadtinformationsPage({this.ortName, this.newEntry, Key key}) : super(key: key);
+  LocationInformationPage({
+    Key key,
+    this.ortName,
+    this.newEntry,
+    this.fromCityPage = false
+  }) : super(key: key);
 
   @override
-  _StadtinformationsPageState createState() => _StadtinformationsPageState();
+  _LocationInformationPageState createState() => _LocationInformationPageState();
 }
 
-class _StadtinformationsPageState extends State<StadtinformationsPage> {
+class _LocationInformationPageState extends State<LocationInformationPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   bool canGerman = false;
   bool canEnglish = false;
   var cityInformation = {};
   var usersCityInformation = [];
   final translator = GoogleTranslator();
-
+  bool hasInterest;
+  bool isCity;
 
   @override
   void initState() {
     cityInformation = getCityFromHive(cityName: widget.ortName);
     cityInformation["familien"].remove(userId);
+    isCity = cityInformation["isCity"] == 1;
 
     super.initState();
   }
@@ -480,8 +488,34 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
     });
   }
 
+  changeIntereset(){
+    if(hasInterest){
+      hasInterest = false;
+
+      cityInformation["interesse"].remove(userId);
+      StadtinfoDatabase().update(
+          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+          "WHERE id = '${cityInformation["id"]}"
+      );
+    }else{
+      hasInterest = true;
+
+      cityInformation["interesse"].add(userId);
+      StadtinfoDatabase().update(
+          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
+          "WHERE id = '${cityInformation["id"]}"
+      );
+    }
+
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    hasInterest = cityInformation["interesse"].contains(userId);
+
     allgemeineInfoBox() {
       String internetSpeedText = cityInformation["internet"] == null
           ? "?"
@@ -784,7 +818,11 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         resizeToAvoidBottomInset: false,
         appBar: CustomAppBar(
             title: widget.ortName,
-            leading: widget.newEntry != null ? StartPage() : null,
+            leading: widget.fromCityPage
+                ? StartPage(
+                  selectedIndex: 2,
+                  informationPageIndex: isCity ? 3 : 4
+                ) : null,
             buttons: [
               IconButton(
                 icon: const Icon(Icons.message),
@@ -796,6 +834,10 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
                     connectedId: "</stadt=${cityInformation["id"]}",
                   ));
                 },
+              ),
+              IconButton(
+                onPressed: () => changeIntereset(),
+                icon: Icon(Icons.star, color: hasInterest ? Colors.yellow.shade900 : Colors.black,),
               )
             ],
         ),
@@ -810,8 +852,8 @@ class _StadtinformationsPageState extends State<StadtinformationsPage> {
         ),
         floatingActionButton: FloatingActionButton(
             heroTag: "create Stadtinformation",
-            child: const Icon(Icons.search),
-            onPressed: () => null),
+            child: const Icon(Icons.create),
+            onPressed: () => addInformationWindow()),
       ),
     );
   }

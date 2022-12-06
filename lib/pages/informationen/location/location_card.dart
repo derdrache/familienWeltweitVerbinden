@@ -1,28 +1,30 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
-import 'stadtinformation.dart';
+import 'location_information.dart';
 
-class CityCard extends StatefulWidget {
-  Map city;
+class LocationCard extends StatefulWidget {
+  Map location;
+  var fromCityPage;
 
-  CityCard({Key key, this.city}) : super(key: key);
+  LocationCard({Key key, this.location, this.fromCityPage = false}) : super(key: key);
 
   @override
-  State<CityCard> createState() => _CityCardState();
+  State<LocationCard> createState() => _LocationCardState();
 }
 
-class _CityCardState extends State<CityCard> {
+class _LocationCardState extends State<LocationCard> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
+  var assetCity = "assets/bilder/city.jpg";
+  var assetLand = "assets/bilder/land.jpg";
   bool hasInterest;
-
+  bool isCity;
 
   @override
   void initState() {
-    hasInterest = widget.city["interesse"].contains(userId);
+    isCity = widget.location["isCity"] == 1;
 
     super.initState();
   }
@@ -31,18 +33,18 @@ class _CityCardState extends State<CityCard> {
     if(hasInterest){
       hasInterest = false;
 
-      widget.city["interesse"].remove(userId);
+      widget.location["interesse"].remove(userId);
       StadtinfoDatabase().update(
           "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id = '${widget.city["id"]}"
+          "WHERE id = '${widget.location["id"]}"
       );
     }else{
       hasInterest = true;
 
-      widget.city["interesse"].add(userId);
+      widget.location["interesse"].add(userId);
       StadtinfoDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id = '${widget.city["id"]}"
+          "WHERE id = '${widget.location["id"]}"
       );
     }
 
@@ -55,11 +57,15 @@ class _CityCardState extends State<CityCard> {
 
   @override
   Widget build(BuildContext context) {
+    hasInterest = widget.location["interesse"].contains(userId);
+
+
     return GestureDetector(
       onTap: () => changePage(
           context,
-          StadtinformationsPage(
-            ortName: widget.city["ort"],
+          LocationInformationPage(
+            ortName: widget.location["ort"],
+            fromCityPage: widget.fromCityPage
           )),
       child: Container(
         margin: const EdgeInsets.all(15),
@@ -80,12 +86,12 @@ class _CityCardState extends State<CityCard> {
                       image: DecorationImage(
                           fit: BoxFit.fitHeight,
                           colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.7), BlendMode.dstATop),
-                          image: const AssetImage("assets/bilder/city.jpg"))),
+                          image: AssetImage( isCity ? assetCity : assetLand))),
                   child: Center(
                       child: Container(
                         padding: const EdgeInsets.all(5),
                         child: Text(
-                          widget.city["ort"],
+                          widget.location["ort"],
                           style:
                           const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                         ),

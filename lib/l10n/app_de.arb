@@ -421,5 +421,7 @@
     "ungeleseneNachrichten": "ungelesene Nachrichten",
     "hilfeVersendetText": "Nachricht versendet - Wir werden uns schnellst möglich bei dir melden",
     "cities": "Städte",
-    "nochKeineStaedteVorhanden": "Noch keine Städte ausgewählt"
+    "nochKeineStaedteVorhanden": "Noch keine Städte ausgewählt",
+    "countries": "Länder",
+    "nochKeineCountriesVorhanden": "Noch keine Länder ausgewählt"
 }
