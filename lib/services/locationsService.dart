@@ -29,7 +29,7 @@ class LocationService {
 
     var cityList = [];
     for (var item in city.split(" ")) {
-      if (!LocationService().isNumeric(item)) cityList.add(item);
+      if (!isNumeric(item)) cityList.add(item);
     }
     city = cityList.join(" ");
 
@@ -43,6 +43,16 @@ class LocationService {
     }
 
     country = deleteNumbers(country);
+
+    if(city.contains("Saudi Arabia")){
+      city = city.split(" ")[0];
+      country = "Saudi Arabia";
+    }else if(city.contains("Saudi-Arabien")){
+      city = city.split(" ")[0];
+      country = "Saudi-Arabien";
+    }
+
+    if(city.contains("Ko Pha-ngan")) city = "Ko Pha-ngan";
 
     return {
       "city": city,
@@ -204,10 +214,17 @@ class LocationService {
   }
 
   bool isNumeric(String str) {
+    bool hasNumber = false;
+
     if (str == null) {
       return false;
     }
-    return double.tryParse(str) != null;
+
+    str.split("").forEach((letter) {
+      if(double.tryParse(letter) != null) hasNumber = true;
+    });
+
+    return hasNumber;
   }
 
   getCountryLocation(input) {

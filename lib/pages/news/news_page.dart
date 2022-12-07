@@ -49,7 +49,18 @@ class _NewsPageState extends State<NewsPage> {
       setState(() {});
     });
 
+
+
     super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_){
+          _refresh();
+    });
+  }
+
+  _refresh()async{
+    await refreshHiveNewsPage();
+    setState(() {});
   }
 
   _addNewSettingProfil(){

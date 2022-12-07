@@ -83,9 +83,9 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   getGoogleSearchLocationData(placeId) async {
     var locationData = await LocationService()
         .getLocationdataFromGoogleID(placeId, widget.sessionToken);
-
     var databaseLocationData = await LocationService()
         .getDatabaseLocationdataFromGoogleResult(locationData);
+
     return databaseLocationData;
   }
 
