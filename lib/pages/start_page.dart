@@ -178,9 +178,9 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     var currentPosition = await LocationService().getCurrentUserLocation();
     var nearstLocationData =
         await LocationService().getNearstLocationData(currentPosition);
-
     nearstLocationData =
         LocationService().transformNearstLocation(nearstLocationData);
+    print(nearstLocationData);
 
     if (nearstLocationData["country"].isEmpty ||
         nearstLocationData["city"].isEmpty) return;
@@ -220,7 +220,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
     _updateOwnLocation(locationData);
     _updateNewsPage(locationData);
-    _updateCityInformation(locationData, exactLocation, nearstLocationData);
+    _updateCityInformation(locationData, exactLocation);
     _updateChatGroups(oldLocation, locationData);
   }
 
@@ -249,12 +249,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     });
   }
 
-  _updateCityInformation(
-      locationData, exactLocation, nearstLocationData) async {
-    if (exactLocation) {
-      locationData["latt"] = nearstLocationData["latt"];
-      locationData["longt"] = nearstLocationData["longt"];
-    }
+  _updateCityInformation(locationData, exactLocation) async {
     await StadtinfoDatabase().addNewCity(locationData);
 
     StadtinfoDatabase().update(
