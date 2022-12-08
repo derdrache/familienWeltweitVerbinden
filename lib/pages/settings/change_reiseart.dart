@@ -26,37 +26,23 @@ class ChangeReiseartPage extends StatelessWidget {
 
     save() {
       if (reiseArtInput.getSelected() == null ||
-          reiseArtInput
-              .getSelected()
-              .isEmpty) {
-        customSnackbar(
-            context, AppLocalizations
-            .of(context)
-            .reiseartAuswaehlen);
+          reiseArtInput.getSelected().isEmpty) {
+        return;
       } else if (reiseArtInput.getSelected() != oldInput) {
         ProfilDatabase().updateProfil(
             "reiseart = '${reiseArtInput.getSelected()}'",
             "WHERE id = '$userId'");
         updateHiveOwnProfil("reiseart", reiseArtInput.getSelected());
-
-        customSnackbar(
-            context,
-            AppLocalizations.of(context).artDerReise
-                + " " + AppLocalizations.of(context).erfolgreichGeaender,
-            color: Colors.green);
-        Navigator.pop(context);
       }
     }
 
+
+    reiseArtInput.onChange = () => save();
+
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).reiseartAendern,
-          buttons: [
-            IconButton(
-                icon: const Icon(Icons.done),
-                onPressed: () => save()
-            )
-          ]),
+          title: AppLocalizations.of(context).reiseartAendern
+      ),
       body: reiseArtInput,
     );
   }
