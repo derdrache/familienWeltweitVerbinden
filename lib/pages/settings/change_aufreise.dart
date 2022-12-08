@@ -74,7 +74,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
     return true;
   }
 
-  saveFunction() async{
+  save() async{
     final String userId = FirebaseAuth.instance.currentUser.uid;
     bool validation = checkValidation();
 
@@ -153,12 +153,6 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
     return Scaffold(
         appBar: CustomAppBar(
             title: AppLocalizations.of(context).aufReiseAendern,
-            buttons: <Widget>[
-              IconButton(
-                  icon: const Icon(Icons.done),
-                  onPressed: () => saveFunction()
-              )
-            ]
         ),
         body: Column(children: [
           aufreiseDropdownButton,
@@ -178,7 +172,15 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
               const SizedBox(width: 20),
               Text(AppLocalizations.of(context).offen, style: const TextStyle(fontSize: 20)),
             ],),
-          )
+          ),
+          SizedBox(height: 20),
+          FloatingActionButton.extended(
+              label: Text(
+                AppLocalizations.of(context).speichern,
+                style: const TextStyle(fontSize: 20),
+              ),
+              icon: const Icon(Icons.save),
+              onPressed: () => save())
         ])
     );
   }
