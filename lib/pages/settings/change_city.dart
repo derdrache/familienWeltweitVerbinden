@@ -28,6 +28,9 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
   @override
   void initState() {
+    autoComplete.onConfirm = (){
+      save();
+    };
     super.initState();
   }
 
@@ -107,12 +110,6 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).ortAendern,
-          buttons: <Widget>[
-            IconButton(
-                icon: const Icon(Icons.done),
-                onPressed: () => save()
-            ),
-          ]
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
