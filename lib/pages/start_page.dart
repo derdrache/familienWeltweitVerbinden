@@ -258,7 +258,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-        "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+        "WHERE (ort LIKE '%${locationData["city"]}%' OR ort LIKE '%${locationData["countryname"]}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
   }
 
   _updateChatGroups(oldLocation, locationData) {

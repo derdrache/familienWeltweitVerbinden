@@ -225,7 +225,7 @@ class LocationService {
     return null;
   }
 
-  getAllCountries() {
+  getAllCountryNames() {
     List<String> countriesListGer = [];
     List<String> countriesListEng = [];
 

@@ -5,22 +5,22 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
-import '../location/location_information.dart';
+import 'city_information.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
 import '../../../widgets/custom_appbar.dart';
 
-class CreateStadtinformationsPage extends StatefulWidget {
-  const CreateStadtinformationsPage({Key key}) : super(key: key);
+class CreateLocationInformationPage extends StatefulWidget {
+  const CreateLocationInformationPage({Key key}) : super(key: key);
 
   @override
-  _CreateStadtinformationsPageState createState() =>
-      _CreateStadtinformationsPageState();
+  _CreateLocationInformationPageState createState() =>
+      _CreateLocationInformationPageState();
 }
 
-class _CreateStadtinformationsPageState
-    extends State<CreateStadtinformationsPage> {
+class _CreateLocationInformationPageState
+    extends State<CreateLocationInformationPage> {
   var ortEingabe = GoogleAutoComplete();
   var titleKontroller = TextEditingController();
   var beschreibungKontroller = TextEditingController();
@@ -117,7 +117,7 @@ class _CreateStadtinformationsPageState
     allInformations.add(newUserInformation);
 
     Navigator.pop(context);
-    changePage(context, LocationInformationPage(ortName: ortData["city"], newEntry: true,));
+    changePage(context, CityInformationPage(ortName: ortData["city"], newEntry: true,));
 
   }
 
