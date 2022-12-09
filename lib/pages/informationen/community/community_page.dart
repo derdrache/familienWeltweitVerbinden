@@ -8,8 +8,6 @@ import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../services/locationsService.dart';
-import '../../../widgets/dialogWindow.dart';
-import '../../../widgets/search_autocomplete.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import 'community_card.dart';
 import 'community_erstellen.dart';
@@ -24,7 +22,7 @@ class CommunityPage extends StatefulWidget {
 }
 
 class _CommunityPageState extends State<CommunityPage> {
-  var suchleiste = SearchAutocomplete();
+  var userId = FirebaseAuth.instance.currentUser.uid;
   var allCommunities = Hive.box('secureBox').get("communities") ?? [];
   var isLoading = true;
   bool filterOn = false;
@@ -33,6 +31,9 @@ class _CommunityPageState extends State<CommunityPage> {
   var allCommunitiesCountries = [];
   bool getInvite = false;
   int invitedCommunityIndex;
+  bool onSearch = false;
+  TextEditingController communitySearchKontroller = TextEditingController();
+  FocusNode searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -40,7 +41,6 @@ class _CommunityPageState extends State<CommunityPage> {
 
     super.initState();
   }
-
 
   initialize() async {
     for (var community in allCommunities) {
@@ -52,14 +52,6 @@ class _CommunityPageState extends State<CommunityPage> {
     }
 
     isLoading = false;
-
-    suchleiste = SearchAutocomplete(
-        searchableItems: allCommunitiesCities + allCommunitiesCountries,
-        onConfirm: () => showFilter(),
-        onRemove: () {
-          filterList = [];
-          showFilter();
-        });
 
     checkCommunityInvite();
 
@@ -74,108 +66,6 @@ class _CommunityPageState extends State<CommunityPage> {
         break;
       }
     }
-  }
-
-  showFilter() {
-    var comunitiesList = Hive.box("secureBox").get("communities");
-    var filterCommunities = [];
-
-    if (suchleiste.getSelected().isNotEmpty) {
-      filterList = suchleiste.getSelected();
-    }
-
-    for (var community in comunitiesList) {
-      if (checkIfInFilter(community, filterList)) {
-        filterCommunities.add(community);
-      }
-    }
-
-    setState(() {
-      allCommunities = filterCommunities;
-    });
-  }
-
-  checkIfInFilter(community, filterList) {
-    var land = community["land"];
-    var stadt = community["stadt"];
-
-    if (filterList.isEmpty) return true;
-
-    var stadtMatch = checkMatch(filterList, [stadt], allCommunitiesCities,
-        simpleSearch: true);
-    var countryMatch = checkMatch(filterList, [land], allCommunitiesCountries,
-        simpleSearch: true);
-
-    if (stadtMatch && countryMatch) return true;
-
-    return false;
-  }
-
-  checkMatch(List selected, List checkList, globalList,
-      {simpleSearch = false}) {
-    bool globalMatch = false;
-    bool match = false;
-
-    for (var select in selected) {
-      if (globalList.contains(select)) globalMatch = true;
-
-      if (checkList.contains(select)) match = true;
-
-      if (simpleSearch) continue;
-
-      if (globalMatch && !match) {
-        int halfListNumber = (globalList.length / 2).toInt();
-
-        var positionGlobal = globalList.indexOf(select);
-        var calculatePosition = positionGlobal < halfListNumber
-            ? positionGlobal + halfListNumber
-            : positionGlobal - halfListNumber;
-        var otherLanguage = globalList[calculatePosition];
-
-        if (checkList.contains(otherLanguage)) match = true;
-      }
-    }
-
-    if (!globalMatch) return true;
-    if (match) return true;
-
-    return false;
-  }
-
-  showFavoritesWindow() {
-    var userId = FirebaseAuth.instance.currentUser.uid;
-    List<Widget> allfavorites = [];
-
-    for (var community in allCommunities) {
-      if (community["interesse"].contains(userId)) {
-        allfavorites.add(CommunityCard(
-          community: community,
-          margin:
-              const EdgeInsets.only(top: 10, bottom: 10, left: 70, right: 70),
-          afterPageVisit: () => changePage(
-              context,
-              StartPage(
-                selectedIndex: 3,
-                informationPageIndex: 2,
-              )),
-        ));
-      }
-    }
-
-    if (allfavorites.isEmpty) {
-      allfavorites.add(Container(
-          margin: const EdgeInsets.all(10),
-          child: Text(AppLocalizations.of(context).keineCommunityFavorite)));
-    }
-
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            title: "favorites",
-            children: allfavorites,
-          );
-        });
   }
 
   communityEinladungAnnehmen() {
@@ -201,16 +91,62 @@ class _CommunityPageState extends State<CommunityPage> {
         "WHERE id = '${allCommunities[invitedCommunityIndex]["id"]}'");
   }
 
+  getAllSearchCommunities(){
+    var searchedCommunities = [];
+    var searchText = communitySearchKontroller.text;
+
+    if(searchText.isEmpty) return searchedCommunities;
+
+    var searchTextFirstLetterBig = searchText.replaceFirst(searchText[0], searchText[0].toUpperCase());
+
+    for(var community in allCommunities){
+      bool nameKondition = community["name"].contains(searchText) || community["name"].contains(searchTextFirstLetterBig);
+      bool countryKondition = community["land"].contains(searchText) || community["land"].contains(searchTextFirstLetterBig);
+      bool cityKondition = community["ort"].contains(searchText) || community["ort"].contains(searchTextFirstLetterBig);
+
+      if(nameKondition || countryKondition || cityKondition) searchedCommunities.add(community);
+
+    }
+
+    return searchedCommunities;
+  }
+
+  getAllFavoritesCommunities(){
+    var favoritesCommunities = [];
+
+    for(var community in allCommunities){
+      var myCommunity = community["erstelltVon"].contains(userId);
+      var isFavorite = community["interesse"].contains(userId);
+
+      if(myCommunity || isFavorite) favoritesCommunities.add(community);
+    }
+
+    return favoritesCommunities;
+  }
+
   @override
   Widget build(BuildContext context) {
-    suchleiste.hintText = AppLocalizations.of(context).filterEventSuche;
+    double width = MediaQuery.of(context).size.width;
 
     showCommunities() {
+      List shownCommunities = onSearch ? getAllSearchCommunities() : getAllFavoritesCommunities();
       List<Widget> communities = [];
+      var emptyText = AppLocalizations.of(context).nochKeinegemeinschaftVorhanden;
+      var emptySearchText = AppLocalizations.of(context).sucheKeineErgebnisse;
 
-      for (var community in allCommunities) {
+      if (shownCommunities.isEmpty) {
+        communities.add(SizedBox(
+          height: 300,
+          child: Center(
+              child: Text(onSearch ? emptySearchText : emptyText,
+                style: const TextStyle(fontSize: 20),
+              )),
+        ));
+      }
+
+      for (var community in shownCommunities) {
         communities.add(CommunityCard(
-            margin: const EdgeInsets.all(10),
+            margin: const EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
             community: community,
             withFavorite: true,
             afterPageVisit: () => setState(() {}),
@@ -221,7 +157,13 @@ class _CommunityPageState extends State<CommunityPage> {
       }
 
       return SingleChildScrollView(
-        child: Wrap(children: communities),
+        child: SizedBox(
+          width: double.infinity,
+          child: Wrap(
+              alignment: WrapAlignment.center,
+              children: communities
+          ),
+        ),
       );
     }
 
@@ -269,30 +211,70 @@ class _CommunityPageState extends State<CommunityPage> {
         title: "Communities",
         leading: IconButton(
           onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
-          icon: Icon(Icons.arrow_back),
-        ),
-        buttons: [
-          IconButton(
-              onPressed: ()=> showFavoritesWindow(),
-              icon: const Icon(
-                Icons.star,
-                size: 30,
-              ))
-        ],
+          icon: const Icon(Icons.arrow_back),
+        )
       ),
-      floatingActionButton: FloatingActionButton(
-          heroTag: "create Community",
-          child: const Icon(Icons.add),
-          onPressed: () =>
-              changePage(context, const CommunityErstellen())),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            suchleiste,
-            Expanded(child: showCommunities()),
-            if (getInvite) showInvite(),
+            Column(
+              children: [
+                Expanded(child: showCommunities()),
+                if (getInvite) showInvite(),
+              ],
+            ),
+            if(onSearch) Positioned(
+                bottom: 15,
+                right: 15,
+                child: Container(
+                  width: width*0.9,
+                  height: 50,
+                  decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: const BorderRadius.all(Radius.circular(20))
+                  ),
+                  child: TextField(
+                    controller: communitySearchKontroller,
+                    focusNode: searchFocusNode,
+                    decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context).suche,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(10)
+                    ),
+                    onChanged: (_) => setState((){}),
+                  ),
+                )
+            )
           ],
         ),
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+              heroTag: "create Community",
+              child: const Icon(Icons.create),
+              onPressed: () =>
+                  changePage(context, const CommunityErstellen())),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            mini: onSearch ? true: false,
+            backgroundColor: onSearch ? Colors.red : null,
+            onPressed: () {
+              if(onSearch){
+                searchFocusNode.unfocus();
+                communitySearchKontroller.clear();
+              } else{
+                searchFocusNode.requestFocus();
+              }
+
+              setState(() {
+                onSearch = !onSearch;
+              });
+            },
+            child: Icon(onSearch ? Icons.close : Icons.search),
+          )
+        ],
       ),
     );
   }

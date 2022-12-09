@@ -22,6 +22,7 @@ class _LocationPageState extends State<LocationPage> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
   var onSearch = false;
   TextEditingController citySearchKontroller = TextEditingController();
+  FocusNode searchFocusNode = FocusNode();
 
   getAllInterestCities() {
     var allCities = Hive.box('secureBox').get("stadtinfo");
@@ -60,14 +61,16 @@ class _LocationPageState extends State<LocationPage> {
   showAllCities() {
     List interesetCities = onSearch ? getAllSearchedCities() : getAllInterestCities();
     List<Widget> interestCitiyCards = [];
+    var emptyText = widget.forCity
+        ? AppLocalizations.of(context).nochKeineStaedteVorhanden
+        : AppLocalizations.of(context).nochKeineCountriesVorhanden;
+    var emptySearchText = AppLocalizations.of(context).sucheKeineErgebnisse;
 
     if (interesetCities.isEmpty) {
       interestCitiyCards.add(SizedBox(
-        height: 600,
+        height: 300,
         child: Center(
-            child: Text( widget.forCity
-                ? AppLocalizations.of(context).nochKeineStaedteVorhanden
-                : AppLocalizations.of(context).nochKeineCountriesVorhanden,
+            child: Text(onSearch ? emptySearchText : emptyText,
               style: const TextStyle(fontSize: 20),
         )),
       ));
@@ -120,8 +123,10 @@ class _LocationPageState extends State<LocationPage> {
                   ),
                   child: TextField(
                     controller: citySearchKontroller,
+                    focusNode: searchFocusNode,
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context).suche,
+                      border: InputBorder.none,
                       contentPadding: EdgeInsets.all(10)
                     ),
                     onChanged: (_) => setState((){}),
@@ -135,7 +140,12 @@ class _LocationPageState extends State<LocationPage> {
             mini: onSearch ? true: false,
             backgroundColor: onSearch ? Colors.red : null,
             onPressed: () {
-              if(onSearch) citySearchKontroller.clear();
+              if(onSearch){
+                searchFocusNode.unfocus();
+                citySearchKontroller.clear();
+              } else{
+                searchFocusNode.requestFocus();
+              }
 
               setState(() {
                 onSearch = !onSearch;

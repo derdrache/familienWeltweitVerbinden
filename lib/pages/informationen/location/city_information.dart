@@ -18,12 +18,12 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../start_page.dart';
 
-class LocationInformationPage extends StatefulWidget {
+class CityInformationPage extends StatefulWidget {
   var ortName;
   var newEntry;
   var fromCityPage;
 
-  LocationInformationPage({
+  CityInformationPage({
     Key key,
     this.ortName,
     this.newEntry,
@@ -31,10 +31,10 @@ class LocationInformationPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _LocationInformationPageState createState() => _LocationInformationPageState();
+  _CityInformationPageState createState() => _CityInformationPageState();
 }
 
-class _LocationInformationPageState extends State<LocationInformationPage> {
+class _CityInformationPageState extends State<CityInformationPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   bool canGerman = false;
   bool canEnglish = false;
