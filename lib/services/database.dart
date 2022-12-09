@@ -1232,7 +1232,7 @@ String decrypt(String encrypted) {
 }
 
 sortProfils(profils) {
-  var allCountries = LocationService().getAllCountries();
+  var allCountries = LocationService().getAllCountryNames();
 
   profils.sort((a, b) {
     var profilALand = a['land'];

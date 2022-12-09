@@ -28,7 +28,7 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
 
   @override
   void initState() {
-    Map allCountries = LocationService().getAllCountries();
+    Map allCountries = LocationService().getAllCountryNames();
     List allCountriesLanguage;
     bool unselectedAndGerman = widget.selected.isEmpty && widget.isGerman;
     bool selectedIsGerman = widget.selected.isNotEmpty

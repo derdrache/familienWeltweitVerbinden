@@ -23,8 +23,8 @@ import '../../widgets/month_picker.dart';
 import '../informationen/community/community_erstellen.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/events/events_erstellen.dart';
-import '../informationen/location/location_information.dart';
-import '../informationen/stadtinformation/create_stadtinformation.dart';
+import '../informationen/location/city_information.dart';
+import '../informationen/location/create_location_information.dart';
 import '../informationen/events/eventCard.dart';
 import '../show_profil.dart';
 
@@ -48,7 +48,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
   MapController mapController = MapController();
   Set<String> allUserName = {};
-  var countriesList = LocationService().getAllCountries();
+  var countriesList = LocationService().getAllCountryNames();
   List<String> allCitiesNames = [];
   List filterList = [];
   List aktiveProfils = [];
@@ -227,7 +227,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   sortProfils(profils) {
-    var allCountries = LocationService().getAllCountries();
+    var allCountries = LocationService().getAllCountryNames();
     profils.sort((a, b) {
       var profilALand = a['land'];
       var profilBLand = b['land'];
@@ -745,7 +745,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     for (var city in popupCities) {
       cityAuswahl.add(InkWell(
         onTap: () => changePage(
-            context, LocationInformationPage(ortName: city["names"].join(" / "))),
+            context, CityInformationPage(ortName: city["names"].join(" / "))),
         child: Container(
             margin: const EdgeInsets.all(10),
             child: Text(city["names"].join(" / "))),
@@ -762,7 +762,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     if (popupCities.length == 1 && currentMapZoom >= cityZoom) {
       changePage(context,
-          LocationInformationPage(ortName: popupCities[0]["names"].join(" / ")));
+          CityInformationPage(ortName: popupCities[0]["names"].join(" / ")));
       return;
     }
 
@@ -1273,7 +1273,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       heroTag: "create cityInformation 1",
                       child: const Icon(Icons.location_city),
                       onPressed: () =>
-                          changePage(context, const CreateStadtinformationsPage())),
+                          changePage(context, const CreateLocationInformationPage())),
                   const SizedBox(width: 10),
                 ]),
               if (!createMenuIsOpen)
