@@ -48,6 +48,7 @@ setGeoData() async{
 refreshHiveData() async {
   String userId = FirebaseAuth.instance.currentUser?.uid;
 
+  await refreshHiveNewsPage();
   await refreshHiveCommunities();
   await refreshHiveStadtInfo();
   await refreshHiveStadtInfoUser();
