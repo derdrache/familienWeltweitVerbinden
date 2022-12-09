@@ -144,6 +144,7 @@ class _LoginPageState extends State<LoginPage> {
     var ownProfil = Hive.box("secureBox").get("ownProfil");
     if(ownProfil == false || ownProfil.isEmpty) return;
 
+    refreshHiveNewsSetting();
     await refreshHiveChats();
     await refreshHiveEvents();
 
@@ -157,6 +158,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _sendeHilfe(reportController){
+    if(reportController.text.isEmpty) return;
+
     ChatDatabase().addAdminMessage(
         reportController.text, "Login/Hilfe");
 
@@ -382,6 +385,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 header(),
                 customTextInput("Email", emailController,
+                    keyboardType: TextInputType.emailAddress,
                     validator: global_functions.checkValidationEmail(context),
                     textInputAction: TextInputAction.next),
                 customTextInput(
