@@ -50,7 +50,6 @@ refreshHiveData() async {
   String userId = FirebaseAuth.instance.currentUser?.uid;
 
   await refreshHiveCommunities();
-  await refreshHiveNewsPage();
   await refreshHiveStadtInfo();
   await refreshHiveStadtInfoUser();
   await refreshHiveFamilyProfils();
