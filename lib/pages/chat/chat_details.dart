@@ -100,6 +100,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     getAndSetChatData();
     writeActiveChat();
     setScrollbarListener();
+    resetNewMessageCounter();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     WidgetsBinding.instance.addObserver(this);
@@ -251,8 +252,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   _asyncMethod() async {
     await getAllDbMessages();
-
-    resetNewMessageCounter();
 
     timer = Timer.periodic(
         const Duration(seconds: 30), (Timer t) => getAllDbMessages());
@@ -1078,7 +1077,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           child: TextButton(
               child: Text(AppLocalizations.of(context).uebersetzen),
               onPressed: () async {
-                var translation = await translator.translate(message["message"],
+                var translationMessage = message["message"].replaceAll("'", "");
+
+                var translation = await translator.translate(translationMessage,
                     from: "auto", to: myLanguage);
 
                 showModalBottomSheet<void>(

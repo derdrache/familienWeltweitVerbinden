@@ -123,6 +123,20 @@ var patchVorlage={
 
   ]
 };
+
+var patch184E={
+  "title" : "1.8.4 - XX.12.2022",
+  "inhalt": [
+
+  ]
+};
+var patch184D={
+  "title" : "1.8.4 - XX.11.2022",
+  "inhalt": [
+
+  ]
+};
+
 var patch183E={
   "title" : "1.8.3 - 26.11.2022",
   "inhalt": [
