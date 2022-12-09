@@ -21,6 +21,7 @@ import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("test");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
