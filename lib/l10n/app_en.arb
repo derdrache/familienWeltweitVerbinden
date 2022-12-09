@@ -423,6 +423,8 @@
     "cities": "Cities",
     "nochKeineStaedteVorhanden": "No cities selected yet",
     "countries": "Countries",
-    "nochKeineCountriesVorhanden": "No countries selected yet"
+    "nochKeineCountriesVorhanden": "No countries selected yet",
+    "nochKeinegemeinschaftVorhanden": "No communities selected yet",
+    "sucheKeineErgebnisse": "No results for the search query"
 }
 

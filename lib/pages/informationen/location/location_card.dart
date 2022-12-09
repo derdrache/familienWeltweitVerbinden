@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
-import 'location_information.dart';
+import 'city_information.dart';
+import 'country_information.dart';
 
 class LocationCard extends StatefulWidget {
   Map location;
@@ -63,10 +64,16 @@ class _LocationCardState extends State<LocationCard> {
     return GestureDetector(
       onTap: () => changePage(
           context,
-          LocationInformationPage(
-            ortName: widget.location["ort"],
-            fromCityPage: widget.fromCityPage
-          )),
+          isCity
+            ? CityInformationPage(
+                ortName: widget.location["ort"],
+                fromCityPage: widget.fromCityPage
+              )
+            : CountryOverviewInformationPage(
+                ortName: widget.location["ort"],
+                fromCityPage: widget.fromCityPage
+              )
+      ),
       child: Container(
         margin: const EdgeInsets.all(15),
         child: Stack(
