@@ -15,7 +15,7 @@ class NewsPageSettingsPage extends StatefulWidget {
 }
 
 class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser.uid;
   bool showFriendAdded;
   bool showFriendChangedLocation;
   bool showNewFamilyLocation;
@@ -25,23 +25,21 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
 
   @override
   void initState() {
-    showFriendAdded = widget.settingsProfil["showFriendAdded"];
+    showFriendAdded = widget.settingsProfil["showFriendAdded"] == 1 ? true : false;
     showFriendChangedLocation =
-        widget.settingsProfil["showFriendChangedLocation"];
-    showNewFamilyLocation = widget.settingsProfil["showNewFamilyLocation"];
-    showInterestingEvents = widget.settingsProfil["showInterestingEvents"];
-    showCityInformation = widget.settingsProfil["showCityInformation"];
-    showFriendTravelPlan = widget.settingsProfil["showFriendTravelPlan"];
+        widget.settingsProfil["showFriendChangedLocation"] == 1 ? true : false;
+    showNewFamilyLocation = widget.settingsProfil["showNewFamilyLocation"] == 1 ? true : false;
+    showInterestingEvents = widget.settingsProfil["showInterestingEvents"] == 1 ? true : false;
+    showCityInformation = widget.settingsProfil["showCityInformation"] == 1 ? true : false;
+    showFriendTravelPlan = widget.settingsProfil["showFriendTravelPlan"] == 1 ? true : false;
 
     super.initState();
   }
 
-  changeHiveProfil(dbColumn, input) {
-    var newsSettings = Hive.box('secureBox').get("newsSettings") ?? [];
+  _changeHiveOwnNewsPageSetting(dbColumn, input) {
+    Map ownSetting = Hive.box('secureBox').get("ownNewsSetting") ?? {};
 
-    for (var newsSetting in newsSettings) {
-      if (newsSetting["id"] == userId) newsSetting[dbColumn] = input;
-    }
+    ownSetting[dbColumn] = input;
   }
 
   @override
@@ -61,7 +59,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     NewsSettingsDatabase().update(
                         "showFriendAdded = '${value == true ? 1 : 0}'",
                         "WHERE id = '$userId'");
-                    changeHiveProfil("showFriendAdded", value);
+                    _changeHiveOwnNewsPageSetting("showFriendAdded", value);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingFriendAdd)
@@ -84,7 +82,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     NewsSettingsDatabase().update(
                         "showFriendChangedLocation = '${value == true ? 1 : 0}'",
                         "WHERE id = '$userId'");
-                    changeHiveProfil("showFriendChangedLocation", value);
+                    _changeHiveOwnNewsPageSetting("showFriendChangedLocation", value);
                   }),
               const SizedBox(width: 10),
               Text(
@@ -108,7 +106,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     NewsSettingsDatabase().update(
                         "showNewFamilyLocation = '${value == true ? 1 : 0}'",
                         "WHERE id = '$userId'");
-                    changeHiveProfil("showNewFamilyLocation", value);
+                    _changeHiveOwnNewsPageSetting("showNewFamilyLocation", value);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingNewFamilieLocation)
@@ -116,7 +114,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
           ));
     }
 
-    newTravelPlanFriend(){
+    friendNewTravelPlanOption(){
       return Container(
           margin: const EdgeInsets.only(bottom: 20),
           child: Row(
@@ -131,7 +129,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     NewsSettingsDatabase().update(
                         "showFriendTravelPlan = '${value == true ? 1 : 0}'",
                         "WHERE id = '$userId'");
-                    changeHiveProfil("showFriendTravelPlan", value);
+                    _changeHiveOwnNewsPageSetting("showFriendTravelPlan", value);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingShowTravelPlan)
@@ -154,7 +152,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     NewsSettingsDatabase().update(
                         "showInterestingEvents = '${value == true ? 1 : 0}'",
                         "WHERE id = '$userId'");
-                    changeHiveProfil("showInterestingEvents", value);
+                    _changeHiveOwnNewsPageSetting("showInterestingEvents", value);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingShowEvent)
@@ -177,7 +175,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     NewsSettingsDatabase().update(
                         "showCityInformation = '${value == true ? 1 : 0}'",
                         "WHERE id = '$userId'");
-                    changeHiveProfil("showCityInformation", value);
+                    _changeHiveOwnNewsPageSetting("showCityInformation", value);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingShowCityInformation)
@@ -195,7 +193,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
           children: [
             newFriendOption(),
             friendChangedLocationOption(),
-            newTravelPlanFriend(),
+            friendNewTravelPlanOption(),
             newFamilyAtLocationOption(),
             showEventsOption(),
             showCityInformationOption()
