@@ -22,7 +22,6 @@ import 'package:translator/translator.dart';
 
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
-import '../informationen/location/city_information.dart';
 import '../informationen/events/eventCard.dart';
 import '../informationen/events/event_details.dart';
 import '../../auth/secrets.dart';
@@ -32,7 +31,7 @@ import '../../widgets/profil_image.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
 import '../../windows/all_user_select.dart';
 import '../../widgets/strike_through_icon.dart';
-import '../informationen/location/country_information.dart';
+import '../informationen/location/location_Information.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   String chatPartnerId;
@@ -202,16 +201,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         adminList.add(connectedData["erstelltVon"]);
       } else if (widget.connectedId.contains("stadt")) {
         Map location = getCityFromHive(cityId: connectedId);
-        bool isCity = location["isCity"] == 1;
 
         connectedData = {
           "name": location["ort"],
           "bild": Hive.box('secureBox').get("allgemein")["cityImage"],
           "erstelltVon": ""
         };
-        pageDetailsPage = isCity
-            ? CityInformationPage(ortName: connectedData["name"])
-            : CountryOverviewInformationPage(ortName: connectedData["name"]);
+        pageDetailsPage = LocationInformationPage(ortName: connectedData["name"]);
       }
     }
 
