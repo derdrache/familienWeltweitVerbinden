@@ -425,5 +425,8 @@
     "countries": "Länder",
     "nochKeineCountriesVorhanden": "Noch keine Länder ausgewählt",
     "nochKeinegemeinschaftVorhanden": "Noch keine Gemeinschaften ausgewählt",
-    "sucheKeineErgebnisse": "Keine Ergebnisse für die Suchanfrage"
+    "sucheKeineErgebnisse": "Keine Ergebnisse für die Suchanfrage",
+    "stadtInformationen": "Stadtinformationen: ",
+    "kosten": "Kosten: ",
+    "aktuellDort": "Aktuell dort: "
 }
