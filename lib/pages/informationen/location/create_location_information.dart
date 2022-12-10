@@ -5,11 +5,11 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
-import 'city_information.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
 import '../../../widgets/custom_appbar.dart';
+import 'location_Information.dart';
 
 class CreateLocationInformationPage extends StatefulWidget {
   const CreateLocationInformationPage({Key key}) : super(key: key);
@@ -117,7 +117,7 @@ class _CreateLocationInformationPageState
     allInformations.add(newUserInformation);
 
     Navigator.pop(context);
-    changePage(context, CityInformationPage(ortName: ortData["city"], newEntry: true,));
+    changePage(context, LocationInformationPage(ortName: ortData["city"]));
 
   }
 

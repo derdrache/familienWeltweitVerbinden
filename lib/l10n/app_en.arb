@@ -425,6 +425,9 @@
     "countries": "Countries",
     "nochKeineCountriesVorhanden": "No countries selected yet",
     "nochKeinegemeinschaftVorhanden": "No communities selected yet",
-    "sucheKeineErgebnisse": "No results for the search query"
+    "sucheKeineErgebnisse": "No results for the search query",
+    "stadtInformationen": "City information: ",
+    "kosten": "Costs: ",
+    "aktuellDort": "Currently there "
 }
 
