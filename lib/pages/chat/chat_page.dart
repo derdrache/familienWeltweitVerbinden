@@ -40,7 +40,7 @@ class _ChatPageState extends State<ChatPage> {
   bool isLoaded = false;
   var mainSlider = 0;
   bool activeChatSearch = false;
-  var seachSearchInputNode = FocusNode();
+  var focusNodeSearch = FocusNode();
   var searchTextKontroller = TextEditingController();
   var searchListMyGroups = [];
   var searchListAllChatgroups = [];
@@ -101,6 +101,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   refreshChatDataFromDb() async {
+    setState(() {});
     await refreshHiveChats();
     setState(() {
       isLoaded = true;
@@ -652,7 +653,7 @@ class _ChatPageState extends State<ChatPage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
             title: TextField(
               cursorColor: Colors.black,
-              focusNode: seachSearchInputNode,
+              focusNode: focusNodeSearch,
               controller: searchTextKontroller,
               textInputAction: TextInputAction.search,
               maxLines: 1,
@@ -671,7 +672,6 @@ class _ChatPageState extends State<ChatPage> {
                 searchListAllChatgroups = [];
 
                 if (value.isEmpty) {
-                  //setState(() {});
                   return;
                 }
 
@@ -736,6 +736,8 @@ class _ChatPageState extends State<ChatPage> {
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
+              focusNodeSearch.unfocus();
+
               setState(() {
                 changeBarOn = false;
                 selectedChats = [];
@@ -787,6 +789,8 @@ class _ChatPageState extends State<ChatPage> {
           buttons: [
             IconButton(
                 onPressed: () {
+                  focusNodeSearch.requestFocus();
+
                   setState(() {
                     activeChatSearch = true;
                   });
