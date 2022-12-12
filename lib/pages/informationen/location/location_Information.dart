@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
+import 'package:familien_suche/pages/informationen/events/event_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -44,7 +46,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
     location["familien"].remove(userId);
     isCity = location["isCity"] == 1;
     tabPages = [
-      CountryInformationPage(
+      GeneralInformationPage(
         location: location,
         fromCityPage: widget.fromCityPage,
       ),
@@ -55,27 +57,6 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
     super.initState();
   }
 
-  createNewChatGroup() async {
-    String locationId = location["id"].toString();
-    var chatGroup = getChatGroupFromHive(locationId.toString());
-    if (chatGroup != null) return;
-
-    var checkChatGroup = await ChatGroupsDatabase()
-        .getChatData("id", "WHERE connected = '</stadt=$locationId'");
-    if (checkChatGroup != false) return;
-
-    var newChatId =
-        await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$locationId");
-    var hiveChatGroups = Hive.box('secureBox').get("chatGroups");
-    hiveChatGroups.add({
-      "id": newChatId,
-      "users": {},
-      "lastMessage": "</neuer Chat",
-      "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
-      "connected": "</stadt=$locationId"
-    });
-  }
-
   changeIntereset() {
     if (hasInterest) {
       hasInterest = false;
@@ -83,14 +64,14 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
       location["interesse"].remove(userId);
       StadtinfoDatabase().update(
           "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id = '${location["id"]}");
+          "WHERE id = '${location["id"]}'");
     } else {
       hasInterest = true;
 
       location["interesse"].add(userId);
       StadtinfoDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id = '${location["id"]}");
+          "WHERE id = '${location["id"]}'");
     }
 
     setState(() {});
@@ -116,16 +97,12 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
             : null,
         buttons: [
           IconButton(
-            icon: const Icon(Icons.message),
+            icon: const Icon(Icons.link),
             onPressed: () async {
-              await createNewChatGroup();
+              Clipboard.setData(ClipboardData(
+                  text: "</cityId=" + location["id"].toString()));
 
-              global_func.changePage(
-                  context,
-                  ChatDetailsPage(
-                    isChatgroup: true,
-                    connectedId: "</stadt=${location["id"]}",
-                  ));
+              customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
             },
           ),
           IconButton(
@@ -164,18 +141,18 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
   }
 }
 
-class CountryInformationPage extends StatefulWidget {
+class GeneralInformationPage extends StatefulWidget {
   Map location;
   bool fromCityPage;
 
-  CountryInformationPage({Key key, this.location, this.fromCityPage = false})
+  GeneralInformationPage({Key key, this.location, this.fromCityPage = false})
       : super(key: key);
 
   @override
-  _CountryInformationPageState createState() => _CountryInformationPageState();
+  _GeneralInformationPageState createState() => _GeneralInformationPageState();
 }
 
-class _CountryInformationPageState extends State<CountryInformationPage> {
+class _GeneralInformationPageState extends State<GeneralInformationPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   bool canGerman = false;
   bool canEnglish = false;
@@ -187,15 +164,28 @@ class _CountryInformationPageState extends State<CountryInformationPage> {
   @override
   void initState() {
     isCity = widget.location["isCity"] == 1;
+    widget.location["familien"] = removeInactiveFamilies(widget.location["familien"]);
 
     super.initState();
+  }
+
+  removeInactiveFamilies(familyList){
+    List allActiveProfils = getAllActiveProfilsHive();
+    List activeFamilies = [];
+
+    for(var profil in allActiveProfils){
+      if(familyList.contains(profil["id"])) activeFamilies.add(profil["id"]);
+    }
+
+    return activeFamilies;
+
   }
 
   showFamilyVisitWindow(list) {
     List<Widget> familiesList = [];
 
     for (var family in list) {
-      var profil = getProfilFromHive(profilId: family);
+      var profil = getProfilFromHive(profilId: family, onlyActive: true);
 
       if (profil == null) continue;
       familiesList.add(InkWell(
@@ -231,7 +221,7 @@ class _CountryInformationPageState extends State<CountryInformationPage> {
 
   getFamiliesThere() {
     int familiesOnLocation = 0;
-    var allProfils = Hive.box('secureBox').get("profils");
+    var allProfils = getAllActiveProfilsHive();
 
     for (var profil in allProfils) {
       var inLocation = widget.location["ort"].contains(profil["ort"]);
@@ -244,6 +234,27 @@ class _CountryInformationPageState extends State<CountryInformationPage> {
     }
 
     return familiesOnLocation;
+  }
+
+  createNewChatGroup(lcationId) async {
+    String locationId = lcationId.toString();
+    var chatGroup = getChatGroupFromHive(locationId.toString());
+    if (chatGroup != null) return;
+
+    var checkChatGroup = await ChatGroupsDatabase()
+        .getChatData("id", "WHERE connected = '</stadt=$locationId'");
+    if (checkChatGroup != false) return;
+
+    var newChatId =
+    await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$locationId");
+    var hiveChatGroups = Hive.box('secureBox').get("chatGroups");
+    hiveChatGroups.add({
+      "id": newChatId,
+      "users": {},
+      "lastMessage": "</neuer Chat",
+      "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
+      "connected": "</stadt=$locationId"
+    });
   }
 
   @override
@@ -408,6 +419,19 @@ class _CountryInformationPageState extends State<CountryInformationPage> {
             children: [
               allgemeineInfoBox(),
             ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              await createNewChatGroup(widget.location["id"]);
+
+              global_func.changePage(
+                  context,
+                  ChatDetailsPage(
+                    isChatgroup: true,
+                    connectedId: "</stadt=${widget.location["id"]}",
+                  ));
+            },
+            child: const Icon(Icons.message),
           ),
         ),
       ),
@@ -706,6 +730,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         "WHERE id ='${information["id"]}'");
   }
 
+  copyInformationDialog(information){
+    var informationText = isGerman ? information["informationGer"]: information["informationGer"];
+
+    Clipboard.setData(ClipboardData(text: informationText));
+
+    customSnackbar(context, AppLocalizations.of(context).informationKopiert, color: Colors.green);
+  }
+
   deleteInformationDialog(information) async {
     Future<void>.delayed(
         const Duration(),
@@ -837,13 +869,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     openInformationMenu(positionDetails, information) async {
       double left = positionDetails.globalPosition.dx;
       double top = positionDetails.globalPosition.dy;
-      bool canChange = information["erstelltVon"] ==
-          userId; /*&&
-          DateTime.now()
-                  .difference(DateTime.parse(information["erstelltAm"]))
-                  .inDays <=
-              1;
-              */
+      bool canChange = information["erstelltVon"] == userId;
 
       await showMenu(
           context: context,
@@ -854,6 +880,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                 child: Text(AppLocalizations.of(context).bearbeiten),
                 onTap: () => changeInformationDialog(information),
               ),
+            PopupMenuItem(
+              child: Text(AppLocalizations.of(context).kopieren),
+              onTap: () => copyInformationDialog(information),
+            ),
             PopupMenuItem(
               child: Text(AppLocalizations.of(context).melden),
               onTap: () => reportInformationDialog(information),

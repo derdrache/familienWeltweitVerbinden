@@ -640,49 +640,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
-  _linkTeilenWindow() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(title: "Community link", children: [
-            Container(
-                margin: const EdgeInsets.all(10),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all()),
-                child:
-                    Text("</communityId=" + widget.community["id"].toString())),
-            Container(
-              margin: const EdgeInsets.only(left: 20, right: 20),
-              child: FloatingActionButton.extended(
-                onPressed: () async {
-                  Clipboard.setData(ClipboardData(
-                      text: "</communityId=" +
-                          widget.community["id"].toString()));
-
-                  await showDialog(
-                      context: context,
-                      builder: (context) {
-                        Future.delayed(const Duration(seconds: 1), () {
-                          Navigator.of(context).pop(true);
-                        });
-                        return AlertDialog(
-                          content: Text(
-                              AppLocalizations.of(context).linkWurdekopiert),
-                        );
-                      });
-                  Navigator.pop(context);
-                },
-                label: Text(AppLocalizations.of(context).linkKopieren),
-                icon: const Icon(Icons.copy),
-              ),
-            ),
-            const SizedBox(height: 10)
-          ]);
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -986,7 +943,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               ),
               IconButton(
                 icon: const Icon(Icons.link),
-                onPressed: () => _linkTeilenWindow(),
+                onPressed: (){
+                  Clipboard.setData(ClipboardData(
+                      text: "</communityId=" + widget.community["id"].toString()
+                  ));
+
+                  customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
+                },
               ),
               IconButton(
                 icon: const Icon(Icons.more_vert),
