@@ -320,8 +320,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "language": languageCode
     };
 
+    messages.add(messageData);
+
     setState(() {
-      messages.add(messageData);
       widget.groupChatData["lastMessage"] = message;
     });
 
