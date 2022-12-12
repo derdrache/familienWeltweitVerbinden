@@ -116,6 +116,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     setState(() {
       vonDate = MonthPickerBox();
       bisDate = MonthPickerBox();
+      ortInput.clear();
     });
   }
 

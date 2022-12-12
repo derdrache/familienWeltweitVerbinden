@@ -91,7 +91,8 @@ class ChangeEmailPage extends StatelessWidget {
           child: Column(
             children: [
               customTextInput(
-                  AppLocalizations.of(context).neueEmail, emailKontroller),
+                  AppLocalizations.of(context).neueEmail, emailKontroller, keyboardType: TextInputType.emailAddress),
+
               const SizedBox(height: 15),
               customTextInput(AppLocalizations.of(context).passwortBestaetigen,
                   passwortKontroller,
