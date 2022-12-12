@@ -124,16 +124,34 @@ var patchVorlage={
   ]
 };
 
-var patch184E={
-  "title" : "1.8.4 - XX.12.2022",
+var patch190E={
+  "title" : "1.9.0 - XX.12.2022",
   "inhalt": [
-
+    "General - iOS version released",
+    "Main Menu - Events and Communities have been consolidated into the new 'Information' menu item. In addition, there is easier access to city and country information in this new menu item",
+    "News - performance has been improved",
+    "Chat - sent messages are now displayed immediately",
+    "Chat - translation error from English to German due to apostrophes has been fixed",
+    "Chat - text input is now displayed correctly and clearly even with very long texts",
+    "Error correction - Events: accepting and cancelling events led to duplicate entries",
+    "Error correction - Automatic location was sometimes displayed in a language other than English or German",
+    "many small improvements",
+    "many small bug fixes"
   ]
 };
-var patch184D={
-  "title" : "1.8.4 - XX.11.2022",
+var patch190D={
+  "title" : "1.9.0 - XX.12.2022",
   "inhalt": [
-
+    "Allgemein - iOS Version veröffentlicht",
+    "Hauptmenü - Events und Gemeinschaften wurden in dem neuen Menüpunkt 'Informationen' zusammengefasst. Zusätzlich gibt es in diesem neuen Menüpunkt einen leichteren Zugriff auf die Stadt- und Landesinformationen",
+    "News - Leistung wurde verbessert",
+    "Chat - Gesendete Nachrichten werden jetzt sofort angezeigt",
+    "Chat - Übersetzungsfehler von Englisch auf Deutsch durch die Apostrophen wurde behoben",
+    "Chat - Texteingabe wird nun auch mit sehr langen Texten korrekt und Übersichtlich angezeigt",
+    "Fehlerkorrektur - Events: Zusage und Absage von Events hat zu doppelten einträgen geführt",
+    "Fehlerkorrektur - Der Automatische Standort wurde manchmal in einer anderen Sprache als Deutsch oder Englisch ausgegeben",
+    "viele kleine Verbesserungen",
+    "viele kleine Fehlerbehebungen"
   ]
 };
 

@@ -14,7 +14,7 @@ import 'firebase_options.dart';
 import 'pages/start_page.dart';
 import 'pages/show_profil.dart';
 import 'pages/chat/chat_details.dart';
-import 'pages/events/event_details.dart';
+import 'pages/informationen/events/event_details.dart';
 import 'pages/login_register_page/login_page.dart';
 import 'services/database.dart';
 import 'services/local_notification.dart';

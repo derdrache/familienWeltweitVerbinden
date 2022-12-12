@@ -948,13 +948,12 @@ class AllgemeinDatabase {
 class ReportsDatabase {
   add(von, title, beschreibung) async {
     var url = Uri.parse(databaseUrl + "database/reports/addReport.php");
-    var test = await http.post(url,
+    await http.post(url,
         body: json.encode({
           "von": von,
           "title": title,
           "beschreibung": beschreibung,
         }));
-    print(test.body);
 
     sendEmail({
       "title": "Eine Meldung ist eingegangen",
@@ -1232,7 +1231,7 @@ String decrypt(String encrypted) {
 }
 
 sortProfils(profils) {
-  var allCountries = LocationService().getAllCountries();
+  var allCountries = LocationService().getAllCountryNames();
 
   profils.sort((a, b) {
     var profilALand = a['land'];
@@ -1257,10 +1256,29 @@ sortProfils(profils) {
   return profils;
 }
 
+getAllActiveProfilsHive(){
+  var allProfils = Hive.box('secureBox').get("profils");
+  List allActiveProfils = [];
+
+  for(var profil in allProfils){
+    profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
+    var monthsUntilInactive = 3;
+    var timeDifference = Duration(
+        microseconds: (DateTime.now().microsecondsSinceEpoch -
+            DateTime.parse(profil["lastLogin"].toString())
+                .microsecondsSinceEpoch)
+            .abs());
+    var monthDifference = timeDifference.inDays / 30.44;
+
+    if(monthDifference < monthsUntilInactive) allActiveProfils.add(profil);
+  }
+
+  return allActiveProfils;
+}
 
 getProfilFromHive(
-    {profilId, profilName, getNameOnly = false, getIdOnly = false}) {
-  var allProfils = Hive.box('secureBox').get("profils");
+    {profilId, profilName, getNameOnly = false, getIdOnly = false, onlyActive = false}) {
+  var allProfils = onlyActive ? getAllActiveProfilsHive() : Hive.box('secureBox').get("profils");
 
   if (profilId != null) {
     for (var profil in allProfils) {
@@ -1370,8 +1388,9 @@ getFamilyProfil({familyId, familyMember}) {
   for (var familyProfil in familyProfils) {
     if (familyId != null && familyId == familyProfil["id"]) return familyProfil;
 
-    if (familyMember != null && familyProfil["members"].contains(familyMember))
+    if (familyMember != null && familyProfil["members"].contains(familyMember)) {
       return familyProfil;
+    }
   }
 }
 
@@ -1449,8 +1468,9 @@ refreshHiveEvents() async {
   var myInterestedEvents = [];
   for (var event in events) {
     if (event["erstelltVon"] == userId) ownEvents.add(event);
-    if (event["interesse"].contains(userId) && event["erstelltVon"] != userId)
+    if (event["interesse"].contains(userId) && event["erstelltVon"] != userId) {
       myInterestedEvents.add(event);
+    }
   }
 
   Hive.box('secureBox').put("myEvents", ownEvents);
