@@ -127,7 +127,7 @@
     "eventMeldenFrage": "Why do you want to report the event?",
     "eventLoeschen": "Delete event",
     "linkKopieren": "copy Link",
-    "linkWurdekopiert": "Link has been copied",
+    "linkWurdekopiert": "Link has been copied - only usable in chat",
     "familienFreigeben": "Share families",
     "teilnehmen": "Take part",
     "absage": "Refuse",
@@ -419,7 +419,17 @@
     "hilfe": "Help",
     "hilfeVorschlag": "How can we help you ? \n\nPlease also provide us with your contact details (email, Telegram username or similar) so that we can contact you.",
     "ungeleseneNachrichten": "unread messages",
-    "hilfeVersendetText": "Message sent - We will get back to you as soon as possible"
-
+    "hilfeVersendetText": "Message sent - We will get back to you as soon as possible",
+    "cities": "Cities",
+    "nochKeineStaedteVorhanden": "No cities selected yet",
+    "countries": "Countries",
+    "nochKeineCountriesVorhanden": "No countries selected yet",
+    "nochKeinegemeinschaftVorhanden": "No communities selected yet",
+    "sucheKeineErgebnisse": "No results for the search query",
+    "stadtInformationen": "City information: ",
+    "kosten": "Costs: ",
+    "aktuellDort": "Currently there ",
+    "kopieren": "copy",
+    "informationKopiert": "Information has been copied"
 }
 

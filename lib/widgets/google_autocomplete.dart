@@ -14,6 +14,7 @@ class GoogleAutoComplete extends StatefulWidget {
   String hintText;
   var googleSearchResult;
   var sessionToken = const Uuid().v4();
+  Function onConfirm;
 
   getGoogleLocationData() {
     return googleSearchResult ??
@@ -46,6 +47,7 @@ class GoogleAutoComplete extends StatefulWidget {
     this.hintText,
     this.width,
     this.suche = true,
+    this.onConfirm
   }) : super(key: key);
 
   @override
@@ -105,6 +107,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
               await getGoogleSearchLocationData(item["place_id"]);
           widget.searchKontroller.text = item["description"];
           resetSearchBar();
+          widget.onConfirm();
         },
         child: Container(
             padding: const EdgeInsets.all(10),

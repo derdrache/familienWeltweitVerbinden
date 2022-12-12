@@ -3,16 +3,17 @@ import 'dart:ui';
 import 'package:collection/collection.dart';
 
 import 'package:familien_suche/pages/show_profil.dart';
-import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
-import '../events/eventCard.dart';
+import '../informationen/events/eventCard.dart';
+import '../informationen/location/location_Information.dart';
 import 'news_page_settings.dart';
 
 class NewsPage extends StatefulWidget {
@@ -491,7 +492,7 @@ class _NewsPageState extends State<NewsPage> {
       return InkWell(
         onTap: () {
           global_func.changePage(
-              context, StadtinformationsPage(ortName: info["ort"]));
+              context, LocationInformationPage(ortName: info["ort"]));
         },
         child: Align(
           child: Stack(
@@ -556,7 +557,7 @@ class _NewsPageState extends State<NewsPage> {
           onTap: () {
             global_func.changePage(
                 context,
-                StadtinformationsPage(
+                LocationInformationPage(
                   ortName: ortsName,
                 ));
           },

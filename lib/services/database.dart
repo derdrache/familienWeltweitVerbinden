@@ -1231,7 +1231,7 @@ String decrypt(String encrypted) {
 }
 
 sortProfils(profils) {
-  var allCountries = LocationService().getAllCountries();
+  var allCountries = LocationService().getAllCountryNames();
 
   profils.sort((a, b) {
     var profilALand = a['land'];
@@ -1256,10 +1256,29 @@ sortProfils(profils) {
   return profils;
 }
 
+getAllActiveProfilsHive(){
+  var allProfils = Hive.box('secureBox').get("profils");
+  List allActiveProfils = [];
+
+  for(var profil in allProfils){
+    profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
+    var monthsUntilInactive = 3;
+    var timeDifference = Duration(
+        microseconds: (DateTime.now().microsecondsSinceEpoch -
+            DateTime.parse(profil["lastLogin"].toString())
+                .microsecondsSinceEpoch)
+            .abs());
+    var monthDifference = timeDifference.inDays / 30.44;
+
+    if(monthDifference < monthsUntilInactive) allActiveProfils.add(profil);
+  }
+
+  return allActiveProfils;
+}
 
 getProfilFromHive(
-    {profilId, profilName, getNameOnly = false, getIdOnly = false}) {
-  var allProfils = Hive.box('secureBox').get("profils");
+    {profilId, profilName, getNameOnly = false, getIdOnly = false, onlyActive = false}) {
+  var allProfils = onlyActive ? getAllActiveProfilsHive() : Hive.box('secureBox').get("profils");
 
   if (profilId != null) {
     for (var profil in allProfils) {

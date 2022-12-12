@@ -2,8 +2,6 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/community/community_card.dart';
-import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -13,20 +11,19 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../../widgets/badge_icon.dart';
-import '../../widgets/month_picker.dart';
-import '../community/community_erstellen.dart';
-import '../events/events_erstellen.dart';
-import 'create_stadtinformation.dart';
 import '../../global/global_functions.dart';
-import '../../services/database.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
+import '../../services/database.dart';
 import '../../services/locationsService.dart';
+import '../../widgets/badge_icon.dart';
+import '../../widgets/month_picker.dart';
+import '../informationen/community/community_card.dart';
+import '../informationen/events/eventCard.dart';
+import '../informationen/location/location_Information.dart';
 import '../show_profil.dart';
-import '../events/eventCard.dart';
 
 class ErkundenPage extends StatefulWidget {
   const ErkundenPage({Key key}) : super(key: key);
@@ -46,7 +43,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
   MapController mapController = MapController();
   Set<String> allUserName = {};
-  var countriesList = LocationService().getAllCountries();
+  var countriesList = LocationService().getAllCountryNames();
   List<String> allCitiesNames = [];
   List filterList = [];
   List aktiveProfils = [];
@@ -225,7 +222,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   sortProfils(profils) {
-    var allCountries = LocationService().getAllCountries();
+    var allCountries = LocationService().getAllCountryNames();
     profils.sort((a, b) {
       var profilALand = a['land'];
       var profilBLand = b['land'];
@@ -743,7 +740,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     for (var city in popupCities) {
       cityAuswahl.add(InkWell(
         onTap: () => changePage(
-            context, StadtinformationsPage(ortName: city["names"].join(" / "))),
+            context, LocationInformationPage(ortName: city["names"].join(" / "))),
         child: Container(
             margin: const EdgeInsets.all(10),
             child: Text(city["names"].join(" / "))),
@@ -760,7 +757,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     if (popupCities.length == 1 && currentMapZoom >= cityZoom) {
       changePage(context,
-          StadtinformationsPage(ortName: popupCities[0]["names"].join(" / ")));
+          LocationInformationPage(ortName: popupCities[0]["names"].join(" / ")));
       return;
     }
 
@@ -1232,70 +1229,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     createMenuButtons() {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-              heroTag: "worldchat",
-              child: const Icon(Icons.message),
-              onPressed: () => global_functions.changePage(context, ChatDetailsPage(
-                connectedId: "",
-                chatId: "1",
-                isChatgroup: true,
-              ))),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (currentMapZoom > minMapZoom)
-                FloatingActionButton(
-                    heroTag: "zoom out 1",
-                    child: const Icon(Icons.zoom_out_map),
-                    onPressed: () => zoomOut()),
-              SizedBox(width: createMenuIsOpen ? 20 : 10),
-              if (createMenuIsOpen)
-                Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  FloatingActionButton(
-                      heroTag: "create community",
-                      child: const Icon(Icons.cottage),
-                      onPressed: () =>
-                          changePage(context, const CommunityErstellen())),
-                  const SizedBox(width: 10),
-                  FloatingActionButton(
-                      heroTag: "create event",
-                      child: const Icon(Icons.calendar_today),
-                      onPressed: () => changePage(context, const EventErstellen())),
-                  const SizedBox(width: 10),
-                  FloatingActionButton(
-                      heroTag: "create cityInformation 1",
-                      child: const Icon(Icons.location_city),
-                      onPressed: () =>
-                          changePage(context, const CreateStadtinformationsPage())),
-                  const SizedBox(width: 10),
-                ]),
-              if (!createMenuIsOpen)
-                FloatingActionButton(
-                    heroTag: "open menu",
-                    child: const Icon(Icons.create),
-                    onPressed: () {
-                      createMenuIsOpen = true;
-                      setState(() {});
-                    }),
-              if (createMenuIsOpen)
-                FloatingActionButton(
-                    mini: true,
-                    backgroundColor: Colors.red,
-                    heroTag: "close menu",
-                    child: const Icon(Icons.close, size: 20),
-                    onPressed: () {
-                      createMenuIsOpen = false;
-                      setState(() {});
-                    }),
-            ],
-          ),
-        ],
-      );
+      return FloatingActionButton(
+          heroTag: "worldchat",
+          child: const Icon(Icons.message),
+          onPressed: () => global_functions.changePage(context, ChatDetailsPage(
+            connectedId: "",
+            chatId: "1",
+            isChatgroup: true,
+          )));
     }
 
     markerPopupContainer() {
@@ -1346,13 +1287,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       top: 130,
                       child: IconButton(
                         icon: const Icon(
-                          Icons.feed,
-                          size: 30,
+                          Icons.location_city,
                         ),
                         onPressed: () => openSelectCityWindow(),
                       ),
                     ),
-                  Positioned(top: 0, right: 10, child: createMenuButtons())
+                  Positioned(top: 60, right: 10, child: createMenuButtons())
                 ],
               );
             }),
