@@ -7,6 +7,7 @@ class SearchAutocomplete extends StatefulWidget {
   Function onRemove;
   var selected = "";
   final TextEditingController _textEditingController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   SearchAutocomplete(
       {Key key,
@@ -26,6 +27,7 @@ class SearchAutocomplete extends StatefulWidget {
   }
 
   clearInput(){
+    _focusNode.unfocus();
     _textEditingController.clear();
   }
 
@@ -35,12 +37,6 @@ class SearchAutocomplete extends StatefulWidget {
 
 class _SearchAutocompleteState extends State<SearchAutocomplete> {
   var filterList = [];
-
-
-
-
-  final FocusNode _focusNode = FocusNode();
-
 
 
   @override
@@ -57,7 +53,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
         children: [
           RawAutocomplete(
             textEditingController: widget._textEditingController,
-            focusNode: _focusNode,
+            focusNode: widget._focusNode,
             optionsBuilder: (TextEditingValue textEditingValue) {
               return textEditingValue.text.isNotEmpty ? widget.searchableItems.where((item) => item.toLowerCase()
                   .contains(textEditingValue.text.toLowerCase())) : [];
@@ -130,9 +126,11 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
           if(widget._textEditingController.text.isNotEmpty) Positioned(
               right: 0, top: 0,
               child: CloseButton(
+                color: Colors.red,
                 onPressed: (){
                   widget.clearInput();
                   widget.onRemove();
+                  setState(() {});
                 },
               ))
         ],

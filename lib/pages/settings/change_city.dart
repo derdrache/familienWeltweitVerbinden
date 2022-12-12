@@ -28,6 +28,9 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
 
   @override
   void initState() {
+    autoComplete.onConfirm = (){
+      save();
+    };
     super.initState();
   }
 
@@ -69,7 +72,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     StadtinfoDatabase().addNewCity(locationDict);
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-        "WHERE ort LIKE '%${locationDict["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+        "WHERE (ort LIKE '%${locationDict["city"]}%' OR ort LIKE '%${locationDict["countryname"]}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
   }
 
   save() async {
@@ -107,12 +110,6 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).ortAendern,
-          buttons: <Widget>[
-            IconButton(
-                icon: const Icon(Icons.done),
-                onPressed: () => save()
-            ),
-          ]
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
