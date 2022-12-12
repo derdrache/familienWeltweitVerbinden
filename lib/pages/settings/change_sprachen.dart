@@ -26,11 +26,12 @@ class ChangeSprachenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    sprachenInputBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
+
 
     save() {
       if (sprachenInputBox.getSelected() == null ||
           sprachenInputBox.getSelected().isEmpty) {
-        customSnackbar(context, AppLocalizations.of(context).spracheAuswaehlen);
         return;
       }
 
@@ -39,23 +40,18 @@ class ChangeSprachenPage extends StatelessWidget {
           "WHERE id = '$userId'");
 
       updateHiveOwnProfil("sprachen", sprachenInputBox.getSelected());
-
-      customSnackbar(
-          context,
-          AppLocalizations.of(context).sprachen +
-              " " +
-              AppLocalizations.of(context).erfolgreichGeaender,
-          color: Colors.green);
-      Navigator.pop(context);
     }
+
+
+    sprachenInputBox.onConfirm = () => save();
 
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).spracheVeraendern,
-          buttons: [
-            IconButton(icon: const Icon(Icons.done), onPressed: () => save())
-          ]),
-      body: sprachenInputBox,
+      ),
+      body: ListView(children: [
+        sprachenInputBox,
+      ])
     );
   }
 }

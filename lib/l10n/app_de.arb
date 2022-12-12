@@ -127,7 +127,7 @@
     "eventMeldenFrage": "Warum möchtest du das Event melden?",
     "eventLoeschen": "Event löschen",
     "linkKopieren": "Link kopieren",
-    "linkWurdekopiert": "Link wurde kopiert",
+    "linkWurdekopiert": "Link wurde kopiert - Nur verwendbar im Chat",
     "familienFreigeben": "Familien freigeben",
     "teilnehmen": "Teilnehmen",
     "absage": "Absagen",
@@ -419,5 +419,16 @@
     "hilfe": "Hilfe",
     "hilfeVorschlag": "Wie können wir dir helfen ? \n\nTeil uns auch bitte deine Kontaktdaten (Email, Telegram Benutzername o.Ä.) mit, damit wir dich Kontaktieren können",
     "ungeleseneNachrichten": "ungelesene Nachrichten",
-    "hilfeVersendetText": "Nachricht versendet - Wir werden uns schnellst möglich bei dir melden"
+    "hilfeVersendetText": "Nachricht versendet - Wir werden uns schnellst möglich bei dir melden",
+    "cities": "Städte",
+    "nochKeineStaedteVorhanden": "Noch keine Städte ausgewählt",
+    "countries": "Länder",
+    "nochKeineCountriesVorhanden": "Noch keine Länder ausgewählt",
+    "nochKeinegemeinschaftVorhanden": "Noch keine Gemeinschaften ausgewählt",
+    "sucheKeineErgebnisse": "Keine Ergebnisse für die Suchanfrage",
+    "stadtInformationen": "Stadtinformationen: ",
+    "kosten": "Kosten: ",
+    "aktuellDort": "Aktuell dort: ",
+    "kopieren": "kopieren",
+    "informationKopiert": "Information wurde kopiert"
 }

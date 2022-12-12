@@ -1,4 +1,3 @@
-import 'package:familien_suche/pages/weltkarte/stadtinformation.dart';
 import 'package:familien_suche/widgets/google_autocomplete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -6,21 +5,22 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
-import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart';
-import '../../services/database.dart';
-import '../../widgets/custom_appbar.dart';
+import '../../../global/custom_widgets.dart';
+import '../../../global/global_functions.dart';
+import '../../../services/database.dart';
+import '../../../widgets/custom_appbar.dart';
+import 'location_Information.dart';
 
-class CreateStadtinformationsPage extends StatefulWidget {
-  const CreateStadtinformationsPage({Key key}) : super(key: key);
+class CreateLocationInformationPage extends StatefulWidget {
+  const CreateLocationInformationPage({Key key}) : super(key: key);
 
   @override
-  _CreateStadtinformationsPageState createState() =>
-      _CreateStadtinformationsPageState();
+  _CreateLocationInformationPageState createState() =>
+      _CreateLocationInformationPageState();
 }
 
-class _CreateStadtinformationsPageState
-    extends State<CreateStadtinformationsPage> {
+class _CreateLocationInformationPageState
+    extends State<CreateLocationInformationPage> {
   var ortEingabe = GoogleAutoComplete();
   var titleKontroller = TextEditingController();
   var beschreibungKontroller = TextEditingController();
@@ -117,7 +117,7 @@ class _CreateStadtinformationsPageState
     allInformations.add(newUserInformation);
 
     Navigator.pop(context);
-    changePage(context, StadtinformationsPage(ortName: ortData["city"], newEntry: true,));
+    changePage(context, LocationInformationPage(ortName: ortData["city"]));
 
   }
 
