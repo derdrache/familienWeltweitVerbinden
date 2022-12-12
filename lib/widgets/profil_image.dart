@@ -277,6 +277,7 @@ class OwnProfilImage extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+                insetPadding: EdgeInsets.zero,
                 backgroundColor: Colors.transparent,
                 content: Image.network(image));
           });

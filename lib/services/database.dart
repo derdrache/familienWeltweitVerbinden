@@ -13,8 +13,8 @@ import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+//var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb
     ? ui.window.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
@@ -1388,8 +1388,9 @@ getFamilyProfil({familyId, familyMember}) {
   for (var familyProfil in familyProfils) {
     if (familyId != null && familyId == familyProfil["id"]) return familyProfil;
 
-    if (familyMember != null && familyProfil["members"].contains(familyMember))
+    if (familyMember != null && familyProfil["members"].contains(familyMember)) {
       return familyProfil;
+    }
   }
 }
 
@@ -1467,8 +1468,9 @@ refreshHiveEvents() async {
   var myInterestedEvents = [];
   for (var event in events) {
     if (event["erstelltVon"] == userId) ownEvents.add(event);
-    if (event["interesse"].contains(userId) && event["erstelltVon"] != userId)
+    if (event["interesse"].contains(userId) && event["erstelltVon"] != userId) {
       myInterestedEvents.add(event);
+    }
   }
 
   Hive.box('secureBox').put("myEvents", ownEvents);
