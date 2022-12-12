@@ -127,7 +127,7 @@
     "eventMeldenFrage": "Why do you want to report the event?",
     "eventLoeschen": "Delete event",
     "linkKopieren": "copy Link",
-    "linkWurdekopiert": "Link has been copied",
+    "linkWurdekopiert": "Link has been copied - only usable in chat",
     "familienFreigeben": "Share families",
     "teilnehmen": "Take part",
     "absage": "Refuse",
@@ -428,6 +428,8 @@
     "sucheKeineErgebnisse": "No results for the search query",
     "stadtInformationen": "City information: ",
     "kosten": "Costs: ",
-    "aktuellDort": "Currently there "
+    "aktuellDort": "Currently there ",
+    "kopieren": "copy",
+    "informationKopiert": "Information has been copied"
 }
 

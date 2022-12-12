@@ -36,7 +36,7 @@ class _LocationCardState extends State<LocationCard> {
       widget.location["interesse"].remove(userId);
       StadtinfoDatabase().update(
           "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id = '${widget.location["id"]}"
+          "WHERE id = '${widget.location["id"]}'"
       );
     }else{
       hasInterest = true;
@@ -44,7 +44,7 @@ class _LocationCardState extends State<LocationCard> {
       widget.location["interesse"].add(userId);
       StadtinfoDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id = '${widget.location["id"]}"
+          "WHERE id = '${widget.location["id"]}'"
       );
     }
 
