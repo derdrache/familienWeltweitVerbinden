@@ -127,7 +127,7 @@
     "eventMeldenFrage": "Warum möchtest du das Event melden?",
     "eventLoeschen": "Event löschen",
     "linkKopieren": "Link kopieren",
-    "linkWurdekopiert": "Link wurde kopiert",
+    "linkWurdekopiert": "Link wurde kopiert - Nur verwendbar im Chat",
     "familienFreigeben": "Familien freigeben",
     "teilnehmen": "Teilnehmen",
     "absage": "Absagen",
@@ -428,5 +428,7 @@
     "sucheKeineErgebnisse": "Keine Ergebnisse für die Suchanfrage",
     "stadtInformationen": "Stadtinformationen: ",
     "kosten": "Kosten: ",
-    "aktuellDort": "Aktuell dort: "
+    "aktuellDort": "Aktuell dort: ",
+    "kopieren": "kopieren",
+    "informationKopiert": "Information wurde kopiert"
 }
