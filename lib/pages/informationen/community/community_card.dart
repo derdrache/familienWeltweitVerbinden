@@ -4,7 +4,7 @@ import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
-import '../../global/global_functions.dart' as global_func;
+import '../../../global/global_functions.dart' as global_func;
 
 import 'community_details.dart';
 

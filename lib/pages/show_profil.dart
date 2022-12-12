@@ -398,8 +398,38 @@ class _UserNameDisplay extends StatelessWidget {
 
   _UserNameDisplay({Key key, this.profil, this.familyProfil}) : super(key: key);
 
+
+
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width*0.7;
+
+    openChat(chatpartnerId, chatpartnerName) async {
+      Map ownProfil = Hive.box('secureBox').get("ownProfil");
+      var chatId = global_functions.getChatID(chatpartnerId);
+
+      if(chatpartnerId ==ownProfil["id"]) return;
+
+      var groupChatData =
+      await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
+
+      if (groupChatData == false) {
+        groupChatData = {
+          "users": {
+            chatpartnerId: {"name": chatpartnerName, "newMessages": 0},
+            userId: {"name": ownProfil, "newMessages": 0}
+          }
+        };
+      }
+
+      global_functions.changePage(
+          context,
+          ChatDetailsPage(
+            chatPartnerId: chatpartnerId,
+            groupChatData: groupChatData,
+          ));
+    }
+
     getFamilyMemberNames() {
       var familyMemberName = "";
 
@@ -425,18 +455,26 @@ class _UserNameDisplay extends StatelessWidget {
             children: [
               ProfilImage(profil, fullScreenWindow: true),
               const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    profil["name"],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  if (familyProfil != null) const SizedBox(height: 5),
-                  if (familyProfil != null) Text(getFamilyMemberNames())
-                ],
+              GestureDetector(
+                onTap: () => openChat(profil["id"], profil["name"]),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: screenWidth,
+                      child: Text(
+                        profil["name"],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: profil["name"].length > 20 ? 20 : 24,
+                            fontWeight: FontWeight.bold
+                        ),
+                      ),
+                    ),
+                    if (familyProfil != null) const SizedBox(height: 5),
+                    if (familyProfil != null) Text(getFamilyMemberNames())
+                  ],
+                ),
               ),
             ],
           ),
@@ -874,3 +912,4 @@ class _UserSozialMediaBox extends StatelessWidget {
         : const SizedBox.shrink();
   }
 }
+

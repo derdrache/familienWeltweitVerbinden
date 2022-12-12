@@ -48,14 +48,24 @@ class ChangeChildrenPage extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).kinderAendern,
-          buttons: [
-            IconButton(
-              icon: const Icon(Icons.done),
-              onPressed: () => save(),
-            )
-          ]
       ),
-      body: childrenBirthdatePickerBox,
+      body: Column(children: [
+        childrenBirthdatePickerBox,
+        const SizedBox(height: 10),
+        FloatingActionButton.extended(
+            label: Text(
+              AppLocalizations.of(context).speichern,
+              style: const TextStyle(fontSize: 20),
+            ),
+            icon: const Icon(Icons.save),
+            onPressed: () => save())
+      ],)
+
+
+      ,
+
+
+
     );
   }
 }

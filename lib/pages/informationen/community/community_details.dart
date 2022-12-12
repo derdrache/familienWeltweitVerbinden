@@ -13,14 +13,14 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
 
-import '../../global/custom_widgets.dart';
-import '../../services/database.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/google_autocomplete.dart';
-import '../../widgets/search_autocomplete.dart';
-import '../../widgets/text_with_hyperlink_detection.dart';
-import '../start_page.dart';
-import '../../global/variablen.dart' as global_var;
+import '../../../global/custom_widgets.dart';
+import '../../../services/database.dart';
+import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/google_autocomplete.dart';
+import '../../../widgets/search_autocomplete.dart';
+import '../../../widgets/text_with_hyperlink_detection.dart';
+import '../../start_page.dart';
+import '../../../global/variablen.dart' as global_var;
 
 class CommunityDetails extends StatefulWidget {
   Map community;
@@ -640,49 +640,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
-  _linkTeilenWindow() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(title: "Community link", children: [
-            Container(
-                margin: const EdgeInsets.all(10),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    border: Border.all()),
-                child:
-                    Text("</communityId=" + widget.community["id"].toString())),
-            Container(
-              margin: const EdgeInsets.only(left: 20, right: 20),
-              child: FloatingActionButton.extended(
-                onPressed: () async {
-                  Clipboard.setData(ClipboardData(
-                      text: "</communityId=" +
-                          widget.community["id"].toString()));
-
-                  await showDialog(
-                      context: context,
-                      builder: (context) {
-                        Future.delayed(const Duration(seconds: 1), () {
-                          Navigator.of(context).pop(true);
-                        });
-                        return AlertDialog(
-                          content: Text(
-                              AppLocalizations.of(context).linkWurdekopiert),
-                        );
-                      });
-                  Navigator.pop(context);
-                },
-                label: Text(AppLocalizations.of(context).linkKopieren),
-                icon: const Icon(Icons.copy),
-              ),
-            ),
-            const SizedBox(height: 10)
-          ]);
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -717,7 +674,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     DbDeleteImage(widget.community["bild"]);
 
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 3));
+                        context, StartPage(selectedIndex: 3, informationPageIndex: 2,));
                   },
                 ),
                 TextButton(
@@ -986,7 +943,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               ),
               IconButton(
                 icon: const Icon(Icons.link),
-                onPressed: () => _linkTeilenWindow(),
+                onPressed: (){
+                  Clipboard.setData(ClipboardData(
+                      text: "</communityId=" + widget.community["id"].toString()
+                  ));
+
+                  customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
+                },
               ),
               IconButton(
                 icon: const Icon(Icons.more_vert),

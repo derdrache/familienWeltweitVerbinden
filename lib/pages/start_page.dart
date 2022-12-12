@@ -18,22 +18,22 @@ import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../widgets/badge_icon.dart';
 import '../windows/patchnotes.dart';
-import 'community/community_page.dart';
-import 'force_update.dart';
-import 'events/event_page.dart';
+import 'informationen/information.dart';
 import 'login_register_page/create_profil_page.dart';
 import 'news/news_page.dart';
 import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
+import 'force_update.dart';
 
 final String userId = FirebaseAuth.instance.currentUser?.uid;
 
 //ignore: must_be_immutable
 class StartPage extends StatefulWidget {
   int selectedIndex;
+  var informationPageIndex;
 
-  StartPage({Key key, this.selectedIndex = 0}) : super(key: key);
+  StartPage({Key key, this.selectedIndex = 0, this.informationPageIndex = 0}) : super(key: key);
 
   @override
   _StartPageState createState() => _StartPageState();
@@ -44,17 +44,18 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   bool hasInternet = true;
   var checkedA2HS = false;
-  List<Widget> tabPages = <Widget>[
-    const NewsPage(),
-    const ErkundenPage(),
-    const EventPage(),
-    const CommunityPage(),
-    const ChatPage(),
-    const SettingPage()
-  ];
+  List<Widget> tabPages;
 
   @override
   void initState() {
+    tabPages = <Widget>[
+      const NewsPage(),
+      const ErkundenPage(),
+      InformationPage(pageSelection: widget.informationPageIndex),
+      const ChatPage(),
+      const SettingPage()
+    ];
+
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 
@@ -254,7 +255,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-        "WHERE ort LIKE '${locationData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+        "WHERE (ort LIKE '%${locationData["city"]}%' OR ort LIKE '%${locationData["countryname"]}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
   }
 
   _updateChatGroups(oldLocation, locationData) {
@@ -413,30 +414,34 @@ class CustomBottomNavigationBar extends StatelessWidget {
       {Key key, this.onNavigationItemTapped, this.selectNavigationItem})
       : super(key: key);
 
-  eventIcon() {
-    var userFreischalten = 0;
+  _eventNotification() {
+    var eventNotification = 0;
     var myEvents = Hive.box('secureBox').get("myEvents") ?? [];
 
     for (var event in myEvents) {
-      userFreischalten += event["freischalten"].length;
+      eventNotification += event["freischalten"].length;
     }
 
-    return BadgeIcon(
-        icon: Icons.event,
-        text: userFreischalten > 0 ? userFreischalten.toString() : "");
+    return eventNotification;
   }
 
-  communityIcon() {
-    var communityInvite = 0;
+  _communitNotifikation() {
+    var communityNotifikation = 0;
     var allCommunities = Hive.box('secureBox').get("communities") ?? [];
 
     for (var community in allCommunities) {
-      if (community["einladung"].contains(userId)) communityInvite += 1;
+      if (community["einladung"].contains(userId)) communityNotifikation += 1;
     }
 
+    return communityNotifikation;
+  }
+
+  informationenIcon(){
+    var notification = _eventNotification() + _communitNotifikation();
+
     return BadgeIcon(
-        icon: Icons.cottage,
-        text: communityInvite > 0 ? communityInvite.toString() : "");
+        icon: Icons.group_work,
+        text: notification > 0 ? notification.toString() : "");
   }
 
   chatIcon() {
@@ -472,12 +477,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: 'World',
         ),
         BottomNavigationBarItem(
-          icon: eventIcon(),
-          label: 'Events',
-        ),
-        BottomNavigationBarItem(
-          icon: communityIcon(),
-          label: 'Community',
+          icon: informationenIcon(),
+          label: "Information",
         ),
         BottomNavigationBarItem(
           icon: chatIcon(),

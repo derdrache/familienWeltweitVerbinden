@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:multiselect/multiselect.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 double sideSpace = 10;
 double borderRounding = 5;
@@ -99,9 +99,9 @@ customSnackbar(context, text, {color = Colors.red, duration = const Duration(sec
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
-  List<String> selected;
+  List selected;
   String hintText;
-  var onConfirm;
+  Function onConfirm;
   var validator;
   Icon icon;
 
@@ -132,58 +132,37 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     super.initState();
   }
 
-  List<String> _createMultiselectItems(){
-    List<String> multiSelectItems = [];
-
-    for(var auswahl in widget.auswahlList){
-      multiSelectItems.add(auswahl);
-    }
-
-    return multiSelectItems;
-  }
-
-
   @override
   Widget build(BuildContext context) {
-    List<String> auswahlListSelectItem = _createMultiselectItems();
 
     changeSelectToList(select){
-      widget.onConfirm;
-      setState(() {
-        widget.selected = select;
-      });
+      widget.selected = select;
+      widget.onConfirm();
     }
 
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Container(
-          width: webWidth,
-          margin: EdgeInsets.all(sideSpace),
-          child : DropDownMultiSelect(
-            onChanged: changeSelectToList,
-            options: auswahlListSelectItem,
-            selectedValues: widget.selected,
-            validator: widget.validator,
-            hint: Text(widget.hintText),
-            icon: const Icon(Icons.arrow_downward, color: Colors.black,),
-            decoration: InputDecoration(
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5.0),
-                borderSide:  const BorderSide(color: Colors.black ),
 
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5.0),
-                borderSide:  const BorderSide(color: Colors.black ),
-
-              ),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 15,
-                horizontal: 10,
-              ),
-            ),
-          )
+    return Container(
+      width: webWidth,
+      margin: EdgeInsets.all(sideSpace),
+      decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.circular(5)
+      ),
+      child: MultiSelectDialogField(
+        initialValue: widget.selected,
+        items: widget.auswahlList.map((e) => MultiSelectItem(e, e)).toList(),
+        listType: MultiSelectListType.LIST,
+        searchable: true,
+        onConfirm: changeSelectToList,
+        onSelectionChanged: changeSelectToList,
+        buttonText: Text(widget.hintText),
+        chipDisplay: MultiSelectChipDisplay(
+          onTap: (value){
+            widget.selected.remove(value);
+            widget.onConfirm();
+            return widget.selected;
+          },
+        ),
       ),
     );
   }
