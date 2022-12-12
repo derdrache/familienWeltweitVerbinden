@@ -37,6 +37,10 @@ class GoogleAutoComplete extends StatefulWidget {
     searchableItems = data["predictions"];
   }
 
+  clear(){
+    searchKontroller.clear();
+  }
+
   GoogleAutoComplete({
     Key key,
     this.hintText,
