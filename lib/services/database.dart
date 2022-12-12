@@ -13,8 +13,8 @@ import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-//var databaseUrl = "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb
     ? ui.window.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
@@ -948,13 +948,12 @@ class AllgemeinDatabase {
 class ReportsDatabase {
   add(von, title, beschreibung) async {
     var url = Uri.parse(databaseUrl + "database/reports/addReport.php");
-    var test = await http.post(url,
+    await http.post(url,
         body: json.encode({
           "von": von,
           "title": title,
           "beschreibung": beschreibung,
         }));
-    print(test.body);
 
     sendEmail({
       "title": "Eine Meldung ist eingegangen",
