@@ -3,23 +3,23 @@ import 'dart:convert';
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/events/event_card_details.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
-import '../../global/global_functions.dart';
-import '../../global/variablen.dart' as global_var;
 
-import '../../services/notification.dart';
-import '../../widgets/custom_appbar.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/search_autocomplete.dart';
-import '../../services/database.dart';
-import '../../widgets/badge_icon.dart';
-import '../show_profil.dart';
-import '../start_page.dart';
+import '../../../global/global_functions.dart';
+import '../../../global/variablen.dart' as global_var;
+import '../../../services/notification.dart';
+import '../../../widgets/custom_appbar.dart';
+import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/search_autocomplete.dart';
+import '../../../services/database.dart';
+import '../../../widgets/badge_icon.dart';
+import '../../show_profil.dart';
+import '../../start_page.dart';
+import 'event_card_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
 
@@ -277,8 +277,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     ChatGroupsDatabase().deleteChat(chatGroupId);
 
                     DbDeleteImage(widget.event["bild"]);
+
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 2));
+                        context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
                   },
                 ),
                 TextButton(
@@ -717,47 +718,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           });
     }
 
-    linkTeilenWindow() async {
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(title: "Event link", children: [
-              Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      border: Border.all()),
-                  child: Text("</eventId=" + widget.event["id"])),
-              Container(
-                margin: const EdgeInsets.only(left: 20, right: 20),
-                child: FloatingActionButton.extended(
-                  onPressed: () async {
-                    Clipboard.setData(
-                        ClipboardData(text: "</eventId=" + widget.event["id"]));
-
-                    await showDialog(
-                        context: context,
-                        builder: (context) {
-                          Future.delayed(const Duration(seconds: 1), () {
-                            Navigator.of(context).pop(true);
-                          });
-                          return AlertDialog(
-                            content: Text(
-                                AppLocalizations.of(context).linkWurdekopiert),
-                          );
-                        });
-                    Navigator.pop(context);
-                  },
-                  label: Text(AppLocalizations.of(context).linkKopieren),
-                  icon: const Icon(Icons.copy),
-                ),
-              ),
-              const SizedBox(height: 10)
-            ]);
-          });
-    }
-
     return SelectionArea(
       child: Scaffold(
         appBar: CustomAppBar(title: "", buttons: [
@@ -778,7 +738,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 }),
           IconButton(
             icon: const Icon(Icons.link),
-            onPressed: () => linkTeilenWindow(),
+            onPressed: () {
+              Clipboard.setData(
+                  ClipboardData(text: "</eventId=" + widget.event["id"]));
+
+              customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
+            },
           ),
           IconButton(
               icon: const Icon(Icons.message),

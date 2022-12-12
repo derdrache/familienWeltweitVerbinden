@@ -17,7 +17,7 @@ class ChangeNamePage extends StatelessWidget {
   Widget build(BuildContext context) {
     nameKontroller.text = oldName;
 
-    saveFunction() async {
+    save() async {
       if (nameKontroller.text.isEmpty) {
         customSnackbar(
             context, AppLocalizations.of(context).neuenNamenEingeben);
@@ -47,18 +47,20 @@ class ChangeNamePage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).nameAendern,
-          buttons: [
-            IconButton(
-                icon: const Icon(Icons.done),
-                onPressed: () => saveFunction()
-            )
-          ]),
+          title: AppLocalizations.of(context).nameAendern,),
       body: Container(
         margin: const EdgeInsets.only(top: 20),
         child: Column(children: [
           customTextInput("Name", nameKontroller,
-              onSubmit: () => saveFunction())
+              onSubmit: () => save()),
+          const SizedBox(height: 10),
+          FloatingActionButton.extended(
+              label: Text(
+                AppLocalizations.of(context).speichern,
+                style: const TextStyle(fontSize: 20),
+              ),
+              icon: const Icon(Icons.save),
+              onPressed: () => save())
         ]),
       ),
     );

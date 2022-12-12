@@ -1,4 +1,4 @@
-import 'package:familien_suche/pages/events/events_suchen.dart';
+import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,9 @@ import 'package:hive/hive.dart';
 
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
-import '../../widgets/badge_icon.dart';
+import '../../../widgets/badge_icon.dart';
+import '../../start_page.dart';
+import 'events_suchen.dart';
 import 'eventCard.dart';
 import 'events_erstellen.dart';
 
@@ -147,34 +149,38 @@ class _EventPageState extends State<EventPage> {
     }
 
     return Scaffold(
+      appBar: CustomAppBar(
+        title: "Events",
+        leading: IconButton(
+          onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
+          icon: Icon(Icons.arrow_back),
+        ),
+        buttons: [
+          IconButton(
+              onPressed: ()=> Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const EventsSuchenPage()))
+                  .whenComplete(() => setState(() {})),
+              icon: const Icon(
+                Icons.search,
+                size: 30,
+              ))
+        ],
+      ),
       body: SafeArea(
         child: Container(
             padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
             child: Column(children: [
               Expanded(child: meineInteressiertenEventsBox()),
               Expanded(child: meineErstellenEventsBox()),
-              const SizedBox(height: 50)
             ])),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-              heroTag: "alleEvents",
-              child: const Icon(Icons.search),
-              onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const EventsSuchenPage()))
-                  .whenComplete(() => setState(() {}))),
-          const SizedBox(width: 10),
-          FloatingActionButton(
-              heroTag: "event hinzufügen",
-              child: const Icon(Icons.add),
-              onPressed: () =>
-                  global_functions.changePage(context, const EventErstellen())),
-        ],
-      ),
+      floatingActionButton: FloatingActionButton(
+          heroTag: "event hinzufügen",
+          child: const Icon(Icons.add),
+          onPressed: () =>
+              global_functions.changePage(context, const EventErstellen())),
     );
   }
 }

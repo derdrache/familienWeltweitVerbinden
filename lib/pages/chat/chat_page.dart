@@ -40,7 +40,7 @@ class _ChatPageState extends State<ChatPage> {
   bool isLoaded = false;
   var mainSlider = 0;
   bool activeChatSearch = false;
-  var focusNodeSearch = FocusNode();
+  var seachSearchInputNode = FocusNode();
   var searchTextKontroller = TextEditingController();
   var searchListMyGroups = [];
   var searchListAllChatgroups = [];
@@ -101,7 +101,6 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   refreshChatDataFromDb() async {
-    setState(() {});
     await refreshHiveChats();
     setState(() {
       isLoaded = true;
@@ -426,6 +425,59 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
 
+    searchChats(value) {
+      searchListMyGroups = [];
+      searchListAllChatgroups = [];
+
+      if (value.isEmpty) {
+        return;
+      }
+
+      var firstLetterBig = value[0].toUpperCase();
+      if (value.length > 1) firstLetterBig += value.substring(1);
+
+      List allMyChats = myChats + myGroupChats;
+      for (var chat in allMyChats) {
+        bool isChatGroup = chat["connected"] != null;
+        var chatName = "";
+
+        if (isChatGroup) {
+          chatName = getChatGroupName(chat["connected"]);
+          chatName ??= AppLocalizations.of(context).weltChat;
+        } else {
+          var chatUsers = chat["users"].keys.toList();
+          var userPartnerId =
+          chatUsers[0] != userId ? chatUsers[0] : chatUsers[1];
+          chatName = getProfilFromHive(
+              profilId: userPartnerId, getNameOnly: true);
+        }
+
+        if(chatName == null) continue;
+
+        if (chatName.contains(value) ||
+            chatName.contains(firstLetterBig)) {
+          searchListMyGroups.add(chat);
+        }
+      }
+
+      List allChatGroups =
+          Hive.box("secureBox").get("chatGroups") ?? [];
+      for (var chatGroup in allChatGroups) {
+        var chatConnected = chatGroup["connected"];
+        var chatName = getChatGroupName(chatConnected);
+        chatName ??= AppLocalizations.of(context).weltChat;
+
+        var containCondition = chatName.contains(value) ||
+            chatName.contains(firstLetterBig);
+        var memberOfItCondition = chatGroup["users"][userId] != null;
+
+        if (containCondition && !memberOfItCondition) {
+          searchListAllChatgroups.add(chatGroup);
+        }
+      }
+      setState(() {});
+    }
+
     newMessageAndPinnedBox(newMessages, isPinned) {
       if (newMessages == 0 && !isPinned) return const SizedBox(height: 30);
 
@@ -516,6 +568,8 @@ class _ChatPageState extends State<ChatPage> {
             };
           }
         }
+
+        if(chatName == null) continue;
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages =
@@ -653,7 +707,7 @@ class _ChatPageState extends State<ChatPage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
             title: TextField(
               cursorColor: Colors.black,
-              focusNode: focusNodeSearch,
+              focusNode: seachSearchInputNode,
               controller: searchTextKontroller,
               textInputAction: TextInputAction.search,
               maxLines: 1,
@@ -667,56 +721,7 @@ class _ChatPageState extends State<ChatPage> {
                       searchTextKontroller.clear();
                     },
                   )),
-              onChanged: (value) {
-                searchListMyGroups = [];
-                searchListAllChatgroups = [];
-
-                if (value.isEmpty) {
-                  return;
-                }
-
-                var firstLetterBig = value[0].toUpperCase();
-                if (value.length > 1) firstLetterBig += value.substring(1);
-
-                List allMyChats = myChats + myGroupChats;
-                for (var chat in allMyChats) {
-                  bool isChatGroup = chat["connected"] != null;
-                  var chatName = "";
-
-                  if (isChatGroup) {
-                    chatName = getChatGroupName(chat["connected"]);
-                    chatName ??= AppLocalizations.of(context).weltChat;
-                  } else {
-                    var chatUsers = chat["users"].keys.toList();
-                    var userPartnerId =
-                        chatUsers[0] != userId ? chatUsers[0] : chatUsers[1];
-                    chatName = getProfilFromHive(
-                        profilId: userPartnerId, getNameOnly: true);
-                  }
-
-                  if (chatName.contains(value) ||
-                      chatName.contains(firstLetterBig)) {
-                    searchListMyGroups.add(chat);
-                  }
-                }
-
-                List allChatGroups =
-                    Hive.box("secureBox").get("chatGroups") ?? [];
-                for (var chatGroup in allChatGroups) {
-                  var chatConnected = chatGroup["connected"];
-                  var chatName = getChatGroupName(chatConnected);
-                  chatName ??= AppLocalizations.of(context).weltChat;
-
-                  var containCondition = chatName.contains(value) ||
-                      chatName.contains(firstLetterBig);
-                  var memberOfItCondition = chatGroup["users"][userId] != null;
-
-                  if (containCondition && !memberOfItCondition) {
-                    searchListAllChatgroups.add(chatGroup);
-                  }
-                }
-                setState(() {});
-              },
+              onChanged: (value) => searchChats(value),
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_sharp),
@@ -736,8 +741,6 @@ class _ChatPageState extends State<ChatPage> {
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
-              focusNodeSearch.unfocus();
-
               setState(() {
                 changeBarOn = false;
                 selectedChats = [];
@@ -785,12 +788,9 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           withLeading: false,
-          //backgroundColor: Colors.white,
           buttons: [
             IconButton(
                 onPressed: () {
-                  focusNodeSearch.requestFocus();
-
                   setState(() {
                     activeChatSearch = true;
                   });
@@ -798,7 +798,6 @@ class _ChatPageState extends State<ChatPage> {
                 icon: const Icon(
                   Icons.search,
                   size: 30,
-                  color: Colors.black,
                 )),
             const SizedBox(
               width: 10,

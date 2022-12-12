@@ -32,12 +32,6 @@ class ChangeAboutmePage extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).ueberMichVeraendern,
-          buttons: [
-            IconButton(
-                icon: const Icon(Icons.done),
-                onPressed: () => save()
-            )
-          ]
       ),
       body: Column(
         children: [
@@ -47,8 +41,15 @@ class ChangeAboutmePage extends StatelessWidget {
             moreLines: 10,
             hintText: AppLocalizations.of(context).aboutusHintText,
             textInputAction: TextInputAction.newline
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton.extended(
+              label: Text(AppLocalizations.of(context).speichern, style: const TextStyle(fontSize: 20),),
+              icon: const Icon(Icons.save),
+              onPressed: () => save()
           )
         ],
+
       )
     );
   }
