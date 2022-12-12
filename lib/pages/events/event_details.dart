@@ -82,20 +82,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     widget.event["freigegeben"].add(user);
     windowState(() {});
 
-    var eventData = getEventFromHive(eventId);
-
-    var freischaltenList = eventData["freischalten"];
-    freischaltenList.remove(user);
     await EventDatabase().update(
-        "freischalten = '${json.encode(freischaltenList)}'",
+        "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$userId')))",
         "WHERE id = '$eventId'");
+
+    setState(() {});
 
     if (!angenommen) return;
 
-    var freigegebenListe = eventData["freigegeben"];
-    freigegebenListe.add(user);
     await EventDatabase().update(
-        "freigegeben = '${json.encode(freigegebenListe)}'",
+        "freigegeben = JSON_ARRAY_APPEND(freigegeben, '\$', '$userId')",
         "WHERE id = '$eventId'");
 
     setState(() {});
@@ -114,9 +110,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       widget.event["freigegeben"].remove(user);
     });
 
-    var freigegebenList = getEventFromHive(eventId)["freigegeben"];
-    freigegebenList.remove(user);
-    EventDatabase().update("freigegeben = '${json.encode(freigegebenList)}'",
+    EventDatabase().update(
+        "freigegeben = JSON_REMOVE(freigegeben, JSON_UNQUOTE(JSON_SEARCH(freigegeben, 'one', '$userId')))",
         "WHERE id = '$eventId'");
   }
 
@@ -205,24 +200,33 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     var interessenList = eventData["interesse"];
 
     if (confirm) {
-      if (!interessenList.contains(userId)) interessenList.add(userId);
+      if (!interessenList.contains(userId)){
+        interessenList.add(userId);
+        EventDatabase().update(
+            "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
+            "WHERE id = '${widget.event["id"]}'");
+      }
       widget.teilnahme = true;
       widget.absage = false;
       zusageList.add(userId);
       absageList.remove(userId);
+
+      EventDatabase().update(
+          "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId')))"
+              "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+          "WHERE id = '${widget.event["id"]}'");
     } else {
       widget.teilnahme = false;
       widget.absage = true;
       zusageList.remove(userId);
       absageList.add(userId);
+
+      EventDatabase().update(
+          "absage = '${json.encode(absageList)}', zusage = '${json.encode(zusageList)}'",
+          "WHERE id = '${widget.event["id"]}'");
     }
 
     setState(() {});
-
-    EventDatabase().update(
-        "absage = '${json.encode(absageList)}', "
-            "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'",
-        "WHERE id = '${widget.event["id"]}'");
   }
 
   @override
