@@ -10,14 +10,14 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../global/custom_widgets.dart';
-import '../../global/global_functions.dart' as global_func;
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/google_autocomplete.dart';
-import '../../services/database.dart';
-import '../../global/variablen.dart' as global_var;
-import '../../widgets/event_image_galerie.dart';
-import '../../widgets/text_with_hyperlink_detection.dart';
+import '../../../global/custom_widgets.dart';
+import '../../../global/global_functions.dart' as global_func;
+import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/google_autocomplete.dart';
+import '../../../services/database.dart';
+import '../../../global/variablen.dart' as global_var;
+import '../../../widgets/event_image_galerie.dart';
+import '../../../widgets/text_with_hyperlink_detection.dart';
 
 /*
 Clean Code Notize:

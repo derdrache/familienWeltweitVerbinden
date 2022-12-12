@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
-import 'package:familien_suche/pages/community/community_details.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,8 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../widgets/google_autocomplete.dart';
-import '../start_page.dart';
+import 'community_details.dart';
+import '../../../widgets/google_autocomplete.dart';
+import '../../start_page.dart';
 
 class CommunityErstellen extends StatefulWidget {
   const CommunityErstellen({Key key}) : super(key: key);
@@ -121,7 +121,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                       .getData("*", "WHERE erstelltVon = '$userId'");
 
                   global_func.changePageForever(
-                      context, StartPage(selectedIndex: 3));
+                      context, StartPage(selectedIndex: 3, informationPageIndex: 2,));
                   global_func.changePage(
                       context, CommunityDetails(community: community));
                 },

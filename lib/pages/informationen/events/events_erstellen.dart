@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
-import 'package:familien_suche/pages/events/event_details.dart';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,13 +10,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../services/database.dart';
-import '../../global/custom_widgets.dart';
+import '../../../services/database.dart';
+import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
-import '../../widgets/custom_appbar.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/google_autocomplete.dart';
-import '../../global/variablen.dart' as global_var;
+import '../../../widgets/custom_appbar.dart';
+import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/google_autocomplete.dart';
+import '../../../global/variablen.dart' as global_var;
+import 'event_details.dart';
 
 class EventErstellen extends StatefulWidget {
   const EventErstellen({Key key}) : super(key: key);
@@ -151,7 +151,7 @@ class _EventErstellenState extends State<EventErstellen> {
 
     if (dbEventData == false) return;
 
-    global_functions.changePage(context, StartPage(selectedIndex: 2));
+    global_functions.changePage(context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
     global_functions.changePage(context, EventDetailsPage(event: dbEventData));
   }
 

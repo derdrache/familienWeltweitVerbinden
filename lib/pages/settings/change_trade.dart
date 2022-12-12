@@ -17,10 +17,9 @@ class ChangeTradePage extends StatelessWidget {
   Widget build(BuildContext context) {
     textKontroller.text = oldText;
 
-    save(){
+    save() {
       ProfilDatabase().updateProfil(
-          "tradeNotize = '${textKontroller.text}'",
-          "WHERE id = '$userId'");
+          "tradeNotize = '${textKontroller.text}'", "WHERE id = '$userId'");
 
       updateHiveOwnProfil("tradeNotize", textKontroller.text);
 
@@ -30,25 +29,29 @@ class ChangeTradePage extends StatelessWidget {
               " " +
               AppLocalizations.of(context).erfolgreichGeaender,
           color: Colors.green);
+
       Navigator.pop(context);
     }
 
     return Scaffold(
-        appBar: CustomAppBar(
-            title: AppLocalizations.of(context).tradeVeraendern,
-            buttons: [
-              IconButton(
-                  icon: const Icon(Icons.done),
-                  onPressed: () => save())
-            ]),
+        appBar:
+            CustomAppBar(title: AppLocalizations.of(context).tradeVeraendern),
         body: Column(
           children: [
             customTextInput(
                 AppLocalizations.of(context).verkaufenTauschenSchenken,
                 textKontroller,
-                moreLines: 10,
+                moreLines: 15,
                 textInputAction: TextInputAction.newline,
-                hintText: AppLocalizations.of(context).tradeHintText)
+                hintText: AppLocalizations.of(context).tradeHintText),
+            const SizedBox(height: 10),
+            FloatingActionButton.extended(
+                label: Text(
+                  AppLocalizations.of(context).speichern,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                icon: const Icon(Icons.save),
+                onPressed: () => save())
           ],
         ));
   }
