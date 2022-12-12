@@ -730,47 +730,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           });
     }
 
-    linkTeilenWindow() async {
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(title: "Event link", children: [
-              Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                      border: Border.all()),
-                  child: Text("</eventId=" + widget.event["id"])),
-              Container(
-                margin: const EdgeInsets.only(left: 20, right: 20),
-                child: FloatingActionButton.extended(
-                  onPressed: () async {
-                    Clipboard.setData(
-                        ClipboardData(text: "</eventId=" + widget.event["id"]));
-
-                    await showDialog(
-                        context: context,
-                        builder: (context) {
-                          Future.delayed(const Duration(seconds: 1), () {
-                            Navigator.of(context).pop(true);
-                          });
-                          return AlertDialog(
-                            content: Text(
-                                AppLocalizations.of(context).linkWurdekopiert),
-                          );
-                        });
-                    Navigator.pop(context);
-                  },
-                  label: Text(AppLocalizations.of(context).linkKopieren),
-                  icon: const Icon(Icons.copy),
-                ),
-              ),
-              const SizedBox(height: 10)
-            ]);
-          });
-    }
-
     return SelectionArea(
       child: Scaffold(
         appBar: CustomAppBar(title: "", buttons: [
@@ -791,7 +750,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 }),
           IconButton(
             icon: const Icon(Icons.link),
-            onPressed: () => linkTeilenWindow(),
+            onPressed: () {
+              Clipboard.setData(
+                  ClipboardData(text: "</eventId=" + widget.event["id"]));
+
+              customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
+            },
           ),
           IconButton(
               icon: const Icon(Icons.message),

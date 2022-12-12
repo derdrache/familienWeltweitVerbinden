@@ -31,7 +31,7 @@ sendNotification(notificationInformation) async {
   if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
   //notificationInformation["token"] ="d7jhOvKk-03zjuQJG3hnFf:APA91bH_fi3_VdtFVmOBLIczINnCYeTxXREsa4FWPhAgZ9SB9NFDIsPYr0KOEDE4vQ0rIabMQLHj87v349eBfDSN38XEWCS6ZK7gs5J4c2wNCDKbo5BkzRYRs_zPGLqJJayBKHHLR1Jn";
 
-  await http.post(url,
+  var test = await http.post(url,
       body: json.encode({
         "to": notificationInformation["token"],
         "title": notificationInformation["title"],
@@ -40,6 +40,7 @@ sendNotification(notificationInformation) async {
         "apiKey": firebaseWebKey,
         "typ": notificationInformation["typ"]
       }));
+  print(test.body);
 }
 
 prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
@@ -64,6 +65,7 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
     "changePageId": chatId,
     "typ": "chat",
   };
+
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
@@ -186,4 +188,20 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
   } else {
     sendNotification(notificationInformation);
   }
+}
+
+
+testNotification(){
+  var notificationInformation = {
+    "token": "c8nNn3Zd0U_uvQjfikOhAt:APA91bEFZQCuweeVXlrtol2k-H8oBYu3D3jAkCRQZq_Tf-kMIKBR3R8ocN5G9JRrHYq-nxvPMoBHEkFosTE4aO78IZUOQyiUI5rzydnCHLAC09onQuqSSSE0zTlMChcCurhve2ty2t_1",
+    "title": "Test2",
+    "inhalt": "Families worldwide notifikation test\n Siehst du diese Notification?",
+    "zu": "vtp97dpVxVZimnyLAdrorgSPUMI3",
+    "changePageId": "vtp97dpVxVZimnyLAdrorgSPUMI3_w9yxDHP3W8dVGoYpBCrLWlufJ0s2",
+    "typ": "chat",
+  };
+
+  sendNotification(notificationInformation);
+
+  print("Done");
 }
