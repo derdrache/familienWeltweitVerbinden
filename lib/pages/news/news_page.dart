@@ -24,7 +24,7 @@ class NewsPage extends StatefulWidget {
 
 class _NewsPageState extends State<NewsPage> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
-  List newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
+  List newsFeedData;
   List events = Hive.box('secureBox').get("events") ?? [];
   List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
@@ -43,14 +43,30 @@ class _NewsPageState extends State<NewsPage> {
     _controller.addListener(() {
       bool isTop = _controller.position.pixels == 0;
       if (isTop) {
-        scrollbarOnBottom = true;
+        if(!scrollbarOnBottom){
+          scrollbarOnBottom = true;
+          setState(() {});
+        }
       } else {
-        scrollbarOnBottom = false;
+        if(scrollbarOnBottom){
+          scrollbarOnBottom = false;
+          setState(() {});
+        }
       }
-      setState(() {});
     });
 
+
+
     super.initState();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_){
+          _refresh();
+    });
+  }
+
+  _refresh()async{
+    //await refreshHiveNewsPage();
+    setState(() {});
   }
 
   _addNewSettingProfil(){
@@ -162,6 +178,7 @@ class _NewsPageState extends State<NewsPage> {
 
   Widget build(BuildContext context) {
     const double titleFontSize = 15;
+    newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
 
     friendsDisplay(news) {
       String addedUser = news["information"].split(" ")[1];
