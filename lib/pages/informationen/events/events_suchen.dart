@@ -6,12 +6,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 import 'dart:ui';
 
-import '../../global/variablen.dart' as global_var;
-import '../../widgets/custom_appbar.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/search_autocomplete.dart';
+import '../../../global/variablen.dart' as global_var;
+import '../../../widgets/custom_appbar.dart';
+import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/search_autocomplete.dart';
+import '../../../services/database.dart';
 import 'eventCard.dart';
-import '../../services/database.dart';
 
 class EventsSuchenPage extends StatefulWidget {
   const EventsSuchenPage({Key key}) : super(key: key);

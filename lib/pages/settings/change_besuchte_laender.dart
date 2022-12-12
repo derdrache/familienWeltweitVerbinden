@@ -28,7 +28,7 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
 
   @override
   void initState() {
-    Map allCountries = LocationService().getAllCountries();
+    Map allCountries = LocationService().getAllCountryNames();
     List allCountriesLanguage;
     bool unselectedAndGerman = widget.selected.isEmpty && widget.isGerman;
     bool selectedIsGerman = widget.selected.isNotEmpty
@@ -43,6 +43,9 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
     besuchteLaenderDropdown = CustomMultiTextForm(
         auswahlList: allCountriesLanguage,
         selected: widget.selected,
+        onConfirm: (){
+          saveInDB();
+        },
     );
 
     super.initState();
@@ -56,55 +59,20 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
         "WHERE id = '${widget.userId}'");
 
     updateHiveOwnProfil("besuchteLaender", selectedCountries);
-
-    customSnackbar(context, AppLocalizations.of(context).besuchteLaenderUpdate,
-        color: Colors.green);
   }
 
   @override
   Widget build(BuildContext context) {
     besuchteLaenderDropdown.hintText =
-        AppLocalizations.of(context).laenderAuswahl;
-
-    besuchteLaenderBox() {
-      List visitedCountriesWidgetlist = [];
-      List visitedCountries = besuchteLaenderDropdown.getSelected();
-
-      for (var country in visitedCountries) {
-        visitedCountriesWidgetlist.add(Container(
-          margin: const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
-          child: Text(country),
-        ));
-      }
-
-      return visitedCountriesWidgetlist;
-    }
+        AppLocalizations.of(context).besuchteLaender;
 
     return Scaffold(
         appBar: CustomAppBar(
           title: AppLocalizations.of(context).besucheLaenderVeraendern,
-          buttons: [
-            IconButton(
-              icon: const Icon(Icons.done),
-              onPressed: () {
-                saveInDB();
-                setState(() {});
-              }
-            )
-          ],
         ),
         body: ListView(
           children: [
             besuchteLaenderDropdown,
-            const SizedBox(height: 10),
-            Container(
-                margin: const EdgeInsets.all(10),
-                child: Text(
-                  AppLocalizations.of(context).besuchteLaender + ": ",
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                )),
-            ...besuchteLaenderBox()
           ],
         ));
   }

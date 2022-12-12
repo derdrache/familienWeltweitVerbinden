@@ -65,7 +65,7 @@ class ChangeEmailPage extends StatelessWidget {
       return true;
     }
 
-    saveFunction() async {
+    save() async {
 
       bool isValid = await checkValidationAndError();
       if(!isValid) return;
@@ -85,13 +85,7 @@ class ChangeEmailPage extends StatelessWidget {
 
     return Scaffold(
         appBar: CustomAppBar(
-            title: AppLocalizations.of(context).emailAendern,
-            buttons: [
-              IconButton(
-                  icon: const Icon(Icons.done),
-                  onPressed: () => saveFunction()
-              )
-            ]),
+            title: AppLocalizations.of(context).emailAendern,),
         body: Container(
           margin: const EdgeInsets.only(top: 20),
           child: Column(
@@ -102,7 +96,15 @@ class ChangeEmailPage extends StatelessWidget {
               const SizedBox(height: 15),
               customTextInput(AppLocalizations.of(context).passwortBestaetigen,
                   passwortKontroller,
-                  passwort: true, onSubmit: () => saveFunction())
+                  passwort: true, onSubmit: () => save()),
+              const SizedBox(height: 20),
+              FloatingActionButton.extended(
+                  label: Text(
+                    AppLocalizations.of(context).speichern,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  icon: const Icon(Icons.save),
+                  onPressed: () => save())
             ],
           ),
         ));
