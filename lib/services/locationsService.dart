@@ -29,7 +29,7 @@ class LocationService {
 
     var cityList = [];
     for (var item in city.split(" ")) {
-      if (!LocationService().isNumeric(item)) cityList.add(item);
+      if (!isNumeric(item)) cityList.add(item);
     }
     city = cityList.join(" ");
 
@@ -43,6 +43,16 @@ class LocationService {
     }
 
     country = deleteNumbers(country);
+
+    if(city.contains("Saudi Arabia")){
+      city = city.split(" ")[0];
+      country = "Saudi Arabia";
+    }else if(city.contains("Saudi-Arabien")){
+      city = city.split(" ")[0];
+      country = "Saudi-Arabien";
+    }
+
+    if(city.contains("Ko Pha-ngan")) city = "Ko Pha-ngan";
 
     return {
       "city": city,
@@ -122,6 +132,10 @@ class LocationService {
   }
 
   getNearstLocationData(position) async {
+    var deviceLanguage =
+    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
+
     try {
       var url =
           "https://families-worldwide.com/services/googleGetNearstCity.php";
@@ -131,8 +145,10 @@ class LocationService {
             "google_maps_key": google_maps_key,
             "lat": position.latitude.toString(),
             "lng": position.longitude.toString(),
+            "sprache": sprache
           }));
       dynamic responseBody = res.body;
+
       var data = jsonDecode(responseBody);
 
       return data["results"][0];
@@ -171,8 +187,12 @@ class LocationService {
   }
 
   getLocationGeoData(location) async {
+    var deviceLanguage =
+    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    var sprache = deviceLanguage == "de" ? "de" : "en";
     location = location.replaceAll(" ", "_");
     location = Uri.encodeComponent(location);
+
     try {
       var url =
           "https://families-worldwide.com/services/googlegetGeodataFromLocationName.php";
@@ -181,6 +201,7 @@ class LocationService {
           body: json.encode({
             "googleKey": google_maps_key,
             "location": location,
+            "sprache": sprache
           }));
       dynamic responseBody = res.body;
 
@@ -193,10 +214,17 @@ class LocationService {
   }
 
   bool isNumeric(String str) {
+    bool hasNumber = false;
+
     if (str == null) {
       return false;
     }
-    return double.tryParse(str) != null;
+
+    str.split("").forEach((letter) {
+      if(double.tryParse(letter) != null) hasNumber = true;
+    });
+
+    return hasNumber;
   }
 
   getCountryLocation(input) {
