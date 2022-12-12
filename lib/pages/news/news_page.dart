@@ -42,11 +42,16 @@ class _NewsPageState extends State<NewsPage> {
     _controller.addListener(() {
       bool isTop = _controller.position.pixels == 0;
       if (isTop) {
-        scrollbarOnBottom = true;
+        if(!scrollbarOnBottom){
+          scrollbarOnBottom = true;
+          setState(() {});
+        }
       } else {
-        scrollbarOnBottom = false;
+        if(scrollbarOnBottom){
+          scrollbarOnBottom = false;
+          setState(() {});
+        }
       }
-      setState(() {});
     });
 
 
