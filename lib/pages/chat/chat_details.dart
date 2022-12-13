@@ -252,10 +252,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _asyncMethod() async {
-    await getAllDbMessages();
+    messages = await getAllDbMessages();
+    await checkCardData();
 
-    timer = Timer.periodic(
-        const Duration(seconds: 30), (Timer t) => getAllDbMessages());
+    setState(() {
+      isLoading = false;
+    });
+
+    timer = Timer.periodic(const Duration(seconds: 30), (Timer t) async {
+      messages = await getAllDbMessages();
+      setState(() {});
+    });
   }
 
   getAllDbMessages() async {
@@ -267,10 +274,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     allDbMessages.sort((a, b) => (a["date"]).compareTo(b["date"]));
 
-    setState(() {
-      messages = allDbMessages;
-      isLoading = false;
-    });
+
+    return allDbMessages;
+
+  }
+
+  checkCardData() async{
+    List newMessages = messages.take(unreadMessages).toList();
+
+    for(var message in newMessages){
+      if(message["message"].contains("</eventId=")){
+        await refreshHiveEvents();
+      }else if(message["message"].contains("</communityId=")){
+        await refreshHiveCommunities();
+      }else if(message["message"].contains("</communityId=")){
+        await refreshHiveStadtInfo();
+      }
+    }
   }
 
   resetNewMessageCounter() async {
@@ -370,7 +390,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           widget.groupChatData["id"], messageData, isBlocked);
     }
 
-    getAllDbMessages();
+    messages = await getAllDbMessages();
+
+    setState(() {});
   }
 
   openProfil() async {

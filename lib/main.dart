@@ -21,7 +21,6 @@ import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("test");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -128,6 +127,7 @@ class MyApp extends StatelessWidget {
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((value) {
+
       if (value != null) {
         var notification = json.decode(value.data.values.last);
         notificationLeadPage(notification);

@@ -55,8 +55,6 @@ class _NewsPageState extends State<NewsPage> {
       }
     });
 
-
-
     super.initState();
     WidgetsBinding.instance
         .addPostFrameCallback((_){
@@ -229,7 +227,7 @@ class _NewsPageState extends State<NewsPage> {
                   ),
                   child: Text(text,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: titleFontSize))),
               Positioned(
@@ -247,7 +245,10 @@ class _NewsPageState extends State<NewsPage> {
 
     changePlaceDisplay(news, myLastLocationDate) {
       String newsUserId = news["erstelltVon"];
-      Map newsUserProfil = getProfilFromHive(profilId: newsUserId);
+      Map familyProfil = getFamilyProfil(familyMember: newsUserId);
+      Map newsUserProfil = getProfilFromHive(profilId: familyProfil != null
+          ? familyProfil["mainProfil"]
+          : newsUserId);
       bool isFriend = ownProfil["friendlist"].contains(newsUserId);
       String text = "";
       String newsOrt = news["information"]["city"];
@@ -270,6 +271,8 @@ class _NewsPageState extends State<NewsPage> {
 
       String newsOrtInfo =
           newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
+      newsUserProfil = Map.from(newsUserProfil);
+      if(familyProfil != null) newsUserProfil["name"] = "Familie " + familyProfil["name"];
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"] == 1) {
         text = newsUserProfil["name"] +
@@ -332,14 +335,23 @@ class _NewsPageState extends State<NewsPage> {
 
     friendsNewTravelPlanDisplay(news) {
       String newsUserId = news["erstelltVon"];
-      Map friendProfil = getProfilFromHive(profilId: newsUserId);
-      bool isFriend = ownProfil["friendlist"].contains(newsUserId);
+      Map familyProfil = getFamilyProfil(familyMember: newsUserId);
+      Map friendProfil = getProfilFromHive(profilId: familyProfil != null
+          ? familyProfil["mainProfil"]
+          : newsUserId);
+
+      bool isFriend = familyProfil != null
+          ? ownProfil["friendlist"].toSet().intersection(familyProfil["members"].toSet()).isNotEmpty
+          : ownProfil["friendlist"].contains(newsUserId);
 
       if (!isFriend ||
           friendProfil == null ||
           ownSettingProfil["showFriendTravelPlan"] == 0) {
         return const SizedBox.shrink();
       }
+
+      friendProfil = Map.from(friendProfil);
+      if(familyProfil != null) friendProfil["name"] = "Familie " + familyProfil["name"];
 
       Map newTravelPlan = news["information"];
       String travelPlanVon =
@@ -387,7 +399,7 @@ class _NewsPageState extends State<NewsPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(textTitle,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: titleFontSize)),
                       const SizedBox(height: 10),
@@ -448,7 +460,7 @@ class _NewsPageState extends State<NewsPage> {
                 ),
                 Row(
                   children: [
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Icon(
                       Icons.fiber_new,
                       size: 30,
@@ -456,12 +468,12 @@ class _NewsPageState extends State<NewsPage> {
                           ? null
                           : Colors.transparent,
                     ),
-                    SizedBox(width: 70),
+                    const SizedBox(width: 70),
                     Expanded(child: Text(eventText)),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Text(event["erstelltAm"].split(" ")[0],
                         style: TextStyle(color: Colors.grey[600])),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                   ],
                 )
               ],
@@ -521,7 +533,7 @@ class _NewsPageState extends State<NewsPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(textHeader,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: titleFontSize)),
                       const SizedBox(height: 10),
@@ -590,7 +602,7 @@ class _NewsPageState extends State<NewsPage> {
                             AppLocalizations.of(context)
                                     .newsLocationBegruessung +
                                 ortsName,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: titleFontSize)),
                         const SizedBox(height: 5),
@@ -631,7 +643,7 @@ class _NewsPageState extends State<NewsPage> {
             "date": newDate.toString(),
             "newsWidget": Center(
               child: Container(
-                margin: EdgeInsets.only(bottom: 30),
+                margin: const EdgeInsets.only(bottom: 30),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
@@ -776,7 +788,7 @@ class NewsStamp extends StatelessWidget {
             Icons.fiber_new,
             size: 30,
           ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Text(date.split(" ")[0], style: TextStyle(color: Colors.grey[600]))
       ],
     );
