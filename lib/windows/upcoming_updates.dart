@@ -30,11 +30,9 @@ class UmcomingUpdatesWindow{
           return CustomAlertDialog(
               title: patchnotesTitle,
               children: [
-                _update("iOS Version"),
                 _update(AppLocalizations.of(context).chatErweiterung),
                 _update(AppLocalizations.of(context).weitereAnemdlungsMoeglichkeiten),
                 _update(AppLocalizations.of(context).eventErweiterung),
-                _update(AppLocalizations.of(context).eventsOrganisationstools),
                 _update(AppLocalizations.of(context).communityErweiterung),
                 _update(AppLocalizations.of(context).layoutVerbessern),
                 _update(AppLocalizations.of(context).schwarzesBrett),
