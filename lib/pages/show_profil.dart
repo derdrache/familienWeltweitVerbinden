@@ -460,11 +460,10 @@ class _UserNameDisplay extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
+                    SizedBox(
                       width: screenWidth,
                       child: Text(
                         profil["name"],
-                        textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: profil["name"].length > 20 ? 20 : 24,
                             fontWeight: FontWeight.bold

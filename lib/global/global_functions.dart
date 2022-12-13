@@ -190,12 +190,17 @@ changeEnglishToGerman(list){
   return germanOutputList;
 }
 
-openURL(url){
+openURL(url) async{
   if(url.contains("http")){
-    launch(url);
-  } else{
-    launch("http://"+url);
+    url = Uri.parse(url);
+  }else{
+    url = Uri.https(url);
   }
+
+  await launchUrl(
+      url,
+      mode: LaunchMode.inAppWebView
+  );
 }
 
 bool isLink(String input) {
