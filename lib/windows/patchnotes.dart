@@ -57,6 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
+                _patch(patch190D),
                 _patch(patch183D),
                 _patch(patch182D),
                 _patch(patch181D),
@@ -84,6 +85,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
+                _patch(patch190E),
                 _patch(patch183E),
                 _patch(patch182E),
                 _patch(patch181E),
@@ -125,12 +127,12 @@ var patchVorlage={
 };
 
 var patch190E={
-  "title" : "1.9.0 - XX.12.2022",
+  "title" : "1.9.0 - 19.12.2022",
   "inhalt": [
     "General - iOS version released",
     "Main Menu - Events and Communities have been consolidated into the new 'Information' menu item. In addition, there is easier access to city and country information in this new menu item",
     "News - performance has been improved",
-    "Chat - sent messages are now displayed immediately",
+    "Chat - cities and countries can be linked in chat, like events and communities",
     "Chat - translation error from English to German due to apostrophes has been fixed",
     "Chat - text input is now displayed correctly and clearly even with very long texts",
     "Error correction - Events: accepting and cancelling events led to duplicate entries",
@@ -140,12 +142,12 @@ var patch190E={
   ]
 };
 var patch190D={
-  "title" : "1.9.0 - XX.12.2022",
+  "title" : "1.9.0 - 19.12.2022",
   "inhalt": [
     "Allgemein - iOS Version veröffentlicht",
     "Hauptmenü - Events und Gemeinschaften wurden in dem neuen Menüpunkt 'Informationen' zusammengefasst. Zusätzlich gibt es in diesem neuen Menüpunkt einen leichteren Zugriff auf die Stadt- und Landesinformationen",
     "News - Leistung wurde verbessert",
-    "Chat - Gesendete Nachrichten werden jetzt sofort angezeigt",
+    "Chat - Städte und Länder können, wie Events und Gemeinschaften, im Chat verlinkt werden",
     "Chat - Übersetzungsfehler von Englisch auf Deutsch durch die Apostrophen wurde behoben",
     "Chat - Texteingabe wird nun auch mit sehr langen Texten korrekt und Übersichtlich angezeigt",
     "Fehlerkorrektur - Events: Zusage und Absage von Events hat zu doppelten einträgen geführt",
