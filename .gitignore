@@ -51,3 +51,4 @@ app.*.map.json
 /lib/services/server
 /lib/services/google
 /lib/test.dart
+/lib/test.apns
