@@ -52,14 +52,16 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
               Switch(
                   value: showFriendAdded,
                   onChanged: (value) {
+                    int intValue = value == true ? 1:0;
+
                     setState(() {
                       showFriendAdded = value;
                     });
 
                     NewsSettingsDatabase().update(
-                        "showFriendAdded = '${value == true ? 1 : 0}'",
+                        "showFriendAdded = '$intValue'",
                         "WHERE id = '$userId'");
-                    _changeHiveOwnNewsPageSetting("showFriendAdded", value);
+                    _changeHiveOwnNewsPageSetting("showFriendAdded", intValue);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingFriendAdd)
@@ -75,14 +77,15 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
               Switch(
                   value: showFriendChangedLocation,
                   onChanged: (value) {
+                    int intValue = value == true ? 1:0;
+
                     setState(() {
                       showFriendChangedLocation = value;
                     });
-
                     NewsSettingsDatabase().update(
-                        "showFriendChangedLocation = '${value == true ? 1 : 0}'",
+                        "showFriendChangedLocation = '$intValue'",
                         "WHERE id = '$userId'");
-                    _changeHiveOwnNewsPageSetting("showFriendChangedLocation", value);
+                    _changeHiveOwnNewsPageSetting("showFriendChangedLocation", intValue);
                   }),
               const SizedBox(width: 10),
               Text(
@@ -99,14 +102,16 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
               Switch(
                   value: showNewFamilyLocation,
                   onChanged: (value) {
+                    int intValue = value == true ? 1:0;
+
                     setState(() {
                       showNewFamilyLocation = value;
                     });
 
                     NewsSettingsDatabase().update(
-                        "showNewFamilyLocation = '${value == true ? 1 : 0}'",
+                        "showNewFamilyLocation = '$intValue'",
                         "WHERE id = '$userId'");
-                    _changeHiveOwnNewsPageSetting("showNewFamilyLocation", value);
+                    _changeHiveOwnNewsPageSetting("showNewFamilyLocation", intValue);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingNewFamilieLocation)
@@ -122,14 +127,16 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
               Switch(
                   value: showFriendTravelPlan,
                   onChanged: (value) {
+                    int intValue = value == true ? 1:0;
+
                     setState(() {
                       showFriendTravelPlan = value;
                     });
 
                     NewsSettingsDatabase().update(
-                        "showFriendTravelPlan = '${value == true ? 1 : 0}'",
+                        "showFriendTravelPlan = '$intValue'",
                         "WHERE id = '$userId'");
-                    _changeHiveOwnNewsPageSetting("showFriendTravelPlan", value);
+                    _changeHiveOwnNewsPageSetting("showFriendTravelPlan", intValue);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingShowTravelPlan)
@@ -145,14 +152,16 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
               Switch(
                   value: showInterestingEvents,
                   onChanged: (value) {
+                    int intValue = value == true ? 1:0;
+
                     setState(() {
                       showInterestingEvents = value;
                     });
 
                     NewsSettingsDatabase().update(
-                        "showInterestingEvents = '${value == true ? 1 : 0}'",
+                        "showInterestingEvents = '$intValue'",
                         "WHERE id = '$userId'");
-                    _changeHiveOwnNewsPageSetting("showInterestingEvents", value);
+                    _changeHiveOwnNewsPageSetting("showInterestingEvents", intValue);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingShowEvent)
@@ -168,14 +177,16 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
               Switch(
                   value: showCityInformation,
                   onChanged: (value) {
+                    int intValue = value == true ? 1:0;
+
                     setState(() {
                       showCityInformation = value;
                     });
 
                     NewsSettingsDatabase().update(
-                        "showCityInformation = '${value == true ? 1 : 0}'",
+                        "showCityInformation = '$intValue'",
                         "WHERE id = '$userId'");
-                    _changeHiveOwnNewsPageSetting("showCityInformation", value);
+                    _changeHiveOwnNewsPageSetting("showCityInformation", intValue);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingShowCityInformation)
