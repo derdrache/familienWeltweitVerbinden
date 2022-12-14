@@ -1509,13 +1509,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                       width: 2,
                                                       color: replyColor))),
                                           child: Container(
-                                            height:
-                                                replyFromId != null ? 36 : 18,
+                                            height: replyFromId != null ? 39 : 18,
                                             constraints: BoxConstraints(
                                                 maxWidth: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.7),
+                                                    0.70),
                                             child: replyFromId != null
                                                 ? Column(
                                                     crossAxisAlignment:
