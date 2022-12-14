@@ -190,15 +190,30 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
 }
 
 
-testNotification(){
+testNotification1(){
   var notificationInformation = {
     "token": "c8nNn3Zd0U_uvQjfikOhAt:APA91bEFZQCuweeVXlrtol2k-H8oBYu3D3jAkCRQZq_Tf-kMIKBR3R8ocN5G9JRrHYq-nxvPMoBHEkFosTE4aO78IZUOQyiUI5rzydnCHLAC09onQuqSSSE0zTlMChcCurhve2ty2t_1",
     "title": "Test2",
-    "inhalt": "Families worldwide notifikation test\n Siehst du diese Notification?",
+    "inhalt": "Families worldwide notifikation test\n Siehst du diese Notification? Und kannst landest du beim draufklicken in unserem Chat?",
     "zu": "vtp97dpVxVZimnyLAdrorgSPUMI3",
     "changePageId": "vtp97dpVxVZimnyLAdrorgSPUMI3_w9yxDHP3W8dVGoYpBCrLWlufJ0s2",
     "typ": "chat",
   };
 
   sendNotification(notificationInformation);
+  print("send");
+}
+
+testNotification2(){
+  var notificationInformation = {
+    "token": "doiVpA5tyE3zisAeXer5aV:APA91bE7MnfLrkRQz1cCpEeVJuwi3mRcyjg5oWeS_d8pPKT4FxEL4eETFYCQAgtQVJ2sqfjWoZwtjzuiUnirk4JLzG61P7pfW9PYCLuRrI1Lbgej0yWVr0tcTLw_2aV9Gyi7e2qhY3Un",
+    "title": "Test2",
+    "inhalt": "Families worldwide notifikation test\n Siehst du diese Notification? Und kannst landest du beim draufklicken in unserem Chat?",
+    "zu": "9o2RieiDLXczqOuoELSxcMjdYX23",
+    "changePageId": "9o2RieiDLXczqOuoELSxcMjdYX23_w9yxDHP3W8dVGoYpBCrLWlufJ0s2",
+    "typ": "chat",
+  };
+
+  sendNotification(notificationInformation);
+  print("send");
 }

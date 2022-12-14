@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
+import '../../services/notification.dart';
 import '../informationen/events/eventCard.dart';
 import '../informationen/location/location_Information.dart';
 import 'news_page_settings.dart';
@@ -360,7 +361,7 @@ class _NewsPageState extends State<NewsPage> {
           newTravelPlan["bis"].split(" ")[0].split("-").reversed.join("-");
       String travelPlanCity = newTravelPlan["ortData"]["city"];
       String travelPlanCountry = newTravelPlan["ortData"]["countryname"];
-      String textTitle = friendProfil["name"] +
+      String textTitle = friendProfil["name"] + "\n" +
           AppLocalizations.of(context).friendNewTravelPlan;
       String textDate = travelPlanVon + " - " + travelPlanbis;
       String textLocation = travelPlanCity + " / " + travelPlanCountry;
@@ -399,6 +400,7 @@ class _NewsPageState extends State<NewsPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(textTitle,
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: titleFontSize)),
@@ -728,12 +730,15 @@ class _NewsPageState extends State<NewsPage> {
                 margin: const EdgeInsets.only(top: 5),
                 child: FloatingActionButton(
                   child: const Icon(Icons.settings),
+                  //onPressed: () => testNotification2(),
+
                   onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => NewsPageSettingsPage(
                                   settingsProfil: ownSettingProfil)))
                       .whenComplete(() => setState(() {})),
+
                 ),
               )
             : Container(
