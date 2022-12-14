@@ -43,7 +43,7 @@ class _InformationPageState extends State<InformationPage> {
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Container(
-                width: 150,
+                width: 160,
                 height: 220,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
