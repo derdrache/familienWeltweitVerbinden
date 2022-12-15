@@ -127,7 +127,6 @@ class MyApp extends StatelessWidget {
     });
 
     FirebaseMessaging.instance.getInitialMessage().then((value) {
-
       if (value != null) {
         var notification = json.decode(value.data.values.last);
         notificationLeadPage(notification);

@@ -441,6 +441,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     }
 
     eventBeschreibung() {
+      if(widget.event["beschreibungGer"].isEmpty) widget.event["beschreibungGer"] = widget.event["beschreibung"];
+      if(widget.event["beschreibungEng"].isEmpty) widget.event["beschreibungEng"] = widget.event["beschreibung"];
+
       return Container(
           margin:
               const EdgeInsets.only(top: 5, left: 10, right: 10, bottom: 10),
@@ -454,7 +457,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                 eventId: widget.event["id"],
                 windowTitle:
                     AppLocalizations.of(context).eventBeschreibungAendern,
-                rowData: widget.event["beschreibung"],
+                rowData: isGerman
+                    ? widget.event["beschreibungGer"]
+                    : widget.event["beschreibungEng"],
                 inputHintText:
                     AppLocalizations.of(context).neueBeschreibungEingeben,
                 isCreator: widget.isCreator,
