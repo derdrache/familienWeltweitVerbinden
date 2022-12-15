@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:translator/translator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -43,6 +43,7 @@ class _EventErstellenState extends State<EventErstellen> {
   var ortAuswahlBox = GoogleAutoComplete();
   var eventIntervalDropdown = CustomDropDownButton();
   var ownEvent = true;
+  final translator = GoogleTranslator();
 
   @override
   void initState() {
@@ -92,6 +93,9 @@ class _EventErstellenState extends State<EventErstellen> {
     var userID = FirebaseAuth.instance.currentUser?.uid;
     var allValid = checkValidations(locationData);
     var interval = eventIntervalDropdown.getSelected();
+    bool descriptionIsGerman = true;
+    String beschreibungGer = "";
+    String beschreibungEng = "";
     DateTime bisDate;
 
     FocusManager.instance.primaryFocus?.unfocus();
@@ -116,12 +120,27 @@ class _EventErstellenState extends State<EventErstellen> {
       };
     }
 
+    var languageCheck = await translator.translate(eventBeschreibungKontroller.text);
+    descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if(descriptionIsGerman){
+      beschreibungGer = eventBeschreibungKontroller.text;
+      beschreibungEng = await descriptionTranslation(beschreibungGer, "auto");
+      beschreibungEng += "\n\nThis is an automatic translation";
+    }else{
+      beschreibungEng = eventBeschreibungKontroller.text;
+      beschreibungGer = await descriptionTranslation(
+          beschreibungEng + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
+      beschreibungGer = beschreibungGer + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+    }
     var eventData = {
       "id": eventId,
       "name": eventNameKontroller.text,
       "erstelltAm": DateTime.now().toString(),
       "erstelltVon": userID,
       "beschreibung": eventBeschreibungKontroller.text,
+      "beschreibungGer":beschreibungGer,
+      "beschreibungEng": beschreibungEng,
       "stadt": locationData["city"],
       "art": eventArtDropdown.getSelected(),
       "wann": wannDate.toString(),
@@ -153,6 +172,15 @@ class _EventErstellenState extends State<EventErstellen> {
 
     global_functions.changePage(context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
     global_functions.changePage(context, EventDetailsPage(event: dbEventData));
+  }
+
+  descriptionTranslation(text, targetLanguage) async{
+    text = text.replaceAll("'", "");
+
+    var translation = await translator.translate(text,
+        from: "auto", to: targetLanguage);
+
+    return translation.toString();
   }
 
   checkValidations(locationData) {
