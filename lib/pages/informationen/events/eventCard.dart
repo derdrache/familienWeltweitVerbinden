@@ -20,6 +20,7 @@ class EventCard extends StatefulWidget {
   Function afterPageVisit;
   bool isCreator;
   bool bigCard;
+  bool fromEventPage;
 
   EventCard({
     Key key,
@@ -29,6 +30,7 @@ class EventCard extends StatefulWidget {
         const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
     this.bigCard = false,
+    this.fromEventPage = false
   })  : isCreator = event["erstelltVon"] == userId,
         super(key: key);
 
@@ -191,7 +193,7 @@ class _EventCardState extends State<EventCard> {
           : null,
         onTap: () => global_func.changePage(
             context,
-            EventDetailsPage(event: widget.event),
+            EventDetailsPage(event: widget.event, fromEventPage: widget.fromEventPage),
             whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,

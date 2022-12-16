@@ -133,6 +133,7 @@ class _EventErstellenState extends State<EventErstellen> {
           beschreibungEng + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
       beschreibungGer = beschreibungGer + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
     }
+
     var eventData = {
       "id": eventId,
       "name": eventNameKontroller.text,

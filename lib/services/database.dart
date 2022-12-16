@@ -259,6 +259,8 @@ class ChatDatabase {
     var chatgroupData = await getChatData("*", "WHERE id = '$chatId'");
     var date = DateTime.now().millisecondsSinceEpoch;
 
+    if(chatId == null || chatId.isEmpty) chatId = global_functions.getChatID(messageData["zu"]);
+
     messageData["message"] = messageData["message"].replaceAll("'", "\\'");
 
     var url = Uri.parse(databaseUrl + "database/chats/newMessage2.php");
