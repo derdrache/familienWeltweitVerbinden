@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
@@ -56,6 +57,7 @@ class EventCardDetails extends StatefulWidget {
 class _EventCardDetailsState extends State<EventCardDetails> {
   final _controller = ScrollController();
   var moreContent = false;
+  final translator = GoogleTranslator();
 
   @override
   void initState() {
@@ -238,6 +240,77 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                 ]);
           });
         });
+  }
+
+  descriptionTranslation(text, targetLanguage) async{
+    text = text.replaceAll("'", "");
+
+    var translation = await translator.translate(text,
+        from: "auto", to: targetLanguage);
+
+    return translation.toString();
+  }
+
+  changeBeschreibungWindow(beschreibung){
+    var newInputController = TextEditingController(text: beschreibung);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+              title: AppLocalizations.of(context).eventBeschreibungAendern,
+              height: 400,
+              children: [
+                customTextInput(AppLocalizations.of(context).neueBeschreibungEingeben, newInputController,
+                  moreLines: 13,
+                  textInputAction: TextInputAction.newline),
+                Container(
+                  margin: const EdgeInsets.only(right: 10),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          child: Text(AppLocalizations.of(context).abbrechen,
+                              style: TextStyle(fontSize: fontsize)),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        TextButton(
+                            child: Text(
+                                AppLocalizations.of(context).speichern,
+                                style: TextStyle(fontSize: fontsize)),
+                            onPressed: () {
+                              saveNewBeschreibung(newInputController.text);
+                              Navigator.pop(context);
+                            }),
+                      ]),
+                )
+              ]);
+        });
+  }
+
+  saveNewBeschreibung(input)async {
+    if(input.isEmpty) return;
+
+    var eventId = widget.event["id"];
+    var event = getEventFromHive(eventId);
+
+    var languageCheck = await translator.translate(input);
+    bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if(descriptionIsGerman){
+      event["beschreibung"] = input;
+      event["beschreibungGer"] = input;
+      var translation = await descriptionTranslation(input, "auto");
+      event["beschreibungEng"] = translation + "\n\nThis is an automatic translation";
+    }else{
+      event["beschreibung"] = input;
+      event["beschreibungEng"] = input;
+      var translation = await descriptionTranslation(input,"de");
+      event["beschreibungGer"] = translation+ "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+    }
+
+    await EventDatabase().update("beschreibung = '${event["beschreibung"]}', beschreibungGer = '${event["beschreibungGer"]}',beschreibungEng = '${event["beschreibungEng"]}'",
+        "WHERE id = '${eventId}'");
   }
 
   @override
@@ -443,6 +516,9 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     eventBeschreibung() {
       if(widget.event["beschreibungGer"].isEmpty) widget.event["beschreibungGer"] = widget.event["beschreibung"];
       if(widget.event["beschreibungEng"].isEmpty) widget.event["beschreibungEng"] = widget.event["beschreibung"];
+      var usedDiscription = isGerman
+          ? widget.event["beschreibungGer"]
+          : widget.event["beschreibungEng"];
 
       return Container(
           margin:
@@ -453,20 +529,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             constraints: const BoxConstraints(
               minHeight: 50.0,
             ),
-            child: ShowDataAndChangeWindow(
-                eventId: widget.event["id"],
-                windowTitle:
-                    AppLocalizations.of(context).eventBeschreibungAendern,
-                rowData: isGerman
-                    ? widget.event["beschreibungGer"]
-                    : widget.event["beschreibungEng"],
-                inputHintText:
-                    AppLocalizations.of(context).neueBeschreibungEingeben,
-                isCreator: widget.isCreator,
-                modus: "textInput",
-                multiLines: true,
-                databaseKennzeichnung: "beschreibung"),
-          )));
+            child: TextWithHyperlinkDetection(
+                text: usedDiscription,
+                onTextTab: widget.isCreator ? () => changeBeschreibungWindow(usedDiscription) : null)
+      )));
     }
 
     cardShadowColor() {

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
@@ -12,6 +14,7 @@ import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
+import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
 import '../../../services/database.dart';
@@ -24,8 +27,9 @@ import '../../../global/variablen.dart' as global_var;
 
 class CommunityDetails extends StatefulWidget {
   Map community;
+  bool fromCommunityPage;
 
-  CommunityDetails({Key key, this.community}) : super(key: key);
+  CommunityDetails({Key key, this.community, this.fromCommunityPage = false}) : super(key: key);
 
   @override
   State<CommunityDetails> createState() => _CommunityDetailsState();
@@ -49,6 +53,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   final _controller = ScrollController();
   var scrollbarOnBottom = true;
   var imageLoading = false;
+  final translator = GoogleTranslator();
+
 
   @override
   void initState() {
@@ -481,19 +487,43 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
-  _saveChangeBeschreibung(newBeschreibung) {
+  _saveChangeBeschreibung(newBeschreibung) async{
     if (newBeschreibung.isEmpty) {
       customSnackbar(context,
           AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
       return;
     }
 
+    var languageCheck = await translator.translate(newBeschreibung);
+    bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if(descriptionIsGerman){
+      widget.community["beschreibung"] = newBeschreibung;
+      widget.community["beschreibungGer"] = newBeschreibung;
+      var translation = await _descriptionTranslation(newBeschreibung, "auto");
+      widget.community["beschreibungEng"] = translation + "\n\nThis is an automatic translation";
+    }else{
+      widget.community["beschreibung"] = newBeschreibung;
+      widget.community["beschreibungEng"] = newBeschreibung;
+      var translation = await _descriptionTranslation(newBeschreibung,"de");
+      widget.community["beschreibungGer"] = translation+ "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+    }
+
     setState(() {
       widget.community["beschreibung"] = newBeschreibung;
     });
 
-    CommunityDatabase().update("beschreibung = '$newBeschreibung'",
+    CommunityDatabase().update("beschreibung = '$newBeschreibung', beschreibungGer = '${widget.community["beschreibungGer"]}', beschreibungEng = '${widget.community["beschreibungEng"]}'",
         "WHERE id = '${widget.community["id"]}'");
+  }
+
+  _descriptionTranslation(text, targetLanguage) async{
+    text = text.replaceAll("'", "");
+
+    var translation = await translator.translate(text,
+        from: "auto", to: targetLanguage);
+
+    return translation.toString();
   }
 
   List<Widget> createFriendlistBox() {
@@ -654,7 +684,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context).communityLoeschen,
-              height: 90,
+              height: 120,
               children: [
                 Center(
                     child: Text(
@@ -674,7 +704,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     DbDeleteImage(widget.community["bild"]);
 
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 3, informationPageIndex: 2,));
+                        context, StartPage(selectedIndex: 2, informationPageIndex: 2,));
                   },
                 ),
                 TextButton(
@@ -809,6 +839,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     _communityInformation() {
       var fremdeCommunity = widget.community["ownCommunity"] == 0;
+      var isGerman = kIsWeb
+          ? window.locale.languageCode == "de"
+          : Platform.localeName == "de_DE";
+      if(widget.community["beschreibungGer"].isEmpty) widget.community["beschreibungGer"] = widget.community["beschreibung"];
+      if(widget.community["beschreibungEng"].isEmpty) widget.community["beschreibungEng"] = widget.community["beschreibung"];
+      var usedDiscription = isGerman
+          ? widget.community["beschreibungGer"]
+          : widget.community["beschreibungEng"];
 
       return [
         Padding(
@@ -870,9 +908,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   "Link: ",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Text(widget.community["link"],
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary))
+                Flexible(
+                  child: Text(widget.community["link"],
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary)),
+                )
               ],
             ),
           ),
@@ -882,7 +922,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
             child: TextWithHyperlinkDetection(
-                text: widget.community["beschreibung"],
+                text: usedDiscription,
               onTextTab: () => isCreator ? _changeBeschreibungWindow(): null,
             )
 
@@ -933,6 +973,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       child: Scaffold(
           appBar: CustomAppBar(
             title: widget.community["name"],
+            leading: widget.fromCommunityPage
+                ? StartPage(selectedIndex: 2, informationPageIndex: 2)
+                : null,
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),
