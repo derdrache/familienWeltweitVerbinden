@@ -18,6 +18,7 @@ class CommunityCard extends StatefulWidget {
   bool isCreator;
   bool bigCard;
   Function afterFavorite;
+  bool fromCommunityPage;
 
   CommunityCard({
     Key key,
@@ -28,6 +29,7 @@ class CommunityCard extends StatefulWidget {
         const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
     this.bigCard = false,
+    this.fromCommunityPage = false
   })  : isCreator = community["erstelltVon"] == userId,
         super(key: key);
 
@@ -49,7 +51,7 @@ class _CommunityCardState extends State<CommunityCard> {
     return GestureDetector(
      onTap: () => global_func.changePage(
           context, 
-          CommunityDetails(community: widget.community),
+          CommunityDetails(community: widget.community, fromCommunityPage: widget.fromCommunityPage),
           whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
           width: (125 + ((screenHeight - 600) / 5)) * bigMultiplikator,

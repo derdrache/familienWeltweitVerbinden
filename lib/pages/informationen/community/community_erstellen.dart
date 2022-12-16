@@ -7,6 +7,7 @@ import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:translator/translator.dart';
 import 'package:uuid/uuid.dart';
 
 import 'community_details.dart';
@@ -27,17 +28,37 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var ortAuswahlBox = GoogleAutoComplete();
   var userId = FirebaseAuth.instance.currentUser.uid;
   var ownCommunity = true;
+  final translator = GoogleTranslator();
 
 
   saveCommunity() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = const Uuid();
     var communityId = uuid.v4();
+    bool descriptionIsGerman = true;
+    String beschreibungGer = "";
+    String beschreibungEng = "";
+
+    var languageCheck = await translator.translate(beschreibungKontroller.text);
+    descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if(descriptionIsGerman){
+      beschreibungGer = beschreibungKontroller.text;
+      beschreibungEng = await descriptionTranslation(beschreibungGer, "auto");
+      beschreibungEng += "\n\nThis is an automatic translation";
+    }else{
+      beschreibungEng = beschreibungKontroller.text;
+      beschreibungGer = await descriptionTranslation(
+          beschreibungEng + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
+      beschreibungGer = beschreibungGer + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+    }
 
     var communityData = {
       "id": communityId,
       "name": nameController.text,
       "beschreibung": beschreibungKontroller.text,
+      "beschreibungGer":beschreibungGer,
+      "beschreibungEng": beschreibungEng,
       "link": linkKontroller.text,
       "ort": locationData["city"],
       "land": locationData["countryname"],
@@ -59,6 +80,15 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     return true;
   }
 
+  descriptionTranslation(text, targetLanguage) async{
+    text = text.replaceAll("'", "");
+
+    var translation = await translator.translate(text,
+        from: "auto", to: targetLanguage);
+
+    return translation.toString();
+  }
+
   checkValidationAndSendError(communityData) {
     if (communityData["name"].isEmpty) {
       customSnackbar(context, AppLocalizations.of(context).bitteNameEingeben);
@@ -73,8 +103,6 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     return false;
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +149,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                       .getData("*", "WHERE erstelltVon = '$userId'");
 
                   global_func.changePageForever(
-                      context, StartPage(selectedIndex: 3, informationPageIndex: 2,));
+                      context, StartPage(selectedIndex: 2, informationPageIndex: 2,));
                   global_func.changePage(
                       context, CommunityDetails(community: community));
                 },

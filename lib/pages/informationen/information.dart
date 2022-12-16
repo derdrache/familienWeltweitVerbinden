@@ -74,8 +74,6 @@ class _InformationPageState extends State<InformationPage> {
       );
     }
 
-    //return EventPage();
-
     return widget.pageSelection == 0 ? Scaffold(
       body: SafeArea(
         child: Column(
