@@ -47,6 +47,7 @@ class _EventPageState extends State<EventPage> {
                 event: event,
                 margin: const EdgeInsets.only(top: 10, bottom: 0, right: 20, left: 10),
                 withInteresse: withInteresse,
+                fromEventPage: true,
                 afterPageVisit: () => setState((){})),
             if (isOwner)
               Positioned(

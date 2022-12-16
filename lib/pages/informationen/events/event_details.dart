@@ -27,10 +27,12 @@ class EventDetailsPage extends StatefulWidget {
   var event;
   var teilnahme;
   var absage;
+  var fromEventPage;
 
   EventDetailsPage({
     Key key,
     this.event,
+    this.fromEventPage = false
   })  : teilnahme =
             event["zusage"] == null ? [] : event["zusage"].contains(userId),
         absage =
@@ -720,7 +722,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     return SelectionArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: "", buttons: [
+        appBar: CustomAppBar(title: "", leading: widget.fromEventPage
+            ? StartPage(selectedIndex: 2, informationPageIndex: 1)
+            : null,buttons: [
           if (isCreator && isNotPublic)
             FutureBuilder(
                 future: EventDatabase().getData(
