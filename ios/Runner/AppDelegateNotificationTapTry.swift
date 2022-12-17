@@ -1,19 +1,25 @@
 import UIKit
 import Flutter
+import FirebaseCore
 import Firebase
-import FirebaseMessaging
 import flutter_local_notifications
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, MessagingDelegate {
+
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-
+  FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
+    GeneratedPluginRegistrant.register(with: registry)
+  }
     FirebaseApp.configure()
-    GeneratedPluginRegistrant.register(with: self)
-    Messaging.messaging().delegate = self
+   FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
+     GeneratedPluginRegistrant.register(with: registry)
+   }
+
         if #available(iOS 10.0, *) {
             // For iOS 10 display notification (sent via APNS)
             UNUserNotificationCenter.current().delegate = self
@@ -22,8 +28,9 @@ import flutter_local_notifications
                     options: authOptions,
                     completionHandler: {_, _ in })
         }
+
+
         application.registerForRemoteNotifications()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
-
 }
