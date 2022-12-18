@@ -90,10 +90,15 @@ class _LocationCardState extends State<LocationCard> {
                   child: Center(
                       child: Container(
                         padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(20)
+                        ),
                         child: Text(
                           widget.location["ort"],
-                          style:
-                          const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                       ))),
             ),
