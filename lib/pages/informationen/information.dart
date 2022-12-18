@@ -43,14 +43,14 @@ class _InformationPageState extends State<InformationPage> {
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Container(
-                width: 160,
+                width: 165,
                 height: 220,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
                     image: image == null ? null : DecorationImage(
                         fit: BoxFit.fitHeight,
                         colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(0.8), BlendMode.dstATop),
+                            Colors.black.withOpacity(0.9), BlendMode.dstATop),
                         image: AssetImage(image))),
                 padding: const EdgeInsets.all(10),
                 child: Column(
@@ -61,11 +61,18 @@ class _InformationPageState extends State<InformationPage> {
                       color: Colors.black,
                       size: 50,
                     ),
-                    const SizedBox(height: 30),
-                    Text(
-                      title,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
+                    const SizedBox(height: 50),
+                    Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 )),
