@@ -10,11 +10,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
+import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/strike_through_icon.dart';
+import '../start_page.dart';
 import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget {
@@ -620,7 +622,7 @@ class _ChatPageState extends State<ChatPage> {
                                       : null,
                                   groupChatData: group,
                                   isChatgroup: !isNotChatGroup)))
-                      .whenComplete(() => refreshChatDataFromDb());
+                      .whenComplete(() => changePage(context, StartPage(selectedIndex: 3,)));
                 }
               },
               onLongPress: () {
