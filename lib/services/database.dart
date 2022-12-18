@@ -1038,10 +1038,9 @@ class NewsPageDatabase {
 
   _checkIfInDatabase(newNews) async {
     var userId = FirebaseAuth.instance.currentUser.uid;
-    var allMyNews = await getData("*", "WHERE erstelltVon = '$userId'");
+    var allMyNews = await getData("*", "WHERE erstelltVon = '$userId'", returnList: true);
     if (allMyNews == false) allMyNews = [];
 
-    //innerhalb des selben Tages oder selben zwei Tagen??
     for (var news in allMyNews) {
       var dateDifference =
           DateTime.now().difference(DateTime.parse(news["erstelltAm"])).inDays;
@@ -1049,6 +1048,7 @@ class NewsPageDatabase {
           key == "id" || key == "erstelltAm" || key == "erstelltVon");
       var checkNewNews = Map<String, dynamic>.of(newNews);
       var equality;
+
       try {
         checkNewNews["information"] = json.decode(checkNewNews["information"]);
         equality = foundation.mapEquals(
@@ -1059,6 +1059,7 @@ class NewsPageDatabase {
 
       if (equality && dateDifference < 2) return true;
     }
+
 
     return false;
   }

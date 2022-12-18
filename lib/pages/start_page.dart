@@ -458,7 +458,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
           newMessageCount += chat["users"][userId]["newMessages"];
         }
 
-        if(snapshot.hasData){
+        if(snapshot.hasData && snapshot.data != false){
           newMessageCount = 0;
           newMessageCount += snapshot.data;
         }
