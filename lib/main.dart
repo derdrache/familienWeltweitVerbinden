@@ -111,12 +111,22 @@ class MyApp extends StatelessWidget {
     }
   }
 
+
+
   _setFirebaseNotifications() {
     final FlutterLocalNotificationsPlugin _notificationsPlugin =
         FlutterLocalNotificationsPlugin();
-    var initializationSettings = const InitializationSettings(
+    var initializationSettings = InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-        iOS: IOSInitializationSettings()
+        iOS: IOSInitializationSettings(
+
+        )
+    );
+
+    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
     );
 
     _notificationsPlugin.initialize(initializationSettings,
