@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
-import '../../services/notification.dart';
 import '../informationen/events/eventCard.dart';
 import '../informationen/location/location_Information.dart';
 import 'news_page_settings.dart';
@@ -23,7 +22,7 @@ class NewsPage extends StatefulWidget {
   _NewsPageState createState() => _NewsPageState();
 }
 
-class _NewsPageState extends State<NewsPage> {
+class _NewsPageState extends State<NewsPage>{
   final String userId = FirebaseAuth.instance.currentUser.uid;
   List newsFeedData;
   List events = Hive.box('secureBox').get("events") ?? [];
@@ -44,12 +43,12 @@ class _NewsPageState extends State<NewsPage> {
     _controller.addListener(() {
       bool isTop = _controller.position.pixels == 0;
       if (isTop) {
-        if(!scrollbarOnBottom){
+        if (!scrollbarOnBottom) {
           scrollbarOnBottom = true;
           setState(() {});
         }
       } else {
-        if(scrollbarOnBottom){
+        if (scrollbarOnBottom) {
           scrollbarOnBottom = false;
           setState(() {});
         }
@@ -58,8 +57,8 @@ class _NewsPageState extends State<NewsPage> {
 
     super.initState();
     WidgetsBinding.instance
-        .addPostFrameCallback((_){
-          _refresh();
+        .addPostFrameCallback((_) {
+      _refresh();
     });
   }
 
@@ -730,15 +729,12 @@ class _NewsPageState extends State<NewsPage> {
                 margin: const EdgeInsets.only(top: 5),
                 child: FloatingActionButton(
                   child: const Icon(Icons.settings),
-                  //onPressed: () => testNotification2(),
-
                   onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => NewsPageSettingsPage(
                                   settingsProfil: ownSettingProfil)))
                       .whenComplete(() => setState(() {})),
-
                 ),
               )
             : Container(
