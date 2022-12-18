@@ -445,18 +445,40 @@ class CustomBottomNavigationBar extends StatelessWidget {
   }
 
   chatIcon() {
+    return FutureBuilder(
+      future: getChatNewMessageCount(),
+      builder: (context, snapshot) {
+        var newMessageCount = 0;
+
+        List myChats = Hive.box("secureBox").get("myChats") ?? [];
+        List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+
+        for (var chat in myChats + myGroupChats) {
+          if (chat["users"][userId] == null) continue;
+          newMessageCount += chat["users"][userId]["newMessages"];
+        }
+
+        if(snapshot.hasData){
+          newMessageCount = 0;
+          newMessageCount += snapshot.data;
+        }
+
+        return BadgeIcon(
+            icon: Icons.chat,
+            text: newMessageCount > 0 ? newMessageCount.toString() : "");
+      }
+    );
+  }
+
+  getChatNewMessageCount() async{
     var newMessageCount = 0;
-    List myChats = Hive.box("secureBox").get("myChats") ?? [];
-    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
 
-    for (var chat in myChats + myGroupChats) {
-      if (chat["users"][userId] == null) continue;
-      newMessageCount += chat["users"][userId]["newMessages"];
-    }
+    var privatChatNewMessages = await ChatDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
+        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
+    var groupChatNewMessages = await ChatGroupsDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
+        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
 
-    return BadgeIcon(
-        icon: Icons.chat,
-        text: newMessageCount > 0 ? newMessageCount.toString() : "");
+    return newMessageCount + privatChatNewMessages + groupChatNewMessages;
   }
 
   @override
