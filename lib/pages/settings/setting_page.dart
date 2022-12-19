@@ -303,8 +303,10 @@ class _ProfilSection extends StatelessWidget {
                       fontSize: fontSize+4,
                       fontWeight: FontWeight.bold)),
               const Expanded(child: SizedBox.shrink()),
-              Text("ↆ " + AppLocalizations.of(context).antippenZumAendern + " ↆ",
+              Icon(Icons.arrow_downward),
+              Text(AppLocalizations.of(context).antippenZumAendern,
                   style: const TextStyle(color: Colors.grey, fontSize: 14)),
+              Icon(Icons.arrow_downward),
               const Expanded(child: SizedBox()),
               GestureDetector(
                   onTap: () {
