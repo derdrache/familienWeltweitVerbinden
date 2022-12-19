@@ -43,7 +43,7 @@ class _InformationPageState extends State<InformationPage> {
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Container(
-                width: 165,
+                width: 160,
                 height: 220,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
@@ -52,7 +52,7 @@ class _InformationPageState extends State<InformationPage> {
                         colorFilter: ColorFilter.mode(
                             Colors.black.withOpacity(0.9), BlendMode.dstATop),
                         image: AssetImage(image))),
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -63,7 +63,7 @@ class _InformationPageState extends State<InformationPage> {
                     ),
                     const SizedBox(height: 50),
                     Container(
-                      padding: EdgeInsets.all(2),
+                      padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.7),
                         borderRadius: BorderRadius.circular(20),
