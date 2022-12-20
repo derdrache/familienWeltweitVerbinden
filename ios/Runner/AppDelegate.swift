@@ -12,8 +12,16 @@ import FirebaseMessaging
   ) -> Bool {
     FirebaseApp.configure()
     GeneratedPluginRegistrant.register(with: self)
-    return super.application(application, didFinishLaunchingWithOptions:
-  launchOptions)
+
+        UNUserNotificationCenter.current().delegate = self
+        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(
+            options: authOptions,
+            completionHandler: {_, _ in })
+
+        application.registerForRemoteNotifications()
+
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
   override func application(_ application: UIApplication,
   didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
