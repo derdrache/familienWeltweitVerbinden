@@ -97,8 +97,8 @@ class _LocationCardState extends State<LocationCard> {
                         child: Text(
                           widget.location["ort"],
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                          style:
+                          const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                       ))),
             ),
