@@ -10,6 +10,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:translator/translator.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../windows/nutzerrichtlinen.dart';
 import 'community_details.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../start_page.dart';
@@ -166,6 +167,8 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
               beschreibungKontroller,
               moreLines: 5, textInputAction: TextInputAction.newline),
           ownCommunityBox(),
+          Center(child: NutzerrichtlinenAnzeigen(page: "create")),
+          const SizedBox(height: 20)
         ],
       ),
     );

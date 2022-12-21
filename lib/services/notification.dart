@@ -188,3 +188,17 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
     sendNotification(notificationInformation);
   }
 }
+
+testNotification1(){
+  var notificationInformation = {
+    "token": "eZUKnENOT0FInvtvnWUfoJ:APA91bHQz6v3dMcsBqzFAK83zU2HnV2Up3j4jtiONe6PyS9M0o5g6incza-h9VANRCzSDvhzKtP0ySGaVbXGlzOeLKs_PLWyacm7sL25y528sYLKr3nB3IyMcujga4ewPLzRQRY5ZNRg",
+    "title": "Test2",
+    "inhalt": "Families worldwide notifikation test\n Siehst du diese Notification? Und kannst landest du beim draufklicken in unserem Chat?",
+    "zu": "",
+    "changePageId": "",
+    "typ": "chat",
+  };
+
+  sendNotification(notificationInformation);
+  print("send");
+}

@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../widgets/dialogWindow.dart';
+import '../../windows/nutzerrichtlinen.dart';
 import 'create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
@@ -245,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               foregroundColor: Colors.black),
-          child: Text(AppLocalizations.of(context).passwortVergessen),
+          child: Text(AppLocalizations.of(context).passwortVergessen, style: const TextStyle(color: Colors.blue),),
           onPressed: () {
             passwortController.text = "";
             global_functions.changePage(context, const ForgetPasswordPage());
@@ -395,9 +396,17 @@ class _LoginPageState extends State<LoginPage> {
                     textInputAction: TextInputAction.done,
                     onSubmit: () => userLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
-                const SizedBox(height: 15),
-                forgetPassButton(),
-                const SizedBox(height: 15),
+                const SizedBox(height: 5),
+                Container(
+                  margin: EdgeInsets.only(left: 20, right: 20),
+                  child: Row(children: [
+                    hilfeButton(),
+                    Expanded(child: SizedBox.shrink()),
+                    forgetPassButton(),
+                  ],),
+                ),
+                const SizedBox(height: 5),
+                NutzerrichtlinenAnzeigen(page: "login"),
                 isLoading
                     ? loadingBox()
                     : kIsWeb && !isPhone()
@@ -420,8 +429,6 @@ class _LoginPageState extends State<LoginPage> {
                   global_functions.changePage(context, const RegisterPage());
                 }),
                 googleLoginButton(),
-                const SizedBox(height: 15),
-                hilfeButton(),
                 const SizedBox(height: 15),
                 if (kIsWeb) footer(),
 
