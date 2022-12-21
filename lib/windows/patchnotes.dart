@@ -57,7 +57,7 @@ class PatchnotesWindow{
               children:
 
               isGerman ? [
-                _patch(patch190D),
+                _patch(patch191D),
                 _patch(patch183D),
                 _patch(patch182D),
                 _patch(patch181D),
@@ -85,7 +85,7 @@ class PatchnotesWindow{
                 _patch(patch1D),
               ] :
               [
-                _patch(patch190E),
+                _patch(patch191E),
                 _patch(patch183E),
                 _patch(patch182E),
                 _patch(patch181E),
@@ -126,10 +126,11 @@ var patchVorlage={
   ]
 };
 
-var patch190E={
+var patch191E={
   "title" : "1.9.0 - 19.12.2022",
   "inhalt": [
     "General - iOS version released",
+    "General - Terms of use and privacy policy have been added. Visible when registering, login and creating content",
     "Main Menu - Events and Communities have been consolidated into the new 'Information' menu item. In addition, there is easier access to city and country information in this new menu item",
     "News - performance has been improved",
     "Chat - cities and countries can be linked in chat, like events and communities",
@@ -143,10 +144,11 @@ var patch190E={
     "many small bug fixes"
   ]
 };
-var patch190D={
+var patch191D={
   "title" : "1.9.0 - 19.12.2022",
   "inhalt": [
     "Allgemein - iOS Version veröffentlicht",
+    "Allgemein - Nutzungsbedingungen und Datenschutzrichtlinie wurden hinzugefügt. Sichtbar beim Registrieren, Anmelden und Inhalte erstellen",
     "Hauptmenü - Events und Gemeinschaften wurden in dem neuen Menüpunkt 'Informationen' zusammengefasst. Zusätzlich gibt es in diesem neuen Menüpunkt einen leichteren Zugriff auf die Stadt- und Landesinformationen",
     "News - Leistung wurde verbessert",
     "Chat - Städte und Länder können, wie Events und Gemeinschaften, im Chat verlinkt werden",

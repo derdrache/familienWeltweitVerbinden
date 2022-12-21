@@ -430,6 +430,8 @@
     "kosten": "Costs: ",
     "aktuellDort": "Currently there ",
     "kopieren": "copy",
-    "informationKopiert": "Information has been copied"
+    "informationKopiert": "Information has been copied",
+    "nutzungsbedingungen": "Terms of Use",
+    "datenschutzrichtlinie" : "Privacy Policy"
 }
 

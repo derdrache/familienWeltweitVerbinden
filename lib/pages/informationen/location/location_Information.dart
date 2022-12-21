@@ -18,6 +18,7 @@ import '../../../global/global_functions.dart' as global_func;
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
+import '../../../windows/nutzerrichtlinen.dart';
 import '../../start_page.dart';
 
 class LocationInformationPage extends StatefulWidget {
@@ -477,16 +478,17 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     informationTextKontroller,
                     moreLines: 8, textInputAction: TextInputAction.newline),
                 const SizedBox(height: 5),
+                NutzerrichtlinenAnzeigen(page: "create"),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                        child: Text(AppLocalizations.of(context).speichern),
+                        child: Text(AppLocalizations.of(context).speichern, style: const TextStyle(fontSize: 20),),
                         onPressed: () => saveNewInformation(
                             title: titleTextKontroller.text,
                             inhalt: informationTextKontroller.text)),
                     TextButton(
-                      child: Text(AppLocalizations.of(context).abbrechen),
+                      child: Text(AppLocalizations.of(context).abbrechen, style: const TextStyle(fontSize: 20),),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -1016,7 +1018,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       if (userCityInfo.isEmpty) {
         userCityInfo.add(Container(
           height: 500,
-          padding: EdgeInsets.all(30),
+          padding: const EdgeInsets.all(30),
           child: Center(
             child: Text(
               AppLocalizations.of(context).keineInsiderInformation,

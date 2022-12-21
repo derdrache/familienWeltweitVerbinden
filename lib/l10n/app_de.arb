@@ -430,5 +430,7 @@
     "kosten": "Kosten: ",
     "aktuellDort": "Aktuell dort: ",
     "kopieren": "kopieren",
-    "informationKopiert": "Information wurde kopiert"
+    "informationKopiert": "Information wurde kopiert",
+    "nutzungsbedingungen": "Nutzungsbedingungen",
+    "datenschutzrichtlinie" : "Datenschutzrichtlinie"
 }
