@@ -6,6 +6,7 @@ import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../services/notification.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../windows/nutzerrichtlinen.dart';
 import 'create_profil_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -125,6 +126,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       passwordCheck: passwordController.text),
                   textInputAction: TextInputAction.done,
                   onSubmit: () => registrationButton()),
+              NutzerrichtlinenAnzeigen(page: "register"),
               isLoading
                   ? loadingBox()
                   : customFloatbuttonExtended(
