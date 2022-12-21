@@ -752,7 +752,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           children: [
             const Icon(Icons.report),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).eventMelden),
+            Text(AppLocalizations.of(context).communityMelden),
           ],
         ),
         onPressed: () {

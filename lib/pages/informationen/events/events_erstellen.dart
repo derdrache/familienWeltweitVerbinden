@@ -17,6 +17,7 @@ import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../global/variablen.dart' as global_var;
+import '../../../windows/nutzerrichtlinen.dart';
 import 'event_details.dart';
 
 class EventErstellen extends StatefulWidget {
@@ -453,6 +454,8 @@ class _EventErstellenState extends State<EventErstellen> {
             customTextInput(AppLocalizations.of(context).eventBeschreibung,
                 eventBeschreibungKontroller,
                 moreLines: 8, textInputAction: TextInputAction.newline),
+            Center(child: NutzerrichtlinenAnzeigen(page: "create")),
+            const SizedBox(height: 20)
           ],
         ),
       ),
