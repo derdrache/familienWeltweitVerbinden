@@ -329,35 +329,76 @@ class _LoginPageState extends State<LoginPage> {
           },
           child: Container(
               height: 50,
-              width: 280,
-              margin: const EdgeInsets.only(
-                  top: 10, bottom: 10, right: 55, left: 55),
+              width: 50,
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.secondary,
-                  borderRadius: const BorderRadius.all(Radius.circular(30))),
+                  borderRadius: const BorderRadius.all(Radius.circular(12))),
               child: Center(
-                  child: !googleLoginLoading ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
+                  child: !googleLoginLoading ? Container(
                     height: 30.0,
                     width: 30.0,
                     decoration: const BoxDecoration(
+                      color: Colors.white,
                       image: DecorationImage(
-                          image: AssetImage('assets/googleGIcon.jpg'),
+                          image: AssetImage('assets/googleGIcon.png'),
                           fit: BoxFit.cover),
                       shape: BoxShape.circle,
                     ),
-                  ),
-                  Text(
-                    AppLocalizations.of(context).loginMitGoogle,
-                    style: const TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  )
-                ],
-              ): const CircularProgressIndicator()
+                  ): const CircularProgressIndicator()
+              )),
+
+        ),
+      );
+    }
+
+    Widget appleLoginButton(){
+      return Align(
+        child: InkWell(
+          onTap: () async {
+            setState(() {
+              googleLoginLoading = true;
+            });
+
+            if (kIsWeb) {
+              await signInWithGoogleWeb();
+            } else {
+              await signInWithGoogleAndroid();
+            }
+            var userId = FirebaseAuth.instance.currentUser?.uid;
+            if (userId == null){
+              setState(() {
+                googleLoginLoading = false;
+              });
+              return;
+            }
+
+            await _refreshHiveData();
+            var ownProfil = Hive.box("secureBox").get("ownProfil");
+
+            if (ownProfil != false && ownProfil.isNotEmpty) {
+              global_functions.changePageForever(context, StartPage());
+            } else {
+              global_functions.changePageForever(
+                  context, const CreateProfilPage());
+            }
+          },
+          child: Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary,
+                  borderRadius: const BorderRadius.all(Radius.circular(12))),
+              child: Center(
+                  child: !googleLoginLoading ? Container(
+                    height: 40.0,
+                    width: 40.0,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/appleIcon.png'),
+                          fit: BoxFit.cover),
+                      shape: BoxShape.circle,
+                    ),
+                  ): const CircularProgressIndicator()
               )),
 
         ),
@@ -428,7 +469,11 @@ class _LoginPageState extends State<LoginPage> {
                     AppLocalizations.of(context).registrieren, () {
                   global_functions.changePage(context, const RegisterPage());
                 }),
-                googleLoginButton(),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  googleLoginButton(),
+                  SizedBox(width: 20),
+                  appleLoginButton()
+                ],),
                 const SizedBox(height: 15),
                 if (kIsWeb) footer(),
 
