@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
@@ -401,7 +400,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                 if (widget.location["wetter"] != null)
                   Flexible(
                       child: InkWell(
-                          onTap: () => launch(widget.location["wetter"]),
+                          onTap: () => global_func.openURL(widget.location["wetter"]),
                           child: Text(widget.location["wetter"],
                               style: TextStyle(
                                   color: Colors.blue, fontSize: fontSize),
