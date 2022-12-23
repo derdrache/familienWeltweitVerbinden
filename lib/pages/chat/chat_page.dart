@@ -16,11 +16,12 @@ import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/strike_through_icon.dart';
-import '../start_page.dart';
 import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key key}) : super(key: key);
+  int chatPageSliderIndex;
+
+  ChatPage({Key key, this.chatPageSliderIndex}) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -40,7 +41,7 @@ class _ChatPageState extends State<ChatPage> {
   bool firstSelectedIsMute = false;
   bool bothDelete = false;
   bool isLoaded = false;
-  var mainSlider = 0;
+  var mainSlider;
   bool activeChatSearch = false;
   var seachSearchInputNode = FocusNode();
   var searchTextKontroller = TextEditingController();
@@ -49,6 +50,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void initState() {
+    mainSlider = widget.chatPageSliderIndex;
     checkNewMessageCounter();
     initilizeCreateChatData();
 
@@ -144,6 +146,8 @@ class _ChatPageState extends State<ChatPage> {
             builder: (_) => ChatDetailsPage(
                   chatPartnerId: chatPartnerId,
                   chatPartnerName: chatPartnerName,
+                backToChatPage: true,
+                  chatPageSliderIndex: mainSlider
                 ))).whenComplete(() => refreshChatDataFromDb());
   }
 
@@ -613,16 +617,14 @@ class _ChatPageState extends State<ChatPage> {
                     changeBarOn = markerOn;
                   });
                 } else {
-                  Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => ChatDetailsPage(
-                                  chatPartnerName: isNotChatGroup
-                                      ? chatPartnerProfil["name"]
-                                      : null,
-                                  groupChatData: group,
-                                  isChatgroup: !isNotChatGroup)))
-                      .whenComplete(() => changePage(context, StartPage(selectedIndex: 3,)));
+                  changePage(context, ChatDetailsPage(
+                      chatPartnerName: isNotChatGroup
+                          ? chatPartnerProfil["name"]
+                          : null,
+                      groupChatData: group,
+                      backToChatPage: true,
+                      chatPageSliderIndex: mainSlider,
+                      isChatgroup: !isNotChatGroup));
                 }
               },
               onLongPress: () {

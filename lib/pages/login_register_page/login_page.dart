@@ -33,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   bool googleLoginLoading = false;
   bool angemeldetBleiben = true;
+  var versionNumber = Hive.box('secureBox').get("version");
 
   @override
   void initState() {
@@ -328,15 +329,15 @@ class _LoginPageState extends State<LoginPage> {
             }
           },
           child: Container(
-              height: 50,
-              width: 50,
+              height: 70,
+              width: 70,
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.secondary,
                   borderRadius: const BorderRadius.all(Radius.circular(12))),
               child: Center(
                   child: !googleLoginLoading ? Container(
-                    height: 30.0,
-                    width: 30.0,
+                    height: 50.0,
+                    width: 50.0,
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       image: DecorationImage(
@@ -383,15 +384,15 @@ class _LoginPageState extends State<LoginPage> {
             }
           },
           child: Container(
-              height: 50,
-              width: 50,
+              height: 70,
+              width: 70,
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.secondary,
                   borderRadius: const BorderRadius.all(Radius.circular(12))),
               child: Center(
                   child: !googleLoginLoading ? Container(
-                    height: 40.0,
-                    width: 40.0,
+                    height: 50.0,
+                    width: 50.0,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
                           image: AssetImage('assets/appleIcon.png'),
@@ -447,7 +448,7 @@ class _LoginPageState extends State<LoginPage> {
                   ],),
                 ),
                 const SizedBox(height: 5),
-                NutzerrichtlinenAnzeigen(page: "login"),
+                if(versionNumber != null) NutzerrichtlinenAnzeigen(page: "login"),
                 isLoading
                     ? loadingBox()
                     : kIsWeb && !isPhone()
@@ -469,9 +470,10 @@ class _LoginPageState extends State<LoginPage> {
                     AppLocalizations.of(context).registrieren, () {
                   global_functions.changePage(context, const RegisterPage());
                 }),
+                const SizedBox(height: 10),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   googleLoginButton(),
-                  SizedBox(width: 20),
+                  SizedBox(width: 40),
                   appleLoginButton()
                 ],),
                 const SizedBox(height: 15),
