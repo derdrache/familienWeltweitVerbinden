@@ -42,6 +42,7 @@ class ChatDetailsPage extends StatefulWidget {
   bool backToChatPage;
   bool isChatgroup;
   String connectedId;
+  int chatPageSliderIndex;
 
   ChatDetailsPage({
     Key key,
@@ -52,6 +53,7 @@ class ChatDetailsPage extends StatefulWidget {
     this.backToChatPage = false,
     this.isChatgroup = false,
     this.connectedId,
+    this.chatPageSliderIndex
   }) : super(key: key);
 
   @override
@@ -2503,11 +2505,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           leading: widget.backToChatPage
               ? IconButton(
                   icon: const Icon(Icons.arrow_back_sharp),
-                  onPressed: () => global_functions.changePageForever(
-                      context,
-                      StartPage(
-                        selectedIndex: 4,
-                      )))
+                  onPressed: (){
+                    global_functions.changePageForever(
+                        context,
+                        StartPage(
+                            selectedIndex: 3,
+                            chatPageSliderIndex: widget.chatPageSliderIndex
+                        ));
+                  }
+                  )
               : null,
           profilBildProfil: chatImage,
           onTap: () => widget.isChatgroup ? mitgliederWindow() : openProfil(),
