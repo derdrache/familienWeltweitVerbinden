@@ -483,6 +483,7 @@ class ChatGroupsDatabase {
       message, chatData, chatGroupName) async {
     var allUser = chatData["users"];
     var whatQuery = "users = JSON_SET(users";
+    List notificationList = [];
 
     allUser.forEach((userId, data) {
       var isActive = data["isActive"] ?? false;
@@ -494,17 +495,18 @@ class ChatGroupsDatabase {
         whatQuery +=
             ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
 
-        prepareChatNotification(
-            chatId: chatData["id"],
-            vonId: message["von"],
-            toId: userId,
-            inhalt: message["message"],
-            chatGroup: chatGroupName);
+        notificationList.add(userId);
       }
     });
 
-    whatQuery += ")";
+    prepareChatGroupNotification(
+        chatId: chatData["id"],
+        vonId: message["von"],
+        idList: notificationList,
+        inhalt: message["message"],
+        chatGroup: chatGroupName);
 
+    whatQuery += ")";
     ChatGroupsDatabase()
         .updateChatGroup(whatQuery, "WHERE id = '${chatData["id"]}'");
   }

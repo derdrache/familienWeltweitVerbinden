@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -11,11 +10,11 @@ import 'package:upgrader/upgrader.dart';
 import "package:universal_html/js.dart" as js;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
 import '../global/variablen.dart';
 import '../services/database.dart';
 import '../services/locationsService.dart';
+import '../services/network_Connectivity.dart';
 import '../widgets/badge_icon.dart';
 import '../windows/patchnotes.dart';
 import 'informationen/information.dart';
@@ -32,8 +31,9 @@ final String userId = FirebaseAuth.instance.currentUser?.uid;
 class StartPage extends StatefulWidget {
   int selectedIndex;
   var informationPageIndex;
+  int chatPageSliderIndex;
 
-  StartPage({Key key, this.selectedIndex = 0, this.informationPageIndex = 0}) : super(key: key);
+  StartPage({Key key, this.selectedIndex = 0, this.informationPageIndex = 0, this.chatPageSliderIndex}) : super(key: key);
 
   @override
   _StartPageState createState() => _StartPageState();
@@ -48,11 +48,14 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    widget.chatPageSliderIndex ??= 0;
     tabPages = <Widget>[
       const NewsPage(),
       const ErkundenPage(),
       InformationPage(pageSelection: widget.informationPageIndex),
-      const ChatPage(),
+      ChatPage(
+        chatPageSliderIndex: widget.chatPageSliderIndex
+      ),
       const SettingPage()
     ];
 
@@ -60,6 +63,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
+
+    NetworkConnectivity(context).checkInternetStatusStream();
   }
 
   @override
@@ -181,7 +186,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
         await LocationService().getNearstLocationData(currentPosition);
     nearstLocationData =
         LocationService().transformNearstLocation(nearstLocationData);
-    print(nearstLocationData);
 
     if (nearstLocationData["country"].isEmpty ||
         nearstLocationData["city"].isEmpty) return;
@@ -293,20 +297,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
 
-    void hasNetwork() async {
-      try {
-        await InternetAddress.lookup('example.com');
-        if (hasInternet == false) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        }
-        hasInternet = true;
-      } on SocketException catch (_) {
-        hasInternet = false;
-        customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet,
-            duration: const Duration(days: 365));
-      }
-    }
-
     void _onItemTapped(int index) {
       setState(() {
         widget.selectedIndex = index;
@@ -387,8 +377,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
         });
       }
     }
-
-    if (!kIsWeb) hasNetwork();
 
     checkA2HS();
 
