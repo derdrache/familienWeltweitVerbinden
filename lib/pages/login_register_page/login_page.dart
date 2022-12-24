@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
+import 'dart:io' show Platform;
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -32,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   String passwort = "";
   bool isLoading = false;
   bool googleLoginLoading = false;
+  bool appleLoginLoading = false;
   bool angemeldetBleiben = true;
   var versionNumber = Hive.box('secureBox').get("version");
 
@@ -94,7 +96,6 @@ class _LoginPageState extends State<LoginPage> {
 
   signInWithGoogleWeb() async {
     await Firebase.initializeApp();
-
 
     try {
       FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
@@ -352,60 +353,6 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget appleLoginButton(){
-      return Align(
-        child: InkWell(
-          onTap: () async {
-            setState(() {
-              googleLoginLoading = true;
-            });
-
-            if (kIsWeb) {
-              await signInWithGoogleWeb();
-            } else {
-              await signInWithGoogleAndroid();
-            }
-            var userId = FirebaseAuth.instance.currentUser?.uid;
-            if (userId == null){
-              setState(() {
-                googleLoginLoading = false;
-              });
-              return;
-            }
-
-            await _refreshHiveData();
-            var ownProfil = Hive.box("secureBox").get("ownProfil");
-
-            if (ownProfil != false && ownProfil.isNotEmpty) {
-              global_functions.changePageForever(context, StartPage());
-            } else {
-              global_functions.changePageForever(
-                  context, const CreateProfilPage());
-            }
-          },
-          child: Container(
-              height: 70,
-              width: 70,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary,
-                  borderRadius: const BorderRadius.all(Radius.circular(12))),
-              child: Center(
-                  child: !googleLoginLoading ? Container(
-                    height: 50.0,
-                    width: 50.0,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/appleIcon.png'),
-                          fit: BoxFit.cover),
-                      shape: BoxShape.circle,
-                    ),
-                  ): const CircularProgressIndicator()
-              )),
-
-        ),
-      );
-    }
-
     Widget footer() {
       return Container(
         margin: const EdgeInsets.all(10),
@@ -472,9 +419,7 @@ class _LoginPageState extends State<LoginPage> {
                 }),
                 const SizedBox(height: 10),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  googleLoginButton(),
-                  SizedBox(width: 40),
-                  appleLoginButton()
+                  if(!Platform.isIOS) googleLoginButton(),
                 ],),
                 const SizedBox(height: 15),
                 if (kIsWeb) footer(),
