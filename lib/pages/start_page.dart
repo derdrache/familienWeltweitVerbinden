@@ -45,10 +45,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   bool hasInternet = true;
   var checkedA2HS = false;
   List<Widget> tabPages;
+  var _networkConnectivity;
 
   @override
   void initState() {
     widget.chatPageSliderIndex ??= 0;
+    _networkConnectivity = NetworkConnectivity(context);
     tabPages = <Widget>[
       const NewsPage(),
       const ErkundenPage(),
@@ -64,7 +66,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
     super.initState();
 
-    NetworkConnectivity(context).checkInternetStatusStream();
+    _networkConnectivity.checkInternetStatusStream();
+  }
+
+  @override
+  void dispose(){
+    _networkConnectivity.disposeStream();
   }
 
   @override
