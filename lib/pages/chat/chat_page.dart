@@ -702,7 +702,18 @@ class _ChatPageState extends State<ChatPage> {
             ));
       }
 
+      if(chatGroupContainers.isEmpty){
+        chatGroupContainers.add(Padding(
+          padding: const EdgeInsets.only(top: 300),
+          child: Center(child: Text(
+              AppLocalizations.of(context).nochKeineChatsVorhanden,
+              style: const TextStyle(
+                  fontSize: 20, color: Colors.grey))),
+        ));
+      }
+
       return chatGroupContainers;
+
     }
 
     showAppBar() {
@@ -815,7 +826,7 @@ class _ChatPageState extends State<ChatPage> {
       appBar: showAppBar(),
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-          child: myChats.isNotEmpty
+          child: isLoaded
               ? MediaQuery.removePadding(
                   removeTop: true,
                   context: context,
@@ -882,14 +893,8 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                   ),
                 )
-              : !isLoaded
-                  ? const Center(child: CircularProgressIndicator())
-                  : Center(
-                      heightFactor: 20,
-                      child: Text(
-                          AppLocalizations.of(context).nochKeineChatsVorhanden,
-                          style: const TextStyle(
-                              fontSize: 20, color: Colors.grey)))),
+              : const Center(child: CircularProgressIndicator())
+      ),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
         child: const Icon(Icons.create),
