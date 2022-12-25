@@ -127,7 +127,7 @@ var patchVorlage={
 };
 
 var patch191E={
-  "title" : "1.9.0 - 19.12.2022",
+  "title" : "1.9.1 - 26.12.2022",
   "inhalt": [
     "General - iOS version released",
     "General - Terms of use have been added. Visible when registering, login and creating content",
@@ -138,6 +138,7 @@ var patch191E={
     "Chat - text input is now displayed correctly and clearly even with very long texts",
     "Events - The description is now automatically translated into English or German",
     "Communities - The description is now automatically translated into English or German",
+    "Error correction - chat page - message 'No chats available yet', although there are chats",
     "Error correction - Events: accepting and cancelling events led to duplicate entries",
     "Error correction - Automatic location was sometimes displayed in a language other than English or German",
     "many small improvements",
@@ -145,7 +146,7 @@ var patch191E={
   ]
 };
 var patch191D={
-  "title" : "1.9.0 - 19.12.2022",
+  "title" : "1.9.1 - 26.12.2022",
   "inhalt": [
     "Allgemein - iOS Version veröffentlicht",
     "Allgemein - Nutzungsbedingungen wurden hinzugefügt. Sichtbar beim Registrieren, Anmelden und Inhalte erstellen",
@@ -156,6 +157,7 @@ var patch191D={
     "Chat - Texteingabe wird nun auch mit sehr langen Texten korrekt und Übersichtlich angezeigt",
     "Events - Die Beschreibung wird jetzt automatisch in Englisch oder Deutsch übersetzt",
     "Gemeinschaften - Die Beschreibung wird jetzt automatisch in Englisch oder Deutsch übersetzt",
+    "Fehlerkorrektur - Chatseite - Meldung 'Noch keine Chats vorhanden', obwohl es Chats gibt",
     "Fehlerkorrektur - Events: Zusage und Absage von Events hat zu doppelten einträgen geführt",
     "Fehlerkorrektur - Der Automatische Standort wurde manchmal in einer anderen Sprache als Deutsch oder Englisch ausgegeben",
     "viele kleine Verbesserungen",
