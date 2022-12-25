@@ -110,8 +110,6 @@ class _LoginPageState extends State<LoginPage> {
         googleLoginLoading = false;
       });
     }
-
-
   }
 
   signInWithGoogleAndroid() async {
