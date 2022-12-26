@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
-import '../../services/notification.dart';
 import '../informationen/events/eventCard.dart';
 import '../informationen/location/location_Information.dart';
 import 'news_page_settings.dart';
@@ -730,16 +729,12 @@ class _NewsPageState extends State<NewsPage>{
                 margin: const EdgeInsets.only(top: 5),
                 child: FloatingActionButton(
                   child: const Icon(Icons.settings),
-                  onPressed: () => testNotification1()
-                  /*
                   onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => NewsPageSettingsPage(
                                   settingsProfil: ownSettingProfil)))
                       .whenComplete(() => setState(() {})),
-
-                   */
                 ),
               )
             : Container(
