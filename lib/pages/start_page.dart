@@ -72,6 +72,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   @override
   void dispose(){
     _networkConnectivity.disposeStream();
+    super.dispose();
   }
 
   @override
