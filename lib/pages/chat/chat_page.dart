@@ -826,8 +826,7 @@ class _ChatPageState extends State<ChatPage> {
       appBar: showAppBar(),
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-          child: isLoaded
-              ? MediaQuery.removePadding(
+          child: MediaQuery.removePadding(
                   removeTop: true,
                   context: context,
                   child: ScrollConfiguration(
@@ -893,7 +892,6 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                   ),
                 )
-              : const Center(child: CircularProgressIndicator())
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
