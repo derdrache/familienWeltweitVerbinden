@@ -205,7 +205,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
         "latt": currentPosition.latitude,
       };
 
-      if (ownProfil["city"] == locationData["city"]) return;
+      if (ownProfil["ort"] == locationData["city"]) return;
 
       _databaseOperations(locationData,
           exactLocation: true, nearstLocationData: nearstLocationData);
