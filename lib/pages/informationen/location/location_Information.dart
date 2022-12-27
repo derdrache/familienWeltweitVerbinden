@@ -224,8 +224,8 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     var allProfils = getAllActiveProfilsHive();
 
     for (var profil in allProfils) {
-      var inLocation = widget.location["ort"].contains(profil["ort"]);
-      var inCountry = widget.location["ort"].contains(profil["land"]);
+      var inLocation = profil["ort"].isNotEmpty && widget.location["ort"].contains(profil["ort"]);
+      var inCountry = profil["ort"].isNotEmpty && widget.location["ort"].contains(profil["land"]);
 
       if (inLocation || inCountry) {
         familiesThere.add(profil["id"]);
