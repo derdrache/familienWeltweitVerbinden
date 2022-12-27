@@ -51,15 +51,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   void initState() {
     widget.chatPageSliderIndex ??= 0;
     _networkConnectivity = NetworkConnectivity(context);
-    tabPages = <Widget>[
-      const NewsPage(),
-      const ErkundenPage(),
-      InformationPage(pageSelection: widget.informationPageIndex),
-      ChatPage(
-        chatPageSliderIndex: widget.chatPageSliderIndex
-      ),
-      const SettingPage()
-    ];
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
@@ -304,8 +295,20 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    tabPages = <Widget>[
+      const NewsPage(),
+      const ErkundenPage(),
+      InformationPage(pageSelection: widget.informationPageIndex),
+      ChatPage(
+          chatPageSliderIndex: widget.chatPageSliderIndex
+      ),
+      const SettingPage()
+    ];
 
     void _onItemTapped(int index) {
+      if(index == 2){
+        widget.informationPageIndex = 0;
+      }
       setState(() {
         widget.selectedIndex = index;
       });
