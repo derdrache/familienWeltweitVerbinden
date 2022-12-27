@@ -417,7 +417,7 @@ class _LoginPageState extends State<LoginPage> {
                 }),
                 const SizedBox(height: 10),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  if(!Platform.isIOS) googleLoginButton(),
+                  if(!kIsWeb && !Platform.isIOS) googleLoginButton(),
                 ],),
                 const SizedBox(height: 15),
                 if (kIsWeb) footer(),
