@@ -25,6 +25,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
 
   @override
   void initState() {
+    print(widget.settingsProfil);
     showFriendAdded = widget.settingsProfil["showFriendAdded"] == 1 ? true : false;
     showFriendChangedLocation =
         widget.settingsProfil["showFriendChangedLocation"] == 1 ? true : false;
