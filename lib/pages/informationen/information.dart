@@ -22,6 +22,7 @@ class _InformationPageState extends State<InformationPage> {
     LocationPage(forLand: true,)
   ];
 
+
   @override
   Widget build(BuildContext context) {
 

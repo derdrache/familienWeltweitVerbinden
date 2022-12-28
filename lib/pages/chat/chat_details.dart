@@ -115,6 +115,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     timer.cancel();
     messageInputNode.dispose();
 
+
     if (widget.groupChatData["users"][userId] != null) {
       Function databaseUpdate = widget.isChatgroup
           ? ChatGroupsDatabase().updateChatGroup
@@ -297,11 +298,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   resetNewMessageCounter() async {
     var users = widget.groupChatData["users"];
+
     if (widget.groupChatData["users"][userId] == null) return;
 
     var usersChatNewMessages = users[userId]["newMessages"];
-
-    if (usersChatNewMessages == 0) return;
 
     var ownAllMessages = ownProfil["newMessages"];
     var newOwnAllMessages = ownAllMessages - usersChatNewMessages < 0
@@ -326,9 +326,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   messageToDbAndClearMessageInput(message) async {
     var userID = FirebaseAuth.instance.currentUser.uid;
     var checkMessage = nachrichtController.text.split("\n").join();
-    var languageCheck = await translator.translate(message);
-    var languageCode = languageCheck.sourceLanguage.code;
-
     if (checkMessage.isEmpty) return;
 
     var messageData = {
@@ -339,7 +336,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "zu": widget.chatPartnerId,
       "responseId": messageExtraInformationId ??= "0",
       "forward": "",
-      "language": languageCode
+      "language": "auto"
     };
 
     messages.add(messageData);
@@ -347,6 +344,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     setState(() {
       widget.groupChatData["lastMessage"] = message;
     });
+
 
     saveMessageinDBAndRefresh(messageData);
 
@@ -384,7 +382,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   saveMessageinDBAndRefresh(messageData) async {
     var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
+
     if (widget.isChatgroup) {
+      var languageCheck = await translator.translate(messageData["message"]);
+      var languageCode = languageCheck.sourceLanguage.code;
+      messageData["language"] = languageCode;
+
       await ChatGroupsDatabase().addNewMessageAndNotification(
           widget.groupChatData["id"], messageData, isBlocked, connectedData["name"]);
     } else {
@@ -393,8 +396,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     messages = await getAllDbMessages();
-
-    setState(() {});
   }
 
   openProfil() async {
@@ -2505,7 +2506,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           leading: widget.backToChatPage
               ? IconButton(
                   icon: const Icon(Icons.arrow_back_sharp),
-                  onPressed: (){
+                  onPressed: () async {
+                    await resetNewMessageCounter();
                     global_functions.changePageForever(
                         context,
                         StartPage(
