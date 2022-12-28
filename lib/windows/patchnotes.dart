@@ -137,7 +137,8 @@ var patch192E={
 var patch192D={
   "title" : "",
   "inhalt": [
-
+    "News Fehlerbehebung - Der Anzeige Fehler in der News Seite wurde behoben",
+    "kleine Fehlerbehebungen"
   ]
 };
 
