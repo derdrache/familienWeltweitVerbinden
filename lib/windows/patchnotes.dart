@@ -54,66 +54,65 @@ class PatchnotesWindow{
         builder: (BuildContext buildContext){
           return CustomAlertDialog(
               title: patchnotesTitle,
-              children:
-
-              isGerman ? [
-                _patch(patch192D),
-                _patch(patch191D),
-                _patch(patch183D),
-                _patch(patch182D),
-                _patch(patch181D),
-                _patch(patch180D),
-                _patch(patch172D),
-                _patch(patch171D),
-                _patch(patch170D),
-                _patch(patch162D),
-                _patch(patch161D),
-                _patch(patch160D),
-                _patch(patch150D),
-                _patch(patch141D),
-                _patch(patch140D),
-                _patch(patch131D),
-                _patch(patch130D),
-                _patch(patch123D),
-                _patch(patch122D),
-                _patch(patch121D),
-                _patch(patch120D),
-                _patch(patch113D),
-                _patch(patch112D),
-                _patch(patch111D),
-                _patch(patch110D),
-                _patch(patch101D),
-                _patch(patch1D),
-              ] :
-              [
-                _patch(patch192E),
-                _patch(patch191E),
-                _patch(patch183E),
-                _patch(patch182E),
-                _patch(patch181E),
-                _patch(patch180E),
-                _patch(patch172E),
-                _patch(patch171E),
-                _patch(patch170E),
-                _patch(patch162E),
-                _patch(patch161E),
-                _patch(patch160E),
-                _patch(patch150E),
-                _patch(patch141E),
-                _patch(patch140E),
-                _patch(patch131E),
-                _patch(patch130E),
-                _patch(patch123E),
-                _patch(patch122E),
-                _patch(patch121E),
-                _patch(patch120E),
-                _patch(patch113E),
-                _patch(patch112E),
-                _patch(patch111E),
-                _patch(patch110E),
-                _patch(patch101E),
-                _patch(patch1E),
-              ]
+              children: isGerman
+                ? [
+                  _patch(patch192D),
+                  _patch(patch191D),
+                  _patch(patch183D),
+                  _patch(patch182D),
+                  _patch(patch181D),
+                  _patch(patch180D),
+                  _patch(patch172D),
+                  _patch(patch171D),
+                  _patch(patch170D),
+                  _patch(patch162D),
+                  _patch(patch161D),
+                  _patch(patch160D),
+                  _patch(patch150D),
+                  _patch(patch141D),
+                  _patch(patch140D),
+                  _patch(patch131D),
+                  _patch(patch130D),
+                  _patch(patch123D),
+                  _patch(patch122D),
+                  _patch(patch121D),
+                  _patch(patch120D),
+                  _patch(patch113D),
+                  _patch(patch112D),
+                  _patch(patch111D),
+                  _patch(patch110D),
+                  _patch(patch101D),
+                  _patch(patch1D),
+                ]
+                :[
+                  _patch(patch192E),
+                  _patch(patch191E),
+                  _patch(patch183E),
+                  _patch(patch182E),
+                  _patch(patch181E),
+                  _patch(patch180E),
+                  _patch(patch172E),
+                  _patch(patch171E),
+                  _patch(patch170E),
+                  _patch(patch162E),
+                  _patch(patch161E),
+                  _patch(patch160E),
+                  _patch(patch150E),
+                  _patch(patch141E),
+                  _patch(patch140E),
+                  _patch(patch131E),
+                  _patch(patch130E),
+                  _patch(patch123E),
+                  _patch(patch122E),
+                  _patch(patch121E),
+                  _patch(patch120E),
+                  _patch(patch113E),
+                  _patch(patch112E),
+                  _patch(patch111E),
+                  _patch(patch110E),
+                  _patch(patch101E),
+                  _patch(patch1E),
+                ]
           );
         });
 
@@ -129,13 +128,14 @@ var patchVorlage={
 };
 
 var patch192E={
-  "title" : "",
+  "title" : "1.9.2 - 30.12.2022",
   "inhalt": [
-
+    "News bug fix - The display error in the news page has been fixed",
+    "minor bug fixes"
   ]
 };
 var patch192D={
-  "title" : "",
+  "title" : "1.9.2 - 30.12.2022",
   "inhalt": [
     "News Fehlerbehebung - Der Anzeige Fehler in der News Seite wurde behoben",
     "kleine Fehlerbehebungen"

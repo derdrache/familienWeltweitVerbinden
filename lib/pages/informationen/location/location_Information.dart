@@ -167,24 +167,24 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   @override
   void initState() {
     isCity = widget.location["isCity"] == 1;
-    widget.location["familien"] = removeInactiveFamilies(widget.location["familien"]);
 
     super.initState();
   }
 
   removeInactiveFamilies(familyList){
-    List allActiveProfils = getAllActiveProfilsHive();
+    List allActiveProfils = List.of(getAllActiveProfilsHive());
     List activeFamilies = [];
+
 
     for(var profil in allActiveProfils){
       if(familyList.contains(profil["id"])) activeFamilies.add(profil["id"]);
     }
 
     return activeFamilies;
-
   }
 
   showFamilyVisitWindow(list) {
+    list = removeInactiveFamilies(list);
     List<Widget> familiesList = [];
 
     for (var family in list) {
@@ -1069,6 +1069,7 @@ class _CountryCitiesPageState extends State<CountryCitiesPage> {
 
       if (isCity && fromCountry) {
         city["userInfos"] = getCityUserInfoFromHive(city["ort"]);
+
         citiesFromCountry.add(city);
       }
     }
