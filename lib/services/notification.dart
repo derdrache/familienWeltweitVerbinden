@@ -32,7 +32,6 @@ sendNotification(notificationInformation, {isGroup = false}) async {
       : "services/sendNotification.php"));
 
   if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
-  //notificationInformation["token"] ="c_gFGMBEQPK5Hmf8nuT7Cf:APA91bFANXzk1lBUuHDWMi_tw-XuL650fYJbUzSmKVoaKK8-vlwdzAC9sEYeNIUHHAyavqP9QW8ndyzQ8pW7R3-FTj_Je_92okkxd0-KOdRtfqEYPM8I9s5hhpjCnuMQQuqdKsjGN880";
 
   await http.post(url,
       body: json.encode({
