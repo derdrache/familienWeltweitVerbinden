@@ -1316,7 +1316,7 @@ class _DateButtonState extends State<DateButton> {
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime.now(),
-            lastDate: DateTime(DateTime.now().year + 1));
+            lastDate: DateTime(DateTime.now().year + 2));
 
         setState(() {});
       },
