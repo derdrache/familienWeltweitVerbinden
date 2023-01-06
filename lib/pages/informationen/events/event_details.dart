@@ -212,16 +212,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       widget.absage = false;
       zusageList.add(userId);
       absageList.remove(userId);
+      widget.event["zusage"].add(userId);
+      widget.event["absage"].remove(userId);
 
       EventDatabase().update(
-          "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId')))"
-              "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+          "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
           "WHERE id = '${widget.event["id"]}'");
     } else {
       widget.teilnahme = false;
       widget.absage = true;
       zusageList.remove(userId);
       absageList.add(userId);
+      widget.event["absage"].add(userId);
+      widget.event["zusage"].remove(userId);
 
       EventDatabase().update(
           "absage = '${json.encode(absageList)}', zusage = '${json.encode(zusageList)}'",
