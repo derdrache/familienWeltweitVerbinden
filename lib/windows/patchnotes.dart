@@ -126,6 +126,19 @@ var patchVorlage={
 
   ]
 };
+var patch193E={
+  "title" : "1.9.3 - 30.12.2022",
+  "inhalt": [
+
+
+  ]
+};
+var patch193D={
+  "title" : "1.9.3 - 30.12.2022",
+  "inhalt": [
+    "Event - Zusagen funktioniert jetzt wieder",
+  ]
+};
 
 var patch192E={
   "title" : "1.9.2 - 30.12.2022",
