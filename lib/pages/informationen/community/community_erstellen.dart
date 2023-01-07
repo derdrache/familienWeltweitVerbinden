@@ -78,7 +78,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
         userId, "</community=$communityId"
     );
 
-    return true;
+    return communityId;
   }
 
   descriptionTranslation(text, targetLanguage) async{
@@ -143,11 +143,10 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
           buttons: [
             IconButton(
                 onPressed: () async {
-                  var success = await saveCommunity();
-                  if (!success) return;
-
+                  var communityId = await saveCommunity();
+                  
                   var community = await CommunityDatabase()
-                      .getData("*", "WHERE erstelltVon = '$userId'");
+                      .getData("*", "WHERE id = '$communityId'");
 
                   global_func.changePageForever(
                       context, StartPage(selectedIndex: 2, informationPageIndex: 2,));
