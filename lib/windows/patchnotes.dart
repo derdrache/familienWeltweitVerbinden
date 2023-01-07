@@ -137,6 +137,7 @@ var patch193D={
   "title" : "1.9.3 - 30.12.2022",
   "inhalt": [
     "Event - Zusagen funktioniert jetzt wieder",
+    "Profil erstellen - es ist nun nicht mehr möglich ein Profil ohne interesse und Sprachen zu erstellen"
   ]
 };
 
