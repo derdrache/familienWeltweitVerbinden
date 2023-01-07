@@ -159,7 +159,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _sendeHilfe(reportController){
-    if(reportController.text.isEmpty) return;
+    var checkText = reportController.text.replaceAll(" ", "");
+    if(checkText.isEmpty) return;
 
     ChatDatabase().addAdminMessage(
         reportController.text, "Login/Hilfe");

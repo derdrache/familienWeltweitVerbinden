@@ -66,7 +66,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     super.initState();
   }
 
-
   changeLoading() {
     if (isLoading) {
       isLoading = false;
@@ -104,14 +103,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var userID = FirebaseAuth.instance.currentUser?.uid;
       var email = FirebaseAuth.instance.currentUser?.email;
       var children = childrenAgePickerBox.getDates();
-      var ortMapData = ortAuswahlBox.getGoogleLocationData();
+      //var ortMapData = ortAuswahlBox.getGoogleLocationData();
+      var ortMapData = {"city": "Puerto Morelos",
+        "countryname": "Mexico",
+        "longt": -86.87553419999999, "latt": 20.8478084, "adress": "Puerto Morelos, Quintana Roo, Mexico"};
 
       if (ortMapData["city"] == null) {
         customSnackbar(context, AppLocalizations.of(context).ortEingeben);
         changeLoading();
         return;
       }
-
 
       var data = {
         "id": userID,
@@ -209,6 +210,14 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       errorString +=
           "- " + AppLocalizations.of(context).reiseartAuswaehlen + "\n";
     }
+    if(interessenAuswahlBox.getSelected().isEmpty){
+      errorString +=
+          "- " + AppLocalizations.of(context).interessenAuswaehlen + "\n";
+    }
+    if(sprachenAuswahlBox.getSelected().isEmpty){
+      errorString +=
+          "- " + AppLocalizations.of(context).spracheAuswaehlen + "\n";
+    }
     if (childrenAgePickerBox.getDates().length == 0 ||
         !childrenInputValidation()) {
       errorString +=
@@ -226,8 +235,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
     return noError;
   }
-
-
 
   @override
   Widget build(BuildContext context) {
