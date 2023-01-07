@@ -103,10 +103,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var userID = FirebaseAuth.instance.currentUser?.uid;
       var email = FirebaseAuth.instance.currentUser?.email;
       var children = childrenAgePickerBox.getDates();
-      //var ortMapData = ortAuswahlBox.getGoogleLocationData();
-      var ortMapData = {"city": "Puerto Morelos",
-        "countryname": "Mexico",
-        "longt": -86.87553419999999, "latt": 20.8478084, "adress": "Puerto Morelos, Quintana Roo, Mexico"};
+      var ortMapData = ortAuswahlBox.getGoogleLocationData();
+
 
       if (ortMapData["city"] == null) {
         customSnackbar(context, AppLocalizations.of(context).ortEingeben);
@@ -168,6 +166,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   additionalDatabaseOperations(ortMapData, userId) async {
+    await refreshHiveChats();
+    await refreshHiveEvents();
+
     await StadtinfoDatabase().addNewCity(ortMapData);
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",

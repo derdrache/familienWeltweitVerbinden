@@ -107,7 +107,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
               await getGoogleSearchLocationData(item["place_id"]);
           widget.searchKontroller.text = item["description"];
           resetSearchBar();
-          widget.onConfirm();
+          if(widget.onConfirm != null) widget.onConfirm();
         },
         child: Container(
             padding: const EdgeInsets.all(10),
