@@ -201,9 +201,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     });
 
     var imageName = eventName + pickedImage.name;
+    imageName = imageName.replaceAll(" ", "_");
+    imageName = imageName.replaceAll("/", "_");
 
     if (pickedImage == null) {
-      customSnackbar(context, "Datei ist beschädigt");
+      customSnackbar(context, AppLocalizations.of(context).dateiBeschaedigt);
       return false;
     }
 
@@ -245,6 +247,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     if (imageName == false) return;
 
+    imageName = imageName.replaceAll("/", "_");
     var image = "https://families-worldwide.com/bilder/" + imageName;
     _saveChangeImage(image);
 

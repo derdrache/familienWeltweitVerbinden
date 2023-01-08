@@ -810,25 +810,28 @@ class _ErkundenPageState extends State<ErkundenPage> {
                         return;
                       }
 
-                      reiseplanungOn = true;
-                      eventMarkerOn = false;
-                      friendMarkerOn = false;
-                      communityMarkerOn = false;
-                      filterOn = false;
-                      filterList = [];
-
-                      setState(() {});
+                      setLookForReiseplanung(
+                          vonDate.getDate(), bisDate.getDate());
 
                       Navigator.pop(context);
-
-                      showReiseplaungMatchedProfils(
-                          vonDate.getDate(), bisDate.getDate());
                     },
                     label: Text(AppLocalizations.of(context).anzeigen)),
               )
             ],
           );
         });
+  }
+
+  setLookForReiseplanung(von, bis){
+    reiseplanungOn = true;
+    eventMarkerOn = false;
+    friendMarkerOn = false;
+    communityMarkerOn = false;
+    filterOn = false;
+    filterList = [];
+
+    showReiseplaungMatchedProfils(
+        von, bis);
   }
 
   showReiseplaungMatchedProfils(von, bis) {
