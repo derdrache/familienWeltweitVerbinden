@@ -95,7 +95,7 @@ class _CommunityPageState extends State<CommunityPage> {
     var searchedCommunities = [];
     var searchText = communitySearchKontroller.text;
 
-    if(searchText.isEmpty) return searchedCommunities;
+    if(searchText.isEmpty) return allCommunities;
 
     var searchTextFirstLetterBig = searchText.replaceFirst(searchText[0], searchText[0].toUpperCase());
 
@@ -232,6 +232,7 @@ class _CommunityPageState extends State<CommunityPage> {
                   height: 50,
                   decoration: BoxDecoration(
                       border: Border.all(),
+                      color: Colors.white,
                       borderRadius: const BorderRadius.all(Radius.circular(20))
                   ),
                   child: TextField(

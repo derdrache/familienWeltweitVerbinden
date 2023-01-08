@@ -97,9 +97,11 @@ class _ImageEventGalerieState extends State<EventImageGalerie> {
     });
 
     var imageName = eventName + pickedImage.name;
+    imageName = imageName.replaceAll(" ", "_");
+    imageName = imageName.replaceAll("/", "_");
 
     if (pickedImage == null) {
-      customSnackbar(context, "Datei ist beschädigt");
+      customSnackbar(context, AppLocalizations.of(context).dateiBeschaedigt);
       return false;
     }
 

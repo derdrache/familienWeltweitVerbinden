@@ -119,6 +119,7 @@ class _LocationPageState extends State<LocationPage> {
                   height: 50,
                   decoration: BoxDecoration(
                     border: Border.all(),
+                    color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20))
                   ),
                   child: TextField(
