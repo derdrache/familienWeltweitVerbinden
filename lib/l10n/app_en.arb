@@ -432,6 +432,7 @@
     "kopieren": "copy",
     "informationKopiert": "Information has been copied",
     "nutzungsbedingungen": "Terms of Use",
-    "datenschutzrichtlinie" : "Privacy Policy"
+    "datenschutzrichtlinie" : "Privacy Policy",
+    "dateiBeschaedigt": "File is damaged"
 }
 
