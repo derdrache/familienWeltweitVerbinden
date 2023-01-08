@@ -432,5 +432,6 @@
     "kopieren": "kopieren",
     "informationKopiert": "Information wurde kopiert",
     "nutzungsbedingungen": "Nutzungsbedingungen",
-    "datenschutzrichtlinie" : "Datenschutzrichtlinie"
+    "datenschutzrichtlinie" : "Datenschutzrichtlinie",
+    "dateiBeschaedigt": "Datei ist beschädigt"
 }
