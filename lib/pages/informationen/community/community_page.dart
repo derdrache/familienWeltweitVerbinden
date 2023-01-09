@@ -87,7 +87,7 @@ class _CommunityPageState extends State<CommunityPage> {
     });
 
     CommunityDatabase().update(
-        "einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId')))",
+        "einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId'))), interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
         "WHERE id = '${allCommunities[invitedCommunityIndex]["id"]}'");
   }
 
