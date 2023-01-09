@@ -346,7 +346,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
 
 
-    saveMessageinDBAndRefresh(messageData);
+
 
     var groupText = messageData["message"];
 
@@ -369,13 +369,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateChatGroup(
-          "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
+          "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.chatId}'");
     } else {
       ChatDatabase().updateChatGroup(
-          "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
+          "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.chatId}'");
     }
+
+    saveMessageinDBAndRefresh(messageData);
 
     messageExtraInformationId = null;
   }
