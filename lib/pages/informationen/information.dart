@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../informationen/community/community_page.dart';
 import '../informationen/events/event_page.dart';
@@ -22,6 +23,27 @@ class _InformationPageState extends State<InformationPage> {
     LocationPage(forLand: true,)
   ];
 
+  getNumberEventNotification(){
+    var eventNotification = 0;
+    var myEvents = Hive.box('secureBox').get("myEvents") ?? [];
+
+    for (var event in myEvents) {
+      eventNotification += event["freischalten"].length;
+    }
+
+    return eventNotification;
+  }
+
+  getNumberCommunityNotification(){
+    var communityNotifikation = 0;
+    var allCommunities = Hive.box('secureBox').get("communities") ?? [];
+
+    for (var community in allCommunities) {
+      if (community["einladung"].contains(userId)) communityNotifikation += 1;
+    }
+
+    return communityNotifikation;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +103,21 @@ class _InformationPageState extends State<InformationPage> {
       );
     }
 
+    badgeCard(card, number){
+      return Stack(children: [
+        card,
+        if(number != 0) Positioned(top: 15, right: 0,child: Container(
+          width: 40, height: 40,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+          child: Center(child: Text(number.toString(), style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.white),)),
+        ))
+      ],);
+    }
+
+
     return widget.pageSelection == 0 ? Scaffold(
       body: SafeArea(
         child: Column(
@@ -89,16 +126,22 @@ class _InformationPageState extends State<InformationPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                pageCards(
-                    "Events",
-                    Icons.calendar_month,
-                    "assets/bilder/museum.jpg",
-                    1),
-                pageCards(
-                    "Communities",
-                    Icons.home,
-                    "assets/bilder/village.jpg",
-                    2)
+                badgeCard(
+                  pageCards(
+                      "Events",
+                      Icons.calendar_month,
+                      "assets/bilder/museum.jpg",
+                      1),
+                    getNumberEventNotification()
+                ),
+                badgeCard(
+                  pageCards(
+                      "Communities",
+                      Icons.home,
+                      "assets/bilder/village.jpg",
+                      2),
+                  getNumberCommunityNotification()
+                )
               ],
             ),
             Row(

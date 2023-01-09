@@ -624,6 +624,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",
         "WHERE id = '${widget.community["id"]}'");
 
+    if(!widget.community["interesse"].contains(newMemberId)){
+      CommunityDatabase().update(
+          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$newMemberId')",
+          "WHERE id = '${widget.community["id"]}'");
+    }
+
     customSnackbar(context,
         newMember + AppLocalizations.of(context).wurdeEingeladenCommunity,
         color: Colors.green);
