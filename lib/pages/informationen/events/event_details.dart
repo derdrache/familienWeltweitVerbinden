@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
@@ -196,22 +194,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   confirmEvent(bool confirm) async {
-    var eventData = getEventFromHive(widget.event["id"]);
-    var zusageList = eventData["zusage"];
-    var absageList = eventData["absage"];
-    var interessenList = eventData["interesse"];
-
     if (confirm) {
-      if (!interessenList.contains(userId)){
-        interessenList.add(userId);
+      if (!widget.event["interesse"].contains(userId)){
+        widget.event["interesse"].add(userId);
         EventDatabase().update(
             "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
             "WHERE id = '${widget.event["id"]}'");
       }
       widget.teilnahme = true;
       widget.absage = false;
-      zusageList.add(userId);
-      absageList.remove(userId);
       widget.event["zusage"].add(userId);
       widget.event["absage"].remove(userId);
 
@@ -221,13 +212,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     } else {
       widget.teilnahme = false;
       widget.absage = true;
-      zusageList.remove(userId);
-      absageList.add(userId);
-      widget.event["absage"].add(userId);
       widget.event["zusage"].remove(userId);
+      widget.event["absage"].add(userId);
 
       EventDatabase().update(
-          "absage = '${json.encode(absageList)}', zusage = '${json.encode(zusageList)}'",
+          "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId'))),absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
           "WHERE id = '${widget.event["id"]}'");
     }
 
