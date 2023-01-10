@@ -13,8 +13,8 @@ import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-//var databaseUrl = "https://families-worldwide.com/";
-var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = "https://families-worldwide.com/";
+//var databaseUrl = "http://test.families-worldwide.com/";
 var spracheIstDeutsch = kIsWeb
     ? ui.window.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
@@ -1198,7 +1198,6 @@ uploadImage(imagePath, imageName, image) async {
   };
 
   try {
-    //Web Version wirft nach vollendung ein Fehler auf => funktioniert aber ohne Probleme
     await http.post(url, body: json.encode(data));
   } catch (_) {}
 }
@@ -1327,7 +1326,7 @@ getChatFromHive(chatId) {
 }
 
 getChatGroupFromHive(connectedId) {
-  var chatGroups = Hive.box('secureBox').get("chatGroups");
+  var chatGroups = Hive.box('secureBox').get("chatGroups") ?? [];
 
   if (connectedId.isEmpty) {
     var worldChat = chatGroups.singleWhere((chatGroup) => chatGroup["id"] == 1);
