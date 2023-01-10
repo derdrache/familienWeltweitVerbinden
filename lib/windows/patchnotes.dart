@@ -56,6 +56,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch193D),
                   _patch(patch192D),
                   _patch(patch191D),
                   _patch(patch183D),
@@ -85,6 +86,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch193E),
                   _patch(patch192E),
                   _patch(patch191E),
                   _patch(patch183E),
@@ -129,15 +131,17 @@ var patchVorlage={
 var patch193E={
   "title" : "1.9.3 - 30.12.2022",
   "inhalt": [
-
-
+    "Event - commitments now works properly again",
+    "Create profile - it is now not possible to create a profile without interest and languages",
+    "small bug fixes"
   ]
 };
 var patch193D={
   "title" : "1.9.3 - 30.12.2022",
   "inhalt": [
-    "Event - Zusagen funktioniert jetzt wieder",
-    "Profil erstellen - es ist nun nicht mehr möglich ein Profil ohne interesse und Sprachen zu erstellen"
+    "Event - Zusagen funktioniert jetzt wieder ordentlich",
+    "Profil erstellen - es ist nun nicht mehr möglich ein Profil ohne interesse und Sprachen zu erstellen",
+    "kleine Fehlerbehebungen"
   ]
 };
 
