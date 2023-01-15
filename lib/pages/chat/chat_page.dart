@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/cupertino.dart';
@@ -141,14 +142,18 @@ class _ChatPageState extends State<ChatPage> {
         getProfilFromHive(profilName: chatPartnerName, getIdOnly: true);
 
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => ChatDetailsPage(
-                  chatPartnerId: chatPartnerId,
-                  chatPartnerName: chatPartnerName,
-                backToChatPage: true,
-                  chatPageSliderIndex: mainSlider
-                ))).whenComplete(() => refreshChatDataFromDb());
+            context,
+            MaterialPageRoute(
+                builder: (_) => ChatDetailsPage(
+                    chatPartnerId: chatPartnerId,
+                    chatPartnerName: chatPartnerName,
+                    backToChatPage: true,
+                    chatPageSliderIndex: mainSlider)))
+        .whenComplete(() => changePageForever(
+            context,
+            StartPage(
+              selectedIndex: 3,
+            )));
   }
 
   List<Widget> createFriendlistBox(userFriendlist) {
@@ -453,28 +458,26 @@ class _ChatPageState extends State<ChatPage> {
         } else {
           var chatUsers = chat["users"].keys.toList();
           var userPartnerId =
-          chatUsers[0] != userId ? chatUsers[0] : chatUsers[1];
-          chatName = getProfilFromHive(
-              profilId: userPartnerId, getNameOnly: true);
+              chatUsers[0] != userId ? chatUsers[0] : chatUsers[1];
+          chatName =
+              getProfilFromHive(profilId: userPartnerId, getNameOnly: true);
         }
 
-        if(chatName == null) continue;
+        if (chatName == null) continue;
 
-        if (chatName.contains(value) ||
-            chatName.contains(firstLetterBig)) {
+        if (chatName.contains(value) || chatName.contains(firstLetterBig)) {
           searchListMyGroups.add(chat);
         }
       }
 
-      List allChatGroups =
-          Hive.box("secureBox").get("chatGroups") ?? [];
+      List allChatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
       for (var chatGroup in allChatGroups) {
         var chatConnected = chatGroup["connected"];
         var chatName = getChatGroupName(chatConnected);
         chatName ??= AppLocalizations.of(context).weltChat;
 
-        var containCondition = chatName.contains(value) ||
-            chatName.contains(firstLetterBig);
+        var containCondition =
+            chatName.contains(value) || chatName.contains(firstLetterBig);
         var memberOfItCondition = chatGroup["users"][userId] != null;
 
         if (containCondition && !memberOfItCondition) {
@@ -575,7 +578,7 @@ class _ChatPageState extends State<ChatPage> {
           }
         }
 
-        if(chatName == null) continue;
+        if (chatName == null) continue;
 
         var lastMessage = cutMessage(group["lastMessage"]);
         var ownChatNewMessages =
@@ -617,14 +620,22 @@ class _ChatPageState extends State<ChatPage> {
                     changeBarOn = markerOn;
                   });
                 } else {
-                  changePage(context, ChatDetailsPage(
-                      chatPartnerName: isNotChatGroup
-                          ? chatPartnerProfil["name"]
-                          : null,
-                      groupChatData: group,
-                      backToChatPage: true,
-                      chatPageSliderIndex: mainSlider,
-                      isChatgroup: !isNotChatGroup));
+                  Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => ChatDetailsPage(
+                                  chatPartnerName: isNotChatGroup
+                                      ? chatPartnerProfil["name"]
+                                      : null,
+                                  groupChatData: group,
+                                  backToChatPage: true,
+                                  chatPageSliderIndex: mainSlider,
+                                  isChatgroup: !isNotChatGroup)))
+                      .whenComplete(() => changePageForever(
+                          context,
+                          StartPage(
+                            selectedIndex: 3,
+                          )));
                 }
               },
               onLongPress: () {
@@ -702,18 +713,16 @@ class _ChatPageState extends State<ChatPage> {
             ));
       }
 
-      if(chatGroupContainers.isEmpty){
+      if (chatGroupContainers.isEmpty) {
         chatGroupContainers.add(Padding(
           padding: const EdgeInsets.only(top: 300),
-          child: Center(child: Text(
-              AppLocalizations.of(context).nochKeineChatsVorhanden,
-              style: const TextStyle(
-                  fontSize: 20, color: Colors.grey))),
+          child: Center(
+              child: Text(AppLocalizations.of(context).nochKeineChatsVorhanden,
+                  style: const TextStyle(fontSize: 20, color: Colors.grey))),
         ));
       }
 
       return chatGroupContainers;
-
     }
 
     showAppBar() {
@@ -827,72 +836,64 @@ class _ChatPageState extends State<ChatPage> {
       resizeToAvoidBottomInset: false,
       body: SafeArea(
           child: MediaQuery.removePadding(
-                  removeTop: true,
-                  context: context,
-                  child: ScrollConfiguration(
-                    behavior:
-                        ScrollConfiguration.of(context).copyWith(dragDevices: {
-                      PointerDeviceKind.touch,
-                      PointerDeviceKind.mouse,
-                    }),
-                    child: searchTextKontroller.text.isEmpty
-                        ? ListView(
-                            shrinkWrap: true,
-                            children: createChatGroupContainers(null))
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                  width: double.infinity,
-                                  decoration: const BoxDecoration(
-                                      border: Border(top: BorderSide())),
-                                  padding: const EdgeInsets.all(10),
-                                  child: const Text("Chats",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20))),
-                              Expanded(
-                                child: searchListMyGroups.isNotEmpty
-                                    ? ListView(
-                                        shrinkWrap: true,
-                                        children: createChatGroupContainers(
-                                            searchListMyGroups),
-                                      )
-                                    : Center(
-                                        child: Text(
-                                        AppLocalizations.of(context)
-                                            .keineErgebnisse,
-                                        style: TextStyle(fontSize: 20),
-                                      )),
-                              ),
-                              Container(
-                                  width: double.infinity,
-                                  decoration: const BoxDecoration(
-                                      border: Border(top: BorderSide())),
-                                  padding: const EdgeInsets.all(10),
-                                  child: Text(
-                                      AppLocalizations.of(context).globaleSuche,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20))),
-                              Expanded(
-                                child: searchListAllChatgroups.isNotEmpty
-                                    ? ListView(
-                                        shrinkWrap: true,
-                                        children: createChatGroupContainers(
-                                            searchListAllChatgroups),
-                                      )
-                                    : Center(
-                                        child: Text(
-                                            AppLocalizations.of(context)
-                                                .keineErgebnisse,
-                                            style: TextStyle(fontSize: 20))),
-                              ),
-                            ],
-                          ),
-                  ),
-                )
-      ),
+        removeTop: true,
+        context: context,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          }),
+          child: searchTextKontroller.text.isEmpty
+              ? ListView(
+                  shrinkWrap: true, children: createChatGroupContainers(null))
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                            border: Border(top: BorderSide())),
+                        padding: const EdgeInsets.all(10),
+                        child: const Text("Chats",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20))),
+                    Expanded(
+                      child: searchListMyGroups.isNotEmpty
+                          ? ListView(
+                              shrinkWrap: true,
+                              children:
+                                  createChatGroupContainers(searchListMyGroups),
+                            )
+                          : Center(
+                              child: Text(
+                              AppLocalizations.of(context).keineErgebnisse,
+                              style: TextStyle(fontSize: 20),
+                            )),
+                    ),
+                    Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                            border: Border(top: BorderSide())),
+                        padding: const EdgeInsets.all(10),
+                        child: Text(AppLocalizations.of(context).globaleSuche,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20))),
+                    Expanded(
+                      child: searchListAllChatgroups.isNotEmpty
+                          ? ListView(
+                              shrinkWrap: true,
+                              children: createChatGroupContainers(
+                                  searchListAllChatgroups),
+                            )
+                          : Center(
+                              child: Text(
+                                  AppLocalizations.of(context).keineErgebnisse,
+                                  style: TextStyle(fontSize: 20))),
+                    ),
+                  ],
+                ),
+        ),
+      )),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
         child: const Icon(Icons.create),
