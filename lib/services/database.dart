@@ -1390,7 +1390,11 @@ getFamilyProfil({familyId, familyMember}) {
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
 
   for (var familyProfil in familyProfils) {
-    if (familyId != null && familyId == familyProfil["id"]) return familyProfil;
+    if(familyProfil["name"].isEmpty) continue;
+
+    if (familyId != null && familyId == familyProfil["id"]){
+      return familyProfil;
+    }
 
     if (familyMember != null && familyProfil["members"].contains(familyMember)) {
       return familyProfil;

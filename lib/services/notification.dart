@@ -111,28 +111,30 @@ prepareChatGroupNotification({chatId, vonId, idList, inhalt, chatGroup = ""}) as
     var notificationsAllowed = toProfil["notificationstatus"];
     var chatNotificationOn = toProfil["chatNotificationOn"];
 
+
     if (notificationsAllowed == 0 ||
         chatNotificationOn == 0 ||
         toActiveChat == chatId || blockList.contains(userId)) continue;
 
     if (toProfil["token"] == "" ||
         toProfil["token"] == null) {
+      var copyNotificationInformation = Map.of(notificationInformation);
       var chatPartnerName = toProfil["name"];
       var toCanGerman = toProfil["sprachen"].contains("Deutsch") || toProfil["sprachen"].contains("german");
 
-      notificationInformation["title"] = title +
+      copyNotificationInformation["title"] = title +
           (toCanGerman
               ? " hat dir eine Nachricht geschrieben"
               : " has written you a message");
 
-      notificationInformation["inhalt"] = """
+      copyNotificationInformation["inhalt"] = """
       <p>Hi $chatPartnerName, </p>
       <p> ${(toCanGerman ? "du hast in der <a href='https://families-worldwide.com/'>Families worldwide App</a> eine neue Nachricht von "
           "$title erhalten" : "you have received a new message from "
           "$title in the <a href='https://families-worldwide.com/'>Families worldwide App</a>")} </p>
     """;
 
-      sendEmail(notificationInformation);
+      sendEmail(copyNotificationInformation);
     } else {
       confirmNotificationList.add(toProfil["token"]);
     }
