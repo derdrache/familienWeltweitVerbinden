@@ -339,6 +339,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "language": "auto"
     };
 
+    timer.cancel();
+    timer = Timer.periodic(const Duration(seconds: 30), (Timer t) async {
+      messages = await getAllDbMessages();
+      setState(() {});
+    });
+
     messages.add(messageData);
 
     setState(() {
@@ -383,6 +389,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   saveMessageinDBAndRefresh(messageData) async {
+
     var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
 
     if (widget.isChatgroup) {
@@ -1218,7 +1225,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       message["message"] = messageSplit.join(" ");
 
-      if (cardData == null) return const SizedBox.shrink();
+      if (cardData.isEmpty) return const SizedBox.shrink();
 
       return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
