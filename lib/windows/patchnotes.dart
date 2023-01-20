@@ -128,6 +128,24 @@ var patchVorlage={
 
   ]
 };
+
+var patch194E={
+  "title" : "1.9.3 - 30.12.2022",
+  "inhalt": [
+    "Chat - New message display now disappears immediately after chat visit",
+    "Chat - Group notification is now sent correctly",
+    "small bug fixes"
+  ]
+};
+var patch194D={
+  "title" : "1.9.3 - 30.12.2022",
+  "inhalt": [
+    "Chat - Neue Nachrichten Anzeige verschwindet jetzt sofort nach Chat besuch",
+    "Chat - Gruppennotifikation wird jetzt korrekt gesendet",
+    "kleine Fehlerbehebungen"
+  ]
+};
+
 var patch193E={
   "title" : "1.9.3 - 30.12.2022",
   "inhalt": [
