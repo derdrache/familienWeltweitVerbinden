@@ -56,6 +56,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch194D),
                   _patch(patch193D),
                   _patch(patch192D),
                   _patch(patch191D),
@@ -86,6 +87,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch194E),
                   _patch(patch193E),
                   _patch(patch192E),
                   _patch(patch191E),
@@ -132,6 +134,7 @@ var patchVorlage={
 var patch194E={
   "title" : "1.9.3 - 30.12.2022",
   "inhalt": [
+    "Registration - White screen after registration process has been fixed",
     "Chat - New message display now disappears immediately after chat visit",
     "Chat - Group notification is now sent correctly",
     "small bug fixes"
@@ -140,6 +143,7 @@ var patch194E={
 var patch194D={
   "title" : "1.9.3 - 30.12.2022",
   "inhalt": [
+    "Registrierung - Weißer Bildschirm nach dem Registrierungsprozess wurde behoben",
     "Chat - Neue Nachrichten Anzeige verschwindet jetzt sofort nach Chat besuch",
     "Chat - Gruppennotifikation wird jetzt korrekt gesendet",
     "kleine Fehlerbehebungen"

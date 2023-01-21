@@ -433,5 +433,6 @@
     "informationKopiert": "Information wurde kopiert",
     "nutzungsbedingungen": "Nutzungsbedingungen",
     "datenschutzrichtlinie" : "Datenschutzrichtlinie",
-    "dateiBeschaedigt": "Datei ist beschädigt"
+    "dateiBeschaedigt": "Datei ist beschädigt",
+    "benutzerNamevergeben": "Benutzername ist schon vergeben"
 }
