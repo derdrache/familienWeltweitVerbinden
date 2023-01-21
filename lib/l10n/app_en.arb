@@ -433,6 +433,7 @@
     "informationKopiert": "Information has been copied",
     "nutzungsbedingungen": "Terms of Use",
     "datenschutzrichtlinie" : "Privacy Policy",
-    "dateiBeschaedigt": "File is damaged"
+    "dateiBeschaedigt": "File is damaged",
+    "benutzerNamevergeben": "User name is already taken"
 }
 

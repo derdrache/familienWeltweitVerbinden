@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
+import '../../services/database.dart';
 import '../../services/notification.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../windows/nutzerrichtlinen.dart';
@@ -47,7 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
 
-        success =  true;
+        success = true;
       } on FirebaseAuthException catch (error) {
         if (error.code == "email-already-in-use") {
           customSnackbar(
@@ -67,21 +69,8 @@ class _RegisterPageState extends State<RegisterPage> {
              Folgendes Problem ist aufgetaucht: $error"""
           });
         }
-
       }
     }
-/*
-    try{
-      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
-    } on FirebaseAuthException catch (error) {
-      sendEmail({
-      "title": "Send Email Verification Problem",
-      "inhalt": """
-               Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
-               Folgendes Problem ist aufgetaucht: $error"""
-      });
-    }
- */
 
     setState(() {
       isLoading = false;
@@ -108,12 +97,19 @@ class _RegisterPageState extends State<RegisterPage> {
           key: formKey,
           child: ListView(
             children: [
-              customTextInput("Email", emailController,
-                  validator: global_functions.checkValidationEmail(context),
-                  textInputAction: TextInputAction.next),
-              customTextInput(AppLocalizations.of(context).emailBestaetigen, checkEmailController,
-                  validator: global_functions.checkValidationEmail(context, emailCheck: emailController.text),
-                  textInputAction: TextInputAction.next),
+              customTextInput(
+                "Email",
+                emailController,
+                validator: global_functions.checkValidationEmail(context),
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              customTextInput(AppLocalizations.of(context).emailBestaetigen,
+                  checkEmailController,
+                  validator: global_functions.checkValidationEmail(context,
+                      emailCheck: emailController.text),
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.emailAddress),
               customTextInput(
                   AppLocalizations.of(context).passwort, passwordController,
                   passwort: true,
