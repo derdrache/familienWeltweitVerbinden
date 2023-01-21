@@ -35,7 +35,5 @@ class LocalNotificationService{
     } on Exception catch (_) {
 
     }
-    
-    
   }
 }
