@@ -29,7 +29,7 @@ class _NewsPageState extends State<NewsPage>{
   List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
   List userNewsContentHive = Hive.box('secureBox').get("userNewsContent") ?? [];
-  Map ownSettingProfil = Hive.box('secureBox').get("ownNewsSetting");
+  var ownSettingProfil = Hive.box('secureBox').get("ownNewsSetting");
   List newsFeed = [];
   List newsFeedDateList = [];
   final _controller = ScrollController();
@@ -38,7 +38,9 @@ class _NewsPageState extends State<NewsPage>{
 
   @override
   void initState() {
-    ownSettingProfil ??= _addNewSettingProfil();
+    if(ownSettingProfil == false || ownSettingProfil == null){
+      ownSettingProfil = _addNewSettingProfil();
+    }
 
     _controller.addListener(() {
       bool isTop = _controller.position.pixels == 0;
@@ -56,16 +58,9 @@ class _NewsPageState extends State<NewsPage>{
     });
 
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
-      _refresh();
-    });
   }
 
-  _refresh()async{
-    //await refreshHiveNewsPage();
-    setState(() {});
-  }
+
 
   _addNewSettingProfil(){
     var newProfil = {
@@ -175,6 +170,7 @@ class _NewsPageState extends State<NewsPage>{
   }
 
   Widget build(BuildContext context) {
+
     const double titleFontSize = 15;
     newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
 

@@ -210,8 +210,6 @@ bool isLink(String input) {
     return !(first4Letters == "http" && first4Letters == "www.");
   }
 
-  //final matcher = RegExp(
-  //    r"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)");
   final matcher = RegExp(
         r"(/([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#\.]?[\w-]+)*\/?/gm)");
 

@@ -61,7 +61,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             ? global_variablen.interessenListe
             : global_variablen.interessenListeEnglisch);
 
-
+    refreshHiveEvents();
 
     super.initState();
   }
@@ -86,15 +86,13 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
     var userName = userNameKontroller.text;
     userName = userName.replaceAll("'", "''");
-    var userExist = true;
+    bool userExist =
+        await ProfilDatabase().getData("id", "WHERE name = '$userName'") !=
+            false;
 
-    try {
-      userExist =
-          await ProfilDatabase().getData("id", "WHERE name = '$userName'") !=
-              false;
-    } catch (_) {
+    if (userExist) {
       customSnackbar(
-          context, AppLocalizations.of(context).keineVerbindungInternet);
+          context, AppLocalizations.of(context).benutzerNamevergeben);
       changeLoading();
       return;
     }
@@ -104,7 +102,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var email = FirebaseAuth.instance.currentUser?.email;
       var children = childrenAgePickerBox.getDates();
       var ortMapData = ortAuswahlBox.getGoogleLocationData();
-
 
       if (ortMapData["city"] == null) {
         customSnackbar(context, AppLocalizations.of(context).ortEingeben);
@@ -129,35 +126,16 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "aboutme": aboutusKontroller.text
       };
 
-      try {
-        await ProfilDatabase().addNewProfil(data);
-        var ownProfil =
-            await ProfilDatabase().getData("*", "WHERE id = '$userID'");
-        Hive.box('secureBox').put("ownProfil", ownProfil);
+      await ProfilDatabase().addNewProfil(data);
+      await refreshHiveProfils();
 
-        var allProfils = Hive.box('secureBox').get("profils");
-        allProfils.add(ownProfil);
+      await NewsPageDatabase().addNewNews({
+        "typ": "ortswechsel",
+        "information": json.encode(ortMapData),
+      });
+      await refreshHiveNewsPage();
 
-        var newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
-        newsFeedData.add({
-          "typ": "ortswechsel",
-          "information": ortMapData,
-          "erstelltAm": DateTime.now().toString(),
-          "erstelltVon": FirebaseAuth.instance.currentUser.uid
-        });
-
-        global_functions.changePageForever(context, StartPage());
-      } catch (_) {
-        customSnackbar(
-                context, AppLocalizations.of(context).keineVerbindungInternet) +
-            "?";
-        sendEmail({
-          "title": "User hat beim Profil erstellen ein Problem",
-          "inhalt": jsonEncode(data)
-        });
-        changeLoading();
-        return;
-      }
+      global_functions.changePageForever(context, StartPage());
 
       additionalDatabaseOperations(ortMapData, userID);
     }
@@ -166,25 +144,22 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   additionalDatabaseOperations(ortMapData, userId) async {
-    await refreshHiveChats();
-    await refreshHiveEvents();
-
     await StadtinfoDatabase().addNewCity(ortMapData);
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
         "WHERE ort LIKE '${ortMapData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
 
-    ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"]);
-    ChatGroupsDatabase().updateChatGroup(
-        "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+    await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"]);
+    await ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_MERGE_PATCH(users, '${json.encode({
+              userId: {"newMessages": 0}
+            })}')",
         "WHERE id = '1'");
     List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     myGroupChats.add(getChatGroupFromHive(""));
 
-    NewsPageDatabase().addNewNews({
-      "typ": "ortswechsel",
-      "information": json.encode(ortMapData),
-    });
+    await refreshHiveChats();
+    await refreshHiveEvents();
   }
 
   childrenInputValidation() {
@@ -211,11 +186,11 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       errorString +=
           "- " + AppLocalizations.of(context).reiseartAuswaehlen + "\n";
     }
-    if(interessenAuswahlBox.getSelected().isEmpty){
+    if (interessenAuswahlBox.getSelected().isEmpty) {
       errorString +=
           "- " + AppLocalizations.of(context).interessenAuswaehlen + "\n";
     }
-    if(sprachenAuswahlBox.getSelected().isEmpty){
+    if (sprachenAuswahlBox.getSelected().isEmpty) {
       errorString +=
           "- " + AppLocalizations.of(context).spracheAuswaehlen + "\n";
     }
@@ -239,9 +214,12 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-    sprachenAuswahlBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
-    reiseArtenAuswahlBox.hintText = AppLocalizations.of(context).artDerReiseAuswaehlen;
-    interessenAuswahlBox.hintText = AppLocalizations.of(context).interessenAuswaehlen;
+    sprachenAuswahlBox.hintText =
+        AppLocalizations.of(context).spracheAuswaehlen;
+    reiseArtenAuswahlBox.hintText =
+        AppLocalizations.of(context).artDerReiseAuswaehlen;
+    interessenAuswahlBox.hintText =
+        AppLocalizations.of(context).interessenAuswaehlen;
     childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
     ortAuswahlBox.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
 

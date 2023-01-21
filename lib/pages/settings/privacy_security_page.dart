@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import '../../auth/secrets.dart';
 import '../../global/variablen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -207,6 +208,10 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       );
     }
 
+    chooseProfilIdWindow(){
+
+    }
+
     deleteProfilWindow() {
       showDialog(
           context: context,
@@ -224,8 +229,17 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () {
-                    ProfilDatabase().deleteProfil(ownProfil["id"]);
-                    DbDeleteImage(ownProfil["bild"]);
+                    var deleteProfil = ownProfil;
+
+                    if(userId == mainAdmin){
+                      var choosenProfilId = chooseProfilIdWindow();
+                      deleteProfil = getProfilFromHive(profilId: choosenProfilId);
+                    }
+
+                    print(deleteProfil["id"]);
+                    return;
+                    ProfilDatabase().deleteProfil(deleteProfil["id"]);
+                    DbDeleteImage(deleteProfil["bild"]);
                     setState(() {});
                     global_functions.changePageForever(
                         context, LoginPage());
