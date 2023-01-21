@@ -717,7 +717,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
   @override
   void initState() {
     if (widget.rowData != String) widget.rowData = widget.rowData.toString();
-    if (widget.databaseKennzeichnung != "link") {
+    if (widget.databaseKennzeichnung != "link"){
       inputKontroller.text = widget.rowData;
     }
 
@@ -778,7 +778,7 @@ class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
         validationText = AppLocalizations.of(context).usernameZuLang;
       }
     } else if (widget.databaseKennzeichnung == "link") {
-      if (global_func.isLink(data)) {
+      if (!global_func.isLink(data)) {
         validationText = AppLocalizations.of(context).eingabeKeinLink;
       }
     }

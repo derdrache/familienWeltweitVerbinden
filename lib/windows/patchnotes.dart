@@ -132,7 +132,7 @@ var patchVorlage={
 };
 
 var patch194E={
-  "title" : "1.9.3 - 30.12.2022",
+  "title" : "1.9.3 - 22.01.2023",
   "inhalt": [
     "Registration - White screen after registration process has been fixed",
     "Chat - New message display now disappears immediately after chat visit",
@@ -141,7 +141,7 @@ var patch194E={
   ]
 };
 var patch194D={
-  "title" : "1.9.3 - 30.12.2022",
+  "title" : "1.9.4 - 22.01.2023",
   "inhalt": [
     "Registrierung - Weißer Bildschirm nach dem Registrierungsprozess wurde behoben",
     "Chat - Neue Nachrichten Anzeige verschwindet jetzt sofort nach Chat besuch",
@@ -151,7 +151,7 @@ var patch194D={
 };
 
 var patch193E={
-  "title" : "1.9.3 - 30.12.2022",
+  "title" : "1.9.3 - 11.01.2023",
   "inhalt": [
     "Event - commitments now works properly again",
     "Create profile - it is now not possible to create a profile without interest and languages",
@@ -159,7 +159,7 @@ var patch193E={
   ]
 };
 var patch193D={
-  "title" : "1.9.3 - 30.12.2022",
+  "title" : "1.9.3 - 11.01.2023",
   "inhalt": [
     "Event - Zusagen funktioniert jetzt wieder ordentlich",
     "Profil erstellen - es ist nun nicht mehr möglich ein Profil ohne interesse und Sprachen zu erstellen",
