@@ -65,7 +65,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     var familyName = familyProfil["name"];
     var mainMemberProfil = Map.of(getProfilFromHive(profilId: familyProfil["mainProfil"]));
     mainMemberProfil["name"] =
-        (spracheIstDeutsch ? "Familie:" : "family") + " " + familyName;
+        (spracheIstDeutsch ? "Familie" : "Family") + " " + familyName;
     profil = mainMemberProfil;
   }
 
