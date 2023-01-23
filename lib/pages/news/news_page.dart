@@ -22,7 +22,7 @@ class NewsPage extends StatefulWidget {
   _NewsPageState createState() => _NewsPageState();
 }
 
-class _NewsPageState extends State<NewsPage>{
+class _NewsPageState extends State<NewsPage> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
   List newsFeedData;
   List events = Hive.box('secureBox').get("events") ?? [];
@@ -38,7 +38,7 @@ class _NewsPageState extends State<NewsPage>{
 
   @override
   void initState() {
-    if(ownSettingProfil == false || ownSettingProfil == null){
+    if (ownSettingProfil == false || ownSettingProfil == null) {
       ownSettingProfil = _addNewSettingProfil();
     }
 
@@ -60,9 +60,7 @@ class _NewsPageState extends State<NewsPage>{
     super.initState();
   }
 
-
-
-  _addNewSettingProfil(){
+  _addNewSettingProfil() {
     var newProfil = {
       "id": userId,
       "showFriendAdded": true,
@@ -89,7 +87,9 @@ class _NewsPageState extends State<NewsPage>{
     }
 
     String newsPagePatchDate = "2022-08-01";
-    if (lastLocationChangeDate.isEmpty) lastLocationChangeDate = newsPagePatchDate;
+    if (lastLocationChangeDate.isEmpty) {
+      lastLocationChangeDate = newsPagePatchDate;
+    }
 
     return lastLocationChangeDate;
   }
@@ -123,7 +123,7 @@ class _NewsPageState extends State<NewsPage>{
     if (_checkWidgetListIsEmpty(widgetList)) {
       widgetList.add(Center(
           child: Container(
-              padding: EdgeInsets.only(top: screenHeight/3),
+              padding: EdgeInsets.only(top: screenHeight / 3),
               child: Text(
                 AppLocalizations.of(context).keineNewsVorhanden,
                 style: const TextStyle(fontSize: 20),
@@ -170,7 +170,6 @@ class _NewsPageState extends State<NewsPage>{
   }
 
   Widget build(BuildContext context) {
-
     const double titleFontSize = 15;
     newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
 
@@ -231,8 +230,8 @@ class _NewsPageState extends State<NewsPage>{
                   right: 35,
                   child: NewsStamp(
                       date: news["erstelltAm"],
-                      isNew:
-                          _checkIfNew(news["information"], news["erstelltVon"])))
+                      isNew: _checkIfNew(
+                          news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -242,9 +241,9 @@ class _NewsPageState extends State<NewsPage>{
     changePlaceDisplay(news, myLastLocationDate) {
       String newsUserId = news["erstelltVon"];
       Map familyProfil = getFamilyProfil(familyMember: newsUserId);
-      Map newsUserProfil = getProfilFromHive(profilId: familyProfil != null
-          ? familyProfil["mainProfil"]
-          : newsUserId);
+      Map newsUserProfil = getProfilFromHive(
+          profilId:
+              familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
       bool isFriend = ownProfil["friendlist"].contains(newsUserId);
       String text = "";
       String newsOrt = news["information"]["city"];
@@ -268,7 +267,10 @@ class _NewsPageState extends State<NewsPage>{
       String newsOrtInfo =
           newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
       newsUserProfil = Map.from(newsUserProfil);
-      if(familyProfil != null) newsUserProfil["name"] = "Familie " + familyProfil["name"];
+      if (familyProfil != null) {
+        newsUserProfil["name"] =
+            AppLocalizations.of(context).familie + " " + familyProfil["name"];
+      }
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"] == 1) {
         text = newsUserProfil["name"] +
@@ -321,8 +323,8 @@ class _NewsPageState extends State<NewsPage>{
                   right: 35,
                   child: NewsStamp(
                       date: news["erstelltAm"],
-                      isNew:
-                          _checkIfNew(news["information"], news["erstelltVon"])))
+                      isNew: _checkIfNew(
+                          news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -332,12 +334,15 @@ class _NewsPageState extends State<NewsPage>{
     friendsNewTravelPlanDisplay(news) {
       String newsUserId = news["erstelltVon"];
       Map familyProfil = getFamilyProfil(familyMember: newsUserId);
-      Map friendProfil = getProfilFromHive(profilId: familyProfil != null
-          ? familyProfil["mainProfil"]
-          : newsUserId);
+      Map friendProfil = getProfilFromHive(
+          profilId:
+              familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
 
       bool isFriend = familyProfil != null
-          ? ownProfil["friendlist"].toSet().intersection(familyProfil["members"].toSet()).isNotEmpty
+          ? ownProfil["friendlist"]
+              .toSet()
+              .intersection(familyProfil["members"].toSet())
+              .isNotEmpty
           : ownProfil["friendlist"].contains(newsUserId);
 
       if (!isFriend ||
@@ -347,7 +352,9 @@ class _NewsPageState extends State<NewsPage>{
       }
 
       friendProfil = Map.from(friendProfil);
-      if(familyProfil != null) friendProfil["name"] = "Familie " + familyProfil["name"];
+      if (familyProfil != null) {
+        friendProfil["name"] = "Familie " + familyProfil["name"];
+      }
 
       Map newTravelPlan = news["information"];
       String travelPlanVon =
@@ -356,7 +363,8 @@ class _NewsPageState extends State<NewsPage>{
           newTravelPlan["bis"].split(" ")[0].split("-").reversed.join("-");
       String travelPlanCity = newTravelPlan["ortData"]["city"];
       String travelPlanCountry = newTravelPlan["ortData"]["countryname"];
-      String textTitle = friendProfil["name"] + "\n" +
+      String textTitle = friendProfil["name"] +
+          "\n" +
           AppLocalizations.of(context).friendNewTravelPlan;
       String textDate = travelPlanVon + " - " + travelPlanbis;
       String textLocation = travelPlanCity + " / " + travelPlanCountry;
@@ -409,8 +417,8 @@ class _NewsPageState extends State<NewsPage>{
                   right: 35,
                   child: NewsStamp(
                       date: news["erstelltAm"],
-                      isNew:
-                          _checkIfNew(news["information"], news["erstelltVon"])))
+                      isNew: _checkIfNew(
+                          news["information"], news["erstelltVon"])))
             ],
           ),
         ),
@@ -435,9 +443,10 @@ class _NewsPageState extends State<NewsPage>{
         return const SizedBox.shrink();
       }
 
-      if(isOnline){
-        eventText = AppLocalizations.of(context).newsPageOnlineEventVorschlag + _evenTagMatch(event["tags"]).toString();
-      }else{
+      if (isOnline) {
+        eventText = AppLocalizations.of(context).newsPageOnlineEventVorschlag +
+            _evenTagMatch(event["tags"]).toString();
+      } else {
         eventText = AppLocalizations.of(context).newsPageOfflineEventVorschlag;
       }
 
@@ -461,7 +470,8 @@ class _NewsPageState extends State<NewsPage>{
                     Icon(
                       Icons.fiber_new,
                       size: 30,
-                      color: _checkIfNew(event["beschreibung"], event["erstelltVon"])
+                      color: _checkIfNew(
+                              event["beschreibung"], event["erstelltVon"])
                           ? null
                           : Colors.transparent,
                     ),
