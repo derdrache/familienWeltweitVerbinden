@@ -554,7 +554,6 @@ class _UserInformationDisplay extends StatelessWidget {
 
     locationBox() {
       Map currentLocation = {
-        "ort": profil["ort"],
         "latt": profil["latt"],
         "longt": profil["longt"]
       };
@@ -753,11 +752,12 @@ class _UserInformationDisplay extends StatelessWidget {
         }
 
         Map reiseplanLocation = {
-
+          "latt": profil["latt"],
+          "longt": profil["longt"]
         };
 
         reiseplanung.add(GestureDetector(
-          onTap: () => WorldmapMini(location: reiseplanLocation,),
+          onTap: () => changePage(context, WorldmapMini(location: reiseplanLocation)),
           child: Container(
             margin: const EdgeInsets.only(bottom: 5),
             child: Row(

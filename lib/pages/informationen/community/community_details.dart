@@ -24,6 +24,7 @@ import '../../../widgets/search_autocomplete.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../start_page.dart';
 import '../../../global/variablen.dart' as global_var;
+import '../../weltkarte/weltkarte_mini.dart';
 
 class CommunityDetails extends StatefulWidget {
   Map community;
@@ -886,7 +887,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: InkWell(
-            onTap: () => isCreator ? _changeOrtWindow() : null,
+            onTap: () => isCreator
+                ? _changeOrtWindow()
+                : global_func.changePage(context, WorldmapMini(
+                location: {"latt": widget.community["latt"], "longt": widget.community["longt"]}
+            )),
             child: Row(
               children: [
                 Text(AppLocalizations.of(context).ort,
