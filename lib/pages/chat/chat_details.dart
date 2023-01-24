@@ -2183,6 +2183,38 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       });
 
       showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Center(child: Text(connectedData["name"])),
+            contentPadding: EdgeInsets.zero,
+            content: SizedBox(
+              width: 600,
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  if (widget.chatId != "1") Container(
+                    width: 100,
+                    height: 40,
+                    margin: const EdgeInsets.only(bottom: 30, top: 10),
+                    child: FittedBox(
+                      child: FloatingActionButton.extended(
+                        label: Text(detailsButtonName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                        onPressed: () => global_functions.changePage(context, pageDetailsPage),
+                      ),
+                    ),
+                  ),
+                  Text(AppLocalizations.of(context).member, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  Expanded(child: ListView(shrinkWrap: true,children: [...mitgliederList]))
+                ]
+              ),
+            ),
+          );
+        }
+      );
+/*
+      showDialog(
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
@@ -2201,10 +2233,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 ),
                 Text(AppLocalizations.of(context).member, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
-                ...mitgliederList
+                ListView(children: [...mitgliederList])
               ],
             );
           });
+
+ */
     }
 
     mitgliederDialog() {

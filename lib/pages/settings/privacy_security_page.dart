@@ -208,8 +208,32 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       );
     }
 
-    chooseProfilIdWindow(){
+    chooseProfilIdWindow() async{
+      String deleteId;
+      TextEditingController idController = TextEditingController();
 
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: "Accountid zum löschen eingeben",
+              height: 150,
+              children: [
+                Center(child: customTextInput("Account id eingeben", idController))
+              ],
+              actions: [
+                TextButton(
+                  child: const Text("Ok"),
+                  onPressed: () {
+                    deleteId = idController.text;
+                    Navigator.pop(context);
+                  }
+                ),
+              ],
+            );
+          });
+
+      return deleteId;
     }
 
     deleteProfilWindow() {
@@ -228,16 +252,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
               actions: [
                 TextButton(
                   child: const Text("Ok"),
-                  onPressed: () {
+                  onPressed: () async{
                     var deleteProfil = ownProfil;
 
-                    if(userId == mainAdmin){
-                      var choosenProfilId = chooseProfilIdWindow();
-                      deleteProfil = getProfilFromHive(profilId: choosenProfilId);
-                    }
-
-                    print(deleteProfil["id"]);
-                    return;
                     ProfilDatabase().deleteProfil(deleteProfil["id"]);
                     DbDeleteImage(deleteProfil["bild"]);
                     setState(() {});
@@ -258,7 +275,17 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       return FloatingActionButton.extended(
           backgroundColor: Colors.red,
           label: Text(AppLocalizations.of(context).accountLoeschen),
-          onPressed: () => deleteProfilWindow());
+          onPressed: () async {
+
+            if(userId == mainAdmin){
+              String choosenProfilId = await chooseProfilIdWindow();
+              ProfilDatabase().deleteProfil(choosenProfilId);
+              Map deleteProfil = getProfilFromHive(profilId: choosenProfilId);
+              DbDeleteImage(deleteProfil["bild"]);
+            }else{
+              deleteProfilWindow();
+            }
+          });
     }
 
     return Scaffold(

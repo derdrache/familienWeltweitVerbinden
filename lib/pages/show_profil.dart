@@ -13,6 +13,7 @@ import '../global/global_functions.dart' as global_functions;
 import '../global/global_functions.dart';
 import '../global/variablen.dart' as global_variablen;
 import '../global/variablen.dart';
+import '../pages/weltkarte/weltkarte_mini.dart';
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
 import '../services/notification.dart';
@@ -552,19 +553,28 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     locationBox() {
-      return Row(
-        children: [
-          Text(
-            AppLocalizations.of(context).aktuelleOrt + ": ",
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
-          ),
-          Flexible(
-              child: Text(
-            profil["ort"],
-            style: TextStyle(fontSize: textSize),
-            maxLines: 2,
-          ))
-        ],
+      Map currentLocation = {
+        "ort": profil["ort"],
+        "latt": profil["latt"],
+        "longt": profil["longt"]
+      };
+
+      return GestureDetector(
+        onTap: () => changePage(context, WorldmapMini(location: currentLocation)),
+        child: Row(
+          children: [
+            Text(
+              AppLocalizations.of(context).aktuelleOrt + ": ",
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            Flexible(
+                child: Text(
+              profil["ort"],
+              style: TextStyle(fontSize: textSize),
+              maxLines: 2,
+            ))
+          ],
+        ),
       );
     }
 
@@ -742,20 +752,27 @@ class _UserInformationDisplay extends StatelessWidget {
           ortText += " / " + reiseplan["ortData"]["countryname"];
         }
 
-        reiseplanung.add(Container(
-          margin: const EdgeInsets.only(bottom: 5),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                    transformDateToText(reiseplan["von"]) +
-                        " - " +
-                        transformDateToText(reiseplan["bis"], onlyMonth: true) +
-                        " in " +
-                        ortText,
-                    style: TextStyle(fontSize: textSize)),
-              ),
-            ],
+        Map reiseplanLocation = {
+
+        };
+
+        reiseplanung.add(GestureDetector(
+          onTap: () => WorldmapMini(location: reiseplanLocation,),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 5),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                      transformDateToText(reiseplan["von"]) +
+                          " - " +
+                          transformDateToText(reiseplan["bis"], onlyMonth: true) +
+                          " in " +
+                          ortText,
+                      style: TextStyle(fontSize: textSize)),
+                ),
+              ],
+            ),
           ),
         ));
       }
