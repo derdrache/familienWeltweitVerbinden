@@ -22,9 +22,7 @@ import '../../../widgets/text_with_hyperlink_detection.dart';
 
 /*
 Clean Code Notize:
-- ShowDataAndChangeWindow => vereinfachen :
-    => getData ifs mehr zusammenfassen
-    =>
+- Bei Falsch Eingabe der Änderungen nicht das Fenster schließen
 - isApproved && isPublic zusammenfassen?
  */
 
@@ -58,9 +56,15 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   final _controller = ScrollController();
   var moreContent = false;
   final translator = GoogleTranslator();
+  var textInputKontroller = TextEditingController();
+  var beschreibungInputKontroller = TextEditingController();
+  var ortAuswahlBox = GoogleAutoComplete();
+  var dropdownInput = CustomDropDownButton();
+  var multiDropDownInput = CustomMultiTextForm();
 
   @override
   void initState() {
+    beschreibungInputKontroller.text = widget.event["beschreibung"];
     _controller.addListener(() {
       if (_controller.position.atEdge) {
         bool isTop = _controller.position.pixels == 0;
@@ -114,7 +118,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           "WHERE id ='${widget.event["id"]}'");
     }
 
-    updateHiveEvent(widget.event["id"], "freischalten", widget.event["freischalten"]);
+    updateHiveEvent(
+        widget.event["id"], "freischalten", widget.event["freischalten"]);
   }
 
   convertIntoMyDate() {
@@ -163,7 +168,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   widget.event["tags"].add(newValue);
                   changeState(() {});
 
-                  updateHiveEvent(widget.event["id"], "tags", widget.event["tags"]);
+                  updateHiveEvent(
+                      widget.event["id"], "tags", widget.event["tags"]);
 
                   await EventDatabase().update(
                       "tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')",
@@ -242,44 +248,47 @@ class _EventCardDetailsState extends State<EventCardDetails> {
         });
   }
 
-  descriptionTranslation(text, targetLanguage) async{
+  descriptionTranslation(text, targetLanguage) async {
     text = text.replaceAll("'", "");
 
-    var translation = await translator.translate(text,
-        from: "auto", to: targetLanguage);
+    var translation =
+        await translator.translate(text, from: "auto", to: targetLanguage);
 
     return translation.toString();
   }
 
-  changeBeschreibungWindow(beschreibung){
-    var newInputController = TextEditingController(text: beschreibung);
-
+  openChangeWindow(title, inputWidget, saveFunction, {double height = 180}) {
     showDialog(
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-              title: AppLocalizations.of(context).eventBeschreibungAendern,
-              height: 400,
+              title: title,
+              height: height,
               children: [
-                customTextInput(AppLocalizations.of(context).neueBeschreibungEingeben, newInputController,
-                  moreLines: 13,
-                  textInputAction: TextInputAction.newline),
+                inputWidget,
                 Container(
                   margin: const EdgeInsets.only(right: 10),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          child: Text(AppLocalizations.of(context).abbrechen,
+                          child: Text(AppLocalizations
+                              .of(context)
+                              .abbrechen,
                               style: TextStyle(fontSize: fontsize)),
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            textInputKontroller = TextEditingController();
+                            Navigator.pop(context);
+                          }
                         ),
                         TextButton(
                             child: Text(
                                 AppLocalizations.of(context).speichern,
                                 style: TextStyle(fontSize: fontsize)),
                             onPressed: () {
-                              saveNewBeschreibung(newInputController.text);
+                              saveFunction();
+                              textInputKontroller = TextEditingController();
+                              setState((){});
                               Navigator.pop(context);
                             }),
                       ]),
@@ -288,8 +297,25 @@ class _EventCardDetailsState extends State<EventCardDetails> {
         });
   }
 
-  saveNewBeschreibung(input)async {
-    if(input.isEmpty) return;
+  saveNewName(){
+    String newName = textInputKontroller.text;
+
+    if(newName.isEmpty) return;
+
+    if (newName.length > 40) {
+      customSnackbar(context, AppLocalizations
+          .of(context)
+          .usernameZuLang);
+    }
+
+    widget.event["name"] = newName;
+    updateHiveEvent(widget.event["id"], "name", newName);
+    EventDatabase().update("name = '$newName'",
+        "WHERE id = '${widget.event["id"]}'");
+  }
+
+  saveNewBeschreibung(input) async {
+    if (input.isEmpty) return;
 
     var eventId = widget.event["id"];
     var event = getEventFromHive(eventId);
@@ -297,20 +323,85 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     var languageCheck = await translator.translate(input);
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
-    if(descriptionIsGerman){
+    if (descriptionIsGerman) {
       event["beschreibung"] = input;
       event["beschreibungGer"] = input;
       var translation = await descriptionTranslation(input, "auto");
-      event["beschreibungEng"] = translation + "\n\nThis is an automatic translation";
-    }else{
+      event["beschreibungEng"] =
+          translation + "\n\nThis is an automatic translation";
+    } else {
       event["beschreibung"] = input;
       event["beschreibungEng"] = input;
-      var translation = await descriptionTranslation(input,"de");
-      event["beschreibungGer"] = translation+ "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      var translation = await descriptionTranslation(input, "de");
+      event["beschreibungGer"] = translation +
+          "\n\nHierbei handelt es sich um eine automatische Übersetzung";
     }
 
-    await EventDatabase().update("beschreibung = '${event["beschreibung"]}', beschreibungGer = '${event["beschreibungGer"]}',beschreibungEng = '${event["beschreibungEng"]}'",
-        "WHERE id = '${eventId}'");
+    await EventDatabase().update(
+        "beschreibung = '${event["beschreibung"]}', beschreibungGer = '${event["beschreibungGer"]}',beschreibungEng = '${event["beschreibungEng"]}'",
+        "WHERE id = '$eventId'");
+  }
+
+  saveNewTimeZone() {
+    String newTimeZone = textInputKontroller.text;
+
+    if(newTimeZone.isEmpty) return;
+
+    widget.event["zeitzone"] = newTimeZone;
+    updateHiveEvent(widget.event["id"], "zeitzone", newTimeZone);
+    EventDatabase().update("zeitzone = '$newTimeZone'",
+        "WHERE id = '${widget.event["id"]}'");
+  }
+
+  saveNewLocation(){
+    var newLocation = ortAuswahlBox.googleSearchResult;
+
+    if(newLocation["city"].isEmpty) return;
+
+    updateHiveEvent(widget.event["id"], "stadt", newLocation["city"]);
+    updateHiveEvent(widget.event["id"], "land", newLocation["countryname"]);
+    updateHiveEvent(widget.event["id"], "latt", newLocation["latt"]);
+    updateHiveEvent(widget.event["id"], "longt", newLocation["longt"]);
+    EventDatabase().updateLocation(widget.event["id"], newLocation);
+    StadtinfoDatabase().addNewCity(newLocation);
+  }
+
+  saveNewMapAndLink(){
+    String newLink = textInputKontroller.text;
+
+    if(newLink.isEmpty) return;
+
+    if (!global_func.isLink(newLink)) {
+      customSnackbar(context, AppLocalizations.of(context).eingabeKeinLink);
+      return;
+    }
+
+    widget.event["link"] = newLink;
+    updateHiveEvent(widget.event["id"], "link", newLink);
+    EventDatabase().update("link = '$newLink'",
+        "WHERE id = '${widget.event["id"]}'");
+  }
+
+  saveNewInterval(){
+    String newInterval = dropdownInput.getSelected();
+
+    if(newInterval.isEmpty) return;
+
+    widget.event["eventInterval"] = newInterval;
+    updateHiveEvent(widget.event["id"], "eventInterval", newInterval);
+    EventDatabase().update("eventInterval = '$newInterval'",
+        "WHERE id = '${widget.event["id"]}'");
+  }
+
+  saveNewSprache(){
+    String newSprache = multiDropDownInput.getSelected();
+
+    if(newSprache.isEmpty) return;
+
+    widget.event["sprache"] = newSprache;
+    updateHiveEvent(widget.event["id"], "sprache", newSprache);
+    EventDatabase().update("sprache = '$newSprache'",
+        "WHERE id = '${widget.event["id"]}'");
   }
 
   @override
@@ -321,6 +412,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     double screenWidth = MediaQuery.of(context).size.width;
     bool isOffline = widget.event["typ"] == global_var.eventTyp[0] ||
         widget.event["typ"] == global_var.eventTypEnglisch[0];
+    ortAuswahlBox.hintText = AppLocalizations.of(context).neueStadtEingeben;
 
     if (screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
@@ -329,6 +421,23 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     widget.event["eventInterval"] = isGerman
         ? global_func.changeEnglishToGerman(widget.event["eventInterval"])
         : global_func.changeGermanToEnglish(widget.event["eventInterval"]);
+
+    nameInformation(){
+      return InkWell(
+        onTap: () => openChangeWindow(
+            AppLocalizations.of(context).eventNameAendern,
+            customTextInput(
+                AppLocalizations.of(context).neuenNamenEingeben,
+                textInputKontroller
+            ),
+            saveNewName
+        ),
+        child: Text(widget.event["name"],
+            style: TextStyle(
+                fontSize: fontsize + 8, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center),
+      );
+    }
 
     bildAndTitleBox() {
       return Stack(
@@ -376,17 +485,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                           ]),
                       margin: const EdgeInsets.only(left: 30, right: 30),
                       width: 800,
-                      child: ShowDataAndChangeWindow(
-                          eventId: widget.event["id"],
-                          windowTitle:
-                              AppLocalizations.of(context).eventNameAendern,
-                          rowData: widget.event["name"],
-                          inputHintText:
-                              AppLocalizations.of(context).neuenNamenEingeben,
-                          isCreator: widget.isCreator,
-                          modus: "textInput",
-                          singleShow: true,
-                          databaseKennzeichnung: "name")))),
+                      child: nameInformation()
+                      ))),
         ],
       );
     }
@@ -417,14 +517,12 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
       return const SizedBox.shrink();
     }
-
+/*
     eventInformationBox() {
       return Container(
         margin: const EdgeInsets.all(10),
         child: Column(
           children: [
-            ShowDatetimeBox(event: widget.event, isCreator: widget.isCreator),
-            const SizedBox(height: 5),
             ShowDataAndChangeWindow(
                 eventId: widget.event["id"],
                 windowTitle: AppLocalizations.of(context).eventZeitzoneAendern,
@@ -458,7 +556,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                       style: TextStyle(fontSize: fontsize))
                 ],
               ),
-            const SizedBox(height: 5),
             if (widget.isApproved || widget.isPublic)
               ShowDataAndChangeWindow(
                   eventId: widget.event["id"],
@@ -470,7 +567,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   isCreator: widget.isCreator,
                   modus: "textInput",
                   databaseKennzeichnung: "link"),
-            if (widget.isApproved || widget.isPublic) const SizedBox(height: 5),
             if (widget.isApproved || widget.isPublic)
               ShowDataAndChangeWindow(
                 eventId: widget.event["id"],
@@ -489,7 +585,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   setState(() {});
                 },
               ),
-            if (widget.isApproved || widget.isPublic) const SizedBox(height: 5),
             ShowDataAndChangeWindow(
                 eventId: widget.event["id"],
                 windowTitle: AppLocalizations.of(context).eventSpracheAendern,
@@ -513,9 +608,127 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       );
     }
 
+
+ */
+
+
+    eventInformationRow(rowTitle, rowData, changeWindow,
+        {bodyColor = Colors.black}) {
+      return Container(
+          margin: const EdgeInsets.only(left: 10, right: 10, top: 5),
+          child: Row(
+            children: [
+              Text(rowTitle,
+                  style: TextStyle(
+                      fontSize: fontsize, fontWeight: FontWeight.bold)),
+              const Expanded(child: SizedBox.shrink()),
+              InkWell(
+                onTap: changeWindow,
+                child: SizedBox(
+                    width: 200,
+                    child: Text(rowData,
+                        textAlign: TextAlign.end,
+                        softWrap: false,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            TextStyle(fontSize: fontsize, color: bodyColor))),
+              )
+            ],
+          ));
+    }
+
+    timeZoneInformation(){
+      return eventInformationRow(
+        AppLocalizations.of(context).zeitzone,
+        "GMT " + widget.event["zeitzone"].toString(),
+            () => openChangeWindow(
+            AppLocalizations.of(context).eventZeitzoneAendern,
+            customTextInput(
+                AppLocalizations.of(context).neueZeitzoneEingeben,
+                textInputKontroller
+            ),
+            saveNewTimeZone
+        ),
+      );
+    }
+
+    locationInformation(){
+      return eventInformationRow(
+        AppLocalizations.of(context).ort,
+        widget.event["stadt"] + ", " + widget.event["land"],
+            () => openChangeWindow(
+            AppLocalizations.of(context).eventStadtAendern,
+            ortAuswahlBox,
+            saveNewLocation,
+            height: 400
+        ));
+    }
+
+    mapAndLinkInformation(){
+      return eventInformationRow(isOffline ? "Map: " : "Link: ",
+          widget.event["link"],
+          () => openChangeWindow(
+              AppLocalizations.of(context).eventMapLinkAendern,
+              customTextInput(
+                  AppLocalizations.of(context).neuenKartenlinkEingeben,
+                  textInputKontroller
+              ),
+              null
+          ),
+          bodyColor: Theme.of(context).colorScheme.secondary);
+    }
+
+    intervalInformation(){
+      dropdownInput = CustomDropDownButton(
+          items: isGerman
+              ? global_var.eventInterval
+              : global_var.eventIntervalEnglisch,
+          selected: widget.event["eventInterval"]);
+
+      return eventInformationRow(
+          "Interval",
+          widget.event["eventInterval"],
+              () => openChangeWindow(
+              AppLocalizations.of(context).eventIntervalAendern,
+              dropdownInput,
+              null
+          )
+      );
+    }
+
+    sprachenInformation(){
+      var data = isGerman
+          ? global_func
+          .changeEnglishToGerman(widget.event["sprache"])
+          .join(", ")
+          : global_func
+          .changeGermanToEnglish(widget.event["sprache"])
+          .join(", ");
+      multiDropDownInput = CustomMultiTextForm(
+        selected: data.split(", "),
+        auswahlList: isGerman
+            ? global_var.sprachenListe
+            : global_var.sprachenListeEnglisch,
+      );
+
+      return eventInformationRow(
+          AppLocalizations.of(context).sprache,
+          data,
+          () => openChangeWindow(
+              AppLocalizations.of(context).eventSpracheAendern,
+              multiDropDownInput,
+              null
+          )
+      );
+    }
+
     eventBeschreibung() {
-      if(widget.event["beschreibungGer"].isEmpty) widget.event["beschreibungGer"] = widget.event["beschreibung"];
-      if(widget.event["beschreibungEng"].isEmpty) widget.event["beschreibungEng"] = widget.event["beschreibung"];
+      if (widget.event["beschreibungGer"].isEmpty) {
+        widget.event["beschreibungGer"] = widget.event["beschreibung"];
+      }
+      if (widget.event["beschreibungEng"].isEmpty) {
+        widget.event["beschreibungEng"] = widget.event["beschreibung"];
+      }
       var usedDiscription = isGerman
           ? widget.event["beschreibungGer"]
           : widget.event["beschreibungEng"];
@@ -525,14 +738,25 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               const EdgeInsets.only(top: 5, left: 10, right: 10, bottom: 10),
           child: Center(
               child: Container(
-            width: double.infinity,
-            constraints: const BoxConstraints(
-              minHeight: 50.0,
-            ),
-            child: TextWithHyperlinkDetection(
-                text: usedDiscription,
-                onTextTab: widget.isCreator ? () => changeBeschreibungWindow(usedDiscription) : null)
-      )));
+                  width: double.infinity,
+                  constraints: const BoxConstraints(
+                    minHeight: 50.0,
+                  ),
+                  child: TextWithHyperlinkDetection(
+                      text: usedDiscription,
+                      onTextTab: widget.isCreator
+                        ? () => openChangeWindow(
+                            AppLocalizations.of(context).eventBeschreibungAendern,
+                            customTextInput(
+                              AppLocalizations.of(context).neueBeschreibungEingeben,
+                              beschreibungInputKontroller,
+                              moreLines: 13,
+                              textInputAction: TextInputAction.newline
+                            ),
+                            saveNewBeschreibung(beschreibungInputKontroller.text),
+                            height: 400
+                          )
+                          : null))));
     }
 
     cardShadowColor() {
@@ -635,7 +859,17 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                     const SizedBox(height: 20),
                     creatorChangeHintBox(),
                     fremdesEventBox(),
-                    eventInformationBox(),
+                    ShowDatetimeBox(
+                        event: widget.event, isCreator: widget.isCreator),
+                    timeZoneInformation(),
+                    if (isOffline) locationInformation(),
+                    if (!isOffline && !widget.isCreator) eventInformationRow(
+                          AppLocalizations.of(context).meinDatum,
+                          convertIntoMyDate(),
+                          null),
+                    if (widget.isApproved || widget.isPublic) mapAndLinkInformation(),
+                    if (widget.isApproved || widget.isPublic) intervalInformation(),
+                    sprachenInformation(),
                     if (widget.isApproved || widget.isPublic)
                       eventBeschreibung(),
                     eventTags()
@@ -668,303 +902,11 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   }
 }
 
-class ShowDataAndChangeWindow extends StatefulWidget {
-  String windowTitle;
-  String rowTitle;
-  var rowData;
-  String inputHintText;
-  bool isCreator;
-  List items;
-  String modus;
-  bool singleShow;
-  bool multiLines;
-  String databaseKennzeichnung;
-  var oldDate;
-  String eventId;
-  Function saveFunction;
-
-  ShowDataAndChangeWindow(
-      {Key key,
-      this.windowTitle,
-      this.isCreator,
-      this.rowTitle,
-      this.rowData,
-      this.inputHintText,
-      this.items,
-      this.modus,
-      this.singleShow = false,
-      this.multiLines = false,
-      this.databaseKennzeichnung,
-      this.oldDate,
-      this.eventId,
-      this.saveFunction})
-      : super(key: key);
-
-  @override
-  _ShowDataAndChangeWindowState createState() =>
-      _ShowDataAndChangeWindowState();
-}
-
-class _ShowDataAndChangeWindowState extends State<ShowDataAndChangeWindow> {
-  var dropdownInput = CustomDropDownButton();
-  var multiDropDownInput = CustomMultiTextForm();
-  var inputKontroller = TextEditingController();
-  var ortAuswahlBox = GoogleAutoComplete();
-  var uhrZeitButton = DateButton();
-  var datumButton = DateButton(getDate: true);
-  var uhrZeit;
-
-  @override
-  void initState() {
-    if (widget.rowData != String) widget.rowData = widget.rowData.toString();
-    if (widget.databaseKennzeichnung != "link"){
-      inputKontroller.text = widget.rowData;
-    }
-
-    dropdownInput = CustomDropDownButton(
-        hintText: widget.inputHintText,
-        items: widget.items,
-        selected: widget.rowData);
-
-    multiDropDownInput = CustomMultiTextForm(
-      selected: widget.rowData.split(", "),
-      auswahlList: widget.items,
-    );
-
-    ortAuswahlBox.hintText = widget.inputHintText;
-
-    super.initState();
-  }
-
-  getData() {
-    var data;
-
-    if (widget.databaseKennzeichnung == "name") {
-      data = inputKontroller.text;
-    } else if (widget.databaseKennzeichnung == "location") {
-      data = ortAuswahlBox.googleSearchResult;
-    } else if (widget.databaseKennzeichnung == "link") {
-      data = inputKontroller.text;
-    } else if (widget.databaseKennzeichnung == "art") {
-      data = dropdownInput.getSelected();
-    } else if (widget.databaseKennzeichnung == "eventInterval") {
-      data = dropdownInput.getSelected();
-    } else if (widget.databaseKennzeichnung == "sprache") {
-      data = multiDropDownInput.getSelected();
-    } else if (widget.databaseKennzeichnung == "beschreibung") {
-      data = inputKontroller.text;
-    } else if (widget.databaseKennzeichnung == "zeitzone") {
-      data = dropdownInput.getSelected();
-    } else if (widget.modus == "date") {
-      var date = datumButton.eventDatum ?? DateTime.parse(widget.oldDate);
-      var time = uhrZeitButton.uhrZeit ?? DateTime.parse(widget.oldDate);
-
-      data = DateTime(date.year, date.month, date.day, time.hour, time.minute)
-          .toString()
-          .substring(0, 16);
-    }
-
-    return data;
-  }
-
-  checkValidation(data) {
-    var validationText = "";
-
-    if (widget.databaseKennzeichnung == "name") {
-      if (data.isEmpty) {
-        validationText = AppLocalizations.of(context).bitteNameEingeben;
-      }
-      if (data.length > 40) {
-        validationText = AppLocalizations.of(context).usernameZuLang;
-      }
-    } else if (widget.databaseKennzeichnung == "link") {
-      if (!global_func.isLink(data)) {
-        validationText = AppLocalizations.of(context).eingabeKeinLink;
-      }
-    }
-
-    return validationText;
-  }
-
-  changeRowData(data) {
-    if (widget.databaseKennzeichnung == "location") {
-      widget.rowData = data["city"] + ", " + data["countryname"];
-    } else if(widget.databaseKennzeichnung == "sprache"){
-      widget.rowData = data.join(" , ");
-    }else {
-      widget.rowData = data;
-    }
-  }
-
-  saveChanges() async {
-    var data = getData();
-    var errorText = checkValidation(data);
-
-    if (!errorText.isEmpty) {
-      customSnackbar(context, errorText);
-      return;
-    }
-
-    changeRowData(data);
-
-    Navigator.pop(context);
-
-    setState(() {});
-
-    if (widget.databaseKennzeichnung == "location") {
-      updateHiveEvent(widget.eventId, "stadt", data["city"]);
-      updateHiveEvent(widget.eventId, "land", data["countryname"]);
-      updateHiveEvent(widget.eventId, "latt", data["latt"]);
-      updateHiveEvent(widget.eventId, "longt", data["longt"]);
-      await EventDatabase().updateLocation(widget.eventId, data);
-      StadtinfoDatabase().addNewCity(data);
-    } else {
-      updateHiveEvent(widget.eventId, widget.databaseKennzeichnung, data);
-      await EventDatabase().update("${widget.databaseKennzeichnung} = '$data'",
-          "WHERE id = '${widget.eventId}'");
-    }
-
-    if (widget.saveFunction != null) widget.saveFunction();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    inputBox() {
-      if (widget.modus == "textInput") {
-        return customTextInput(widget.inputHintText, inputKontroller,
-            moreLines: widget.multiLines ? 13 : 1,
-            textInputAction: TextInputAction.newline);
-      }
-      if (widget.modus == "dropdown") return dropdownInput;
-      if (widget.modus == "multiDropdown") return multiDropDownInput;
-      if (widget.modus == "googleAutoComplete") return ortAuswahlBox;
-    }
-
-    openChangeWindow() {
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-                title: widget.windowTitle,
-                height: widget.multiLines ||
-                        widget.modus == "googleAutoComplete" ||
-                        widget.modus == "date"
-                    ? 400
-                    : 180,
-                children: [
-                  inputBox(),
-                  Container(
-                    margin: const EdgeInsets.only(right: 10),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            child: Text(AppLocalizations.of(context).abbrechen,
-                                style: TextStyle(fontSize: fontsize)),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                          TextButton(
-                              child: Text(
-                                  AppLocalizations.of(context).speichern,
-                                  style: TextStyle(fontSize: fontsize)),
-                              onPressed: () => saveChanges()),
-                        ]),
-                  )
-                ]);
-          });
-    }
-
-    openLinkAskWindow() {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            children: [
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.pop(context);
-                  openChangeWindow();
-                },
-                child: Text(AppLocalizations.of(context).linkBearbeiten),
-              ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.pop(context);
-                  if (!widget.rowData.contains("http")) {
-                    widget.rowData = "http://" + widget.rowData;
-                  }
-                  global_func.openURL(widget.rowData);
-                },
-                child: Text(AppLocalizations.of(context).linkOeffnen),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
-    return !widget.singleShow && !widget.multiLines
-        ? Row(
-            children: [
-              Text(widget.rowTitle + " ",
-                  style: TextStyle(
-                      fontSize: fontsize, fontWeight: FontWeight.bold)),
-              const Expanded(child: SizedBox.shrink()),
-              InkWell(
-                child: SizedBox(
-                  width: 200,
-                  child: Text(
-                    widget.databaseKennzeichnung == "zeitzone"
-                        ? "GMT " + widget.rowData.toString()
-                        : widget.rowData,
-                    style: TextStyle(
-                        fontSize: fontsize,
-                        color: widget.databaseKennzeichnung != "link"
-                            ? Colors.black
-                            : Theme.of(context).colorScheme.secondary),
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
-                    textAlign: TextAlign.end,
-                  ),
-                ),
-                onTap: widget.databaseKennzeichnung != "link"
-                    ? () => openChangeWindow()
-                    : () {
-                        if (widget.isCreator) {
-                          if(widget.rowData.isEmpty){
-                            openChangeWindow();
-                          } else{
-                            openLinkAskWindow();
-                          }
-                        } else {
-                          if (!widget.rowData.contains("http")) {
-                            widget.rowData = "http://" + widget.rowData;
-                          }
-                          global_func.openURL(widget.rowData);
-                        }
-                      },
-              )
-            ],
-          )
-        : widget.multiLines
-            ? TextWithHyperlinkDetection(
-                text: widget.rowData,
-                onTextTab: widget.isCreator ? () => openChangeWindow() : null)
-            : GestureDetector(
-              onTap: widget.isCreator ? () => openChangeWindow() : null,
-              child: Text(widget.rowData,
-                  style: TextStyle(
-                      fontSize: fontsize + 8, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center),
-            );
-  }
-}
-
 class ShowDatetimeBox extends StatefulWidget {
   var event;
   var isCreator;
 
-  ShowDatetimeBox({this.event, this.isCreator});
+  ShowDatetimeBox({Key key, this.event, this.isCreator}) : super(key: key);
 
   @override
   _ShowDatetimeBoxState createState() => _ShowDatetimeBoxState();
@@ -1115,7 +1057,6 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
   @override
   void initState() {
-
     wannDateInputButton = DateButton(
       getDate: true,
       eventDatum: DateTime.parse(widget.event["wann"]),
@@ -1148,141 +1089,28 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     isSingeDay = widget.event["eventInterval"] != global_var.eventInterval[2] &&
         widget.event["eventInterval"] != global_var.eventIntervalEnglisch[2];
 
-    return InkWell(
-        onTap: !widget.isCreator ? null : () => openChangeWindow(),
-        child: Row(
-          children: [
-            Text(AppLocalizations.of(context).datum + " ",
-                style:
-                    TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold)),
-            const Expanded(child: SizedBox.shrink()),
-            SizedBox(
-              width: 200,
-              child: Text(
-                createInhaltText(),
-                style: TextStyle(fontSize: fontsize, color: Colors.black),
-                softWrap: false,
-                overflow: TextOverflow.fade,
-                textAlign: TextAlign.end,
-              ),
-            )
-          ],
-        ));
-  }
-}
-
-class CardFeet extends StatefulWidget {
-  String organisator;
-  var event;
-  double width;
-  var eventZusage;
-
-  CardFeet(
-      {Key key, this.organisator, this.width, this.event, this.eventZusage})
-      : super(key: key);
-
-  @override
-  _CardFeetState createState() => _CardFeetState();
-}
-
-class _CardFeetState extends State<CardFeet> {
-  Map organisatorProfil;
-  var ownName = FirebaseAuth.instance.currentUser.displayName;
-  var teilnehmerAnzahl = "";
-
-  @override
-  void initState() {
-    organisatorProfil = getProfilFromHive(profilId: widget.organisator);
-
-    super.initState();
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    showTeilnehmerWindow() {
-      var zusagenIds = widget.event["zusage"];
-      var allProfils = Hive.box("secureBox").get("profils");
-      var zusagenProfils = [];
-      List<Widget> zusagenNameBoxes = [];
-
-      for (var profilId in zusagenIds) {
-        for (var profil in allProfils) {
-          if (profil["id"] == profilId) {
-            zusagenProfils.add(profil);
-            break;
-          }
-        }
-      }
-
-      for (var member in zusagenProfils) {
-        zusagenNameBoxes.add(InkWell(
-            onTap: () {
-              global_func.changePage(
-                  context,
-                  ShowProfilPage(
-                    profil: member,
-                  ));
-            },
-            child: Container(
-                margin: const EdgeInsets.all(10),
+    return Container(
+      margin: const EdgeInsets.only(left: 10, right: 10),
+      child: InkWell(
+          onTap: !widget.isCreator ? null : () => openChangeWindow(),
+          child: Row(
+            children: [
+              Text(AppLocalizations.of(context).datum + " ",
+                  style: TextStyle(
+                      fontSize: fontsize, fontWeight: FontWeight.bold)),
+              const Expanded(child: SizedBox.shrink()),
+              SizedBox(
+                width: 200,
                 child: Text(
-                  member["name"],
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.secondary),
-                ))));
-      }
-
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CustomAlertDialog(
-              title: AppLocalizations.of(context).teilnehmer,
-              children: zusagenNameBoxes,
-            );
-          });
-    }
-
-    return Positioned(
-      bottom: 25,
-      left: 30,
-      child: Container(
-        padding: const EdgeInsets.only(right: 20),
-        width: widget.width,
-        child: Row(
-          children: [
-            InkWell(
-              child: Text(AppLocalizations.of(context).teilnehmer,
-                  style: TextStyle(
-                      fontSize: fontsize,
-                      color: Theme.of(context).colorScheme.secondary)),
-              onTap: () => showTeilnehmerWindow(),
-            ),
-            InkWell(
-              child: Text(widget.eventZusage.length.toString(),
-                  style: TextStyle(
-                      fontSize: fontsize,
-                      color: Theme.of(context).colorScheme.secondary)),
-              onTap: () => showTeilnehmerWindow(),
-            ),
-            const Expanded(child: SizedBox()),
-            InkWell(
-              child: Text(organisatorProfil["name"] ?? "",
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
-                      fontSize: fontsize)
-              ),
-              onTap: () {
-                global_func.changePage(
-                    context,
-                    ShowProfilPage(
-                      profil: organisatorProfil,
-                    ));
-              },
-            )
-          ],
-        ),
-      ),
+                  createInhaltText(),
+                  style: TextStyle(fontSize: fontsize, color: Colors.black),
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                  textAlign: TextAlign.end,
+                ),
+              )
+            ],
+          )),
     );
   }
 }
@@ -1368,7 +1196,8 @@ class _InteresseButtonState extends State<InteresseButton> {
       right: 28,
       child: GestureDetector(
           onTap: () async {
-            var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
+            var myInterestedEvents =
+                Hive.box('secureBox').get("interestEvents") ?? [];
             var eventData = getEventFromHive(widget.id);
             var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
             widget.hasIntereset = !widget.hasIntereset;
@@ -1382,29 +1211,146 @@ class _InteresseButtonState extends State<InteresseButton> {
 
               myGroupChats.add(getChatGroupFromHive(widget.id));
               ChatGroupsDatabase().updateChatGroup(
-                  "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
+                  "users = JSON_MERGE_PATCH(users, '${json.encode({
+                        userId: {"newMessages": 0}
+                      })}')",
                   "WHERE connected LIKE '%${widget.id}%'");
             } else {
               eventData["interesse"].remove(userId);
-              myInterestedEvents.removeWhere((event) => event["id"] == widget.id);
+              myInterestedEvents
+                  .removeWhere((event) => event["id"] == widget.id);
               EventDatabase().update(
                   "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
                   "WHERE id ='${widget.id}'");
 
-              myGroupChats.removeWhere((chatGroup) => chatGroup["connected"].contains(widget.id));
+              myGroupChats.removeWhere(
+                  (chatGroup) => chatGroup["connected"].contains(widget.id));
               ChatGroupsDatabase().updateChatGroup(
                   "users = JSON_REMOVE(users, '\$.$userId')",
                   "WHERE connected LIKE '%${widget.id}%'");
             }
 
             setState(() {});
-
           },
           child: Icon(
             Icons.favorite,
             color: widget.hasIntereset ? Colors.red : Colors.black,
             size: 30,
           )),
+    );
+  }
+}
+
+class CardFeet extends StatefulWidget {
+  String organisator;
+  var event;
+  double width;
+  var eventZusage;
+
+  CardFeet(
+      {Key key, this.organisator, this.width, this.event, this.eventZusage})
+      : super(key: key);
+
+  @override
+  _CardFeetState createState() => _CardFeetState();
+}
+
+class _CardFeetState extends State<CardFeet> {
+  Map organisatorProfil;
+  var ownName = FirebaseAuth.instance.currentUser.displayName;
+  var teilnehmerAnzahl = "";
+
+  @override
+  void initState() {
+    organisatorProfil = getProfilFromHive(profilId: widget.organisator);
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    showTeilnehmerWindow() {
+      var zusagenIds = widget.event["zusage"];
+      var allProfils = Hive.box("secureBox").get("profils");
+      var zusagenProfils = [];
+      List<Widget> zusagenNameBoxes = [];
+
+      for (var profilId in zusagenIds) {
+        for (var profil in allProfils) {
+          if (profil["id"] == profilId) {
+            zusagenProfils.add(profil);
+            break;
+          }
+        }
+      }
+
+      for (var member in zusagenProfils) {
+        zusagenNameBoxes.add(InkWell(
+            onTap: () {
+              global_func.changePage(
+                  context,
+                  ShowProfilPage(
+                    profil: member,
+                  ));
+            },
+            child: Container(
+                margin: const EdgeInsets.all(10),
+                child: Text(
+                  member["name"],
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                ))));
+      }
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).teilnehmer,
+              children: zusagenNameBoxes,
+            );
+          });
+    }
+
+    return Positioned(
+      bottom: 25,
+      left: 30,
+      child: Container(
+        padding: const EdgeInsets.only(right: 20),
+        width: widget.width,
+        child: Row(
+          children: [
+            InkWell(
+              child: Text(AppLocalizations.of(context).teilnehmer,
+                  style: TextStyle(
+                      fontSize: fontsize,
+                      color: Theme.of(context).colorScheme.secondary)),
+              onTap: () => showTeilnehmerWindow(),
+            ),
+            InkWell(
+              child: Text(widget.eventZusage.length.toString(),
+                  style: TextStyle(
+                      fontSize: fontsize,
+                      color: Theme.of(context).colorScheme.secondary)),
+              onTap: () => showTeilnehmerWindow(),
+            ),
+            const Expanded(child: SizedBox()),
+            InkWell(
+              child: Text(organisatorProfil["name"] ?? "",
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                      fontSize: fontsize)),
+              onTap: () {
+                global_func.changePage(
+                    context,
+                    ShowProfilPage(
+                      profil: organisatorProfil,
+                    ));
+              },
+            )
+          ],
+        ),
+      ),
     );
   }
 }
