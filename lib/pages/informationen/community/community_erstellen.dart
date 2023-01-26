@@ -7,6 +7,7 @@ import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
 import 'package:uuid/uuid.dart';
 
@@ -26,10 +27,11 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var nameController = TextEditingController();
   var beschreibungKontroller = TextEditingController();
   var linkKontroller = TextEditingController();
-  var ortAuswahlBox = GoogleAutoComplete();
+  var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true,);
   var userId = FirebaseAuth.instance.currentUser.uid;
   var ownCommunity = true;
   final translator = GoogleTranslator();
+  bool chooseCurrentLocation = false;
 
 
   saveCommunity() async {
@@ -109,6 +111,32 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   Widget build(BuildContext context) {
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
 
+    chooseOwnLocationBox(){
+      return Container(
+        margin: const EdgeInsets.only(left: 15, right: 15),
+        child: Row(children: [
+          Text(AppLocalizations.of(context).aktuellenOrtVerwenden),
+          const Expanded(child: SizedBox.shrink()),
+          Switch(value: chooseCurrentLocation, onChanged: (bool){
+            if(bool){
+              var ownProfil = Hive.box('secureBox').get("ownProfil");
+              var currentLocaton = {
+                "city": ownProfil["ort"],
+                "countryname": ownProfil["land"],
+                "longt": ownProfil["longt"],
+                "latt": ownProfil["latt"],
+              };
+              ortAuswahlBox.setLocation(currentLocaton);
+            } else{
+              ortAuswahlBox.clear();
+            }
+            setState(() {
+              chooseCurrentLocation = bool;
+            });
+          })
+        ],),
+      );
+    }
 
     ownCommunityBox() {
       double screenWidth = MediaQuery.of(context).size.width;
@@ -159,6 +187,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
         children: [
           customTextInput(
               AppLocalizations.of(context).communityName, nameController),
+          chooseOwnLocationBox(),
           ortAuswahlBox,
           customTextInput(AppLocalizations.of(context).linkEingebenOptional,
               linkKontroller),
