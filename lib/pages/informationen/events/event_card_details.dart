@@ -57,10 +57,11 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   var moreContent = false;
   final translator = GoogleTranslator();
   var textInputKontroller = TextEditingController();
-  var beschreibungInputKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
+  var beschreibungInputKontroller = TextEditingController();
   var dropdownInput = CustomDropDownButton();
   var multiDropDownInput = CustomMultiTextForm();
+  bool chooseCurrentLocation = false;
 
   @override
   void initState() {
@@ -297,6 +298,72 @@ class _EventCardDetailsState extends State<EventCardDetails> {
         });
   }
 
+  openLocationChangeWindow(){
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return StatefulBuilder(
+            builder: (context, dialogSetState) {
+              if(chooseCurrentLocation) {
+                var ownProfil = Hive.box('secureBox').get("ownProfil");
+                var currentLocaton = {
+                  "city": ownProfil["ort"],
+                  "countryname": ownProfil["land"],
+                  "longt": ownProfil["longt"],
+                  "latt": ownProfil["latt"],
+                };
+                ortAuswahlBox.setLocation(currentLocaton);
+              }else{
+                ortAuswahlBox.clear();
+              }
+
+              return CustomAlertDialog(
+                  title: AppLocalizations.of(context).eventStadtAendern,
+                  height: 400,
+                  children: [
+                    ortAuswahlBox,
+                    Container(
+                      margin: const EdgeInsets.only(left: 5, right: 5),
+                      child: Row(children: [
+                        Text(AppLocalizations.of(context).aktuellenOrtVerwenden),
+                        const Expanded(child: SizedBox.shrink()),
+                        Switch(value: chooseCurrentLocation, onChanged: (bool){
+                          chooseCurrentLocation = bool;
+                          dialogSetState((){});
+                        })
+                      ],),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                child: Text(AppLocalizations
+                                    .of(context)
+                                    .abbrechen,
+                                    style: TextStyle(fontSize: fontsize)),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }
+                            ),
+                            TextButton(
+                                child: Text(
+                                    AppLocalizations.of(context).speichern,
+                                    style: TextStyle(fontSize: fontsize)),
+                                onPressed: () {
+                                  saveNewLocation();
+                                  setState((){});
+                                  Navigator.pop(context);
+                                }),
+                          ]),
+                    )
+                  ]);
+            }
+          );
+        });
+  }
+
   saveNewName(){
     String newName = textInputKontroller.text;
 
@@ -394,13 +461,13 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   }
 
   saveNewSprache(){
-    String newSprache = multiDropDownInput.getSelected();
+    List newSprache = multiDropDownInput.getSelected();
 
     if(newSprache.isEmpty) return;
 
     widget.event["sprache"] = newSprache;
     updateHiveEvent(widget.event["id"], "sprache", newSprache);
-    EventDatabase().update("sprache = '$newSprache'",
+    EventDatabase().update("sprache = '${jsonEncode(newSprache)}'",
         "WHERE id = '${widget.event["id"]}'");
   }
 
@@ -517,100 +584,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
       return const SizedBox.shrink();
     }
-/*
-    eventInformationBox() {
-      return Container(
-        margin: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            ShowDataAndChangeWindow(
-                eventId: widget.event["id"],
-                windowTitle: AppLocalizations.of(context).eventZeitzoneAendern,
-                rowTitle: AppLocalizations.of(context).zeitzone,
-                rowData: widget.event["zeitzone"],
-                inputHintText:
-                    AppLocalizations.of(context).neueZeitzoneEingeben,
-                isCreator: widget.isCreator,
-                modus: "dropdown",
-                databaseKennzeichnung: "zeitzone",
-                items: global_var.eventZeitzonen),
-            const SizedBox(height: 5),
-            if (isOffline)
-              ShowDataAndChangeWindow(
-                  eventId: widget.event["id"],
-                  windowTitle: AppLocalizations.of(context).eventStadtAendern,
-                  rowTitle: AppLocalizations.of(context).ort,
-                  rowData: widget.event["stadt"] + ", " + widget.event["land"],
-                  inputHintText: AppLocalizations.of(context).neueStadtEingeben,
-                  isCreator: widget.isCreator,
-                  modus: "googleAutoComplete",
-                  databaseKennzeichnung: "location"),
-            if (!isOffline && !widget.isCreator)
-              Row(
-                children: [
-                  Text(AppLocalizations.of(context).meinDatum,
-                      style: TextStyle(
-                          fontSize: fontsize, fontWeight: FontWeight.bold)),
-                  const Expanded(child: SizedBox.shrink()),
-                  Text(convertIntoMyDate(),
-                      style: TextStyle(fontSize: fontsize))
-                ],
-              ),
-            if (widget.isApproved || widget.isPublic)
-              ShowDataAndChangeWindow(
-                  eventId: widget.event["id"],
-                  windowTitle: AppLocalizations.of(context).eventMapLinkAendern,
-                  rowTitle: isOffline ? "Map: " : "Link: ",
-                  rowData: widget.event["link"],
-                  inputHintText:
-                      AppLocalizations.of(context).neuenKartenlinkEingeben,
-                  isCreator: widget.isCreator,
-                  modus: "textInput",
-                  databaseKennzeichnung: "link"),
-            if (widget.isApproved || widget.isPublic)
-              ShowDataAndChangeWindow(
-                eventId: widget.event["id"],
-                windowTitle: AppLocalizations.of(context).eventIntervalAendern,
-                inputHintText: "",
-                isCreator: widget.isCreator,
-                rowTitle: "Interval",
-                rowData: widget.event["eventInterval"],
-                items: isGerman
-                    ? global_var.eventInterval
-                    : global_var.eventIntervalEnglisch,
-                modus: "dropdown",
-                databaseKennzeichnung: "eventInterval",
-                saveFunction: () async {
-                  widget.event = getEventFromHive(widget.event["id"]);
-                  setState(() {});
-                },
-              ),
-            ShowDataAndChangeWindow(
-                eventId: widget.event["id"],
-                windowTitle: AppLocalizations.of(context).eventSpracheAendern,
-                inputHintText: "",
-                isCreator: widget.isCreator,
-                rowTitle: AppLocalizations.of(context).sprache,
-                rowData: isGerman
-                    ? global_func
-                        .changeEnglishToGerman(widget.event["sprache"])
-                        .join(", ")
-                    : global_func
-                        .changeGermanToEnglish(widget.event["sprache"])
-                        .join(", "),
-                items: isGerman
-                    ? global_var.sprachenListe
-                    : global_var.sprachenListeEnglisch,
-                modus: "multiDropdown",
-                databaseKennzeichnung: "sprache"),
-          ],
-        ),
-      );
-    }
-
-
- */
-
 
     eventInformationRow(rowTitle, rowData, changeWindow,
         {bodyColor = Colors.black}) {
@@ -656,12 +629,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       return eventInformationRow(
         AppLocalizations.of(context).ort,
         widget.event["stadt"] + ", " + widget.event["land"],
-            () => openChangeWindow(
-            AppLocalizations.of(context).eventStadtAendern,
-            ortAuswahlBox,
-            saveNewLocation,
-            height: 400
-        ));
+            () => openLocationChangeWindow()
+      );
     }
 
     mapAndLinkInformation(){
@@ -673,7 +642,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                   AppLocalizations.of(context).neuenKartenlinkEingeben,
                   textInputKontroller
               ),
-              null
+              saveNewMapAndLink
           ),
           bodyColor: Theme.of(context).colorScheme.secondary);
     }
@@ -691,7 +660,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               () => openChangeWindow(
               AppLocalizations.of(context).eventIntervalAendern,
               dropdownInput,
-              null
+              saveNewInterval
           )
       );
     }
@@ -706,6 +675,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           .join(", ");
       multiDropDownInput = CustomMultiTextForm(
         selected: data.split(", "),
+        hintText: "Sprachen auswählen",
         auswahlList: isGerman
             ? global_var.sprachenListe
             : global_var.sprachenListeEnglisch,
@@ -717,7 +687,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           () => openChangeWindow(
               AppLocalizations.of(context).eventSpracheAendern,
               multiDropDownInput,
-              null
+              saveNewSprache,
+              height: 600
           )
       );
     }
