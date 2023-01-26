@@ -434,5 +434,6 @@
     "nutzungsbedingungen": "Nutzungsbedingungen",
     "datenschutzrichtlinie" : "Datenschutzrichtlinie",
     "dateiBeschaedigt": "Datei ist beschädigt",
-    "benutzerNamevergeben": "Benutzername ist schon vergeben"
+    "benutzerNamevergeben": "Benutzername ist schon vergeben",
+    "aktuellenOrtVerwenden": "Aktuellen Ort verwenden"
 }

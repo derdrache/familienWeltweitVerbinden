@@ -434,6 +434,7 @@
     "nutzungsbedingungen": "Terms of Use",
     "datenschutzrichtlinie" : "Privacy Policy",
     "dateiBeschaedigt": "File is damaged",
-    "benutzerNamevergeben": "User name is already taken"
+    "benutzerNamevergeben": "User name is already taken",
+    "aktuellenOrtVerwenden": "Use current location"
 }
 

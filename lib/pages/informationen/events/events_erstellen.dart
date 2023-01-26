@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:familien_suche/pages/start_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -41,10 +42,11 @@ class _EventErstellenState extends State<EventErstellen> {
   var sprachenAuswahlBox = CustomMultiTextForm();
   var eventArtDropdown = CustomDropDownButton();
   var ortTypDropdown = CustomDropDownButton();
-  var ortAuswahlBox = GoogleAutoComplete();
+  var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true);
   var eventIntervalDropdown = CustomDropDownButton();
   var ownEvent = true;
   final translator = GoogleTranslator();
+  bool chooseCurrentLocation = false;
 
   @override
   void initState() {
@@ -310,6 +312,35 @@ class _EventErstellenState extends State<EventErstellen> {
             );
     }
 
+    chooseOwnLocationBox(){
+      if(ortTypDropdown.selected == "online") return SizedBox.shrink();
+
+      return Container(
+        margin: const EdgeInsets.only(left: 15, right: 15),
+        child: Row(children: [
+          Text(AppLocalizations.of(context).aktuellenOrtVerwenden),
+          const Expanded(child: SizedBox.shrink()),
+          Switch(value: chooseCurrentLocation, onChanged: (bool){
+            if(bool){
+              var ownProfil = Hive.box('secureBox').get("ownProfil");
+              var currentLocaton = {
+                "city": ownProfil["ort"],
+                "countryname": ownProfil["land"],
+                "longt": ownProfil["longt"],
+                "latt": ownProfil["latt"],
+              };
+              ortAuswahlBox.setLocation(currentLocaton);
+            } else{
+              ortAuswahlBox.clear();
+            }
+            setState(() {
+              chooseCurrentLocation = bool;
+            });
+          })
+        ],),
+      );
+    }
+
     ortEingabeBox() {
       if (ortTypDropdown.selected == "online") {
         return customTextInput(
@@ -445,6 +476,7 @@ class _EventErstellenState extends State<EventErstellen> {
               children: [eventArtDropdown, eventArtInformation()],
             ),
             ortTypDropdown,
+            chooseOwnLocationBox(),
             Align(child: ortEingabeBox()),
             sprachenAuswahlBox,
             eventIntervalDropdown,
