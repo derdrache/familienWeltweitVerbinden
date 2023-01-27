@@ -351,9 +351,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       widget.groupChatData["lastMessage"] = message;
     });
 
-
-
-
     var groupText = messageData["message"];
 
     if (messageData["message"].contains("</eventId=")) {
