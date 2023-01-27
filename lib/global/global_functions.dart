@@ -193,6 +193,13 @@ changeEnglishToGerman(list){
 openURL(url) async{
   if(url.contains("http")){
     url = Uri.parse(url);
+  }else if(isPhoneNumber(url)){
+    var tel = Uri(
+      scheme: 'tel',
+      path: url,
+    );
+    launchUrl(tel);
+    return;
   }else{
     url = Uri.https(url);
   }
@@ -212,6 +219,13 @@ bool isLink(String input) {
 
   final matcher = RegExp(
         r"(/([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#\.]?[\w-]+)*\/?/gm)");
+
+  return matcher.hasMatch(input);
+}
+
+bool isPhoneNumber(String input){
+  input = input.replaceAll(" ", "");
+  final matcher = RegExp(r'^(?:[+0][1-9])?[0-9]{10,12}$');
 
   return matcher.hasMatch(input);
 }

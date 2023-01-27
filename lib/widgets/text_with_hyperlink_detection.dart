@@ -38,7 +38,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
     }
 
     for (var word in beschreibungsList) {
-      if(global_func.isLink(word) || word.contains("http")){
+      if(global_func.isLink(word) || word.contains("http") || global_func.isPhoneNumber(word)){
         hasLink = true;
         var wordArray = word.split("\n");
 
@@ -46,7 +46,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
           addHyperlinkText(word +" ");
         }else{
           for(var line in wordArray){
-            if(global_func.isLink(line) || line.contains("http")){
+            if(global_func.isLink(line) || line.contains("http")|| global_func.isPhoneNumber(line)){
               addHyperlinkText(line);
               addNormalText("\n");
             }else{
