@@ -912,20 +912,16 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
     if (!isSingeDay) {
       var bisDate = bisDateInputButton.eventDatum;
-      var bisTime = bisTimeInputButton.eventDatum;
+      var bisTime = bisTimeInputButton.uhrZeit;
 
       if (bisDate == null) {
         return customSnackbar(
             context, AppLocalizations.of(context).eingebenBisTagEvent);
-      } else {
-        bisDate = DateTime.parse(widget.event["bis"]);
       }
 
       if (bisTime == null) {
         return customSnackbar(
             context, AppLocalizations.of(context).eingebenBisUhrzeitEvent);
-      } else {
-        bisTime = DateTime.parse(widget.event["bis"]);
       }
 
       newBisDate = DateTime(bisDate.year, bisDate.month, bisDate.day,
