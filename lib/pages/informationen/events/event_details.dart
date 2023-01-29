@@ -507,9 +507,29 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     teilnahmeButtonBox() {
+      bool recurringEvent = global_var.eventIntervalEnglisch[0] != widget.event["eventInterval"]
+          && global_var.eventInterval[0] != widget.event["eventInterval"];
+
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          if(recurringEvent) Column(children: [
+            Text(AppLocalizations.of(context).immerDabei),
+            Switch(value: widget.event["immerZusagen"].contains(userId), onChanged: (value){
+              if(value){
+                widget.event["immerZusagen"].add(userId);
+                EventDatabase().update(
+                    "immerZusagen = JSON_ARRAY_APPEND(immerZusagen, '\$', '$userId')",
+                    "WHERE id= '${widget.event["id"]}'");
+              }else{
+                widget.event["immerZusagen"].remove(userId);
+                EventDatabase().update(
+                    "immerZusagen = JSON_REMOVE(immerZusagen, JSON_UNQUOTE(JSON_SEARCH(immerZusagen, 'one', '$userId')))",
+                    "WHERE id= '${widget.event["id"]}'");
+              }
+              setState(() {});
+            },)
+          ],),
           if (widget.teilnahme != true)
             Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
