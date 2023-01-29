@@ -297,18 +297,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   resetNewMessageCounter() async {
-    var users = widget.groupChatData["users"];
-
     if (widget.groupChatData["users"][userId] == null) return;
-
-    var usersChatNewMessages = users[userId]["newMessages"];
-
-    var ownAllMessages = ownProfil["newMessages"];
-    var newOwnAllMessages = ownAllMessages - usersChatNewMessages < 0
-        ? 0
-        : ownAllMessages - usersChatNewMessages;
-
-    ownProfil["newMessages"] = newOwnAllMessages;
 
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
@@ -386,17 +375,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   saveMessageinDBAndRefresh(messageData) async {
-
-    var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
-
     if (widget.isChatgroup) {
       var languageCheck = await translator.translate(messageData["message"]);
       var languageCode = languageCheck.sourceLanguage.code;
       messageData["language"] = languageCode;
 
       await ChatGroupsDatabase().addNewMessageAndNotification(
-          widget.groupChatData["id"], messageData, isBlocked, connectedData["name"]);
+          widget.groupChatData["id"], messageData, connectedData["name"]);
     } else {
+      var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
       await ChatDatabase().addNewMessageAndSendNotification(
           widget.groupChatData["id"], messageData, isBlocked);
     }
@@ -864,6 +851,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     } else if(cardType == "location"){
       return LocationCard(location: data);
     }
+  }
+
+  getInitialScrollIndex(messagesLength){
+    var index = 0;
+    var noScrollCount = 4;
+
+    if(unreadMessages == 0 || unreadMessages <= noScrollCount) return index;
+
+    return unreadMessages - noScrollCount;
   }
 
   @override
@@ -1956,7 +1952,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             PointerDeviceKind.mouse,
           }),
           child: ScrollablePositionedList.builder(
-            initialScrollIndex: unreadMessages != 0 ? unreadMessages - 1 : 0,
+            initialScrollIndex: getInitialScrollIndex(messages.length),
             itemScrollController: _scrollController,
             itemPositionsListener: itemPositionListener,
             reverse: true,
