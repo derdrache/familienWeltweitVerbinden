@@ -20,17 +20,19 @@ class ForceUpdatePage extends StatelessWidget {
           child: Center(
               child:
               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Image.asset('assets/WeltFlugzeug.png'),
+                SizedBox(height: 50),
                 Text(
                   spracheIstDeutsch
-                      ? "Families worldwide hat ein großes Update bekommen"
-                      : "Families worldwide has received a major update",
+                      ? "Families worldwide hat wichtige Updates bekommen"
+                      : "Families worldwide received important updates",
                   style: const TextStyle(fontSize: 20),
                 ),
                 const SizedBox(height: 30),
                 Text(
                   spracheIstDeutsch
-                      ? "Bitte im Playstore die neuste Version runterladen. "
-                      : "Please download the latest version from the Playstore. ",
+                      ? "Damit die alten Fehler für alle sichtbar behoben sind, ist es nötig, die App auf den neusten Stand zu bringen\n\nBitte lade dir dafür die neuste Version im App Store runter."
+                      : "In order to fix the old bugs for everyone to see, it is necessary to update the app to the latest version\n\nPlease download the latest version from the App Store for this.",
                   style: const TextStyle(fontSize: 16),
                 ),
               ])),
