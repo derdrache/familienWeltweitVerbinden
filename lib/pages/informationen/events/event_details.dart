@@ -22,61 +22,41 @@ import 'event_card_details.dart';
 var userId = FirebaseAuth.instance.currentUser.uid;
 
 class EventDetailsPage extends StatefulWidget {
-  var event;
-  var teilnahme;
-  var absage;
-  var fromEventPage;
+  Map event;
+  bool teilnahme;
+  bool absage;
+  bool fromEventPage;
 
   EventDetailsPage({
     Key key,
     this.event,
     this.fromEventPage = false
-  })  : teilnahme =
-            event["zusage"] == null ? [] : event["zusage"].contains(userId),
-        absage =
-            event["absage"] == null ? [] : event["absage"].contains(userId),
-        super(key: key);
+  }):super(key: key);
 
   @override
   _EventDetailsPageState createState() => _EventDetailsPageState();
 }
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var isCreator;
-  var isApproved;
+  bool teilnahme;
+  bool absage;
+  bool isCreator;
+  bool isApproved;
   var searchAutocomplete;
-  var allName;
-  var userFriendlist = Hive.box("secureBox").get("ownProfil")["friendlist"];
-  var eventDetails = {};
-  var isNotPublic;
-  var isRepeating;
+  bool isNotPublic;
 
   @override
   void initState() {
-    eventDetails = {
-      "zusagen":
-          widget.event["zusage"] == null ? [] : widget.event["zusage"].length,
-      "absagen":
-          widget.event["absage"] == null ? [] : widget.event["absage"].length,
-      "interessierte": widget.event["interesse"] == null
-          ? []
-          : widget.event["interesse"].length,
-      "freigegeben": widget.event["freigegeben"] == null
-          ? []
-          : widget.event["freigegeben"].length
-    };
-    getDatabaseData();
+    teilnahme = widget.event["zusage"] == null
+        ? false : widget.event["zusage"].contains(userId);
+    absage =widget.event["absage"] == null
+        ? false : widget.event["absage"].contains(userId);
 
     super.initState();
   }
 
-  getDatabaseData() async {
-    allName = getAllProfilNames();
-  }
-
   freischalten(user, angenommen, windowState) async {
-    var eventId = widget.event["id"];
+    String eventId = widget.event["id"];
 
     widget.event["freischalten"].remove(user);
     widget.event["freigegeben"].add(user);
@@ -104,7 +84,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   freigegebenEntfernen(user, windowState) async {
-    var eventId = widget.event["id"];
+    String eventId = widget.event["id"];
 
     windowState(() {
       widget.event["freigegeben"].remove(user);
@@ -116,27 +96,29 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   newOrganisatorIsOwnerWindow() async {
-    var newOwnerIsInitsiator = false;
+    bool newOwnerIsInitsiator = false;
 
     await showDialog(
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             title: AppLocalizations.of(context).newOwnerIsInitiator,
-            children: [],
+            children: const [],
             actions: [
               TextButton(
                   onPressed: () {
                     newOwnerIsInitsiator = true;
                     Navigator.pop(context);
                   },
-                  child: Text(AppLocalizations.of(context).ja)),
+                  child: Text(AppLocalizations.of(context).ja)
+              ),
               TextButton(
                   onPressed: () {
                     newOwnerIsInitsiator = false;
                     Navigator.pop(context);
                   },
-                  child: Text(AppLocalizations.of(context).nein)),
+                  child: Text(AppLocalizations.of(context).nein)
+              ),
             ],
           );
         });
@@ -145,11 +127,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   changeOrganisatorWindow() {
-    var inputKontroller = TextEditingController();
+    TextEditingController inputKontroller = TextEditingController();
 
     searchAutocomplete = SearchAutocomplete(
       hintText: AppLocalizations.of(context).benutzerEingeben,
-      searchableItems: allName,
+      searchableItems: getAllProfilNames(),
       onConfirm: () {
         inputKontroller.text = searchAutocomplete.getSelected()[0];
       },
@@ -168,9 +150,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   label: Text(AppLocalizations.of(context).uebertragen),
                   onPressed: () async {
                     Navigator.pop(context);
-                    var isInitiator = await newOrganisatorIsOwnerWindow();
-
-                    var selectedUserId = getProfilFromHive(profilName: inputKontroller.text, getIdOnly: true);
+                    bool isInitiator = await newOrganisatorIsOwnerWindow();
+                    String selectedUserId = getProfilFromHive(
+                        profilName: inputKontroller.text, getIdOnly: true);
 
                     setState(() {
                       widget.event["erstelltVon"] = selectedUserId;
@@ -195,12 +177,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   confirmEvent(bool confirm) async {
     if (confirm) {
-      if (!widget.event["interesse"].contains(userId)){
+
+      if (!widget.event["interesse"].contains(userId)) {
         widget.event["interesse"].add(userId);
         EventDatabase().update(
             "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
             "WHERE id = '${widget.event["id"]}'");
       }
+
       widget.teilnahme = true;
       widget.absage = false;
       widget.event["zusage"].add(userId);
@@ -223,28 +207,49 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     setState(() {});
   }
 
+  changeImmerZusage(bool confirm) {
+    if (confirm) {
+      widget.event["immerZusagen"].add(userId);
+      EventDatabase().update(
+          "immerZusagen = JSON_ARRAY_APPEND(immerZusagen, '\$', '$userId')",
+          "WHERE id= '${widget.event["id"]}'");
+
+      bool hasZusage = widget.event["zusage"].contains(userId);
+      if (hasZusage) return;
+
+      widget.event["zusage"].add(userId);
+      widget.teilnahme = true;
+      EventDatabase().update(
+          "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+          "WHERE id= '${widget.event["id"]}'");
+    } else {
+      widget.event["immerZusagen"].remove(userId);
+      EventDatabase().update(
+          "immerZusagen = JSON_REMOVE(immerZusagen, JSON_UNQUOTE(JSON_SEARCH(immerZusagen, 'one', '$userId')))",
+          "WHERE id= '${widget.event["id"]}'");
+    }
+  }
+
+  deleteEvent(){
+    var events = Hive.box('secureBox').get("events");
+    events.removeWhere((event) =>
+    event["id"] == widget.event["id"]);
+
+    EventDatabase().delete(widget.event["id"]);
+
+    var chatGroupId = getChatGroupFromHive(
+        widget.event["id"])["id"];
+    ChatGroupsDatabase().deleteChat(chatGroupId);
+
+    DbDeleteImage(widget.event["bild"]);
+  }
+
   @override
   Widget build(BuildContext context) {
     isCreator = widget.event["erstelltVon"] == userId;
-    isApproved =
-        isCreator ? true : widget.event["freigegeben"].contains(userId);
-    isNotPublic =
-        widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
-    eventDetails = {
-      "zusagen":
-          widget.event["zusage"] == null ? [] : widget.event["zusage"].length,
-      "absagen":
-          widget.event["absage"] == null ? [] : widget.event["absage"].length,
-      "interessierte": widget.event["interesse"] == null
-          ? []
-          : widget.event["interesse"].length,
-      "freigegeben": widget.event["freigegeben"] == null
-          ? []
-          : widget.event["freigegeben"].length
-    };
-    isRepeating = widget.event["eventInterval"] !=
-            global_var.eventInterval[0] &&
-        widget.event["eventInterval"] != global_var.eventIntervalEnglisch[0];
+    isApproved = isCreator ? true : widget.event["freigegeben"].contains(userId);
+    isNotPublic = widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
+
 
     deleteEventWindow() {
       showDialog(
@@ -256,24 +261,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               children: [
                 Center(
                     child: Text(
-                        AppLocalizations.of(context).eventWirklichLoeschen))
+                        AppLocalizations
+                            .of(context)
+                            .eventWirklichLoeschen))
               ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
-                  onPressed: () {
-                    var events = Hive.box('secureBox').get("events");
-                    events.removeWhere((event) => event["id"] == widget.event["id"]);
-
-                    EventDatabase().delete(widget.event["id"]);
-
-                    var chatGroupId = getChatGroupFromHive(widget.event["id"])["id"];
-                    ChatGroupsDatabase().deleteChat(chatGroupId);
-
-                    DbDeleteImage(widget.event["bild"]);
+                  onPressed: (){
+                    deleteEvent();
 
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
+                        context,
+                        StartPage(selectedIndex: 2, informationPageIndex: 1,));
                   },
                 ),
                 TextButton(
@@ -286,7 +286,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     reportEventWindow() {
-      var reportController = TextEditingController();
+      TextEditingController reportController = TextEditingController();
 
       showDialog(
           context: context,
@@ -303,12 +303,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     child: FloatingActionButton.extended(
                         onPressed: () {
                           Navigator.pop(context);
-                          ReportsDatabase().add(
-                              userId,
+                          ReportsDatabase().add(userId,
                               "Melde Event id: " + widget.event["id"],
                               reportController.text);
                         },
-                        label: Text(AppLocalizations.of(context).senden)),
+                        label: Text(AppLocalizations
+                            .of(context)
+                            .senden)),
                   )
                 ]);
           });
@@ -320,7 +321,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           children: [
             const Icon(Icons.delete),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).eventLoeschen),
+            Text(AppLocalizations
+                .of(context)
+                .eventLoeschen),
           ],
         ),
         onPressed: () {
@@ -336,7 +339,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           children: [
             const Icon(Icons.report),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).eventMelden),
+            Text(AppLocalizations
+                .of(context)
+                .eventMelden),
           ],
         ),
         onPressed: () {
@@ -347,6 +352,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     eventDetailsDialog() {
+      int eventZusagen = widget.event["zusage"].length;
+      int eventAbsagen = widget.event["absage"].length;
+      int eventInteressierte = widget.event["interesse"].length;
+      int eventFreigegebene = widget.event["freigegeben"].length;
+      int eventUnsure = eventInteressierte - eventZusagen - eventAbsagen;
+
       return SimpleDialogOption(
           child: Row(
             children: const [
@@ -355,43 +366,48 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               Text("Event Info"),
             ],
           ),
-          onPressed: () => showDialog(
-              context: context,
-              builder: (BuildContext buildContext) {
-                return CustomAlertDialog(title: "Event Information", children: [
-                  const SizedBox(height: 10),
-                  Text(
-                      AppLocalizations.of(context).interessierte +
-                          eventDetails["interessierte"].toString(),
-                      style: TextStyle(fontSize: fontsize)),
-                  const SizedBox(height: 10),
-                  Text(
-                      AppLocalizations.of(context).zusagen +
-                          eventDetails["zusagen"].toString(),
-                      style: TextStyle(fontSize: fontsize)),
-                  const SizedBox(height: 10),
-                  Text(
-                      AppLocalizations.of(context).absagen +
-                          eventDetails["absagen"].toString(),
-                      style: TextStyle(fontSize: fontsize)),
-                  const SizedBox(height: 10),
-                  Text(
-                      AppLocalizations.of(context).unsicher +
-                          (eventDetails["interessierte"] -
-                                  eventDetails["zusagen"] -
-                                  eventDetails["absagen"])
-                              .toString(),
-                      style: TextStyle(fontSize: fontsize)),
-                  const SizedBox(height: 10),
-                  if (isNotPublic)
-                    Text(
-                        AppLocalizations.of(context).freigegeben +
-                            (eventDetails["freigegeben"] + 1).toString(),
-                        style: TextStyle(fontSize: fontsize)),
-                  if (isNotPublic) const SizedBox(height: 10),
-                  const SizedBox(height: 10)
-                ]);
-              }));
+          onPressed: () =>
+              showDialog(
+                  context: context,
+                  builder: (BuildContext buildContext) {
+                    return CustomAlertDialog(
+                        title: "Event Information", children: [
+                      const SizedBox(height: 10),
+                      Text(
+                          AppLocalizations
+                              .of(context)
+                              .interessierte +
+                              eventInteressierte.toString(),
+                          style: TextStyle(fontSize: fontsize)),
+                      const SizedBox(height: 10),
+                      Text(
+                          AppLocalizations
+                              .of(context)
+                              .zusagen +
+                              eventZusagen.toString(),
+                          style: TextStyle(fontSize: fontsize)),
+                      const SizedBox(height: 10),
+                      Text(
+                          AppLocalizations.of(context).absagen +
+                              eventAbsagen.toString(),
+                          style: TextStyle(fontSize: fontsize)),
+                      const SizedBox(height: 10),
+                      Text(
+                          AppLocalizations.of(context).unsicher
+                              + eventUnsure.toString(),
+                          style: TextStyle(fontSize: fontsize)),
+                      const SizedBox(height: 10),
+                      if (isNotPublic)
+                        Text(
+                            AppLocalizations
+                                .of(context)
+                                .freigegeben +
+                                (eventFreigegebene + 1).toString(),
+                            style: TextStyle(fontSize: fontsize)),
+                      if (isNotPublic) const SizedBox(height: 10),
+                      const SizedBox(height: 10)
+                    ]);
+                  }));
     }
 
     eventOptinenDialog() {
@@ -411,52 +427,35 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 builder: (BuildContext buildContext) {
                   return StatefulBuilder(
                       builder: (buildContext, dialogSetState) {
-                    return CustomAlertDialog(
-                        title: AppLocalizations.of(context).eventOptionen,
-                        children: [
-                          Row(
+                        return CustomAlertDialog(
+                            title: AppLocalizations.of(context).eventOptionen,
                             children: [
-                              Expanded(
-                                  child: Text(
-                                      AppLocalizations.of(context).immerDabei)),
-                              Switch(
-                                value: widget.event["immerZusagen"]
-                                    .contains(userId),
-                                inactiveThumbColor: Colors.grey[700],
-                                activeColor:
-                                    Theme.of(context).colorScheme.primary,
-                                onChanged: (value) {
-                                  var zusage =
-                                      widget.event["zusage"].contains(userId);
-                                  if (value) {
-                                    widget.event["immerZusagen"].add(userId);
-                                    EventDatabase().update(
-                                        "immerZusagen = JSON_ARRAY_APPEND(immerZusagen, '\$', '$userId')",
-                                        "WHERE id= '${widget.event["id"]}'");
-
-                                    if (!zusage) {
-                                      widget.event["zusage"].add(userId);
-                                      widget.teilnahme = true;
-                                      EventDatabase().update(
-                                          "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
-                                          "WHERE id= '${widget.event["id"]}'");
-                                    }
-                                  } else {
-                                    widget.event["immerZusagen"].remove(userId);
-                                    EventDatabase().update(
-                                        "immerZusagen = JSON_REMOVE(immerZusagen, JSON_UNQUOTE(JSON_SEARCH(immerZusagen, 'one', '$userId')))",
-                                        "WHERE id= '${widget.event["id"]}'");
-                                  }
-
-                                  dialogSetState(() {});
-
-                                  setState(() {});
-                                },
+                              Row(
+                                children: [
+                                  Expanded(
+                                      child: Text(
+                                          AppLocalizations
+                                              .of(context)
+                                              .immerDabei)),
+                                  Switch(
+                                    value: widget.event["immerZusagen"]
+                                        .contains(userId),
+                                    inactiveThumbColor: Colors.grey[700],
+                                    activeColor:
+                                    Theme
+                                        .of(context)
+                                        .colorScheme
+                                        .primary,
+                                    onChanged: (value) {
+                                      changeImmerZusage(value);
+                                      dialogSetState(() {});
+                                      setState(() {});
+                                    },
+                                  )
+                                ],
                               )
-                            ],
-                          )
-                        ]);
-                  });
+                            ]);
+                      });
                 });
           });
     }
@@ -467,7 +466,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           children: [
             const Icon(Icons.change_circle),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).bestitzerWechseln),
+            Text(AppLocalizations
+                .of(context)
+                .bestitzerWechseln),
           ],
         ),
         onPressed: () {
@@ -478,6 +479,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     moreMenu() {
+      bool isRepeating = widget.event["eventInterval"] != global_var.eventInterval[0] &&
+          widget.event["eventInterval"] != global_var.eventIntervalEnglisch[0];
+
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -489,7 +493,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   child: SimpleDialog(
                     contentPadding: EdgeInsets.zero,
                     insetPadding:
-                        const EdgeInsets.only(top: 40, left: 0, right: 10),
+                    const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
                       if (isApproved || !isNotPublic) eventDetailsDialog(),
                       if (isApproved || !isNotPublic)
@@ -507,45 +511,50 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     teilnahmeButtonBox() {
-      bool recurringEvent = global_var.eventIntervalEnglisch[0] != widget.event["eventInterval"]
+      bool isRepeating  = global_var.eventIntervalEnglisch[0] !=
+          widget.event["eventInterval"]
           && global_var.eventInterval[0] != widget.event["eventInterval"];
 
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if(recurringEvent) Column(children: [
-            Text(AppLocalizations.of(context).immerDabei),
-            Switch(value: widget.event["immerZusagen"].contains(userId), onChanged: (value){
-              if(value){
-                widget.event["immerZusagen"].add(userId);
-                EventDatabase().update(
-                    "immerZusagen = JSON_ARRAY_APPEND(immerZusagen, '\$', '$userId')",
-                    "WHERE id= '${widget.event["id"]}'");
-              }else{
-                widget.event["immerZusagen"].remove(userId);
-                EventDatabase().update(
-                    "immerZusagen = JSON_REMOVE(immerZusagen, JSON_UNQUOTE(JSON_SEARCH(immerZusagen, 'one', '$userId')))",
-                    "WHERE id= '${widget.event["id"]}'");
-              }
-              setState(() {});
-            },)
+          if(isRepeating) Column(children: [
+            Text(AppLocalizations
+                .of(context)
+                .immerDabei),
+            Switch(
+              value: widget.event["immerZusagen"].contains(userId),
+              onChanged: (value) {
+                changeImmerZusage(value);
+                setState(() {});
+              },)
           ],),
           if (widget.teilnahme != true)
             Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
               child: FloatingActionButton.extended(
                   heroTag: "teilnehmen",
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  backgroundColor: Theme
+                      .of(context)
+                      .colorScheme
+                      .primary,
                   onPressed: () => confirmEvent(true),
-                  label: Text(AppLocalizations.of(context).teilnehmen)),
+                  label: Text(AppLocalizations
+                      .of(context)
+                      .teilnehmen)),
             ),
           if (widget.absage != true)
             Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
               child: FloatingActionButton.extended(
                 heroTag: "Absagen",
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                label: Text(AppLocalizations.of(context).absage),
+                backgroundColor: Theme
+                    .of(context)
+                    .colorScheme
+                    .primary,
+                label: Text(AppLocalizations
+                    .of(context)
+                    .absage),
                 onPressed: () => confirmEvent(false),
               ),
             )
@@ -557,7 +566,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       List<Widget> freizugebenListe = [];
 
       for (var user in widget.event["freischalten"]) {
-        var profil = getProfilFromHive(profilId: user);
+        Map profil = getProfilFromHive(profilId: user);
 
         freizugebenListe.add(Container(
             margin: const EdgeInsets.only(left: 20),
@@ -565,12 +574,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               children: [
                 Expanded(
                   child: InkWell(
-                      onTap: () => changePage(
-                          context,
-                          ShowProfilPage(
-                            userName: profil["name"],
-                            profil: profil,
-                          )),
+                      onTap: () =>
+                          changePage(
+                              context,
+                              ShowProfilPage(
+                                userName: profil["name"],
+                                profil: profil,
+                              )),
                       child: Text(profil["name"])),
                 ),
                 IconButton(
@@ -591,7 +601,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           padding: const EdgeInsets.only(top: 50),
           child: Center(
             child: Text(
-              AppLocalizations.of(context).keineFamilienFreigebenVorhanden,
+              AppLocalizations
+                  .of(context)
+                  .keineFamilienFreigebenVorhanden,
               style: const TextStyle(color: Colors.grey),
             ),
           ),
@@ -603,6 +615,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     freigeschalteteUser(windowSetState) async {
       List<Widget> freigeschlatetList = [];
+
       for (var user in widget.event["freigegeben"]) {
         var profil = getProfilFromHive(profilId: user);
 
@@ -612,12 +625,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               children: [
                 Expanded(
                   child: InkWell(
-                      onTap: () => changePage(
-                          context,
-                          ShowProfilPage(
-                            userName: profil["name"],
-                            profil: profil,
-                          )),
+                      onTap: () =>
+                          changePage(
+                              context,
+                              ShowProfilPage(
+                                userName: profil["name"],
+                                profil: profil,
+                              )),
                       child: Text(profil["name"])),
                 ),
                 const Expanded(child: SizedBox(width: 10)),
@@ -636,7 +650,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           padding: const EdgeInsets.only(top: 50),
           child: Center(
             child: Text(
-              AppLocalizations.of(context).keineFamilienFreigebenVorhanden,
+              AppLocalizations
+                  .of(context)
+                  .keineFamilienFreigebenVorhanden,
               style: const TextStyle(color: Colors.grey),
             ),
           ),
@@ -664,7 +680,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         Container(
                           margin: const EdgeInsets.all(10),
                           child: Text(
-                            AppLocalizations.of(context).familienFreigeben,
+                            AppLocalizations
+                                .of(context)
+                                .familienFreigeben,
                             style: TextStyle(
                                 fontSize: fontsize,
                                 fontWeight: FontWeight.bold),
@@ -689,7 +707,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         Container(
                           margin: const EdgeInsets.all(10),
                           child: Text(
-                            AppLocalizations.of(context).freigegebeneFamilien,
+                            AppLocalizations
+                                .of(context)
+                                .freigegebeneFamilien,
                             style: TextStyle(
                                 fontSize: fontsize,
                                 fontWeight: FontWeight.bold),
@@ -736,7 +756,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       child: Scaffold(
         appBar: CustomAppBar(title: "", leading: widget.fromEventPage
             ? StartPage(selectedIndex: 2, informationPageIndex: 1)
-            : null,buttons: [
+            : null, buttons: [
           if (isCreator && isNotPublic)
             FutureBuilder(
                 future: EventDatabase().getData(
@@ -758,12 +778,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               Clipboard.setData(
                   ClipboardData(text: "</eventId=" + widget.event["id"]));
 
-              customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
+              customSnackbar(context, AppLocalizations
+                  .of(context)
+                  .linkWurdekopiert, color: Colors.green);
             },
           ),
           IconButton(
               icon: const Icon(Icons.message),
-              onPressed: () => global_func.changePage(
+              onPressed: () =>
+                  global_func.changePage(
                     context,
                     ChatDetailsPage(
                       connectedId: "</event=" + widget.event["id"],
@@ -797,8 +820,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 }
 
 class EventArtButton extends StatefulWidget {
-  var event;
-  var isCreator;
+  Map event;
+  bool isCreator;
   var pageState;
 
   EventArtButton({Key key, this.event, this.isCreator, this.pageState})
@@ -812,99 +835,107 @@ class _EventArtButtonState extends State<EventArtButton> {
   var eventTypInput = CustomDropDownButton();
   var icon;
 
-  eventArtSave() {
-    var auswahl = eventTypInput.getSelected();
-    if (auswahl == widget.event["art"]) return;
+  saveEventArt() {
+    String select = eventTypInput.getSelected();
 
-    widget.event["art"] = auswahl;
-    setState(() {});
-    widget.pageState(() {});
+    if (select == widget.event["art"]) return;
+
+    widget.event["art"] = select;
 
     EventDatabase()
-        .update("art = '$auswahl'", "WHERE id = '${widget.event["id"]}'");
-
-    Navigator.pop(context);
+        .update("art = '$select'", "WHERE id = '${widget.event["id"]}'");
   }
 
   eventArtInformation() {
-    return Positioned(
-        top: -15,
-        left: 10,
-        child: IconButton(
-            icon: const Icon(Icons.help, size: 15),
-            onPressed: () => showDialog(
-                context: context,
-                builder: (BuildContext buildContext) {
-                  return CustomAlertDialog(
-                      height: 500,
-                      title: AppLocalizations.of(context).informationEventArt,
-                      children: [
-                        const SizedBox(height: 10),
-                        Container(
-                          margin: const EdgeInsets.only(left: 5, right: 5),
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text("privat       ",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                const SizedBox(width: 5),
-                                Expanded(
-                                  child: Text(
-                                    AppLocalizations.of(context)
-                                        .privatInformationText,
-                                    maxLines: 10,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                )
-                              ]),
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          margin: const EdgeInsets.only(left: 5, right: 5),
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                    width: 70,
-                                    child: Text(
-                                        AppLocalizations.of(context)
-                                            .halbOeffentlich,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold))),
-                                const SizedBox(width: 5),
-                                Expanded(
-                                  child: Text(
-                                    AppLocalizations.of(context)
-                                        .halbOeffentlichInformationText,
-                                    maxLines: 10,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                )
-                              ]),
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          margin: const EdgeInsets.only(left: 5, right: 5),
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(AppLocalizations.of(context).oeffentlich,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(width: 5),
-                                Expanded(
-                                  child: Text(
-                                    AppLocalizations.of(context)
-                                        .oeffentlichInformationText,
-                                    maxLines: 10,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ]),
-                        )
-                      ]);
-                })));
+    return SizedBox(
+      height: 20,
+      child: Align(
+          alignment: Alignment.centerRight,
+          child: IconButton(
+              icon: const Icon(Icons.help, size: 20),
+              onPressed: () =>
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext buildContext) {
+                        return CustomAlertDialog(
+                            height: 500,
+                            title: AppLocalizations
+                                .of(context)
+                                .informationEventArt,
+                            children: [
+                              const SizedBox(height: 10),
+                              Container(
+                                margin: const EdgeInsets.only(left: 5, right: 5),
+                                child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text("privat       ",
+                                          style:
+                                          TextStyle(fontWeight: FontWeight.bold)),
+                                      const SizedBox(width: 5),
+                                      Expanded(
+                                        child: Text(
+                                          AppLocalizations
+                                              .of(context)
+                                              .privatInformationText,
+                                          maxLines: 10,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                              const SizedBox(height: 20),
+                              Container(
+                                margin: const EdgeInsets.only(left: 5, right: 5),
+                                child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                          width: 70,
+                                          child: Text(
+                                              AppLocalizations
+                                                  .of(context)
+                                                  .halbOeffentlich,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold))),
+                                      const SizedBox(width: 5),
+                                      Expanded(
+                                        child: Text(
+                                          AppLocalizations
+                                              .of(context)
+                                              .halbOeffentlichInformationText,
+                                          maxLines: 10,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                              const SizedBox(height: 20),
+                              Container(
+                                margin: const EdgeInsets.only(left: 5, right: 5),
+                                child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(AppLocalizations
+                                          .of(context)
+                                          .oeffentlich,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold)),
+                                      const SizedBox(width: 5),
+                                      Expanded(
+                                        child: Text(
+                                          AppLocalizations
+                                              .of(context)
+                                              .oeffentlichInformationText,
+                                          maxLines: 10,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ]),
+                              )
+                            ]);
+                      }))),
+    );
   }
 
   @override
@@ -921,26 +952,33 @@ class _EventArtButtonState extends State<EventArtButton> {
   @override
   Widget build(BuildContext context) {
     icon = widget.event["art"] == "öffentlich" ||
-            widget.event["art"] == "public"
+        widget.event["art"] == "public"
         ? Icons.lock_open
         : widget.event["art"] == "privat" || widget.event["art"] == "private"
-            ? Icons.enhanced_encryption
-            : Icons.lock;
+        ? Icons.enhanced_encryption
+        : Icons.lock;
 
     return Positioned(
       top: -5,
       left: -10,
       child: IconButton(
-          icon: Icon(icon, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(icon, color: Theme
+              .of(context)
+              .colorScheme
+              .primary),
           onPressed: !widget.isCreator
               ? null
-              : () => showDialog(
+              : () =>
+              showDialog(
                   context: context,
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
-                        title: AppLocalizations.of(context).eventArtAendern,
-                        height: 180,
+                        title: AppLocalizations
+                            .of(context)
+                            .eventArtAendern,
+                        height: 200,
                         children: [
+                          eventArtInformation(),
                           eventTypInput,
                           Container(
                             margin: const EdgeInsets.only(right: 10),
@@ -949,16 +987,24 @@ class _EventArtButtonState extends State<EventArtButton> {
                                 children: [
                                   TextButton(
                                     child: Text(
-                                        AppLocalizations.of(context).abbrechen,
+                                        AppLocalizations
+                                            .of(context)
+                                            .abbrechen,
                                         style: TextStyle(fontSize: fontsize)),
                                     onPressed: () => Navigator.pop(context),
                                   ),
                                   TextButton(
                                       child: Text(
-                                          AppLocalizations.of(context)
+                                          AppLocalizations
+                                              .of(context)
                                               .speichern,
                                           style: TextStyle(fontSize: fontsize)),
-                                      onPressed: () => eventArtSave()),
+                                      onPressed: () {
+                                        saveEventArt();
+                                        setState(() {});
+                                        widget.pageState(() {});
+                                        Navigator.pop(context);
+                                      }),
                                 ]),
                           )
                         ]);
