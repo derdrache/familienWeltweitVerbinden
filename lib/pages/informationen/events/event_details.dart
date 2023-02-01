@@ -23,8 +23,6 @@ var userId = FirebaseAuth.instance.currentUser.uid;
 
 class EventDetailsPage extends StatefulWidget {
   Map event;
-  bool teilnahme;
-  bool absage;
   bool fromEventPage;
 
   EventDetailsPage({
@@ -55,7 +53,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     super.initState();
   }
 
-  freischalten(user, angenommen, windowState) async {
+  userFreischalten(user, angenommen, windowState) async {
     String eventId = widget.event["id"];
 
     widget.event["freischalten"].remove(user);
@@ -83,7 +81,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  freigegebenEntfernen(user, windowState) async {
+  removeUser(user, windowState) async {
     String eventId = widget.event["id"];
 
     windowState(() {
@@ -95,7 +93,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         "WHERE id = '$eventId'");
   }
 
-  newOrganisatorIsOwnerWindow() async {
+  isOwnerWindow() async {
     bool newOwnerIsInitsiator = false;
 
     await showDialog(
@@ -150,7 +148,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   label: Text(AppLocalizations.of(context).uebertragen),
                   onPressed: () async {
                     Navigator.pop(context);
-                    bool isInitiator = await newOrganisatorIsOwnerWindow();
+                    bool isInitiator = await isOwnerWindow();
                     String selectedUserId = getProfilFromHive(
                         profilName: inputKontroller.text, getIdOnly: true);
 
@@ -175,7 +173,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         });
   }
 
-  confirmEvent(bool confirm) async {
+  takePartDecision(bool confirm) async {
     if (confirm) {
 
       if (!widget.event["interesse"].contains(userId)) {
@@ -185,8 +183,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             "WHERE id = '${widget.event["id"]}'");
       }
 
-      widget.teilnahme = true;
-      widget.absage = false;
+      teilnahme = true;
+      absage = false;
       widget.event["zusage"].add(userId);
       widget.event["absage"].remove(userId);
 
@@ -194,8 +192,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
           "WHERE id = '${widget.event["id"]}'");
     } else {
-      widget.teilnahme = false;
-      widget.absage = true;
+      teilnahme = false;
+      absage = true;
       widget.event["zusage"].remove(userId);
       widget.event["absage"].add(userId);
 
@@ -218,7 +216,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       if (hasZusage) return;
 
       widget.event["zusage"].add(userId);
-      widget.teilnahme = true;
+      teilnahme = true;
       EventDatabase().update(
           "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
           "WHERE id= '${widget.event["id"]}'");
@@ -529,7 +527,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 setState(() {});
               },)
           ],),
-          if (widget.teilnahme != true)
+          if (teilnahme != true)
             Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
               child: FloatingActionButton.extended(
@@ -538,12 +536,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       .of(context)
                       .colorScheme
                       .primary,
-                  onPressed: () => confirmEvent(true),
+                  onPressed: () => takePartDecision(true),
                   label: Text(AppLocalizations
                       .of(context)
                       .teilnehmen)),
             ),
-          if (widget.absage != true)
+          if (absage != true)
             Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
               child: FloatingActionButton.extended(
@@ -555,7 +553,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 label: Text(AppLocalizations
                     .of(context)
                     .absage),
-                onPressed: () => confirmEvent(false),
+                onPressed: () => takePartDecision(false),
               ),
             )
         ],
@@ -584,10 +582,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       child: Text(profil["name"])),
                 ),
                 IconButton(
-                    onPressed: () => freischalten(user, true, windowSetState),
+                    onPressed: () => userFreischalten(user, true, windowSetState),
                     icon: const Icon(Icons.check_circle, size: 27)),
                 IconButton(
-                    onPressed: () => freischalten(user, false, windowSetState),
+                    onPressed: () => userFreischalten(user, false, windowSetState),
                     icon: const Icon(
                       Icons.cancel,
                       size: 27,
@@ -636,7 +634,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 ),
                 const Expanded(child: SizedBox(width: 10)),
                 IconButton(
-                    onPressed: () => freigegebenEntfernen(user, windowSetState),
+                    onPressed: () => removeUser(user, windowSetState),
                     icon: const Icon(
                       Icons.cancel,
                       size: 27,
@@ -822,7 +820,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 class EventArtButton extends StatefulWidget {
   Map event;
   bool isCreator;
-  var pageState;
+  Function pageState;
 
   EventArtButton({Key key, this.event, this.isCreator, this.pageState})
       : super(key: key);
@@ -833,7 +831,7 @@ class EventArtButton extends StatefulWidget {
 
 class _EventArtButtonState extends State<EventArtButton> {
   var eventTypInput = CustomDropDownButton();
-  var icon;
+  IconData icon;
 
   saveEventArt() {
     String select = eventTypInput.getSelected();
