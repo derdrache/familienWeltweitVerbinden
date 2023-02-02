@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../global/style.dart';
 import '../informationen/community/community_page.dart';
 import '../informationen/events/event_page.dart';
 import 'location/location_page.dart';
@@ -49,6 +50,10 @@ class _InformationPageState extends State<InformationPage> {
   Widget build(BuildContext context) {
 
     pageCards(title, icon, image, pageIndex) {
+      var h1FontSize = getResponsiveFontSize(context, "h1");
+      double screenWidth = MediaQuery. of(context). size. width;
+      double screenHeight = MediaQuery. of(context). size. height;
+
       return GestureDetector(
         onTap: () {
           setState(() {
@@ -56,8 +61,7 @@ class _InformationPageState extends State<InformationPage> {
           });
         },
         child: Container(
-          margin:
-          const EdgeInsets.only(left: 10, right: 10, top: 30, bottom: 30),
+          margin: const EdgeInsets.only(left: 10, right: 10),
           child: Card(
             elevation: 25,
             shadowColor: Colors.black,
@@ -65,8 +69,8 @@ class _InformationPageState extends State<InformationPage> {
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Container(
-                width: 160,
-                height: 220,
+                width: (screenWidth / 2) -40,
+                height: (screenHeight / 2) - 130,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
                     image: image == null ? null : DecorationImage(
@@ -78,11 +82,6 @@ class _InformationPageState extends State<InformationPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      icon,
-                      color: Colors.black,
-                      size: 50,
-                    ),
                     const SizedBox(height: 50),
                     Container(
                       padding: const EdgeInsets.all(10),
@@ -92,8 +91,8 @@ class _InformationPageState extends State<InformationPage> {
                       ),
                       child: Text(
                         title,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: h1FontSize, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -104,9 +103,9 @@ class _InformationPageState extends State<InformationPage> {
     }
 
     badgeCard(card, number){
-      return Stack(children: [
+      return Stack(clipBehavior: Clip.none, children: [
         card,
-        if(number != 0) Positioned(top: 15, right: 0,child: Container(
+        if(number != 0) Positioned(top: -15, right: 0,child: Container(
           width: 40, height: 40,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -123,6 +122,7 @@ class _InformationPageState extends State<InformationPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -144,6 +144,7 @@ class _InformationPageState extends State<InformationPage> {
                 )
               ],
             ),
+            SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -158,7 +159,8 @@ class _InformationPageState extends State<InformationPage> {
                     "assets/bilder/land.jpg",
                     4),
               ],
-            )
+            ),
+            SizedBox(height: 30),
           ],
         ),
       ),

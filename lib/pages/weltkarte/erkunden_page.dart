@@ -1169,7 +1169,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createPopupCards({event, community, spezialActivation = false}) {
       double screenWidth = MediaQuery.of(context).size.width;
-      var eventCrossAxisCount = screenWidth / 190;
+      var crossAxisCount = screenWidth / 250;
       popupItems = [];
       popupTyp = event != null ? "events" : "community";
       var showItems = event ?? community;
@@ -1187,7 +1187,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       popupItems.add(SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: eventCrossAxisCount.round(), // 392 => 2  => 1036 =>
+            crossAxisCount: crossAxisCount.round(),
             childAspectRatio: 0.75,
           ),
           delegate:
