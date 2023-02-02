@@ -16,7 +16,6 @@ class CommunityCard extends StatefulWidget {
   bool withFavorite;
   Function afterPageVisit;
   bool isCreator;
-  bool bigCard;
   Function afterFavorite;
   bool fromCommunityPage;
 
@@ -28,7 +27,6 @@ class CommunityCard extends StatefulWidget {
     this.margin =
         const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
-    this.bigCard = false,
     this.fromCommunityPage = false
   })  : isCreator = community["erstelltVon"] == userId,
         super(key: key);
@@ -42,9 +40,8 @@ class _CommunityCardState extends State<CommunityCard> {
 
   @override
   Widget build(BuildContext context) {
-    var bigMultiplikator = widget.bigCard == true ? 1.4 : 1.0;
     double screenHeight = MediaQuery.of(context).size.height;
-    var fontSize = screenHeight / 55 * bigMultiplikator;
+    var fontSize = screenHeight / 55;
     var isAssetImage =
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
@@ -54,8 +51,8 @@ class _CommunityCardState extends State<CommunityCard> {
           CommunityDetails(community: widget.community, fromCommunityPage: widget.fromCommunityPage),
           whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
-          width: (120 + ((screenHeight - 600) / 5)) * bigMultiplikator,
-          height: screenHeight / 3.2 * bigMultiplikator,
+          width: (120 + ((screenHeight - 600) / 5)),
+          height: screenHeight / 3.2,
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -75,6 +72,7 @@ class _CommunityCardState extends State<CommunityCard> {
                   Container(
                     constraints: const BoxConstraints(
                       minHeight: 70,
+                      maxHeight: 120
                     ),
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
@@ -83,16 +81,12 @@ class _CommunityCardState extends State<CommunityCard> {
                       ),
                       child: isAssetImage
                           ? Image.asset(widget.community["bild"],
-                              height: (70 + ((screenHeight - 600) / 4)) *
-                                  bigMultiplikator,
-                              width: (135 + ((screenHeight - 600) / 4)) *
-                                  bigMultiplikator,
+                              height: (70 + ((screenHeight - 600) / 4)),
+                              width: (135 + ((screenHeight - 600) / 4)),
                               fit: BoxFit.fill)
                           : Image.network(widget.community["bild"],
-                              height: (70 + ((screenHeight - 600) / 4)) *
-                                  bigMultiplikator,
-                              width: (135 + ((screenHeight - 600) / 4)) *
-                                  bigMultiplikator,
+                              height: (70 + ((screenHeight - 600) / 4)),
+                              width: (135 + ((screenHeight - 600) / 4)),
                               fit: BoxFit.fill),
                     ),
                   ),
