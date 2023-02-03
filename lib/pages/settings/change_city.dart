@@ -1,23 +1,27 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
+import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../../global/custom_widgets.dart';
+import '../../services/locationsService.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
-class ChangeCityPage extends StatefulWidget {
-  const ChangeCityPage({Key key}) : super(key: key);
+class ChangeLocationPage extends StatefulWidget {
+  const ChangeLocationPage({Key key}) : super(key: key);
 
   @override
-  _ChangeCityPageState createState() => _ChangeCityPageState();
+  _ChangeLocationPageState createState() => _ChangeLocationPageState();
 }
 
-class _ChangeCityPageState extends State<ChangeCityPage> {
+class _ChangeLocationPageState extends State<ChangeLocationPage> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
   TextEditingController ortChangeKontroller = TextEditingController();
   List suggestedCities = [];
@@ -25,6 +29,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   int selectedIndex = -1;
   Map locationData = {};
   var autoComplete = GoogleAutoComplete();
+  var ownProfil = Hive.box("secureBox").get("ownProfil");
 
   @override
   void initState() {
@@ -43,8 +48,39 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
   }
 
-  saveProfil(locationDict) async {
-    var ownProfil = Hive.box("secureBox").get("ownProfil");
+  addVisitedCountries(newCountry) async{
+    List visitedCountries = ownProfil["besuchteLaender"];
+    Map allCountries = LocationService().getAllCountryNames();
+    String targetLanguage = getVisitedCountriesLanguage(visitedCountries, allCountries);
+    int wrongLanguageIndex = targetLanguage == "ger"
+        ? allCountries["eng"].indexOf(newCountry)
+        : allCountries["ger"].indexOf(newCountry);
+
+    if(wrongLanguageIndex > -1) newCountry = allCountries["ger"][wrongLanguageIndex];
+
+    if(visitedCountries.contains(newCountry)) return;
+
+
+    ownProfil["besuchteLaender"].add(newCountry);
+    ProfilDatabase().updateProfil(
+        "besuchteLaender = JSON_ARRAY_APPEND(besuchteLaender, '\$', '$newCountry')",
+        "WHERE id = '${ownProfil["id"]}'"
+    );
+  }
+
+  getVisitedCountriesLanguage(visitedCountries, allCountries){
+    final bool isGermanDeviceLanguage = kIsWeb
+        ? window.locale.languageCode == "de"
+        : Platform.localeName == "de_DE";
+    String visitedCountriesLanguage = ownProfil["besuchteLaender"].isEmpty
+        ?  isGermanDeviceLanguage ? "ger" : "eng"
+        : allCountries["ger"].contains(ownProfil["besuchteLaender"][0])
+          ? "ger" : "eng";
+
+    return visitedCountriesLanguage;
+  }
+
+  saveLocation(locationDict) async {
     ownProfil["ort"] = locationDict["city"];
     ownProfil["longt"] =locationDict["longt"];
     ownProfil["latt"] =locationDict["latt"];
@@ -53,11 +89,13 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     ProfilDatabase().updateProfilLocation(userId, locationDict);
   }
 
-  saveNewsPage(locationDict){
-    NewsPageDatabase().addNewNews({
+  saveNewsPage(locationDict) async {
+    bool isSaved =  await NewsPageDatabase().addNewNews({
       "typ": "ortswechsel",
       "information": json.encode(locationDict),
     });
+
+    if(!isSaved) return;
 
     var newsFeed = Hive.box("secureBox").get("newsFeed");
     newsFeed.add({
@@ -78,6 +116,7 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
   save() async {
     var locationData = autoComplete.getGoogleLocationData();
 
+
     if(locationData["city"] == null) {
       customSnackbar(context, AppLocalizations.of(context).ortEingeben);
       return;
@@ -92,7 +131,8 @@ class _ChangeCityPageState extends State<ChangeCityPage> {
     final String oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
 
     saveChatGroups(locationDict, oldLocation);
-    saveProfil(locationDict);
+    saveLocation(locationDict);
+    addVisitedCountries(locationDict["countryname"]);
     saveNewsPage(locationDict);
     saveCityInformation(locationDict);
 

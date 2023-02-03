@@ -61,7 +61,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     windowState(() {});
 
     await EventDatabase().update(
-        "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$userId')))",
+        "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$user')))",
         "WHERE id = '$eventId'");
 
     setState(() {});
@@ -78,6 +78,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       toId: user,
       eventId: eventId,
       eventName: widget.event["name"],
+      typ: "freigegeben"
     );
   }
 
@@ -692,11 +693,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             builder: (BuildContext context,
                                 AsyncSnapshot<dynamic> snapshot) {
                               if (snapshot.hasData) {
-                                return Column(
-                                  children: [
-                                    snapshot.data,
-                                  ],
-                                );
+                                return snapshot.data;
                               }
                               return const SizedBox.shrink();
                             },
@@ -719,11 +716,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             builder: (BuildContext context,
                                 AsyncSnapshot<dynamic> snapshot) {
                               if (snapshot.hasData) {
-                                return Column(
-                                  children: [
-                                    snapshot.data,
-                                  ],
-                                );
+                                return snapshot.data;
                               }
                               return const SizedBox.shrink();
                             },
