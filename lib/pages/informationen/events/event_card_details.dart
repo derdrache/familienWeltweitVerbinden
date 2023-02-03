@@ -13,6 +13,7 @@ import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
+import '../../../services/notification.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../services/database.dart';
@@ -57,6 +58,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   var changeDropdownInput = CustomDropDownButton();
   var changeMultiDropdownInput = CustomMultiTextForm();
   bool chooseCurrentLocation = false;
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
 
   @override
   void initState() {
@@ -114,6 +116,13 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           "freischalten = JSON_ARRAY_APPEND(freischalten, '\$', '$userId'),"
               "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
           "WHERE id ='${widget.event["id"]}'");
+
+      prepareEventNotification(
+          eventId: widget.event["id"],
+          toId: ownProfil["Id"],
+          eventName : widget.event["name"],
+          typ: "freigeben"
+      );
     }
 
     updateHiveEvent(
@@ -484,7 +493,6 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           builder: (BuildContext buildContext) {
             return StatefulBuilder(builder: (context, dialogSetState) {
               if (chooseCurrentLocation) {
-                var ownProfil = Hive.box('secureBox').get("ownProfil");
                 var currentLocaton = {
                   "city": ownProfil["ort"],
                   "countryname": ownProfil["land"],
