@@ -322,7 +322,7 @@ class _ProfilSection extends StatelessWidget {
             Wrap(
               children: [
                 profilThemeContainer(userProfil["ort"],
-                    AppLocalizations.of(context).aktuelleOrt, ChangeCityPage()),
+                    AppLocalizations.of(context).aktuelleOrt, ChangeLocationPage()),
                 profilThemeContainer(
                     reiseArtInput.getSelected(),
                     AppLocalizations.of(context).artDerReise,
