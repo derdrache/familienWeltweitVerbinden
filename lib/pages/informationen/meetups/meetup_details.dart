@@ -17,25 +17,25 @@ import '../../../services/database.dart';
 import '../../../widgets/badge_icon.dart';
 import '../../show_profil.dart';
 import '../../start_page.dart';
-import 'event_card_details.dart';
+import 'meetup_card_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
 
-class EventDetailsPage extends StatefulWidget {
-  Map event;
-  bool fromEventPage;
+class MeetupDetailsPage extends StatefulWidget {
+  Map meetupData;
+  bool fromMeetupPage;
 
-  EventDetailsPage({
+  MeetupDetailsPage({
     Key key,
-    this.event,
-    this.fromEventPage = false
+    this.meetupData,
+    this.fromMeetupPage = false
   }):super(key: key);
 
   @override
-  _EventDetailsPageState createState() => _EventDetailsPageState();
+  _MeetupDetailsPageState createState() => _MeetupDetailsPageState();
 }
 
-class _EventDetailsPageState extends State<EventDetailsPage> {
+class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
   bool teilnahme;
   bool absage;
   bool isCreator;
@@ -45,53 +45,53 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   @override
   void initState() {
-    teilnahme = widget.event["zusage"] == null
-        ? false : widget.event["zusage"].contains(userId);
-    absage =widget.event["absage"] == null
-        ? false : widget.event["absage"].contains(userId);
+    teilnahme = widget.meetupData["zusage"] == null
+        ? false : widget.meetupData["zusage"].contains(userId);
+    absage =widget.meetupData["absage"] == null
+        ? false : widget.meetupData["absage"].contains(userId);
 
     super.initState();
   }
 
   userFreischalten(user, angenommen, windowState) async {
-    String eventId = widget.event["id"];
+    String meetupId = widget.meetupData["id"];
 
-    widget.event["freischalten"].remove(user);
-    widget.event["freigegeben"].add(user);
+    widget.meetupData["freischalten"].remove(user);
+    widget.meetupData["freigegeben"].add(user);
     windowState(() {});
 
-    await EventDatabase().update(
+    await MeetupDatabase().update(
         "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$user')))",
-        "WHERE id = '$eventId'");
+        "WHERE id = '$meetupId'");
 
     setState(() {});
 
     if (!angenommen) return;
 
-    await EventDatabase().update(
+    await MeetupDatabase().update(
         "freigegeben = JSON_ARRAY_APPEND(freigegeben, '\$', '$userId')",
-        "WHERE id = '$eventId'");
+        "WHERE id = '$meetupId'");
 
     setState(() {});
 
-    prepareEventNotification(
+    prepareMeetupNotification(
       toId: user,
-      eventId: eventId,
-      eventName: widget.event["name"],
+      meetupId: meetupId,
+      meetupName: widget.meetupData["name"],
       typ: "freigegeben"
     );
   }
 
   removeUser(user, windowState) async {
-    String eventId = widget.event["id"];
+    String meetupId = widget.meetupData["id"];
 
     windowState(() {
-      widget.event["freigegeben"].remove(user);
+      widget.meetupData["freigegeben"].remove(user);
     });
 
-    EventDatabase().update(
+    MeetupDatabase().update(
         "freigegeben = JSON_REMOVE(freigegeben, JSON_UNQUOTE(JSON_SEARCH(freigegeben, 'one', '$userId')))",
-        "WHERE id = '$eventId'");
+        "WHERE id = '$meetupId'");
   }
 
   isOwnerWindow() async {
@@ -154,20 +154,20 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         profilName: inputKontroller.text, getIdOnly: true);
 
                     setState(() {
-                      widget.event["erstelltVon"] = selectedUserId;
-                      widget.event["isOwner"] = isInitiator;
+                      widget.meetupData["erstelltVon"] = selectedUserId;
+                      widget.meetupData["isOwner"] = isInitiator;
                     });
 
                     customSnackbar(
                         context,
-                        AppLocalizations.of(context).eventUebergebenAn1 +
+                        AppLocalizations.of(context).meetupUebergebenAn1 +
                             inputKontroller.text +
-                            AppLocalizations.of(context).eventUebergebenAn2,
+                            AppLocalizations.of(context).meetupUebergebenAn2,
                         color: Colors.green);
 
-                    await EventDatabase().update(
+                    await MeetupDatabase().update(
                         "erstelltVon = '$selectedUserId', ownEvent = '$isInitiator'",
-                        "WHERE id = '${widget.event["id"]}'");
+                        "WHERE id = '${widget.meetupData["id"]}'");
                   },
                 )
               ]);
@@ -177,30 +177,30 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   takePartDecision(bool confirm) async {
     if (confirm) {
 
-      if (!widget.event["interesse"].contains(userId)) {
-        widget.event["interesse"].add(userId);
-        EventDatabase().update(
+      if (!widget.meetupData["interesse"].contains(userId)) {
+        widget.meetupData["interesse"].add(userId);
+        MeetupDatabase().update(
             "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-            "WHERE id = '${widget.event["id"]}'");
+            "WHERE id = '${widget.meetupData["id"]}'");
       }
 
       teilnahme = true;
       absage = false;
-      widget.event["zusage"].add(userId);
-      widget.event["absage"].remove(userId);
+      widget.meetupData["zusage"].add(userId);
+      widget.meetupData["absage"].remove(userId);
 
-      EventDatabase().update(
+      MeetupDatabase().update(
           "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
-          "WHERE id = '${widget.event["id"]}'");
+          "WHERE id = '${widget.meetupData["id"]}'");
     } else {
       teilnahme = false;
       absage = true;
-      widget.event["zusage"].remove(userId);
-      widget.event["absage"].add(userId);
+      widget.meetupData["zusage"].remove(userId);
+      widget.meetupData["absage"].add(userId);
 
-      EventDatabase().update(
+      MeetupDatabase().update(
           "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId'))),absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
-          "WHERE id = '${widget.event["id"]}'");
+          "WHERE id = '${widget.meetupData["id"]}'");
     }
 
     setState(() {});
@@ -208,67 +208,66 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
   changeImmerZusage(bool confirm) {
     if (confirm) {
-      widget.event["immerZusagen"].add(userId);
-      EventDatabase().update(
+      widget.meetupData["immerZusagen"].add(userId);
+      MeetupDatabase().update(
           "immerZusagen = JSON_ARRAY_APPEND(immerZusagen, '\$', '$userId')",
-          "WHERE id= '${widget.event["id"]}'");
+          "WHERE id= '${widget.meetupData["id"]}'");
 
-      bool hasZusage = widget.event["zusage"].contains(userId);
+      bool hasZusage = widget.meetupData["zusage"].contains(userId);
       if (hasZusage) return;
 
-      widget.event["zusage"].add(userId);
+      widget.meetupData["zusage"].add(userId);
       teilnahme = true;
-      EventDatabase().update(
+      MeetupDatabase().update(
           "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
-          "WHERE id= '${widget.event["id"]}'");
+          "WHERE id= '${widget.meetupData["id"]}'");
     } else {
-      widget.event["immerZusagen"].remove(userId);
-      EventDatabase().update(
+      widget.meetupData["immerZusagen"].remove(userId);
+      MeetupDatabase().update(
           "immerZusagen = JSON_REMOVE(immerZusagen, JSON_UNQUOTE(JSON_SEARCH(immerZusagen, 'one', '$userId')))",
-          "WHERE id= '${widget.event["id"]}'");
+          "WHERE id= '${widget.meetupData["id"]}'");
     }
   }
 
-  deleteEvent(){
-    var events = Hive.box('secureBox').get("events");
-    events.removeWhere((event) =>
-    event["id"] == widget.event["id"]);
+  deleteMeetup(){
+    var meetups = Hive.box('secureBox').get("events");
+    meetups.removeWhere((meetup) => meetup["id"] == widget.meetupData["id"]);
 
-    EventDatabase().delete(widget.event["id"]);
+    MeetupDatabase().delete(widget.meetupData["id"]);
 
     var chatGroupId = getChatGroupFromHive(
-        widget.event["id"])["id"];
+        widget.meetupData["id"])["id"];
     ChatGroupsDatabase().deleteChat(chatGroupId);
 
-    DbDeleteImage(widget.event["bild"]);
+    DbDeleteImage(widget.meetupData["bild"]);
   }
 
   @override
   Widget build(BuildContext context) {
-    isCreator = widget.event["erstelltVon"] == userId;
-    isApproved = isCreator ? true : widget.event["freigegeben"].contains(userId);
-    isNotPublic = widget.event["art"] != "öffentlich" && widget.event["art"] != "public";
+    isCreator = widget.meetupData["erstelltVon"] == userId;
+    isApproved = isCreator ? true : widget.meetupData["freigegeben"].contains(userId);
+    isNotPublic = widget.meetupData["art"] != "öffentlich" && widget.meetupData["art"] != "public";
 
 
-    deleteEventWindow() {
+    deleteMeetupWindow() {
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).eventLoeschen,
+              title: AppLocalizations.of(context).meetupLoeschen,
               height: 90,
               children: [
                 Center(
                     child: Text(
                         AppLocalizations
                             .of(context)
-                            .eventWirklichLoeschen))
+                            .meetupWirklichLoeschen))
               ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: (){
-                    deleteEvent();
+                    deleteMeetup();
 
                     global_func.changePageForever(
                         context,
@@ -284,7 +283,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           });
     }
 
-    reportEventWindow() {
+    reportMeetupWindow() {
       TextEditingController reportController = TextEditingController();
 
       showDialog(
@@ -292,9 +291,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
                 height: 380,
-                title: AppLocalizations.of(context).eventMelden,
+                title: AppLocalizations.of(context).meetupMelden,
                 children: [
-                  customTextInput(AppLocalizations.of(context).eventMeldenFrage,
+                  customTextInput(AppLocalizations.of(context).meetupMeldenFrage,
                       reportController,
                       moreLines: 10),
                   Container(
@@ -303,7 +302,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         onPressed: () {
                           Navigator.pop(context);
                           ReportsDatabase().add(userId,
-                              "Melde Event id: " + widget.event["id"],
+                              "Melde Event id: " + widget.meetupData["id"],
                               reportController.text);
                         },
                         label: Text(AppLocalizations
@@ -314,7 +313,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           });
     }
 
-    deleteEventDialog() {
+    deleteMeetupDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -322,17 +321,17 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             const SizedBox(width: 10),
             Text(AppLocalizations
                 .of(context)
-                .eventLoeschen),
+                .meetupLoeschen),
           ],
         ),
         onPressed: () {
           Navigator.pop(context);
-          deleteEventWindow();
+          deleteMeetupWindow();
         },
       );
     }
 
-    reportEventDialog() {
+    reportMeetupDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -340,29 +339,29 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             const SizedBox(width: 10),
             Text(AppLocalizations
                 .of(context)
-                .eventMelden),
+                .meetupMelden),
           ],
         ),
         onPressed: () {
           Navigator.pop(context);
-          reportEventWindow();
+          reportMeetupWindow();
         },
       );
     }
 
-    eventDetailsDialog() {
-      int eventZusagen = widget.event["zusage"].length;
-      int eventAbsagen = widget.event["absage"].length;
-      int eventInteressierte = widget.event["interesse"].length;
-      int eventFreigegebene = widget.event["freigegeben"].length;
-      int eventUnsure = eventInteressierte - eventZusagen - eventAbsagen;
+    meetupDetailsDialog() {
+      int meetupZusagen = widget.meetupData["zusage"].length;
+      int meetupAbsagen = widget.meetupData["absage"].length;
+      int meetupInteressierte = widget.meetupData["interesse"].length;
+      int meetupFreigegebene = widget.meetupData["freigegeben"].length;
+      int meetupUnsure = meetupInteressierte - meetupZusagen - meetupAbsagen;
 
       return SimpleDialogOption(
           child: Row(
             children: const [
               Icon(Icons.info),
               SizedBox(width: 10),
-              Text("Event Info"),
+              Text("Meetup Info"),
             ],
           ),
           onPressed: () =>
@@ -370,30 +369,30 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   context: context,
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
-                        title: "Event Information", children: [
+                        title: "Meetup Information", children: [
                       const SizedBox(height: 10),
                       Text(
                           AppLocalizations
                               .of(context)
                               .interessierte +
-                              eventInteressierte.toString(),
+                              meetupInteressierte.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       Text(
                           AppLocalizations
                               .of(context)
                               .zusagen +
-                              eventZusagen.toString(),
+                              meetupZusagen.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       Text(
                           AppLocalizations.of(context).absagen +
-                              eventAbsagen.toString(),
+                              meetupAbsagen.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       Text(
                           AppLocalizations.of(context).unsicher
-                              + eventUnsure.toString(),
+                              + meetupUnsure.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       if (isNotPublic)
@@ -401,7 +400,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                             AppLocalizations
                                 .of(context)
                                 .freigegeben +
-                                (eventFreigegebene + 1).toString(),
+                                (meetupFreigegebene + 1).toString(),
                             style: TextStyle(fontSize: fontsize)),
                       if (isNotPublic) const SizedBox(height: 10),
                       const SizedBox(height: 10)
@@ -409,13 +408,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   }));
     }
 
-    eventOptinenDialog() {
+    meetupOptinenDialog() {
       return SimpleDialogOption(
           child: Row(
             children: [
               const Icon(Icons.settings),
               const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).eventOptionen),
+              Text(AppLocalizations.of(context).meetupOptionen),
             ],
           ),
           onPressed: () {
@@ -427,7 +426,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   return StatefulBuilder(
                       builder: (buildContext, dialogSetState) {
                         return CustomAlertDialog(
-                            title: AppLocalizations.of(context).eventOptionen,
+                            title: AppLocalizations.of(context).meetupOptionen,
                             children: [
                               Row(
                                 children: [
@@ -437,7 +436,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                               .of(context)
                                               .immerDabei)),
                                   Switch(
-                                    value: widget.event["immerZusagen"]
+                                    value: widget.meetupData["immerZusagen"]
                                         .contains(userId),
                                     inactiveThumbColor: Colors.grey[700],
                                     activeColor:
@@ -478,8 +477,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     moreMenu() {
-      bool isRepeating = widget.event["eventInterval"] != global_var.eventInterval[0] &&
-          widget.event["eventInterval"] != global_var.eventIntervalEnglisch[0];
+      bool isRepeating = widget.meetupData["eventInterval"] != global_var.meetupInterval[0] &&
+          widget.meetupData["eventInterval"] != global_var.meetupIntervalEnglisch[0];
 
       showDialog(
           context: context,
@@ -494,13 +493,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     insetPadding:
                     const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
-                      if (isApproved || !isNotPublic) eventDetailsDialog(),
+                      if (isApproved || !isNotPublic) meetupDetailsDialog(),
                       if (isApproved || !isNotPublic)
-                        if (isRepeating) eventOptinenDialog(),
-                      if (!isCreator) reportEventDialog(),
+                        if (isRepeating) meetupOptinenDialog(),
+                      if (!isCreator) reportMeetupDialog(),
                       if (isCreator) changeOrganisatorDialog(),
                       if (isCreator) const SizedBox(height: 15),
-                      if (isCreator) deleteEventDialog(),
+                      if (isCreator) deleteMeetupDialog(),
                     ],
                   ),
                 ),
@@ -510,9 +509,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
 
     teilnahmeButtonBox() {
-      bool isRepeating  = global_var.eventIntervalEnglisch[0] !=
-          widget.event["eventInterval"]
-          && global_var.eventInterval[0] != widget.event["eventInterval"];
+      bool isRepeating  = global_var.meetupIntervalEnglisch[0] !=
+          widget.meetupData["eventInterval"]
+          && global_var.meetupInterval[0] != widget.meetupData["eventInterval"];
 
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -522,7 +521,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 .of(context)
                 .immerDabei),
             Switch(
-              value: widget.event["immerZusagen"].contains(userId),
+              value: widget.meetupData["immerZusagen"].contains(userId),
               onChanged: (value) {
                 changeImmerZusage(value);
                 setState(() {});
@@ -564,7 +563,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     userFreischaltenList(windowSetState) async {
       List<Widget> freizugebenListe = [];
 
-      for (var user in widget.event["freischalten"]) {
+      for (var user in widget.meetupData["freischalten"]) {
         Map profil = getProfilFromHive(profilId: user);
 
         freizugebenListe.add(Container(
@@ -595,7 +594,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             )));
       }
 
-      if (widget.event["freischalten"].length == 0) {
+      if (widget.meetupData["freischalten"].length == 0) {
         freizugebenListe.add(Padding(
           padding: const EdgeInsets.only(top: 50),
           child: Center(
@@ -615,7 +614,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     freigeschalteteUser(windowSetState) async {
       List<Widget> freigeschlatetList = [];
 
-      for (var user in widget.event["freigegeben"]) {
+      for (var user in widget.meetupData["freigegeben"]) {
         var profil = getProfilFromHive(profilId: user);
 
         freigeschlatetList.add(Container(
@@ -644,7 +643,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             )));
       }
 
-      if (widget.event["freigegeben"].length == 0) {
+      if (widget.meetupData["freigegeben"].length == 0) {
         freigeschlatetList.add(Padding(
           padding: const EdgeInsets.only(top: 50),
           child: Center(
@@ -745,13 +744,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     return SelectionArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: "", leading: widget.fromEventPage
+        appBar: CustomAppBar(title: "", leading: widget.fromMeetupPage
             ? StartPage(selectedIndex: 2, informationPageIndex: 1)
             : null, buttons: [
           if (isCreator && isNotPublic)
             FutureBuilder(
-                future: EventDatabase().getData(
-                    "freischalten", "WHERE id = '${widget.event["id"]}'"),
+                future: MeetupDatabase().getData(
+                    "freischalten", "WHERE id = '${widget.meetupData["id"]}'"),
                 builder: (context, snap) {
                   var data = snap.hasData ? snap.data.length.toString() : "";
                   if (data == "0") data = "";
@@ -760,14 +759,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       icon: BadgeIcon(
                           icon: Icons.event_available,
                           text: data
-                              .toString()), //const Icon(Icons.event_available),
+                              .toString()),
                       onPressed: () => userfreischalteWindow());
                 }),
           IconButton(
             icon: const Icon(Icons.link),
             onPressed: () {
               Clipboard.setData(
-                  ClipboardData(text: "</eventId=" + widget.event["id"]));
+                  ClipboardData(text: "</eventId=" + widget.meetupData["id"]));
 
               customSnackbar(context, AppLocalizations
                   .of(context)
@@ -780,7 +779,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   global_func.changePage(
                     context,
                     ChatDetailsPage(
-                      connectedId: "</event=" + widget.event["id"],
+                      connectedId: "</event=" + widget.meetupData["id"],
                       isChatgroup: true,
                     ),
                   )),
@@ -792,12 +791,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         body: ListView(
           children: [
             Stack(children: [
-              EventCardDetails(
-                event: widget.event,
+              MeetupCardDetails(
+                meetupData: widget.meetupData,
                 isApproved: isApproved,
               ),
-              EventArtButton(
-                event: widget.event,
+              MeetupArtButton(
+                meetupData: widget.meetupData,
                 isCreator: isCreator,
                 pageState: setState,
               ),
@@ -810,34 +809,34 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 }
 
-class EventArtButton extends StatefulWidget {
-  Map event;
+class MeetupArtButton extends StatefulWidget {
+  Map meetupData;
   bool isCreator;
   Function pageState;
 
-  EventArtButton({Key key, this.event, this.isCreator, this.pageState})
+  MeetupArtButton({Key key, this.meetupData, this.isCreator, this.pageState})
       : super(key: key);
 
   @override
-  _EventArtButtonState createState() => _EventArtButtonState();
+  _MeetupArtButtonState createState() => _MeetupArtButtonState();
 }
 
-class _EventArtButtonState extends State<EventArtButton> {
-  var eventTypInput = CustomDropDownButton();
+class _MeetupArtButtonState extends State<MeetupArtButton> {
+  var meetupTypInput = CustomDropDownButton();
   IconData icon;
 
-  saveEventArt() {
-    String select = eventTypInput.getSelected();
+  saveMeetupArt() {
+    String select = meetupTypInput.getSelected();
 
-    if (select == widget.event["art"]) return;
+    if (select == widget.meetupData["art"]) return;
 
-    widget.event["art"] = select;
+    widget.meetupData["art"] = select;
 
-    EventDatabase()
-        .update("art = '$select'", "WHERE id = '${widget.event["id"]}'");
+    MeetupDatabase()
+        .update("art = '$select'", "WHERE id = '${widget.meetupData["id"]}'");
   }
 
-  eventArtInformation() {
+  meetupArtInformation() {
     return SizedBox(
       height: 20,
       child: Align(
@@ -852,7 +851,7 @@ class _EventArtButtonState extends State<EventArtButton> {
                             height: 500,
                             title: AppLocalizations
                                 .of(context)
-                                .informationEventArt,
+                                .informationMeetupArt,
                             children: [
                               const SizedBox(height: 10),
                               Container(
@@ -931,21 +930,21 @@ class _EventArtButtonState extends State<EventArtButton> {
 
   @override
   void initState() {
-    eventTypInput = CustomDropDownButton(
+    meetupTypInput = CustomDropDownButton(
       items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
       selected: isGerman
-          ? global_func.changeEnglishToGerman(widget.event["art"])
-          : global_func.changeGermanToEnglish(widget.event["art"]),
+          ? global_func.changeEnglishToGerman(widget.meetupData["art"])
+          : global_func.changeGermanToEnglish(widget.meetupData["art"]),
     );
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    icon = widget.event["art"] == "öffentlich" ||
-        widget.event["art"] == "public"
+    icon = widget.meetupData["art"] == "öffentlich" ||
+        widget.meetupData["art"] == "public"
         ? Icons.lock_open
-        : widget.event["art"] == "privat" || widget.event["art"] == "private"
+        : widget.meetupData["art"] == "privat" || widget.meetupData["art"] == "private"
         ? Icons.enhanced_encryption
         : Icons.lock;
 
@@ -966,11 +965,11 @@ class _EventArtButtonState extends State<EventArtButton> {
                     return CustomAlertDialog(
                         title: AppLocalizations
                             .of(context)
-                            .eventArtAendern,
+                            .meetupArtAendern,
                         height: 200,
                         children: [
-                          eventArtInformation(),
-                          eventTypInput,
+                          meetupArtInformation(),
+                          meetupTypInput,
                           Container(
                             margin: const EdgeInsets.only(right: 10),
                             child: Row(
@@ -991,7 +990,7 @@ class _EventArtButtonState extends State<EventArtButton> {
                                               .speichern,
                                           style: TextStyle(fontSize: fontsize)),
                                       onPressed: () {
-                                        saveEventArt();
+                                        saveMeetupArt();
                                         setState(() {});
                                         widget.pageState(() {});
                                         Navigator.pop(context);

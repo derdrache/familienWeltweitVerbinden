@@ -61,7 +61,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             ? global_variablen.interessenListe
             : global_variablen.interessenListeEnglisch);
 
-    refreshHiveEvents();
+    refreshHiveMeetups();
 
     super.initState();
   }
@@ -159,7 +159,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     myGroupChats.add(getChatGroupFromHive(""));
 
     await refreshHiveChats();
-    await refreshHiveEvents();
+    await refreshHiveMeetups();
   }
 
   childrenInputValidation() {

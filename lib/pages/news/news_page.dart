@@ -12,7 +12,7 @@ import 'package:intl/intl.dart';
 
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
-import '../informationen/events/eventCard.dart';
+import '../informationen/meetups/meetupCard.dart';
 import '../informationen/location/location_Information.dart';
 import 'news_page_settings.dart';
 
@@ -444,10 +444,10 @@ class _NewsPageState extends State<NewsPage> {
       }
 
       if (isOnline) {
-        eventText = AppLocalizations.of(context).newsPageOnlineEventVorschlag +
+        eventText = AppLocalizations.of(context).newsPageOnlineMeetupVorschlag +
             _evenTagMatch(event["tags"]).toString();
       } else {
-        eventText = AppLocalizations.of(context).newsPageOfflineEventVorschlag;
+        eventText = AppLocalizations.of(context).newsPageOfflineMeetupVorschlag;
       }
 
       userNewsContent.add(
@@ -459,9 +459,9 @@ class _NewsPageState extends State<NewsPage> {
             margin: const EdgeInsets.only(bottom: 20),
             child: Column(
               children: [
-                EventCard(
+                MeetupCard(
                   margin: const EdgeInsets.all(15),
-                  event: event,
+                  meetupData: event,
                   withInteresse: true,
                 ),
                 Row(

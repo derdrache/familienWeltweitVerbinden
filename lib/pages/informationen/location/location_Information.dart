@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/informationen/events/event_card_details.dart';
+import 'package:familien_suche/pages/informationen/meetups/meetup_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';

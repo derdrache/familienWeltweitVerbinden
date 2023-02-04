@@ -32,7 +32,7 @@ class UmcomingUpdatesWindow{
               children: [
                 _update(AppLocalizations.of(context).chatErweiterung),
                 _update(AppLocalizations.of(context).weitereAnemdlungsMoeglichkeiten),
-                _update(AppLocalizations.of(context).eventErweiterung),
+                _update(AppLocalizations.of(context).meetupErweiterung),
                 _update(AppLocalizations.of(context).communityErweiterung),
                 _update(AppLocalizations.of(context).layoutVerbessern),
                 _update(AppLocalizations.of(context).schwarzesBrett),

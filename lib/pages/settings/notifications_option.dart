@@ -74,8 +74,8 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         const SizedBox(width: 20),
         Text(
             kIsWeb
-                ? AppLocalizations.of(context).eventEmailErhalten
-                : AppLocalizations.of(context).eventNotificationErhalten,
+                ? AppLocalizations.of(context).meetupEmailErhalten
+                : AppLocalizations.of(context).meetupNotificationErhalten,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(

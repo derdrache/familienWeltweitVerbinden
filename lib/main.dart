@@ -14,7 +14,7 @@ import 'firebase_options.dart';
 import 'pages/start_page.dart';
 import 'pages/show_profil.dart';
 import 'pages/chat/chat_details.dart';
-import 'pages/informationen/events/event_details.dart';
+import 'pages/informationen/meetups/meetup_details.dart';
 import 'pages/login_register_page/login_page.dart';
 import 'services/database.dart';
 import 'services/local_notification.dart';
@@ -58,7 +58,7 @@ refreshHiveData() async {
 
   await refreshHiveProfils();
   await refreshHiveChats();
-  await refreshHiveEvents();
+  await refreshHiveMeetups();
 }
 
 void main() async {
@@ -179,10 +179,10 @@ class MyApp extends StatelessWidget {
   }
 
   _changeToEvent(eventId) async {
-    var eventData = getEventFromHive(eventId);
+    var eventData = getMeetupFromHive(eventId);
 
     navigatorKey.currentState?.push(
-        MaterialPageRoute(builder: (_) => EventDetailsPage(event: eventData)));
+        MaterialPageRoute(builder: (_) => MeetupDetailsPage(meetupData: eventData)));
   }
 
   _changeToProfil(profilId) async {
