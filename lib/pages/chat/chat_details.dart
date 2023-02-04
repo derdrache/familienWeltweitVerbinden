@@ -318,7 +318,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (checkMessage.isEmpty) return;
 
     var messageData = {
-      "chatId": widget.chatId,
+      "chatId": widget.groupChatData["id"],
       "message": message,
       "von": userID,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
@@ -353,7 +353,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     for (var myChat in myChats) {
-      if (myChat["id"] == widget.chatId) {
+      if (myChat["id"] == widget.groupChatData["id"]) {
         myChat["lastMessage"] = groupText;
         myChat["lastMessageDate"] = int.parse(messageData["date"]);
       }
@@ -362,19 +362,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateChatGroup(
           "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.chatId}'");
+          "WHERE id = '${widget.groupChatData["id"]}'");
     } else {
       ChatDatabase().updateChatGroup(
           "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.chatId}'");
+          "WHERE id = '${widget.groupChatData["id"]}'");
     }
 
-    saveMessageinDBAndRefresh(messageData);
+    await saveNewMessage(messageData);
+    messages = await getAllDbMessages();
 
     messageExtraInformationId = null;
   }
 
-  saveMessageinDBAndRefresh(messageData) async {
+  saveNewMessage(messageData) async {
     if (widget.isChatgroup) {
       var languageCheck = await translator.translate(messageData["message"]);
       var languageCode = languageCheck.sourceLanguage.code;
@@ -387,8 +388,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       await ChatDatabase().addNewMessageAndSendNotification(
           widget.groupChatData["id"], messageData, isBlocked);
     }
-
-    messages = await getAllDbMessages();
   }
 
   openProfil() async {
