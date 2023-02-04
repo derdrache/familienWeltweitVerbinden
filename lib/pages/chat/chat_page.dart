@@ -424,7 +424,7 @@ class _ChatPageState extends State<ChatPage> {
 
       var connectedId = chatConnected.split("=")[1];
       if (chatConnected.contains("event")) {
-        var eventData = getEventFromHive(connectedId);
+        var eventData = getMeetupFromHive(connectedId);
         var isPrivate = ["privat", "private"].contains(eventData["art"]);
         return isPrivate ? "" : eventData["name"];
       }
@@ -560,7 +560,7 @@ class _ChatPageState extends State<ChatPage> {
           var connectedId = group["connected"].split("=")[1];
 
           if (group["connected"].contains("event")) {
-            chatData = getEventFromHive(connectedId);
+            chatData = getMeetupFromHive(connectedId);
             chatName = chatData["name"];
           } else if (group["connected"].contains("community")) {
             chatData = getCommunityFromHive(connectedId);

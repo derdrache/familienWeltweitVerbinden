@@ -22,8 +22,8 @@ import 'package:translator/translator.dart';
 
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
-import '../informationen/events/eventCard.dart';
-import '../informationen/events/event_details.dart';
+import '../informationen/meetups/meetupCard.dart';
+import '../informationen/meetups/meetup_details.dart';
 import '../../auth/secrets.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
@@ -193,9 +193,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       widget.groupChatData ??= getChatGroupFromHive(connectedId);
 
       if (widget.connectedId.contains("event")) {
-        connectedData = getEventFromHive(connectedId);
-        pageDetailsPage = EventDetailsPage(
-          event: connectedData,
+        connectedData = getMeetupFromHive(connectedId);
+        pageDetailsPage = MeetupDetailsPage(
+          meetupData: connectedData,
         );
         adminList.add(connectedData["erstelltVon"]);
       } else if (widget.connectedId.contains("community")) {
@@ -287,7 +287,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     for(var message in newMessages){
       if(message["message"].contains("</eventId=")){
-        await refreshHiveEvents();
+        await refreshHiveMeetups();
       }else if(message["message"].contains("</communityId=")){
         await refreshHiveCommunities();
       }else if(message["message"].contains("</communityId=")){
@@ -834,11 +834,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   getDisplayedCard(cardType, data){
     if(cardType == "event"){
-      return EventCard(
+      return MeetupCard(
         margin: const EdgeInsets.only(
             left: 15, right: 15, top: 15, bottom: 0),
         withInteresse: true,
-        event: data,
+        meetupData: data,
         afterPageVisit: () => setState(() {}),
       );
     } else if(cardType == "community"){
@@ -1206,7 +1206,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       messageSplit.asMap().forEach((index, text) {
         if (text.contains("</eventId=")) {
           cardTypeId = text.substring(10);
-          cardData = getEventFromHive(cardTypeId);
+          cardData = getMeetupFromHive(cardTypeId);
         } else if(text.contains("</communityId=")){
           cardTypeId = text.substring(14);
           cardData = getCommunityFromHive(cardTypeId);

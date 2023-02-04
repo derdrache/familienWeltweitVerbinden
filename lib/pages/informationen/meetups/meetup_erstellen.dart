@@ -19,32 +19,32 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../windows/nutzerrichtlinen.dart';
-import 'event_details.dart';
+import 'meetup_details.dart';
 
-class EventErstellen extends StatefulWidget {
-  const EventErstellen({Key key}) : super(key: key);
+class MeetupErstellen extends StatefulWidget {
+  const MeetupErstellen({Key key}) : super(key: key);
 
   @override
-  _EventErstellenState createState() => _EventErstellenState();
+  _MeetupErstellenState createState() => _MeetupErstellenState();
 }
 
-class _EventErstellenState extends State<EventErstellen> {
+class _MeetupErstellenState extends State<MeetupErstellen> {
   var isGerman = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  var eventNameKontroller = TextEditingController();
-  DateTime eventWannDatum;
-  DateTime eventBisDatum;
-  TimeOfDay eventWannUhrzeit;
-  TimeOfDay eventBisUhrzeit;
-  var eventBeschreibungKontroller = TextEditingController();
-  var eventOrtKontroller = TextEditingController();
+  var meetupNameKontroller = TextEditingController();
+  DateTime meetupWannDatum;
+  DateTime meetupBisDatum;
+  TimeOfDay meetupWannUhrzeit;
+  TimeOfDay meetupBisUhrzeit;
+  var meetupBeschreibungKontroller = TextEditingController();
+  var meetupOrtKontroller = TextEditingController();
   var sprachenAuswahlBox = CustomMultiTextForm();
-  var eventArtDropdown = CustomDropDownButton();
+  var meetupArtDropdown = CustomDropDownButton();
   var ortTypDropdown = CustomDropDownButton();
   var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true);
-  var eventIntervalDropdown = CustomDropDownButton();
-  var ownEvent = true;
+  var meetupIntervalDropdown = CustomDropDownButton();
+  var ownMeetup = true;
   final translator = GoogleTranslator();
   bool chooseCurrentLocation = false;
 
@@ -62,21 +62,21 @@ class _EventErstellenState extends State<EventErstellen> {
     ortTypDropdown = CustomDropDownButton(
       selected: "offline",
       hintText: "offline / online",
-      labelText: "Event typ",
-      items: isGerman ? global_var.eventTyp : global_var.eventTypEnglisch,
+      labelText: "Meetup typ",
+      items: isGerman ? global_var.meetupTyp : global_var.meetupTypEnglisch,
       onChange: () {
         setState(() {});
       },
     );
 
-    eventArtDropdown = CustomDropDownButton(
+    meetupArtDropdown = CustomDropDownButton(
       items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
     );
 
-    eventIntervalDropdown = CustomDropDownButton(
+    meetupIntervalDropdown = CustomDropDownButton(
         items: isGerman
-            ? global_var.eventInterval
-            : global_var.eventIntervalEnglisch,
+            ? global_var.meetupInterval
+            : global_var.meetupIntervalEnglisch,
         onChange: () {
           setState(() {});
         });
@@ -84,18 +84,18 @@ class _EventErstellenState extends State<EventErstellen> {
     super.initState();
   }
 
-  isMultiDayEvent(eventInterval) {
-    return eventInterval == global_var.eventInterval[2] ||
-        eventInterval == global_var.eventIntervalEnglisch[2];
+  isMultiDayMeetup(interval) {
+    return interval == global_var.meetupInterval[2] ||
+        interval == global_var.meetupIntervalEnglisch[2];
   }
 
-  saveEvent() async {
+  saveMeetup() async {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = const Uuid();
-    var eventId = uuid.v4();
+    var meetupId = uuid.v4();
     var userID = FirebaseAuth.instance.currentUser?.uid;
     var allValid = checkValidations(locationData);
-    var interval = eventIntervalDropdown.getSelected();
+    var interval = meetupIntervalDropdown.getSelected();
     bool descriptionIsGerman = true;
     String beschreibungGer = "";
     String beschreibungEng = "";
@@ -107,11 +107,11 @@ class _EventErstellenState extends State<EventErstellen> {
       customSnackbar(context, allValid);
       return;
     }
-    var wannDate = DateTime(eventWannDatum.year, eventWannDatum.month,
-        eventWannDatum.day, eventWannUhrzeit.hour, eventWannUhrzeit.minute);
-    if (isMultiDayEvent(interval)) {
-      bisDate = DateTime(eventBisDatum.year, eventBisDatum.month,
-          eventBisDatum.day, eventBisUhrzeit.hour, eventBisUhrzeit.minute);
+    var wannDate = DateTime(meetupWannDatum.year, meetupWannDatum.month,
+        meetupWannDatum.day, meetupWannUhrzeit.hour, meetupWannUhrzeit.minute);
+    if (isMultiDayMeetup(interval)) {
+      bisDate = DateTime(meetupBisDatum.year, meetupBisDatum.month,
+          meetupBisDatum.day, meetupBisUhrzeit.hour, meetupBisUhrzeit.minute);
     }
 
     if (locationData["latt"] == null) {
@@ -123,37 +123,37 @@ class _EventErstellenState extends State<EventErstellen> {
       };
     }
 
-    var languageCheck = await translator.translate(eventBeschreibungKontroller.text);
+    var languageCheck = await translator.translate(meetupBeschreibungKontroller.text);
     descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
     if(descriptionIsGerman){
-      beschreibungGer = eventBeschreibungKontroller.text;
+      beschreibungGer = meetupBeschreibungKontroller.text;
       beschreibungEng = await descriptionTranslation(beschreibungGer, "auto");
       beschreibungEng += "\n\nThis is an automatic translation";
     }else{
-      beschreibungEng = eventBeschreibungKontroller.text;
+      beschreibungEng = meetupBeschreibungKontroller.text;
       beschreibungGer = await descriptionTranslation(
           beschreibungEng + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
       beschreibungGer = beschreibungGer + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
     }
 
-    var eventData = {
-      "id": eventId,
-      "name": eventNameKontroller.text,
+    var meetupData = {
+      "id": meetupId,
+      "name": meetupNameKontroller.text,
       "erstelltAm": DateTime.now().toString(),
       "erstelltVon": userID,
-      "beschreibung": eventBeschreibungKontroller.text,
+      "beschreibung": meetupBeschreibungKontroller.text,
       "beschreibungGer":beschreibungGer,
       "beschreibungEng": beschreibungEng,
       "stadt": locationData["city"],
-      "art": eventArtDropdown.getSelected(),
+      "art": meetupArtDropdown.getSelected(),
       "wann": wannDate.toString(),
       "bis": bisDate.toString(),
       "typ": ortTypDropdown.getSelected(),
       "sprache": json.encode(sprachenAuswahlBox.getSelected()),
       "interval": interval,
       "link": ortTypDropdown.getSelected() == "online"
-          ? eventOrtKontroller.text
+          ? meetupOrtKontroller.text
           : "",
       "land": locationData["countryname"],
       "longt": locationData["longt"],
@@ -161,21 +161,21 @@ class _EventErstellenState extends State<EventErstellen> {
       "zeitzone": DateTime.now().timeZoneOffset.inHours.toString(),
       "interesse": json.encode([userID]),
       "bild": "assets/bilder/strand.jpg",
-      "ownEvent": ownEvent
+      "ownMeetup": ownMeetup
     };
 
-    await EventDatabase().addNewEvent(eventData);
+    await MeetupDatabase().addNewMeetup(meetupData);
     StadtinfoDatabase().addNewCity(locationData);
-    var dbEventData =
-        await EventDatabase().getData("*", "WHERE id = '$eventId'");
+    var dbMeetupData =
+        await MeetupDatabase().getData("*", "WHERE id = '$meetupId'");
     ChatGroupsDatabase().addNewChatGroup(
-        userID, "</event=$eventId"
+        userID, "</event=$meetupId"
     );
 
-    if (dbEventData == false) return;
+    if (dbMeetupData == false) return;
 
     global_functions.changePage(context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
-    global_functions.changePage(context, EventDetailsPage(event: dbEventData));
+    global_functions.changePage(context, MeetupDetailsPage(meetupData: dbMeetupData));
   }
 
   descriptionTranslation(text, targetLanguage) async{
@@ -190,37 +190,37 @@ class _EventErstellenState extends State<EventErstellen> {
   checkValidations(locationData) {
     var validationFailText = "";
 
-    if (eventNameKontroller.text.isEmpty) {
+    if (meetupNameKontroller.text.isEmpty) {
       validationFailText = AppLocalizations.of(context).bitteNameEingeben;
-    } else if (eventNameKontroller.text.length > 40) {
+    } else if (meetupNameKontroller.text.length > 40) {
       validationFailText = AppLocalizations.of(context).usernameZuLang;
-    } else if (eventArtDropdown.getSelected().isEmpty) {
-      validationFailText = AppLocalizations.of(context).bitteEventArtEingeben;
-    } else if (eventIntervalDropdown.getSelected().isEmpty) {
+    } else if (meetupArtDropdown.getSelected().isEmpty) {
+      validationFailText = AppLocalizations.of(context).bitteMeetupArtEingeben;
+    } else if (meetupIntervalDropdown.getSelected().isEmpty) {
       validationFailText =
-          AppLocalizations.of(context).bitteEventIntervalEingeben;
+          AppLocalizations.of(context).bitteMeetupIntervalEingeben;
     } else if (ortTypDropdown.getSelected().isEmpty) {
-      validationFailText = AppLocalizations.of(context).bitteEventTypEingeben;
+      validationFailText = AppLocalizations.of(context).bitteMeetupTypEingeben;
     } else if (ortTypDropdown.getSelected() == "offline" &&
         locationData["city"] == null) {
       validationFailText = AppLocalizations.of(context).bitteStadtEingeben;
     } else if (ortTypDropdown.getSelected() == "online" &&
-        eventOrtKontroller.text.isEmpty) {
+        meetupOrtKontroller.text.isEmpty) {
       validationFailText = AppLocalizations.of(context).bitteLinkEingeben;
     } else if (sprachenAuswahlBox.getSelected().isEmpty) {
       validationFailText = AppLocalizations.of(context).bitteSpracheEingeben;
-    } else if (eventWannDatum == null) {
-      validationFailText = AppLocalizations.of(context).bitteEventDatumEingeben;
-    } else if (eventBisDatum == null &&
-        isMultiDayEvent(eventIntervalDropdown.getSelected())) {
+    } else if (meetupWannDatum == null) {
+      validationFailText = AppLocalizations.of(context).bitteMeetupDatumEingeben;
+    } else if (meetupBisDatum == null &&
+        isMultiDayMeetup(meetupIntervalDropdown.getSelected())) {
       validationFailText =
-          AppLocalizations.of(context).bitteEnddatumEventEingeben;
-    } else if (eventWannUhrzeit == null) {
+          AppLocalizations.of(context).bitteEnddatumMeetupEingeben;
+    } else if (meetupWannUhrzeit == null) {
       validationFailText =
-          AppLocalizations.of(context).bitteEventUhrzeitEingeben;
-    } else if (eventBeschreibungKontroller.text.isEmpty) {
+          AppLocalizations.of(context).bitteMeetupUhrzeitEingeben;
+    } else if (meetupBeschreibungKontroller.text.isEmpty) {
       validationFailText =
-          AppLocalizations.of(context).bitteEventBeschreibungEingeben;
+          AppLocalizations.of(context).bitteMeetupBeschreibungEingeben;
     }
 
     if (validationFailText.isEmpty) return true;
@@ -234,24 +234,24 @@ class _EventErstellenState extends State<EventErstellen> {
     double screenWidth = MediaQuery.of(context).size.width;
     sprachenAuswahlBox.hintText =
         AppLocalizations.of(context).spracheAuswaehlen;
-    eventArtDropdown.labelText =  AppLocalizations.of(context).eventOeffentlichkeit;
-    eventArtDropdown.hintText = AppLocalizations.of(context).eventArten;
-    eventIntervalDropdown.labelText = AppLocalizations.of(context).eventWiederholung;
-    eventIntervalDropdown.hintText = isGerman
-        ? global_var.eventInterval.join(", ")
-        : global_var.eventIntervalEnglisch.join(", ");
+    meetupArtDropdown.labelText =  AppLocalizations.of(context).meetupOeffentlichkeit;
+    meetupArtDropdown.hintText = AppLocalizations.of(context).meetupArten;
+    meetupIntervalDropdown.labelText = AppLocalizations.of(context).meetupWiederholung;
+    meetupIntervalDropdown.hintText = isGerman
+        ? global_var.meetupInterval.join(", ")
+        : global_var.meetupIntervalEnglisch.join(", ");
     ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
 
-    dateTimeBox(eventDatum, eventUhrzeit, dateTimeTyp) {
+    dateTimeBox(meetupDatum, meetupUhrzeit, dateTimeTyp) {
       var dateString = AppLocalizations.of(context).datumAuswaehlen;
-      if (eventDatum != null) {
+      if (meetupDatum != null) {
         var dateFormat = DateFormat('dd-MM-yyyy');
         var dateTime =
-            DateTime(eventDatum.year, eventDatum.month, eventDatum.day);
+            DateTime(meetupDatum.year, meetupDatum.month, meetupDatum.day);
         dateString = dateFormat.format(dateTime);
       }
 
-      return !isMultiDayEvent(eventIntervalDropdown.getSelected()) &&
+      return !isMultiDayMeetup(meetupIntervalDropdown.getSelected()) &&
               dateTimeTyp == "bis"
           ? const SizedBox.shrink()
           : Align(
@@ -263,8 +263,8 @@ class _EventErstellenState extends State<EventErstellen> {
                   children: [
                     Text(
                       dateTimeTyp == "wann"
-                          ? "Event start: "
-                          : AppLocalizations.of(context).eventEnde,
+                          ? "Meetup start: "
+                          : AppLocalizations.of(context).meetupEnde,
                       style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(width: 20),
@@ -278,9 +278,9 @@ class _EventErstellenState extends State<EventErstellen> {
                             lastDate: DateTime(DateTime.now().year + 1));
 
                         if (dateTimeTyp == "wann") {
-                          eventWannDatum = pickedDate;
+                          meetupWannDatum = pickedDate;
                         } else {
-                          eventBisDatum = pickedDate;
+                          meetupBisDatum = pickedDate;
                         }
 
                         setState(() {});
@@ -288,9 +288,9 @@ class _EventErstellenState extends State<EventErstellen> {
                     ),
                     const SizedBox(width: 20),
                     ElevatedButton(
-                      child: Text(eventUhrzeit == null
+                      child: Text(meetupUhrzeit == null
                           ? AppLocalizations.of(context).uhrzeitAuswaehlen
-                          : eventUhrzeit.format(context)),
+                          : meetupUhrzeit.format(context)),
                       onPressed: () async {
                         var pickedTime = await showTimePicker(
                           context: context,
@@ -298,9 +298,9 @@ class _EventErstellenState extends State<EventErstellen> {
                         );
 
                         if (dateTimeTyp == "wann") {
-                          eventWannUhrzeit = pickedTime;
+                          meetupWannUhrzeit = pickedTime;
                         } else {
-                          eventBisUhrzeit = pickedTime;
+                          meetupBisUhrzeit = pickedTime;
                         }
 
                         setState(() {});
@@ -344,7 +344,7 @@ class _EventErstellenState extends State<EventErstellen> {
     ortEingabeBox() {
       if (ortTypDropdown.selected == "online") {
         return customTextInput(
-            AppLocalizations.of(context).eventLinkEingeben, eventOrtKontroller,
+            AppLocalizations.of(context).meetupLinkEingeben, meetupOrtKontroller,
             validator: global_functions.checkValidatorEmpty(context));
       } else if (ortTypDropdown.selected == "offline") {
         return ortAuswahlBox;
@@ -353,7 +353,7 @@ class _EventErstellenState extends State<EventErstellen> {
       }
     }
 
-    eventArtInformation() {
+    meetupArtInformation() {
       return Positioned(
           top: -5,
           left: screenWidth < 640 ? -5 : ((screenWidth - 640) / 2) + 5,
@@ -364,7 +364,7 @@ class _EventErstellenState extends State<EventErstellen> {
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
                         height: 500,
-                        title: AppLocalizations.of(context).informationEventArt,
+                        title: AppLocalizations.of(context).informationMeetupArt,
                         children: [
                           const SizedBox(height: 10),
                           Container(
@@ -434,7 +434,7 @@ class _EventErstellenState extends State<EventErstellen> {
                   })));
     }
 
-    ownEventBox() {
+    ownMeetupBox() {
       return Container(
         margin: const EdgeInsets.all(10),
         child: Row(
@@ -442,16 +442,16 @@ class _EventErstellenState extends State<EventErstellen> {
             Container(
                 padding: const EdgeInsets.only(left:10),
                 width: screenWidth * 0.75,
-                child: Text(AppLocalizations.of(context).frageErstellerEvent,
+                child: Text(AppLocalizations.of(context).frageErstellerMeetup,
                     maxLines: 2, style: const TextStyle(fontSize: 18),)),
             const Expanded(
               child: SizedBox.shrink(),
             ),
             Checkbox(
-                value: ownEvent,
+                value: ownMeetup,
                 onChanged: (value) {
                   setState(() {
-                    ownEvent = value;
+                    ownMeetup = value;
                   });
                 }),
           ],
@@ -461,30 +461,30 @@ class _EventErstellenState extends State<EventErstellen> {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).eventErstellen,
+          title: AppLocalizations.of(context).meetupErstellen,
           buttons: [
             IconButton(
-                onPressed: () => saveEvent(),
+                onPressed: () => saveMeetup(),
                 icon: const Icon(Icons.done, size: 30))
           ]),
       body: SafeArea(
         child: ListView(
           children: [
-            customTextInput("Event Name", eventNameKontroller,
+            customTextInput("Meetup Name", meetupNameKontroller,
                 validator: global_functions.checkValidatorEmpty(context)),
             Stack(
-              children: [eventArtDropdown, eventArtInformation()],
+              children: [meetupArtDropdown, meetupArtInformation()],
             ),
             ortTypDropdown,
             chooseOwnLocationBox(),
             Align(child: ortEingabeBox()),
             sprachenAuswahlBox,
-            eventIntervalDropdown,
-            dateTimeBox(eventWannDatum, eventWannUhrzeit, "wann"),
-            dateTimeBox(eventBisDatum, eventBisUhrzeit, "bis"),
-            ownEventBox(),
-            customTextInput(AppLocalizations.of(context).eventBeschreibung,
-                eventBeschreibungKontroller,
+            meetupIntervalDropdown,
+            dateTimeBox(meetupWannDatum, meetupWannUhrzeit, "wann"),
+            dateTimeBox(meetupBisDatum, meetupBisUhrzeit, "bis"),
+            ownMeetupBox(),
+            customTextInput(AppLocalizations.of(context).meetupBeschreibung,
+                meetupBeschreibungKontroller,
                 moreLines: 8, textInputAction: TextInputAction.newline),
             Center(child: NutzerrichtlinenAnzeigen(page: "create")),
             const SizedBox(height: 20)

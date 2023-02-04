@@ -271,7 +271,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   _refreshHiveDb() async {
     await refreshHiveChats();
-    await refreshHiveEvents();
+    await refreshHiveMeetups();
     await refreshHiveProfils();
     await refreshHiveCommunities();
     await refreshHiveNewsPage();

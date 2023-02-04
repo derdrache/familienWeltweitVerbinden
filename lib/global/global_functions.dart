@@ -115,7 +115,7 @@ changeGermanToEnglish(list){
   }
   if(list.runtimeType == String && checkList.isEmpty){
     var reiseartenIndex = reisearten.indexOf(list);
-    var eventIntervalIndex = eventInterval.indexOf(list);
+    var eventIntervalIndex = meetupInterval.indexOf(list);
     var eventArtIndex = eventArt.indexOf(list);
     var aufreiseIndex = aufreise.indexOf(list);
     var standortBestimmungIndex = standortbestimmung.indexOf(list);
@@ -123,7 +123,7 @@ changeGermanToEnglish(list){
     var interesseIndex = interessenListe.indexOf(list);
 
     if(reiseartenIndex > -1) return reiseartenEnglisch[reiseartenIndex];
-    if(eventIntervalIndex > -1) return eventIntervalEnglisch[eventIntervalIndex];
+    if(eventIntervalIndex > -1) return meetupIntervalEnglisch[eventIntervalIndex];
     if(eventArtIndex > -1) return eventArtEnglisch[eventArtIndex];
     if(aufreiseIndex > -1) return aufreiseEnglisch[aufreiseIndex];
     if(standortBestimmungIndex > -1) return standortbestimmungEnglisch[standortBestimmungIndex];
@@ -160,7 +160,7 @@ changeEnglishToGerman(list){
 
   if(list.runtimeType == String && checkList.isEmpty){
     var reiseartenIndex = reiseartenEnglisch.indexOf(list);
-    var eventIntervalIndex = eventIntervalEnglisch.indexOf(list);
+    var eventIntervalIndex = meetupIntervalEnglisch.indexOf(list);
     var eventArtIndex = eventArtEnglisch.indexOf(list);
     var aufreiseIndex = aufreiseEnglisch.indexOf(list);
     var standortBestimmungIndex = standortbestimmungEnglisch.indexOf(list);
@@ -168,7 +168,7 @@ changeEnglishToGerman(list){
     var interessenIndex = interessenListeEnglisch.indexOf(list);
 
     if(reiseartenIndex > -1) return reisearten[reiseartenIndex];
-    if(eventIntervalIndex > -1) return eventInterval[eventIntervalIndex];
+    if(eventIntervalIndex > -1) return meetupInterval[eventIntervalIndex];
     if(eventArtIndex > -1) return eventArt[eventArtIndex];
     if(aufreiseIndex > -1) return aufreise[aufreiseIndex];
     if(standortBestimmungIndex > -1) return standortbestimmung[standortBestimmungIndex];

@@ -18,7 +18,7 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../services/database.dart';
 import '../../../global/variablen.dart' as global_var;
-import '../../../widgets/event_image_galerie.dart';
+import '../../../widgets/meetup_image_galerie.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
@@ -31,24 +31,24 @@ var isGerman = kIsWeb
     : Platform.localeName == "de_DE";
 
 //ignore: must_be_immutable
-class EventCardDetails extends StatefulWidget {
-  Map event;
-  bool offlineEvent;
+class MeetupCardDetails extends StatefulWidget {
+  Map meetupData;
+  bool offlineMeetup;
   bool isCreator;
   bool isApproved;
   bool isPublic;
 
-  EventCardDetails(
-      {Key key, this.event, this.offlineEvent = true, this.isApproved = false})
-      : isCreator = event["erstelltVon"] == userId,
-        isPublic = event["art"] == "öffentlich" || event["art"] == "public",
+  MeetupCardDetails(
+      {Key key, this.meetupData, this.offlineMeetup = true, this.isApproved = false})
+      : isCreator = meetupData["erstelltVon"] == userId,
+        isPublic = meetupData["art"] == "öffentlich" || meetupData["art"] == "public",
         super(key: key);
 
   @override
-  _EventCardDetailsState createState() => _EventCardDetailsState();
+  _MeetupCardDetailsState createState() => _MeetupCardDetailsState();
 }
 
-class _EventCardDetailsState extends State<EventCardDetails> {
+class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   final _scrollController = ScrollController();
   bool moreContent = false;
   final translator = GoogleTranslator();
@@ -62,7 +62,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
   @override
   void initState() {
-    beschreibungInputKontroller.text = widget.event["beschreibung"];
+    beschreibungInputKontroller.text = widget.meetupData["beschreibung"];
 
     addScrollListener();
 
@@ -96,77 +96,77 @@ class _EventCardDetailsState extends State<EventCardDetails> {
   askForRelease(isOnList) async {
     if (isOnList) {
       customSnackbar(
-          context, AppLocalizations.of(context).eventInteresseZurueckgenommen,
+          context, AppLocalizations.of(context).meetupInteresseZurueckgenommen,
           color: Colors.green);
 
-      widget.event["freischalten"].remove(userId);
+      widget.meetupData["freischalten"].remove(userId);
 
-      EventDatabase().update(
+      MeetupDatabase().update(
           "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$userId'))),"
               "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id ='${widget.event["id"]}'");
+          "WHERE id ='${widget.meetupData["id"]}'");
     } else {
       customSnackbar(
-          context, AppLocalizations.of(context).eventInteresseMitgeteilt,
+          context, AppLocalizations.of(context).meetupInteresseMitgeteilt,
           color: Colors.green);
 
-      widget.event["freischalten"].add(userId);
+      widget.meetupData["freischalten"].add(userId);
 
-      EventDatabase().update(
+      MeetupDatabase().update(
           "freischalten = JSON_ARRAY_APPEND(freischalten, '\$', '$userId'),"
               "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id ='${widget.event["id"]}'");
+          "WHERE id ='${widget.meetupData["id"]}'");
 
-      prepareEventNotification(
-          eventId: widget.event["id"],
+      prepareMeetupNotification(
+          meetupId: widget.meetupData["id"],
           toId: ownProfil["Id"],
-          eventName : widget.event["name"],
+          meetupName : widget.meetupData["name"],
           typ: "freigeben"
       );
     }
 
-    updateHiveEvent(
-        widget.event["id"], "freischalten", widget.event["freischalten"]);
+    updateHiveMeetup(
+        widget.meetupData["id"], "freischalten", widget.meetupData["freischalten"]);
   }
 
-  convertEventDateIntoMyDate() {
-    var eventZeitzone = widget.event["zeitzone"];
+  convertMeetupDateIntoMyDate() {
+    var meetupZeitzone = widget.meetupData["zeitzone"];
     var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
-    var eventBeginn = widget.event["wann"];
+    var meetupBeginn = widget.meetupData["wann"];
 
-    eventBeginn = DateTime.parse(eventBeginn)
-        .add(Duration(hours: deviceZeitzone - eventZeitzone));
+    meetupBeginn = DateTime.parse(meetupBeginn)
+        .add(Duration(hours: deviceZeitzone - meetupZeitzone));
 
     var ownDate =
-        eventBeginn.toString().split(" ")[0].split("-").reversed.join(".");
+        meetupBeginn.toString().split(" ")[0].split("-").reversed.join(".");
     var ownTime =
-        eventBeginn.toString().split(" ")[1].toString().substring(0, 5);
+        meetupBeginn.toString().split(" ")[1].toString().substring(0, 5);
 
     return ownDate + " " + ownTime;
   }
 
   saveTag(newValue) {
-    if (widget.event["tags"]
+    if (widget.meetupData["tags"]
             .contains(global_func.changeGermanToEnglish(newValue)) ||
-        widget.event["tags"]
+        widget.meetupData["tags"]
             .contains(global_func.changeEnglishToGerman(newValue))) return;
 
-    widget.event["tags"].add(newValue);
+    widget.meetupData["tags"].add(newValue);
 
-    updateHiveEvent(widget.event["id"], "tags", widget.event["tags"]);
+    updateHiveMeetup(widget.meetupData["id"], "tags", widget.meetupData["tags"]);
 
-    EventDatabase().update("tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')",
-        "WHERE id = '${widget.event["id"]}'");
+    MeetupDatabase().update("tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')",
+        "WHERE id = '${widget.meetupData["id"]}'");
   }
 
   removeTag(tag) {
-    widget.event["tags"].remove(tag);
+    widget.meetupData["tags"].remove(tag);
 
-    updateHiveEvent(widget.event["id"], "tags", widget.event["tags"]);
+    updateHiveMeetup(widget.meetupData["id"], "tags", widget.meetupData["tags"]);
 
-    EventDatabase().update(
+    MeetupDatabase().update(
         "tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))",
-        "WHERE id = '${widget.event["id"]}'");
+        "WHERE id = '${widget.meetupData["id"]}'");
   }
 
   descriptionTranslation(text, targetLanguage) async {
@@ -187,10 +187,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
     }
 
-    widget.event["name"] = newName;
-    updateHiveEvent(widget.event["id"], "name", newName);
-    EventDatabase()
-        .update("name = '$newName'", "WHERE id = '${widget.event["id"]}'");
+    widget.meetupData["name"] = newName;
+    updateHiveMeetup(widget.meetupData["id"], "name", newName);
+    MeetupDatabase()
+        .update("name = '$newName'", "WHERE id = '${widget.meetupData["id"]}'");
 
     return true;
   }
@@ -200,38 +200,38 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
     if (newBeschreibung.isEmpty) return false;
 
-    var eventId = widget.event["id"];
-    var event = getEventFromHive(eventId);
+    var meetupId = widget.meetupData["id"];
+    var meetupData = getMeetupFromHive(meetupId);
 
-    event["beschreibung"] = newBeschreibung;
-    event["beschreibungGer"]= newBeschreibung;
-    event["beschreibungEng"]= newBeschreibung;
+    meetupData["beschreibung"] = newBeschreibung;
+    meetupData["beschreibungGer"]= newBeschreibung;
+    meetupData["beschreibungEng"]= newBeschreibung;
 
-    translateAndSaveBeschreibung(event);
+    translateAndSaveBeschreibung(meetupData);
 
     return true;
   }
 
-  translateAndSaveBeschreibung(event) async{
-    var newBeschreibung = event["beschreibung"];
+  translateAndSaveBeschreibung(meetupData) async{
+    var newBeschreibung = meetupData["beschreibung"];
     var languageCheck = await translator.translate(newBeschreibung);
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
     if (descriptionIsGerman) {
-      event["beschreibungGer"] = newBeschreibung;
+      meetupData["beschreibungGer"] = newBeschreibung;
       var translation = await descriptionTranslation(newBeschreibung, "auto");
-      event["beschreibungEng"] =
+      meetupData["beschreibungEng"] =
           translation + "\n\nThis is an automatic translation";
     } else {
-      event["beschreibungEng"] = newBeschreibung;
+      meetupData["beschreibungEng"] = newBeschreibung;
       var translation = await descriptionTranslation(newBeschreibung, "de");
-      event["beschreibungGer"] = translation +
+      meetupData["beschreibungGer"] = translation +
           "\n\nHierbei handelt es sich um eine automatische Übersetzung";
     }
 
-    await EventDatabase().update(
-        "beschreibung = '${event["beschreibung"]}', beschreibungGer = '${event["beschreibungGer"]}',beschreibungEng = '${event["beschreibungEng"]}'",
-        "WHERE id = '${event["id"]}'");
+    await MeetupDatabase().update(
+        "beschreibung = '${meetupData["beschreibung"]}', beschreibungGer = '${meetupData["beschreibungGer"]}',beschreibungEng = '${meetupData["beschreibungEng"]}'",
+        "WHERE id = '${meetupData["id"]}'");
   }
 
   checkAndSaveNewTimeZone() {
@@ -239,10 +239,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
     if (newTimeZone.isEmpty) return false;
 
-    widget.event["zeitzone"] = newTimeZone;
-    updateHiveEvent(widget.event["id"], "zeitzone", newTimeZone);
-    EventDatabase().update(
-        "zeitzone = '$newTimeZone'", "WHERE id = '${widget.event["id"]}'");
+    widget.meetupData["zeitzone"] = newTimeZone;
+    updateHiveMeetup(widget.meetupData["id"], "zeitzone", newTimeZone);
+    MeetupDatabase().update(
+        "zeitzone = '$newTimeZone'", "WHERE id = '${widget.meetupData["id"]}'");
 
     return true;
   }
@@ -252,11 +252,11 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
     if (newLocation["city"].isEmpty) return false;
 
-    updateHiveEvent(widget.event["id"], "stadt", newLocation["city"]);
-    updateHiveEvent(widget.event["id"], "land", newLocation["countryname"]);
-    updateHiveEvent(widget.event["id"], "latt", newLocation["latt"]);
-    updateHiveEvent(widget.event["id"], "longt", newLocation["longt"]);
-    EventDatabase().updateLocation(widget.event["id"], newLocation);
+    updateHiveMeetup(widget.meetupData["id"], "stadt", newLocation["city"]);
+    updateHiveMeetup(widget.meetupData["id"], "land", newLocation["countryname"]);
+    updateHiveMeetup(widget.meetupData["id"], "latt", newLocation["latt"]);
+    updateHiveMeetup(widget.meetupData["id"], "longt", newLocation["longt"]);
+    MeetupDatabase().updateLocation(widget.meetupData["id"], newLocation);
     StadtinfoDatabase().addNewCity(newLocation);
 
     return true;
@@ -272,10 +272,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       return;
     }
 
-    widget.event["link"] = newLink;
-    updateHiveEvent(widget.event["id"], "link", newLink);
-    EventDatabase()
-        .update("link = '$newLink'", "WHERE id = '${widget.event["id"]}'");
+    widget.meetupData["link"] = newLink;
+    updateHiveMeetup(widget.meetupData["id"], "link", newLink);
+    MeetupDatabase()
+        .update("link = '$newLink'", "WHERE id = '${widget.meetupData["id"]}'");
 
     return true;
   }
@@ -285,10 +285,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
     if (newInterval.isEmpty) return false;
 
-    widget.event["eventInterval"] = newInterval;
-    updateHiveEvent(widget.event["id"], "eventInterval", newInterval);
-    EventDatabase().update(
-        "eventInterval = '$newInterval'", "WHERE id = '${widget.event["id"]}'");
+    widget.meetupData["eventInterval"] = newInterval;
+    updateHiveMeetup(widget.meetupData["id"], "eventInterval", newInterval);
+    MeetupDatabase().update(
+        "eventInterval = '$newInterval'", "WHERE id = '${widget.meetupData["id"]}'");
 
     return true;
   }
@@ -298,10 +298,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
     if (newSprache.isEmpty) return false;
 
-    widget.event["sprache"] = newSprache;
-    updateHiveEvent(widget.event["id"], "sprache", newSprache);
-    EventDatabase().update("sprache = '${jsonEncode(newSprache)}'",
-        "WHERE id = '${widget.event["id"]}'");
+    widget.meetupData["sprache"] = newSprache;
+    updateHiveMeetup(widget.meetupData["id"], "sprache", newSprache);
+    MeetupDatabase().update("sprache = '${jsonEncode(newSprache)}'",
+        "WHERE id = '${widget.meetupData["id"]}'");
 
     return true;
   }
@@ -313,12 +313,12 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     if (screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
     double cardHeight = screenHeight / 1.34;
-    bool isOffline = widget.event["typ"] == global_var.eventTyp[0] ||
-        widget.event["typ"] == global_var.eventTypEnglisch[0];
+    bool isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
+        widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
     ortAuswahlBox.hintText = AppLocalizations.of(context).neueStadtEingeben;
-    widget.event["eventInterval"] = isGerman
-        ? global_func.changeEnglishToGerman(widget.event["eventInterval"])
-        : global_func.changeGermanToEnglish(widget.event["eventInterval"]);
+    widget.meetupData["eventInterval"] = isGerman
+        ? global_func.changeEnglishToGerman(widget.meetupData["eventInterval"])
+        : global_func.changeGermanToEnglish(widget.meetupData["eventInterval"]);
 
     creatorChangeHintBox() {
       if (!widget.isCreator) return const SizedBox.shrink();
@@ -329,22 +329,22 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       );
     }
 
-    fremdesEventBox() {
-      var fremdesEvent = widget.event["ownEvent"] == 0;
+    fremdesMeetupBox() {
+      var fremdesMeetup = widget.meetupData["ownEvent"] == 0;
 
-      if (!fremdesEvent || widget.isCreator) return const SizedBox.shrink();
+      if (!fremdesMeetup || widget.isCreator) return const SizedBox.shrink();
 
       return Container(
         padding: const EdgeInsets.only(left: 10, right: 10),
         width: screenWidth * 0.8,
-        child: Text(AppLocalizations.of(context).nichtErstellerEvent,
+        child: Text(AppLocalizations.of(context).nichtErstellerMeetup,
             textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.red, fontSize: 18),
             maxLines: 2),
       );
     }
 
-    eventInformationRow(rowTitle, rowData, changeWindow,
+    meetupInformationRow(rowTitle, rowData, changeWindow,
         {bodyColor = Colors.black}) {
       return Container(
           margin: const EdgeInsets.only(left: 10, right: 10, top: 5),
@@ -410,11 +410,11 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     nameInformation() {
       return InkWell(
         onTap: () => openChangeWindow(
-            AppLocalizations.of(context).eventNameAendern,
+            AppLocalizations.of(context).meetupNameAendern,
             customTextInput(AppLocalizations.of(context).neuenNamenEingeben,
                 changeTextInputController),
             checkAndSaveNewName),
-        child: Text(widget.event["name"],
+        child: Text(widget.meetupData["name"],
             style:
                 TextStyle(fontSize: fontsize + 8, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center),
@@ -423,29 +423,29 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
     bildAndTitleBox() {
       bool isAssetImage =
-          widget.event["bild"].substring(0, 5) == "asset" ? true : false;
+          widget.meetupData["bild"].substring(0, 5) == "asset" ? true : false;
 
       return Stack(
         clipBehavior: Clip.none,
         children: [
           Stack(
             children: [
-              EventImageGalerie(
+              MeetupImageGalerie(
                 isCreator: widget.isCreator,
-                event: widget.event,
+                meetupData: widget.meetupData,
                 child: ClipRRect(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0),
                     ),
                     child: isAssetImage
-                        ? Image.asset(widget.event["bild"],
+                        ? Image.asset(widget.meetupData["bild"],
                             fit: BoxFit.fitWidth)
                         : Container(
                             constraints:
                                 BoxConstraints(maxHeight: screenHeight / 2.08),
                             child: Image.network(
-                              widget.event["bild"],
+                              widget.meetupData["bild"],
                             ))),
               ),
             ],
@@ -476,11 +476,11 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     }
 
     timeZoneInformation() {
-      return eventInformationRow(
+      return meetupInformationRow(
         AppLocalizations.of(context).zeitzone,
-        "GMT " + widget.event["zeitzone"].toString(),
+        "GMT " + widget.meetupData["zeitzone"].toString(),
         () => openChangeWindow(
-            AppLocalizations.of(context).eventZeitzoneAendern,
+            AppLocalizations.of(context).meetupZeitzoneAendern,
             customTextInput(AppLocalizations.of(context).neueZeitzoneEingeben,
                 changeTextInputController),
             checkAndSaveNewTimeZone),
@@ -505,7 +505,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
               }
 
               return CustomAlertDialog(
-                  title: AppLocalizations.of(context).eventStadtAendern,
+                  title: AppLocalizations.of(context).meetupStadtAendern,
                   height: 400,
                   children: [
                     ortAuswahlBox,
@@ -554,18 +554,18 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     }
 
     locationInformation() {
-      return eventInformationRow(
+      return meetupInformationRow(
           AppLocalizations.of(context).ort,
-          widget.event["stadt"] + ", " + widget.event["land"],
+          widget.meetupData["stadt"] + ", " + widget.meetupData["land"],
           () => openLocationChangeWindow());
     }
 
     mapAndLinkInformation() {
-      return eventInformationRow(
+      return meetupInformationRow(
           isOffline ? "Map: " : "Link: ",
-          widget.event["link"],
+          widget.meetupData["link"],
           () => openChangeWindow(
-              AppLocalizations.of(context).eventMapLinkAendern,
+              AppLocalizations.of(context).meetupMapLinkAendern,
               customTextInput(
                   AppLocalizations.of(context).neuenKartenlinkEingeben,
                   changeTextInputController),
@@ -576,15 +576,15 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     intervalInformation() {
       changeDropdownInput = CustomDropDownButton(
           items: isGerman
-              ? global_var.eventInterval
-              : global_var.eventIntervalEnglisch,
-          selected: widget.event["eventInterval"]);
+              ? global_var.meetupInterval
+              : global_var.meetupIntervalEnglisch,
+          selected: widget.meetupData["eventInterval"]);
 
-      return eventInformationRow(
+      return meetupInformationRow(
           "Interval",
-          widget.event["eventInterval"],
+          widget.meetupData["eventInterval"],
           () => openChangeWindow(
-              AppLocalizations.of(context).eventIntervalAendern,
+              AppLocalizations.of(context).meetupIntervalAendern,
               changeDropdownInput,
               checkAndSaveNewInterval));
     }
@@ -592,10 +592,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     sprachenInformation() {
       var data = isGerman
           ? global_func
-              .changeEnglishToGerman(widget.event["sprache"])
+              .changeEnglishToGerman(widget.meetupData["sprache"])
               .join(", ")
           : global_func
-              .changeGermanToEnglish(widget.event["sprache"])
+              .changeGermanToEnglish(widget.meetupData["sprache"])
               .join(", ");
       changeMultiDropdownInput = CustomMultiTextForm(
         selected: data.split(", "),
@@ -605,26 +605,26 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             : global_var.sprachenListeEnglisch,
       );
 
-      return eventInformationRow(
+      return meetupInformationRow(
           AppLocalizations.of(context).sprache,
           data,
           () => openChangeWindow(
-              AppLocalizations.of(context).eventSpracheAendern,
+              AppLocalizations.of(context).meetupSpracheAendern,
               changeMultiDropdownInput,
               checkAndSaveNewSprache,
               height: 600));
     }
 
-    eventBeschreibung() {
-      if (widget.event["beschreibungGer"].isEmpty) {
-        widget.event["beschreibungGer"] = widget.event["beschreibung"];
+    meetupBeschreibung() {
+      if (widget.meetupData["beschreibungGer"].isEmpty) {
+        widget.meetupData["beschreibungGer"] = widget.meetupData["beschreibung"];
       }
-      if (widget.event["beschreibungEng"].isEmpty) {
-        widget.event["beschreibungEng"] = widget.event["beschreibung"];
+      if (widget.meetupData["beschreibungEng"].isEmpty) {
+        widget.meetupData["beschreibungEng"] = widget.meetupData["beschreibung"];
       }
       var usedDiscription = isGerman
-          ? widget.event["beschreibungGer"]
-          : widget.event["beschreibungEng"];
+          ? widget.meetupData["beschreibungGer"]
+          : widget.meetupData["beschreibungEng"];
 
       return Container(
           margin:
@@ -640,7 +640,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                       onTextTab: widget.isCreator
                           ? () => openChangeWindow(
                               AppLocalizations.of(context)
-                                  .eventBeschreibungAendern,
+                                  .meetupBeschreibungAendern,
                               customTextInput(
                                   AppLocalizations.of(context)
                                       .neueBeschreibungEingeben,
@@ -653,14 +653,14 @@ class _EventCardDetailsState extends State<EventCardDetails> {
     }
 
     cardShadowColor() {
-      if (widget.event["zusage"].contains(userId)) return Colors.green;
-      if (widget.event["absage"].contains(userId)) return Colors.red;
+      if (widget.meetupData["zusage"].contains(userId)) return Colors.green;
+      if (widget.meetupData["absage"].contains(userId)) return Colors.red;
 
       return Colors.grey;
     }
 
     secretFogWithButton() {
-      var isOnList = widget.event["freischalten"].contains(userId);
+      var isOnList = widget.meetupData["freischalten"].contains(userId);
 
       return Container(
           width: cardWidth,
@@ -688,15 +688,15 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           ));
     }
 
-    createChangeableEventTags(changeState) {
-      List<Widget> eventTags = [];
+    createChangeableMeetupTags(changeState) {
+      List<Widget> meetupTags = [];
 
-      for (var tag in widget.event["tags"]) {
+      for (var tag in widget.meetupData["tags"]) {
         String tagText = isGerman
             ? global_func.changeEnglishToGerman(tag)
             : global_func.changeGermanToEnglish(tag);
 
-        eventTags.add(InkWell(
+        meetupTags.add(InkWell(
           onTap: () async {
             removeTag(tag);
             changeState(() {});
@@ -727,10 +727,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
         ));
       }
 
-      return eventTags;
+      return meetupTags;
     }
 
-    changeEventTagsWindow() {
+    changeMeetupTagsWindow() {
       List<String> tagItems = (isGerman
           ? global_var.reisearten + global_var.interessenListe
           : global_var.reiseartenEnglisch + global_var.interessenListeEnglisch);
@@ -738,7 +738,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
-            return StatefulBuilder(builder: (context, setStateEventTagWindow) {
+            return StatefulBuilder(builder: (context, setStateMeetupTagWindow) {
               return CustomAlertDialog(
                   title: AppLocalizations.of(context).tagsChange,
                   children: [
@@ -762,7 +762,7 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                                 }).toList(),
                                 onChanged: (newValue) async {
                                   saveTag(newValue);
-                                  setStateEventTagWindow(() {});
+                                  setStateMeetupTagWindow(() {});
                                   setState(() {});
                                 })),
                       )
@@ -772,18 +772,18 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                         margin: const EdgeInsets.all(5),
                         child: Wrap(
                           children:
-                              createChangeableEventTags(setStateEventTagWindow),
+                              createChangeableMeetupTags(setStateMeetupTagWindow),
                         ))
                   ]);
             });
           });
     }
 
-    eventTags() {
-      List<Widget> eventTags = [];
+    meetupTagList() {
+      List<Widget> meetupTags = [];
 
-      for (var tag in widget.event["tags"]) {
-        eventTags.add(Container(
+      for (var tag in widget.meetupData["tags"]) {
+        meetupTags.add(Container(
             margin: const EdgeInsets.only(right: 5, top: 5),
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
@@ -799,18 +799,18 @@ class _EventCardDetailsState extends State<EventCardDetails> {
             )));
       }
 
-      if (eventTags.isEmpty && widget.isCreator) {
-        eventTags.add(Container(
+      if (meetupTags.isEmpty && widget.isCreator) {
+        meetupTags.add(Container(
             margin: const EdgeInsets.all(10),
-            child: const Text("Hier klicken um Eventlabel hinzuzufügen",
+            child: const Text("Hier klicken um Meetuplabel hinzuzufügen",
                 style: TextStyle(color: Colors.grey))));
       }
 
       return InkWell(
-        onTap: () => widget.isCreator ? changeEventTagsWindow() : null,
+        onTap: () => widget.isCreator ? changeMeetupTagsWindow() : null,
         child: Container(
             margin: const EdgeInsets.only(left: 10, right: 10),
-            child: Wrap(children: eventTags)),
+            child: Wrap(children: meetupTags)),
       );
     }
 
@@ -842,15 +842,15 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                     bildAndTitleBox(),
                     const SizedBox(height: 20),
                     creatorChangeHintBox(),
-                    fremdesEventBox(),
+                    fremdesMeetupBox(),
                     ShowDatetimeBox(
-                        event: widget.event, isCreator: widget.isCreator),
+                        meetupData: widget.meetupData, isCreator: widget.isCreator),
                     timeZoneInformation(),
                     if (isOffline) locationInformation(),
                     if (!isOffline && !widget.isCreator)
-                      eventInformationRow(
+                      meetupInformationRow(
                           AppLocalizations.of(context).meinDatum,
-                          convertEventDateIntoMyDate(),
+                          convertMeetupDateIntoMyDate(),
                           null),
                     if (widget.isApproved || widget.isPublic)
                       mapAndLinkInformation(),
@@ -858,8 +858,8 @@ class _EventCardDetailsState extends State<EventCardDetails> {
                       intervalInformation(),
                     sprachenInformation(),
                     if (widget.isApproved || widget.isPublic)
-                      eventBeschreibung(),
-                    eventTags()
+                      meetupBeschreibung(),
+                    meetupTagList()
                   ],
                 ),
               ),
@@ -875,13 +875,13 @@ class _EventCardDetailsState extends State<EventCardDetails> {
           if (!widget.isApproved && !widget.isPublic) secretFogWithButton(),
           if (!widget.isCreator)
             InteresseButton(
-              hasIntereset: widget.event["interesse"].contains(userId),
-              id: widget.event["id"],
+              hasIntereset: widget.meetupData["interesse"].contains(userId),
+              id: widget.meetupData["id"],
             ),
           CardFeet(
-              organisator: widget.event["erstelltVon"],
-              event: widget.event,
-              eventZusage: widget.event["zusage"],
+              organisator: widget.meetupData["erstelltVon"],
+              meetupData: widget.meetupData,
+              meetupZusage: widget.meetupData["zusage"],
               width: cardWidth),
         ],
       ),
@@ -891,10 +891,10 @@ class _EventCardDetailsState extends State<EventCardDetails> {
 
 //ignore: must_be_immutable
 class ShowDatetimeBox extends StatefulWidget {
-  Map event;
+  Map meetupData;
   bool isCreator;
 
-  ShowDatetimeBox({Key key, this.event, this.isCreator}) : super(key: key);
+  ShowDatetimeBox({Key key, this.meetupData, this.isCreator}) : super(key: key);
 
   @override
   _ShowDatetimeBoxState createState() => _ShowDatetimeBoxState();
@@ -909,9 +909,9 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
   saveChanges() async {
     var wannDate =
-        wannDateInputButton.eventDatum ?? DateTime.parse(widget.event["wann"]);
+        wannDateInputButton.meetupDatum ?? DateTime.parse(widget.meetupData["wann"]);
     var wannTime =
-        wannTimeInputButton.uhrZeit ?? DateTime.parse(widget.event["wann"]);
+        wannTimeInputButton.uhrZeit ?? DateTime.parse(widget.meetupData["wann"]);
     var newWannDate = DateTime(wannDate.year, wannDate.month, wannDate.day,
             wannTime.hour, wannTime.minute)
         .toString()
@@ -919,17 +919,17 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     var newBisDate;
 
     if (!isSingeDay) {
-      var bisDate = bisDateInputButton.eventDatum;
+      var bisDate = bisDateInputButton.meetupDatum;
       var bisTime = bisTimeInputButton.uhrZeit;
 
       if (bisDate == null) {
         return customSnackbar(
-            context, AppLocalizations.of(context).eingebenBisTagEvent);
+            context, AppLocalizations.of(context).eingebenBisTagMeetup);
       }
 
       if (bisTime == null) {
         return customSnackbar(
-            context, AppLocalizations.of(context).eingebenBisUhrzeitEvent);
+            context, AppLocalizations.of(context).eingebenBisUhrzeitMeetup);
       }
 
       newBisDate = DateTime(bisDate.year, bisDate.month, bisDate.day,
@@ -938,15 +938,15 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
           .substring(0, 16);
     }
 
-    updateHiveEvent(widget.event["id"], "wann", "newWannDate");
-    updateHiveEvent(widget.event["id"], "bis", "newBisDate");
+    updateHiveMeetup(widget.meetupData["id"], "wann", "newWannDate");
+    updateHiveMeetup(widget.meetupData["id"], "bis", "newBisDate");
 
-    EventDatabase().update("wann = '$newWannDate', bis = '$newBisDate'",
-        "WHERE id = '${widget.event["id"]}'");
+    MeetupDatabase().update("wann = '$newWannDate', bis = '$newBisDate'",
+        "WHERE id = '${widget.meetupData["id"]}'");
 
     setState(() {
-      widget.event["wann"] = newWannDate;
-      widget.event["bis"] = newBisDate;
+      widget.meetupData["wann"] = newWannDate;
+      widget.meetupData["bis"] = newBisDate;
     });
     Navigator.pop(context);
   }
@@ -962,13 +962,13 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     } else if (!isSingeDay) {
       return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         Column(children: [
-          const Text("Event start"),
+          const Text("Meetup start"),
           const SizedBox(height: 5),
           wannDateInputButton,
           wannTimeInputButton
         ]),
         Column(children: [
-          const Text("Event ende"),
+          const Text("Meetup ende"),
           const SizedBox(height: 5),
           bisDateInputButton,
           bisTimeInputButton
@@ -982,7 +982,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-              title: AppLocalizations.of(context).eventDatumAendern,
+              title: AppLocalizations.of(context).meetupDatumAendern,
               height: 300,
               children: [
                 const SizedBox(height: 20),
@@ -1008,12 +1008,12 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
   }
 
   createInhaltText() {
-    List wannDatetimeList = widget.event["wann"].split(" ");
+    List wannDatetimeList = widget.meetupData["wann"].split(" ");
     List wannDateList = wannDatetimeList[0].split("-");
     List wannTimeList = wannDatetimeList[1].split(":");
 
     if (!isSingeDay) {
-      var bisDatetimeList = widget.event["bis"]?.split(" ");
+      var bisDatetimeList = widget.meetupData["bis"]?.split(" ");
       var bisDateText = "?";
       var bisTimeText = "?";
 
@@ -1043,26 +1043,26 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
   void initState() {
     wannDateInputButton = DateButton(
       getDate: true,
-      eventDatum: DateTime.parse(widget.event["wann"]),
+      meetupDatum: DateTime.parse(widget.meetupData["wann"]),
     );
     wannTimeInputButton = DateButton(
         uhrZeit: TimeOfDay(
-            hour: int.parse(widget.event["wann"].split(" ")[1].split(":")[0]),
+            hour: int.parse(widget.meetupData["wann"].split(" ")[1].split(":")[0]),
             minute:
-                int.parse(widget.event["wann"].split(" ")[1].split(":")[1])));
+                int.parse(widget.meetupData["wann"].split(" ")[1].split(":")[1])));
     bisDateInputButton = DateButton(
       getDate: true,
-      eventDatum: widget.event["bis"] != null
-          ? DateTime.parse(widget.event["bis"])
+      meetupDatum: widget.meetupData["bis"] != null
+          ? DateTime.parse(widget.meetupData["bis"])
           : null,
     );
     bisTimeInputButton = DateButton(
-        uhrZeit: widget.event["bis"] != null
+        uhrZeit: widget.meetupData["bis"] != null
             ? TimeOfDay(
                 hour:
-                    int.parse(widget.event["bis"].split(" ")[1].split(":")[0]),
+                    int.parse(widget.meetupData["bis"].split(" ")[1].split(":")[0]),
                 minute:
-                    int.parse(widget.event["bis"].split(" ")[1].split(":")[1]))
+                    int.parse(widget.meetupData["bis"].split(" ")[1].split(":")[1]))
             : null);
 
     super.initState();
@@ -1070,8 +1070,8 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
   @override
   Widget build(BuildContext context) {
-    isSingeDay = widget.event["eventInterval"] != global_var.eventInterval[2] &&
-        widget.event["eventInterval"] != global_var.eventIntervalEnglisch[2];
+    isSingeDay = widget.meetupData["eventInterval"] != global_var.meetupInterval[2] &&
+        widget.meetupData["eventInterval"] != global_var.meetupIntervalEnglisch[2];
 
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
@@ -1102,10 +1102,10 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 //ignore: must_be_immutable
 class DateButton extends StatefulWidget {
   var uhrZeit;
-  var eventDatum;
+  var meetupDatum;
   var getDate;
 
-  DateButton({Key key, this.eventDatum, this.uhrZeit, this.getDate = false})
+  DateButton({Key key, this.meetupDatum, this.uhrZeit, this.getDate = false})
       : super(key: key);
 
   @override
@@ -1115,17 +1115,17 @@ class DateButton extends StatefulWidget {
 class _DateButtonState extends State<DateButton> {
   dateBox() {
     var dateString = AppLocalizations.of(context).datumAuswaehlen;
-    if (widget.eventDatum != null) {
+    if (widget.meetupDatum != null) {
       var dateFormat = DateFormat('dd.MM.yyyy');
-      var dateTime = DateTime(widget.eventDatum.year, widget.eventDatum.month,
-          widget.eventDatum.day);
+      var dateTime = DateTime(widget.meetupDatum.year, widget.meetupDatum.month,
+          widget.meetupDatum.day);
       dateString = dateFormat.format(dateTime);
     }
 
     return ElevatedButton(
       child: Text(dateString),
       onPressed: () async {
-        widget.eventDatum = await showDatePicker(
+        widget.meetupDatum = await showDatePicker(
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime.now(),
@@ -1182,16 +1182,16 @@ class _InteresseButtonState extends State<InteresseButton> {
       right: 28,
       child: GestureDetector(
           onTap: () async {
-            var myInterestedEvents =
+            var myInterestedMeetups =
                 Hive.box('secureBox').get("interestEvents") ?? [];
-            var eventData = getEventFromHive(widget.id);
+            var meetupData = getMeetupFromHive(widget.id);
             var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
             widget.hasIntereset = !widget.hasIntereset;
 
             if (widget.hasIntereset) {
-              eventData["interesse"].add(userId);
-              myInterestedEvents.add(eventData);
-              EventDatabase().update(
+              meetupData["interesse"].add(userId);
+              myInterestedMeetups.add(meetupData);
+              MeetupDatabase().update(
                   "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
                   "WHERE id ='${widget.id}'");
 
@@ -1202,10 +1202,10 @@ class _InteresseButtonState extends State<InteresseButton> {
                       })}')",
                   "WHERE connected LIKE '%${widget.id}%'");
             } else {
-              eventData["interesse"].remove(userId);
-              myInterestedEvents
-                  .removeWhere((event) => event["id"] == widget.id);
-              EventDatabase().update(
+              meetupData["interesse"].remove(userId);
+              myInterestedMeetups
+                  .removeWhere((meetup) => meetup["id"] == widget.id);
+              MeetupDatabase().update(
                   "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
                   "WHERE id ='${widget.id}'");
 
@@ -1230,12 +1230,12 @@ class _InteresseButtonState extends State<InteresseButton> {
 //ignore: must_be_immutable
 class CardFeet extends StatefulWidget {
   String organisator;
-  var event;
+  var meetupData;
   double width;
-  var eventZusage;
+  var meetupZusage;
 
   CardFeet(
-      {Key key, this.organisator, this.width, this.event, this.eventZusage})
+      {Key key, this.organisator, this.width, this.meetupData, this.meetupZusage})
       : super(key: key);
 
   @override
@@ -1257,7 +1257,7 @@ class _CardFeetState extends State<CardFeet> {
   @override
   Widget build(BuildContext context) {
     showTeilnehmerWindow() {
-      var zusagenIds = widget.event["zusage"];
+      var zusagenIds = widget.meetupData["zusage"];
       var allProfils = Hive.box("secureBox").get("profils");
       var zusagenProfils = [];
       List<Widget> zusagenNameBoxes = [];
@@ -1315,7 +1315,7 @@ class _CardFeetState extends State<CardFeet> {
               onTap: () => showTeilnehmerWindow(),
             ),
             InkWell(
-              child: Text(widget.eventZusage.length.toString(),
+              child: Text(widget.meetupZusage.length.toString(),
                   style: TextStyle(
                       fontSize: fontsize,
                       color: Theme.of(context).colorScheme.secondary)),
