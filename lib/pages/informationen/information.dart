@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 
 import '../../global/style.dart';
 import '../informationen/community/community_page.dart';
-import '../informationen/events/event_page.dart';
+import '../informationen/meetups/meetup_page.dart';
 import 'location/location_page.dart';
 
 class InformationPage extends StatefulWidget {
@@ -18,7 +18,7 @@ class InformationPage extends StatefulWidget {
 class _InformationPageState extends State<InformationPage> {
   var pageList = [
     "",
-    const EventPage(),
+    const MeetupPage(),
     const CommunityPage(),
     LocationPage(forCity: true,),
     LocationPage(forLand: true,)
@@ -128,7 +128,7 @@ class _InformationPageState extends State<InformationPage> {
               children: [
                 badgeCard(
                   pageCards(
-                      "Events",
+                      "Meetups",
                       Icons.calendar_month,
                       "assets/bilder/museum.jpg",
                       1),

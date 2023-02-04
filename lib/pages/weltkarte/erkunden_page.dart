@@ -21,7 +21,7 @@ import '../../services/locationsService.dart';
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';
 import '../informationen/community/community_card.dart';
-import '../informationen/events/eventCard.dart';
+import '../informationen/meetups/meetupCard.dart';
 import '../informationen/location/location_Information.dart';
 import '../show_profil.dart';
 
@@ -1101,7 +1101,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (spezialActivation) {
       if (friendMarkerOn) return AppLocalizations.of(context).freundesListe;
       if (filterOn) return AppLocalizations.of(context).filterErgebnisse;
-      if (eventMarkerOn) return AppLocalizations.of(context).neueEvents;
+      if (eventMarkerOn) return AppLocalizations.of(context).neueMeetups;
       if (communityMarkerOn) {
         return AppLocalizations.of(context).neueCommunities;
       }
@@ -1195,13 +1195,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
             var itemData = showItems["profils"][index];
 
             if (event != null) {
-              return EventCard(
+              return MeetupCard(
                   margin: const EdgeInsets.only(
                       top: 15, bottom: 15, left: 25, right: 25),
-                  event: itemData,
+                  meetupData: itemData,
                   withInteresse: true,
                   afterPageVisit: () async {
-                    events = await EventDatabase().getData("*",
+                    events = await MeetupDatabase().getData("*",
                         "WHERE art != 'privat' AND art != 'private' ORDER BY wann ASC");
 
                     var refreshEvents = [];
@@ -1416,8 +1416,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createEventMarker() {
       for (var event in aktiveEvents) {
-        bool isOnline = event["profils"][0]["typ"] == global_var.eventTyp[1] ||
-            event["profils"][0]["typ"] == global_var.eventTypEnglisch[1];
+        bool isOnline = event["profils"][0]["typ"] == global_var.meetupTyp[1] ||
+            event["profils"][0]["typ"] == global_var.meetupTypEnglisch[1];
         var position = LatLng(event["latt"], event["longt"]);
 
         allMarker.add(eventMarker(event["name"], position, () {

@@ -147,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
 
     refreshHiveNewsSetting();
     await refreshHiveChats();
-    await refreshHiveEvents();
+    await refreshHiveMeetups();
 
     if(userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1"){
       await refreshHiveCommunities();

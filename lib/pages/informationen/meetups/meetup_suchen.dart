@@ -11,22 +11,22 @@ import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../services/database.dart';
-import 'eventCard.dart';
+import 'meetupCard.dart';
 
-class EventsSuchenPage extends StatefulWidget {
-  const EventsSuchenPage({Key key}) : super(key: key);
+class MeetupSuchenPage extends StatefulWidget {
+  const MeetupSuchenPage({Key key}) : super(key: key);
 
   @override
-  _EventsSuchenPageState createState() => _EventsSuchenPageState();
+  _MeetupSuchenPageState createState() => _MeetupSuchenPageState();
 }
 
-class _EventsSuchenPageState extends State<EventsSuchenPage> {
+class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   var searchAutocomplete = SearchAutocomplete();
-  dynamic eventsBackup = [];
-  var allEvents = [];
-  var allEventCities = [];
-  var allEventCountries = [];
+  dynamic meetupsBackup = [];
+  var allMeetups = [];
+  var allMeetupCities = [];
+  var allMeetupCountries = [];
   bool filterOn = false;
   var filterList = [];
   var isLoading = true;
@@ -43,72 +43,72 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
         ? window.locale.languageCode == "de"
         : Platform.localeName == "de_DE";
 
-    eventsBackup = await EventDatabase().getData(
+    meetupsBackup = await MeetupDatabase().getData(
         "*",
         "WHERE art != 'privat' AND art != 'private' AND erstelltVon != '$userId' ORDER BY wann ASC",
         returnList: true);
 
-    if (eventsBackup == false) eventsBackup = [];
+    if (meetupsBackup == false) meetupsBackup = [];
 
-    allEvents = eventsBackup;
+    allMeetups = meetupsBackup;
 
     isLoading = false;
 
-    for (var event in eventsBackup) {
-      if (event["stadt"] != "Online") allEventCities.add(event["stadt"]);
-      if (event["land"] != "Online") {
-        var countryData = LocationService().getCountryLocation(event["land"]);
+    for (var meetup in meetupsBackup) {
+      if (meetup["stadt"] != "Online") allMeetupCities.add(meetup["stadt"]);
+      if (meetup["land"] != "Online") {
+        var countryData = LocationService().getCountryLocation(meetup["land"]);
 
-        allEventCountries.add(spracheIstDeutsch
+        allMeetupCountries.add(spracheIstDeutsch
             ? countryData["nameGer"]
             : countryData["nameEng"]);
       }
     }
 
     searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context).filterEventSuche,
-        searchableItems: allEventCities.toList() + allEventCountries.toList(),
-        onConfirm: () => filterShowEvents(),
+        hintText: AppLocalizations.of(context).filterMeetupSuche,
+        searchableItems: allMeetupCities.toList() + allMeetupCountries.toList(),
+        onConfirm: () => filterShowMeetups(),
         onRemove: () {
           filterList = [];
-          filterShowEvents();
+          filterShowMeetups();
         });
 
     setState(() {});
   }
 
-  filterShowEvents() {
+  filterShowMeetups() {
     var filterProfils = [];
 
     if (filterList.isEmpty && searchAutocomplete.getSelected().isNotEmpty) {
       filterList = searchAutocomplete.getSelected();
     }
 
-    for (var event in eventsBackup) {
-      if (checkIfInFilter(event, filterList)) filterProfils.add(event);
+    for (var meetup in meetupsBackup) {
+      if (checkIfInFilter(meetup, filterList)) filterProfils.add(meetup);
     }
 
     setState(() {
-      allEvents = filterProfils;
+      allMeetups = filterProfils;
     });
   }
 
-  checkIfInFilter(event, filterList) {
-    var eventLand = event["land"];
-    var eventStadt = event["stadt"];
-    var eventSprache = event["sprache"];
-    var eventTyp = event["typ"];
+  checkIfInFilter(meetup, filterList) {
+    var meetupLand = meetup["land"];
+    var meetupStadt = meetup["stadt"];
+    var meetupSprache = meetup["sprache"];
+    var meetupTyp = meetup["typ"];
 
     if (filterList.isEmpty) return true;
 
-    var spracheMatch = checkMatch(filterList, eventSprache,
+    var spracheMatch = checkMatch(filterList, meetupSprache,
         global_var.sprachenListe + global_var.sprachenListeEnglisch);
-    var stadtMatch = checkMatch(filterList, [eventStadt], allEventCities,
+    var stadtMatch = checkMatch(filterList, [meetupStadt], allMeetupCities,
         simpleSearch: true);
-    var countryMatch = checkMatch(filterList, [eventLand], allEventCountries,
+    var countryMatch = checkMatch(filterList, [meetupLand], allMeetupCountries,
         simpleSearch: true);
-    var typMatch = checkMatch(filterList, [eventTyp],
-        global_var.eventTyp + global_var.eventTypEnglisch);
+    var typMatch = checkMatch(filterList, [meetupTyp],
+        global_var.meetupTyp + global_var.meetupTypEnglisch);
 
     if (spracheMatch && stadtMatch && countryMatch && typMatch) return true;
 
@@ -151,7 +151,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
         ? global_var.sprachenListe
         : global_var.sprachenListeEnglisch;
     var typSelection =
-        spracheIstDeutsch ? global_var.eventTyp : global_var.eventTypEnglisch;
+        spracheIstDeutsch ? global_var.meetupTyp : global_var.meetupTypEnglisch;
 
     await showDialog(
         context: context,
@@ -162,7 +162,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
               children: [
                 createCheckBoxen(windowSetState, sprachenSelection,
                     AppLocalizations.of(context).sprachen),
-                createCheckBoxen(windowSetState, typSelection, "Event typ"),
+                createCheckBoxen(windowSetState, typSelection, "Meetup typ"),
               ],
             );
           });
@@ -202,7 +202,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
                     }
                     windowSetState(() {});
 
-                    filterShowEvents();
+                    filterShowMeetups();
                   }),
             ),
             Expanded(
@@ -237,22 +237,22 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     }
     windowSetState(() {});
 
-    filterShowEvents();
+    filterShowMeetups();
   }
 
   @override
   Widget build(BuildContext context) {
-    showEvents() {
-      List<Widget> meineEvents = [];
+    showMeetups() {
+      List<Widget> meineMeetups = [];
 
-      for (var event in allEvents) {
-        meineEvents.add(EventCard(
+      for (var meetup in allMeetups) {
+        meineMeetups.add(MeetupCard(
             margin:
                 const EdgeInsets.only(top: 10, bottom: 10, left: 17, right: 17),
             withInteresse: true,
-            event: event,
+            meetupData: meetup,
             afterPageVisit: () async {
-              eventsBackup = allEvents = await EventDatabase().getData(
+              meetupsBackup = allMeetups = await MeetupDatabase().getData(
                   "*",
                   "WHERE art != 'privat' AND art != 'private' AND erstelltVon != '" +
                       userId +
@@ -263,7 +263,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
             }));
       }
 
-      return meineEvents;
+      return meineMeetups;
     }
 
     filterButton() {
@@ -277,7 +277,7 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
     }
 
     return Scaffold(
-        appBar: CustomAppBar(title: AppLocalizations.of(context).alleEvents),
+        appBar: CustomAppBar(title: AppLocalizations.of(context).alleMeetups),
         body: SafeArea(
           child: Container(
               padding: const EdgeInsets.only(top: 10),
@@ -288,17 +288,17 @@ class _EventsSuchenPageState extends State<EventsSuchenPage> {
                   margin: const EdgeInsets.only(top: 80),
                   child: SingleChildScrollView(
                     child: Center(
-                      child: allEvents.isEmpty
+                      child: allMeetups.isEmpty
                           ? Container(
                               margin: const EdgeInsets.only(top: 50),
                               child: isLoading
                                   ? const CircularProgressIndicator()
                                   : Text(
                                       AppLocalizations.of(context)
-                                          .keineEventsVorhanden,
+                                          .keineMeetupsVorhanden,
                                       style: const TextStyle(fontSize: 30),
                                     ))
-                          : Wrap(children: showEvents()),
+                          : Wrap(children: showMeetups()),
                     ),
                   ),
                 ),
