@@ -165,7 +165,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     _changeHiveOwnNewsPageSetting("showInterestingEvents", intValue);
                   }),
               const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).newsSettingShowEvent)
+              Text(AppLocalizations.of(context).newsSettingShowMeetup)
             ],
           ));
     }

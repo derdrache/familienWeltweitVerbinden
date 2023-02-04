@@ -9,73 +9,73 @@ import 'package:hive/hive.dart';
 
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_func;
-import 'event_details.dart';
+import 'meetup_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
 
-class EventCard extends StatefulWidget {
+class MeetupCard extends StatefulWidget {
   EdgeInsets margin;
-  Map event;
+  Map meetupData;
   bool withInteresse;
   Function afterPageVisit;
   bool isCreator;
   bool bigCard;
-  bool fromEventPage;
+  bool fromMeetupPage;
 
-  EventCard({
+  MeetupCard({
     Key key,
-    this.event,
+    this.meetupData,
     this.withInteresse = false,
     this.margin =
         const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
     this.bigCard = false,
-    this.fromEventPage = false
-  })  : isCreator = event["erstelltVon"] == userId,
+    this.fromMeetupPage = false
+  })  : isCreator = meetupData["erstelltVon"] == userId,
         super(key: key);
 
   @override
-  _EventCardState createState() => _EventCardState();
+  _MeetupCardState createState() => _MeetupCardState();
 }
 
-class _EventCardState extends State<EventCard> {
+class _MeetupCardState extends State<MeetupCard> {
   bool onAbsageList;
   bool onZusageList;
   var shadowColor = Colors.grey.withOpacity(0.8);
 
   @override
   void initState() {
-    onAbsageList = widget.event["absage"].contains(userId);
-    onZusageList = widget.event["zusage"].contains(userId);
+    onAbsageList = widget.meetupData["absage"].contains(userId);
+    onZusageList = widget.meetupData["zusage"].contains(userId);
 
     super.initState();
   }
 
-  confirmEvent(bool confirm) async {
+  confirmMeetup(bool confirm) async {
     if (confirm) {
-      var onInteresseList = widget.event["interesse"].contains(userId);
+      var onInteresseList = widget.meetupData["interesse"].contains(userId);
 
       if (!onInteresseList) {
-        widget.event["interesse"].add(userId);
+        widget.meetupData["interesse"].add(userId);
       }
 
       setState(() {
-        widget.event["zusage"].add(userId);
-        widget.event["absage"].remove(userId);
+        widget.meetupData["zusage"].add(userId);
+        widget.meetupData["absage"].remove(userId);
         onZusageList = true;
         onAbsageList = false;
       });
     } else {
       setState(() {
-        widget.event["absage"].add(userId);
-        widget.event["zusage"].remove(userId);
+        widget.meetupData["absage"].add(userId);
+        widget.meetupData["zusage"].remove(userId);
         onAbsageList = true;
         onZusageList = false;
       });
     }
 
-    var dbData = await EventDatabase().getData(
-        "absage, zusage, interesse", "WHERE id = '${widget.event["id"]}'");
+    var dbData = await MeetupDatabase().getData(
+        "absage, zusage, interesse", "WHERE id = '${widget.meetupData["id"]}'");
 
     var zusageList = dbData["zusage"];
     var absageList = dbData["absage"];
@@ -90,20 +90,20 @@ class _EventCardState extends State<EventCard> {
       absageList.add(userId);
     }
 
-    EventDatabase().update(
+    MeetupDatabase().update(
         "absage = '${json.encode(absageList)}', "
             "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'",
-        "WHERE id = '${widget.event["id"]}'");
+        "WHERE id = '${widget.meetupData["id"]}'");
   }
 
   createDatetimeText() {
 
     var datetimeText =
-        widget.event["wann"].split(" ")[0].split("-").reversed.join(".");
-    var datetimeWann = DateTime.parse(widget.event["wann"]);
+        widget.meetupData["wann"].split(" ")[0].split("-").reversed.join(".");
+    var datetimeWann = DateTime.parse(widget.meetupData["wann"]);
 
-    if(widget.event["bis"] == null || widget.event["bis"] =="null") return datetimeText;
-    var datetimeBis = DateTime.parse(widget.event["bis"]);
+    if(widget.meetupData["bis"] == null || widget.meetupData["bis"] =="null") return datetimeText;
+    var datetimeBis = DateTime.parse(widget.meetupData["bis"]);
 
     if (DateTime.now().compareTo(datetimeWann) > 0 && datetimeBis.year.toString() == "0000") {
       return DateTime.now()
@@ -117,16 +117,16 @@ class _EventCardState extends State<EventCard> {
     return datetimeText;
   }
 
-  createOnlineEventTime() {
-    var eventZeitzone = widget.event["zeitzone"] is String
-        ? int.parse(widget.event["zeitzone"])
-        : widget.event["zeitzone"];
+  createOnlineMeetupTime() {
+    var meetupZeitzone = widget.meetupData["zeitzone"] is String
+        ? int.parse(widget.meetupData["zeitzone"])
+        : widget.meetupData["zeitzone"];
     var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
-    var eventBeginn = widget.event["wann"];
+    var meetupStart = widget.meetupData["wann"];
 
-    eventBeginn = DateTime.parse(eventBeginn).add(Duration(hours: deviceZeitzone - eventZeitzone));
+    meetupStart = DateTime.parse(meetupStart).add(Duration(hours: deviceZeitzone - meetupZeitzone));
 
-    return eventBeginn.toString().split(" ")[1].toString().substring(0, 5);
+    return meetupStart.toString().split(" ")[1].toString().substring(0, 5);
   }
 
   @override
@@ -134,18 +134,18 @@ class _EventCardState extends State<EventCard> {
     var bigMultiplikator = widget.bigCard == true ? 1.4 : 1.0;
     double screenHeight = MediaQuery.of(context).size.height;
     var fontSize = screenHeight / 55 * bigMultiplikator;
-    var forTeilnahmeFreigegeben = (widget.event["art"] == "public" ||
-            widget.event["art"] == "öffentlich") ||
-        widget.event["freigegeben"].contains(userId);
+    var forTeilnahmeFreigegeben = (widget.meetupData["art"] == "public" ||
+            widget.meetupData["art"] == "öffentlich") ||
+        widget.meetupData["freigegeben"].contains(userId);
     var isAssetImage =
-        widget.event["bild"].substring(0, 5) == "asset" ? true : false;
-    var isOffline = widget.event["typ"] == global_var.eventTyp[0] ||
-        widget.event["typ"] == global_var.eventTypEnglisch[0];
+        widget.meetupData["bild"].substring(0, 5) == "asset" ? true : false;
+    var isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
+        widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
 
-    if (widget.event["zusage"].contains(userId)) {
+    if (widget.meetupData["zusage"].contains(userId)) {
       shadowColor = Colors.green.withOpacity(0.8);
     }
-    if (widget.event["absage"].contains(userId)) {
+    if (widget.meetupData["absage"].contains(userId)) {
       shadowColor = Colors.red.withOpacity(0.8);
     }
 
@@ -167,7 +167,7 @@ class _EventCardState extends State<EventCard> {
                   Text(AppLocalizations.of(context).teilnehmen),
                 ],
               ),
-              onTap: () => confirmEvent(true),
+              onTap: () => confirmMeetup(true),
             ),
           if (!onAbsageList)
             PopupMenuItem(
@@ -181,7 +181,7 @@ class _EventCardState extends State<EventCard> {
                   Text(AppLocalizations.of(context).absage),
                 ],
               ),
-              onTap: () => confirmEvent(false),
+              onTap: () => confirmMeetup(false),
             ),
         ],
       );
@@ -193,7 +193,7 @@ class _EventCardState extends State<EventCard> {
           : null,
         onTap: () => global_func.changePage(
             context,
-            EventDetailsPage(event: widget.event, fromEventPage: widget.fromEventPage),
+            MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
             whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
           width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
@@ -224,13 +224,13 @@ class _EventCardState extends State<EventCard> {
                         topRight: Radius.circular(20.0),
                       ),
                       child: isAssetImage
-                          ? Image.asset(widget.event["bild"],
+                          ? Image.asset(widget.meetupData["bild"],
                               height: (70 + ((screenHeight - 600) / 4)) *
                                   bigMultiplikator,
                               width: (135 + ((screenHeight - 600) / 4)) *
                                   bigMultiplikator,
                               fit: BoxFit.fill)
-                          : Image.network(widget.event["bild"],
+                          : Image.network(widget.meetupData["bild"],
                               height: (70 + ((screenHeight - 600) / 4)) *
                                   bigMultiplikator,
                               width: (130 + ((screenHeight - 600) / 4)) *
@@ -244,8 +244,8 @@ class _EventCardState extends State<EventCard> {
                         right: 8,
                         child: InteresseButton(
                           hasIntereset:
-                              widget.event["interesse"].contains(userId),
-                          id: widget.event["id"],
+                              widget.meetupData["interesse"].contains(userId),
+                          id: widget.meetupData["id"],
                         )),
                 ],
               ),
@@ -261,7 +261,7 @@ class _EventCardState extends State<EventCard> {
                     ),
                     child: Column(
                       children: [
-                        Text(widget.event["name"],
+                        Text(widget.meetupData["name"],
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -282,7 +282,7 @@ class _EventCardState extends State<EventCard> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(widget.event["stadt"],
+                              Text(widget.meetupData["stadt"],
                                   style: TextStyle(fontSize: fontSize))
                             ],
                           ),
@@ -291,7 +291,7 @@ class _EventCardState extends State<EventCard> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(widget.event["land"],
+                              Text(widget.meetupData["land"],
                                   style: TextStyle(fontSize: fontSize))
                             ],
                           ),
@@ -302,7 +302,7 @@ class _EventCardState extends State<EventCard> {
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: fontSize)),
-                              Text(createOnlineEventTime() + " GMT " + DateTime.now().timeZoneOffset.inHours.toString(),
+                              Text(createOnlineMeetupTime() + " GMT " + DateTime.now().timeZoneOffset.inHours.toString(),
                                   style: TextStyle(fontSize: fontSize))
                             ],
                           ),
@@ -313,7 +313,7 @@ class _EventCardState extends State<EventCard> {
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: fontSize)),
-                              Text(widget.event["typ"],
+                              Text(widget.meetupData["typ"],
                                   style: TextStyle(fontSize: fontSize))
                             ],
                           )
@@ -340,15 +340,15 @@ class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
 
   setInteresse() async {
-    var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
-    var eventData = getEventFromHive(widget.id);
+    var myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
+    var meetupData = getMeetupFromHive(widget.id);
     var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     widget.hasIntereset = !widget.hasIntereset;
 
     if (widget.hasIntereset) {
-      eventData["interesse"].add(userId);
-      myInterestedEvents.add(eventData);
-      EventDatabase().update(
+      meetupData["interesse"].add(userId);
+      myInterestedMeetups.add(meetupData);
+      MeetupDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
           "WHERE id ='${widget.id}'");
 
@@ -357,9 +357,9 @@ class _InteresseButtonState extends State<InteresseButton> {
           "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
           "WHERE connected LIKE '%${widget.id}%'");
     } else {
-      eventData["interesse"].remove(userId);
-      myInterestedEvents.removeWhere((event) => event["id"] == widget.id);
-      EventDatabase().update(
+      meetupData["interesse"].remove(userId);
+      myInterestedMeetups.removeWhere((meetup) => meetup["id"] == widget.id);
+      MeetupDatabase().update(
           "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
           "WHERE id ='${widget.id}'");
 

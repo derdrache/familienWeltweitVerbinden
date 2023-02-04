@@ -9,22 +9,22 @@ import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_functions;
 import '../../../widgets/badge_icon.dart';
 import '../../start_page.dart';
-import 'events_suchen.dart';
-import 'eventCard.dart';
-import 'events_erstellen.dart';
+import 'meetup_suchen.dart';
+import 'meetupCard.dart';
+import 'meetup_erstellen.dart';
 
-class EventPage extends StatefulWidget {
-  const EventPage({Key key}) : super(key: key);
+class MeetupPage extends StatefulWidget {
+  const MeetupPage({Key key}) : super(key: key);
 
   @override
-  _EventPageState createState() => _EventPageState();
+  _MeetupPageState createState() => _MeetupPageState();
 }
 
-class _EventPageState extends State<EventPage> {
+class _MeetupPageState extends State<MeetupPage> {
   var userId = FirebaseAuth.instance.currentUser.uid;
   double textSizeHeadline = 20.0;
-  var myOwnEvents = Hive.box('secureBox').get("myEvents") ?? [];
-  var myInterestedEvents = Hive.box('secureBox').get("interestEvents") ?? [];
+  var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
+  var myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
 
   @override
   void initState() {
@@ -34,20 +34,20 @@ class _EventPageState extends State<EventPage> {
   @override
   Widget build(BuildContext context) {
 
-    createEventCards(events, withInteresse) {
-      List<Widget> eventCards = [];
+    createMeetupCards(meetups, withInteresse) {
+      List<Widget> meetupCards = [];
 
-      for (var event in events) {
-        bool isOwner = event["erstelltVon"] == userId;
-        var freischaltenCount = event["freischalten"].length;
+      for (var meetup in meetups) {
+        bool isOwner = meetup["erstelltVon"] == userId;
+        var freischaltenCount = meetup["freischalten"].length;
 
-        eventCards.add(Stack(
+        meetupCards.add(Stack(
           children: [
-            EventCard(
-                event: event,
+            MeetupCard(
+                meetupData: meetup,
                 margin: const EdgeInsets.only(top: 10, bottom: 0, right: 20, left: 10),
                 withInteresse: withInteresse,
-                fromEventPage: true,
+                fromMeetupPage: true,
                 afterPageVisit: () => setState((){})),
             if (isOwner)
               Positioned(
@@ -61,10 +61,10 @@ class _EventPageState extends State<EventPage> {
         ));
       }
 
-      return eventCards;
+      return meetupCards;
     }
 
-    meineInteressiertenEventsBox() {
+    meineInteressiertenMeetupsBox() {
       return Container(
           padding: const EdgeInsets.only(top: 10),
           width: double.infinity,
@@ -78,19 +78,19 @@ class _EventPageState extends State<EventPage> {
               Container(
                   margin: const EdgeInsets.only(left: 10),
                   child: Text(
-                    AppLocalizations.of(context).favoritenEvents,
+                    AppLocalizations.of(context).favoritenMeetups,
                     style: TextStyle(fontSize: textSizeHeadline),
                   )),
               FutureBuilder(
                   future: null,
                   builder: (context, snapshot) {
-                    if (myInterestedEvents != null && myInterestedEvents.isNotEmpty) {
+                    if (myInterestedMeetups != null && myInterestedMeetups.isNotEmpty) {
                       return Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
                               direction: Axis.vertical,
-                              children: createEventCards(myInterestedEvents, true)),
+                              children: createMeetupCards(myInterestedMeetups, true)),
                         ),
                       );
                     }
@@ -99,7 +99,7 @@ class _EventPageState extends State<EventPage> {
                         heightFactor: 5,
                         child: Text(
                           AppLocalizations.of(context)
-                              .nochKeineEventsAusgewaehlt,
+                              .nochKeineMeetupsAusgewaehlt,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: textSizeHeadline, color: Colors.grey),
@@ -109,7 +109,7 @@ class _EventPageState extends State<EventPage> {
           ));
     }
 
-    meineErstellenEventsBox() {
+    meineErstellenMeetupsBox() {
       return Container(
           padding: const EdgeInsets.only(top: 10),
           width: double.infinity,
@@ -119,19 +119,19 @@ class _EventPageState extends State<EventPage> {
               Container(
                   margin: const EdgeInsets.only(left: 10),
                   child: Text(
-                    AppLocalizations.of(context).meineEvents,
+                    AppLocalizations.of(context).meineMeetups,
                     style: TextStyle(fontSize: textSizeHeadline),
                   )),
               FutureBuilder(
                   future: null,
                   builder: (context, snapshot) {
-                    if (myOwnEvents != null && myOwnEvents.isNotEmpty) {
+                    if (myOwnMeetups != null && myOwnMeetups.isNotEmpty) {
                       return Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Wrap(
                               direction: Axis.vertical,
-                              children: createEventCards(myOwnEvents, false)),
+                              children: createMeetupCards(myOwnMeetups, false)),
                         ),
                       );
                     }
@@ -139,7 +139,7 @@ class _EventPageState extends State<EventPage> {
                     return Center(
                         heightFactor: 5,
                         child: Text(
-                          AppLocalizations.of(context).nochKeineEventsErstellt,
+                          AppLocalizations.of(context).nochKeineMeetupsErstellt,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: textSizeHeadline, color: Colors.grey),
@@ -151,7 +151,7 @@ class _EventPageState extends State<EventPage> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Events",
+        title: "Meetups",
         leading: IconButton(
           onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
           icon: Icon(Icons.arrow_back),
@@ -161,7 +161,7 @@ class _EventPageState extends State<EventPage> {
               onPressed: ()=> Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => const EventsSuchenPage()))
+                      builder: (_) => const MeetupSuchenPage()))
                   .whenComplete(() => setState(() {})),
               icon: const Icon(
                 Icons.search,
@@ -173,15 +173,15 @@ class _EventPageState extends State<EventPage> {
         child: Container(
             padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
             child: Column(children: [
-              Expanded(child: meineInteressiertenEventsBox()),
-              Expanded(child: meineErstellenEventsBox()),
+              Expanded(child: meineInteressiertenMeetupsBox()),
+              Expanded(child: meineErstellenMeetupsBox()),
             ])),
       ),
       floatingActionButton: FloatingActionButton(
-          heroTag: "event hinzufügen",
+          heroTag: "meetup hinzufügen",
           child: const Icon(Icons.add),
           onPressed: () =>
-              global_functions.changePage(context, const EventErstellen())),
+              global_functions.changePage(context, const MeetupErstellen())),
     );
   }
 }

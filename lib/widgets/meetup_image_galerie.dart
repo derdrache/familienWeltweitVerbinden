@@ -11,19 +11,19 @@ import 'package:image/image.dart' as image_pack;
 import '../global/custom_widgets.dart';
 import '../services/database.dart';
 
-class EventImageGalerie extends StatefulWidget {
+class MeetupImageGalerie extends StatefulWidget {
   var isCreator;
-  var event;
+  var meetupData;
   var child;
 
-  EventImageGalerie({Key key, this.child, this.isCreator, this.event})
+  MeetupImageGalerie({Key key, this.child, this.isCreator, this.meetupData})
       : super(key: key);
 
   @override
-  _ImageEventGalerieState createState() => _ImageEventGalerieState();
+  _ImageMeetupGalerieState createState() => _ImageMeetupGalerieState();
 }
 
-class _ImageEventGalerieState extends State<EventImageGalerie> {
+class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
   var isWebDesktop = kIsWeb &&
       (defaultTargetPlatform != TargetPlatform.iOS ||
           defaultTargetPlatform != TargetPlatform.android);
@@ -58,7 +58,7 @@ class _ImageEventGalerieState extends State<EventImageGalerie> {
   }
 
   saveChanges() {
-    var oldImage = widget.event["bild"];
+    var oldImage = widget.meetupData["bild"];
 
     if (selectedImage == "" && ownPictureKontroller.text == "") {
       customSnackbar(context, AppLocalizations.of(context).bitteBildAussuchen);
@@ -72,7 +72,7 @@ class _ImageEventGalerieState extends State<EventImageGalerie> {
       widget.child = Image.asset(selectedImage, fit: BoxFit.fitWidth);
     }
 
-    updateHiveEvent(widget.event["id"],"bild",  selectedImage);
+    updateHiveMeetup(widget.meetupData["id"],"bild",  selectedImage);
 
     setState(() {
       imageLoading = false;
@@ -81,12 +81,12 @@ class _ImageEventGalerieState extends State<EventImageGalerie> {
     DbDeleteImage(oldImage);
 
 
-    EventDatabase().update(
-        "bild = '$selectedImage'", "WHERE id = '${widget.event["id"]}'");
+    MeetupDatabase().update(
+        "bild = '$selectedImage'", "WHERE id = '${widget.meetupData["id"]}'");
   }
 
   pickAndUploadImage() async {
-    var eventName = widget.event["name"] + "_";
+    var meetupName = widget.meetupData["name"] + "_";
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
@@ -96,7 +96,7 @@ class _ImageEventGalerieState extends State<EventImageGalerie> {
       imageLoading = true;
     });
 
-    var imageName = eventName + pickedImage.name;
+    var imageName = meetupName + pickedImage.name;
     imageName = imageName.replaceAll(" ", "_");
     imageName = imageName.replaceAll("/", "_");
 
@@ -220,7 +220,7 @@ class _ImageEventGalerieState extends State<EventImageGalerie> {
             return StatefulBuilder(builder: (context, setState) {
               windowSetState = setState;
               return CustomAlertDialog(
-                title: AppLocalizations.of(context).eventBildAendern,
+                title: AppLocalizations.of(context).meetupBildAendern,
                 children: [
                   showImages(),
                   const SizedBox(height: 20),
@@ -236,7 +236,7 @@ class _ImageEventGalerieState extends State<EventImageGalerie> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).eventBildAendern,
+              title: AppLocalizations.of(context).meetupBildAendern,
               children: [
                 ownLinkInput(),
                 const SizedBox(height: 20),
