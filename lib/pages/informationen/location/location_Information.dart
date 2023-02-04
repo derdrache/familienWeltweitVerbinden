@@ -640,7 +640,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                         TextButton(
                           child: Text(AppLocalizations.of(context).speichern),
                           onPressed: () => changeInformation(
-                              information: information,
+                              id: information["id"],
                               newTitle: titleTextKontroller.text,
                               newInformation: informationTextKontroller.text),
                         ),
@@ -655,8 +655,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             }));
   }
 
-  changeInformation({information, newTitle, newInformation}) async {
-    String titleGer, informationGer, titleEng, informationEng;
+  changeInformation({id, newTitle, newInformation}) async {
     newTitle = newTitle.trim();
     newInformation = newInformation.trim();
 
@@ -672,6 +671,25 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           AppLocalizations.of(context).beschreibungStadtinformationEingeben);
       return;
     }
+
+    for (var i = 0; i < widget.usersCityInformation.length; i++) {
+      if (widget.usersCityInformation[i]["id"] == id) {
+        widget.usersCityInformation[i]["titleGer"] = newTitle;
+        widget.usersCityInformation[i]["informationGer"] = newInformation;
+        widget.usersCityInformation[i]["titleEng"] = newTitle;
+        widget.usersCityInformation[i]["informationEng"] = newInformation;
+        break;
+      }
+    }
+
+    updateDatabase(id, newTitle, newInformation);
+
+    setState(() {});
+    Navigator.pop(context);
+  }
+
+  updateDatabase(id, newTitle, newInformation, ) async{
+    String titleGer, informationGer, titleEng, informationEng;
 
     var languageCheck = await translator.translate(newInformation);
     var languageCode = languageCheck.sourceLanguage.code;
@@ -703,7 +721,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     var allInformations = secureBox.get("stadtinfoUser");
 
     for (var i = 0; i < allInformations.length; i++) {
-      if (allInformations[i]["id"] == information["id"]) {
+      if (allInformations[i]["id"] == id) {
         allInformations[i]["sprache"] = languageCode;
         allInformations[i]["titleGer"] = titleGer;
         allInformations[i]["informationGer"] = informationGer;
@@ -712,19 +730,15 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         break;
       }
     }
-
     secureBox.put("stadtinfoUser", allInformations);
 
-    setState(() {});
-    Navigator.pop(context);
-
-    StadtinfoUserDatabase().update(
+    await StadtinfoUserDatabase().update(
         "sprache ='$languageCode',  "
             "titleGer = '$titleGer', "
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
             "informationEng = '$informationEng'",
-        "WHERE id ='${information["id"]}'");
+        "WHERE id ='$id'");
   }
 
   copyInformationDialog(information){
