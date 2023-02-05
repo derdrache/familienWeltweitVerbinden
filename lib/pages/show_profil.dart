@@ -13,13 +13,13 @@ import '../global/global_functions.dart' as global_functions;
 import '../global/global_functions.dart';
 import '../global/variablen.dart' as global_variablen;
 import '../global/variablen.dart';
-import '../pages/weltkarte/weltkarte_mini.dart';
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
 import '../services/notification.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/profil_image.dart';
 import '../widgets/text_with_hyperlink_detection.dart';
+import 'informationen/location/location_Information.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
 double columnSpacing = 15;
@@ -553,13 +553,9 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     locationBox() {
-      Map currentLocation = {
-        "latt": profil["latt"],
-        "longt": profil["longt"]
-      };
 
       return GestureDetector(
-        onTap: () => changePage(context, WorldmapMini(location: currentLocation)),
+        onTap: () => changePage(context, LocationInformationPage(ortName: profil["ort"])),
         child: Row(
           children: [
             Text(
@@ -751,13 +747,8 @@ class _UserInformationDisplay extends StatelessWidget {
           ortText += " / " + reiseplan["ortData"]["countryname"];
         }
 
-        Map reiseplanLocation = {
-          "latt": profil["latt"],
-          "longt": profil["longt"]
-        };
-
         reiseplanung.add(GestureDetector(
-          onTap: () => changePage(context, WorldmapMini(location: reiseplanLocation)),
+          onTap: () => changePage(context, LocationInformationPage(ortName: profil["ort"])),
           child: Container(
             margin: const EdgeInsets.only(bottom: 5),
             child: Row(
