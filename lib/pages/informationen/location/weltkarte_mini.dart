@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../widgets/custom_appbar.dart';
-
 class WorldmapMini extends StatelessWidget {
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxMapZoom = 14;
@@ -15,7 +13,6 @@ class WorldmapMini extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "Standort anzeigen"),
       body: FlutterMap(
       options: MapOptions(
         center: LatLng(location["latt"], location["longt"]),
