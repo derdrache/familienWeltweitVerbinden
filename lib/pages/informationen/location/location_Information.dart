@@ -19,6 +19,7 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import '../../start_page.dart';
+import 'weltkarte_mini.dart';
 
 class LocationInformationPage extends StatefulWidget {
   var ortName;
@@ -54,6 +55,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         fromCityPage: widget.fromCityPage,
       ),
       InsiderInformationPage(location: location, usersCityInformation: usersCityInformation),
+      WorldmapMini(location: location),
       CountryCitiesPage(countryName: widget.ortName),
     ];
 
@@ -132,6 +134,10 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.tips_and_updates),
             label: AppLocalizations.of(context).insiderInformation,
+          ),
+          if(isCity) BottomNavigationBarItem(
+            icon: const Icon(Icons.map),
+            label: AppLocalizations.of(context).cities,
           ),
           if (!isCity)
             BottomNavigationBarItem(
