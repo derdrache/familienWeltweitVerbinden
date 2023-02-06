@@ -45,6 +45,8 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
     saveProfilReiseplanung();
 
+    StadtinfoDatabase().addNewCity(ortInput);
+
     NewsPageDatabase().addNewNews({
       "typ": "reiseplanung",
       "information": json.encode(widget.reiseplanung.last),
