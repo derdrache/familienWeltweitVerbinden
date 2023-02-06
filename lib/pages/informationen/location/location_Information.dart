@@ -55,11 +55,19 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         fromCityPage: widget.fromCityPage,
       ),
       InsiderInformationPage(location: location, usersCityInformation: usersCityInformation),
-      WorldmapMini(location: location),
-      CountryCitiesPage(countryName: widget.ortName),
     ];
+    addLastTab();
+
 
     super.initState();
+  }
+
+  addLastTab(){
+    if(isCity){
+      tabPages.add(WorldmapMini(location: location));
+    }else{
+      tabPages.add(CountryCitiesPage(countryName: widget.ortName));
+    }
   }
 
   changeIntereset() {
