@@ -12,7 +12,6 @@ import 'package:hive/hive.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/global_functions.dart';
-import '../../services/notification.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_variablen;
