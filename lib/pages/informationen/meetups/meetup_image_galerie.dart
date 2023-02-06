@@ -8,8 +8,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
 
-import '../global/custom_widgets.dart';
-import '../services/database.dart';
+import '../../../global/custom_widgets.dart';
+import '../../../services/database.dart';
 
 class MeetupImageGalerie extends StatefulWidget {
   var isCreator;
