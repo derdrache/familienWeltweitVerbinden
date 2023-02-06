@@ -18,7 +18,8 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../services/database.dart';
 import '../../../global/variablen.dart' as global_var;
-import '../../../widgets/meetup_image_galerie.dart';
+import '../location/location_Information.dart';
+import 'meetup_image_galerie.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 
 var userId = FirebaseAuth.instance.currentUser.uid;
@@ -370,6 +371,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     openChangeWindow(title, inputWidget, saveFunction, {double height = 180}) {
+      if(!widget.isCreator) return;
+
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
@@ -488,6 +491,12 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     openLocationChangeWindow() {
+      if(!widget.isCreator) {
+        global_func.changePage(
+          context,
+          LocationInformationPage(ortName: widget.meetupData["ort"]));
+      }
+      
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
