@@ -251,7 +251,10 @@ class _NewsPageState extends State<NewsPage> {
       String ownOrt = ownProfil["ort"];
       var locationTimeCheck = DateTime.parse(news["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
-      bool samePlaceAndTime = ownOrt == newsOrt &&
+      double distance = global_func.calculateDistance(ownProfil["latt"], ownProfil["longt"],
+          news["information"]["latt"], news["information"]["longt"]);
+      bool inDistance = distance <= (ownSettingProfil["distance"] ?? 50);
+      bool samePlaceAndTime = (inDistance || ownOrt == newsOrt) &&
           locationTimeCheck >= 0 &&
           ownSettingProfil["showNewFamilyLocation"] == 1;
 
@@ -274,15 +277,19 @@ class _NewsPageState extends State<NewsPage> {
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"] == 1) {
         text = newsUserProfil["name"] +
-            AppLocalizations.of(context).freundOrtsWechsel +
+            AppLocalizations
+                .of(context)
+                .freundOrtsWechsel +
             "\n" +
             newsOrtInfo;
-      } else if (ownOrt == newsOrt && samePlaceAndTime) {
+      }else if (ownOrt == newsOrt) {
         text = newsUserProfil["name"] +
             AppLocalizations.of(context).familieInDeinemOrt;
+      }else if(inDistance) {
+        text = newsUserProfil["name"] + AppLocalizations.of(context).imUmkreis;
       }
 
-      userNewsContent
+        userNewsContent
           .add({"news": news["information"], "ersteller": news["erstelltVon"]});
 
       return InkWell(
