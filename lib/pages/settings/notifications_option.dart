@@ -19,15 +19,13 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   var userId = FirebaseAuth.instance.currentUser.uid;
 
+
   allNotificationSetting() {
     return Row(
       children: [
         const SizedBox(width: 20),
         Text(
-            kIsWeb
-                ? AppLocalizations.of(context).emailErhalten
-                : AppLocalizations.of(context)
-                    .benachrichtigungenErhalten, //email erhalten
+            AppLocalizations.of(context).alleBenachrichtigungen,//email erhalten
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -50,9 +48,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            kIsWeb
-                ? AppLocalizations.of(context).chatEmailErhalten
-                : AppLocalizations.of(context).chatNotificationErhalten,
+            AppLocalizations.of(context).chatNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -73,9 +69,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            kIsWeb
-                ? AppLocalizations.of(context).meetupEmailErhalten
-                : AppLocalizations.of(context).meetupNotificationErhalten,
+            AppLocalizations.of(context).meetupNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -96,9 +90,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            kIsWeb
-                ? AppLocalizations.of(context).friendEmailErhalten
-                : AppLocalizations.of(context).friendNotificationErhalten,
+            AppLocalizations.of(context).friendNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -112,6 +104,62 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
                   "newFriendNotificationOn = '$value'",
                   "WHERE id = '${ownProfil["newFriendNotificationOn"]}'");
             })
+      ],
+    );
+  }
+
+  familieInRangeNotificationSetting(){
+    double distance = ownProfil["familiesDistance"].toDouble() ?? 50.0;
+    bool familieInRangeNotificationOn = distance > 0;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const SizedBox(width: 20),
+            Text(
+                AppLocalizations.of(context).familieInRangeNotification,
+                style: const TextStyle(fontSize: 20)),
+            const Expanded(child: SizedBox(width: 20)),
+            Switch(
+                value: familieInRangeNotificationOn,
+                onChanged: (value) {
+                  var distance = value ? 50 : 0;
+
+                  setState(() {
+                    ownProfil["familiesDistance"] = distance;
+                  });
+
+                  ProfilDatabase().updateProfil(
+                      "familiesDistance = $distance",
+                      "WHERE id = '$userId'"
+                  );
+                }
+            )
+          ],
+        ),
+        if(familieInRangeNotificationOn) Text(
+            "${distance.round()} km ${AppLocalizations.of(context).umkreis}"
+        ),
+        if(familieInRangeNotificationOn) Slider(
+          value: distance,
+          min: 5,
+          max: 200,
+          divisions: 100,
+          label: '${distance.round()} km',
+          onChanged: (newDistance){
+            setState(() {
+              distance = newDistance;
+              ownProfil["familiesDistance"] = newDistance;
+            });
+          },
+          onChangeEnd: (newDistance){
+            ProfilDatabase().updateProfil(
+                "familiesDistance = $newDistance",
+                "WHERE id = '$userId'"
+            );
+          },
+        )
       ],
     );
   }
@@ -135,6 +183,8 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
             eventNotificationSetting(),
           if (ownProfil["notificationstatus"] == 1)
             newFriendNotificationSetting(),
+          if(ownProfil["notificationstatus"] == 1)
+            familieInRangeNotificationSetting()
         ],
       ),
     );

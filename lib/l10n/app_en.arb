@@ -63,7 +63,7 @@
     "feedbackText": "Here you can tell me everything from errors in the app to improvement requests to nice words.",
     "feedback": "feedback",
     "senden": "send",
-    "benachrichtigungenErhalten":"receive notifications",
+    "alleBenachrichtigungen":"all notifications",
     "benachrichtigungen": "Notifications",
     "emailAlleSichtbar": "e-mail visible to all",
     "privatsphaereSicherheit":"Privacy and security",
@@ -173,10 +173,8 @@
     "filterMeetupSuche": "search by country or City",
     "filterErkunden": "Family, City or Country",
     "emailErhalten" : "receive e-mail",
-    "chatNotificationErhalten": "receive chat notification",
-    "chatEmailErhalten": "receive chat e-mails",
-    "meetupNotificationErhalten": "receive meetup notification",
-    "meetupEmailErhalten": "receive meetup e-mails",
+    "chatNotification": "chat notification",
+    "meetupNotification": "meetup notification",
     "meetupUebergebenAn1": "the meetup was successfully handed over to ",
     "meetupUebergebenAn2": " ",
     "uebertragen": "transfer",
@@ -242,8 +240,7 @@
     "accountWirklichLoeschen": "Do you really want to delete the account?",
     "freundHinzufuegen": "add friend",
     "freundEntfernen": "remove friend",
-    "friendEmailErhalten": "receive new friend e-mail",
-    "friendNotificationErhalten" : "receive new friend notification",
+    "friendNotification" : "new friend notification",
     "titleZuLang": "Title is too long, max 100 characters",
     "automatischeUebersetzung": "This text has been automatically translated",
     "keineFamilieStadt": "There weren't any families in this town yet",
@@ -436,6 +433,10 @@
     "dateiBeschaedigt": "File is damaged",
     "benutzerNamevergeben": "User name is already taken",
     "aktuellenOrtVerwenden": "Use current location",
-    "keineEingabe": "Input field is empty"
+    "keineEingabe": "Input field is empty",
+    "imUmkreis": " is in your surroundings",
+    "umkreis": "Surroundings",
+    "familieInRangeEmailErhalten": "receive new familie around you e-mails",
+    "familieInRangeNotification" : "new familie around notification"
 }
 
