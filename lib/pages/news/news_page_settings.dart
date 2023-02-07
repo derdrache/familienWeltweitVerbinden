@@ -16,16 +16,17 @@ class NewsPageSettingsPage extends StatefulWidget {
 
 class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
+  Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
   bool showFriendAdded;
   bool showFriendChangedLocation;
   bool showNewFamilyLocation;
   bool showInterestingEvents;
   bool showCityInformation;
   bool showFriendTravelPlan;
+  double distance;
 
   @override
   void initState() {
-    print(widget.settingsProfil);
     showFriendAdded = widget.settingsProfil["showFriendAdded"] == 1 ? true : false;
     showFriendChangedLocation =
         widget.settingsProfil["showFriendChangedLocation"] == 1 ? true : false;
@@ -33,6 +34,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
     showInterestingEvents = widget.settingsProfil["showInterestingEvents"] == 1 ? true : false;
     showCityInformation = widget.settingsProfil["showCityInformation"] == 1 ? true : false;
     showFriendTravelPlan = widget.settingsProfil["showFriendTravelPlan"] == 1 ? true : false;
+    distance = ownProfil["familiesDistance"].toDouble() ?? 50.0;
 
     super.initState();
   }
@@ -98,24 +100,54 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
     newFamilyAtLocationOption() {
       return Container(
           margin: const EdgeInsets.only(bottom: 20),
-          child: Row(
+          child: Column(
             children: [
-              Switch(
-                  value: showNewFamilyLocation,
-                  onChanged: (value) {
-                    int intValue = value == true ? 1:0;
+              Row(
+                children: [
+                  Switch(
+                      value: showNewFamilyLocation,
+                      onChanged: (value) {
+                        int intValue = value == true ? 1:0;
+                        double newDistance = value ? 50 : 5;
 
-                    setState(() {
-                      showNewFamilyLocation = value;
-                    });
+                        setState(() {
+                          showNewFamilyLocation = value;
+                        });
 
-                    NewsSettingsDatabase().update(
-                        "showNewFamilyLocation = '$intValue'",
-                        "WHERE id = '$userId'");
-                    _changeHiveOwnNewsPageSetting("showNewFamilyLocation", intValue);
-                  }),
-              const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).newsSettingNewFamilieLocation)
+                        NewsSettingsDatabase().update(
+                            "showNewFamilyLocation = '$intValue'",
+                            "WHERE id = '$userId'");
+
+                        ProfilDatabase().updateProfil(
+                            "familiesDistance = $newDistance",
+                            "WHERE id = '$userId'"
+                        );
+                        _changeHiveOwnNewsPageSetting("showNewFamilyLocation", intValue);
+                      }),
+                  const SizedBox(width: 10),
+                  Text(AppLocalizations.of(context).newsSettingNewFamilieLocation)
+                ],
+              ),
+              if(showNewFamilyLocation) Text("${distance.round()} km ${AppLocalizations.of(context).umkreis}"),
+              if(showNewFamilyLocation) Slider(
+                value: distance,
+                min: 5,
+                max: 200,
+                divisions: 100,
+                label: '${distance.round()} km',
+                onChanged: (newDistance){
+                  setState(() {
+                    distance = newDistance;
+                    ownProfil["familiesDistance"] = newDistance;
+                  });
+                },
+                onChangeEnd: (newDistance){
+                  ProfilDatabase().updateProfil(
+                      "familiesDistance = $newDistance",
+                      "WHERE id = '$userId'"
+                  );
+                },
+              )
             ],
           ));
     }
@@ -208,7 +240,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
             friendNewTravelPlanOption(),
             newFamilyAtLocationOption(),
             showEventsOption(),
-            showCityInformationOption()
+            showCityInformationOption(),
           ],
         ),
       ),
