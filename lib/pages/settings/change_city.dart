@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/locationsService.dart';
+import '../../services/notification.dart' as notifications;
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
@@ -134,6 +135,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     saveLocation(locationDict);
     addVisitedCountries(locationDict["countryname"]);
     saveNewsPage(locationDict);
+    notifications.prepareFamilieAroundNotification();
     saveCityInformation(locationDict);
 
     customSnackbar(context,
