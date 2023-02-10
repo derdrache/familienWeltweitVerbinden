@@ -313,14 +313,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   messageToDbAndClearMessageInput(message) async {
-    var userID = FirebaseAuth.instance.currentUser.uid;
+    var ownProfilId = FirebaseAuth.instance.currentUser.uid;
     var checkMessage = nachrichtController.text.split("\n").join();
     if (checkMessage.isEmpty) return;
 
     var messageData = {
       "chatId": widget.groupChatData["id"],
       "message": message,
-      "von": userID,
+      "von": ownProfilId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": widget.chatPartnerId,
       "responseId": messageExtraInformationId ??= "0",
