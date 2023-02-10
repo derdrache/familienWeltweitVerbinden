@@ -13,8 +13,8 @@ import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
 
-var databaseUrl = "https://families-worldwide.com/";
-//var databaseUrl = "http://test.families-worldwide.com/";
+var databaseUrl = webseite;
+//var databaseUrl = testWebseite;
 var spracheIstDeutsch = kIsWeb
     ? ui.window.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
@@ -123,31 +123,31 @@ class ProfilDatabase {
         "friendlist = JSON_REMOVE(friendlist, JSON_UNQUOTE(JSON_SEARCH(friendlist, 'one', '$userId')))",
         "WHERE JSON_CONTAINS(friendlist, '\"$userId\"') > 0");
 
-    var userEvents = await EventDatabase()
+    var userMeetups = await MeetupDatabase()
         .getData("id", "WHERE erstelltVon = '$userId'", returnList: true);
-    if (userEvents != false) {
-      for (var eventId in userEvents) {
-        _deleteInTable("events", "id", eventId);
+    if (userMeetups != false) {
+      for (var meetupId in userMeetups) {
+        _deleteInTable("events", "id", meetupId);
       }
     }
 
-    EventDatabase().update(
+    MeetupDatabase().update(
         "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
         "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0");
 
-    EventDatabase().update(
+    MeetupDatabase().update(
         "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId')))",
         "WHERE JSON_CONTAINS(zusage, '\"$userId\"') > 0");
 
-    EventDatabase().update(
+    MeetupDatabase().update(
         "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId')))",
         "WHERE JSON_CONTAINS(absage, '\"$userId\"') > 0");
 
-    EventDatabase().update(
+    MeetupDatabase().update(
         "freischalten = JSON_REMOVE(freischalten, JSON_UNQUOTE(JSON_SEARCH(freischalten, 'one', '$userId')))",
         "WHERE JSON_CONTAINS(freischalten, '\"$userId\"') > 0");
 
-    EventDatabase().update(
+    MeetupDatabase().update(
         "freigegeben = JSON_REMOVE(freigegeben, JSON_UNQUOTE(JSON_SEARCH(freigegeben, 'one', '$userId')))",
         "WHERE JSON_CONTAINS(freigegeben, '\"$userId\"') > 0");
 
@@ -263,6 +263,8 @@ class ChatDatabase {
 
     messageData["message"] = messageData["message"].replaceAll("'", "\\'");
 
+    if (isBlocked) return;
+
     var url = Uri.parse(databaseUrl + "database/chats/newMessage2.php");
     await http.post(url,
         body: json.encode({
@@ -274,8 +276,6 @@ class ChatDatabase {
           "responseId": messageData["responseId"],
           "forward": messageData["forward"]
         }));
-
-    if (isBlocked) return;
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
@@ -294,25 +294,16 @@ class ChatDatabase {
   }
 
   _changeNewMessageCounter(chatPartnerId, chatData) async {
-    var dbData = await ProfilDatabase()
-        .getData("activeChat, newMessages", "WHERE id = '$chatPartnerId'");
-    var activeChat = dbData["activeChat"];
-    var allNewMessages = dbData["newMessages"];
+    var chatId = chatData['id'];
+    var activeChat = await ProfilDatabase()
+        .getData("activeChat", "WHERE id = '$chatPartnerId'");
 
-    if (chatData["id"] != activeChat) {
-      ProfilDatabase().updateProfil("newMessages = '${allNewMessages + 1}'",
-          "WHERE id ='$chatPartnerId'");
-
-      var chatId = chatData['id'];
-      var oldChatNewMessages =
-          await ChatDatabase().getChatData("users", "WHERE id = '$chatId'");
-
-      oldChatNewMessages[chatPartnerId]["newMessages"] =
-          oldChatNewMessages[chatPartnerId]["newMessages"] + 1;
+    if (chatId != activeChat) {
 
       ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$chatPartnerId.newMessages',${oldChatNewMessages[chatPartnerId]["newMessages"]})",
+          "users = JSON_SET(users, '\$.$chatPartnerId.newMessages', JSON_VALUE(users, '\$.$chatPartnerId.newMessages') + 1)",
           "WHERE id = '${chatData["id"]}'");
+
     }
   }
 
@@ -455,7 +446,7 @@ class ChatGroupsDatabase {
         }));
   }
 
-  addNewMessageAndNotification(chatId, messageData, isBlocked, chatGroupName) async {
+  addNewMessageAndNotification(chatId, messageData, chatGroupName) async {
     var chatgroupData = await getChatData("*", "WHERE id = '$chatId'");
     var date = DateTime.now().millisecondsSinceEpoch;
 
@@ -473,8 +464,6 @@ class ChatGroupsDatabase {
           "language": messageData["language"]
         }));
 
-    if (isBlocked) return;
-
     _addNotificationCounterAndSendNotification(
         messageData, chatgroupData, chatGroupName);
   }
@@ -490,18 +479,17 @@ class ChatGroupsDatabase {
       isActive = isActive == 1 ? true : false;
       var isMute = chatData["users"][userId]["mute"] ?? false;
 
-      if (!isActive && !isMute) {
+      if (!isActive) {
         chatData["users"][userId]["newMessages"] += 1;
         whatQuery +=
-            ",'\$.$userId.newMessages', ${chatData["users"][userId]["newMessages"]}";
+            ",'\$.$userId.newMessages', JSON_VALUE(users, '\$.$userId.newMessages') + 1)";
 
-        notificationList.add(userId);
+        if(!isMute) notificationList.add(userId);
       }
     });
 
     prepareChatGroupNotification(
         chatId: chatData["id"],
-        vonId: message["von"],
         idList: notificationList,
         inhalt: message["message"],
         chatGroup: chatGroupName);
@@ -575,25 +563,25 @@ class ChatGroupsDatabase {
   }
 }
 
-class EventDatabase {
-  addNewEvent(eventData) async {
+class MeetupDatabase {
+  addNewMeetup(meetupData) async {
     var url = Uri.parse(databaseUrl + "database/events/newEvent.php");
-    await http.post(url, body: json.encode(eventData));
+    await http.post(url, body: json.encode(meetupData));
 
-    eventData["freischalten"] = [];
-    eventData["eventInterval"] = eventData["interval"];
-    eventData["bis"] = eventData["bis"] == "null" ? null : eventData["bis"];
-    eventData["absage"] = [];
-    eventData["zusage"] = [];
-    eventData["freigegeben"] = [];
-    eventData["sprache"] = jsonDecode(eventData["sprache"]);
-    eventData["interesse"] = jsonDecode(eventData["interesse"]);
-    eventData["tags"] = [];
+    meetupData["freischalten"] = [];
+    meetupData["eventInterval"] = meetupData["interval"];
+    meetupData["bis"] = meetupData["bis"] == "null" ? null : meetupData["bis"];
+    meetupData["absage"] = [];
+    meetupData["zusage"] = [];
+    meetupData["freigegeben"] = [];
+    meetupData["sprache"] = jsonDecode(meetupData["sprache"]);
+    meetupData["interesse"] = jsonDecode(meetupData["interesse"]);
+    meetupData["tags"] = [];
 
-    var myOwnEvents = Hive.box('secureBox').get("myEvents") ?? [];
-    myOwnEvents.add(eventData);
-    var events = Hive.box('secureBox').get("events") ?? [];
-    events.add(eventData);
+    var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
+    myOwnMeetups.add(meetupData);
+    var meetups = Hive.box('secureBox').get("events") ?? [];
+    meetups.add(meetupData);
   }
 
   update(whatData, queryEnd) async {
@@ -653,11 +641,11 @@ class EventDatabase {
     return responseBody;
   }
 
-  delete(eventId) {
-    _deleteInTable("events", "id", eventId);
+  delete(meetupId) {
+    _deleteInTable("events", "id", meetupId);
 
-    List myEvents = Hive.box('secureBox').get("myEvents") ?? [];
-    myEvents.removeWhere((event) => event["id"] == eventId);
+    List myMeetups = Hive.box('secureBox').get("myEvents") ?? [];
+    myMeetups.removeWhere((meetup) => meetup["id"] == meetupId);
   }
 }
 
@@ -1029,13 +1017,15 @@ class FamiliesDatabase {
 class NewsPageDatabase {
   addNewNews(news) async {
     var alreadyAvailable = await _checkIfInDatabase(news);
-    if (alreadyAvailable) return;
+    if (alreadyAvailable) return false;
 
     var url = Uri.parse(databaseUrl + "database/newsPage/newNews.php");
     news["erstelltAm"] = DateTime.now().toString();
     news["erstelltVon"] = FirebaseAuth.instance.currentUser.uid;
 
     await http.post(url, body: json.encode(news));
+
+    return true;
   }
 
   _checkIfInDatabase(newNews) async {
@@ -1339,11 +1329,11 @@ getChatGroupFromHive(connectedId) {
   }
 }
 
-getEventFromHive(eventId) {
-  var events = Hive.box('secureBox').get("events");
+getMeetupFromHive(meetupId) {
+  var meetups = Hive.box('secureBox').get("events");
 
-  for (var event in events) {
-    if (event["id"] == eventId) return event;
+  for (var meetup in meetups) {
+    if (meetup["id"] == meetupId) return meetup;
   }
 
   return {};
@@ -1421,9 +1411,9 @@ updateHiveCommunity(id, changeTyp, changeData) {
   community[changeTyp] = changeData;
 }
 
-updateHiveEvent(id, changeTyp, changeData) {
-  var event = getEventFromHive(id);
-  event[changeTyp] = changeData;
+updateHiveMeetup(id, changeTyp, changeData) {
+  var meetup = getMeetupFromHive(id);
+  meetup[changeTyp] = changeData;
 }
 
 
@@ -1463,26 +1453,26 @@ refreshHiveChats() async {
   Hive.box("secureBox").put("myGroupChats", myGroupChats);
 }
 
-refreshHiveEvents() async {
-  var events =
-      await EventDatabase().getData("*", "ORDER BY wann ASC", returnList: true);
-  if (events == false) events = [];
-  Hive.box("secureBox").put("events", events);
+refreshHiveMeetups() async {
+  var meetups =
+      await MeetupDatabase().getData("*", "ORDER BY wann ASC", returnList: true);
+  if (meetups == false) meetups = [];
+  Hive.box("secureBox").put("events", meetups);
 
   var userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == null) return;
 
-  var ownEvents = [];
-  var myInterestedEvents = [];
-  for (var event in events) {
-    if (event["erstelltVon"] == userId) ownEvents.add(event);
-    if (event["interesse"].contains(userId) && event["erstelltVon"] != userId) {
-      myInterestedEvents.add(event);
+  var ownMeetups = [];
+  var myInterestedMeetups = [];
+  for (var meetup in meetups) {
+    if (meetup["erstelltVon"] == userId) ownMeetups.add(meetup);
+    if (meetup["interesse"].contains(userId) && meetup["erstelltVon"] != userId) {
+      myInterestedMeetups.add(meetup);
     }
   }
 
-  Hive.box('secureBox').put("myEvents", ownEvents);
-  Hive.box('secureBox').put("interestEvents", myInterestedEvents);
+  Hive.box('secureBox').put("myEvents", ownMeetups);
+  Hive.box('secureBox').put("interestEvents", myInterestedMeetups);
 }
 
 refreshHiveProfils() async {

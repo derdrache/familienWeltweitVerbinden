@@ -3,22 +3,23 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 import '../auth/secrets.dart';
+import '../global/global_functions.dart' as global_funcs;
 import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 var databaseUrl = "https://families-worldwide.com/";
 
-sendEmail(notificationInformation) async {
+sendEmail(notificationInformation, {targetEmail = null}) async {
   var userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
 
   var url = Uri.parse(databaseUrl + "services/sendEmail2.php");
-  var emailAdresse = await ProfilDatabase()
+  targetEmail ??= await ProfilDatabase()
       .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
 
   http.post(url,
       body: json.encode({
-        "to": emailAdresse,
+        "to": targetEmail,
         "title": notificationInformation["title"],
         "inhalt": notificationInformation["inhalt"]
       }));
@@ -26,6 +27,7 @@ sendEmail(notificationInformation) async {
 
 sendNotification(notificationInformation, {isGroup = false}) async {
   var userId = FirebaseAuth.instance.currentUser?.uid;
+  var groupLists = [];
 
   var url = Uri.parse(databaseUrl + (isGroup
       ? "services/sendGroupNotification.php"
@@ -33,16 +35,39 @@ sendNotification(notificationInformation, {isGroup = false}) async {
 
   if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
 
-  await http.post(url,
-      body: json.encode({
-        "to": notificationInformation["token"],
-        "toList": notificationInformation["toList"],
-        "title": notificationInformation["title"],
-        "inhalt": notificationInformation["inhalt"],
-        "changePageId": notificationInformation["changePageId"],
-        "apiKey": firebaseWebKey,
-        "typ": notificationInformation["typ"]
-      }));
+  if(isGroup){
+    var allSendIds = notificationInformation["toList"];
+
+    while (allSendIds.length > 1000){
+      groupLists.add(notificationInformation["toList"].sublist(0,1000));
+      allSendIds = allSendIds.sublist(1001);
+    }
+    groupLists.add(notificationInformation["toList"].sublist(0));
+
+    for(var sendGroup in groupLists){
+      await http.post(url,
+          body: json.encode({
+            "to": notificationInformation["token"],
+            "toList": sendGroup,
+            "title": notificationInformation["title"],
+            "inhalt": notificationInformation["inhalt"],
+            "changePageId": notificationInformation["changePageId"],
+            "apiKey": firebaseWebKey,
+            "typ": notificationInformation["typ"]
+          }));
+    }
+  }else{
+    await http.post(url,
+        body: json.encode({
+          "to": notificationInformation["token"],
+          "toList": notificationInformation["toList"],
+          "title": notificationInformation["title"],
+          "inhalt": notificationInformation["inhalt"],
+          "changePageId": notificationInformation["changePageId"],
+          "apiKey": firebaseWebKey,
+          "typ": notificationInformation["typ"]
+        }));
+  }
 }
 
 prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
@@ -93,10 +118,11 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
   }
 }
 
-prepareChatGroupNotification({chatId, vonId, idList, inhalt, chatGroup = ""}) async {
+prepareChatGroupNotification({chatId, idList, inhalt, chatGroup = ""}) async {
   List confirmNotificationList = [];
+  String ownName = Hive.box('secureBox').get("ownProfil")["name"];
   if(chatGroup.isNotEmpty) chatGroup += " - ";
-  var title = chatGroup + getProfilFromHive(profilId: vonId, getNameOnly: true);
+  var title = chatGroup + ownName;
   var notificationInformation = {
     "title": title,
     "inhalt": inhalt,
@@ -106,11 +132,14 @@ prepareChatGroupNotification({chatId, vonId, idList, inhalt, chatGroup = ""}) as
 
   for(var userId in idList){
     var toProfil = getProfilFromHive(profilId: userId);
+
+    if(toProfil == null) continue;
+
     var blockList = Hive.box('secureBox').get("ownProfil")["geblocktVon"];
     var toActiveChat = toProfil["activeChat"];
     var notificationsAllowed = toProfil["notificationstatus"];
     var chatNotificationOn = toProfil["chatNotificationOn"];
-
+    bool targetCanGerman = toProfil["sprachen"].contains("Deutsch") || toProfil["sprachen"].contains("german");
 
     if (notificationsAllowed == 0 ||
         chatNotificationOn == 0 ||
@@ -120,16 +149,15 @@ prepareChatGroupNotification({chatId, vonId, idList, inhalt, chatGroup = ""}) as
         toProfil["token"] == null) {
       var copyNotificationInformation = Map.of(notificationInformation);
       var chatPartnerName = toProfil["name"];
-      var toCanGerman = toProfil["sprachen"].contains("Deutsch") || toProfil["sprachen"].contains("german");
 
       copyNotificationInformation["title"] = title +
-          (toCanGerman
+          (targetCanGerman
               ? " hat dir eine Nachricht geschrieben"
               : " has written you a message");
 
       copyNotificationInformation["inhalt"] = """
       <p>Hi $chatPartnerName, </p>
-      <p> ${(toCanGerman ? "du hast in der <a href='https://families-worldwide.com/'>Families worldwide App</a> eine neue Nachricht von "
+      <p> ${(targetCanGerman ? "du hast in der <a href='https://families-worldwide.com/'>Families worldwide App</a> eine neue Nachricht von "
           "$title erhalten" : "you have received a new message from "
           "$title in the <a href='https://families-worldwide.com/'>Families worldwide App</a>")} </p>
     """;
@@ -146,33 +174,26 @@ prepareChatGroupNotification({chatId, vonId, idList, inhalt, chatGroup = ""}) as
 
 }
 
-prepareEventNotification({eventId, toId, eventName}) async {
+prepareMeetupNotification({meetupId, toId, meetupName, typ}) async {
   var dbData = await ProfilDatabase().getData(
       "notificationstatus, eventNotificationOn, token, name, sprachen",
       "WHERE id = '$toId'");
   var notificationsAllowed = dbData["notificationstatus"];
-  var eventNotificationOn = dbData["eventNotificationOn"];
+  var meetupNotificationOn = dbData["eventNotificationOn"];
   var toCanGerman = dbData["sprachen"].contains("Deutsch") || dbData["sprachen"].contains("german");
-  String title;
-  String inhalt;
 
-  if(toCanGerman){
-    title = "Event Freigabe";
-    inhalt ="Du hast jetzt Zugriff auf folgendes Event: " + eventName;
-  }else{
-    title = "Event release";
-    inhalt = "You now have access to the following event: " + eventName;
-  }
+  var meetupText = createMeetupText(typ,meetupName,toCanGerman ? "ger" : "eng");
 
-  if (notificationsAllowed == 0 || eventNotificationOn == 0) return;
+
+  if (notificationsAllowed == 0 || meetupNotificationOn == 0) return;
 
   var notificationInformation = {
     "zu": toId,
     "toName": dbData["name"],
     "typ": "event",
-    "title": title,
-    "inhalt": inhalt,
-    "changePageId": eventId,
+    "title": meetupText["title"],
+    "inhalt": meetupText["inhalt"],
+    "changePageId": meetupId,
     "token": dbData["token"]
   };
 
@@ -195,6 +216,33 @@ prepareEventNotification({eventId, toId, eventName}) async {
   } else {
     sendNotification(notificationInformation);
   }
+}
+
+createMeetupText(typ, meetupName, sprache){
+  var meetupText = {
+    "title": "",
+    "inhalt": ""
+  };
+
+  if(typ == "freigeben"){
+    if(sprache == "ger"){
+      meetupText["title"] = "Meetup - Familie freigaben";
+      meetupText["inhalt"] = "Eine Familie möchte für das Meetup $meetupName freigeschaltet werden";
+    }else{
+      meetupText["title"] = "Meetup familie release";
+      meetupText["inhalt"] = "A family wants to be unlocked for the meetup $meetupName";
+    }
+  }else if(typ == "freigegeben"){
+    if(sprache == "ger"){
+      meetupText["title"] = "Meetup Freigabe";
+      meetupText["inhalt"] ="Du hast jetzt Zugriff auf folgendes Meetup: " + meetupName;
+    }else{
+      meetupText["title"] = "Meetup release";
+      meetupText["inhalt"] = "You now have access to the following meetup: " + meetupName;
+    }
+  }
+
+  return meetupText;
 }
 
 prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
@@ -245,16 +293,48 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
   }
 }
 
-testNotification1(){
-  var notificationInformation = {
-    "token": "eZUKnENOT0FInvtvnWUfoJ:APA91bHQz6v3dMcsBqzFAK83zU2HnV2Up3j4jtiONe6PyS9M0o5g6incza-h9VANRCzSDvhzKtP0ySGaVbXGlzOeLKs_PLWyacm7sL25y528sYLKr3nB3IyMcujga4ewPLzRQRY5ZNRg",
-    "title": "Test2 Families worldwide",
-    "inhalt": "Siehst du diese Benachrichtigung?\n Es wird keine Nachricht im Chat geben",
-    "zu": "",
-    "changePageId": "",
-    "typ": "chat",
-  };
+prepareFamilieAroundNotification(){
+  Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
+  List allProfils = Hive.box('secureBox').get("profils") ?? [];
 
-  sendNotification(notificationInformation);
-  print("send");
+  for(Map profil in allProfils){
+    double profilFamiliesRange = profil["familiesDistance"];
+    bool notificationAllowed = profilFamiliesRange > 0;
+
+    if(!notificationAllowed) continue;
+
+    var ownLatt = ownProfil["latt"];
+    var ownLongt = ownProfil["longt"];
+    var profilLatt = profil["latt"];
+    var profilLongt = profil["longt"];
+    bool inRange = global_funcs.calculateDistance(
+        ownLatt, ownLongt, profilLatt, profilLongt) <= profilFamiliesRange;
+
+    if(!inRange) continue;
+
+    String profilId = profil["id"];
+    String ownProfilId = ownProfil["id"];
+    var profilToken = profil["token"];
+    bool canGerman = profil["sprachen"].contains("Deutsch") || profil["sprachen"].contains("german");
+    var notificationInformation = {
+      "token": profilToken,
+      "title": "",
+      "inhalt": "",
+      "zu": profilId,
+      "changePageId": ownProfilId,
+      "typ": "newFriend"
+    };
+
+    if(profilToken != "" && profilToken != null){
+      if(canGerman){
+        notificationInformation["title"] = "Neue Familie in deiner Nähe";
+        notificationInformation["inhalt"] = "Es gibt eine neue Familie in oder um deinen Ort";
+      }else{
+        notificationInformation["title"] = "New Familie near you";
+        notificationInformation["inhalt"] = "There is a new family in or around your location";
+      }
+      sendNotification(notificationInformation);
+    }
+  }
+
 }
