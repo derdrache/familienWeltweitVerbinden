@@ -74,10 +74,13 @@ class _InformationPageState extends State<InformationPage> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
                     image: image == null ? null : DecorationImage(
-                        fit: BoxFit.fitHeight,
+                        fit: BoxFit.fill,
                         colorFilter: ColorFilter.mode(
                             Colors.black.withOpacity(0.9), BlendMode.dstATop),
                         image: AssetImage(image))),
+                constraints: BoxConstraints(
+                  maxWidth: screenHeight / 2.5
+                ),
                 padding: const EdgeInsets.all(5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
