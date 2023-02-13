@@ -111,10 +111,10 @@ class _InformationPageState extends State<InformationPage> {
         if(number != 0) Positioned(top: -15, right: 0,child: Container(
           width: 40, height: 40,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
             color: Theme.of(context).colorScheme.secondary,
           ),
-          child: Center(child: Text(number.toString(), style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.white),)),
+          child: Center(child: Text(number.toString(), style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.white),)),
         ))
       ],);
     }
@@ -125,7 +125,7 @@ class _InformationPageState extends State<InformationPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -147,7 +147,7 @@ class _InformationPageState extends State<InformationPage> {
                 )
               ],
             ),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -163,7 +163,7 @@ class _InformationPageState extends State<InformationPage> {
                     4),
               ],
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
           ],
         ),
       ),

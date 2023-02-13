@@ -276,7 +276,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           backgroundColor: Colors.red,
           label: Text(AppLocalizations.of(context).accountLoeschen),
           onPressed: () async {
-
             if(userId == mainAdmin){
               String choosenProfilId = await chooseProfilIdWindow();
               ProfilDatabase().deleteProfil(choosenProfilId);
