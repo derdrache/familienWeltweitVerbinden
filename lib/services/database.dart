@@ -109,12 +109,6 @@ class ProfilDatabase {
   }
 
   deleteProfil(userId) async {
-    try {
-      await FirebaseAuth.instance.currentUser.delete();
-    } catch (_) {
-      return false;
-    }
-
     _deleteInTable("profils", "id", userId);
     _deleteInTable("newsSettings", "id", userId);
     _deleteInTable("news_page", "id", userId);
@@ -156,7 +150,16 @@ class ProfilDatabase {
         "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId')"
     );
 
-    Hive.box("secureBox").deleteFromDisk();
+    if(userId == FirebaseAuth.instance.currentUser.uid){
+      Hive.box("secureBox").deleteFromDisk();
+      try {
+        await FirebaseAuth.instance.currentUser.delete();
+      } catch (_) {
+        return false;
+      }
+    }
+
+
   }
 }
 
