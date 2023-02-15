@@ -45,6 +45,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
   @override
   void initState() {
     location = getCityFromHive(cityName: widget.ortName);
+    if(location == null) Navigator.pop(context);
     location["familien"].remove(userId);
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
     isCity = location["isCity"] == 1;
