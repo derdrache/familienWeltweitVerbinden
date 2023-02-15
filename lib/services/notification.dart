@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart' as global_funcs;
-import 'database.dart';
+import 'database/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 var databaseUrl = webseite;

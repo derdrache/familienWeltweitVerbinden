@@ -16,7 +16,7 @@ import 'pages/show_profil.dart';
 import 'pages/chat/chat_details.dart';
 import 'pages/informationen/meetups/meetup_details.dart';
 import 'pages/login_register_page/login_page.dart';
-import 'services/database.dart';
+import 'services/database/database.dart';
 import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 

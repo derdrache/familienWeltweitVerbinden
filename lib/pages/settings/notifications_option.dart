@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../../services/database.dart';
+import '../../services/database/database.dart';
 import '../../widgets/custom_appbar.dart';
 
 class NotificationsOptionsPage extends StatefulWidget {
