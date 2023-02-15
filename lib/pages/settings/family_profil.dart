@@ -8,7 +8,7 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../services/database.dart';
+import '../../services/database/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/search_autocomplete.dart';

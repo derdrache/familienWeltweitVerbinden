@@ -1,6 +1,6 @@
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/start_page.dart';
-import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/services/database/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

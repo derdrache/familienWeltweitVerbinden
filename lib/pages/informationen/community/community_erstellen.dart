@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
-import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/services/database/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

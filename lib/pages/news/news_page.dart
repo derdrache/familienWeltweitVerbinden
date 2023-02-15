@@ -10,7 +10,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
-import '../../../services/database.dart';
+import '../../services/database/database.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../informationen/meetups/meetupCard.dart';
 import '../informationen/location/location_Information.dart';
