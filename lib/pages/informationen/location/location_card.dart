@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../global/global_functions.dart';
-import '../../../services/database/database.dart';
+import '../../../services/database.dart';
 import 'location_Information.dart';
 
 class LocationCard extends StatefulWidget {

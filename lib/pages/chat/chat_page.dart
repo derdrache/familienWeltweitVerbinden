@@ -12,7 +12,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../../global/global_functions.dart';
-import '../../services/database/database.dart';
+import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;

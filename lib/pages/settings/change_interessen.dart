@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
-import '../../services/database/database.dart';
+import '../../services/database.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../widgets/custom_appbar.dart';
 
