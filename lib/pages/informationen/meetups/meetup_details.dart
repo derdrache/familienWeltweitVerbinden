@@ -210,10 +210,14 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     if (confirm) {
       widget.meetupData["immerZusagen"].add(userId);
       MeetupDatabase().update(
-          "immerZusagen = JSON_ARRAY_APPEND(immerZusagen, '\$', '$userId')",
+          "immerZusagen = JSON_ARRAY_APPEND(immerZusagen, '\$', '$userId'), absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId')))",
           "WHERE id= '${widget.meetupData["id"]}'");
 
       bool hasZusage = widget.meetupData["zusage"].contains(userId);
+      widget.meetupData["absage"].remove(userId);
+      teilnahme = true;
+      absage = false;
+
       if (hasZusage) return;
 
       widget.meetupData["zusage"].add(userId);
@@ -448,6 +452,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                                       changeImmerZusage(value);
                                       dialogSetState(() {});
                                       setState(() {});
+
                                     },
                                   )
                                 ],
@@ -525,6 +530,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
               onChanged: (value) {
                 changeImmerZusage(value);
                 setState(() {});
+                print(widget.meetupData);
               },)
           ],),
           if (teilnahme != true)

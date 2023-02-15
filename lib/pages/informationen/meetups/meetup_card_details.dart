@@ -495,7 +495,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
         global_func.changePage(
           context,
           LocationInformationPage(ortName: widget.meetupData["ort"]));
+        return;
       }
+
       
       showDialog(
           context: context,
