@@ -10,7 +10,7 @@ import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/chat/pin_messages.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/pages/start_page.dart';
-import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/services/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';

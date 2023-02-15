@@ -15,7 +15,7 @@ import 'create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
-import '../../services/database.dart';
+import '../../services/database/database.dart';
 import 'impressum.dart';
 
 class LoginPage extends StatefulWidget {

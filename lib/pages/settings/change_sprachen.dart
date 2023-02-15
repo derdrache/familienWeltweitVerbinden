@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
-import '../../services/database.dart';
+import '../../services/database/database.dart';
 import '../../global/variablen.dart' as global_variablen;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 

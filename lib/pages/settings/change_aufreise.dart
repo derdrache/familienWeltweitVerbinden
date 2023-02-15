@@ -2,7 +2,7 @@ import 'package:familien_suche/global/variablen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../services/database.dart';
+import '../../services/database/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';

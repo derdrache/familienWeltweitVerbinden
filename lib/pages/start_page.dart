@@ -12,7 +12,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../global/global_functions.dart';
 import '../global/variablen.dart';
-import '../services/database.dart';
+import '../services/database/database.dart';
 import '../services/locationsService.dart';
 import '../services/network_Connectivity.dart';
 import '../widgets/badge_icon.dart';
