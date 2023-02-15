@@ -17,7 +17,7 @@ import 'package:image/image.dart' as image_pack;
 import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
-import '../../../services/database/database.dart';
+import '../../../services/database.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/search_autocomplete.dart';

@@ -10,7 +10,7 @@ import '../../../global/variablen.dart' as global_var;
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/search_autocomplete.dart';
-import '../../../services/database/database.dart';
+import '../../../services/database.dart';
 import 'meetupCard.dart';
 
 class MeetupSuchenPage extends StatefulWidget {

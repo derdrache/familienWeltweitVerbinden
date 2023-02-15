@@ -16,7 +16,7 @@ import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
-import '../../services/database/database.dart';
+import '../../services/database.dart';
 import '../../services/locationsService.dart';
 import '../../widgets/badge_icon.dart';
 import '../../widgets/month_picker.dart';

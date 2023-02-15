@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
-import '../../services/database/database.dart';
+import '../../services/database.dart';
 import '../../services/notification.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../windows/nutzerrichtlinen.dart';

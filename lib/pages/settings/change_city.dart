@@ -11,7 +11,7 @@ import '../../services/locationsService.dart';
 import '../../services/notification.dart' as notifications;
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
-import '../../services/database/database.dart';
+import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 

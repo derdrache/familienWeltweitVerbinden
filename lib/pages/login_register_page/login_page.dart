@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'dart:io' show Platform;
 
+import '../../auth/secrets.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../widgets/dialogWindow.dart';
@@ -15,7 +16,7 @@ import 'create_profil_page.dart';
 import '../start_page.dart';
 import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
-import '../../services/database/database.dart';
+import '../../services/database.dart';
 import 'impressum.dart';
 
 class LoginPage extends StatefulWidget {
@@ -137,9 +138,8 @@ class _LoginPageState extends State<LoginPage> {
 
   _refreshHiveData() async {
     var userId = FirebaseAuth.instance.currentUser?.uid;
-    if(userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1"){
-      databaseUrl = "http://test.families-worldwide.com/";
-    }
+    if(userId == appStoreViewAccount)  databaseUrl = testWebseite;
+
     await refreshHiveProfils();
 
     var ownProfil = Hive.box("secureBox").get("ownProfil");

@@ -16,7 +16,7 @@ import '../../../global/global_functions.dart' as global_func;
 import '../../../services/notification.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
-import '../../../services/database/database.dart';
+import '../../../services/database.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../location/location_Information.dart';
 import 'meetup_image_galerie.dart';

@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
 
 import '../../../global/custom_widgets.dart';
-import '../../../services/database/database.dart';
+import '../../../services/database.dart';
 
 class MeetupImageGalerie extends StatefulWidget {
   var isCreator;

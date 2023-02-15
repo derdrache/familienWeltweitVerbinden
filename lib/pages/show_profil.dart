@@ -14,7 +14,7 @@ import '../global/global_functions.dart';
 import '../global/variablen.dart' as global_variablen;
 import '../global/variablen.dart';
 import '../pages/chat/chat_details.dart';
-import '../services/database/database.dart';
+import '../services/database.dart';
 import '../services/notification.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/profil_image.dart';
