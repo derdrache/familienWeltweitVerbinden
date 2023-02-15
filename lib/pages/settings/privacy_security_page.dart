@@ -13,7 +13,7 @@ import '../../global/global_functions.dart' as global_func;
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
-import '../../services/database.dart';
+import '../../services/database/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../login_register_page/login_page.dart';

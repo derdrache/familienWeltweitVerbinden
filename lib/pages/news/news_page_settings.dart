@@ -1,4 +1,4 @@
-import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/services/database/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
