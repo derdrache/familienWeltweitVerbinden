@@ -7,9 +7,9 @@ import '../global/global_functions.dart' as global_funcs;
 import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-var databaseUrl = "https://families-worldwide.com/";
+var databaseUrl = webseite;
 
-sendEmail(notificationInformation, {targetEmail = null}) async {
+sendEmail(notificationInformation, {targetEmail}) async {
   var userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == "BUw5puWtumVtAa8mpnDmhBvwdJo1") return;
 
