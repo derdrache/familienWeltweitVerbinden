@@ -436,5 +436,6 @@
     "keineEingabe": "Eingabefeld ist leer",
     "imUmkreis": " ist in deiner Umgebung",
     "umkreis": "Umkreis",
-    "familieInRangeNotification" : "Neue Familie im Umkreis Notification"
+    "familieInRangeNotification" : "Neue Familie im Umkreis Notification",
+    "neuenOrtEingeben": "Neuen ort eingeben"
 }

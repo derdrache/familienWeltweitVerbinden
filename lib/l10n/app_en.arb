@@ -437,6 +437,7 @@
     "imUmkreis": " is in your surroundings",
     "umkreis": "Surroundings",
     "familieInRangeEmailErhalten": "receive new familie around you e-mails",
-    "familieInRangeNotification" : "new familie around notification"
+    "familieInRangeNotification" : "new familie around notification",
+    "neuenOrtEingeben": "Enter new location"
 }
 

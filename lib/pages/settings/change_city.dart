@@ -147,7 +147,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
   @override
   Widget build(BuildContext context) {
-    autoComplete.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
+    autoComplete.hintText = AppLocalizations.of(context).neuenOrtEingeben;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -156,6 +156,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(height: 15),
           autoComplete,
         ],
       ),
