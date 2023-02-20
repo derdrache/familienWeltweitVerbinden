@@ -48,11 +48,22 @@ class _InformationPageState extends State<InformationPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery. of(context). size. width;
+    double screenHeight = MediaQuery. of(context). size. height;
+    double handyScreenWidth = 400;
+    double cardAbstandWidth = screenWidth > handyScreenWidth ? screenWidth / 17.5 : 0;
+    print(screenWidth);
+    print(screenHeight);
+
+    //desktopwidth 1280 => 50
+    //desktopHeight 619
+
+    //handyWidth 392 => 0
+    //handyHeight 737
 
     pageCards(title, icon, image, pageIndex) {
       var h1FontSize = getResponsiveFontSize(context, "h1");
-      double screenWidth = MediaQuery. of(context). size. width;
-      double screenHeight = MediaQuery. of(context). size. height;
+
 
       return GestureDetector(
         onTap: () {
@@ -61,7 +72,7 @@ class _InformationPageState extends State<InformationPage> {
           });
         },
         child: Container(
-          margin: const EdgeInsets.only(left: 10, right: 10),
+          margin: EdgeInsets.only(left: 10, right: 10),
           child: Card(
             elevation: 25,
             shadowColor: Colors.black,
@@ -70,7 +81,7 @@ class _InformationPageState extends State<InformationPage> {
             ),
             child: Container(
                 width: (screenWidth / 2) -40,
-                height: (screenHeight / 2) - 130,
+                height: (screenHeight / 3.5),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
                     image: image == null ? null : DecorationImage(
@@ -137,6 +148,7 @@ class _InformationPageState extends State<InformationPage> {
                       1),
                     getNumberEventNotification()
                 ),
+                SizedBox(width: cardAbstandWidth),
                 badgeCard(
                   pageCards(
                       "Communities",
@@ -156,6 +168,7 @@ class _InformationPageState extends State<InformationPage> {
                     Icons.location_city,
                     "assets/bilder/city.jpg",
                     3),
+                SizedBox(width: cardAbstandWidth),
                 pageCards(
                     AppLocalizations.of(context).countries,
                     Icons.flag,
