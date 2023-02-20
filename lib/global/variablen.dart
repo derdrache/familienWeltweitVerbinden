@@ -12,7 +12,7 @@ List<String> sprachenListe = ["Deutsch", "Englisch", "Spanisch", "Chinesisch",
   "Französisch", "Arabisch", "Russisch", "Italienisch", "Portugiesisch", "Japanisch", "Türkisch", "Polnisch", "Niederländisch"];
 List<String> meetupInterval = ["einmalig", "täglich", "mehrtägig", "wöchentlich", "alle 2 Wochen", "monatlich"];
 List<String> meetupTyp = ["offline", "online"];
-List<String> eventArt = ["privat", "halb-öffentlich", "öffentlich"];
+List<String> eventArt = ["öffentlich", "halb-öffentlich", "privat"];
 List<String> aufreise = ["nein", "vergangen", "aktiv"];
 List<String> standortbestimmung = ["deaktiviert", "genauer Standort",  "nächste Stadt", "nächste Region"];
 List<String> privacySetting = ["Alle","Follower", "Freunde"];
@@ -27,7 +27,7 @@ List<String> sprachenListeEnglisch = ["german", "english", "spanish", "chinese",
   "french", "arabic", "russian", "italian", "portuguese", "japanese", "turkish", "polish", "dutch"];
 List<String> meetupIntervalEnglisch = ["once", "daily", "several days", "weekly","every 2 weeks","monthly"];
 List<String> meetupTypEnglisch = ["offline", "online"];
-List<String> eventArtEnglisch = ["private", "semi-public", "public"];
+List<String> eventArtEnglisch = ["public", "semi-public", "private"];
 List<String> aufreiseEnglisch = ["no", "past", "active"];
 List<String> standortbestimmungEnglisch = ["disabled", "exact location",
   "nearest city", "nearest region"];
