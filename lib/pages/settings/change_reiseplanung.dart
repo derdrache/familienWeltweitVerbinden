@@ -44,8 +44,8 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     }
 
     saveProfilReiseplanung();
-
-    StadtinfoDatabase().addNewCity(ortInput);
+    var newLocation = ortInput.googleSearchResult;
+    StadtinfoDatabase().addNewCity(newLocation);
 
     NewsPageDatabase().addNewNews({
       "typ": "reiseplanung",
