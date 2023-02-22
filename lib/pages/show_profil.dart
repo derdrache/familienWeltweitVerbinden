@@ -89,8 +89,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                   _UserNameDisplay(profil: profil, familyProfil: familyProfil),
                   const SizedBox(height: 10),
                   _UserInformationDisplay(profil: profil),
-                  const SizedBox(height: 15),
-                  _UserSozialMediaBox(profil: profil),
                 ]),
               ),
             ),
@@ -833,6 +831,77 @@ class _UserInformationDisplay extends StatelessWidget {
       return Text(text, style: TextStyle(color: color, fontSize: size));
     }
 
+    profilEmailAdress(){
+      return Container(
+        margin: const EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(left: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).kontakt,
+              style: TextStyle(
+                  fontSize: headlineTextSize,
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            profil["emailAnzeigen"] == 1
+                ? FutureBuilder(
+                future: ProfilDatabase()
+                    .getData("email", "WHERE id = '${profil["id"]}'"),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Row(children: [
+                      Text(
+                        "Email: ",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: textSize),
+                      ),
+                      Text(snapshot.data,
+                          style: TextStyle(fontSize: textSize))
+                    ]);
+                  }
+                  return Container();
+                })
+                : const SizedBox.shrink(),
+            SizedBox(height: columnSpacing)
+          ],
+        ),
+      );
+    }
+
+    socialMediaItem(link){
+      return Container(
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            TextWithHyperlinkDetection(text: link,)
+          ],
+        ),
+      );
+    }
+
+    socialMediaBox(){
+      List<Widget> socialMediaContent = [];
+
+      for(var socialMediaLink in profil["socialMediaLinks"]){
+        socialMediaContent.add(socialMediaItem(socialMediaLink));
+      }
+
+      return Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text("Social Media: ",
+                style:
+                TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+            ...socialMediaContent
+          ]));
+    }
+
+
+
     return Container(
         padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
         decoration: BoxDecoration(
@@ -861,6 +930,8 @@ class _UserInformationDisplay extends StatelessWidget {
             kinderBox(),
             besuchteLaenderBox(),
             if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
+            if (profil["emailAnzeigen"] == 1) profilEmailAdress(),
+            if(profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
             if (profil["aboutme"].isNotEmpty) aboutmeBox(),
             if (profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
             interessenBox(),
@@ -870,53 +941,4 @@ class _UserInformationDisplay extends StatelessWidget {
   }
 }
 
-class _UserSozialMediaBox extends StatelessWidget {
-  final Map profil;
-
-  const _UserSozialMediaBox({Key key, this.profil}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return profil["emailAnzeigen"] == 1
-        ? Container(
-            margin: const EdgeInsets.only(top: 10),
-            padding: const EdgeInsets.only(left: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context).kontakt,
-                  style: TextStyle(
-                      fontSize: headlineTextSize,
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                profil["emailAnzeigen"] == 1
-                    ? FutureBuilder(
-                        future: ProfilDatabase()
-                            .getData("email", "WHERE id = '${profil["id"]}'"),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Row(children: [
-                              Text(
-                                "Email: ",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: textSize),
-                              ),
-                              Text(snapshot.data,
-                                  style: TextStyle(fontSize: textSize))
-                            ]);
-                          }
-                          return Container();
-                        })
-                    : const SizedBox.shrink(),
-                SizedBox(height: columnSpacing)
-              ],
-            ),
-          )
-        : const SizedBox.shrink();
-  }
-}
 
