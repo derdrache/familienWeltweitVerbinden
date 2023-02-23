@@ -29,6 +29,7 @@ import '../login_register_page/login_page.dart';
 import 'change_aufreise.dart';
 import 'change_besuchte_laender.dart';
 import 'change_children.dart';
+import 'change_social_media.dart';
 import 'change_trade.dart';
 import 'family_profil.dart';
 import 'privacy_security_page.dart';
@@ -390,6 +391,12 @@ class _ProfilSection extends StatelessWidget {
                     ChangeBesuchteLaenderPage(
                         selected: besuchteLaender,
                         isGerman: spracheIstDeutsch)),
+                profilThemeContainer(
+                  userProfil["socialMediaLinks"].isEmpty
+                      ? "0" :  userProfil["socialMediaLinks"].length.toString(),
+                  "Social Media Links",
+                  const ChangeSocialMediaLinks()
+                )
               ],
             ),
           ],

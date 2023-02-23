@@ -877,6 +877,7 @@ class _UserInformationDisplay extends StatelessWidget {
         margin: const EdgeInsets.all(5),
         child: Row(
           children: [
+            Text("- "),
             TextWithHyperlinkDetection(text: link,)
           ],
         ),
