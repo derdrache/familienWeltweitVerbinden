@@ -268,11 +268,12 @@ class _ProfilSection extends StatelessWidget {
     }
 
     createAufreiseText() {
-      String text = "";
+      String text = AppLocalizations.of(context).nein;
       String seit = userProfil["aufreiseSeit"];
       String bis = userProfil["aufreiseBis"];
 
-      if (seit == null) return " ";
+      if (seit == null) return AppLocalizations.of(context).nein;
+
       text = seit.split(" ")[0].split("-").take(2).toList().reversed.join("-");
 
       if (bis == null) {
@@ -361,6 +362,10 @@ class _ProfilSection extends StatelessWidget {
                       isGerman: spracheIstDeutsch,
                     )),
                 profilThemeContainer(
+                    userProfil["aboutme"],
+                    AppLocalizations.of(context).ueberMich,
+                    ChangeAboutmePage(oldText: userProfil["aboutme"])),
+                profilThemeContainer(
                     createAufreiseText(),
                     AppLocalizations.of(context).aufReise,
                     ChangeAufreisePage(
@@ -371,14 +376,6 @@ class _ProfilSection extends StatelessWidget {
                             ? null
                             : DateTime.parse(userProfil["aufreiseBis"]),
                         isGerman: spracheIstDeutsch)),
-                profilThemeContainer(
-                    userProfil["aboutme"],
-                    AppLocalizations.of(context).ueberMich,
-                    ChangeAboutmePage(oldText: userProfil["aboutme"])),
-                profilThemeContainer(
-                    userProfil["tradeNotize"],
-                    AppLocalizations.of(context).verkaufenTauschenSchenken,
-                    ChangeTradePage(oldText: userProfil["tradeNotize"])),
                 profilThemeContainer(
                     reisePlanung.length.toString(),
                     AppLocalizations.of(context).reisePlanung,
@@ -396,7 +393,12 @@ class _ProfilSection extends StatelessWidget {
                       ? "0" :  userProfil["socialMediaLinks"].length.toString(),
                   "Social Media Links",
                   const ChangeSocialMediaLinks()
-                )
+                ),
+                profilThemeContainer(
+                    userProfil["tradeNotize"],
+                    AppLocalizations.of(context).verkaufenTauschenSchenken,
+                    ChangeTradePage(oldText: userProfil["tradeNotize"])),
+
               ],
             ),
           ],
