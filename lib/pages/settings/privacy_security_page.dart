@@ -134,33 +134,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     setExactLocationDropdown();
 
 
-    emailSettingContainer() {
-      return Container(
-        margin: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Text(
-              AppLocalizations.of(context).emailAlleSichtbar,
-              style: TextStyle(fontSize: fontsize),
-            ),
-            const Expanded(child: SizedBox(width: 20)),
-            Switch(
-                value: ownProfil["emailAnzeigen"] == 1 ? true : false,
-                inactiveThumbColor: Colors.grey[700],
-                activeColor: Theme.of(context).colorScheme.primary,
-                onChanged: (value) {
-                  setState(() {
-                    ownProfil["emailAnzeigen"] = value == true ? 1 : 0;
-                  });
-                  ProfilDatabase().updateProfil(
-                      "emailAnzeigen = '${ownProfil["emailAnzeigen"]}'",
-                      "WHERE id = '$userId'");
-                })
-          ],
-        ),
-      );
-    }
-
     automaticLocationContainer() {
       return Container(
         margin: const EdgeInsets.all(10),
@@ -293,7 +266,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       body: SafeArea(
         child: Column(
           children: [
-            emailSettingContainer(),
             automaticLocationContainer(),
             exactLocationBox(),
             reiseplanungBox(),
