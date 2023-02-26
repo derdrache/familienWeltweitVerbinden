@@ -8,9 +8,9 @@ Currently available on:
 
 
 ## Contributing Bug reports
-We use GitHub for bug tracking. Please search the existing issues for your bug and create a new one if the issue is not yet tracked!
+I try to use GitHub for bug tracking. Please search the existing issues for your bug and create a new one if the issue is not yet tracked!
 
-[https://github.com/signalapp/Signal-Android/issues](https://github.com/derdrache/familienWeltweitVerbinden/issues)
+[https://github.com/derdrache/familienWeltweitVerbinden/issues](https://github.com/derdrache/familienWeltweitVerbinden/issues)
 
 
 
