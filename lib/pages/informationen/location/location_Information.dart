@@ -146,7 +146,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
           ),
           if(isCity) BottomNavigationBarItem(
             icon: const Icon(Icons.map),
-            label: AppLocalizations.of(context).cities,
+            label: AppLocalizations.of(context).karte,
           ),
           if (!isCity)
             BottomNavigationBarItem(
