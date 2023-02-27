@@ -438,5 +438,7 @@
     "umkreis": "Umkreis",
     "familieInRangeNotification" : "Neue Familie im Umkreis Notification",
     "neuenOrtEingeben": "Neuen ort eingeben",
-    "socialMediaLinkAendern": "Social Media Link ändern"
+    "socialMediaLinkAendern": "Social Media Link ändern",
+    "mitFreundenTeilen": "Mit Freunden teilen",
+    "teilenLinkText": "Die Vernetzungsapp für Reisefamilien"
 }

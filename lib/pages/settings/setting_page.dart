@@ -17,6 +17,7 @@ import 'package:hive/hive.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../global/global_functions.dart' as global_func;
 import '../../global/variablen.dart' as global_variablen;
@@ -518,6 +519,12 @@ class _SupportInformation extends StatelessWidget {
                 AppLocalizations.of(context).geplanteErweiterungen,
                 Icons.update,
                 () => UmcomingUpdatesWindow(context: context).openWindow()),
+            const SizedBox(height: 20),
+            settingThemeContainer(
+                AppLocalizations.of(context).mitFreundenTeilen,
+              Icons.share,
+                () => Share.share(AppLocalizations.of(context).teilenLinkText + '\nhttps://families-worldwide.com/')
+            ),
             /*
               SizedBox(height: 20),
               settingThemeContainer("Über das Projekt", Icons.description,

@@ -439,6 +439,8 @@
     "familieInRangeEmailErhalten": "receive new familie around you e-mails",
     "familieInRangeNotification" : "new familie around notification",
     "neuenOrtEingeben": "Enter new location",
-    "socialMediaLinkAendern": "Change Social Media Link"
+    "socialMediaLinkAendern": "Change Social Media Link",
+    "mitFreundenTeilen": "Share with friends",
+    "teilenLinkText": "The networking app for travel families"
 }
 
