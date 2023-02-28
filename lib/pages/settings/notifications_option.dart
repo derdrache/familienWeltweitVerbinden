@@ -31,12 +31,22 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         Switch(
             value: ownProfil["notificationstatus"] == 1 ? true : false,
             onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
               setState(() {
-                ownProfil["notificationstatus"] = value == true ? 1 : 0;
+                ownProfil["notificationstatus"] = notificationOn;
+                ownProfil["chatNotificationOn"] = notificationOn;
+                ownProfil["eventNotificationOn"] = notificationOn;
+                ownProfil["newFriendNotificationOn"] = notificationOn;
+                ownProfil["familiesDistance"] = value ? 50 : 0;
               });
 
               ProfilDatabase().updateProfil(
-                  "notificationstatus = '${ownProfil["notificationstatus"]}'",
+                  "notificationstatus = '$notificationOn, "
+                      "chatNotificationOn = '$notificationOn', "
+                      "eventNotificationOn = '$notificationOn',"
+                      "newFriendNotificationOn = '$notificationOn',"
+                      "familiesDistance = ${value ? 50 : 0}",
                   "WHERE id = '$userId'");
             })
       ],
@@ -54,11 +64,13 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         Switch(
             value: ownProfil["chatNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
               setState(() {
-                ownProfil["chatNotificationOn"] = value == true ? 1 : 0;
+                ownProfil["chatNotificationOn"] = notificationOn;
               });
-              ProfilDatabase().updateProfil("chatNotificationOn = '$value'",
-                  "WHERE id = '${ownProfil["chatNotificationOn"]}'");
+              ProfilDatabase().updateProfil("chatNotificationOn = '$notificationOn'",
+                  "WHERE id = '${ownProfil["id"]}'");
             })
       ],
     );
@@ -75,11 +87,13 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         Switch(
             value: ownProfil["eventNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
               setState(() {
-                ownProfil["eventNotificationOn"] = value == true ? 1 : 0;
+                ownProfil["eventNotificationOn"] = notificationOn;
               });
-              ProfilDatabase().updateProfil("eventNotificationOn = '$value'",
-                  "WHERE id = '${ownProfil["eventNotificationOn"]}'");
+              ProfilDatabase().updateProfil("eventNotificationOn = '$notificationOn'",
+                  "WHERE id = '${ownProfil["id"]}'");
             })
       ],
     );
@@ -96,13 +110,14 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
         Switch(
             value: ownProfil["newFriendNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
               setState(() {
-                ownProfil["newFriendNotificationOn"] =
-                    value == true ? 1 : 0;
+                ownProfil["newFriendNotificationOn"] = notificationOn;
               });
               ProfilDatabase().updateProfil(
-                  "newFriendNotificationOn = '$value'",
-                  "WHERE id = '${ownProfil["newFriendNotificationOn"]}'");
+                  "newFriendNotificationOn = '$notificationOn'",
+                  "WHERE id = '${ownProfil["id"]}'");
             })
       ],
     );
