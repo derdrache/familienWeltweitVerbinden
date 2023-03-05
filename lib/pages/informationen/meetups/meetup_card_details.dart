@@ -120,7 +120,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
       prepareMeetupNotification(
           meetupId: widget.meetupData["id"],
-          toId: ownProfil["Id"],
+          toId: widget.meetupData["erstelltVon"],
           meetupName : widget.meetupData["name"],
           typ: "freigeben"
       );

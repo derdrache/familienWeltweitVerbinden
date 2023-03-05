@@ -52,14 +52,6 @@ class _InformationPageState extends State<InformationPage> {
     double screenHeight = MediaQuery. of(context). size. height;
     double handyScreenWidth = 400;
     double cardAbstandWidth = screenWidth > handyScreenWidth ? screenWidth / 17.5 : 0;
-    print(screenWidth);
-    print(screenHeight);
-
-    //desktopwidth 1280 => 50
-    //desktopHeight 619
-
-    //handyWidth 392 => 0
-    //handyHeight 737
 
     pageCards(title, icon, image, pageIndex) {
       var h1FontSize = getResponsiveFontSize(context, "h1");

@@ -113,18 +113,43 @@ class _AppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AppBarState extends State<_AppBar> {
+  var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
   var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
   String _userName;
   bool _isOwnProfil;
 
   @override
-  void initState() {
+  void initState(){
     bool isFmailyMember = widget.familyProfil != null
         && widget.familyProfil["members"].contains(userId);
     _isOwnProfil = widget.profil["id"] == userId || isFmailyMember;
-
     _userName = widget.profil["name"];
+
+    createUserNotizen();
+
     super.initState();
+  }
+
+  createUserNotizen() async{
+    if(ownProfil["userNotizen"] != null) return;
+
+    var userNotizen = await NotizDatabase().getData("userNotizen", "WHERE id = '$userId'");
+
+    if(userNotizen == false){
+      NotizDatabase().newNotize();
+      ownProfil["userNotizen"] = {};
+    }else{
+      ownProfil["userNotizen"] = userNotizen;
+    }
+
+  }
+
+  saveNotiz(notiz){
+    ownProfil["userNotizen"][widget.profil["id"]] = notiz;
+    NotizDatabase().update(
+        "userNotizen = '${json.encode(ownProfil["userNotizen"])}'",
+        "WHERE id = '$userId'"
+    );
   }
 
   openChat(chatpartnerId, chatpartnerName) async {
@@ -150,8 +175,61 @@ class _AppBarState extends State<_AppBar> {
         ));
   }
 
+  openNoteWindow(){
+    TextEditingController userNotizController = TextEditingController();
+    var userNotiz = ownProfil["userNotizen"][widget.profil["id"]];
+    bool changeNote = false;
+
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return StatefulBuilder(
+            builder: (context, noteState) {
+              return CustomAlertDialog(
+                  title: AppLocalizations.of(context).notizeUeber + _userName,
+                  children: [
+                    if(userNotiz == null || changeNote) TextField(
+                      controller: userNotizController,
+                      maxLines: 10,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        hintText: AppLocalizations.of(context).notizEingeben,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if(userNotiz== null || changeNote) FloatingActionButton.extended(
+                      label: Text(AppLocalizations.of(context).speichern),
+                        onPressed: (){
+                          saveNotiz(userNotizController.text);
+                          noteState(() {
+                            changeNote = false;
+                          });
+                        }
+                    ),
+                    if(userNotiz != null && !changeNote) InkWell(
+                      onTap: ()=> noteState((){
+                        changeNote = true;
+                        userNotizController.text = userNotiz;
+                      }),
+                      child: Text(userNotiz)
+                    ),
+                    const SizedBox(height: 5)
+                  ]);
+            }
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    openNoteButton(){
+      return IconButton(
+        icon: const Icon(Icons.description),
+        onPressed: () => openNoteWindow(),
+      );
+    }
+
     openChatButton() {
       return IconButton(
           icon: const Icon(Icons.message),
@@ -384,6 +462,7 @@ class _AppBarState extends State<_AppBar> {
     }
 
     return CustomAppBar(title: "", buttons: [
+      _isOwnProfil ? const SizedBox.shrink() : openNoteButton(),
       _isOwnProfil ? const SizedBox.shrink() : openChatButton(),
       _isOwnProfil ? const SizedBox.shrink() : moreMenuButton()
     ]);
@@ -835,7 +914,7 @@ class _UserInformationDisplay extends StatelessWidget {
         margin: const EdgeInsets.all(5),
         child: Row(
           children: [
-            Text("- "),
+            const Text("- "),
             TextWithHyperlinkDetection(text: link,)
           ],
         ),

@@ -1179,6 +1179,67 @@ class NewsSettingsDatabase {
   }
 }
 
+class NotizDatabase{
+  newNotize() async {
+    var url = Uri.parse(databaseUrl + databasePathNewNotize);
+    var userId = FirebaseAuth.instance.currentUser.uid;
+
+    await http.post(url, body: json.encode({"id": userId}));
+  }
+
+  update(whatData, queryEnd) async {
+    var url = Uri.parse(databaseUrl + databasePathUpdate);
+
+    await http.post(url,
+        body: json.encode({
+          "table": "notizen",
+          "whatData": whatData,
+          "queryEnd": queryEnd
+        }));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async{
+    var url = Uri.parse(databaseUrl + databasePathGetData);
+
+    var res = await http.post(url,
+        body: json.encode({
+          "whatData": whatData,
+          "queryEnd": queryEnd,
+          "table": "notizen"
+        }));
+
+    dynamic responseBody = res.body;
+    responseBody = _decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if (responseBody.isEmpty) return false;
+
+    for (var i = 0; i < responseBody.length; i++) {
+      if (responseBody[i].keys.toList().length == 1) {
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for (var key in responseBody[i].keys.toList()) {
+        try {
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        } catch (_) {}
+      }
+    }
+
+    if (responseBody.length == 1 && !returnList) {
+      responseBody = responseBody[0];
+      try {
+        responseBody = jsonDecode(responseBody);
+      } catch (_) {}
+    }
+
+    return responseBody;
+  }
+}
+
 uploadImage(imagePath, imageName, image) async {
   var url = Uri.parse(databasePathUploadImage);
   var data = {
@@ -1490,6 +1551,7 @@ refreshHiveProfils() async {
   for (var profil in dbProfils) {
     if (profil["id"] == userId) ownProfil = profil;
   }
+
   Hive.box('secureBox').put("ownProfil", ownProfil);
 }
 

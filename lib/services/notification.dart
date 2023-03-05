@@ -8,6 +8,7 @@ import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 sendEmail(notificationInformation, {targetEmail}) async {
+  return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == "appStoreViewAccount") return;
 
@@ -23,17 +24,18 @@ sendEmail(notificationInformation, {targetEmail}) async {
       }));
 }
 
-sendNotification(notificationInformation, {isGroup = false}) async {
+sendNotification(notificationInformation, {isChatGroup = false}) async {
+  return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
 
-  var url = Uri.parse(databaseUrl + (isGroup
+  var url = Uri.parse(databaseUrl + (isChatGroup
       ? phpSendGroupNotification
       : phpSendNotification));
 
   if (userId == "appStoreViewAccount") return;
 
-  if(isGroup){
+  if(isChatGroup){
     var allSendIds = notificationInformation["toList"];
 
     while (allSendIds.length > 1000){
@@ -45,7 +47,6 @@ sendNotification(notificationInformation, {isGroup = false}) async {
     for(var sendGroup in groupLists){
       await http.post(url,
           body: json.encode({
-            "to": notificationInformation["token"],
             "toList": sendGroup,
             "title": notificationInformation["title"],
             "inhalt": notificationInformation["inhalt"],
@@ -58,7 +59,6 @@ sendNotification(notificationInformation, {isGroup = false}) async {
     await http.post(url,
         body: json.encode({
           "to": notificationInformation["token"],
-          "toList": notificationInformation["toList"],
           "title": notificationInformation["title"],
           "inhalt": notificationInformation["inhalt"],
           "changePageId": notificationInformation["changePageId"],
@@ -168,7 +168,7 @@ prepareChatGroupNotification({chatId, idList, inhalt, chatGroup = ""}) async {
 
   notificationInformation["toList"] = confirmNotificationList;
 
-  sendNotification(notificationInformation, isGroup: true);
+  sendNotification(notificationInformation, isChatGroup: true);
 
 }
 
@@ -296,7 +296,7 @@ prepareFamilieAroundNotification(){
   List allProfils = Hive.box('secureBox').get("profils") ?? [];
 
   for(Map profil in allProfils){
-    double profilFamiliesRange = profil["familiesDistance"];
+    double profilFamiliesRange = profil["familiesDistance"].toDouble();
     bool notificationAllowed = profilFamiliesRange > 0;
 
     if(!notificationAllowed) continue;

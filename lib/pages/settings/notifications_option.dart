@@ -42,7 +42,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
               });
 
               ProfilDatabase().updateProfil(
-                  "notificationstatus = '$notificationOn, "
+                  "notificationstatus = '$notificationOn', "
                       "chatNotificationOn = '$notificationOn', "
                       "eventNotificationOn = '$notificationOn',"
                       "newFriendNotificationOn = '$notificationOn',"

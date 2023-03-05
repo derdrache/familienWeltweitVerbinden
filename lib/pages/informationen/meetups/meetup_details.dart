@@ -69,7 +69,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     if (!angenommen) return;
 
     await MeetupDatabase().update(
-        "freigegeben = JSON_ARRAY_APPEND(freigegeben, '\$', '$userId')",
+        "freigegeben = JSON_ARRAY_APPEND(freigegeben, '\$', '$user')",
         "WHERE id = '$meetupId'");
 
     setState(() {});

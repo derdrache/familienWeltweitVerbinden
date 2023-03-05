@@ -442,6 +442,8 @@
     "socialMediaLinkAendern": "Change Social Media Link",
     "mitFreundenTeilen": "Share with friends",
     "teilenLinkText": "The networking app for travel families",
-    "karte": "Map"
+    "karte": "Map",
+    "notizeUeber": "Note about ",
+    "notizEingeben": "Enter note"
 }
 
