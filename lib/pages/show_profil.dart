@@ -211,7 +211,7 @@ class _AppBarState extends State<_AppBar> {
                         changeNote = true;
                         userNotizController.text = userNotiz;
                       }),
-                      child: Text(userNotiz)
+                      child: Text(userNotiz, maxLines: 10)
                     ),
                     const SizedBox(height: 5)
                   ]);
