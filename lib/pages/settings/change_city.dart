@@ -114,6 +114,28 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
         "WHERE (ort LIKE '%${locationDict["city"]}%' OR ort LIKE '%${locationDict["countryname"]}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
   }
 
+  deleteOldTravelPlan(locationDict){
+    List travelPlans = ownProfil["reisePlanung"];
+    Map removePlan = {};
+
+    for(var travelPlan in travelPlans){
+      bool sameCity =locationDict["city"] == travelPlan["ortData"]["city"];
+      bool sameCountry = locationDict["countryname"] ==travelPlan["ortData"]["countryname"];
+      bool sameMonth = DateTime.parse(travelPlan["von"]).month == DateTime.now().month;
+
+      if(sameCity && sameCountry && sameMonth){
+        removePlan = travelPlan;
+      }
+    }
+
+
+    if(removePlan.isEmpty) return;
+
+    travelPlans.remove(removePlan);
+    ProfilDatabase().updateProfil("reisePlanung = '$travelPlans'", "WHERE id = '$userId'");
+
+  }
+
   save() async {
     var locationData = autoComplete.getGoogleLocationData();
 
@@ -131,12 +153,14 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     };
     final String oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
 
-    saveChatGroups(locationDict, oldLocation);
     saveLocation(locationDict);
-    addVisitedCountries(locationDict["countryname"]);
+    saveChatGroups(locationDict, oldLocation);
     saveNewsPage(locationDict);
     notifications.prepareFamilieAroundNotification();
     saveCityInformation(locationDict);
+
+    deleteOldTravelPlan(locationDict);
+    addVisitedCountries(locationDict["countryname"]);
 
     customSnackbar(context,
     AppLocalizations.of(context).aktuelleOrt +" "+
