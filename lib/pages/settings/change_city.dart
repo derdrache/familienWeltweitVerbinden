@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../../global/custom_widgets.dart';
@@ -23,14 +22,13 @@ class ChangeLocationPage extends StatefulWidget {
 }
 
 class _ChangeLocationPageState extends State<ChangeLocationPage> {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
   TextEditingController ortChangeKontroller = TextEditingController();
   List suggestedCities = [];
   List<Widget> suggestedCitiesList = [];
   int selectedIndex = -1;
   Map locationData = {};
   var autoComplete = GoogleAutoComplete();
-  var ownProfil = Hive.box("secureBox").get("ownProfil");
+  Map ownProfil = Hive.box("secureBox").get("ownProfil");
 
   @override
   void initState() {
@@ -40,8 +38,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     super.initState();
   }
 
-  saveChatGroups(locationDict, oldLocation) async{
-
+  joindAndRemoveChatGroups(locationDict, oldLocation) async{
     final Map leaveCity = getCityFromHive(cityName: oldLocation) ?? {};
     String chatConnectId = leaveCity["id"].toString();
 
@@ -87,7 +84,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     ownProfil["latt"] =locationDict["latt"];
     ownProfil["land"] =locationDict["countryname"];
 
-    ProfilDatabase().updateProfilLocation(userId, locationDict);
+    ProfilDatabase().updateProfilLocation(ownProfil["id"], locationDict);
   }
 
   saveNewsPage(locationDict) async {
@@ -102,7 +99,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     newsFeed.add({
       "typ": "ortswechsel",
       "information": locationDict,
-      "erstelltVon": userId,
+      "erstelltVon": ownProfil["id"],
       "erstelltAm": DateTime.now().toString()
     });
   }
@@ -110,8 +107,8 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
   saveCityInformation(locationDict){
     StadtinfoDatabase().addNewCity(locationDict);
     StadtinfoDatabase().update(
-        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-        "WHERE (ort LIKE '%${locationDict["city"]}%' OR ort LIKE '%${locationDict["countryname"]}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '${ownProfil["id"]}')",
+        "WHERE (ort LIKE '%${locationDict["city"]}%' OR ort LIKE '%${locationDict["countryname"]}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
   }
 
   deleteOldTravelPlan(locationDict){
@@ -132,7 +129,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     if(removePlan.isEmpty) return;
 
     travelPlans.remove(removePlan);
-    ProfilDatabase().updateProfil("reisePlanung = '$travelPlans'", "WHERE id = '$userId'");
+    ProfilDatabase().updateProfil("reisePlanung = '$travelPlans'", "WHERE id = '${ownProfil["id"]}'");
 
   }
 
@@ -154,7 +151,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     final String oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
 
     saveLocation(locationDict);
-    saveChatGroups(locationDict, oldLocation);
+    joindAndRemoveChatGroups(locationDict, oldLocation);
     saveNewsPage(locationDict);
     notifications.prepareFamilieAroundNotification();
     saveCityInformation(locationDict);
@@ -180,7 +177,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           autoComplete,
         ],
       ),
