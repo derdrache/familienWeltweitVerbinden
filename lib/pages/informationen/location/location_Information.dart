@@ -55,7 +55,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         usersCityInformation: usersCityInformation,
         fromCityPage: widget.fromCityPage,
       ),
-      InsiderInformationPage(location: location, usersCityInformation: usersCityInformation),
+      InsiderInformationPage(location: location),
     ];
     addLastTab();
 
@@ -459,9 +459,8 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
 class InsiderInformationPage extends StatefulWidget {
   Map location;
-  List usersCityInformation;
 
-  InsiderInformationPage({Key key, this.location, this.usersCityInformation}) : super(key: key);
+  InsiderInformationPage({Key key, this.location}) : super(key: key);
 
   @override
   State<InsiderInformationPage> createState() => _InsiderInformationPageState();
@@ -470,6 +469,8 @@ class InsiderInformationPage extends StatefulWidget {
 class _InsiderInformationPageState extends State<InsiderInformationPage> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
   final translator = GoogleTranslator();
+  List usersCityInformation;
+
 
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
@@ -578,14 +579,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   }
 
   setThumb(thumb, index) async {
-    var infoId = widget.usersCityInformation[index]["id"];
+    var infoId = usersCityInformation[index]["id"];
 
     if (thumb == "up") {
-      if (widget.usersCityInformation[index]["thumbUp"].contains(userId)) return;
+      if (usersCityInformation[index]["thumbUp"].contains(userId)) return;
 
       setState(() {
-        widget.usersCityInformation[index]["thumbUp"].add(userId);
-        widget.usersCityInformation[index]["thumbDown"].remove(userId);
+        usersCityInformation[index]["thumbUp"].add(userId);
+        usersCityInformation[index]["thumbDown"].remove(userId);
       });
 
       var dbData = await StadtinfoUserDatabase()
@@ -600,11 +601,11 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           "thumbUp = '${jsonEncode(dbThumbUpList)}', thumbDown = '${jsonEncode(dbThumbDownList)}'",
           "WHERE id ='$infoId'");
     } else if (thumb == "down") {
-      if (widget.usersCityInformation[index]["thumbDown"].contains(userId)) return;
+      if (usersCityInformation[index]["thumbDown"].contains(userId)) return;
 
       setState(() {
-        widget.usersCityInformation[index]["thumbDown"].add(userId);
-        widget.usersCityInformation[index]["thumbUp"].remove(userId);
+        usersCityInformation[index]["thumbDown"].add(userId);
+        usersCityInformation[index]["thumbUp"].remove(userId);
       });
 
       var dbData = await StadtinfoUserDatabase()
@@ -687,12 +688,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       return;
     }
 
-    for (var i = 0; i < widget.usersCityInformation.length; i++) {
-      if (widget.usersCityInformation[i]["id"] == id) {
-        widget.usersCityInformation[i]["titleGer"] = newTitle;
-        widget.usersCityInformation[i]["informationGer"] = newInformation;
-        widget.usersCityInformation[i]["titleEng"] = newTitle;
-        widget.usersCityInformation[i]["informationEng"] = newInformation;
+    for (var i = 0; i < usersCityInformation.length; i++) {
+      if (usersCityInformation[i]["id"] == id) {
+        usersCityInformation[i]["titleGer"] = newTitle;
+        usersCityInformation[i]["informationGer"] = newInformation;
+        usersCityInformation[i]["titleEng"] = newTitle;
+        usersCityInformation[i]["informationEng"] = newInformation;
         break;
       }
     }
@@ -890,12 +891,20 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     };
   }
 
+
+@override
+  void initState() {
+    usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     openInformationMenu(positionDetails, information) async {
       double left = positionDetails.globalPosition.dx;
       double top = positionDetails.globalPosition.dy;
       bool canChange = information["erstelltVon"] == userId;
+      usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
 
       await showMenu(
           context: context,
@@ -1035,8 +1044,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     userInfoBox() {
       List<Widget> userCityInfo = [];
 
-      for (var i = 0; i < widget.usersCityInformation.length; i++) {
-        userCityInfo.add(insiderInfoBox(widget.usersCityInformation[i], i));
+      for (var i = 0; i < usersCityInformation.length; i++) {
+        userCityInfo.add(insiderInfoBox(usersCityInformation[i], i));
       }
 
       if (userCityInfo.isEmpty) {
