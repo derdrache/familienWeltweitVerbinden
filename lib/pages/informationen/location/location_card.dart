@@ -17,8 +17,6 @@ class LocationCard extends StatefulWidget {
 
 class _LocationCardState extends State<LocationCard> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
-  var assetCity = "assets/bilder/city.jpg";
-  var assetLand = "assets/bilder/land.jpg";
   bool hasInterest;
   bool isCity;
 
@@ -27,6 +25,16 @@ class _LocationCardState extends State<LocationCard> {
     isCity = widget.location["isCity"] == 1;
 
     super.initState();
+  }
+
+  getLocationImageWidget(){
+    if(!isCity) return AssetImage("assets/bilder/land.jpg");
+
+    if(widget.location["bild"].isEmpty){
+        return AssetImage("assets/bilder/city.jpg");
+    }else{
+        return NetworkImage(widget.location["bild"]);
+    }
   }
 
   changeIntereset(){
@@ -86,7 +94,7 @@ class _LocationCardState extends State<LocationCard> {
                       image: DecorationImage(
                           fit: BoxFit.fitHeight,
                           colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.7), BlendMode.dstATop),
-                          image: AssetImage( isCity ? assetCity : assetLand))),
+                          image: getLocationImageWidget())),
                   child: Center(
                       child: Container(
                         padding: const EdgeInsets.all(5),
