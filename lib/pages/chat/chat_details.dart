@@ -1196,6 +1196,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorData = getProfilFromHive(profilId: message["von"]);
       var creatorName = creatorData["name"];
       var creatorColor = creatorData["bildStandardFarbe"];
+      var isMyMessage = message["von"] == userId;
 
       if (hasForward) {
         var messageAutorId = message["forward"].split(":")[1];
@@ -1278,7 +1279,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     ),
                   Container(
                     alignment: messageBoxInformation["textAlign"],
-                    child: getDisplayedCard(cardType, cardData),
+                    child: Stack(children: [
+                      getDisplayedCard(cardType, cardData),
+                      if (isMyMessage || adminList.contains(userId)) Positioned(top:0, right: 0, child: CloseButton(
+                        color: Colors.red,
+                        onPressed: (){
+                          checkAndRemovePinnedMessage(message);
+                          deleteMessage(message["id"]);
+                        },
+                      ))
+                    ],)
                   ),
                   messageSplit.length == 1
                       ? Row(
