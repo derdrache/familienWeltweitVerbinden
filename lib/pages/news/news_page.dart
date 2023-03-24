@@ -28,7 +28,7 @@ class _NewsPageState extends State<NewsPage> {
   List events = Hive.box('secureBox').get("events") ?? [];
   List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
-  List userNewsContentHive = List.of(Hive.box('secureBox').get("userNewsContent")) ?? [];
+  List userNewsContentHive = Hive.box('secureBox').get("userNewsContent") ?? [];
   var ownSettingProfil = Hive.box('secureBox').get("ownNewsSetting");
   List newsFeed = [];
   List newsFeedDateList = [];
