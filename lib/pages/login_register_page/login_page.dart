@@ -385,16 +385,19 @@ class _LoginPageState extends State<LoginPage> {
                     onSubmit: () => userLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
                 const SizedBox(height: 5),
-                Container(
-                  margin: EdgeInsets.only(left: 20, right: 20),
-                  child: Row(children: [
-                    hilfeButton(),
-                    Expanded(child: SizedBox.shrink()),
-                    forgetPassButton(),
-                  ],),
+                Center(
+                  child: Container(
+                    width: 600,
+                    margin: EdgeInsets.only(left: 20, right: 20),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.center ,children: [
+                      hilfeButton(),
+                      Expanded(child: SizedBox(width: 50)),
+                      forgetPassButton(),
+                    ],),
+                  ),
                 ),
                 const SizedBox(height: 5),
-                if(versionNumber != null) NutzerrichtlinenAnzeigen(page: "login"),
+                if(versionNumber != null) Center(child: NutzerrichtlinenAnzeigen(page: "login")),
                 isLoading
                     ? loadingBox()
                     : kIsWeb && !isPhone()
