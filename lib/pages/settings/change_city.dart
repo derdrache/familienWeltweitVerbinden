@@ -174,12 +174,14 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).ortAendern,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 15),
-          autoComplete,
-        ],
+      body: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 15),
+            autoComplete,
+          ],
+        ),
       ),
     );
   }
