@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
 
+import 'package:familien_suche/global/encryption.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +111,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
       var data = {
         "id": userID,
-        "email": email,
+        "email": encrypt(email),
         "name": userName,
         "ort": ortMapData["city"],
         "interessen": interessenAuswahlBox.getSelected(),

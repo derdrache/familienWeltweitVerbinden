@@ -5,10 +5,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io' as io;
 import 'dart:ui' as ui;
-import 'package:encrypt/encrypt.dart';
 import 'package:flutter/foundation.dart' as foundation;
 
 import '../auth/secrets.dart';
+import '../global/encryption.dart';
 import '../global/global_functions.dart' as global_functions;
 import 'locationsService.dart';
 import 'notification.dart';
@@ -57,7 +57,7 @@ class ProfilDatabase {
         body: json.encode(
             {"whatData": whatData, "queryEnd": queryEnd, "table": "profils"}));
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if (responseBody.isEmpty) return false;
@@ -194,7 +194,7 @@ class ChatDatabase {
         body: json.encode(
             {"whatData": whatData, "queryEnd": queryEnd, "table": "chats"}));
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if (responseBody.isEmpty) return false;
@@ -233,7 +233,7 @@ class ChatDatabase {
           "table": "messages"
         }));
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
 
@@ -379,7 +379,7 @@ class ChatGroupsDatabase {
           "table": "chat_groups"
         }));
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if (responseBody.isEmpty) return false;
@@ -429,7 +429,7 @@ class ChatGroupsDatabase {
           "table": "group_messages"
         }));
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
 
@@ -613,7 +613,7 @@ class MeetupDatabase {
         body: json.encode(
             {"whatData": whatData, "queryEnd": queryEnd, "table": "events"}));
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
     responseBody = jsonDecode(responseBody);
 
     if (responseBody.isEmpty) return false;
@@ -700,7 +700,7 @@ class CommunityDatabase {
         }));
 
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
 
@@ -772,7 +772,7 @@ class StadtinfoDatabase {
           "table": "stadtinfo"
         }));
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if (responseBody.isEmpty) return false;
@@ -851,7 +851,7 @@ class StadtinfoUserDatabase {
           "table": "stadtinfo_user"
         }));
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if (responseBody.isEmpty) return false;
@@ -908,7 +908,7 @@ class AllgemeinDatabase {
         }));
 
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
     if (responseBody.isEmpty) return false;
@@ -980,7 +980,7 @@ class FamiliesDatabase {
             {"whatData": whatData, "queryEnd": queryEnd, "table": "families"}));
 
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
 
@@ -1079,7 +1079,7 @@ class NewsPageDatabase {
         }));
 
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
 
@@ -1144,7 +1144,7 @@ class NewsSettingsDatabase {
         }));
 
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
 
@@ -1209,7 +1209,7 @@ class NotizDatabase{
         }));
 
     dynamic responseBody = res.body;
-    responseBody = _decrypt(responseBody);
+    responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
 
@@ -1274,15 +1274,6 @@ _deleteInTable(table, whereParameter, whereValue) async {
       }));
 }
 
-String _decrypt(String encrypted) {
-  final key = Key.fromUtf8(phpCryptoKey);
-  final iv = IV.fromUtf8(phpCryptoIV);
-
-  final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
-  Encrypted enBase64 = Encrypted.from64(encrypted);
-  final decrypted = encrypter.decrypt(enBase64, iv: iv);
-  return decrypted;
-}
 
 sortProfils(profils) {
   var allCountries = LocationService().getAllCountryNames();
@@ -1536,23 +1527,25 @@ refreshHiveMeetups() async {
 }
 
 refreshHiveProfils() async {
+  var userId = FirebaseAuth.instance.currentUser?.uid;
+  var ownProfil = {};
+
   List<dynamic> dbProfils = await ProfilDatabase()
       .getData("*", "WHERE name != 'googleView' ORDER BY ort ASC");
   if (dbProfils == false) dbProfils = [];
   dbProfils = sortProfils(dbProfils);
 
-  Hive.box('secureBox').put("profils", dbProfils);
-
-  var userId = FirebaseAuth.instance.currentUser?.uid;
-  var ownProfil = {};
-
-  if (userId == null || userId.isEmpty) return;
 
   for (var profil in dbProfils) {
+    profil = decryptProfil(profil);
     if (profil["id"] == userId) ownProfil = profil;
   }
 
-  Hive.box('secureBox').put("ownProfil", ownProfil);
+  Hive.box('secureBox').put("profils", dbProfils);
+
+  if (userId != null && userId.isNotEmpty)  Hive.box('secureBox').put("ownProfil", ownProfil);
+
+
 }
 
 refreshHiveCommunities() async {
@@ -1599,4 +1592,14 @@ refreshHiveFamilyProfils() async {
       await FamiliesDatabase().getData("*", "", returnList: true);
   if (familyProfils == false) familyProfils = [];
   Hive.box("secureBox").put("familyProfils", familyProfils);
+}
+
+decryptProfil(profil){
+  try{
+    profil["email"] = decrypt(profil["email"]);
+  }catch(_){
+
+  }
+
+  return profil;
 }

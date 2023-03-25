@@ -10,6 +10,7 @@ import 'package:upgrader/upgrader.dart';
 import "package:universal_html/js.dart" as js;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../global/encryption.dart';
 import '../global/global_functions.dart';
 import '../global/variablen.dart';
 import '../services/database.dart';
@@ -138,11 +139,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   _updateOwnEmail() async {
     final String userAuthEmail = FirebaseAuth.instance.currentUser?.email;
+    String enryptEmail = encrypt(userAuthEmail);
     var userDBEmail = ownProfil["email"];
 
     if (userAuthEmail != userDBEmail) {
       ProfilDatabase()
-          .updateProfil("email = '$userAuthEmail'", "WHERE id = '$userId'");
+          .updateProfil("email = '$enryptEmail'", "WHERE id = '$userId'");
     }
   }
 

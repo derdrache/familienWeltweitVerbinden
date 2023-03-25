@@ -1,3 +1,4 @@
+import 'package:familien_suche/global/encryption.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
@@ -66,15 +67,15 @@ class ChangeEmailPage extends StatelessWidget {
     }
 
     save() async {
-
       bool isValid = await checkValidationAndError();
+      var encryptedEmail = encrypt(emailKontroller.text);
       if(!isValid) return;
 
       FirebaseAuth.instance.currentUser
           .verifyBeforeUpdateEmail(emailKontroller.text);
       updateHiveOwnProfil("email", emailKontroller.text);
       ProfilDatabase().updateProfil(
-          "email = '${emailKontroller.text}'", "WHERE id = '$userId'");
+          "email = '$encryptedEmail'", "WHERE id = '$userId'");
 
       customSnackbar(
           context, AppLocalizations.of(context).neueEmailVerifizieren,
