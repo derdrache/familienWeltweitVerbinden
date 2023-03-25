@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
 
 import '../global/custom_widgets.dart';
+import '../global/global_functions.dart';
 import '../services/database.dart';
 import 'dialogWindow.dart';
 
@@ -44,6 +45,8 @@ class _ProfilImageState extends State<ProfilImage> {
     if (widget.profil["bild"].isNotEmpty) {
       deleteOldImage(widget.profil["bild"][0]);
     }
+
+    newLink = sanitizeString(newLink);
 
     setState(() {
       widget.profil["bild"] = newLink;

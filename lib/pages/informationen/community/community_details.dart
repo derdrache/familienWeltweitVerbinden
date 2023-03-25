@@ -17,6 +17,7 @@ import 'package:image/image.dart' as image_pack;
 import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
+import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
@@ -202,8 +203,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     });
 
     var imageName = eventName + pickedImage.name;
-    imageName = imageName.replaceAll(" ", "_");
-    imageName = imageName.replaceAll("/", "_");
+    imageName = sanitizeString(imageName);
 
     if (pickedImage == null) {
       customSnackbar(context, AppLocalizations.of(context).dateiBeschaedigt);

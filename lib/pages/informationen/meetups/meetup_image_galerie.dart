@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as image_pack;
 
 import '../../../global/custom_widgets.dart';
+import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
 
 class MeetupImageGalerie extends StatefulWidget {
@@ -97,8 +98,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     });
 
     var imageName = meetupName + pickedImage.name;
-    imageName = imageName.replaceAll(" ", "_");
-    imageName = imageName.replaceAll("/", "_");
+    imageName = sanitizeString(imageName);
 
     if (pickedImage == null) {
       customSnackbar(context, AppLocalizations.of(context).dateiBeschaedigt);

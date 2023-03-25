@@ -238,3 +238,8 @@ bool isPhoneNumber(String input){
 
   return matcher.hasMatch(input);
 }
+
+String sanitizeString(String filename) {
+  RegExp regex = RegExp(r'[\\/:*?"<>|]');
+  return filename.replaceAll(regex, '_');
+}
