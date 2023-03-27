@@ -31,9 +31,11 @@ class _ImageCropState extends State<ImageCrop> {
 
     await uploadImage(widget.imageData["path"], imageName, widget.imageData["byte"]);
 
-    if (onwProfil["bild"].isNotEmpty) DbDeleteImage(onwProfil["bild"][0]);
-    updateHiveOwnProfil("bild", imageList);
 
+    if (onwProfil["bild"].isNotEmpty) DbDeleteImage(onwProfil["bild"][0]);
+
+
+    updateHiveOwnProfil("bild", imageList);
     await ProfilDatabase().updateProfil("bild = '${json.encode(imageList)}'",
         "WHERE id = '${onwProfil["id"]}'");
   }

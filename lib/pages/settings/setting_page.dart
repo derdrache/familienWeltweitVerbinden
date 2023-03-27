@@ -165,6 +165,8 @@ class _NameSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    userProfil = Hive.box("secureBox").get("ownProfil");
+
     return Container(
         width: double.maxFinite,
         padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
