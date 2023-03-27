@@ -239,7 +239,13 @@ bool isPhoneNumber(String input){
   return matcher.hasMatch(input);
 }
 
-String sanitizeString(String filename) {
+String sanitizeString(String url) {
+  List urlSplit = url.split("/");
+  String title = urlSplit.last;
+
   RegExp regex = RegExp(r'[\\/:*?"<>|]');
-  return filename.replaceAll(regex, '_');
+  title = title.replaceAll(regex, '_');
+  urlSplit[urlSplit.length -1] = title;
+
+  return urlSplit.join("/");
 }

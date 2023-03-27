@@ -9,6 +9,7 @@ import 'package:image/image.dart' as image_pack;
 
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
+import '../pages/imageCrop.dart';
 import '../services/database.dart';
 import 'dialogWindow.dart';
 
@@ -46,7 +47,7 @@ class _ProfilImageState extends State<ProfilImage> {
       deleteOldImage(widget.profil["bild"][0]);
     }
 
-    newLink = sanitizeString(newLink);
+    newLink[0] = sanitizeString(newLink[0]);
 
     setState(() {
       widget.profil["bild"] = newLink;
@@ -60,12 +61,10 @@ class _ProfilImageState extends State<ProfilImage> {
     DbDeleteImage(oldLink);
   }
 
-  pickAndUploadImage() async {
-    var userName = FirebaseAuth.instance.currentUser.displayName;
+  pickImage() async{
+    var userName = widget.profil["name"];
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
-
-    var imageName = userName + pickedImage.name;
 
     if (pickedImage == null) {
       customSnackbar(context, "Datei ist beschädigt");
@@ -74,9 +73,12 @@ class _ProfilImageState extends State<ProfilImage> {
 
     var imageByte = await changeImageSize(pickedImage);
 
-    await uploadImage(pickedImage.path, imageName, imageByte);
+    return {
+      "name" : userName + pickedImage.name,
+      "path": pickedImage.path,
+      "byte": imageByte
+    };
 
-    return imageName;
   }
 
   changeImageSize(pickedImage) async {
@@ -165,12 +167,24 @@ class _ProfilImageState extends State<ProfilImage> {
           PopupMenuItem(
             child: Text(AppLocalizations.of(context).hochladen),
             onTap: () async {
-              var imageName = await pickAndUploadImage();
+              var imageData = await pickImage();
 
+              if(imageData == null) return;
+
+              changePage(context, ImageCrop(
+                imageData: imageData,
+              ));
+
+              return;
+
+              //await uploadImage(pickedImage.path, imageName, imageByte);
+/*
               if (imageName == false) return;
               profilImageLinkKontroller.text =
                   "https://families-worldwide.com/bilder/" + imageName;
               checkAndSaveImage();
+
+ */
             },
           ),
           if (widget.profil["bild"].isNotEmpty)
