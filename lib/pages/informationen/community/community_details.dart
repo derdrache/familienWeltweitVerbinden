@@ -23,6 +23,7 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
+import '../../imageCrop.dart';
 import '../../start_page.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../location/location_Information.dart';
@@ -191,59 +192,41 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     );
   }
 
-  _pickAndUploadImage() async {
+  pickImage() async{
     var eventName = widget.community["name"] + "_";
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
     if (pickedImage == null) return;
 
-    setState(() {
-      imageLoading = true;
-    });
+    var imageByte = await changeImageSize(pickedImage);
 
-    var imageName = eventName + pickedImage.name;
-    imageName = sanitizeString(imageName);
+    return {
+      "name" : eventName + pickedImage.name,
+      "path": pickedImage.path,
+      "byte": imageByte
+    };
 
-    if (pickedImage == null) {
-      customSnackbar(context, AppLocalizations.of(context).dateiBeschaedigt);
-      return false;
-    }
-
-    var imageByte = await _changeImageSize(pickedImage);
-
-    await uploadImage(pickedImage.path, imageName, imageByte);
-
-    return imageName;
   }
 
-  _changeImageSize(pickedImage) async {
-    var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
-    var originalWidth = imageByte.width;
-    var originalHeight = imageByte.height;
-    var minPixel = 1000;
-    var newWidth = 0;
-    var newHeight = 0;
+  _pickImage() async {
+    var imageData = await pickImage();
 
-    if (originalWidth > originalHeight) {
-      var factor = originalWidth / originalHeight;
-      newHeight = minPixel;
-      newWidth = (minPixel * factor).round();
-    } else {
-      var factor = originalHeight / originalWidth;
-      newWidth = minPixel;
-      newHeight = (minPixel * factor).round();
-    }
+    if (imageData == null) return;
 
-    var imageResizeThumbnail =
-        image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
-    var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 20);
-
-    return imageJpgByte;
+    Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ImageCrop(
+      imageData: imageData,
+      typ: "community",
+    ))).then((_)=>setState((){
+      widget.community = getCommunityFromHive(widget.community["id"]);
+    }));
   }
 
   _selectAndUploadImage() async {
-    var imageName = await _pickAndUploadImage();
+    var imageName = await _pickImage();
+
+
+
     var oldImage = widget.community["bild"];
 
     if (imageName == false) return;

@@ -1,11 +1,10 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as image_pack;
 
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
@@ -81,31 +80,6 @@ class _ProfilImageState extends State<ProfilImage> {
 
   }
 
-  changeImageSize(pickedImage) async {
-    var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
-    var originalWidth = imageByte.width;
-    var originalHeight = imageByte.height;
-    var minPixel = 400;
-    var newWidth = 0;
-    var newHeight = 0;
-
-    if (originalWidth > originalHeight) {
-      var factor = originalWidth / originalHeight;
-      newHeight = minPixel;
-      newWidth = (minPixel * factor).round();
-    } else {
-      var factor = originalHeight / originalWidth;
-      newWidth = minPixel;
-      newHeight = (minPixel * factor).round();
-    }
-
-    var imageResizeThumbnail =
-        image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
-    var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 25);
-
-    return imageJpgByte;
-  }
-
   deleteProfilImage() async {
     deleteOldImage(widget.profil["bild"][0]);
 
@@ -171,20 +145,13 @@ class _ProfilImageState extends State<ProfilImage> {
 
               if(imageData == null) return;
 
-              changePage(context, ImageCrop(
+              Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ImageCrop(
                 imageData: imageData,
-              ));
+                typ: "profil",
+              ))).then((_)=>setState((){
+                widget.profil = Hive.box("secureBox").get("ownProfil");
+              }));
 
-              return;
-
-              //await uploadImage(pickedImage.path, imageName, imageByte);
-/*
-              if (imageName == false) return;
-              profilImageLinkKontroller.text =
-                  "https://families-worldwide.com/bilder/" + imageName;
-              checkAndSaveImage();
-
- */
             },
           ),
           if (widget.profil["bild"].isNotEmpty)

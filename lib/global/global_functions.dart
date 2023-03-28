@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:math' show cos, sqrt, asin;
+import 'package:image/image.dart' as image_pack;
 
 import 'package:familien_suche/global/variablen.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -248,4 +249,29 @@ String sanitizeString(String url) {
   urlSplit[urlSplit.length -1] = title;
 
   return urlSplit.join("/");
+}
+
+changeImageSize(pickedImage) async {
+  var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
+  var originalWidth = imageByte.width;
+  var originalHeight = imageByte.height;
+  var minPixel = 400;
+  var newWidth = 0;
+  var newHeight = 0;
+
+  if (originalWidth > originalHeight) {
+    var factor = originalWidth / originalHeight;
+    newHeight = minPixel;
+    newWidth = (minPixel * factor).round();
+  } else {
+    var factor = originalHeight / originalWidth;
+    newWidth = minPixel;
+    newHeight = (minPixel * factor).round();
+  }
+
+  var imageResizeThumbnail =
+  image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
+  var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 25);
+
+  return imageJpgByte;
 }

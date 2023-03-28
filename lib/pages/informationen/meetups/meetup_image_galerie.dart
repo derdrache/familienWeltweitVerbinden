@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as image_pack;
 
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
+import '../../imageCrop.dart';
 
 class MeetupImageGalerie extends StatefulWidget {
   var isCreator;
@@ -86,66 +86,37 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
         "bild = '$selectedImage'", "WHERE id = '${widget.meetupData["id"]}'");
   }
 
-  pickAndUploadImage() async {
+  pickImage() async{
     var meetupName = widget.meetupData["name"] + "_";
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
-    if(pickedImage == null) return;
-
-    setState(() {
-      imageLoading = true;
-    });
-
-    var imageName = meetupName + pickedImage.name;
-    imageName = sanitizeString(imageName);
-
     if (pickedImage == null) {
-      customSnackbar(context, AppLocalizations.of(context).dateiBeschaedigt);
+      customSnackbar(context, "Datei ist beschädigt");
       return false;
     }
 
     var imageByte = await changeImageSize(pickedImage);
 
-    await uploadImage(pickedImage.path, imageName, imageByte);
+    return {
+      "name" : meetupName + pickedImage.name,
+      "path": pickedImage.path,
+      "byte": imageByte
+    };
 
-    return imageName;
-  }
-
-  changeImageSize(pickedImage) async {
-    var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
-    var originalWidth = imageByte.width;
-    var originalHeight = imageByte.height;
-    var minPixel = 1000;
-    var newWidth = 0;
-    var newHeight = 0;
-
-    if (originalWidth > originalHeight) {
-      var factor = originalWidth / originalHeight;
-      newHeight = minPixel;
-      newWidth = (minPixel * factor).round();
-    } else {
-      var factor = originalHeight / originalWidth;
-      newWidth = minPixel;
-      newHeight = (minPixel * factor).round();
-    }
-
-    var imageResizeThumbnail =
-        image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
-    var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 20);
-
-    return imageJpgByte;
   }
 
   selectAndUploadImage() async {
-    var imageName = await pickAndUploadImage();
+    var imageData = await pickImage();
 
-    if (imageName == false) return;
+    if (imageData == null) return;
 
-    ownPictureKontroller.text =
-        "https://families-worldwide.com/bilder/" + imageName;
-
-    saveChanges();
+    Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ImageCrop(
+      imageData: imageData,
+      typ: "meetup",
+    ))).then((_)=>setState((){
+      widget.meetupData = getMeetupFromHive(widget.meetupData["id"]);
+    }));
   }
 
   @override
