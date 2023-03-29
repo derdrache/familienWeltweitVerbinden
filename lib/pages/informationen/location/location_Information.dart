@@ -622,7 +622,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     }
   }
 
-  sortThumb(data) {
+  sortInformation(data) {
     data.sort((a, b) => (b["thumbUp"].length - b["thumbDown"].length)
         .compareTo(a["thumbUp"].length - a["thumbDown"].length) as int);
     return data;
@@ -892,6 +892,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   }
 
 
+
 @override
   void initState() {
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
@@ -900,6 +901,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   Widget build(BuildContext context) {
+    usersCityInformation = sortInformation(usersCityInformation);
+
     openInformationMenu(positionDetails, information) async {
       double left = positionDetails.globalPosition.dx;
       double top = positionDetails.globalPosition.dy;
