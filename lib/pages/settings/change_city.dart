@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 import '../../global/custom_widgets.dart';
 import '../../services/locationsService.dart';
 import '../../services/notification.dart' as notifications;
@@ -35,6 +36,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     autoComplete.onConfirm = (){
       save();
     };
+
     super.initState();
   }
 
@@ -85,6 +87,23 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     ownProfil["land"] =locationDict["countryname"];
 
     ProfilDatabase().updateProfilLocation(ownProfil["id"], locationDict);
+  }
+
+  deleteChangeCityNewsSameDay() async{
+    var now = DateTime.now();
+    var nextDay = DateTime(now.year, now.month, now.day + 1);
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String today = formatter.format(now);
+    String tomorrow = formatter.format(nextDay);
+    String dateQuery = "erstelltAm >='$today 00:00:00' AND erstelltAm <'$tomorrow 00:00:00'";
+
+    var getTodaysEntries = await NewsPageDatabase().getData("*", "WHERE erstelltVon = '${ownProfil["id"]}' AND typ = 'ortswechsel' AND $dateQuery", returnList: true);
+
+    if(getTodaysEntries == false) return;
+
+    for(var news in getTodaysEntries){
+      NewsPageDatabase().delete(news["id"]);
+    }
   }
 
   saveNewsPage(locationDict) async {
@@ -152,6 +171,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
     saveLocation(locationDict);
     joindAndRemoveChatGroups(locationDict, oldLocation);
+    deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);
     notifications.prepareFamilieAroundNotification();
     saveCityInformation(locationDict);

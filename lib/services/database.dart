@@ -1079,6 +1079,7 @@ class NewsPageDatabase {
         }));
 
     dynamic responseBody = res.body;
+
     responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
@@ -1535,7 +1536,6 @@ refreshHiveProfils() async {
   if (dbProfils == false) dbProfils = [];
   dbProfils = sortProfils(dbProfils);
 
-
   for (var profil in dbProfils) {
     profil = decryptProfil(profil);
     if (profil["id"] == userId) ownProfil = profil;
@@ -1543,7 +1543,9 @@ refreshHiveProfils() async {
 
   Hive.box('secureBox').put("profils", dbProfils);
 
-  if (userId != null && userId.isNotEmpty)  Hive.box('secureBox').put("ownProfil", ownProfil);
+  if (userId != null && userId.isNotEmpty){
+    Hive.box('secureBox').put("ownProfil", ownProfil);
+  }
 
 
 }
