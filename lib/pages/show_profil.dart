@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
 import '../global/custom_widgets.dart';
+import '../global/encryption.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/global_functions.dart';
 import '../global/variablen.dart' as global_variablen;
@@ -139,6 +140,10 @@ class _AppBarState extends State<_AppBar> {
       NotizDatabase().newNotize();
       ownProfil["userNotizen"] = {};
     }else{
+      if(userNotizen.isNotEmpty){
+        userNotizen = decrypt(userNotizen);
+        userNotizen = json.decode(userNotizen);
+      }
       ownProfil["userNotizen"] = userNotizen;
     }
 
@@ -146,8 +151,11 @@ class _AppBarState extends State<_AppBar> {
 
   saveNotiz(notiz){
     ownProfil["userNotizen"][widget.profil["id"]] = notiz;
+
+    var encryptNotes = encrypt(json.encode(ownProfil["userNotizen"]));
+
     NotizDatabase().update(
-        "userNotizen = '${json.encode(ownProfil["userNotizen"])}'",
+        "userNotizen = '$encryptNotes'",
         "WHERE id = '$userId'"
     );
   }
@@ -177,7 +185,6 @@ class _AppBarState extends State<_AppBar> {
 
   openNoteWindow(){
     TextEditingController userNotizController = TextEditingController();
-    var userNotiz = ownProfil["userNotizen"][widget.profil["id"]];
     bool changeNote = false;
 
     showDialog(
@@ -185,6 +192,9 @@ class _AppBarState extends State<_AppBar> {
         builder: (BuildContext buildContext) {
           return StatefulBuilder(
             builder: (context, noteState) {
+              var notizen = ownProfil["userNotizen"];
+              var userNotiz = notizen[widget.profil["id"]];
+
               return CustomAlertDialog(
                   title: AppLocalizations.of(context).notizeUeber + _userName,
                   children: [
@@ -200,7 +210,9 @@ class _AppBarState extends State<_AppBar> {
                     if(userNotiz== null || changeNote) FloatingActionButton.extended(
                       label: Text(AppLocalizations.of(context).speichern),
                         onPressed: (){
+                        print(userNotizController.text);
                           saveNotiz(userNotizController.text);
+
                           noteState(() {
                             changeNote = false;
                           });

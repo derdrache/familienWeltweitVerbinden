@@ -1,7 +1,7 @@
 import 'package:encrypt/encrypt.dart';
 import '../auth/secrets.dart';
 
-String decrypt(String encrypted) {
+decrypt(String encrypted) {
   final key = Key.fromUtf8(phpCryptoKey);
   final iv = IV.fromUtf8(phpCryptoIV);
 

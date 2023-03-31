@@ -1197,6 +1197,7 @@ class NotizDatabase{
           "whatData": whatData,
           "queryEnd": queryEnd
         }));
+
   }
 
   getData(whatData, queryEnd, {returnList = false}) async{
