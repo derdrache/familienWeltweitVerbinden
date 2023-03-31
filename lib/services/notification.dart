@@ -238,6 +238,14 @@ createMeetupText(typ, meetupName, sprache){
       meetupText["title"] = "Meetup release";
       meetupText["inhalt"] = "You now have access to the following meetup: " + meetupName;
     }
+  } else if(typ == "takePart"){
+    if(sprache == "ger"){
+      meetupText["title"] = "$meetupName - Neuer Teilnehmer";
+      meetupText["inhalt"] ="";
+    }else{
+      meetupText["title"] = "$meetupName - New participant";
+      meetupText["inhalt"] = "";
+    }
   }
 
   return meetupText;

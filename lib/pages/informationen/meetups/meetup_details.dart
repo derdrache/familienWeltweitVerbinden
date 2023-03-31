@@ -246,6 +246,15 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     DbDeleteImage(widget.meetupData["bild"]);
   }
 
+  sendTakePartNotification(meetupData){
+    prepareMeetupNotification(
+      meetupId: meetupData["id"],
+      toId: meetupData["erstelltVon"],
+      meetupName: meetupData["name"],
+      typ: "takePart"
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     isCreator = widget.meetupData["erstelltVon"] == userId;
@@ -542,7 +551,10 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                       .of(context)
                       .colorScheme
                       .primary,
-                  onPressed: () => takePartDecision(true),
+                  onPressed: () {
+                    takePartDecision(true);
+                    sendTakePartNotification(widget.meetupData);
+                  },
                   label: Text(AppLocalizations
                       .of(context)
                       .teilnehmen)),
