@@ -210,7 +210,6 @@ class _AppBarState extends State<_AppBar> {
                     if(userNotiz== null || changeNote) FloatingActionButton.extended(
                       label: Text(AppLocalizations.of(context).speichern),
                         onPressed: (){
-                        print(userNotizController.text);
                           saveNotiz(userNotizController.text);
 
                           noteState(() {
