@@ -78,6 +78,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   saveFunction() async {
+
     changeLoading();
 
     if (!_formKey.currentState.validate()) {
@@ -237,7 +238,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           isLoading
               ? const CircularProgressIndicator()
               : IconButton(
-                  onPressed: saveFunction,
+                  onPressed: () => saveFunction(),
                   icon: const Icon(
                     Icons.done,
                     size: 30,
@@ -282,9 +283,9 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                   moreLines: 4),
               Container(
                 margin:
-                    EdgeInsets.only(top: 5, bottom: 5, right: 15, left: 15),
+                    const EdgeInsets.only(top: 10, bottom: 5, right: 15, left: 15),
                 child: FloatingActionButton.extended(
-                    onPressed: () => null, label: Text(AppLocalizations.of(context).profilErstellen)),
+                    onPressed: () => saveFunction(), label: Text(AppLocalizations.of(context).profilErstellen)),
               )
             ],
           ),
