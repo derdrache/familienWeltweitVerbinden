@@ -444,5 +444,8 @@
     "karte": "Karte",
     "notizeUeber": "Notize über ",
     "notizEingeben": "Notiz eingeben",
-    "bildBearbeiten" : "Bild bearbeiten"
+    "bildBearbeiten" : "Bild bearbeiten",
+    "geheimerChat": "Geheimer Chat",
+    "geheimerChatMeldung": "Private Chatgruppe - Nur für Mitglieder",
+    "settings": "Settings"
 }

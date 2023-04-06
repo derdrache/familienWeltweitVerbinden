@@ -13,7 +13,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as image_pack;
 import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
@@ -663,6 +662,31 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
+  _openGroupChat(){
+    bool hasSecretChat = widget.community["secretChat"]?.isOdd ?? false;
+    bool isMember = widget.community["members"].contains(userId)
+        || widget.community["erstelltVon"] == userId;
+    bool hasAccess = !hasSecretChat || isMember;
+
+    if(!hasAccess){
+      customSnackbar(context, AppLocalizations.of(context).geheimerChatMeldung);
+      return;
+    }
+
+    global_func.changePage(context, ChatDetailsPage(
+      connectedId: "</community="+widget.community["id"],
+      isChatgroup: true,
+    ));
+  }
+
+  _changeSecretChatOption(newValue){
+    int secretChat = newValue ? 1 : 0;
+
+    updateHiveCommunity(widget.community["id"], "secretChat", secretChat);
+    CommunityDatabase()
+        .update("secretChat = '$secretChat'", "WHERE id = '${widget.community["id"]}'");
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -771,6 +795,55 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
+    _settingDialog(){
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              const Icon(Icons.settings),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).settings),
+            ],
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+
+            showDialog(
+                context: context,
+                builder: (BuildContext buildContext) {
+                  return StatefulBuilder(
+                      builder: (buildContext, dialogSetState) {
+                        return CustomAlertDialog(
+                            title: AppLocalizations.of(context).settings,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                      child: Text(
+                                          AppLocalizations
+                                              .of(context)
+                                              .geheimerChat)),
+                                  Switch(
+                                    value: widget.community["secretChat"]?.isOdd ?? false,
+                                    inactiveThumbColor: Colors.grey[700],
+                                    activeColor:
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .primary,
+                                    onChanged: (value) {
+                                      _changeSecretChatOption(value);
+                                      dialogSetState(() {});
+                                      setState(() {});
+
+                                    },
+                                  )
+                                ],
+                              )
+                            ]);
+                      });
+                });
+          });
+    }
+
     _deleteDialog() {
       return SimpleDialogOption(
         child: Row(
@@ -801,8 +874,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     insetPadding:
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
+
                       if (!isCreator) _reportDialog(),
                       if (isCreator) _addMemberDialog(),
+                      if (isCreator) _settingDialog(),
                       if (isCreator) _deleteDialog(),
                     ],
                   ),
@@ -974,10 +1049,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),
-                onPressed: () => global_func.changePage(context, ChatDetailsPage(
-                  connectedId: "</community="+widget.community["id"],
-                  isChatgroup: true,
-                )),
+                onPressed: () => _openGroupChat(),
               ),
               IconButton(
                 icon: const Icon(Icons.link),

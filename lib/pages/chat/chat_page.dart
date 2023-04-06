@@ -419,7 +419,7 @@ class _ChatPageState extends State<ChatPage> {
     myChats = Hive.box("secureBox").get("myChats") ?? [];
     myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
 
-    getChatGroupName(chatConnected, {withPrivateEvents}) {
+    getChatGroupName(chatConnected) {
       if (chatConnected.isEmpty) return AppLocalizations.of(context).weltChat;
 
       var connectedId = chatConnected.split("=")[1];
@@ -429,7 +429,16 @@ class _ChatPageState extends State<ChatPage> {
         return isPrivate ? "" : eventData["name"];
       }
       if (chatConnected.contains("community")) {
-        return getCommunityFromHive(connectedId)["name"];
+        var communityData = getCommunityFromHive(connectedId);
+
+        if(communityData.isEmpty) return;
+
+        bool hasSecretChat = communityData["secretChat"]?.isOdd ?? false;
+        bool isMember = communityData["members"].contains(userId)
+            || communityData["erstelltVon"] == userId;
+        bool hasAccess = !hasSecretChat || isMember;
+
+        return !hasAccess ? "" :getCommunityFromHive(connectedId)["name"];
       }
       if (chatConnected.contains("stadt")) {
         return getCityFromHive(cityId: connectedId, getName: true);
@@ -448,9 +457,10 @@ class _ChatPageState extends State<ChatPage> {
       if (value.length > 1) firstLetterBig += value.substring(1);
 
       List allMyChats = myChats + myGroupChats;
+
       for (var chat in allMyChats) {
         bool isChatGroup = chat["connected"] != null;
-        var chatName = "";
+        String chatName = "";
 
         if (isChatGroup) {
           chatName = getChatGroupName(chat["connected"]);

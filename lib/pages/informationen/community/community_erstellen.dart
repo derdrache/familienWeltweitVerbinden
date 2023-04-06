@@ -32,6 +32,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var ownCommunity = true;
   final translator = GoogleTranslator();
   bool chooseCurrentLocation = false;
+  bool secretChat = false;
 
 
   saveCommunity() async {
@@ -70,7 +71,8 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       "erstelltAm": DateTime.now().toString(),
       "members": json.encode(ownCommunity ? [userId] : []),
       "erstelltVon": userId,
-      "ownCommunity": ownCommunity
+      "ownCommunity": ownCommunity,
+      "secretChat": secretChat
     };
 
     if (!checkValidationAndSendError(communityData)) return false;
@@ -116,7 +118,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       return Container(
         margin: const EdgeInsets.only(left: 15, right: 15),
         child: Row(children: [
-          Text(AppLocalizations.of(context).aktuellenOrtVerwenden),
+          Text(AppLocalizations.of(context).aktuellenOrtVerwenden, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const Expanded(child: SizedBox.shrink()),
           Switch(value: chooseCurrentLocation, onChanged: (bool){
             if(bool){
@@ -140,20 +142,13 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     }
 
     ownCommunityBox() {
-      double screenWidth = MediaQuery.of(context).size.width;
-
-      return Container(
-        margin: const EdgeInsets.all(10),
+      return Padding(
+        padding: EdgeInsets.only(left:15, right: 15),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.only(left:10),
-                width: screenWidth * 0.75,
+            Expanded(
                 child: Text(AppLocalizations.of(context).frageTeilGemeinschaft,
-                    maxLines: 2, style: const TextStyle(fontSize: 16))),
-            const Expanded(
-              child: SizedBox.shrink(),
-            ),
+                    maxLines: 2, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
             Checkbox(
                 value: ownCommunity,
                 onChanged: (value) {
@@ -161,6 +156,25 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                     ownCommunity = value;
                   });
                 }),
+          ],
+        ),
+      );
+    }
+
+    secretChatQuestionBox(){
+      return Padding(
+        padding: EdgeInsets.only(left: 15, right: 15),
+        child: Row(
+          children: [
+            Expanded(child: Text(AppLocalizations.of(context).geheimerChat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+            Switch(
+                value: secretChat,
+                onChanged: (newValue){
+                  setState(() {
+                    secretChat = newValue;
+                  });
+                }
+            ),
           ],
         ),
       );
@@ -195,6 +209,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
           customTextInput(AppLocalizations.of(context).beschreibungCommunity,
               beschreibungKontroller,
               moreLines: 5, textInputAction: TextInputAction.newline),
+          Center(child: secretChatQuestionBox()),
           ownCommunityBox(),
           Center(child: NutzerrichtlinenAnzeigen(page: "create")),
           const SizedBox(height: 20)

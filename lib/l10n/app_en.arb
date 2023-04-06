@@ -445,6 +445,9 @@
     "karte": "Map",
     "notizeUeber": "Note about ",
     "notizEingeben": "Enter note",
-    "bildBearbeiten" : "Edit image"
+    "bildBearbeiten" : "Edit image",
+    "geheimerChat": "Secret chat",
+    "geheimerChatMeldung": "Private chat group - Members only",
+    "settings": "Settings"
 }
 
