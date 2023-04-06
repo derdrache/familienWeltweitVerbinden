@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'dart:io';
 
 import 'package:familien_suche/global/encryption.dart';
+import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -223,79 +224,69 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
     ortAuswahlBox.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
 
-    pageTitle() {
-      return Align(
-        child: SizedBox(
-          height: 60,
-          width: 600,
-          child: Row(children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back, size: 35),
-              onPressed: () {
-                changePage(context, LoginPage());
-              },
-            ),
-            const Expanded(child: SizedBox.shrink()),
-            Text(
-              AppLocalizations.of(context).profilErstellen,
-              style: const TextStyle(fontSize: 30),
-            ),
-            const Expanded(child: SizedBox.shrink()),
-            isLoading
-                ? const CircularProgressIndicator()
-                : TextButton(
-                    onPressed: saveFunction,
-                    child: const Icon(
-                      Icons.done,
-                      size: 30,
-                    ),
-                  )
-          ]),
-        ),
-      );
-    }
-
     return Scaffold(
-      body: Container(
-        margin: const EdgeInsets.only(top: 30),
-        child: Form(
-          key: _formKey,
-          child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            }),
-            child: ListView(
-              children: [
-                pageTitle(),
-                customTextInput(AppLocalizations.of(context).benutzername,
-                    userNameKontroller,
-                    validator: global_functions.checkValidatorEmpty(context)),
-                Align(
-                    child: Container(
-                        margin: const EdgeInsets.only(left: 5, right: 5),
-                        child: ortAuswahlBox)),
-                reiseArtenAuswahlBox,
-                sprachenAuswahlBox,
-                interessenAuswahlBox,
-                Align(
+      appBar: CustomAppBar(
+        title: AppLocalizations.of(context).profilErstellen,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, size: 35),
+          onPressed: () {
+            changePage(context, LoginPage());
+          },
+        ),
+        buttons: [
+          isLoading
+              ? const CircularProgressIndicator()
+              : IconButton(
+                  onPressed: saveFunction,
+                  icon: const Icon(
+                    Icons.done,
+                    size: 30,
+                  ),
+                )
+        ],
+      ),
+      body: Form(
+        key: _formKey,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          }),
+          child: ListView(
+            children: [
+              customTextInput(AppLocalizations.of(context).benutzername,
+                  userNameKontroller,
+                  validator: global_functions.checkValidatorEmpty(context)),
+              Align(
                   child: Container(
-                      width: 600,
-                      padding: const EdgeInsets.all(10),
-                      child: Text(
-                        AppLocalizations.of(context).anzahlUndAlterKinder,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      )),
-                ),
-                childrenAgePickerBox,
-                customTextInput(
-                    AppLocalizations.of(context).aboutusHintText +
-                        " *optional*",
-                    aboutusKontroller,
-                    moreLines: 4)
-              ],
-            ),
+                      margin: const EdgeInsets.only(left: 5, right: 5),
+                      child: ortAuswahlBox)),
+              reiseArtenAuswahlBox,
+              sprachenAuswahlBox,
+              interessenAuswahlBox,
+              Align(
+                child: Container(
+                    width: 600,
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      AppLocalizations.of(context).anzahlUndAlterKinder,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    )),
+              ),
+              childrenAgePickerBox,
+              customTextInput(
+                  AppLocalizations.of(context).aboutusHintText +
+                      " *optional*",
+                  aboutusKontroller,
+                  moreLines: 4),
+              Container(
+                margin:
+                    EdgeInsets.only(top: 5, bottom: 5, right: 15, left: 15),
+                child: FloatingActionButton.extended(
+                    onPressed: () => null, label: Text(AppLocalizations.of(context).profilErstellen)),
+              )
+            ],
           ),
         ),
       ),
