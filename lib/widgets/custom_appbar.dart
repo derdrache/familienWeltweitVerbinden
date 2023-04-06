@@ -53,7 +53,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: title.runtimeType == String
           ? SizedBox(
               height: 50,
-              child: Row(children: [
+              child: Row( children: [
                 if (profilBildProfil != null)
                   Padding(
                       padding: const EdgeInsets.only(top: 3, right: 5),
@@ -69,9 +69,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: GestureDetector(
                     onTap: onTap,
                     behavior: HitTestBehavior.opaque,
-                    child: Text(title,
-                        style:
-                            const TextStyle(color: Colors.white)),
+                    child: Center(
+                      child: Text(title,
+                          style:
+                              const TextStyle(color: Colors.white, fontSize: 26)),
+                    ),
                   ),
                 )
               ]),
