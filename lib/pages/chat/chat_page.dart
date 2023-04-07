@@ -834,6 +834,7 @@ class _ChatPageState extends State<ChatPage> {
                   setState(() {
                     activeChatSearch = true;
                   });
+                  seachSearchInputNode.requestFocus();
                 },
                 icon: const Icon(
                   Icons.search,
