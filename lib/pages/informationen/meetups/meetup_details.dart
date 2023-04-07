@@ -255,6 +255,24 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     );
   }
 
+  openChat(){
+    bool isPrivat = widget.meetupData["art"] == "private" || widget.meetupData["art"] == "privat";
+    bool hasAccsess = widget.meetupData["erstelltAm"] == userId || widget.meetupData["freigegeben"].contains(userId);
+
+    if(isPrivat && !hasAccsess){
+      customSnackbar(context, AppLocalizations.of(context).geheimerChatMeldung);
+      return;
+    }
+
+    global_func.changePage(
+      context,
+      ChatDetailsPage(
+        connectedId: "</event=" + widget.meetupData["id"],
+        isChatgroup: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     isCreator = widget.meetupData["erstelltVon"] == userId;
@@ -793,14 +811,8 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           ),
           IconButton(
               icon: const Icon(Icons.message),
-              onPressed: () =>
-                  global_func.changePage(
-                    context,
-                    ChatDetailsPage(
-                      connectedId: "</event=" + widget.meetupData["id"],
-                      isChatgroup: true,
-                    ),
-                  )),
+              onPressed: () => openChat()
+          ),
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () => moreMenu(),

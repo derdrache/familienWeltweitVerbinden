@@ -425,8 +425,14 @@ class _ChatPageState extends State<ChatPage> {
       var connectedId = chatConnected.split("=")[1];
       if (chatConnected.contains("event")) {
         var eventData = getMeetupFromHive(connectedId);
+
+        if(eventData.isEmpty) return;
+
         var isPrivate = ["privat", "private"].contains(eventData["art"]);
-        return isPrivate ? "" : eventData["name"];
+        var hasAccsess = eventData["freigegeben"].contains(userId)
+            || eventData["erstelltVon"] == userId;
+
+        return isPrivate && !hasAccsess ? "" : eventData["name"];
       }
       if (chatConnected.contains("community")) {
         var communityData = getCommunityFromHive(connectedId);
