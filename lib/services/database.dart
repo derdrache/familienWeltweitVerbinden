@@ -1556,6 +1556,15 @@ refreshHiveCommunities() async {
       .getData("*", "ORDER BY ort ASC", returnList: true);
   if (dbCommunities == false) dbCommunities = [];
 
+  dbCommunities.sort((m1, m2) {
+    DateTime dt1 = DateTime.parse(m1["erstelltAm"]);
+    DateTime dt2 = DateTime.parse(m2["erstelltAm"]);
+
+    var r = dt2.compareTo(dt1);
+    if (r != 0) return r;
+    return dt2.compareTo(dt1);
+  });
+
   Hive.box('secureBox').put("communities", dbCommunities);
 }
 

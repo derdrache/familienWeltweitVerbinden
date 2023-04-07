@@ -34,6 +34,7 @@ class _CommunityPageState extends State<CommunityPage> {
   bool onSearch = false;
   TextEditingController communitySearchKontroller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
+  String pageTitle = "Communities";
 
   @override
   void initState() {
@@ -162,7 +163,10 @@ class _CommunityPageState extends State<CommunityPage> {
           width: double.infinity,
           child: Wrap(
               alignment: WrapAlignment.center,
-              children: communities
+              children: [
+                ...communities,
+                if(onSearch) const SizedBox(height: 330)
+              ]
           ),
         ),
       );
@@ -209,7 +213,7 @@ class _CommunityPageState extends State<CommunityPage> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Communities",
+        title: pageTitle,
         leading: IconButton(
           onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
           icon: const Icon(Icons.arrow_back),
@@ -264,10 +268,11 @@ class _CommunityPageState extends State<CommunityPage> {
             backgroundColor: onSearch ? Colors.red : null,
             onPressed: () {
               if(onSearch){
+                pageTitle = "Communities";
                 searchFocusNode.unfocus();
                 communitySearchKontroller.clear();
-              } else{
-                searchFocusNode.requestFocus();
+              }else{
+                pageTitle = AppLocalizations.of(context).suche +" "+ "Communities";
               }
 
               setState(() {
