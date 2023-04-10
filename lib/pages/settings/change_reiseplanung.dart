@@ -10,6 +10,7 @@ import 'package:collection/collection.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../widgets/month_picker.dart';
+import '../../services/notification.dart';
 
 class ChangeReiseplanungPage extends StatefulWidget {
   final String userId = FirebaseAuth.instance.currentUser.uid;
@@ -114,6 +115,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     widget.reiseplanung.add(newReiseplan);
 
     saveInDatabase();
+    prepareNewTravelPlanNotification();
 
     setState(() {
       vonDate = MonthPickerBox();
