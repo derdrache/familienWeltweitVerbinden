@@ -45,7 +45,9 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
   @override
   void initState() {
     location = getCityFromHive(cityName: widget.ortName);
+
     if(location == null) Navigator.pop(context);
+
     location["familien"].remove(userId);
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
     isCity = location["isCity"] == 1;
@@ -99,7 +101,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    hasInterest = location["interesse"].contains(userId);
+    hasInterest = location["interesse"]?.contains(userId) ?? false;
 
     return SelectionArea(
         child: Scaffold(
@@ -242,8 +244,8 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     var allProfils = getAllActiveProfilsHive();
 
     for (var profil in allProfils) {
-      var inLocation = profil["ort"].isNotEmpty && widget.location["ort"].contains(profil["ort"]);
-      var inCountry = profil["ort"].isNotEmpty && widget.location["ort"].contains(profil["land"]);
+      var inLocation = profil["ort"].isNotEmpty && (widget.location["ort"]?.contains(profil["ort"]) ?? false);
+      var inCountry = profil["ort"].isNotEmpty && (widget.location["ort"]?.contains(profil["land"])??false);
 
       if (inLocation || inCountry) {
         familiesThere.add(profil["id"]);
@@ -279,6 +281,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   Widget build(BuildContext context) {
     double iconSize = 28;
     double fontSize = 18;
+    var anzahlFamilien = widget.location["familien"]?.length ?? 0;
 
     allgemeineInfoBox() {
       var familiesOnLocation = getFamiliesThere();
@@ -335,7 +338,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   const SizedBox(width: 10),
                   Text(
                       AppLocalizations.of(context).besuchtVon +
-                          widget.location["familien"].length.toString() +
+                          anzahlFamilien.toString() +
                           AppLocalizations.of(context).familien,
                       style: TextStyle(fontSize: fontSize)),
                 ],

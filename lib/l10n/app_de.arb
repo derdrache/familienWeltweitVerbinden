@@ -447,5 +447,6 @@
     "bildBearbeiten" : "Bild bearbeiten",
     "geheimerChat": "Geheimer Chat",
     "geheimerChatMeldung": "Private Chatgruppe - Nur für Mitglieder",
-    "settings": "Settings"
+    "settings": "Settings",
+    "reiseplanungNotification": "Neue Reiseplanung"
 }

@@ -173,7 +173,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     joindAndRemoveChatGroups(locationDict, oldLocation);
     deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);
-    notifications.prepareFamilieAroundNotification();
+    notifications.prepareNewFamilieLocationNotification();
     saveCityInformation(locationDict);
 
     deleteOldTravelPlan(locationDict);

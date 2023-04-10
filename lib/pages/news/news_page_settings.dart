@@ -47,6 +47,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+
     newFriendOption() {
       return Container(
           margin: const EdgeInsets.only(bottom: 20),
@@ -158,18 +159,17 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
           child: Row(
             children: [
               Switch(
-                  value: showFriendTravelPlan,
+                  value: ownProfil["travelPlanNotification"] == 1 ? true : false,
                   onChanged: (value) {
                     int intValue = value == true ? 1:0;
 
                     setState(() {
-                      showFriendTravelPlan = value;
+                      ownProfil["travelPlanNotification"] = intValue;
                     });
 
-                    NewsSettingsDatabase().update(
-                        "showFriendTravelPlan = '$intValue'",
-                        "WHERE id = '$userId'");
-                    _changeHiveOwnNewsPageSetting("showFriendTravelPlan", intValue);
+                    ProfilDatabase().updateProfil(
+                        "travelPlanNotification = '$intValue'",
+                        "WHERE id = '${ownProfil["id"]}'");
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingShowTravelPlan)

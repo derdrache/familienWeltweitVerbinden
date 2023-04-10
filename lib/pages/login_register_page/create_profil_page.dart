@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../services/notification.dart' as notifications;
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/global_functions.dart';
@@ -136,6 +137,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "information": json.encode(ortMapData),
       });
       await refreshHiveNewsPage();
+
+      notifications.prepareNewFamilieLocationNotification();
 
       global_functions.changePageForever(context, StartPage());
 

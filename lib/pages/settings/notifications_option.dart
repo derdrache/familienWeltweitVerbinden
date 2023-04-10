@@ -25,7 +25,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            AppLocalizations.of(context).alleBenachrichtigungen,//email erhalten
+            AppLocalizations.of(context).alleBenachrichtigungen,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -179,8 +179,34 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
     );
   }
 
+  friendsTravelPlanNotificationSetting(){
+    return Row(
+      children: [
+        const SizedBox(width: 20),
+        Text(
+            AppLocalizations.of(context).reiseplanungNotification,
+            style: const TextStyle(fontSize: 20)),
+        const Expanded(child: SizedBox(width: 20)),
+        Switch(
+            value: ownProfil["travelPlanNotification"] == 1 ? true : false,
+            onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
+              setState(() {
+                ownProfil["travelPlanNotification"] = notificationOn;
+              });
+              ProfilDatabase().updateProfil(
+                  "travelPlanNotification = '$notificationOn'",
+                  "WHERE id = '${ownProfil["id"]}'");
+            })
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool notificationsAllowed = ownProfil["notificationstatus"] == 1;
+
     return Scaffold(
       appBar:
           CustomAppBar(
@@ -192,14 +218,11 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
             height: 20,
           ),
           allNotificationSetting(),
-          if (ownProfil["notificationstatus"] == 1)
-            chatNotificationSetting(),
-          if (ownProfil["notificationstatus"] == 1)
-            eventNotificationSetting(),
-          if (ownProfil["notificationstatus"] == 1)
-            newFriendNotificationSetting(),
-          if(ownProfil["notificationstatus"] == 1)
-            familieInRangeNotificationSetting()
+          if (notificationsAllowed) chatNotificationSetting(),
+          if (notificationsAllowed) eventNotificationSetting(),
+          if (notificationsAllowed) newFriendNotificationSetting(),
+          if (notificationsAllowed) familieInRangeNotificationSetting(),
+          if (notificationsAllowed) friendsTravelPlanNotificationSetting(),
         ],
       ),
     );

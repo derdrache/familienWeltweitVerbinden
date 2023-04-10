@@ -299,15 +299,16 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
   }
 }
 
-prepareFamilieAroundNotification(){
+prepareNewFamilieLocationNotification(){
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
   List allProfils = Hive.box('secureBox').get("profils") ?? [];
 
   for(Map profil in allProfils){
     double profilFamiliesRange = profil["familiesDistance"].toDouble();
-    bool notificationAllowed = profilFamiliesRange > 0;
+    bool notificationAllowed = profil["notificationstatus"] == 1;
+    bool rangeNotificationAllowed = profilFamiliesRange > 0;
 
-    if(!notificationAllowed) continue;
+    if(!rangeNotificationAllowed || !notificationAllowed) continue;
 
     var ownLatt = ownProfil["latt"];
     var ownLongt = ownProfil["longt"];
@@ -342,5 +343,41 @@ prepareFamilieAroundNotification(){
       sendNotification(notificationInformation);
     }
   }
+}
 
+prepareNewTravelPlanNotification(){
+  Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
+  List allProfils = Hive.box('secureBox').get("profils") ?? [];
+
+  for(Map profil in allProfils){
+    bool travelPlanNotificationAllowed = profil["travelPlanNotification"] == 1;
+    bool notificationAllowed = profil["notificationstatus"] == 1;
+    bool isFriend = profil["friends"].contains(profil["id"]);
+
+    if(!travelPlanNotificationAllowed || !notificationAllowed || !isFriend) continue;
+
+    String profilId = profil["id"];
+    String ownProfilId = ownProfil["id"];
+    var profilToken = profil["token"];
+    bool canGerman = profil["sprachen"].contains("Deutsch") || profil["sprachen"].contains("german");
+    var notificationInformation = {
+      "token": profilToken,
+      "title": "",
+      "inhalt": "",
+      "zu": profilId,
+      "changePageId": ownProfilId,
+      "typ": "newFriend"
+    };
+
+    if(profilToken != "" && profilToken != null){
+      if(canGerman){
+        notificationInformation["title"] = "Neue Reiseplanung von einem Freund";
+        notificationInformation["inhalt"] = "Ein Freund von dir hat eine neue Reiseplanung erstellt";
+      }else{
+        notificationInformation["title"] = "New travel plan from friend";
+        notificationInformation["inhalt"] = "A friend of yours has made a new travel plan";
+      }
+      sendNotification(notificationInformation);
+    }
+  }
 }
