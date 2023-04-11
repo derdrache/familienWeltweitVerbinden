@@ -1188,7 +1188,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     cardMessage(index, message, messageBoxInformation, cardType){
-      var messageSplit = message["message"].split(" ");
+      var messageSplit = message["message"].replaceAll("\n", " ").split(" ");
       var cardTypeId = "";
       var cardData;
       var hasForward = message["forward"].isNotEmpty;
@@ -1197,27 +1197,34 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorName = creatorData["name"];
       var creatorColor = creatorData["bildStandardFarbe"];
       var isMyMessage = message["von"] == userId;
+      var replaceText = "";
 
       if (hasForward) {
         var messageAutorId = message["forward"].split(":")[1];
         forwardProfil = getProfilFromHive(profilId: messageAutorId);
       }
 
-      messageSplit.asMap().forEach((index, text) {
+      for(var text in messageSplit){
         if (text.contains("</eventId=")) {
           cardTypeId = text.substring(10);
+          replaceText = "</eventId=" + cardTypeId;
           cardData = getMeetupFromHive(cardTypeId);
+          break;
         } else if(text.contains("</communityId=")){
           cardTypeId = text.substring(14);
+          replaceText = "</communityId=" + cardTypeId;
           cardData = getCommunityFromHive(cardTypeId);
+          break;
         } else if(text.contains("</cityId=")){
           cardTypeId = text.substring(9);
+          replaceText = "</cityId=" + cardTypeId;
           cardData = getCityFromHive(cityId: cardTypeId);
+          break;
         }
-      });
+      }
 
-      message["message"] = messageSplit.join(" ");
-
+      message["message"] = message["message"].replaceAll(replaceText, "").trim();
+      
       if (cardData.isEmpty) return const SizedBox.shrink();
 
       return Row(
