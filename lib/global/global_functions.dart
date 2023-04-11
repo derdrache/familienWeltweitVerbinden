@@ -216,7 +216,7 @@ openURL(url) async{
 
   await launchUrl(
       url,
-      mode: LaunchMode.inAppWebView
+      mode: LaunchMode.externalApplication
   );
 }
 
