@@ -69,11 +69,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: GestureDetector(
                     onTap: onTap,
                     behavior: HitTestBehavior.opaque,
-                    child: Center(
-                      child: Text(title,
-                          style:
-                              const TextStyle(color: Colors.white, fontSize: 26)),
-                    ),
+                    child: Text(title,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 26)),
                   ),
                 )
               ]),
