@@ -117,8 +117,8 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
             onPressed: () async {
               Clipboard.setData(ClipboardData(
                   text: "</cityId=" + location["id"].toString()));
-
               customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
+              global_func.changePageForever(context, StartPage(selectedIndex: 3,));
             },
           ),
           IconButton(
