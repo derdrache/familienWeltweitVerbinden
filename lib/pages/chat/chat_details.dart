@@ -849,6 +849,37 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return unreadMessages - noScrollCount;
   }
 
+  getCardIdDataFromMessage(String message){
+    var messageSplit = message.replaceAll("\n", " ").split(" ");
+    Map data = {
+      "id":"",
+      "typ": "",
+      "text": "",
+      "onlyId": messageSplit.length == 1
+    };
+
+    for (var text in messageSplit) {
+      if (text.contains("</eventId=")) {
+        data["typ"] = "event";
+        data["id"] = text.substring(10);
+        data["text"] = "</eventId=" + data["id"];
+        break;
+      } else if (text.contains("</communityId=")) {
+        data["typ"] = "community";
+        data["id"] = text.substring(14);
+        data["text"] = "</communityId=" + data["id"];
+        break;
+      } else if (text.contains("</cityId=")) {
+        data["typ"] = "city";
+        data["id"] = text.substring(9);
+        data["text"] = "</cityId=" + data["id"];
+        break;
+      }
+    }
+
+    return data;
+  }
+
   @override
   Widget build(BuildContext context) {
     var ownMessageBoxColor =
@@ -1176,8 +1207,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     cardMessage(index, message, messageBoxInformation, cardType) {
-      var messageSplit = message["message"].replaceAll("\n", " ").split(" ");
-      var cardTypeId = "";
       var cardData;
       var hasForward = message["forward"].isNotEmpty;
       var forwardProfil;
@@ -1185,34 +1214,28 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorName = creatorData["name"];
       var creatorColor = creatorData["bildStandardFarbe"];
       var isMyMessage = message["von"] == userId;
-      var replaceText = "";
+
 
       if (hasForward) {
         var messageAutorId = message["forward"].split(":")[1];
         forwardProfil = getProfilFromHive(profilId: messageAutorId);
       }
 
-      for (var text in messageSplit) {
-        if (text.contains("</eventId=")) {
-          cardTypeId = text.substring(10);
-          replaceText = "</eventId=" + cardTypeId;
-          cardData = getMeetupFromHive(cardTypeId);
-          break;
-        } else if (text.contains("</communityId=")) {
-          cardTypeId = text.substring(14);
-          replaceText = "</communityId=" + cardTypeId;
-          cardData = getCommunityFromHive(cardTypeId);
-          break;
-        } else if (text.contains("</cityId=")) {
-          cardTypeId = text.substring(9);
-          replaceText = "</cityId=" + cardTypeId;
-          cardData = getCityFromHive(cityId: cardTypeId);
-          break;
-        }
+      var cardIdData = getCardIdDataFromMessage(message["message"]);
+
+      if(cardIdData["typ"] == "event"){
+        cardData = getMeetupFromHive(cardIdData["id"]);
+      }else if(cardIdData["typ"] == "community"){
+        cardData = getCommunityFromHive(cardIdData["id"]);
+      }else if(cardIdData["typ"] == "city"){
+        cardData = getCityFromHive(cityId: cardIdData["id"]);
       }
 
+      var replaceText = cardData["name"];
+      var removeId = cardIdData["text"];
+
       message["message"] =
-          message["message"].replaceAll(replaceText, "").trim();
+          message["message"].replaceAll(removeId, replaceText).trim();
 
       if (cardData.isEmpty) return const SizedBox.shrink();
 
@@ -1296,7 +1319,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 )
                         ],
                       )),
-                  messageSplit.length == 1
+                  cardIdData["onlyId"]
                       ? Row(
                           children: [
                             if (messageBoxInformation["textAlign"] ==
