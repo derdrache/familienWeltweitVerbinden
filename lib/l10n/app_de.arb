@@ -448,5 +448,8 @@
     "geheimerChat": "Geheimer Chat",
     "geheimerChatMeldung": "Private Chatgruppe - Nur für Mitglieder",
     "settings": "Settings",
-    "reiseplanungNotification": "Neue Reiseplanung"
+    "reiseplanungNotification": "Neue Reiseplanung",
+    "tag": "Tag",
+    "monat": "Monat",
+    "jahr": "Jahr"
 }

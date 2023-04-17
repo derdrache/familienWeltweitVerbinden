@@ -1,10 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FlexibleDatePicker extends StatefulWidget {
   final int startYear;
   final int endYear;
+  int selectedDay, selectedMonth, selectedYear;
+  bool withMonth;
+  bool withDay;
 
-  const FlexibleDatePicker({Key key, this.startYear, this.endYear}) : super(key: key);
+  FlexibleDatePicker({
+    Key key, 
+    this.startYear, 
+    this.endYear, 
+    this.withDay = false, 
+    this.withMonth = false
+    }) : super(key: key);
+
+  getDate(){
+    return DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1);
+  }
+
+  showMore({day = false, month = false}){
+    if(day) withDay = true;
+    if(month) withMonth = true;
+    
+  }
 
   @override
   State<FlexibleDatePicker> createState() => _FlexibleDatePickerState();
@@ -12,6 +32,7 @@ class FlexibleDatePicker extends StatefulWidget {
 
 class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   final int daysForListdays = 32;
+
   List listDays;
   List listMonths;
   List listYears;
@@ -47,19 +68,56 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   @override
   Widget build(BuildContext context) {
       return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        dateDropDown(listDays),
+        if(widget.withDay) Column(children: [
+          Text(AppLocalizations.of(context).tag),
+          dateDropDown(listDays, "day"),
+        ],),
+        if(widget.withMonth) Column(children: [
+          Text(AppLocalizations.of(context).monat),
+          dateDropDown(listMonths, "month"),
+        ],),
+        Column(children: [
+          Text(AppLocalizations.of(context).jahr),
+          dateDropDown(listYears, "year"),
+        ],)
+        
       ],);
   }
 
-  Widget dateDropDown(items){
+  Widget dateDropDown(items, typ){
+    var dropdownValue;
+          if(typ == "day"){
+            dropdownValue = widget.selectedDay;
+          }else if(typ == "month"){
+            dropdownValue = widget.selectedMonth;      
+          }else if(typ == "year"){
+            dropdownValue = widget.selectedYear;
+          }
+
+
     return DropdownButton(
-        items: items.map<DropdownMenuItem>((items) {
+        value: dropdownValue,
+        items: items.map<DropdownMenuItem>((item) {
+          var value = item.runtimeType == int ? item : item["id"];
+          var text = item.runtimeType == int ? item.toString() : item["value"];
+          
           return DropdownMenuItem(
-            value: items,
-            child: Text(items.toString()),
+            value: value,
+            child: Text(text),
           );
         }).toList(),
-        onChanged: (value){}
+        onChanged: (value){
+          if(typ == "day"){
+            widget.selectedDay = value;
+          }else if(typ == "month"){
+            widget.selectedMonth = value;      
+          }else if(typ == "year"){
+            widget.selectedYear = value;
+          }
+    
+          setState(() {});
+        }
     );
   }
+
 }
