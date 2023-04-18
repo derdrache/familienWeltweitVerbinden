@@ -452,6 +452,7 @@
     "reiseplanungNotification": "New travel plan",
     "tag": "Day",
     "monat": "Month",
-    "jahr": "Year"
+    "jahr": "Year",
+    "genauesDatum": "Accurate date"
 }
 

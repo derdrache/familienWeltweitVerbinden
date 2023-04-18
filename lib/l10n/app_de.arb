@@ -451,5 +451,6 @@
     "reiseplanungNotification": "Neue Reiseplanung",
     "tag": "Tag",
     "monat": "Monat",
-    "jahr": "Jahr"
+    "jahr": "Jahr",
+    "genauesDatum": "Genaues Datum"
 }

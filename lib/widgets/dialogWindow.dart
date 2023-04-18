@@ -35,6 +35,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20.0))),
       contentPadding: EdgeInsets.zero,
+      insetPadding: EdgeInsets.all(10),
       actions: widget.actions,
       content: SizedBox(
         height: widget.height,

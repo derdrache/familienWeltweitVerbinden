@@ -9,10 +9,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var testWidget = FlexibleDatePicker(
+      hintText: "test",
+    );
 
     return MaterialApp(
       home: Scaffold(
-        body: Placeholder()
+        body: Center(child: testWidget,)
       )
     );
 
