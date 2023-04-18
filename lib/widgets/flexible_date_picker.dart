@@ -7,17 +7,19 @@ class FlexibleDatePicker extends StatefulWidget {
   int selectedDay, selectedMonth, selectedYear;
   bool withMonth;
   bool withDay;
+  bool language;
 
   FlexibleDatePicker({
     Key key, 
     this.startYear, 
     this.endYear, 
     this.withDay = false, 
-    this.withMonth = false
+    this.withMonth = false,
+    this.language
     }) : super(key: key);
 
   getDate(){
-    return DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1);
+    return DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1, selectedDay != null ? 1 : 0);
   }
 
   showMore({day = false, month = false}){
@@ -36,6 +38,20 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   List listDays;
   List listMonths;
   List listYears;
+    List<dynamic> listMonths_de = [
+    {"id": 1, "value": "Januar"},
+    {"id": 2, "value": "Februar"},
+    {"id": 3, "value": "März"},
+    {"id": 4, "value": "April"},
+    {"id": 5, "value": "Mai"},
+    {"id": 6, "value": "Juni"},
+    {"id": 7, "value": "Juli"},
+    {"id": 8, "value": "August"},
+    {"id": 9, "value": "September"},
+    {"id": 10, "value": "Oktober"},
+    {"id": 11, "value": "November"},
+    {"id": 12, "value": "Dezember"}
+  ];
   List<dynamic> listMonths_en = [
     {"id": 1, "value": "January"},
     {"id": 2, "value": "February"},
@@ -54,7 +70,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
 @override
   void initState() {
     listDays = Iterable<int>.generate(daysForListdays).skip(1).toList();
-    listMonths = listMonths_en;
+    listMonths = widget.language == "deutsch" ? listMonths_de : listMonths_en;
     listYears =
         Iterable<int>.generate((widget.endYear ?? DateTime.now().year) + 1)
             .skip(widget.startYear ?? DateTime.now().year)
