@@ -71,8 +71,8 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
 
   @override
   void initState() {
-    withDay = widget.withDay;
-    withMonth = widget.withMonth;
+    withDay = true;
+    withMonth = true;
     listDays = Iterable<int>.generate(daysForListdays).skip(1).toList();
     listMonths = widget.language == "deutsch" ? listMonths_de : listMonths_en;
     listYears =
@@ -86,9 +86,14 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   }
 
   save() {
-    if (widget.selectedDay == null ||
-        widget.selectedMonth == null ||
-        widget.selectedYear == null) {
+    bool daySelected = widget.selectedDay != null;
+    bool monthSelected = widget.selectedMonth != null;
+    bool yearSelected = widget.selectedYear != null;
+
+    bool allFilledAll = withDay && daySelected && monthSelected && yearSelected;
+    bool allFilledPart = !withDay && yearSelected && ((widget.withMonth && monthSelected) || !widget.withMonth);
+
+    if (!allFilledAll && !allFilledPart) {
       return;
     }
 
@@ -102,6 +107,9 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
 
   createDateText() {
     if (selectedDate == null) return widget.hintText;
+
+    if(!withDay && !widget.withMonth) return selectedDate.year.toString();
+    if(!withDay && widget.withMonth) return selectedDate.day.toString() + "." +selectedDate.month.toString();
 
     return selectedDate.day.toString() +
         "." +
@@ -161,6 +169,11 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
 
                               if (withDay || !widget.withMonth)
                                 withMonth = newValue;
+
+                              if(!newValue){
+                                widget.selectedDay = null;
+                                if(!widget.withMonth) widget.selectedMonth = null;
+                              }
                             });
                           })
                   ],
