@@ -1,3 +1,4 @@
+import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -7,10 +8,12 @@ class FlexibleDatePicker extends StatefulWidget {
   final int startYear;
   final int endYear;
   int selectedDay, selectedMonth, selectedYear;
+  int selectedEndDay, selectedEndMonth, selectedEndYear;
   bool withMonth;
   bool withDay;
   bool language;
   String hintText;
+  bool multiDate;
 
   FlexibleDatePicker(
       {Key key,
@@ -19,12 +22,22 @@ class FlexibleDatePicker extends StatefulWidget {
       this.withDay = false,
       this.withMonth = false,
       this.language,
-      this.hintText = ""})
-      : super(key: key);
+      this.hintText = "",
+      this.multiDate = false,
+      }) : super(key: key);
 
   getDate() {
-    return DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1,
+    if(multiDate){
+      DateTime start = DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1,
         selectedDay != null ? 1 : 0);
+      DateTime end = DateTime(selectedEndYear, selectedEndMonth ?? 1, selectedEndDay ?? 1,
+        selectedDay != null ? 1 : 0);  
+      return [start, end];
+    } else{
+      return DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1,
+        selectedDay != null ? 1 : 0);
+    }
+
   }
 
   @override
@@ -39,6 +52,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   bool withDay;
   bool withMonth;
   DateTime selectedDate;
+  DateTime selectedEndDate;
   bool moreDateData = false;
   List<dynamic> listMonths_de = [
     {"id": 1, "value": "Januar"},
@@ -89,33 +103,70 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
     bool daySelected = widget.selectedDay != null;
     bool monthSelected = widget.selectedMonth != null;
     bool yearSelected = widget.selectedYear != null;
+    bool startNormalFilled = withDay && daySelected && monthSelected && yearSelected;
+    bool startSecretFilled = !withDay && yearSelected 
+      && ((widget.withMonth && monthSelected) || !widget.withMonth);
 
-    bool allFilledAll = withDay && daySelected && monthSelected && yearSelected;
-    bool allFilledPart = !withDay && yearSelected && ((widget.withMonth && monthSelected) || !widget.withMonth);
+    bool endDaySelected = widget.selectedEndDay != null;
+    bool endMonthSelected = widget.selectedEndMonth != null;
+    bool endYearSelected = widget.selectedEndYear != null;
+    bool endNormalFilled = withDay && endDaySelected && endMonthSelected && endYearSelected;
+    bool endSecretFilled = !withDay && endYearSelected 
+      && ((widget.withMonth && endMonthSelected) || !widget.withMonth);
 
-    if (!allFilledAll && !allFilledPart) {
-      return;
+
+    if (!startNormalFilled && !startSecretFilled 
+      && (widget.multiDate && !endNormalFilled) && (widget.multiDate && !endSecretFilled)) {
+      return false;
     }
 
-    setState(() {
-      selectedDate = DateTime(widget.selectedYear, widget.selectedMonth ?? 1,
+    selectedDate = DateTime(widget.selectedYear, widget.selectedMonth ?? 1,
           widget.selectedDay ?? 1, widget.selectedDay != null ? 1 : 0);
-    });
+
+    if(widget.multiDate){
+      selectedEndDate = DateTime(widget.selectedEndYear, widget.selectedEndMonth ?? 1, 
+        widget.selectedEndDay ?? 1, widget.selectedDay != null ? 1 : 0);
+    }
+    
+    return true;
+  }
+
+  showErrorMessage(){
+    customSnackbar(context, "vollständiges Datum eingeben");
   }
 
   reset() {}
 
   createDateText() {
     if (selectedDate == null) return widget.hintText;
+      if(!withDay && !widget.withMonth){
+        if(widget.multiDate){
+          return selectedDate.year.toString() + " - " + selectedEndDate.year.toString();
+        }else{
+          return selectedDate.year.toString();
+        }
+      }else if(!withDay && widget.withMonth){
+        if(widget.multiDate){
+          return selectedDate.day.toString() + "." +selectedDate.month.toString() + " - " 
+            + selectedEndDate.day.toString() + "." +selectedEndDate.month.toString();
+        }else{
+          return selectedDate.day.toString() + "." +selectedDate.month.toString();
+        }
+        
+      }else{
+        if(widget.multiDate){
+          return selectedDate.day.toString() + "." + selectedDate.month.toString() + "." 
+            + selectedDate.year.toString() + " - " + selectedEndDate.day.toString() + "." 
+          + selectedEndDate.month.toString() + "." + selectedEndDate.year.toString();
+        }else{
+          return selectedDate.day.toString() + "." 
+            + selectedDate.month.toString() + "." 
+            + selectedDate.year.toString();
+        }
 
-    if(!withDay && !widget.withMonth) return selectedDate.year.toString();
-    if(!withDay && widget.withMonth) return selectedDate.day.toString() + "." +selectedDate.month.toString();
+      }
 
-    return selectedDate.day.toString() +
-        "." +
-        selectedDate.month.toString() +
-        "." +
-        selectedDate.year.toString();
+
   }
 
   showPickerWindow() {
@@ -126,34 +177,9 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
             return CustomAlertDialog(
               title: "",
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (withDay)
-                      Column(
-                        children: [
-                          Text("Tag"), //AppLocalizations.of(context).tag),
-                          dateDropDown(listDays, "day",
-                              onClick: () => windowSetState(() {})),
-                        ],
-                      ),
-                    if (withMonth)
-                      Column(
-                        children: [
-                          Text("Monat"), //AppLocalizations.of(context).monat),
-                          dateDropDown(listMonths, "month",
-                              onClick: () => windowSetState(() {})),
-                        ],
-                      ),
-                    Column(
-                      children: [
-                        Text("Jahr"), //AppLocalizations.of(context).jahr),
-                        dateDropDown(listYears, "year",
-                            onClick: () => windowSetState(() {})),
-                      ],
-                    )
-                  ],
-                ),
+                datePickerBox(windowSetState, multiDateTitle: "Start"),
+                if(widget.multiDate) SizedBox(height: 15),
+                if(widget.multiDate) datePickerBox(windowSetState, endDate: true, multiDateTitle: "End"),
                 SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -190,8 +216,15 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
                         child: Text("Cancel")),
                     TextButton(
                         onPressed: () {
-                          save();
-                          Navigator.pop(context);
+                          bool succsess = save();
+
+                          if(succsess){
+                            setState(() {});
+                            Navigator.pop(context);
+                          }else{
+                            showErrorMessage();
+                          }
+                          
                         },
                         child: Text("Ok")),
                   ],
@@ -207,9 +240,12 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
     return InkWell(
       onTap: () => showPickerWindow(),
       child: Container(
-        width: 80,
+        width: widget.multiDate ? 160 :  80,
         height: 50,
-        decoration: BoxDecoration(border: Border.all()),
+        decoration: BoxDecoration(
+          border: Border.all(),
+          borderRadius: BorderRadius.all(Radius.circular(5))
+          ),
         child: Center(
             child: Text(
           createDateText(),
@@ -221,18 +257,24 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
     );
   }
 
-  Widget dateDropDown(items, typ, {onClick}) {
+  Widget dateDropDown(items, typ, {onClick, endDate = false}) {
     var dropdownValue;
-    if (typ == "day") {
+    if (typ == "day" && !endDate) {
       dropdownValue = widget.selectedDay;
-    } else if (typ == "month") {
+    } else if (typ == "month" && !endDate) {
       dropdownValue = widget.selectedMonth;
-    } else if (typ == "year") {
+    } else if (typ == "year" && !endDate) {
       dropdownValue = widget.selectedYear;
+    } else if (typ == "day" && endDate){
+      dropdownValue = widget.selectedEndDay;
+    } else if (typ == "month" && endDate){
+      dropdownValue = widget.selectedEndMonth;  
+    } else if (typ == "year" && endDate){
+      dropdownValue = widget.selectedEndYear;  
     }
 
     return Padding(
-      padding: const EdgeInsets.only(left: 5, right: 5, top: 5),
+      padding: const EdgeInsets.only(left: 2, right: 2, top: 5),
       child: Container(
         padding: EdgeInsets.only(left: 20, right: 5, top: 5, bottom: 5),
         decoration: BoxDecoration(
@@ -252,12 +294,18 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
               );
             }).toList(),
             onChanged: (value) {
-              if (typ == "day") {
+              if (typ == "day" && !endDate) {
                 widget.selectedDay = value;
-              } else if (typ == "month") {
+              } else if (typ == "month"&& !endDate) {
                 widget.selectedMonth = value;
-              } else if (typ == "year") {
+              } else if (typ == "year"&& !endDate) {
                 widget.selectedYear = value;
+              } else if(typ == "day" && endDate){
+                widget.selectedEndDay = value;
+              }else if (typ == "month"&& endDate){
+                widget.selectedEndMonth = value;
+              }else if (typ == "year"&& endDate){
+                widget.selectedEndYear = value;
               }
       
               onClick();
@@ -267,5 +315,50 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
           ),
       ),
     );
+  }
+
+  Widget multiDateTitleBox(text){
+    return Container(
+      width: 50,
+      padding: const EdgeInsets.only(right: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, 
+        children: [
+          Text(""), 
+          Text(text)
+          ],),
+    );
+  }
+
+  Widget datePickerBox(windowSetState, {endDate = false, multiDateTitle = ""}){
+    return                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if(widget.multiDate) multiDateTitleBox(multiDateTitle),
+                    if (withDay)
+                      Column(
+                        children: [
+                          if(!endDate) Text("Tag"), //AppLocalizations.of(context).tag),
+                          dateDropDown(listDays, "day", endDate: endDate,
+                              onClick: () => windowSetState(() {})),
+                        ],
+                      ),
+                    if (withMonth)
+                      Column(
+                        children: [
+                          if(!endDate) Text("Monat"), //AppLocalizations.of(context).monat),
+                          dateDropDown(listMonths, "month", endDate: endDate,
+                              onClick: () => windowSetState(() {})),
+                        ],
+                      ),
+                    Column(
+                      children: [
+                        if(!endDate) Text("Jahr"), //AppLocalizations.of(context).jahr),
+                        dateDropDown(listYears, "year", endDate: endDate,
+                            onClick: () => windowSetState(() {})),
+                      ],
+                    )
+                  ],
+                );
   }
 }
