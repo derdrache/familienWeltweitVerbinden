@@ -147,10 +147,10 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
         }
       }else if(!withDay && widget.withMonth){
         if(widget.multiDate){
-          return selectedDate.day.toString() + "." +selectedDate.month.toString() + " - " 
-            + selectedEndDate.day.toString() + "." +selectedEndDate.month.toString();
+          return selectedDate.month.toString() + "." +selectedDate.year.toString() + " - " 
+            + selectedEndDate.month.toString() + "." +selectedEndDate.year.toString();
         }else{
-          return selectedDate.day.toString() + "." +selectedDate.month.toString();
+          return selectedDate.month.toString() + "." +selectedDate.year.toString();
         }
         
       }else{
@@ -185,7 +185,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (!widget.withDay)
-                      Text("Genaues Datum"), //AppLocalizations.of(context).genauesDatum
+                      Text(AppLocalizations.of(context).genauesDatum),
                     if (!widget.withDay)
                       Switch(
                           value: withDay,
@@ -331,29 +331,29 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   }
 
   Widget datePickerBox(windowSetState, {endDate = false, multiDateTitle = ""}){
-    return                 Row(
+    return  Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if(widget.multiDate) multiDateTitleBox(multiDateTitle),
                     if (withDay)
                       Column(
                         children: [
-                          if(!endDate) Text("Tag"), //AppLocalizations.of(context).tag),
+                          if(!endDate) Text(AppLocalizations.of(context).tag),
                           dateDropDown(listDays, "day", endDate: endDate,
                               onClick: () => windowSetState(() {})),
                         ],
                       ),
-                    if (withMonth)
+                    if(withMonth)
                       Column(
                         children: [
-                          if(!endDate) Text("Monat"), //AppLocalizations.of(context).monat),
+                          if(!endDate) Text(AppLocalizations.of(context).monat),
                           dateDropDown(listMonths, "month", endDate: endDate,
                               onClick: () => windowSetState(() {})),
                         ],
                       ),
                     Column(
                       children: [
-                        if(!endDate) Text("Jahr"), //AppLocalizations.of(context).jahr),
+                        if(!endDate) Text(AppLocalizations.of(context).jahr),
                         dateDropDown(listYears, "year", endDate: endDate,
                             onClick: () => windowSetState(() {})),
                       ],

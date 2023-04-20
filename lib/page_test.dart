@@ -11,7 +11,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var testWidget = FlexibleDatePicker(
       hintText: "test",
-      multiDate: true,
     );
 
     return MaterialApp(
