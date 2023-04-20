@@ -6,9 +6,11 @@ import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:collection/collection.dart';
+import 'package:hive/hive.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
+import '../../widgets/flexible_date_picker.dart';
 import '../../widgets/month_picker.dart';
 import '../../services/notification.dart';
 
@@ -26,8 +28,11 @@ class ChangeReiseplanungPage extends StatefulWidget {
 }
 
 class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
-  var vonDate = MonthPickerBox();
-  var bisDate = MonthPickerBox();
+  var datePicker = FlexibleDatePicker(
+                    startYear: DateTime.now().year,
+                    withMonth: true,
+                    multiDate: true,
+                  );
   var ortInput = GoogleAutoComplete();
 
   saveProfilReiseplanung(){
@@ -87,22 +92,23 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   addNewTravelPlan() {
     var ortData = ortInput.getGoogleLocationData();
 
-    if (vonDate.getDate() == null ||
-        bisDate.getDate() == null ||
-        ortData["city"] == null) {
+    if(datePicker.getDate() == null || ortData["city"] == null){
       customSnackbar(context,
           AppLocalizations.of(context).vollstaendigeDatenZukunftsOrtEingeben);
       return;
     }
 
-    if (bisDate.getDate().isBefore(vonDate.getDate())) {
+    var startDate = datePicker.getDate()[0];
+    var endDate = datePicker.getDate()[1];
+
+    if (endDate.isBefore(startDate)) {
       customSnackbar(context, AppLocalizations.of(context).vonKleinerAlsBis);
       return;
     }
 
     var newReiseplan = {
-      "von": vonDate.getDate().toString(),
-      "bis": bisDate.getDate().toString(),
+      "von": startDate.toString(),
+      "bis": endDate.toString(),
       "ortData": ortData
     };
 
@@ -118,8 +124,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     prepareNewTravelPlanNotification();
 
     setState(() {
-      vonDate = MonthPickerBox();
-      bisDate = MonthPickerBox();
+      datePicker.clear();
       ortInput.clear();
     });
   }
@@ -134,8 +139,8 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
   @override
   Widget build(BuildContext context) {
-    vonDate.hintText = AppLocalizations.of(context).von;
-    bisDate.hintText = AppLocalizations.of(context).bis;
+    datePicker.hintText = AppLocalizations.of(context).datumEingeben;
+    datePicker.language = widget.isGerman ? "ger" : "eng";
     ortInput.hintText = AppLocalizations.of(context).ort;
 
     transformDateToText(dateString) {
@@ -153,13 +158,13 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
               Column(
                 children: [
                   SizedBox(width: 300,child: ortInput),
-                  Row(
-                    children: [
-                      vonDate,
-                      const SizedBox(width: 40),
-                      bisDate,
-                    ],
-                  ),
+                  FlexibleDatePicker(
+                    startYear: DateTime.now().year,
+                    language: widget.isGerman ? "ger" : "eng",
+                    withMonth: true,
+                    multiDate: true,
+                    hintText: AppLocalizations.of(context).datumEingeben,
+                  )
                 ],
               ),
               Expanded(

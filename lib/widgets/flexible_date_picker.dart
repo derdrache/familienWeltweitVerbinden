@@ -11,7 +11,7 @@ class FlexibleDatePicker extends StatefulWidget {
   int selectedEndDay, selectedEndMonth, selectedEndYear;
   bool withMonth;
   bool withDay;
-  bool language;
+  String language;
   String hintText;
   bool multiDate;
 
@@ -38,6 +38,15 @@ class FlexibleDatePicker extends StatefulWidget {
         selectedDay != null ? 1 : 0);
     }
 
+  }
+
+  clear(){
+    selectedDay = null;
+    selectedEndDay = null;
+    selectedMonth = null;
+    selectedEndMonth = null;
+    selectedYear = null;
+    selectedEndYear = null;
   }
 
   @override
@@ -88,9 +97,9 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
     withDay = true;
     withMonth = true;
     listDays = Iterable<int>.generate(daysForListdays).skip(1).toList();
-    listMonths = widget.language == "deutsch" ? listMonths_de : listMonths_en;
+    listMonths = widget.language == "ger" ? listMonths_de : listMonths_en;
     listYears =
-        Iterable<int>.generate((widget.endYear ?? DateTime.now().year) + 1)
+        Iterable<int>.generate((widget.endYear ?? DateTime.now().year + 10) + 1)
             .skip(widget.startYear ?? DateTime.now().year)
             .toList()
             .reversed
