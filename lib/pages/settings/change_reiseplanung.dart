@@ -139,8 +139,6 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
   @override
   Widget build(BuildContext context) {
-    datePicker.hintText = AppLocalizations.of(context).datumEingeben;
-    datePicker.language = widget.isGerman ? "ger" : "eng";
     ortInput.hintText = AppLocalizations.of(context).ort;
 
     transformDateToText(dateString) {
@@ -160,10 +158,8 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
                   SizedBox(width: 300,child: ortInput),
                   FlexibleDatePicker(
                     startYear: DateTime.now().year,
-                    language: widget.isGerman ? "ger" : "eng",
                     withMonth: true,
                     multiDate: true,
-                    hintText: AppLocalizations.of(context).datumEingeben,
                   )
                 ],
               ),

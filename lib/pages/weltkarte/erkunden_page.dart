@@ -16,6 +16,7 @@ import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
+import '../../widgets/flexible_date_picker.dart';
 import '../../services/database.dart';
 import '../../services/locationsService.dart';
 import '../../widgets/badge_icon.dart';
@@ -773,8 +774,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   openSelectReiseplanungsDateWindow() {
-    var vonDate = MonthPickerBox(hintText: AppLocalizations.of(context).von);
-    var bisDate = MonthPickerBox(hintText: AppLocalizations.of(context).bis);
+    var datePicker = FlexibleDatePicker(
+      startYear: DateTime.now().year,
+      withMonth: true,
+      multiDate: true,
+    );
 
     showDialog(
         context: context,
@@ -790,28 +794,19 @@ class _ErkundenPageState extends State<ErkundenPage> {
                         fontSize: 18, fontWeight: FontWeight.bold),
                   )),
               const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  vonDate,
-                  const SizedBox(
-                    width: 30,
-                  ),
-                  bisDate
-                ],
-              ),
+              datePicker,
               Container(
                 margin: const EdgeInsets.all(30),
                 child: FloatingActionButton.extended(
                     onPressed: () {
-                      if (vonDate.getDate() == null) {
+                      if (datePicker.getDate() == null) {
                         customSnackbar(context,
                             AppLocalizations.of(context).datumEingeben);
                         return;
                       }
 
                       setLookForReiseplanung(
-                          vonDate.getDate(), bisDate.getDate());
+                          datePicker.getDate()[0], datePicker.getDate()[1]);
 
                       Navigator.pop(context);
                     },

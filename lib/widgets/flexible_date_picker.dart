@@ -3,6 +3,7 @@ import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
 
 class FlexibleDatePicker extends StatefulWidget {
   final int startYear;
@@ -11,9 +12,8 @@ class FlexibleDatePicker extends StatefulWidget {
   int selectedEndDay, selectedEndMonth, selectedEndYear;
   bool withMonth;
   bool withDay;
-  String language;
-  String hintText;
   bool multiDate;
+  DateTime selectedDate;
 
   FlexibleDatePicker(
       {Key key,
@@ -21,19 +21,31 @@ class FlexibleDatePicker extends StatefulWidget {
       this.endYear,
       this.withDay = false,
       this.withMonth = false,
-      this.language,
-      this.hintText = "",
       this.multiDate = false,
+      this.selectedDate
       }) : super(key: key);
 
+  setDate(DateTime date){
+    selectedDay = date.day;
+    selectedMonth = date.month;
+    selectedYear = date.year;
+    selectedDate = date;
+  }
+
   getDate() {
+    
     if(multiDate){
       DateTime start = DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1,
         selectedDay != null ? 1 : 0);
       DateTime end = DateTime(selectedEndYear, selectedEndMonth ?? 1, selectedEndDay ?? 1,
         selectedDay != null ? 1 : 0);  
+
       return [start, end];
     } else{
+      selectedYear ??= selectedDate.year;
+      selectedMonth ??= selectedDate.month;
+      selectedDay ??= selectedDate.day;
+
       return DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1,
         selectedDay != null ? 1 : 0);
     }
@@ -54,13 +66,14 @@ class FlexibleDatePicker extends StatefulWidget {
 }
 
 class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
+  final String defaultLocale = Platform.localeName.split("_")[0];
   final int daysForListdays = 32;
   List listDays;
   List listMonths;
   List listYears;
   bool withDay;
   bool withMonth;
-  DateTime selectedDate;
+  
   DateTime selectedEndDate;
   bool moreDateData = false;
   List<dynamic> listMonths_de = [
@@ -94,10 +107,16 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
 
   @override
   void initState() {
+    if(widget.selectedDate != null){
+      widget.selectedYear = widget.selectedDate.year;
+      widget.selectedMonth = widget.selectedDate.month;
+      widget.selectedDay = widget.selectedDate.day;
+    }
+
     withDay = true;
     withMonth = true;
     listDays = Iterable<int>.generate(daysForListdays).skip(1).toList();
-    listMonths = widget.language == "ger" ? listMonths_de : listMonths_en;
+    listMonths = defaultLocale == "de" ? listMonths_de : listMonths_en;
     listYears =
         Iterable<int>.generate((widget.endYear ?? DateTime.now().year + 10) + 1)
             .skip(widget.startYear ?? DateTime.now().year)
@@ -129,7 +148,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
       return false;
     }
 
-    selectedDate = DateTime(widget.selectedYear, widget.selectedMonth ?? 1,
+    widget.selectedDate = DateTime(widget.selectedYear, widget.selectedMonth ?? 1,
           widget.selectedDay ?? 1, widget.selectedDay != null ? 1 : 0);
 
     if(widget.multiDate){
@@ -147,30 +166,30 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   reset() {}
 
   createDateText() {
-    if (selectedDate == null) return widget.hintText;
+    if (widget.selectedDate == null) return AppLocalizations.of(context).datumEingeben;
       if(!withDay && !widget.withMonth){
         if(widget.multiDate){
-          return selectedDate.year.toString() + " - " + selectedEndDate.year.toString();
+          return widget.selectedDate.year.toString() + " - " + selectedEndDate.year.toString();
         }else{
-          return selectedDate.year.toString();
+          return widget.selectedDate.year.toString();
         }
       }else if(!withDay && widget.withMonth){
         if(widget.multiDate){
-          return selectedDate.month.toString() + "." +selectedDate.year.toString() + " - " 
+          return widget.selectedDate.month.toString() + "." +widget.selectedDate.year.toString() + " - " 
             + selectedEndDate.month.toString() + "." +selectedEndDate.year.toString();
         }else{
-          return selectedDate.month.toString() + "." +selectedDate.year.toString();
+          return widget.selectedDate.month.toString() + "." +widget.selectedDate.year.toString();
         }
         
       }else{
         if(widget.multiDate){
-          return selectedDate.day.toString() + "." + selectedDate.month.toString() + "." 
-            + selectedDate.year.toString() + " - " + selectedEndDate.day.toString() + "." 
+          return widget.selectedDate.day.toString() + "." + widget.selectedDate.month.toString() + "." 
+            + widget.selectedDate.year.toString() + " - " + selectedEndDate.day.toString() + "." 
           + selectedEndDate.month.toString() + "." + selectedEndDate.year.toString();
         }else{
-          return selectedDate.day.toString() + "." 
-            + selectedDate.month.toString() + "." 
-            + selectedDate.year.toString();
+          return widget.selectedDate.day.toString() + "." 
+            + widget.selectedDate.month.toString() + "." 
+            + widget.selectedDate.year.toString();
         }
 
       }
@@ -256,11 +275,10 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
           borderRadius: BorderRadius.all(Radius.circular(5))
           ),
         child: Center(
-            child: Text(
-          createDateText(),
+            child: Text(createDateText(), textAlign: TextAlign.center,
           style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: selectedDate == null ? Colors.grey : Colors.black),
+              color: widget.selectedDate == null ? Colors.grey : Colors.black),
         )),
       ),
     );
