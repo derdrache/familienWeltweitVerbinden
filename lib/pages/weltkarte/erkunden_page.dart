@@ -800,11 +800,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 child: FloatingActionButton.extended(
                     onPressed: () {
                       if (datePicker.getDate() == null) {
-                        customSnackbar(context,
-                            AppLocalizations.of(context).datumEingeben);
+                        customSnackbar(context,AppLocalizations.of(context).datumEingeben);
                         return;
                       }
 
+                      if(datePicker.getDate()[1].isBefore(datePicker.getDate()[0])){
+                        customSnackbar(context,AppLocalizations.of(context).bisDatumFalsch);
+                        return;
+                      }
+                      
                       setLookForReiseplanung(
                           datePicker.getDate()[0], datePicker.getDate()[1]);
 

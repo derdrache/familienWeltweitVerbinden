@@ -453,6 +453,7 @@
     "tag": "Day",
     "monat": "Month",
     "jahr": "Year",
-    "genauesDatum": "Accurate date"
+    "genauesDatum": "Accurate date",
+    "bisDatumFalsch": "End date must be greater than the start date"
 }
 

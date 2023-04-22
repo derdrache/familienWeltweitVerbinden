@@ -452,5 +452,6 @@
     "tag": "Tag",
     "monat": "Monat",
     "jahr": "Jahr",
-    "genauesDatum": "Genaues Datum"
+    "genauesDatum": "Genaues Datum",
+    "bisDatumFalsch": "Enddatum muss größer als das Startdatum sein"
 }
