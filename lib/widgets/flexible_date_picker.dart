@@ -2,7 +2,6 @@ import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
 import 'dart:io';
 
 class FlexibleDatePicker extends StatefulWidget {
@@ -33,6 +32,7 @@ class FlexibleDatePicker extends StatefulWidget {
   }
 
   getDate() {
+    if(selectedYear == null) return null;
     
     if(multiDate){
       DateTime start = DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1,
@@ -148,10 +148,18 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
       return false;
     }
 
-    widget.selectedDate = DateTime(widget.selectedYear, widget.selectedMonth ?? 1,
+    DateTime startDate = DateTime(widget.selectedYear, widget.selectedMonth ?? 1,
           widget.selectedDay ?? 1, widget.selectedDay != null ? 1 : 0);
+    widget.selectedDate = startDate;
 
     if(widget.multiDate){
+      DateTime endDate = DateTime(widget.selectedEndYear, widget.selectedEndMonth ?? 1, 
+        widget.selectedEndDay ?? 1, widget.selectedDay != null ? 1 : 0);
+
+      if(endDate.isBefore(startDate)){
+        return false;
+      }
+
       selectedEndDate = DateTime(widget.selectedEndYear, widget.selectedEndMonth ?? 1, 
         widget.selectedEndDay ?? 1, widget.selectedDay != null ? 1 : 0);
     }
@@ -167,6 +175,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
 
   createDateText() {
     if (widget.selectedDate == null) return AppLocalizations.of(context).datumEingeben;
+    
       if(!withDay && !widget.withMonth){
         if(widget.multiDate){
           return widget.selectedDate.year.toString() + " - " + selectedEndDate.year.toString();
