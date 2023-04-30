@@ -32,9 +32,11 @@ class FlexibleDatePicker extends StatefulWidget {
   }
 
   getDate() {
-    if(selectedYear == null) return null;
+
     
     if(multiDate){
+      if(selectedYear == null) return null;
+
       DateTime start = DateTime(selectedYear, selectedMonth ?? 1, selectedDay ?? 1,
         selectedDay != null ? 1 : 0);
       DateTime end = DateTime(selectedEndYear, selectedEndMonth ?? 1, selectedEndDay ?? 1,

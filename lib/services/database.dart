@@ -100,7 +100,7 @@ class ProfilDatabase {
         body: json.encode({
           "id": userId,
           "land": locationDict["countryname"],
-          "city": locationDict["city"],
+          "city": locationDict["city"].replaceAll("'", "\\'"),
           "longt": locationDict["longt"],
           "latt": locationDict["latt"]
         }));
@@ -533,8 +533,7 @@ class ChatGroupsDatabase {
       chatGroupData = await ChatGroupsDatabase()
           .getChatData("*", "WHERE connected = '</stadt=$cityId'");
       if (chatGroupData == false) {
-        chatGroupData =
-            await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$cityId");
+        chatGroupData = await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$cityId");
       }
     }
 
@@ -744,8 +743,10 @@ class StadtinfoDatabase {
 
     if (!await _checkIfNew(city)) return false;
 
+    Map dbCity = Map.of(city);
+    dbCity["ort"] = dbCity["ort"].replaceAll("'", "''");
     var url = Uri.parse(databaseUrl + databasePathNewCity);
-    var cityId = await http.post(url, body: json.encode(city));
+    var cityId = await http.post(url, body: json.encode(dbCity));
     var newCityInfo = {
       "id": cityId.body,
       "ort": city["ort"],
@@ -1025,7 +1026,6 @@ class NewsPageDatabase {
     news["erstelltVon"] = FirebaseAuth.instance.currentUser.uid;
 
     await http.post(url, body: json.encode(news));
-
     return true;
   }
 

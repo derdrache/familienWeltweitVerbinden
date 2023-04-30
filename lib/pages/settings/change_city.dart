@@ -33,6 +33,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
   @override
   void initState() {
+    save();
     autoComplete.onConfirm = (){
       save();
     };
@@ -107,11 +108,16 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
   }
 
   saveNewsPage(locationDict) async {
-    bool isSaved =  await NewsPageDatabase().addNewNews({
-      "typ": "ortswechsel",
-      "information": json.encode(locationDict),
-    });
+    Map dbLocation = Map.of(locationDict);
+    dbLocation["city"] = dbLocation["city"].replaceAll("'", "''");
+    dbLocation["ort"] = dbLocation["ort"].replaceAll("'", "''");
 
+    var newLocationNews = {
+      "typ": "ortswechsel",
+      "information": json.encode(dbLocation),
+    };
+
+    bool isSaved =  await NewsPageDatabase().addNewNews(newLocationNews);
     if(!isSaved) return;
 
     var newsFeed = Hive.box("secureBox").get("newsFeed");
@@ -123,8 +129,8 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     });
   }
 
-  saveCityInformation(locationDict){
-    StadtinfoDatabase().addNewCity(locationDict);
+  saveCityInformation(locationDict) async{
+    await StadtinfoDatabase().addNewCity(locationDict);
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '${ownProfil["id"]}')",
         "WHERE (ort LIKE '%${locationDict["city"]}%' OR ort LIKE '%${locationDict["countryname"]}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
@@ -153,8 +159,8 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
   }
 
   save() async {
-    var locationData = autoComplete.getGoogleLocationData();
-
+    //var locationData = autoComplete.getGoogleLocationData();
+    var locationData = {"city": "Platja d'Aro", "countryname": "Spain", "longt": 3.0668559, "latt": 41.8179488};
 
     if(locationData["city"] == null) {
       customSnackbar(context, AppLocalizations.of(context).ortEingeben);
@@ -170,11 +176,12 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     final String oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
 
     saveLocation(locationDict);
+    await saveCityInformation(locationDict);
     joindAndRemoveChatGroups(locationDict, oldLocation);
     deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);
     notifications.prepareNewFamilieLocationNotification();
-    saveCityInformation(locationDict);
+
 
     deleteOldTravelPlan(locationDict);
     addVisitedCountries(locationDict["countryname"]);
