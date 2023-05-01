@@ -159,8 +159,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
   }
 
   save() async {
-    //var locationData = autoComplete.getGoogleLocationData();
-    var locationData = {"city": "Platja d'Aro", "countryname": "Spain", "longt": 3.0668559, "latt": 41.8179488};
+    var locationData = autoComplete.getGoogleLocationData();
 
     if(locationData["city"] == null) {
       customSnackbar(context, AppLocalizations.of(context).ortEingeben);
