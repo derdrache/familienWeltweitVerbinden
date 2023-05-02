@@ -742,7 +742,7 @@ class _UserInformationDisplay extends StatelessWidget {
           Text(AppLocalizations.of(context).kinder + ": ",
               style:
                   TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-          Text(childrenList.reversed.join(" , "),
+          Text(childrenList.reversed.join(", "),
               style: TextStyle(fontSize: textSize))
         ],
       );
