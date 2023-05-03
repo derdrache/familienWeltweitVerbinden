@@ -22,10 +22,10 @@ class NewsPage extends StatefulWidget {
   _NewsPageState createState() => _NewsPageState();
 }
 
-class _NewsPageState extends State<NewsPage> {
+class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
   final String userId = FirebaseAuth.instance.currentUser.uid;
-  List newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
-  List events = Hive.box('secureBox').get("events") ?? [];
+  List newsFeedData;
+  List events;
   List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
   List userNewsContentHive = Hive.box('secureBox').get("userNewsContent") ?? [];
@@ -57,7 +57,24 @@ class _NewsPageState extends State<NewsPage> {
       }
     });
 
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+      setState(() {});
+    }
+  }
+
+  _refreshData() async{
+    await refreshHiveNewsPage();
+    refreshHiveChats();
+    refreshHiveMeetups();
+    refreshHiveProfils();
+    refreshHiveCommunities();
   }
 
   _addNewSettingProfil() {
@@ -199,8 +216,9 @@ class _NewsPageState extends State<NewsPage> {
   }
 
   Widget build(BuildContext context) {
-    const double titleFontSize = 15;
     newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
+    events = Hive.box('secureBox').get("events") ?? [];
+    const double titleFontSize = 15;
 
     friendsDisplay(news) {
       String addedUser = news["information"].split(" ")[1];

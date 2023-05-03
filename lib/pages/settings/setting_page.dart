@@ -22,6 +22,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../global/global_functions.dart' as global_func;
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
+import '../../services/database.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/profil_image.dart';
 import '../../windows/upcoming_updates.dart';
@@ -44,7 +45,7 @@ var borderColor = Colors.grey[200];
 double globalPadding = 30;
 double fontSize = 20;
 var userID = FirebaseAuth.instance.currentUser.uid;
-var userProfil = Hive.box("secureBox").get("ownProfil");
+var userProfil;
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key key}) : super(key: key);
@@ -53,9 +54,34 @@ class SettingPage extends StatefulWidget {
   _SettingPageState createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingPage> {
+class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver{
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+
+    super.initState();
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+      setState(() {});
+    }
+  }
+
+  _refreshData() async {
+    await refreshHiveProfils();
+    refreshHiveNewsPage();
+    refreshHiveChats();
+    refreshHiveMeetups();
+    refreshHiveCommunities();
+  }
+
   @override
   Widget build(BuildContext context) {
+    userProfil = Hive.box("secureBox").get("ownProfil");
+
     return Scaffold(
       appBar: _SettingsAppBar(
         userProfil: userProfil,
@@ -70,7 +96,7 @@ class _SettingPageState extends State<SettingPage> {
           }),
           child:
               ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
-            const _NameSection(),
+            _NameSection(),
             _ProfilSection(afterChange: () => setState(() {}),),
             const _SettingSection(),
             const _SupportInformation()
@@ -206,6 +232,8 @@ class _ProfilSection extends StatelessWidget {
 
   void setData() async {
     List childrenAgeTimestamp = [];
+
+    userProfil["kinder"].sort();
 
     userProfil["kinder"].forEach((kind) {
       var changeTimeStamp = global_func.ChangeTimeStamp(kind);

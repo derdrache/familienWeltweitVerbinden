@@ -20,7 +20,6 @@ import '../../widgets/flexible_date_picker.dart';
 import '../../services/database.dart';
 import '../../services/locationsService.dart';
 import '../../widgets/badge_icon.dart';
-import '../../widgets/month_picker.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/meetups/meetupCard.dart';
 import '../informationen/location/location_Information.dart';
@@ -33,7 +32,7 @@ class ErkundenPage extends StatefulWidget {
   _ErkundenPageState createState() => _ErkundenPageState();
 }
 
-class _ErkundenPageState extends State<ErkundenPage> {
+class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver{
   var userId = FirebaseAuth.instance.currentUser.uid;
   var profils = [];
   var profilsBackup = [];
@@ -104,9 +103,27 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     setSearchAutocomplete();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => mounted = true);
+    WidgetsBinding.instance.addObserver(this);
+
     super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) => mounted = true);
   }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+      setState(() {});
+    }
+  }
+
+  _refreshData() async {
+    await refreshHiveProfils();
+    refreshHiveNewsPage();
+    refreshHiveChats();
+    await refreshHiveMeetups();
+    await refreshHiveCommunities();
+  }
+
 
   setEvents(){
     var localDbEvents = Hive.box('secureBox').get("events") ?? [];

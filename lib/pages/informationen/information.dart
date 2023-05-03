@@ -6,6 +6,7 @@ import '../../global/style.dart';
 import '../informationen/community/community_page.dart';
 import '../informationen/meetups/meetup_page.dart';
 import 'location/location_page.dart';
+import '../../services/database.dart';
 
 class InformationPage extends StatefulWidget {
   var pageSelection;
@@ -15,7 +16,7 @@ class InformationPage extends StatefulWidget {
   State<InformationPage> createState() => _InformationPageState();
 }
 
-class _InformationPageState extends State<InformationPage> {
+class _InformationPageState extends State<InformationPage> with WidgetsBindingObserver{
   var pageList = [
     "",
     const MeetupPage(),
@@ -44,6 +45,30 @@ class _InformationPageState extends State<InformationPage> {
     }
 
     return communityNotifikation;
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+      setState(() {});
+    }
+  }
+
+  _refreshData() async{
+    refreshHiveStadtInfo();
+    refreshHiveStadtInfoUser();
+    refreshHiveNewsPage();
+    refreshHiveChats();
+    refreshHiveMeetups();
+    refreshHiveProfils();
+    refreshHiveCommunities();
   }
 
   @override

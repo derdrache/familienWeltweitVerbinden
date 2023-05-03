@@ -40,7 +40,7 @@ class StartPage extends StatefulWidget {
   _StartPageState createState() => _StartPageState();
 }
 
-class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
+class _StartPageState extends State<StartPage> {
   final String userName = FirebaseAuth.instance.currentUser?.displayName;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   bool hasInternet = true;
@@ -53,7 +53,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     widget.chatPageSliderIndex ??= 0;
     _networkConnectivity = NetworkConnectivity(context);
 
-    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
@@ -65,13 +64,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   void dispose(){
     _networkConnectivity.disposeStream();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _refreshHiveDb();
-    }
   }
 
   _asyncMethod() async {
@@ -271,14 +263,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
   }
 
-  _refreshHiveDb() async {
-    await refreshHiveChats();
-    await refreshHiveMeetups();
-    await refreshHiveProfils();
-    await refreshHiveCommunities();
-    await refreshHiveNewsPage();
-  }
-
   _oldUserAutomaticJoinChats(ort) async {
     var savedVersion = Hive.box('secureBox').get("version");
     var lastLoginBeforeUpdate = savedVersion == null && DateTime.parse(ownProfil["lastLogin"])
@@ -298,8 +282,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     tabPages = <Widget>[
-      const NewsPage(),
-      const ErkundenPage(),
+      NewsPage(),
+      ErkundenPage(),
       InformationPage(pageSelection: widget.informationPageIndex),
       ChatPage(
           chatPageSliderIndex: widget.chatPageSliderIndex

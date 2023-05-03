@@ -28,7 +28,7 @@ class ChatPage extends StatefulWidget {
   _ChatPageState createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   var userId = FirebaseAuth.instance.currentUser.uid;
   var searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
@@ -55,11 +55,23 @@ class _ChatPageState extends State<ChatPage> {
     checkNewMessageCounter();
     initilizeCreateChatData();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      refreshChatDataFromDb();
-    });
-
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+      setState(() {});
+    }
+  }
+
+  _refreshData() async{
+    refreshHiveProfils();
+    refreshHiveNewsPage();
+    await refreshHiveChats();
+    refreshHiveMeetups();
+    refreshHiveCommunities();
   }
 
   checkNewMessageCounter() async {
