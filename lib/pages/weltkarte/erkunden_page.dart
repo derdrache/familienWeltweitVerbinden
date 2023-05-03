@@ -822,18 +822,24 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
                 margin: const EdgeInsets.all(30),
                 child: FloatingActionButton.extended(
                     onPressed: () {
-                      if (datePicker.getDate() == null) {
+                      var selectedDate = datePicker.getDate();
+
+                      if (selectedDate == null) {
                         customSnackbar(context,AppLocalizations.of(context).datumEingeben);
                         return;
                       }
 
-                      if(datePicker.getDate()[1].isBefore(datePicker.getDate()[0])){
-                        customSnackbar(context,AppLocalizations.of(context).bisDatumFalsch);
-                        return;
+                      if(selectedDate.runtimeType == DateTime){
+                        selectedDate = [selectedDate, null];
+                      }else{
+                        if(selectedDate[1].isBefore(selectedDate[0])){
+                          customSnackbar(context,AppLocalizations.of(context).bisDatumFalsch);
+                          return;
+                        }
                       }
-                      
-                      setLookForReiseplanung(
-                          datePicker.getDate()[0], datePicker.getDate()[1]);
+
+
+                      setLookForReiseplanung(selectedDate[0], selectedDate[1]);
 
                       Navigator.pop(context);
                     },
@@ -857,7 +863,7 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
   }
 
   showReiseplaungMatchedProfils(von, bis) {
-    von = von;
+    von = DateTime(von.year, von.month, von.day);
     bis = bis ?? von;
     var selectDates = [von];
     var selectedProfils = [];
@@ -872,38 +878,38 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
 
       if (reiseplanung == null || profil["id"] == userId) continue;
 
-      reiseplanungLoop:
       for (var planung in reiseplanung) {
         var planungVon = DateTime.parse(planung["von"]);
         var planungBis = DateTime.parse(planung["bis"]);
 
         if (selectDates.contains(planungVon)) {
-          var newProfil = profil;
+          var newProfil = Map.of(profil);
           newProfil["ort"] = planung["ortData"]["city"];
           newProfil["land"] = planung["ortData"]["countryname"];
           newProfil["latt"] = planung["ortData"]["latt"];
           newProfil["longt"] = planung["ortData"]["longt"];
 
           selectedProfils.add(newProfil);
-          continue reiseplanungLoop;
+          continue;
         }
 
         while (planungVon != planungBis) {
           planungVon =
               DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
           if (selectDates.contains(planungVon)) {
-            profil["ort"] = planung["ortData"]["city"];
-            profil["land"] = planung["ortData"]["countryname"];
-            profil["latt"] = planung["ortData"]["latt"];
-            profil["longt"] = planung["ortData"]["longt"];
+            var newProfil = Map.of(profil);
+            newProfil["ort"] = planung["ortData"]["city"];
+            newProfil["land"] = planung["ortData"]["countryname"];
+            newProfil["latt"] = planung["ortData"]["latt"];
+            newProfil["longt"] = planung["ortData"]["longt"];
 
-            selectedProfils.add(profil);
-            continue reiseplanungLoop;
+            selectedProfils.add(newProfil);
+            continue;
           }
         }
       }
     }
-
+    print(selectedProfils);
     profils = selectedProfils;
     createAndSetZoomLevels(profils, "profils");
   }
