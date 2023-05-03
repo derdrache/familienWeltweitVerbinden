@@ -453,5 +453,6 @@
     "monat": "Monat",
     "jahr": "Jahr",
     "genauesDatum": "Genaues Datum",
-    "bisDatumFalsch": "Enddatum muss größer als das Startdatum sein"
+    "bisDatumFalsch": "Enddatum muss größer als das Startdatum sein",
+    "zeitraumSuche": "Zeitraum auswahl"
 }

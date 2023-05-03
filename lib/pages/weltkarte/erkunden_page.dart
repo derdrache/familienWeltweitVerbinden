@@ -795,6 +795,8 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
       startYear: DateTime.now().year,
       withMonth: true,
       multiDate: true,
+      withEndDateSwitch: true,
+      inaccurateDate: true,
     );
 
     showDialog(

@@ -1,7 +1,5 @@
-import 'package:familien_suche/widgets/year_picker.dart';
 import 'package:flutter/material.dart';
 import '../widgets/flexible_date_picker.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 double sideSpace = 10;
 
@@ -10,7 +8,7 @@ class CustomDatePicker extends StatefulWidget {
   var hintText;
   var deleteFunction;
   bool dateIsSelected;
-    var datePicker;
+  var datePicker;
 
   getPickedDate(){
     return datePicker.getDate();
@@ -40,16 +38,6 @@ class CustomDatePickerState extends State<CustomDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-
-    differentText(){
-      if (widget.dateIsSelected){
-        return Text(widget.hintText, style: const TextStyle(fontSize: 16, color: Colors.black));
-      } else{
-        return const Text("Year", style: TextStyle(fontSize: 13, color: Colors.grey));
-      }
-    }
-
-
     return FractionallySizedBox(
       widthFactor: 0.25,
       child: Stack(
