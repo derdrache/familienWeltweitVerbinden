@@ -301,16 +301,20 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
     if(filterList.isEmpty){
       filterProfils = profilsBackup;
     }else{
-      for (var profil in Hive.box('secureBox').get("profils") ?? []) {
-        if (checkIfInFilter(profil)){
-          filterProfils.add(profil);
-        }else{
-          for(var family in familyProfils){
-            var familyName = (spracheIstDeutsch ? "Familie:" : "family") + " " + family["name"];
-            if(family["mainProfil"] == profil["id"] && filterList.contains(familyName)){
-              var familyProfil = Map.from(profil);
-              familyProfil["name"] = familyName;
-              filterProfils.add(familyProfil);
+      for (var profilGroup in aktiveProfils ?? []) {
+        for(var profil in profilGroup["profils"]) {
+          if (checkIfInFilter(profil)) {
+            filterProfils.add(profil);
+          } else {
+            for (var family in familyProfils) {
+              var familyName = (spracheIstDeutsch ? "Familie:" : "family") +
+                  " " + family["name"];
+              if (family["mainProfil"] == profil["id"] &&
+                  filterList.contains(familyName)) {
+                var familyProfil = Map.from(profil);
+                familyProfil["name"] = familyName;
+                filterProfils.add(familyProfil);
+              }
             }
           }
         }
