@@ -603,6 +603,11 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
             chatData = {
               "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
             };
+          } else if(group["connected"].contains("support")){
+            chatName = "Support Chat";
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
+            };
           }
         }
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
@@ -541,6 +542,11 @@ class _SupportInformation extends StatelessWidget {
             const SizedBox(height: 20),
             settingThemeContainer("Feedback", Icons.feedback,
                 () => global_func.changePage(context, FeedbackPage())),
+            const SizedBox(height: 20),
+            settingThemeContainer("Support Chat", Icons.chat,
+                    () => global_func.changePage(context, ChatDetailsPage(
+                        isChatgroup: true, chatId: "86",connectedId: "</support=1"
+                    ))),
             const SizedBox(height: 20),
             settingThemeContainer("Patch Notes", Icons.format_list_bulleted,
                 () => PatchnotesWindow(context: context).openWindow()),
