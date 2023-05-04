@@ -498,6 +498,23 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
         }
       }
 
+      for(var userProfil in dbProfilData){
+        String userName = userProfil["name"];
+        String chatPartnerId = userProfil["id"];
+
+        var containCondition =
+            userName.contains(value) || userName.contains(firstLetterBig);
+        bool chatExist = false;
+
+        for(var chat in myChats){
+          if(chat["users"][chatPartnerId] != null) chatExist = true;
+        }
+
+        if(containCondition && !chatExist){
+          searchListAllChatgroups.add(userProfil);
+        }
+      }
+
       List allChatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
       for (var chatGroup in allChatGroups) {
         var chatConnected = chatGroup["connected"];
@@ -549,15 +566,40 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
         Map chatPartnerProfil;
         String chatPartnerId;
 
-        var users = group["users"];
-        var isNotChatGroup = group["connected"] == null;
+        var users = group["users"] ?? {};
+        var isChatGroup = group["connected"] != null;
         var chatData;
 
         if (group["lastMessage"] is int) {
           group["lastMessage"] = group["lastMessage"].toString();
         }
 
-        if (isNotChatGroup) {
+        if(isChatGroup){
+          var connectedId = group["connected"].split("=")[1];
+
+          if (group["connected"].contains("event")) {
+            chatData = getMeetupFromHive(connectedId);
+            chatName = chatData["name"];
+          } else if (group["connected"].contains("community")) {
+            chatData = getCommunityFromHive(connectedId);
+            chatName = chatData["name"];
+          } else if (group["connected"].contains("stadt")) {
+            chatName = getCityFromHive(cityId: connectedId, getName: true);
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
+            };
+          } else if (group["connected"].contains("world")) {
+            chatName = AppLocalizations.of(context).weltChat;
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
+            };
+          } else if(group["connected"].contains("support")){
+            chatName = "Support Chat";
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
+            };
+          }
+        } else if (users.isNotEmpty){
           users.forEach((key, value) async {
             if (key != userId) {
               chatPartnerId = key;
@@ -584,43 +626,24 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
               isBlocked) {
             continue;
           }
-        } else if (group["connected"].isNotEmpty) {
-          var connectedId = group["connected"].split("=")[1];
+        }else{
+          chatName = group["name"];
+          chatPartnerProfil = group;
 
-          if (group["connected"].contains("event")) {
-            chatData = getMeetupFromHive(connectedId);
-            chatName = chatData["name"];
-          } else if (group["connected"].contains("community")) {
-            chatData = getCommunityFromHive(connectedId);
-            chatName = chatData["name"];
-          } else if (group["connected"].contains("stadt")) {
-            chatName = getCityFromHive(cityId: connectedId, getName: true);
-            chatData = {
-              "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
-            };
-          } else if (group["connected"].contains("world")) {
-            chatName = AppLocalizations.of(context).weltChat;
-            chatData = {
-              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
-            };
-          } else if(group["connected"].contains("support")){
-            chatName = "Support Chat";
-            chatData = {
-              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
-            };
-          }
+          var isBlocked = group["geblocktVon"].contains(userId);
+          if(isBlocked) continue;
         }
 
         if (chatName == null) continue;
 
-        var lastMessage = cutMessage(group["lastMessage"]);
+        var lastMessage = cutMessage(group["lastMessage"] ?? "");
         var ownChatNewMessages =
             users[userId] != null ? users[userId]["newMessages"] : 0;
 
         var isPinned =
             users[userId] != null ? users[userId]["pinned"] ?? false : false;
         var lastMessageTime =
-            DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
+            DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"] ?? 0);
         var sortIndex = chatGroupContainers.length;
 
         if (isPinned) sortIndex = 0;
@@ -657,13 +680,13 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                           context,
                           MaterialPageRoute(
                               builder: (_) => ChatDetailsPage(
-                                  chatPartnerName: isNotChatGroup
-                                      ? chatPartnerProfil["name"]
-                                      : null,
+                                  chatPartnerName: isChatGroup
+                                      ? null
+                                      : chatPartnerProfil["name"],
                                   groupChatData: group,
                                   backToChatPage: true,
                                   chatPageSliderIndex: mainSlider,
-                                  isChatgroup: !isNotChatGroup)))
+                                  isChatgroup: isChatGroup)))
                       .whenComplete(() => changePageForever(
                           context,
                           StartPage(
