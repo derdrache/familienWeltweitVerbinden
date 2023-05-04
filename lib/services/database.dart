@@ -555,7 +555,7 @@ class ChatGroupsDatabase {
     var userId = FirebaseAuth.instance.currentUser.uid;
 
     myGroupChats.removeWhere(
-        (chat) => chat["connected"].split("=")[1] == connectedId.toString());
+        (chat) => chat["connected"] == connectedId.toString());
 
     ChatGroupsDatabase().updateChatGroup(
         "users = JSON_REMOVE(users, '\$.$userId')",
