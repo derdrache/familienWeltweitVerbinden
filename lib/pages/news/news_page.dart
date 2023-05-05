@@ -310,13 +310,15 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       bool samePlaceAndTime = (inDistance || ownOrt == newsOrt) &&
           locationTimeCheck >= 0 &&
           ownSettingProfil["showNewFamilyLocation"] == 1;
+      bool sameFamily = familyProfil != null ? familyProfil["members"].contains(userId) : false;
 
       if (newsUserProfil == null ||
           newsOrt == null ||
           newsLand == null ||
           ownSettingProfil["showFriendChangedLocation"] == 0 ||
           ownSettingProfil["showNewFamilyLocation"] == 0 ||
-          !(isFriend || samePlaceAndTime)) {
+          !(isFriend || samePlaceAndTime) ||
+          sameFamily) {
         return const SizedBox.shrink();
       }
 
