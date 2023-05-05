@@ -244,8 +244,15 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     var allProfils = getAllActiveProfilsHive();
 
     for (var profil in allProfils) {
-      var inLocation = profil["ort"].isNotEmpty && (widget.location["ort"]?.contains(profil["ort"]) ?? false);
-      var inCountry = profil["ort"].isNotEmpty && (widget.location["ort"]?.contains(profil["land"])??false);
+      if(profil["ort"].isEmpty) continue;
+
+      var inLocation = widget.location["ort"]?.contains(profil["ort"]) ?? false;
+      List countryVariations = widget.location["ort"].split(" / ");
+      bool inCountry = false;
+
+      for(var country in countryVariations){
+        if(country == profil["ort"]) inCountry = true;
+      }
 
       if (inLocation || inCountry) {
         familiesThere.add(profil["id"]);
