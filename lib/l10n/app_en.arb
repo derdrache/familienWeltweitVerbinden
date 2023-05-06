@@ -287,7 +287,7 @@
     "genauerStandortSichtbarFuer": "exact location visible for ",
     "filterErgebnisse": "all filters results",
     "keineMeetupsVorhanden": "no meetups available",
-    "langeZeitNichtGesehen": "long time not seen",
+    "langeZeitNichtGesehen": "not seen for more than one month",
     "innerhalbMonatsGesehen": "seen within one month",
     "innerhalbWocheGesehen": "seen within one week",
     "kuerzlichGesehen": "seen recently",
