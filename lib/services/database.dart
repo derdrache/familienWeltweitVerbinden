@@ -763,7 +763,8 @@ class StadtinfoDatabase {
       "longt": city["longt"],
       "isCity": 1,
       "familien": [],
-      "interesse": []
+      "interesse": [],
+      "bild": ""
     };
 
     var stadtInfos = Hive.box('secureBox').get("stadtinfo");
@@ -814,13 +815,12 @@ class StadtinfoDatabase {
   update(whatData, queryEnd) async {
     var url = Uri.parse(databaseUrl + databasePathUpdate);
 
-    var test = await http.post(url,
+    await http.post(url,
         body: json.encode({
           "table": "stadtinfo",
           "whatData": whatData,
           "queryEnd": queryEnd
         }));
-    print(test.body);
   }
 
   _checkIfNew(city) async {
