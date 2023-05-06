@@ -14,7 +14,6 @@ import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class ChangeLocationPage extends StatefulWidget {
   const ChangeLocationPage({Key key}) : super(key: key);
 
@@ -33,15 +32,14 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
   @override
   void initState() {
-    save();
-    autoComplete.onConfirm = (){
+    autoComplete.onConfirm = () {
       save();
     };
 
     super.initState();
   }
 
-  joindAndRemoveChatGroups(locationDict, oldLocation) async{
+  joindAndRemoveChatGroups(locationDict, oldLocation) async {
     final Map leaveCity = getCityFromHive(cityName: oldLocation) ?? {};
     String chatConnectId = leaveCity["id"].toString();
 
@@ -49,60 +47,66 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
   }
 
-  addVisitedCountries(newCountry) async{
+  addVisitedCountries(newCountry) async {
     List visitedCountries = ownProfil["besuchteLaender"];
     Map allCountries = LocationService().getAllCountryNames();
-    String targetLanguage = getVisitedCountriesLanguage(visitedCountries, allCountries);
+    String targetLanguage =
+        getVisitedCountriesLanguage(visitedCountries, allCountries);
     int wrongLanguageIndex = targetLanguage == "ger"
         ? allCountries["eng"].indexOf(newCountry)
         : allCountries["ger"].indexOf(newCountry);
 
-    if(wrongLanguageIndex > -1) newCountry = allCountries["ger"][wrongLanguageIndex];
+    if (wrongLanguageIndex > -1)
+      newCountry = allCountries["ger"][wrongLanguageIndex];
 
-    if(visitedCountries.contains(newCountry)) return;
-
+    if (visitedCountries.contains(newCountry)) return;
 
     ownProfil["besuchteLaender"].add(newCountry);
     ProfilDatabase().updateProfil(
         "besuchteLaender = JSON_ARRAY_APPEND(besuchteLaender, '\$', '$newCountry')",
-        "WHERE id = '${ownProfil["id"]}'"
-    );
+        "WHERE id = '${ownProfil["id"]}'");
   }
 
-  getVisitedCountriesLanguage(visitedCountries, allCountries){
+  getVisitedCountriesLanguage(visitedCountries, allCountries) {
     final bool isGermanDeviceLanguage = kIsWeb
         ? window.locale.languageCode == "de"
         : Platform.localeName == "de_DE";
     String visitedCountriesLanguage = ownProfil["besuchteLaender"].isEmpty
-        ?  isGermanDeviceLanguage ? "ger" : "eng"
+        ? isGermanDeviceLanguage
+            ? "ger"
+            : "eng"
         : allCountries["ger"].contains(ownProfil["besuchteLaender"][0])
-          ? "ger" : "eng";
+            ? "ger"
+            : "eng";
 
     return visitedCountriesLanguage;
   }
 
   saveLocation(locationDict) async {
     ownProfil["ort"] = locationDict["city"];
-    ownProfil["longt"] =locationDict["longt"];
-    ownProfil["latt"] =locationDict["latt"];
-    ownProfil["land"] =locationDict["countryname"];
+    ownProfil["longt"] = locationDict["longt"];
+    ownProfil["latt"] = locationDict["latt"];
+    ownProfil["land"] = locationDict["countryname"];
 
     ProfilDatabase().updateProfilLocation(ownProfil["id"], locationDict);
   }
 
-  deleteChangeCityNewsSameDay() async{
+  deleteChangeCityNewsSameDay() async {
     var now = DateTime.now();
     var nextDay = DateTime(now.year, now.month, now.day + 1);
     var formatter = new DateFormat('yyyy-MM-dd');
     String today = formatter.format(now);
     String tomorrow = formatter.format(nextDay);
-    String dateQuery = "erstelltAm >='$today 00:00:00' AND erstelltAm <'$tomorrow 00:00:00'";
+    String dateQuery =
+        "erstelltAm >='$today 00:00:00' AND erstelltAm <'$tomorrow 00:00:00'";
 
-    var getTodaysEntries = await NewsPageDatabase().getData("*", "WHERE erstelltVon = '${ownProfil["id"]}' AND typ = 'ortswechsel' AND $dateQuery", returnList: true);
+    var getTodaysEntries = await NewsPageDatabase().getData("*",
+        "WHERE erstelltVon = '${ownProfil["id"]}' AND typ = 'ortswechsel' AND $dateQuery",
+        returnList: true);
 
-    if(getTodaysEntries == false) return;
+    if (getTodaysEntries == false) return;
 
-    for(var news in getTodaysEntries){
+    for (var news in getTodaysEntries) {
       NewsPageDatabase().delete(news["id"]);
     }
   }
@@ -117,8 +121,8 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
       "information": json.encode(dbLocation),
     };
 
-    bool isSaved =  await NewsPageDatabase().addNewNews(newLocationNews);
-    if(!isSaved) return;
+    bool isSaved = await NewsPageDatabase().addNewNews(newLocationNews);
+    if (!isSaved) return;
 
     var newsFeed = Hive.box("secureBox").get("newsFeed");
     newsFeed.add({
@@ -129,39 +133,55 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     });
   }
 
-  saveCityInformation(locationDict) async{
+  saveCityInformation(locationDict) async {
     await StadtinfoDatabase().addNewCity(locationDict);
-    StadtinfoDatabase().update(
-        "familien = JSON_ARRAY_APPEND(familien, '\$', '${ownProfil["id"]}')",
-        "WHERE (ort LIKE '%${locationDict["city"]}%' OR ort LIKE '%${locationDict["countryname"]}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
+
+    var sql =
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '${ownProfil["id"]}')";
+    var cityInfo = getCityFromHive(cityName: locationDict["city"]);
+
+    if (!cityInfo["interesse"].contains(ownProfil["id"])) {
+      sql +=
+          ", interesse = JSON_ARRAY_APPEND(interesse, '\$', '${ownProfil["id"]}')";
+      cityInfo["interesse"].add(ownProfil["id"]);
+    }
+
+    StadtinfoDatabase().update(sql,
+        "WHERE (ort LIKE '%${locationDict["city"].replaceAll("'", "''")}%' OR ort LIKE '%${locationDict["city"].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
+
+    if(!cityInfo["familien"].contains(ownProfil["id"])){
+      cityInfo["familien"].add(ownProfil["id"]);
+    }
+
   }
 
-  deleteOldTravelPlan(locationDict){
+  deleteOldTravelPlan(locationDict) {
     List travelPlans = ownProfil["reisePlanung"];
     Map removePlan = {};
 
-    for(var travelPlan in travelPlans){
-      bool sameCity =locationDict["city"] == travelPlan["ortData"]["city"];
-      bool sameCountry = locationDict["countryname"] ==travelPlan["ortData"]["countryname"];
-      bool sameMonth = DateTime.parse(travelPlan["von"]).month == DateTime.now().month;
+    for (var travelPlan in travelPlans) {
+      bool sameCity = locationDict["city"] == travelPlan["ortData"]["city"];
+      bool sameCountry =
+          locationDict["countryname"] == travelPlan["ortData"]["countryname"];
+      bool sameMonth =
+          DateTime.parse(travelPlan["von"]).month == DateTime.now().month;
 
-      if(sameCity && sameCountry && sameMonth){
+      if (sameCity && sameCountry && sameMonth) {
         removePlan = travelPlan;
       }
     }
 
-
-    if(removePlan.isEmpty) return;
+    if (removePlan.isEmpty) return;
 
     travelPlans.remove(removePlan);
-    ProfilDatabase().updateProfil("reisePlanung = '$travelPlans'", "WHERE id = '${ownProfil["id"]}'");
-
+    ProfilDatabase().updateProfil(
+        "reisePlanung = '$travelPlans'", "WHERE id = '${ownProfil["id"]}'");
   }
 
   save() async {
     var locationData = autoComplete.getGoogleLocationData();
 
-    if(locationData["city"] == null) {
+    if (locationData["city"] == null) {
       customSnackbar(context, AppLocalizations.of(context).ortEingeben);
       return;
     }
@@ -181,16 +201,17 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     saveNewsPage(locationDict);
     notifications.prepareNewFamilieLocationNotification();
 
-
     deleteOldTravelPlan(locationDict);
     addVisitedCountries(locationDict["countryname"]);
 
-    customSnackbar(context,
-    AppLocalizations.of(context).aktuelleOrt +" "+
-            AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+    customSnackbar(
+        context,
+        AppLocalizations.of(context).aktuelleOrt +
+            " " +
+            AppLocalizations.of(context).erfolgreichGeaender,
+        color: Colors.green);
     Navigator.pop(context);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +219,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).ortAendern,
+        title: AppLocalizations.of(context).ortAendern,
       ),
       body: Center(
         child: Column(

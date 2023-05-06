@@ -521,6 +521,7 @@ class ChatGroupsDatabase {
 
   joinAndCreateCityChat(cityName) async {
     var userId = FirebaseAuth.instance.currentUser.uid;
+    var isNewChat = false;
 
     var city = getCityFromHive(cityName: cityName);
 
@@ -534,6 +535,7 @@ class ChatGroupsDatabase {
           .getChatData("*", "WHERE connected = '</stadt=$cityId'");
       if (chatGroupData == false) {
         chatGroupData = await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$cityId");
+        isNewChat = true;
       }
     }
 
@@ -546,8 +548,14 @@ class ChatGroupsDatabase {
             })}')",
         "WHERE id = ${chatGroupData["id"]}");
 
-    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-    myGroupChats.add(chatGroupData);
+
+    if(isNewChat){
+      refreshHiveChats();
+    }else{
+      var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+      myGroupChats.add(chatGroupData);
+    }
+
   }
 
   leaveChat(connectedId) {
@@ -754,7 +762,8 @@ class StadtinfoDatabase {
       "latt": city["latt"],
       "longt": city["longt"],
       "isCity": 1,
-      "familien": []
+      "familien": [],
+      "interesse": []
     };
 
     var stadtInfos = Hive.box('secureBox').get("stadtinfo");
@@ -805,12 +814,13 @@ class StadtinfoDatabase {
   update(whatData, queryEnd) async {
     var url = Uri.parse(databaseUrl + databasePathUpdate);
 
-    await http.post(url,
+    var test = await http.post(url,
         body: json.encode({
           "table": "stadtinfo",
           "whatData": whatData,
           "queryEnd": queryEnd
         }));
+    print(test.body);
   }
 
   _checkIfNew(city) async {
