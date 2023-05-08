@@ -21,6 +21,7 @@ class MeetupCard extends StatefulWidget {
   bool isCreator;
   bool bigCard;
   bool fromMeetupPage;
+  bool smallCard;
 
   MeetupCard({
     Key key,
@@ -30,7 +31,8 @@ class MeetupCard extends StatefulWidget {
         const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
     this.afterPageVisit,
     this.bigCard = false,
-    this.fromMeetupPage = false
+    this.fromMeetupPage = false,
+    this.smallCard = false
   })  : isCreator = meetupData["erstelltVon"] == userId,
         super(key: key);
 
@@ -131,9 +133,9 @@ class _MeetupCardState extends State<MeetupCard> {
 
   @override
   Widget build(BuildContext context) {
-    var bigMultiplikator = widget.bigCard == true ? 1.4 : 1.0;
+    var sizeRefactor = widget.bigCard == true ? 1.4 : widget.smallCard ? 0.5 : 1.0;
     double screenHeight = MediaQuery.of(context).size.height;
-    var fontSize = screenHeight / 55 * bigMultiplikator;
+    var fontSize = screenHeight / 55 * sizeRefactor;
     var forTeilnahmeFreigegeben = (widget.meetupData["art"] == "public" ||
             widget.meetupData["art"] == "öffentlich") ||
         widget.meetupData["freigegeben"].contains(userId);
@@ -196,8 +198,8 @@ class _MeetupCardState extends State<MeetupCard> {
             MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
             whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
-          width: (130 + ((screenHeight - 600) / 5)) * bigMultiplikator,
-          height: screenHeight / 3.2 * bigMultiplikator,
+          width: (130 + ((screenHeight - 600) / 5)) * sizeRefactor,
+          height: screenHeight / 3.2 * sizeRefactor,
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -215,8 +217,8 @@ class _MeetupCardState extends State<MeetupCard> {
               Stack(
                 children: [
                   Container(
-                    constraints: const BoxConstraints(
-                      minHeight: 70,
+                    constraints: BoxConstraints(
+                      minHeight: 70 * sizeRefactor,
                     ),
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
@@ -226,19 +228,19 @@ class _MeetupCardState extends State<MeetupCard> {
                       child: isAssetImage
                           ? Image.asset(widget.meetupData["bild"],
                               height: (70 + ((screenHeight - 600) / 4)) *
-                                  bigMultiplikator,
+                                  sizeRefactor,
                               width: (135 + ((screenHeight - 600) / 4)) *
-                                  bigMultiplikator,
+                                  sizeRefactor,
                               fit: BoxFit.fill)
                           : Image.network(widget.meetupData["bild"],
                               height: (70 + ((screenHeight - 600) / 4)) *
-                                  bigMultiplikator,
+                                  sizeRefactor,
                               width: (130 + ((screenHeight - 600) / 4)) *
-                                  bigMultiplikator,
+                                  sizeRefactor,
                               fit: BoxFit.fill),
                     ),
                   ),
-                  if (widget.withInteresse && !widget.isCreator)
+                  if (widget.withInteresse && !widget.isCreator && !widget.smallCard)
                     Positioned(
                         top: 2,
                         right: 8,

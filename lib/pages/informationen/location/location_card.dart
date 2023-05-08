@@ -8,8 +8,13 @@ import 'location_Information.dart';
 class LocationCard extends StatefulWidget {
   Map location;
   var fromCityPage;
+  bool smallCard;
 
-  LocationCard({Key key, this.location, this.fromCityPage = false}) : super(key: key);
+  LocationCard({Key key,
+    this.location,
+    this.fromCityPage = false,
+    this.smallCard = false
+  }) : super(key: key);
 
   @override
   State<LocationCard> createState() => _LocationCardState();
@@ -65,6 +70,7 @@ class _LocationCardState extends State<LocationCard> {
 
   @override
   Widget build(BuildContext context) {
+    double sizeRefactor = widget.smallCard ? 0.5 : 1;
     hasInterest = widget.location["interesse"].contains(userId);
 
 
@@ -86,8 +92,8 @@ class _LocationCardState extends State<LocationCard> {
                 borderRadius: BorderRadius.circular(15.0),
               ),
               child: Container(
-                  width: 150,
-                  height: 200,
+                  width: 150 * sizeRefactor,
+                  height: 200 * sizeRefactor,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15.0),
@@ -106,11 +112,11 @@ class _LocationCardState extends State<LocationCard> {
                           widget.location["ort"],
                           textAlign: TextAlign.center,
                           style:
-                          const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 22 * sizeRefactor, fontWeight: FontWeight.bold),
                         ),
                       ))),
             ),
-            Positioned(
+            if(!widget.smallCard) Positioned(
                 right: 0,
                 child: IconButton(
                   onPressed: () => changeIntereset(),

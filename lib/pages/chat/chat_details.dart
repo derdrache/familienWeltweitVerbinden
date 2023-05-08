@@ -821,22 +821,24 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     writeActiveChat();
   }
 
-  getDisplayedCard(cardType, data) {
+  getDisplayedCard(cardType, data, {smallCard = false}) {
     if (cardType == "event") {
       return MeetupCard(
-        margin: const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 0),
-        withInteresse: true,
-        meetupData: data,
-        afterPageVisit: () => setState(() {}),
-      );
+          margin:
+              const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 0),
+          withInteresse: true,
+          meetupData: data,
+          afterPageVisit: () => setState(() {}),
+          smallCard: smallCard);
     } else if (cardType == "community") {
       return CommunityCard(
         margin: const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 0),
         community: data,
         afterPageVisit: () => setState(() {}),
+        smallCard: smallCard,
       );
     } else if (cardType == "location") {
-      return LocationCard(location: data);
+      return LocationCard(location: data, smallCard: smallCard);
     }
   }
 
@@ -849,10 +851,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return unreadMessages - noScrollCount;
   }
 
-  getCardIdDataFromMessage(String message){
+  getCardIdDataFromMessage(String message) {
     var messageSplit = message.replaceAll("\n", " ").split(" ");
     Map data = {
-      "id":"",
+      "id": "",
       "typ": "",
       "text": "",
       "onlyId": messageSplit.length == 1
@@ -879,6 +881,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     return data;
   }
+
+  saveLocal() {}
 
   @override
   Widget build(BuildContext context) {
@@ -1215,7 +1219,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorColor = creatorData["bildStandardFarbe"];
       var isMyMessage = message["von"] == userId;
 
-
       if (hasForward) {
         var messageAutorId = message["forward"].split(":")[1];
         forwardProfil = getProfilFromHive(profilId: messageAutorId);
@@ -1223,18 +1226,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       var cardIdData = getCardIdDataFromMessage(message["message"]);
 
-      if(cardIdData["typ"] == "event"){
+      if (cardIdData["typ"] == "event") {
         cardData = getMeetupFromHive(cardIdData["id"]);
-      }else if(cardIdData["typ"] == "community"){
+      } else if (cardIdData["typ"] == "community") {
         cardData = getCommunityFromHive(cardIdData["id"]);
-      }else if(cardIdData["typ"] == "city"){
+      } else if (cardIdData["typ"] == "city") {
         cardData = getCityFromHive(cityId: cardIdData["id"]);
       }
 
-      var replaceText = cardData["name"];
+      var replaceText = cardData["name"] ?? cardData["ort"];
       var removeId = cardIdData["text"];
 
-      message["message"] =
+      var changedMessageText =
           message["message"].replaceAll(removeId, replaceText).trim();
 
       if (cardData.isEmpty) return const SizedBox.shrink();
@@ -1303,20 +1306,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           getDisplayedCard(cardType, cardData),
                           if (isMyMessage || adminList.contains(userId))
                             Positioned(
-                                top: 2,
-                                right: 2,
-                                child: InkWell(
-                                  onTap: () {
-                                    checkAndRemovePinnedMessage(message);
-                                    deleteMessage(message["id"]);
-                                  },
-                                  child: const CircleAvatar(
+                              top: 2,
+                              right: 2,
+                              child: InkWell(
+                                onTap: () {
+                                  checkAndRemovePinnedMessage(message);
+                                  deleteMessage(message["id"]);
+                                },
+                                child: const CircleAvatar(
                                     radius: 12.0,
                                     backgroundColor: Colors.red,
-                                    child: Icon(Icons.close, color: Colors.white, size: 18)
-                                  ),
-                                ),
-                                )
+                                    child: Icon(Icons.close,
+                                        color: Colors.white, size: 18)),
+                              ),
+                            )
                         ],
                       )),
                   cardIdData["onlyId"]
@@ -1372,7 +1375,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     alignment: WrapAlignment.end,
                                     children: [
                                       TextWithHyperlinkDetection(
-                                          text: message["message"] ?? "",
+                                          text: changedMessageText ?? "",
                                           fontsize: 16,
                                           onTextTab: () =>
                                               openMessageMenu(message, index)),
@@ -1435,14 +1438,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var isCommunity = replyMessage.isEmpty
           ? false
           : replyMessage["message"].contains("</communityId=");
+      bool isLocation = replyMessage.isEmpty
+          ? false
+          : replyMessage["message"].contains("</cityId=");
+      bool containsCard = isEvent || isCommunity || isLocation;
+      String cardTyp = "";
 
-      if (isEvent || isCommunity) {
+      if (isEvent || isCommunity || isLocation) {
         if (isEvent) {
           var eventId = replyMessage["message"].substring(10);
           for (var event in allEvents) {
             if (event["id"] == eventId) {
               textAddition = "Event: ";
               cardData = event;
+              cardTyp = "event";
               break;
             }
           }
@@ -1452,9 +1461,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             if (community["id"] == communityId) {
               textAddition = "Community: ";
               cardData = community;
+              cardTyp = "community";
               break;
             }
           }
+        } else if (isLocation) {
+          var locationId = replyMessage["message"].substring(9);
+          cardData = getCityFromHive(cityId: locationId);
+          cardTyp = "location";
         }
       }
 
@@ -1555,7 +1569,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                       color: replyColor))),
                                           child: Container(
                                             height:
-                                                replyFromId != null ? 39 : 18,
+                                                replyFromId != null ? containsCard ? 142 : 39 : 18,
                                             constraints: BoxConstraints(
                                                 maxWidth: MediaQuery.of(context)
                                                         .size
@@ -1578,20 +1592,27 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                                           .bold,
                                                                   color:
                                                                       replyColor)),
-                                                      const SizedBox(height: 3),
+                                                      if(!containsCard) const SizedBox(height: 3),
                                                       Flexible(
-                                                        child: Text(
-                                                          cardData["name"] ==
-                                                                  null
-                                                              ? replyMessage[
-                                                                  "message"]
-                                                              : textAddition +
-                                                                  cardData[
-                                                                      "name"],
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
+                                                        child: !containsCard
+                                                            ? Text(
+                                                                cardData["name"] ==
+                                                                        null
+                                                                    ? replyMessage[
+                                                                        "message"]
+                                                                    : textAddition +
+                                                                        cardData[
+                                                                            "name"],
+                                                                maxLines: 1,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              )
+                                                            : getDisplayedCard(
+                                                                cardTyp,
+                                                                cardData,
+                                                                smallCard:
+                                                                    true),
                                                       )
                                                     ],
                                                   )
