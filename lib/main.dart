@@ -63,8 +63,16 @@ refreshHiveData() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  bool isPhone = getDeviceType() == "phone";
+
+  if(isPhone){
+    await SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  }else{
+    await SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown, DeviceOrientation.landscapeLeft,DeviceOrientation.landscapeRight]);
+  }
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -80,6 +88,11 @@ void main() async {
   refreshHiveData();
 
   runApp(MyApp());
+}
+
+String getDeviceType() {
+  final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+  return data.size.shortestSide < 550 ? 'phone' :'tablet';
 }
 
 class MyApp extends StatelessWidget {
