@@ -1445,29 +1445,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       String cardTyp = "";
 
       if (isEvent || isCommunity || isLocation) {
-        if (isEvent) {
-          var eventId = replyMessage["message"].substring(10);
-          for (var event in allEvents) {
-            if (event["id"] == eventId) {
-              textAddition = "Event: ";
-              cardData = event;
-              cardTyp = "event";
-              break;
-            }
-          }
-        } else if (isCommunity) {
-          var communityId = replyMessage["message"].substring(14);
-          for (var community in allCommunities) {
-            if (community["id"] == communityId) {
-              textAddition = "Community: ";
-              cardData = community;
-              cardTyp = "community";
-              break;
-            }
-          }
-        } else if (isLocation) {
-          var locationId = replyMessage["message"].substring(9);
-          cardData = getCityFromHive(cityId: locationId);
+        var cardIdData = getCardIdDataFromMessage(replyMessage["message"]);
+
+        if (cardIdData["typ"] == "event") {
+          cardData = getMeetupFromHive(cardIdData["id"]);
+          textAddition = "Event: ";
+          cardTyp = "event";
+        } else if (cardIdData["typ"] == "community") {
+          cardData = getCommunityFromHive(cardIdData["id"]);
+          textAddition = "Community: ";
+          cardTyp = "community";
+        } else if (cardIdData["typ"] == "city") {
+          cardData = getCityFromHive(cityId: cardIdData["id"]);
           cardTyp = "location";
         }
       }
