@@ -331,6 +331,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     setState(() {
       widget.groupChatData["lastMessage"] = message;
+      widget.groupChatData["lastMessageDate"] = int.parse(messageData["date"]);
     });
 
     var groupText = messageData["message"];
@@ -345,12 +346,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       groupText = "<Location Card>";
     }
 
-    for (var myChat in myChats) {
-      if (myChat["id"] == widget.groupChatData["id"]) {
-        myChat["lastMessage"] = groupText;
-        myChat["lastMessageDate"] = int.parse(messageData["date"]);
-      }
-    }
+    groupText = groupText.replaceAll("'", "''");
 
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateChatGroup(
