@@ -60,12 +60,6 @@ class _StartPageState extends State<StartPage> {
     _networkConnectivity.checkInternetStatusStream();
   }
 
-  @override
-  void dispose(){
-    _networkConnectivity.disposeStream();
-    super.dispose();
-  }
-
   _asyncMethod() async {
     await refreshHiveAllgemein();
     if (!kIsWeb) {
