@@ -909,7 +909,7 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
         }
       }
     }
-    print(selectedProfils);
+
     profils = selectedProfils;
     createAndSetZoomLevels(profils, "profils");
   }
@@ -1534,8 +1534,8 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
           onPositionChanged: (position, changed) {
               mapPosition = position.center;
               FocusScope.of(context).unfocus();
-
               if(currentMapZoom != position.zoom){
+                mapController.move(mapPosition, position.zoom);
                 currentMapZoom = position.zoom;
                 changeProfil(currentMapZoom);
               }
