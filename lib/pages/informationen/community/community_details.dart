@@ -60,6 +60,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   @override
   void initState() {
+    if(widget.community["beschreibungGer"].isEmpty) widget.community["beschreibungGer"] = widget.community["beschreibung"];
+    if(widget.community["beschreibungEng"].isEmpty) widget.community["beschreibungEng"] = widget.community["beschreibung"];
+
     _setCreatorText();
     _initImages();
     _getDBDataSetAllUserNames();
@@ -489,6 +492,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _saveChangeBeschreibung(newBeschreibung) async{
+    setState(() {
+      widget.community["beschreibung"] = newBeschreibung;
+    });
+
     var languageCheck = await translator.translate(newBeschreibung);
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
@@ -503,10 +510,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       var translation = await _descriptionTranslation(newBeschreibung,"de");
       widget.community["beschreibungGer"] = translation+ "\n\nHierbei handelt es sich um eine automatische Übersetzung";
     }
-
-    setState(() {
-      widget.community["beschreibung"] = newBeschreibung;
-    });
 
     newBeschreibung = newBeschreibung.replaceAll("'", "''");
     var beschreibungGer = widget.community["beschreibungGer"].replaceAll("'", "''");
@@ -923,11 +926,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       var isGerman = kIsWeb
           ? window.locale.languageCode == "de"
           : Platform.localeName == "de_DE";
-      if(widget.community["beschreibungGer"].isEmpty) widget.community["beschreibungGer"] = widget.community["beschreibung"];
-      if(widget.community["beschreibungEng"].isEmpty) widget.community["beschreibungEng"] = widget.community["beschreibung"];
-      var usedDiscription = isGerman
-          ? widget.community["beschreibungGer"]
-          : widget.community["beschreibungEng"];
+      var discription = "";
+
+      if(isCreator){
+        discription = widget.community["beschreibung"];
+      }else if(isGerman){
+        discription = widget.community["beschreibungGer"];
+      }else{
+        discription = widget.community["beschreibungEng"];
+      }
 
       return [
         Padding(
@@ -1005,7 +1012,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
             child: TextWithHyperlinkDetection(
-                text: usedDiscription,
+                text: discription,
               onTextTab: () => isCreator ? _changeBeschreibungWindow(): null,
             )
 
