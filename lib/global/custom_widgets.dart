@@ -86,7 +86,7 @@ Widget customFloatbuttonExtended(text, function){
   );
 }
 
-customSnackbar(context, text, {color = Colors.red, duration = const Duration(seconds: 5)}){
+customSnackbar(context, text, {color = Colors.red, duration = const Duration(seconds: 3)}){
   var snackbar = SnackBar(
         duration: duration,
           backgroundColor: color,
