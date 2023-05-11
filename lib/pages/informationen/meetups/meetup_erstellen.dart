@@ -164,7 +164,23 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       "ownMeetup": ownMeetup
     };
 
-    await MeetupDatabase().addNewMeetup(meetupData);
+    await MeetupDatabase().addNewMeetup(Map.of(meetupData));
+
+    meetupData["freischalten"] = [];
+    meetupData["eventInterval"] = meetupData["interval"];
+    meetupData["bis"] = meetupData["bis"] == "null" ? null : meetupData["bis"];
+    meetupData["absage"] = [];
+    meetupData["zusage"] = [];
+    meetupData["freigegeben"] = [];
+    meetupData["sprache"] = jsonDecode(meetupData["sprache"]);
+    meetupData["interesse"] = jsonDecode(meetupData["interesse"]);
+    meetupData["tags"] = [];
+
+    var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
+    myOwnMeetups.add(meetupData);
+    var meetups = Hive.box('secureBox').get("events") ?? [];
+    meetups.add(meetupData);
+
     StadtinfoDatabase().addNewCity(locationData);
     var dbMeetupData =
         await MeetupDatabase().getData("*", "WHERE id = '$meetupId'");

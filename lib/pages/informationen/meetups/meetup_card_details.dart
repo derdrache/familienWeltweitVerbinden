@@ -190,6 +190,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     widget.meetupData["name"] = newName;
     updateHiveMeetup(widget.meetupData["id"], "name", newName);
+
+    newName = newName.replaceAll("'", "''");
+
     MeetupDatabase()
         .update("name = '$newName'", "WHERE id = '${widget.meetupData["id"]}'");
 
@@ -230,8 +233,12 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           "\n\nHierbei handelt es sich um eine automatische Übersetzung";
     }
 
+    String beschreibung = meetupData["beschreibung"].replaceAll("'", "''");
+    String beschreibungGer = meetupData["beschreibungGer"].replaceAll("'", "''");
+    String beschreibungEng = meetupData["beschreibungEng"].replaceAll("'", "''");
+
     await MeetupDatabase().update(
-        "beschreibung = '${meetupData["beschreibung"]}', beschreibungGer = '${meetupData["beschreibungGer"]}',beschreibungEng = '${meetupData["beschreibungEng"]}'",
+        "beschreibung = '$beschreibung', beschreibungGer = '$beschreibungGer',beschreibungEng = '$beschreibungEng'",
         "WHERE id = '${meetupData["id"]}'");
   }
 
@@ -257,8 +264,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     updateHiveMeetup(widget.meetupData["id"], "land", newLocation["countryname"]);
     updateHiveMeetup(widget.meetupData["id"], "latt", newLocation["latt"]);
     updateHiveMeetup(widget.meetupData["id"], "longt", newLocation["longt"]);
-    MeetupDatabase().updateLocation(widget.meetupData["id"], newLocation);
     StadtinfoDatabase().addNewCity(newLocation);
+
+    newLocation["city"] = newLocation["city"].replaceAll("'", "''");
+    MeetupDatabase().updateLocation(widget.meetupData["id"], newLocation);
 
     return true;
   }

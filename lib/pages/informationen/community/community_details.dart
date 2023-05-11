@@ -338,6 +338,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["name"] = newName;
     });
 
+    newName = newName.replaceAll("'", "''");
+
     CommunityDatabase()
         .update("name = '$newName'", "WHERE id = '${widget.community["id"]}'");
   }
@@ -355,19 +357,21 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             children: [
               ortAuswahlBox,
               const SizedBox(height: 15),
-              _windowOptions(() =>
-                  _saveChangeLocation(ortAuswahlBox.getGoogleLocationData()))
+              _windowOptions((){
+                var newLocation = ortAuswahlBox.getGoogleLocationData();
+                if (newLocation["city"].isEmpty) {
+                  customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+                  return;
+                }
+                _saveChangeLocation(newLocation);
+              }
+                  )
             ],
           );
         });
   }
 
   _saveChangeLocation(newLocationData) {
-    if (newLocationData["city"].isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context).ortEingeben);
-      return;
-    }
-
     setState(() {
       widget.community["ort"] = newLocationData["city"];
       widget.community["land"] = newLocationData["countryname"];
@@ -379,6 +383,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     updateHiveCommunity(widget.community["id"], "land", newLocationData["countryname"]);
     updateHiveCommunity(widget.community["id"], "latt", newLocationData["latt"]);
     updateHiveCommunity(widget.community["id"], "longt", newLocationData["longt"]);
+
+    newLocationData["city"] = newLocationData["city"].replaceAll("'", "''");
 
     CommunityDatabase().updateLocation(widget.community["id"], newLocationData);
   }
@@ -466,20 +472,22 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   newBeschreibungKontroller,
                   moreLines: 13,
                   textInputAction: TextInputAction.newline),
-              _windowOptions(
-                  () => _saveChangeBeschreibung(newBeschreibungKontroller.text))
+              _windowOptions((){
+                String newBeschreibung = newBeschreibungKontroller.text;
+                if (newBeschreibung.isEmpty) {
+                  customSnackbar(context,
+                  AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
+                  return;
+                }
+
+                _saveChangeBeschreibung(newBeschreibung);
+              })
             ],
           );
         });
   }
 
   _saveChangeBeschreibung(newBeschreibung) async{
-    if (newBeschreibung.isEmpty) {
-      customSnackbar(context,
-          AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
-      return;
-    }
-
     var languageCheck = await translator.translate(newBeschreibung);
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
@@ -499,7 +507,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["beschreibung"] = newBeschreibung;
     });
 
-    CommunityDatabase().update("beschreibung = '$newBeschreibung', beschreibungGer = '${widget.community["beschreibungGer"]}', beschreibungEng = '${widget.community["beschreibungEng"]}'",
+    newBeschreibung = newBeschreibung.replaceAll("'", "''");
+    var beschreibungGer = widget.community["beschreibungGer"].replaceAll("'", "''");
+    var beschreibungEng = widget.community["beschreibungEng"].replaceAll("'", "''");
+
+    CommunityDatabase().update("beschreibung = '$newBeschreibung', beschreibungGer = '$beschreibungGer', beschreibungEng = '$beschreibungEng'",
         "WHERE id = '${widget.community["id"]}'");
   }
 

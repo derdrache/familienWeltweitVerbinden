@@ -576,12 +576,18 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       "thumbDown": []
     };
 
-    StadtinfoUserDatabase().addNewInformation(newUserInformation);
-
     var secureBox = Hive.box("secureBox");
     var allInformations = secureBox.get("stadtinfoUser");
     allInformations.add(newUserInformation);
     secureBox.put("stadtinfoUser", allInformations);
+
+    newUserInformation["ort"] = newUserInformation["ort"].replaceAll("'", "''");
+    newUserInformation["titleGer"] = newUserInformation["titleGer"].replaceAll("'", "''");
+    newUserInformation["informationGer"] = newUserInformation["informationGer"].replaceAll("'", "''");
+    newUserInformation["titleEng"] = newUserInformation["titleEng"].replaceAll("'", "''");
+    newUserInformation["informationEng"] = newUserInformation["informationEng"].replaceAll("'", "''");
+
+    StadtinfoUserDatabase().addNewInformation(newUserInformation);
 
     Navigator.pop(context);
 
@@ -757,6 +763,11 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       }
     }
     secureBox.put("stadtinfoUser", allInformations);
+
+    titleGer = titleGer.replaceAll("'", "''");
+    informationGer = informationGer.replaceAll("'", "''");
+    titleEng = titleEng.replaceAll("'", "''");
+    informationEng = informationEng.replaceAll("'", "''");
 
     await StadtinfoUserDatabase().update(
         "sprache ='$languageCode',  "

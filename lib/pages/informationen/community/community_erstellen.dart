@@ -77,7 +77,16 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     if (!checkValidationAndSendError(communityData)) return false;
 
-    await CommunityDatabase().addNewCommunity(communityData);
+    await CommunityDatabase().addNewCommunity(Map.of(communityData));
+
+    communityData["bild"] = "assets/bilder/village.jpg";
+    communityData["interesse"] = [];
+    communityData["members"] = [];
+    communityData["einladung"] = [];
+
+    var allCommunities = Hive.box('secureBox').get("communities") ?? [];
+    allCommunities.add(communityData);
+
     StadtinfoDatabase().addNewCity(locationData);
     ChatGroupsDatabase().addNewChatGroup(
         userId, "</community=$communityId"

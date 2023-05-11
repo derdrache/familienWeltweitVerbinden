@@ -573,23 +573,15 @@ class ChatGroupsDatabase {
 
 class MeetupDatabase {
   addNewMeetup(meetupData) async {
+
+    meetupData["name"] = meetupData["name"].replaceAll("'", "''");
+    meetupData["stadt"] = meetupData["stadt"].replaceAll("'", "''");
+    meetupData["beschreibung"] = meetupData["beschreibung"].replaceAll("'", "''");
+    meetupData["beschreibungGer"] = meetupData["beschreibungGer"].replaceAll("'", "''");
+    meetupData["beschreibungEng"] = meetupData["beschreibungEng"].replaceAll("'", "''");
+
     var url = Uri.parse(databaseUrl + databasePathNewMeetUp);
     await http.post(url, body: json.encode(meetupData));
-
-    meetupData["freischalten"] = [];
-    meetupData["eventInterval"] = meetupData["interval"];
-    meetupData["bis"] = meetupData["bis"] == "null" ? null : meetupData["bis"];
-    meetupData["absage"] = [];
-    meetupData["zusage"] = [];
-    meetupData["freigegeben"] = [];
-    meetupData["sprache"] = jsonDecode(meetupData["sprache"]);
-    meetupData["interesse"] = jsonDecode(meetupData["interesse"]);
-    meetupData["tags"] = [];
-
-    var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
-    myOwnMeetups.add(meetupData);
-    var meetups = Hive.box('secureBox').get("events") ?? [];
-    meetups.add(meetupData);
   }
 
   update(whatData, queryEnd) async {
@@ -659,16 +651,14 @@ class MeetupDatabase {
 
 class CommunityDatabase {
   addNewCommunity(communityData) async {
+    communityData["name"] = communityData["name"].replaceAll("'", "''");
+    communityData["ort"] = communityData["ort"].replaceAll("'", "''");
+    communityData["beschreibung"] = communityData["beschreibung"].replaceAll("'", "''");
+    communityData["beschreibungGer"] = communityData["beschreibungGer"].replaceAll("'", "''");
+    communityData["beschreibungEng"] = communityData["beschreibungEng"].replaceAll("'", "''");
+
     var url = Uri.parse(databaseUrl + databasePathNewCommunity);
     await http.post(url, body: json.encode(communityData));
-
-    communityData["bild"] = "assets/bilder/village.jpg";
-    communityData["interesse"] = [];
-    communityData["members"] = [];
-    communityData["einladung"] = [];
-
-    var allCommunities = Hive.box('secureBox').get("communities") ?? [];
-    allCommunities.add(communityData);
   }
 
   update(whatData, queryEnd) async {

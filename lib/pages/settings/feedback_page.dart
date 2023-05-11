@@ -13,10 +13,13 @@ class FeedbackPage extends StatelessWidget {
   final String userName = Hive.box("secureBox").get("ownProfil")["name"];
 
   feedbackSendenAndClose(context) async {
-    if(feedbackTextKontroller.text.isEmpty) return;
+    String text = feedbackTextKontroller.text;
 
-    ChatDatabase().addAdminMessage(
-        feedbackTextKontroller.text, userName);
+    if(text.isEmpty) return;
+
+    text = text.replaceAll("'", "''");
+
+    ChatDatabase().addAdminMessage(text, userName);
 
     feedbackTextKontroller.clear();
 
