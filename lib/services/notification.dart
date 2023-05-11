@@ -352,7 +352,7 @@ prepareNewTravelPlanNotification(){
   for(Map profil in allProfils){
     bool travelPlanNotificationAllowed = profil["travelPlanNotification"] == 1;
     bool notificationAllowed = profil["notificationstatus"] == 1;
-    bool isFriend = profil["friends"].contains(profil["id"]);
+    bool isFriend = profil["friendlist"].contains(profil["id"]);
 
     if(!travelPlanNotificationAllowed || !notificationAllowed || !isFriend) continue;
 
