@@ -6,12 +6,10 @@ import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:collection/collection.dart';
-import 'package:hive/hive.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../widgets/flexible_date_picker.dart';
-import '../../widgets/month_picker.dart';
 import '../../services/notification.dart';
 
 class ChangeReiseplanungPage extends StatefulWidget {
@@ -35,21 +33,23 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
                   );
   var ortInput = GoogleAutoComplete();
 
-  saveProfilReiseplanung(){
-    ProfilDatabase().updateProfil(
-        "reisePlanung = '${jsonEncode(widget.reiseplanung)}'",
-        "WHERE id = '${widget.userId}'");
+  saveProfilReiseplanung(newReiseplan){
     updateHiveOwnProfil("reisePlanung", widget.reiseplanung);
+
+    ProfilDatabase().updateProfil(
+        "reisePlanung = '${json.encode(widget.reiseplanung)}'",
+        "WHERE id = '${widget.userId}'");
+
   }
 
-  saveInDatabase(){
+  saveInDatabase(newReiseplan){
     if(checkDuplicateEntry()){
       widget.reiseplanung.removeLast();
       customSnackbar(context, "Doppelter Eintrag");
       return;
     }
 
-    saveProfilReiseplanung();
+    saveProfilReiseplanung(newReiseplan);
     var newLocation = ortInput.googleSearchResult;
     StadtinfoDatabase().addNewCity(newLocation);
 
@@ -120,7 +120,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
     widget.reiseplanung.add(newReiseplan);
 
-    saveInDatabase();
+    saveInDatabase(newReiseplan);
     prepareNewTravelPlanNotification();
 
     setState(() {
@@ -132,7 +132,9 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   deleteReiseplan(reiseplan) {
     widget.reiseplanung.remove(reiseplan);
 
-    saveProfilReiseplanung();
+    ProfilDatabase().updateProfil(
+        "reisePlanung = '${json.encode(widget.reiseplanung)}'",
+        "WHERE id = '${widget.userId}'");
 
     setState(() {});
   }
@@ -156,11 +158,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
               Column(
                 children: [
                   SizedBox(width: 300,child: ortInput),
-                  FlexibleDatePicker(
-                    startYear: DateTime.now().year,
-                    withMonth: true,
-                    multiDate: true,
-                  )
+                  datePicker
                 ],
               ),
               Expanded(
