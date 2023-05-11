@@ -385,6 +385,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     updateHiveCommunity(widget.community["id"], "longt", newLocationData["longt"]);
 
     newLocationData["city"] = newLocationData["city"].replaceAll("'", "''");
+    newLocationData["countryname"] = newLocationData["countryname"].replaceAll("'", "''");
 
     CommunityDatabase().updateLocation(widget.community["id"], newLocationData);
   }

@@ -19,6 +19,10 @@ var spracheIstDeutsch = kIsWeb
 
 class ProfilDatabase {
   addNewProfil(profilData) async {
+    profilData["ort"] = profilData["ort"].replaceAll("'", "''");
+    profilData["land"] = profilData["land"].replaceAll("'", "''");
+    profilData["aboutme"] = profilData["aboutme"].replaceAll("'", "''");
+
     var url = Uri.parse(databaseUrl + databasePathNewProfil);
     var data = {
       "id": profilData["id"],
@@ -576,6 +580,7 @@ class MeetupDatabase {
 
     meetupData["name"] = meetupData["name"].replaceAll("'", "''");
     meetupData["stadt"] = meetupData["stadt"].replaceAll("'", "''");
+    meetupData["countryname"] = meetupData["countryname"].replaceAll("'", "''");
     meetupData["beschreibung"] = meetupData["beschreibung"].replaceAll("'", "''");
     meetupData["beschreibungGer"] = meetupData["beschreibungGer"].replaceAll("'", "''");
     meetupData["beschreibungEng"] = meetupData["beschreibungEng"].replaceAll("'", "''");
@@ -653,6 +658,7 @@ class CommunityDatabase {
   addNewCommunity(communityData) async {
     communityData["name"] = communityData["name"].replaceAll("'", "''");
     communityData["ort"] = communityData["ort"].replaceAll("'", "''");
+    communityData["countryname"] = communityData["countryname"].replaceAll("'", "''");
     communityData["beschreibung"] = communityData["beschreibung"].replaceAll("'", "''");
     communityData["beschreibungGer"] = communityData["beschreibungGer"].replaceAll("'", "''");
     communityData["beschreibungEng"] = communityData["beschreibungEng"].replaceAll("'", "''");
@@ -743,6 +749,7 @@ class StadtinfoDatabase {
 
     Map dbCity = Map.of(city);
     dbCity["ort"] = dbCity["ort"].replaceAll("'", "''");
+    dbCity["countryname"] = dbCity["countryname"].replaceAll("'", "''");
     var url = Uri.parse(databaseUrl + databasePathNewCity);
     var cityId = await http.post(url, body: json.encode(dbCity));
     var newCityInfo = {

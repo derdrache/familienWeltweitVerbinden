@@ -267,6 +267,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     StadtinfoDatabase().addNewCity(newLocation);
 
     newLocation["city"] = newLocation["city"].replaceAll("'", "''");
+    newLocation["countryname"] = newLocation["countryname"].replaceAll("'", "''");
     MeetupDatabase().updateLocation(widget.meetupData["id"], newLocation);
 
     return true;

@@ -115,6 +115,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     Map dbLocation = Map.of(locationDict);
     dbLocation["city"] = dbLocation["city"].replaceAll("'", "''");
     dbLocation["ort"] = dbLocation["ort"].replaceAll("'", "''");
+    dbLocation["countryname"] = dbLocation["countryname"].replaceAll("'", "''");
 
     var newLocationNews = {
       "typ": "ortswechsel",
