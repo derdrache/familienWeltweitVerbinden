@@ -453,5 +453,6 @@
     "jahr": "Jahr",
     "genauesDatum": "Genaues Datum",
     "bisDatumFalsch": "Enddatum muss größer als das Startdatum sein",
-    "zeitraumSuche": "Zeitraum auswahl"
+    "zeitraumSuche": "Zeitraum auswahl",
+    "vollesDatumEingeben": "vollständiges Datum eingeben"
 }

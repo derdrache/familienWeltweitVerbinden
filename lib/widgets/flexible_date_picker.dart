@@ -1,4 +1,3 @@
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -77,6 +76,8 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   bool withDay;
   bool withMonth;
   bool withEndDate = true;
+  String errorText = "";
+  var globalWindowSetState;
 
   DateTime selectedEndDate;
   bool moreDateData = false;
@@ -148,10 +149,9 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
         endYearSelected &&
         ((widget.withMonth && endMonthSelected) || !widget.withMonth);
 
-    if (!startNormalFilled &&
-        !startSecretFilled &&
-        (widget.multiDate && !endNormalFilled) &&
-        (widget.multiDate && !endSecretFilled)) {
+    if ( !(startNormalFilled || startSecretFilled) ||
+        widget.multiDate && !(endNormalFilled || endSecretFilled)){
+      showErrorMessage(AppLocalizations.of(context).vollesDatumEingeben);
       return false;
     }
 
@@ -170,6 +170,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
           widget.selectedDay != null ? 1 : 0);
 
       if (endDate.isBefore(startDate)) {
+        showErrorMessage(AppLocalizations.of(context).bisDatumFalsch);
         return false;
       }
 
@@ -183,8 +184,10 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
     return true;
   }
 
-  showErrorMessage() {
-    customSnackbar(context, "vollständiges Datum eingeben");
+  showErrorMessage(text) {
+    globalWindowSetState(() {
+      errorText = text;
+    });
   }
 
   reset() {}
@@ -243,6 +246,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(builder: (context, windowSetState) {
+            globalWindowSetState = windowSetState;
             return CustomAlertDialog(
               title: "",
               children: [
@@ -292,6 +296,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
                     ],
                   ),
                 SizedBox(height: 10),
+                if(errorText.isNotEmpty) Text(errorText, style: TextStyle(color: Colors.red),),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -308,8 +313,6 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
                           if (succsess) {
                             setState(() {});
                             Navigator.pop(context);
-                          } else {
-                            showErrorMessage();
                           }
                         },
                         child: Text("Ok")),
