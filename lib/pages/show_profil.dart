@@ -206,7 +206,7 @@ class _AppBarState extends State<_AppBar> {
                         hintText: AppLocalizations.of(context).notizEingeben,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     if(userNotiz== null || changeNote) FloatingActionButton.extended(
                       label: Text(AppLocalizations.of(context).speichern),
                         onPressed: (){
