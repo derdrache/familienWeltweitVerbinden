@@ -92,9 +92,14 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   addNewTravelPlan() {
     var ortData = ortInput.getGoogleLocationData();
 
-    if(datePicker.getDate() == null || ortData["city"] == null){
+    if(datePicker.getDate() == null){
       customSnackbar(context,
-          AppLocalizations.of(context).vollstaendigeDatenZukunftsOrtEingeben);
+          AppLocalizations.of(context).datumEingeben);
+      return;
+    }
+    if(ortData["city"] == null){
+      customSnackbar(context,
+          AppLocalizations.of(context).ortEingeben);
       return;
     }
 
