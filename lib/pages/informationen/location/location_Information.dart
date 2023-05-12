@@ -538,6 +538,25 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       return;
     }
 
+    var newUserInformation = {
+      "ort": widget.location["ort"],
+      "sprache": "auto",
+      "titleGer": title,
+      "informationGer": inhalt,
+      "titleEng": title,
+      "informationEng": inhalt,
+      "erstelltAm": nowFormatted,
+      "erstelltVon": userId,
+      "thumbUp": [],
+      "thumbDown": []
+    };
+
+    setState(() {
+      usersCityInformation.add(newUserInformation);
+    });
+
+    Navigator.pop(context);
+
     var languageCheck = await translator.translate(inhalt);
     var languageCode = languageCheck.sourceLanguage.code;
     if (languageCode == "auto") languageCode = "en";
@@ -564,17 +583,11 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       informationEng = informationTranslation.toString();
     }
 
-    var newUserInformation = {
-      "ort": widget.location["ort"],
-      "sprache": languageCode,
-      "titleGer": titleGer,
-      "informationGer": informationGer,
-      "titleEng": titleEng,
-      "informationEng": informationEng,
-      "erstelltAm": nowFormatted,
-      "thumbUp": [],
-      "thumbDown": []
-    };
+    newUserInformation["sprache"] = languageCode;
+    newUserInformation["titleGer"] = titleGer;
+    newUserInformation["informationGer"] = informationGer;
+    newUserInformation["titleEng"] = titleEng;
+    newUserInformation["informationEng"] = informationEng;
 
     var secureBox = Hive.box("secureBox");
     var allInformations = secureBox.get("stadtinfoUser");
@@ -589,9 +602,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     StadtinfoUserDatabase().addNewInformation(newUserInformation);
 
-    Navigator.pop(context);
-
-    setState(() {});
   }
 
   setThumb(thumb, index) async {

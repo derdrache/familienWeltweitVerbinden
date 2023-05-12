@@ -841,10 +841,8 @@ class StadtinfoDatabase {
 
 class StadtinfoUserDatabase {
   addNewInformation(stadtinformation) async {
-    var userId = FirebaseAuth.instance.currentUser.uid;
     var url =
         Uri.parse(databaseUrl + databasePathNewCityInformation);
-    stadtinformation["erstelltVon"] = userId;
 
     await http.post(url, body: json.encode(stadtinformation));
   }
