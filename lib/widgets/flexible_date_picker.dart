@@ -124,8 +124,6 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
     listYears =
         Iterable<int>.generate((widget.endYear ?? DateTime.now().year + 10) + 1)
             .skip(widget.startYear ?? DateTime.now().year)
-            .toList()
-            .reversed
             .toList();
 
     super.initState();
