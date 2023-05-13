@@ -1381,9 +1381,12 @@ getChatGroupFromHive({chatId, connectedWith}) {
       if (chatGroup["id"].toString() == chatId) return chatGroup;
     }
   }else if(connectedWith != null){
-    if (connectedWith.isEmpty) {
-      var worldChat = chatGroups.singleWhere((chatGroup) => chatGroup["id"] == 1);
-      return worldChat;
+
+    if(connectedWith == "</support=1"){
+      return chatGroups.singleWhere((chatGroup) => chatGroup["connected"] == connectedWith);
+    }
+    if(connectedWith == "</world=1"){
+      return chatGroups.singleWhere((chatGroup) => chatGroup["id"] == 1);
     }
 
     for (var chatGroup in chatGroups) {
