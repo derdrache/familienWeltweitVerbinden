@@ -161,25 +161,10 @@ class _AppBarState extends State<_AppBar> {
   }
 
   openChat(chatpartnerId, chatpartnerName) async {
-    var chatId = global_functions.getChatID(chatpartnerId);
-
-    var groupChatData =
-        await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
-
-    if (groupChatData == false) {
-      groupChatData = {
-        "users": {
-          chatpartnerId: {"name": widget.profil["name"], "newMessages": 0},
-          userId: {"name": _userName, "newMessages": 0}
-        }
-      };
-    }
-
     global_functions.changePage(
         context,
         ChatDetailsPage(
           chatPartnerId: chatpartnerId,
-          groupChatData: groupChatData,
         ));
   }
 
@@ -494,28 +479,11 @@ class _UserNameDisplay extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width*0.7;
 
     openChat(chatpartnerId, chatpartnerName) async {
-      Map ownProfil = Hive.box('secureBox').get("ownProfil");
-      var chatId = global_functions.getChatID(chatpartnerId);
-
-      if(chatpartnerId ==ownProfil["id"]) return;
-
-      var groupChatData =
-      await ChatDatabase().getChatData("*", "WHERE id = '$chatId'");
-
-      if (groupChatData == false) {
-        groupChatData = {
-          "users": {
-            chatpartnerId: {"name": chatpartnerName, "newMessages": 0},
-            userId: {"name": ownProfil, "newMessages": 0}
-          }
-        };
-      }
-
       global_functions.changePage(
           context,
           ChatDetailsPage(
             chatPartnerId: chatpartnerId,
-            groupChatData: groupChatData,
+            chatPartnerName: chatpartnerName,
           ));
     }
 

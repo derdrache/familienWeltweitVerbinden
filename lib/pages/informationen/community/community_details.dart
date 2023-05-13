@@ -690,7 +690,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     }
 
     global_func.changePage(context, ChatDetailsPage(
-      connectedId: "</community="+widget.community["id"],
+      connectedWith: "</community="+widget.community["id"],
       isChatgroup: true,
     ));
   }
@@ -732,7 +732,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     communities.removeWhere((community) => community["id"] == widget.community["id"]);
 
                     await CommunityDatabase().delete(widget.community["id"]);
-                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(widget.community["id"]));
+                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(connectedWith: widget.community["id"])["id"]);
 
                     DbDeleteImage(widget.community["bild"]);
 

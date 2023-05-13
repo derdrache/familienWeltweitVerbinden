@@ -265,7 +265,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
   createNewChatGroup(lcationId) async {
     String locationId = lcationId.toString();
-    var chatGroup = getChatGroupFromHive(locationId.toString());
+    var chatGroup = getChatGroupFromHive(connectedWith: locationId.toString());
     if (chatGroup != null) return;
 
     var checkChatGroup = await ChatGroupsDatabase()
@@ -456,7 +456,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   context,
                   ChatDetailsPage(
                     isChatgroup: true,
-                    connectedId: "</stadt=${widget.location["id"]}",
+                    connectedWith: "</stadt=${widget.location["id"]}",
                   ));
             },
             child: const Icon(Icons.message),

@@ -40,7 +40,7 @@ class ChatDetailsPage extends StatefulWidget {
   var groupChatData;
   bool backToChatPage;
   bool isChatgroup;
-  String connectedId;
+  String connectedWith;
   int chatPageSliderIndex;
 
   ChatDetailsPage(
@@ -51,7 +51,7 @@ class ChatDetailsPage extends StatefulWidget {
       this.groupChatData,
       this.backToChatPage = false,
       this.isChatgroup = false,
-      this.connectedId,
+      this.connectedWith,
       this.chatPageSliderIndex})
       : super(key: key);
 
@@ -65,11 +65,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var nachrichtController = TextEditingController();
   Timer timer;
   List<dynamic> messages = [];
-  var chatPartnerProfil;
+  Map chatPartnerProfil;
   bool bothDelete = false;
-  var messageInputNode = FocusNode();
-  var searchInputNode = FocusNode();
-  var messageExtraInformationId;
+  FocusNode messageInputNode = FocusNode();
+  FocusNode searchInputNode = FocusNode();
+  String messageExtraInformationId;
   String changeMessageInputModus;
   Widget extraInputInformationBox = const SizedBox.shrink();
   final _scrollController = ItemScrollController();
@@ -93,16 +93,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   var unreadMessages = 0;
   var adminList = [mainAdmin];
   final translator = GoogleTranslator();
-  var myLanguage = WidgetsBinding.instance.window.locales[0].languageCode;
+  var ownLanguage = WidgetsBinding.instance.window.locales[0].languageCode;
 
   @override
   void initState() {
-    if (!widget.isChatgroup) createNewChat();
-
-    getAndSetChatData();
-    writeActiveChat();
-    setScrollbarListener();
-    resetNewMessageCounter();
+    _getAndSetChatData();
+    _changeUserChatStatus(1);
+    _setScrollbarListener();
+    _resetNewMessageCounter();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
     WidgetsBinding.instance.addObserver(this);
@@ -114,15 +112,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     timer.cancel();
     messageInputNode.dispose();
 
-    if (widget.groupChatData["users"][userId] != null) {
-      Function databaseUpdate = widget.isChatgroup
-          ? ChatGroupsDatabase().updateChatGroup
-          : ChatDatabase().updateChatGroup;
-
-      widget.groupChatData["users"][userId]["isActive"] = 0;
-      databaseUpdate("users = JSON_SET(users, '\$.$userId.isActive', ${0})",
-          "WHERE id = '${widget.chatId}'");
-    }
+    _changeUserChatStatus(0);
 
     WidgetsBinding.instance.removeObserver(this);
 
@@ -131,75 +121,49 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _changeUserChatStatus(1);
+    } else {
+      _changeUserChatStatus(0);
+    }
+  }
+
+  _changeUserChatStatus(int status){
+    if(widget.groupChatData["users"][userId] == null) return;
+
     Function databaseUpdate = widget.isChatgroup
         ? ChatGroupsDatabase().updateChatGroup
         : ChatDatabase().updateChatGroup;
 
-    if (state == AppLifecycleState.resumed) {
-      widget.groupChatData["users"][userId]["isActive"] = 1;
-      databaseUpdate("users = JSON_SET(users, '\$.$userId.isActive', ${1})",
-          "WHERE id = '${widget.chatId}'");
-    } else {
-      widget.groupChatData["users"][userId]["isActive"] = 0;
-      databaseUpdate("users = JSON_SET(users, '\$.$userId.isActive', ${0})",
-          "WHERE id = '${widget.chatId}'");
-    }
+    widget.groupChatData["users"][userId]["isActive"] = status;
+    databaseUpdate("users = JSON_SET(users, '\$.$userId.isActive', $status)",
+        "WHERE id = '${widget.chatId}'");
   }
 
-  createNewChat() {
-    if (widget.groupChatData == null || widget.groupChatData["id"] == null) {
-      widget.chatId ??= global_functions.getChatID(widget.chatPartnerId);
+  _getAndSetChatData() {
+    if(widget.groupChatData != null) return;
 
-      for (var chat in myChats) {
-        if (widget.chatId == chat["id"]) {
-          widget.groupChatData = chat;
-          return;
-        }
-      }
-      widget.groupChatData =
-          ChatDatabase().addNewChatGroup(widget.chatPartnerId);
-    }
-  }
+    if(widget.isChatgroup){
+      widget.groupChatData = getChatGroupFromHive(
+          chatId: widget.chatId, connectedWith: widget.connectedWith);
 
-  getAndSetChatData() {
-    widget.connectedId ??= widget.groupChatData["connected"];
-    widget.isChatgroup = widget.connectedId != null;
+      var connectedId = widget.groupChatData["connected"] == null
+          ? ""
+          : widget.groupChatData["connected"].split("=")[1];
 
-    if (!widget.isChatgroup) {
-      var userIds = widget.groupChatData["id"].split("_");
-      userIds.remove(userId);
-
-      widget.chatPartnerId ??= userIds[0];
-      widget.chatPartnerName ??=
-          getProfilFromHive(profilId: widget.chatPartnerId, getNameOnly: true);
-      chatPartnerProfil = getProfilFromHive(profilId: widget.chatPartnerId);
-      if (widget.groupChatData["users"][userId] == null) {
-        widget.groupChatData["users"][userId] = {"newMessages": 0};
-        ChatDatabase().updateChatGroup(
-            "users = JSON_MERGE(users, '${json.encode({
-                  userId: {"newMessages": 0}
-                })}')",
-            "WHERE id = '${widget.groupChatData["id"]}'");
-      }
-    } else if (widget.isChatgroup) {
-      var connectedId =
-          widget.connectedId.isEmpty ? "" : widget.connectedId.split("=")[1];
-
-      widget.groupChatData ??= getChatGroupFromHive(connectedId);
-
-      if (widget.connectedId.contains("event")) {
+      if (widget.groupChatData["connected"].contains("event")) {
         connectedData = getMeetupFromHive(connectedId);
         pageDetailsPage = MeetupDetailsPage(
           meetupData: connectedData,
         );
         adminList.add(connectedData["erstelltVon"]);
-      } else if (widget.connectedId.contains("community")) {
+      } else if (widget.groupChatData["connected"].contains("community")) {
         connectedData = getCommunityFromHive(connectedId);
         pageDetailsPage = CommunityDetails(
           community: connectedData,
         );
         adminList.add(connectedData["erstelltVon"]);
-      } else if (widget.connectedId.contains("stadt")) {
+      } else if (widget.groupChatData["connected"].contains("stadt")) {
         Map location = getCityFromHive(cityId: connectedId);
 
         connectedData = {
@@ -210,30 +174,24 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         pageDetailsPage =
             LocationInformationPage(ortName: connectedData["name"]);
       }
-    }
+    }else{
+      chatPartnerProfil = getProfilFromHive(
+          profilId: widget.chatPartnerId, profilName: widget.chatPartnerName);
+      widget.groupChatData = getChatFromHive(
+          widget.chatId ?? global_functions.getChatID(chatPartnerProfil["id"]));
 
-    if (widget.groupChatData != null &&
-        widget.groupChatData["users"][userId] != null) {
-      unreadMessages += widget.groupChatData["users"][userId]["newMessages"];
+      widget.groupChatData ??= ChatDatabase().addNewChatGroup(chatPartnerProfil["id"]);
     }
 
     widget.chatId ??= widget.groupChatData["id"].toString();
+
+    if (widget.groupChatData["users"][userId] != null) {
+      unreadMessages += widget.groupChatData["users"][userId]["newMessages"];
+    }
+
   }
 
-  writeActiveChat() {
-    Function databaseUpdate = widget.isChatgroup
-        ? ChatGroupsDatabase().updateChatGroup
-        : ChatDatabase().updateChatGroup;
-
-    if (widget.groupChatData["users"][userId] == null) return;
-
-    widget.groupChatData["users"][userId]["isActive"] = 1;
-
-    databaseUpdate("users = JSON_SET(users, '\$.$userId.isActive', ${1})",
-        "WHERE id = '${widget.chatId}'");
-  }
-
-  setScrollbarListener() {
+  _setScrollbarListener() {
     itemPositionListener.itemPositions.addListener(() {
       if (itemPositionListener.itemPositions.value.first.index == 0 &&
           !hasStartPosition) {
@@ -250,7 +208,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _asyncMethod() async {
-    messages = await getAllDbMessages();
+    messages = await _getAllDbMessages();
     await checkCardData();
 
     setState(() {
@@ -258,13 +216,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
 
     timer = Timer.periodic(const Duration(seconds: 30), (Timer t) async {
-      messages = await getAllDbMessages();
+      messages = await _getAllDbMessages();
       setState(() {});
     });
   }
 
-  getAllDbMessages() async {
-    var chatId = widget.chatId ?? widget.groupChatData["id"];
+  _getAllDbMessages() async {
+    var chatId = widget.groupChatData["id"];
 
     List<dynamic> allDbMessages = widget.isChatgroup
         ? await ChatGroupsDatabase().getAllChatMessages(chatId)
@@ -275,7 +233,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return allDbMessages;
   }
 
-  checkCardData() async {
+  checkCardData() async {//????
     List newMessages = messages.take(unreadMessages).toList();
 
     for (var message in newMessages) {
@@ -289,7 +247,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  resetNewMessageCounter() async {
+  _resetNewMessageCounter() async {
     if (widget.groupChatData["users"][userId] == null) return;
 
     widget.groupChatData["users"][userId]["newMessages"] = 0;
@@ -315,7 +273,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "message": message,
       "von": ownProfilId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
-      "zu": widget.chatPartnerId,
+      "zu": chatPartnerProfil["Id"],
       "responseId": messageExtraInformationId ??= "0",
       "forward": "",
       "language": "auto"
@@ -323,7 +281,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     timer.cancel();
     timer = Timer.periodic(const Duration(seconds: 30), (Timer t) async {
-      messages = await getAllDbMessages();
+      messages = await _getAllDbMessages();
       setState(() {});
     });
 
@@ -359,7 +317,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     await saveNewMessage(messageData);
-    messages = await getAllDbMessages();
+    messages = await _getAllDbMessages();
 
     messageExtraInformationId = null;
   }
@@ -373,7 +331,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       await ChatGroupsDatabase().addNewMessageAndNotification(
           widget.groupChatData["id"], messageData, connectedData["name"]);
     } else {
-      var isBlocked = ownProfil["geblocktVon"].contains(widget.chatPartnerId);
+      var isBlocked = ownProfil["geblocktVon"].contains(chatPartnerProfil["id"]);
       await ChatDatabase().addNewMessageAndSendNotification(
           widget.groupChatData["id"], messageData, isBlocked);
     }
@@ -814,7 +772,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     myGroupChats.add(widget.groupChatData);
     Hive.box("secureBox").put("myGroupChats", myGroupChats);
 
-    writeActiveChat();
+    _changeUserChatStatus(1);
   }
 
   getDisplayedCard(cardType, data, {smallCard = false}) {
@@ -1151,7 +1109,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 var translationMessage = message["message"].replaceAll("'", "");
 
                 var translation = await translator.translate(translationMessage,
-                    from: "auto", to: myLanguage);
+                    from: "auto", to: ownLanguage);
 
                 showModalBottomSheet<void>(
                     shape: RoundedRectangleBorder(
@@ -1921,7 +1879,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
         if (message["message"] == "") continue;
 
-        var checkTextAndPersonalLanguage = myLanguage ==
+        var checkTextAndPersonalLanguage = ownLanguage ==
             (message["language"] == "auto" ? "en" : message["language"]);
 
         message["showTranslationButton"] =
@@ -2415,7 +2373,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           Expanded(
                             child: Text(
                                 AppLocalizations.of(context).auchBeiLoeschen +
-                                    widget.chatPartnerName),
+                                    chatPartnerProfil["name"]),
                           )
                         ],
                       )
@@ -2471,7 +2429,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       onPressed: () async {
                         Navigator.pop(context);
 
-                        ChatGroupsDatabase().leaveChat(widget.connectedId);
+                        ChatGroupsDatabase().leaveChat(widget.groupChatData["connected"]);
 
                         setState(() {
                           widget.groupChatData["users"]
@@ -2523,7 +2481,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     showAppBar() {
-      if (textSearchIsActive) {
+        if (textSearchIsActive) {
         return CustomAppBar(
             title: TextField(
               cursorColor: Colors.black,
@@ -2574,6 +2532,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ]);
       } else if (chatPartnerProfil != false) {
         var chatImage = widget.isChatgroup ? connectedData : chatPartnerProfil;
+        String title = widget.isChatgroup ? connectedData["name"] : chatPartnerProfil["name"];
 
         return CustomAppBar(
           title: widget.isChatgroup
@@ -2581,7 +2540,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.chatPartnerName ?? connectedData["name"]),
+                      Text(title),
                       const SizedBox(height: 3),
                       Text(
                         widget.groupChatData["users"].length.toString() +
@@ -2592,12 +2551,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     ],
                   ),
                 )
-              : widget.chatPartnerName ?? connectedData["name"],
+              : title,
           leading: widget.backToChatPage
               ? IconButton(
                   icon: const Icon(Icons.arrow_back_sharp),
                   onPressed: () async {
-                    await resetNewMessageCounter();
+                    _resetNewMessageCounter();
                     global_functions.changePageForever(
                         context,
                         StartPage(

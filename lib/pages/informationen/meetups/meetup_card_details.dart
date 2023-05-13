@@ -1216,7 +1216,7 @@ class _InteresseButtonState extends State<InteresseButton> {
                   "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
                   "WHERE id ='${widget.id}'");
 
-              myGroupChats.add(getChatGroupFromHive(widget.id));
+              myGroupChats.add(getChatGroupFromHive(connectedWith: widget.id));
               ChatGroupsDatabase().updateChatGroup(
                   "users = JSON_MERGE_PATCH(users, '${json.encode({
                         userId: {"newMessages": 0}

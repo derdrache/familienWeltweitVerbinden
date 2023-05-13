@@ -239,8 +239,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
     MeetupDatabase().delete(widget.meetupData["id"]);
 
-    var chatGroupId = getChatGroupFromHive(
-        widget.meetupData["id"])["id"];
+    var chatGroupId = getChatGroupFromHive(connectedWith: widget.meetupData["id"])["id"];
     ChatGroupsDatabase().deleteChat(chatGroupId);
 
     DbDeleteImage(widget.meetupData["bild"]);
@@ -267,7 +266,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     global_func.changePage(
       context,
       ChatDetailsPage(
-        connectedId: "</event=" + widget.meetupData["id"],
+        connectedWith: "</event=" + widget.meetupData["id"],
         isChatgroup: true,
       ),
     );

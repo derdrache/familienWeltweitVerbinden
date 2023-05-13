@@ -532,7 +532,7 @@ class ChatGroupsDatabase {
     if (city == null) return;
 
     var cityId = city["id"];
-    var chatGroupData = getChatGroupFromHive("</stadt=$cityId");
+    var chatGroupData = getChatGroupFromHive(connectedWith: "</stadt=$cityId");
 
     if (chatGroupData == null) {
       chatGroupData = await ChatGroupsDatabase()
@@ -1373,18 +1373,25 @@ getChatFromHive(chatId) {
   }
 }
 
-getChatGroupFromHive(connectedId) {
+getChatGroupFromHive({chatId, connectedWith}) {
   var chatGroups = Hive.box('secureBox').get("chatGroups") ?? [];
 
-  if (connectedId.isEmpty) {
-    var worldChat = chatGroups.singleWhere((chatGroup) => chatGroup["id"] == 1);
-    return worldChat;
+  if(chatId != null){
+    for (var chatGroup in chatGroups) {
+      if (chatGroup["id"].toString() == chatId) return chatGroup;
+    }
+  }else if(connectedWith != null){
+    if (connectedWith.isEmpty) {
+      var worldChat = chatGroups.singleWhere((chatGroup) => chatGroup["id"] == 1);
+      return worldChat;
+    }
+
+    for (var chatGroup in chatGroups) {
+      if (chatGroup["connected"].split("=")[1] == connectedWith) return chatGroup;
+    }
   }
 
-  for (var chatGroup in chatGroups) {
-    if (chatGroup["connected"].isEmpty) continue;
-    if (chatGroup["connected"].split("=")[1] == connectedId) return chatGroup;
-  }
+  return;
 }
 
 getMeetupFromHive(meetupId) {

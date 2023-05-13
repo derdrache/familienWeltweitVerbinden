@@ -161,7 +161,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             })}')",
         "WHERE id = '1'");
     List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-    myGroupChats.add(getChatGroupFromHive(""));
+    myGroupChats.add(getChatGroupFromHive(chatId: "1"));
 
     await refreshHiveChats();
     await refreshHiveMeetups();

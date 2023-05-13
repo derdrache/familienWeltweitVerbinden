@@ -545,7 +545,7 @@ class _SupportInformation extends StatelessWidget {
             const SizedBox(height: 20),
             settingThemeContainer("Support Chat", Icons.chat,
                     () => global_func.changePage(context, ChatDetailsPage(
-                        isChatgroup: true, chatId: "86",connectedId: "</support=1"
+                        isChatgroup: true, connectedWith: "</support=1"
                     ))),
             const SizedBox(height: 20),
             settingThemeContainer("Patch Notes", Icons.format_list_bulleted,

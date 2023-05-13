@@ -1264,7 +1264,6 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
           heroTag: "worldchat",
           child: const Icon(Icons.message),
           onPressed: () => global_functions.changePage(context, ChatDetailsPage(
-            connectedId: "",
             chatId: "1",
             isChatgroup: true,
           )));
