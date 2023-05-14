@@ -61,8 +61,8 @@ class ChatDetailsPage extends StatefulWidget {
 
 class _ChatDetailsPageState extends State<ChatDetailsPage>
     with WidgetsBindingObserver {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var nachrichtController = TextEditingController();
+  TextEditingController nachrichtController = TextEditingController();
+  String userId = FirebaseAuth.instance.currentUser.uid;
   Timer timer;
   List<dynamic> messages = [];
   Map chatPartnerProfil;
@@ -75,10 +75,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   final _scrollController = ItemScrollController();
   var itemPositionListener = ItemPositionsListener.create();
   bool hasStartPosition = true;
-  List myChats = Hive.box("secureBox").get("myChats") ?? [];
-  List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-  List allEvents = Hive.box('secureBox').get("events") ?? [];
-  List allCommunities = Hive.box('secureBox').get("communities") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil");
   int angehefteteMessageShowIndex;
   bool isLoading = true;
@@ -94,10 +90,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   List adminList = [mainAdmin];
   final translator = GoogleTranslator();
   String ownLanguage = WidgetsBinding.instance.window.locales[0].languageCode;
+  bool userJoinedChat;
 
   @override
   void initState() {
     _getAndSetChatData();
+    userJoinedChat = widget.groupChatData["users"][userId] != null;
     widget.chatId ??= widget.groupChatData["id"].toString();
     _setConnectionData();
     _changeUserChatStatus(1);
@@ -131,7 +129,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _changeUserChatStatus(int status){
-    if(widget.groupChatData["users"][userId] == null) return;
+    if(!userJoinedChat) return;
 
     Function databaseUpdate = widget.isChatgroup
         ? ChatGroupsDatabase().updateChatGroup
@@ -156,7 +154,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       widget.groupChatData ??= ChatDatabase().addNewChatGroup(chatPartnerProfil["id"]);
     }
 
-    if (widget.groupChatData["users"][userId] != null) {
+    if (!userJoinedChat) {
       unreadMessages += widget.groupChatData["users"][userId]["newMessages"];
     }
 
@@ -261,7 +259,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _resetNewMessageCounter() async {
-    if (widget.groupChatData["users"][userId] == null) return;
+    if (!userJoinedChat) return;
 
     widget.groupChatData["users"][userId]["newMessages"] = 0;
 
@@ -368,6 +366,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   _deletePrivatChat() {
     var chatUsers = widget.groupChatData["users"];
+    List myChats = Hive.box("secureBox").get("myChats") ?? [];
 
     if (chatUsers.length <= 1 || bothDelete) {
       for (var myChat in myChats) {
@@ -566,8 +565,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     List pinnedMessages = _getPinnedMessages();
 
     if (pinnedMessages == null || pinnedMessages.isEmpty) {
-      widget.groupChatData["users"][userId]
-          ["pinnedMessages"] = [int.parse(message["id"])];
+      widget.groupChatData["users"][userId]["pinnedMessages"] = [int.parse(message["id"])];
 
       setState(() {
         angehefteteMessageShowIndex =
@@ -676,8 +674,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     angehefteteMessageShowIndex = angehefteteMessageShowIndex - 1;
 
     if (angehefteteMessageShowIndex < 0) {
-      angehefteteMessageShowIndex =
-          widget.groupChatData["users"][userId]["pinnedMessages"].length - 1;
+      angehefteteMessageShowIndex = _getPinnedMessages().length -1;
     }
 
     _scrollToMessage(index);
@@ -761,6 +758,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _joinChatGroup(){
+    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     Map newUserInformation = {"newMessages": 0};
 
     setState(() {
@@ -846,11 +844,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         Theme.of(context).colorScheme.secondary.withOpacity(0.7);
     Color chatpartnerMessageBoxColor = Colors.white;
     Color timeStampColor = Colors.grey[600];
-    bool userJoinedChat = widget.groupChatData["users"][userId] != null;
     Offset _tabPosition;
 
     _angehefteteNachrichten() {
-      if (widget.groupChatData["users"][userId] == null) {
+      if (!userJoinedChat) {
         return const SizedBox.shrink();
       }
 
@@ -861,7 +858,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       angehefteteMessageShowIndex ??= pinnedMessages.length - 1;
-
       int displayedMessageId = pinnedMessages[angehefteteMessageShowIndex];
       String displayedMessageText = "";
       int index = -1;
@@ -2032,7 +2028,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ],
           ),
         );
-      } else if (widget.groupChatData["users"][userId] == null) {
+      } else if (!userJoinedChat) {
         return GestureDetector(
           onTap: () => _joinChatGroup(),
           child: Container(
@@ -2144,9 +2140,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    mitgliederWindow() {
-      List<Widget> mitgliederList = [];
-      String detailsButtonName = "Information";
+    _getMemberList(){
+      List<Widget> memberList = [];
 
       widget.groupChatData["users"].forEach((memberUserId, data) {
         Map userProfil = getProfilFromHive(profilId: memberUserId) ?? {};
@@ -2154,7 +2149,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
         if (userProfil.isEmpty) return;
 
-        mitgliederList.add(GestureDetector(
+        memberList.add(GestureDetector(
           onTap: () => global_functions.changePage(
               context,
               ShowProfilPage(
@@ -2172,6 +2167,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ),
         ));
       });
+
+      return memberList;
+    }
+
+    _mitgliederWindow() {
+      List<Widget> mitgliederList = _getMemberList();
+      String detailsButtonName = "Information";
 
       showDialog(
           context: context,
@@ -2208,32 +2210,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               ),
             );
           });
-/*
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CustomAlertDialog(
-              title: connectedData["name"],
-              children: [
-                if (widget.chatId != "1") Container(
-                  width: 100,
-                  height: 40,
-                  margin: const EdgeInsets.only(bottom: 30, top: 10),
-                  child: FittedBox(
-                    child: FloatingActionButton.extended(
-                      label: Text(detailsButtonName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                      onPressed: () => global_functions.changePage(context, pageDetailsPage),
-                    ),
-                  ),
-                ),
-                Text(AppLocalizations.of(context).member, style: const TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                ListView(children: [...mitgliederList])
-              ],
-            );
-          });
-
- */
     }
 
     _mitgliederDialog() {
@@ -2247,7 +2223,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ),
         onPressed: () {
           Navigator.pop(context);
-          mitgliederWindow();
+          _mitgliederWindow();
         },
       );
     }
@@ -2323,7 +2299,54 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    deleteDialog() {
+    _deleteWindow(){
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(builder: (ontext, setState) {
+              return CustomAlertDialog(
+                title: AppLocalizations.of(context).chatLoeschen,
+                height: 150,
+                children: [
+                  Center(
+                      child: Text(AppLocalizations.of(context)
+                          .chatWirklichLoeschen)),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Checkbox(
+                          value: bothDelete,
+                          onChanged: (value) => {
+                            setState(() {
+                              bothDelete = value;
+                            })
+                          }),
+                      Expanded(
+                        child: Text(
+                            AppLocalizations.of(context).auchBeiLoeschen +
+                                chatPartnerProfil["name"]),
+                      )
+                    ],
+                  )
+                ],
+                actions: [
+                  TextButton(
+                    child: Text(AppLocalizations.of(context).loeschen),
+                    onPressed: () async {
+                      _deletePrivatChat();
+                    },
+                  ),
+                  TextButton(
+                    child: Text(AppLocalizations.of(context).abbrechen),
+                    onPressed: () => Navigator.pop(context),
+                  )
+                ],
+              );
+            });
+          });
+    }
+
+    _deleteDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -2337,56 +2360,47 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ),
         onPressed: () {
           Navigator.pop(context);
-
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return StatefulBuilder(builder: (ontext, setState) {
-                  return CustomAlertDialog(
-                    title: AppLocalizations.of(context).chatLoeschen,
-                    height: 150,
-                    children: [
-                      Center(
-                          child: Text(AppLocalizations.of(context)
-                              .chatWirklichLoeschen)),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Checkbox(
-                              value: bothDelete,
-                              onChanged: (value) => {
-                                    setState(() {
-                                      bothDelete = value;
-                                    })
-                                  }),
-                          Expanded(
-                            child: Text(
-                                AppLocalizations.of(context).auchBeiLoeschen +
-                                    chatPartnerProfil["name"]),
-                          )
-                        ],
-                      )
-                    ],
-                    actions: [
-                      TextButton(
-                        child: Text(AppLocalizations.of(context).loeschen),
-                        onPressed: () async {
-                          _deletePrivatChat();
-                        },
-                      ),
-                      TextButton(
-                        child: Text(AppLocalizations.of(context).abbrechen),
-                        onPressed: () => Navigator.pop(context),
-                      )
-                    ],
-                  );
-                });
-              });
+          _deleteWindow();
         },
       );
     }
 
-    leaveDialog() {
+    _leaveWindow(){
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).gruppeVerlassen,
+              height: 100,
+              children: [
+                Center(
+                    child: Text(AppLocalizations.of(context)
+                        .gruppeWirklichVerlassen)),
+              ],
+              actions: [
+                TextButton(
+                  child: Text(AppLocalizations.of(context).gruppeVerlassen),
+                  onPressed: () async {
+                    Navigator.pop(context);
+
+                    ChatGroupsDatabase().leaveChat(widget.groupChatData["connected"]);
+
+                    setState(() {
+                      widget.groupChatData["users"]
+                          .removeWhere((key, value) => key == userId);
+                    });
+                  },
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context).abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+            );
+          });
+    }
+
+    _leaveDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -2400,39 +2414,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ),
         onPressed: () {
           Navigator.pop(context);
-
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return CustomAlertDialog(
-                  title: AppLocalizations.of(context).gruppeVerlassen,
-                  height: 100,
-                  children: [
-                    Center(
-                        child: Text(AppLocalizations.of(context)
-                            .gruppeWirklichVerlassen)),
-                  ],
-                  actions: [
-                    TextButton(
-                      child: Text(AppLocalizations.of(context).gruppeVerlassen),
-                      onPressed: () async {
-                        Navigator.pop(context);
-
-                        ChatGroupsDatabase().leaveChat(widget.groupChatData["connected"]);
-
-                        setState(() {
-                          widget.groupChatData["users"]
-                              .removeWhere((key, value) => key == userId);
-                        });
-                      },
-                    ),
-                    TextButton(
-                      child: Text(AppLocalizations.of(context).abbrechen),
-                      onPressed: () => Navigator.pop(context),
-                    )
-                  ],
-                );
-              });
+          _leaveWindow();
         },
       );
     }
@@ -2455,11 +2437,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       if (widget.isChatgroup) _mitgliederDialog(),
                       if (userJoinedChat) _pinChatDialog(),
                       if (userJoinedChat) _muteDialog(),
-                      if (!widget.isChatgroup) deleteDialog(),
+                      if (!widget.isChatgroup) _deleteDialog(),
                       if (connectedData["erstelltVon"] != userId &&
                           userJoinedChat &&
                           widget.isChatgroup)
-                        leaveDialog(),
+                        _leaveDialog(),
                       const SizedBox(height: 5)
                     ],
                   ),
@@ -2555,7 +2537,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   })
               : null,
           profilBildProfil: chatImage,
-          onTap: () => widget.isChatgroup ? mitgliederWindow() : _openProfil(),
+          onTap: () => widget.isChatgroup ? _mitgliederWindow() : _openProfil(),
           buttons: [
             IconButton(
                 onPressed: () => _moreMenuWindow(),
@@ -2586,3 +2568,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     );
   }
 }
+
+
+
