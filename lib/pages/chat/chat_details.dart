@@ -90,7 +90,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   List adminList = [mainAdmin];
   final translator = GoogleTranslator();
   String ownLanguage = WidgetsBinding.instance.window.locales[0].languageCode;
-  bool userJoinedChat;
+  bool userJoinedChat = false;
 
   @override
   void initState() {
@@ -154,7 +154,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       widget.groupChatData ??= ChatDatabase().addNewChatGroup(chatPartnerProfil["id"]);
     }
 
-    if (!userJoinedChat) {
+    if (userJoinedChat) {
       unreadMessages += widget.groupChatData["users"][userId]["newMessages"];
     }
 
