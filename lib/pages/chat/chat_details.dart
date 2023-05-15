@@ -325,13 +325,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       ChatGroupsDatabase().updateChatGroup(
           "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.groupChatData["id"]}'");
-    } else {
-      ChatDatabase().updateChatGroup(
-          "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.groupChatData["id"]}'");
-    }
 
-    if (widget.isChatgroup) {
       var languageCheck = await translator.translate(messageData["message"]);
       var languageCode = languageCheck.sourceLanguage.code;
       messageData["language"] = languageCode;
@@ -339,11 +333,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       await ChatGroupsDatabase().addNewMessageAndNotification(
           widget.groupChatData["id"], messageData, connectedData["name"]);
     } else {
+      ChatDatabase().updateChatGroup(
+          "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
+          "WHERE id = '${widget.groupChatData["id"]}'");
+
       var isBlocked = ownProfil["geblocktVon"].contains(chatPartnerProfil["id"]);
       await ChatDatabase().addNewMessageAndSendNotification(
           widget.groupChatData["id"], messageData, isBlocked);
     }
-
   }
 
   _openProfil(){
