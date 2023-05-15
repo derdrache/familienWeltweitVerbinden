@@ -56,6 +56,12 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
     initilizeCreateChatData();
 
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) async{
+      await refreshHiveChats();
+      setState(() {});
+    });
+
     super.initState();
   }
 
@@ -67,9 +73,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   }
 
   _refreshData() async{
+    await refreshHiveChats();
     refreshHiveProfils();
     refreshHiveNewsPage();
-    await refreshHiveChats();
     refreshHiveMeetups();
     refreshHiveCommunities();
   }
