@@ -10,11 +10,12 @@ class LocationCard extends StatefulWidget {
   var fromCityPage;
   bool smallCard;
 
-  LocationCard({Key key,
-    this.location,
-    this.fromCityPage = false,
-    this.smallCard = false
-  }) : super(key: key);
+  LocationCard(
+      {Key key,
+      this.location,
+      this.fromCityPage = false,
+      this.smallCard = false})
+      : super(key: key);
 
   @override
   State<LocationCard> createState() => _LocationCardState();
@@ -32,40 +33,37 @@ class _LocationCardState extends State<LocationCard> {
     super.initState();
   }
 
-  getLocationImageWidget(){
-    if(!isCity) return AssetImage("assets/bilder/land.jpg");
-
-    if(widget.location["bild"].isEmpty){
-        return AssetImage("assets/bilder/city.jpg");
-    }else{
-        return NetworkImage(widget.location["bild"]);
+  getLocationImageWidget() {
+    if (widget.location["bild"].isEmpty) {
+      if (!isCity) return const AssetImage("assets/bilder/land.jpg");
+      return const AssetImage("assets/bilder/city.jpg");
+    } else {
+      if (!isCity) {
+        return AssetImage(
+            "assets/bilder/flaggen/${widget.location["bild"]}.jpeg");
+      }
+      return NetworkImage(widget.location["bild"]);
     }
   }
 
-  changeIntereset(){
-    if(hasInterest){
+  changeIntereset() {
+    if (hasInterest) {
       hasInterest = false;
 
       widget.location["interesse"].remove(userId);
       StadtinfoDatabase().update(
           "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id = '${widget.location["id"]}'"
-      );
-    }else{
+          "WHERE id = '${widget.location["id"]}'");
+    } else {
       hasInterest = true;
 
       widget.location["interesse"].add(userId);
       StadtinfoDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id = '${widget.location["id"]}'"
-      );
+          "WHERE id = '${widget.location["id"]}'");
     }
 
-
-
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
@@ -73,14 +71,76 @@ class _LocationCardState extends State<LocationCard> {
     double sizeRefactor = widget.smallCard ? 0.5 : 1;
     hasInterest = widget.location["interesse"].contains(userId);
 
+    cityLayout() {
+      return Container(
+          width: 150 * sizeRefactor,
+          height: 200 * sizeRefactor,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15.0),
+              image: DecorationImage(
+                  fit: BoxFit.fill,
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.7), BlendMode.dstATop),
+                  image: getLocationImageWidget())),
+          child: Center(
+              child: Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(20)),
+            child: Text(
+              widget.location["ort"],
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 22 * sizeRefactor, fontWeight: FontWeight.bold),
+            ),
+          )));
+    }
+
+    countryLayout() {
+      return SizedBox(
+          width: 150 * sizeRefactor,
+          height: 200 * sizeRefactor,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(15)),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 150 * sizeRefactor,
+                  height: 87 * sizeRefactor,
+                  child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(15),
+                          topLeft: Radius.circular(15)),
+                      child: Image(image: getLocationImageWidget(), fit: BoxFit.fitWidth,)),
+                ),
+                Expanded(
+                  child: Container(
+                    child: Center(
+                      child: Text(
+                        widget.location["ort"],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 22 * sizeRefactor,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ));
+    }
 
     return GestureDetector(
       onTap: () => changePage(
-          context, LocationInformationPage(
+          context,
+          LocationInformationPage(
               ortName: widget.location["ort"],
-              fromCityPage: widget.fromCityPage
-          )
-      ),
+              fromCityPage: widget.fromCityPage)),
       child: Container(
         margin: const EdgeInsets.all(15),
         child: Stack(
@@ -91,38 +151,19 @@ class _LocationCardState extends State<LocationCard> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),
               ),
-              child: Container(
-                  width: 150 * sizeRefactor,
-                  height: 200 * sizeRefactor,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15.0),
-                      image: DecorationImage(
-                          fit: BoxFit.fitHeight,
-                          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.7), BlendMode.dstATop),
-                          image: getLocationImageWidget())),
-                  child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(20)
-                        ),
-                        child: Text(
-                          widget.location["ort"],
-                          textAlign: TextAlign.center,
-                          style:
-                          TextStyle(fontSize: 22 * sizeRefactor, fontWeight: FontWeight.bold),
-                        ),
-                      ))),
+              child: isCity ? cityLayout() : countryLayout(),
             ),
-            if(!widget.smallCard) Positioned(
-                right: 0,
-                child: IconButton(
-                  onPressed: () => changeIntereset(),
-                  icon: Icon(Icons.star, color: hasInterest ? Colors.yellow.shade900 : Colors.black,),
-                )
-            )
+            if (!widget.smallCard)
+              Positioned(
+                  right: 0,
+                  child: IconButton(
+                    onPressed: () => changeIntereset(),
+                    icon: Icon(
+                      Icons.star,
+                      color:
+                          hasInterest ? Colors.yellow.shade900 : Colors.black,
+                    ),
+                  ))
           ],
         ),
       ),
