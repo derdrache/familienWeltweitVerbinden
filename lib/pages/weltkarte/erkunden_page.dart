@@ -866,7 +866,7 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
     von = DateTime(von.year, von.month, von.day);
     bis = bis ?? von;
     var selectDates = [von];
-    var selectedProfils = [];
+    Set<Map> selectedProfils = Set<Map>();
 
     while (von != bis) {
       von = DateTime(von.year, von.month + 1, von.day);
@@ -904,13 +904,13 @@ class _ErkundenPageState extends State<ErkundenPage> with WidgetsBindingObserver
             newProfil["longt"] = planung["ortData"]["longt"];
 
             selectedProfils.add(newProfil);
-            continue;
+            break;
           }
         }
       }
     }
 
-    profils = selectedProfils;
+    profils = selectedProfils.toList();
     createAndSetZoomLevels(profils, "profils");
   }
 
