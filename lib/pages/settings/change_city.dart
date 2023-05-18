@@ -169,6 +169,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
       if (sameCity && sameCountry && sameMonth) {
         removePlan = travelPlan;
+        break;
       }
     }
 
