@@ -190,7 +190,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
   }
 
   _getCombineInformationIfSameUser(news){
-    var lastNews = newsFeed.last["news"];
+    var lastNews = newsFeed.length > 0 ?newsFeed.last["news"] : null;
     var newInformation = {};
 
     if(lastNews == null) return news["information"];
@@ -221,6 +221,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
     events = Hive.box('secureBox').get("events") ?? [];
+    ownSettingProfil = Hive.box('secureBox').get("ownNewsSetting");
     const double titleFontSize = 15;
 
     friendsDisplay(news) {
