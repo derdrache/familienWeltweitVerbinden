@@ -164,12 +164,19 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     int intValue = value == true ? 1:0;
 
                     setState(() {
+                      showFriendTravelPlan = value;
                       ownProfil["travelPlanNotification"] = intValue;
                     });
+
+                    NewsSettingsDatabase().update(
+                        "showFriendTravelPlan = '$intValue'",
+                        "WHERE id = '$userId'");
 
                     ProfilDatabase().updateProfil(
                         "travelPlanNotification = '$intValue'",
                         "WHERE id = '${ownProfil["id"]}'");
+
+                    _changeHiveOwnNewsPageSetting("showFriendTravelPlan", intValue);
                   }),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context).newsSettingShowTravelPlan)

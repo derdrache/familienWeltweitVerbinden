@@ -74,6 +74,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
   }
 
   _refreshData() async{
+    await refreshHiveNewsPage();
     refreshHiveChats();
     refreshHiveMeetups();
     refreshHiveProfils();
