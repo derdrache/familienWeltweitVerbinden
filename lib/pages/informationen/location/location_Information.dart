@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/informationen/meetups/meetup_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
@@ -604,48 +602,46 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   }
 
-  setThumb(thumb, index) async {
+  setThumbUp(index) {
     var infoId = usersCityInformation[index]["id"];
 
-    if (thumb == "up") {
-      if (usersCityInformation[index]["thumbUp"].contains(userId)) return;
+    if (usersCityInformation[index]["thumbUp"].contains(userId)){
+      usersCityInformation[index]["thumbUp"].remove(userId);
 
-      setState(() {
-        usersCityInformation[index]["thumbUp"].add(userId);
-        usersCityInformation[index]["thumbDown"].remove(userId);
-      });
-
-      var dbData = await StadtinfoUserDatabase()
-          .getData("thumbUp, thumbDown", "WHERE id ='$infoId'");
-      var dbThumbUpList = dbData["thumbUp"];
-      var dbThumbDownList = dbData["thumbDown"];
-
-      dbThumbUpList.add(userId);
-      dbThumbDownList.remove(userId);
-
-      await StadtinfoUserDatabase().update(
-          "thumbUp = '${jsonEncode(dbThumbUpList)}', thumbDown = '${jsonEncode(dbThumbDownList)}'",
+      StadtinfoUserDatabase().update(
+          "thumbUp = JSON_REMOVE(thumbUp, JSON_UNQUOTE(JSON_SEARCH(thumbUp, 'one', '$userId')))",
           "WHERE id ='$infoId'");
-    } else if (thumb == "down") {
-      if (usersCityInformation[index]["thumbDown"].contains(userId)) return;
+    }else{
+      usersCityInformation[index]["thumbUp"].add(userId);
+      usersCityInformation[index]["thumbDown"].remove(userId);
 
-      setState(() {
-        usersCityInformation[index]["thumbDown"].add(userId);
-        usersCityInformation[index]["thumbUp"].remove(userId);
-      });
-
-      var dbData = await StadtinfoUserDatabase()
-          .getData("thumbUp, thumbDown", "WHERE id ='$infoId'");
-      var dbThumbUpList = dbData["thumbUp"];
-      var dbThumbDownList = dbData["thumbDown"];
-
-      dbThumbDownList.add(userId);
-      dbThumbUpList.remove(userId);
-
-      await StadtinfoUserDatabase().update(
-          "thumbUp = '${jsonEncode(dbThumbUpList)}', thumbDown = '${jsonEncode(dbThumbDownList)}'",
+      StadtinfoUserDatabase().update(
+          "thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId'))), thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')",
           "WHERE id ='$infoId'");
     }
+    setState(() {});
+
+  }
+
+  setThumbDown(index)  {
+    var infoId = usersCityInformation[index]["id"];
+
+    if (usersCityInformation[index]["thumbDown"].contains(userId)){
+      usersCityInformation[index]["thumbDown"].remove(userId);
+
+      StadtinfoUserDatabase().update(
+          "thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))",
+          "WHERE id ='$infoId'");
+    }else{
+      usersCityInformation[index]["thumbDown"].add(userId);
+      usersCityInformation[index]["thumbUp"].remove(userId);
+
+      StadtinfoUserDatabase().update(
+          "thumbUp = JSON_REMOVE(thumbUp, JSON_UNQUOTE(JSON_SEARCH(thumbUp, 'one', '$userId'))), thumbDown = JSON_ARRAY_APPEND(thumbDown, '\$', '$userId')",
+          "WHERE id ='$infoId'");
+    }
+
+    setState(() {});
   }
 
   sortInformation(data) {
@@ -922,8 +918,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     };
   }
 
-
-
 @override
   void initState() {
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
@@ -1032,7 +1026,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   IconButton(
-                      onPressed: () => setThumb("up", index),
+                      onPressed: () => setThumbUp(index),
                       icon: Icon(
                         Icons.thumb_up,
                         color: information["thumbUp"].contains(userId)
@@ -1044,7 +1038,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                       .toString()),
                   IconButton(
                       //padding: EdgeInsets.all(5),
-                      onPressed: () => setThumb("down", index),
+                      onPressed: () => setThumbDown(index),
                       icon: Icon(Icons.thumb_down,
                           color: information["thumbDown"].contains(userId)
                               ? Colors.red
