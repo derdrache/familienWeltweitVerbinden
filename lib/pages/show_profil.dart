@@ -803,7 +803,7 @@ class _UserInformationDisplay extends StatelessWidget {
         }
 
         reiseplanung.add(GestureDetector(
-          onTap: () => changePage(context, LocationInformationPage(ortName: profil["ort"])),
+          onTap: () => changePage(context, LocationInformationPage(ortName: reiseplan["ortData"]["city"])),
           child: Container(
             margin: const EdgeInsets.only(bottom: 5),
             child: Row(
