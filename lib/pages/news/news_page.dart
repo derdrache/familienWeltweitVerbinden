@@ -404,7 +404,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       Map friendProfil = getProfilFromHive(
           profilId:
               familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
-
+      bool isFamilymember = familyProfil != null ? familyProfil["members"].contains(userId) : false;
       bool isFriend = familyProfil != null
           ? ownProfil["friendlist"]
               .toSet()
@@ -413,7 +413,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
           : ownProfil["friendlist"].contains(newsUserId);
 
       if (!isFriend || friendProfil == null ||
-          ownSettingProfil["showFriendTravelPlan"] == 0) {
+          ownSettingProfil["showFriendTravelPlan"] == 0 || isFamilymember) {
         return null;
       }
 
