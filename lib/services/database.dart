@@ -362,11 +362,11 @@ class ChatGroupsDatabase {
     groupData["users"] = user == null
         ? {}
         : {
-            user: {"newMessages": 0}
-          };
-
+      user: {"newMessages": 0}
+    };
     var chatGroups = Hive.box("secureBox").get("chatGroups") ?? [];
     chatGroups.add(groupData);
+
     var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     myGroupChats.add(groupData);
 
@@ -1390,7 +1390,7 @@ getChatGroupFromHive({chatId, connectedWith}) {
     }
 
     for (var chatGroup in chatGroups) {
-      if (chatGroup["connected"].split("=")[1] == connectedWith) return chatGroup;
+      if (chatGroup["connected"] == connectedWith) return chatGroup;
     }
   }
 

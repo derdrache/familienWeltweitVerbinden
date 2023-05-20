@@ -140,10 +140,19 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "WHERE id = '${widget.chatId}'");
   }
 
-  _getAndSetChatData() {
+  _getAndSetChatData(){
     if(widget.isChatgroup){
       widget.groupChatData ??= getChatGroupFromHive(
           chatId: widget.chatId, connectedWith: widget.connectedWith);
+
+      widget.groupChatData ??= {
+        "id": -1,
+        "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
+        "lastMessage": "</neuer Chat",
+        "users": {},
+        "connected": widget.connectedWith
+      };
+      _createNewChatgroup();
     }else{
       chatPartnerProfil = getProfilFromHive(
           profilId: widget.chatPartnerId, profilName: widget.chatPartnerName);
@@ -158,6 +167,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       unreadMessages += widget.groupChatData["users"][userId]["newMessages"];
     }
 
+  }
+
+  _createNewChatgroup() async{
+    widget.groupChatData = await ChatGroupsDatabase().addNewChatGroup(null, widget.connectedWith);
   }
 
   _setConnectionData(){

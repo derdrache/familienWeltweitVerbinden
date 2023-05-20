@@ -52,3 +52,4 @@ app.*.map.json
 /lib/test.dart
 /lib/test.apns
 /lib/auth/
+/lib/page_test.dart
