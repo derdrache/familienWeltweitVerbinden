@@ -158,24 +158,23 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
   deleteOldTravelPlan(locationDict) {
     List travelPlans = ownProfil["reisePlanung"];
-    Map removePlan = {};
+    List removePlans = [];
 
     for (var travelPlan in travelPlans) {
-      bool sameCity = locationDict["city"] == travelPlan["ortData"]["city"];
-      bool sameCountry =
-          locationDict["countryname"] == travelPlan["ortData"]["countryname"];
-      bool sameMonth =
-          DateTime.parse(travelPlan["von"]).month == DateTime.now().month;
+      var isPast = DateTime.parse(travelPlan["bis"]).compareTo(DateTime.now()) == -1;
 
-      if (sameCity && sameCountry && sameMonth) {
-        removePlan = travelPlan;
+      if (isPast) {
+        removePlans.add(travelPlan);
         break;
       }
     }
 
-    if (removePlan.isEmpty) return;
+    if (removePlans.isEmpty) return;
 
-    travelPlans.remove(removePlan);
+    for(var removePlan in removePlans){
+      travelPlans.remove(removePlan);
+    }
+
     ProfilDatabase().updateProfil(
         "reisePlanung = '$travelPlans'", "WHERE id = '${ownProfil["id"]}'");
   }
