@@ -179,42 +179,38 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   checkAllValidation(userExist, userName) {
-    bool noError = true;
+    bool hasError = false;
     String errorString =
         AppLocalizations.of(context).bitteEingabeKorrigieren + "\n";
 
     if (userExist) {
       errorString +=
           "- " + AppLocalizations.of(context).usernameInVerwendung + "\n";
-    }
-    if (reiseArtenAuswahlBox.getSelected().isEmpty) {
+    }else if (reiseArtenAuswahlBox.getSelected().isEmpty) {
       errorString +=
           "- " + AppLocalizations.of(context).reiseartAuswaehlen + "\n";
-    }
-    if (interessenAuswahlBox.getSelected().isEmpty) {
-      errorString +=
-          "- " + AppLocalizations.of(context).interessenAuswaehlen + "\n";
-    }
-    if (sprachenAuswahlBox.getSelected().isEmpty) {
+    } else if (sprachenAuswahlBox.getSelected().isEmpty) {
       errorString +=
           "- " + AppLocalizations.of(context).spracheAuswaehlen + "\n";
-    }
-    if (childrenAgePickerBox.getDates().length == 0 ||
+    } else if (interessenAuswahlBox.getSelected().isEmpty) {
+      errorString +=
+          "- " + AppLocalizations.of(context).interessenAuswaehlen + "\n";
+    }else if (childrenAgePickerBox.getDates().length == 0 ||
         !childrenInputValidation()) {
       errorString +=
           "- " + AppLocalizations.of(context).geburtsdatumEingeben + "\n";
-    }
-    if (userName.length > 40) {
+    }else if (userName.length > 40) {
       errorString += "- " + AppLocalizations.of(context).usernameZuLang;
     }
 
+
     if (errorString.length > 29) {
-      noError = false;
+      hasError = true;
 
       customSnackbar(context, errorString);
     }
 
-    return noError;
+    return !hasError;
   }
 
   @override

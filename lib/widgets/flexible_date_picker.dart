@@ -45,6 +45,8 @@ class FlexibleDatePicker extends StatefulWidget {
 
       return [start, end];
     } else {
+      if(selectedDate == null) return;
+
       selectedYear ??= selectedDate.year;
       selectedMonth ??= selectedDate.month;
       selectedDay ??= selectedDate.day;
