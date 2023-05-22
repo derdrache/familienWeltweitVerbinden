@@ -727,12 +727,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () async {
+                    CommunityDatabase().delete(widget.community["id"]);
+                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(connectedWith: "</community=${widget.community["id"]}")["id"]);
 
                     var communities = Hive.box('secureBox').get("communities");
                     communities.removeWhere((community) => community["id"] == widget.community["id"]);
-
-                    await CommunityDatabase().delete(widget.community["id"]);
-                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(connectedWith: widget.community["id"])["id"]);
 
                     DbDeleteImage(widget.community["bild"]);
 

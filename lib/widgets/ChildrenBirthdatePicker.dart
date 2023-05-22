@@ -11,6 +11,8 @@ class CustomDatePicker extends StatefulWidget {
   var datePicker;
 
   getPickedDate(){
+    if(datePicker == null) return;
+
     return datePicker.getDate();
   }
 
@@ -200,7 +202,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
                 datePicker: FlexibleDatePicker(
                   startYear: DateTime.now().year-18,
                   endYear: DateTime.now().year,
-                  selectedDate: DateTime.parse(dates[i]),
+                  selectedDate: dates[i] == null ? null :DateTime.parse(dates[i]),
                 ),
                 dateIsSelected: dates[i] != null
             )

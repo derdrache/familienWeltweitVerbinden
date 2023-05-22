@@ -145,14 +145,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       widget.groupChatData ??= getChatGroupFromHive(
           chatId: widget.chatId, connectedWith: widget.connectedWith);
 
-      widget.groupChatData ??= {
-        "id": -1,
-        "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
-        "lastMessage": "</neuer Chat",
-        "users": {},
-        "connected": widget.connectedWith
-      };
-      _createNewChatgroup();
+      if(widget.groupChatData == null){
+        widget.groupChatData ??= {
+          "id": -1,
+          "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
+          "lastMessage": "</neuer Chat",
+          "users": {},
+          "connected": widget.connectedWith
+        };
+        _createNewChatgroup();
+      }
     }else{
       chatPartnerProfil = getProfilFromHive(
           profilId: widget.chatPartnerId, profilName: widget.chatPartnerName);
@@ -297,7 +299,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "message": message,
       "von": ownProfilId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
-      "zu": chatPartnerProfil["Id"],
+      "zu": chatPartnerProfil["id"],
       "responseId": messageExtraInformationId ??= "0",
       "forward": "",
       "language": "auto"
@@ -568,7 +570,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (pinnedMessages.runtimeType == String) {
       return json.decode(pinnedMessages);
     }
-    return pinnedMessages;
+    return pinnedMessages ?? [];
   }
 
   _pinMessage(Map message) async {

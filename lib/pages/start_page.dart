@@ -47,10 +47,12 @@ class _StartPageState extends State<StartPage> {
   var checkedA2HS = false;
   List<Widget> tabPages;
   var _networkConnectivity;
+  bool noProfil;
 
   @override
   void initState() {
     widget.chatPageSliderIndex ??= 0;
+    noProfil = ownProfil["id"] == null;
     _networkConnectivity = NetworkConnectivity(context);
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
@@ -370,6 +372,9 @@ class _StartPageState extends State<StartPage> {
     }
 
     checkA2HS();
+
+
+    if(noProfil) return Scaffold();
 
     return UpgradeAlert(
       upgrader: Upgrader(shouldPopScope: () => true),

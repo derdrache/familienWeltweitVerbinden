@@ -65,10 +65,7 @@ class _ProfilImageState extends State<ProfilImage> {
     var pickedImage = await ImagePicker()
         .pickImage(source: ImageSource.gallery, imageQuality: 50);
 
-    if (pickedImage == null) {
-      customSnackbar(context, "Datei ist beschädigt");
-      return false;
-    }
+    if (pickedImage == null) return;
 
     var imageByte = await changeImageSize(pickedImage);
 
