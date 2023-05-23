@@ -230,9 +230,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
 
                     ProfilDatabase().deleteProfil(deleteProfil["id"]);
                     DbDeleteImage(deleteProfil["bild"]);
+
                     setState(() {});
-                    global_functions.changePageForever(
-                        context, LoginPage());
+                    global_functions.changePageForever(context, LoginPage());
                   },
                 ),
                 TextButton(

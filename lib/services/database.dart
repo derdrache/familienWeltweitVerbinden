@@ -111,6 +111,10 @@ class ProfilDatabase {
   }
 
   deleteProfil(userId) async {
+    Map ownProfil = getProfilFromHive(profilId: userId);
+    ReportsDatabase().add("", "delete User", "Folgende Email muss gelöscht werden: ${ownProfil["email"]}");
+
+
     _deleteInTable("profils", "id", userId);
     _deleteInTable("newsSettings", "id", userId);
     _deleteInTable("news_page", "id", userId);
@@ -146,6 +150,14 @@ class ProfilDatabase {
     MeetupDatabase().update(
         "freigegeben = JSON_REMOVE(freigegeben, JSON_UNQUOTE(JSON_SEARCH(freigegeben, 'one', '$userId')))",
         "WHERE JSON_CONTAINS(freigegeben, '\"$userId\"') > 0");
+
+    MeetupDatabase().update(
+        "immerZusagen = JSON_REMOVE(immerZusagen, JSON_UNQUOTE(JSON_SEARCH(immerZusagen, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(immerZusagen, '\"$userId\"') > 0");
+
+    CommunityDatabase().update(
+        "members = JSON_REMOVE(members, JSON_UNQUOTE(JSON_SEARCH(members, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(members, '\"$userId\"') > 0");
 
     ChatGroupsDatabase().updateChatGroup(
         "users = JSON_REMOVE(users, '\$.$userId')",
@@ -651,6 +663,11 @@ class MeetupDatabase {
 
     List myMeetups = Hive.box('secureBox').get("myEvents") ?? [];
     myMeetups.removeWhere((meetup) => meetup["id"] == meetupId);
+    var meetups = Hive.box('secureBox').get("events");
+    meetups.removeWhere((meetup) => meetup["id"] == meetupId);
+
+    var chatGroupId = getChatGroupFromHive(connectedWith: "</event=$meetupId")["id"];
+    ChatGroupsDatabase().deleteChat(chatGroupId);
   }
 }
 

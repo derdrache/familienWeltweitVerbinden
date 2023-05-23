@@ -8,13 +8,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../global/global_functions.dart';
 import '../services/database.dart';
+import '../widgets/loading_button.dart';
 
 class ImageCrop extends StatefulWidget {
   var imageData;
   var typ;
   var meetupCommunityData;
 
-  ImageCrop({Key key, this.imageData, this.typ, this.meetupCommunityData}) : super(key: key);
+  ImageCrop({Key key, this.imageData, this.typ, this.meetupCommunityData})
+      : super(key: key);
 
   @override
   State<ImageCrop> createState() => _ImageCropState();
@@ -23,21 +25,37 @@ class ImageCrop extends StatefulWidget {
 class _ImageCropState extends State<ImageCrop> {
   final _controller = CropController();
   Map onwProfil = Hive.box("secureBox").get("ownProfil");
+  bool isLoading = false;
 
-  uploadAndDeleteOldImage() async{
+  _save(image) async {
+    widget.imageData["byte"] = image;
+
+    var imageList = await uploadAndDeleteOldImage();
+
+    if (widget.typ == "profil") {
+      saveDBProfil(imageList);
+    } else if (widget.typ == "meetup") {
+      saveDBMeetup(imageList);
+    } else if (widget.typ == "community") {
+      saveDBCommunity(imageList);
+    }
+  }
+
+  uploadAndDeleteOldImage() async {
     var imageName = widget.imageData["name"];
     imageName = sanitizeString(imageName);
     var imageSavePath = "https://families-worldwide.com/bilder/" + imageName;
     var imageList = [imageSavePath];
 
-    await uploadImage(widget.imageData["path"], imageName, widget.imageData["byte"]);
+    await uploadImage(
+        widget.imageData["path"], imageName, widget.imageData["byte"]);
 
     if (onwProfil["bild"].isNotEmpty) DbDeleteImage(onwProfil["bild"][0]);
 
     return imageList;
   }
 
-  saveDBProfil(imageList) async{
+  saveDBProfil(imageList) {
     if (onwProfil["bild"].isNotEmpty) DbDeleteImage(onwProfil["bild"][0]);
 
     updateHiveOwnProfil("bild", imageList);
@@ -45,52 +63,56 @@ class _ImageCropState extends State<ImageCrop> {
         "WHERE id = '${onwProfil["id"]}'");
   }
 
-  saveDBMeetup(imageList) async{
+  saveDBMeetup(imageList) {
     var oldImage = widget.meetupCommunityData["bild"];
     DbDeleteImage(oldImage);
 
     updateHiveMeetup(widget.meetupCommunityData["id"], "bild", imageList[0]);
-    MeetupDatabase().update("bild = '${imageList[0]}'", "WHERE id = '${widget.meetupCommunityData["id"]}'");
+    MeetupDatabase().update("bild = '${imageList[0]}'",
+        "WHERE id = '${widget.meetupCommunityData["id"]}'");
   }
 
-  saveDBCommunity(imageList) async{
+  saveDBCommunity(imageList) {
     var oldImage = widget.meetupCommunityData["bild"];
     DbDeleteImage(oldImage);
 
     updateHiveCommunity(widget.meetupCommunityData["id"], "bild", imageList[0]);
-    CommunityDatabase().update("bild = '${imageList[0]}'", "WHERE id = '${widget.meetupCommunityData["id"]}'");
+    CommunityDatabase().update("bild = '${imageList[0]}'",
+        "WHERE id = '${widget.meetupCommunityData["id"]}'");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        title: AppLocalizations.of(context).bildBearbeiten,
-        buttons: [
-          IconButton(onPressed: () async{
-            _controller.crop();
-          }, icon: Icon(Icons.done))
-        ],
-      ),
-      body: Crop(
-        image: widget.imageData["byte"],
-        controller: _controller,
-        onCropped: (image) async {
-          widget.imageData["byte"] = image;
+        appBar: CustomAppBar(
+          title: AppLocalizations
+              .of(context)
+              .bildBearbeiten,
+          buttons: [
+            isLoading
+                ? LoadingButton()
+                : IconButton(onPressed: () async {
+                    _controller.crop();
+                  }, icon: const Icon(Icons.done))
+          ],
+        ),
+        body: Crop(
+          image: widget.imageData["byte"],
+          controller: _controller,
+          onCropped: (image) async {
+            setState(() {
+              isLoading = true;
+            });
 
-          var imageList = await uploadAndDeleteOldImage();
+            await _save(image);
 
-          if(widget.typ == "profil"){
-            await saveDBProfil(imageList);
-          }else if(widget.typ == "meetup"){
-            await saveDBMeetup(imageList);
-          }else if(widget.typ == "community"){
-            await saveDBCommunity(imageList);
-          }
+            setState(() {
+              isLoading = false;
+            });
 
-          Navigator.pop(context);
-        },
-      )
+            Navigator.pop(context);
+          },
+        )
     );
   }
 }

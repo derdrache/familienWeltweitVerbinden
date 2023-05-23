@@ -317,6 +317,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     return true;
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -420,6 +422,41 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           });
     }
 
+    _changeOrOpenLinkWindow() async {
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+
+      await showMenu(
+        context: context,
+        position: RelativeRect.fromRect(
+            Offset(MediaQuery.of(context).size.width - 60,MediaQuery.of(context).size.height / 1.6) & const Size(40, 40), // smaller rect, the touch area
+            Offset.zero & overlay.size // Bigger rect, the entire screen
+        ),
+        items: [
+          PopupMenuItem(
+              child: Text(AppLocalizations.of(context).linkBearbeiten),
+              onTap: () {
+                Future.delayed(
+                    const Duration(seconds: 0), () => openChangeWindow(
+                      AppLocalizations.of(context).meetupMapLinkAendern,
+                      customTextInput(
+                          AppLocalizations.of(context).neuenKartenlinkEingeben,
+                          changeTextInputController),
+                      checkAndSaveNewMapAndLink
+                    )
+                );
+              }),
+          PopupMenuItem(
+            child: Text(AppLocalizations.of(context).linkOeffnen),
+            onTap: () {
+              Navigator.pop(context);
+              global_func.openURL(widget.meetupData["link"]);
+            },
+          ),
+        ],
+        elevation: 8.0,
+      );
+    }
+
     nameInformation() {
       return InkWell(
         onTap: () => openChangeWindow(
@@ -435,8 +472,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     bildAndTitleBox() {
-      bool isAssetImage =
-          widget.meetupData["bild"].substring(0, 5) == "asset" ? true : false;
 
       return Stack(
         clipBehavior: Clip.none,
@@ -446,20 +481,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               MeetupImageGalerie(
                 isCreator: widget.isCreator,
                 meetupData: widget.meetupData,
-                child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0),
-                    ),
-                    child: isAssetImage
-                        ? Image.asset(widget.meetupData["bild"],
-                            fit: BoxFit.fitWidth)
-                        : Container(
-                            constraints:
-                                BoxConstraints(maxHeight: screenHeight / 2.08),
-                            child: Image.network(
-                              widget.meetupData["bild"],
-                            ))),
+
               ),
             ],
           ),
@@ -585,12 +607,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       return meetupInformationRow(
           isOffline ? "Map: " : "Link: ",
           widget.meetupData["link"],
-          () => openChangeWindow(
-              AppLocalizations.of(context).meetupMapLinkAendern,
-              customTextInput(
-                  AppLocalizations.of(context).neuenKartenlinkEingeben,
-                  changeTextInputController),
-              checkAndSaveNewMapAndLink),
+          (){
+            if (widget.isCreator) _changeOrOpenLinkWindow();
+            if (!widget.isCreator) global_func.openURL(widget.meetupData["link"]);
+          },
           bodyColor: Theme.of(context).colorScheme.secondary);
     }
 

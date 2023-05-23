@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:hive/hive.dart';
 
 import '../../../global/global_functions.dart';
 import '../../../global/variablen.dart' as global_var;
@@ -234,13 +233,9 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
   }
 
   deleteMeetup(){
-    var meetups = Hive.box('secureBox').get("events");
-    meetups.removeWhere((meetup) => meetup["id"] == widget.meetupData["id"]);
+
 
     MeetupDatabase().delete(widget.meetupData["id"]);
-
-    var chatGroupId = getChatGroupFromHive(connectedWith: widget.meetupData["id"])["id"];
-    ChatGroupsDatabase().deleteChat(chatGroupId);
 
     DbDeleteImage(widget.meetupData["bild"]);
   }

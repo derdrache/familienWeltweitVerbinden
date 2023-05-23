@@ -219,6 +219,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ImageCrop(
       imageData: imageData,
       typ: "community",
+      meetupCommunityData: widget.community,
     ))).then((_)=>setState((){
       widget.community = getCommunityFromHive(widget.community["id"]);
     }));
@@ -227,11 +228,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   _selectAndUploadImage() async {
     var imageName = await _pickImage();
 
-
-
     var oldImage = widget.community["bild"];
 
-    if (imageName == false) return;
+    if (imageName == false || imageName == null) return;
 
     imageName = imageName.replaceAll("/", "_");
     var image = "https://families-worldwide.com/bilder/" + imageName;

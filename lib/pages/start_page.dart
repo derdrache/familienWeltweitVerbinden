@@ -26,7 +26,7 @@ import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
 import 'force_update.dart';
 
-final String userId = FirebaseAuth.instance.currentUser?.uid;
+
 
 //ignore: must_be_immutable
 class StartPage extends StatefulWidget {
@@ -41,6 +41,7 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
+  final String userId = FirebaseAuth.instance.currentUser?.uid;
   final String userName = FirebaseAuth.instance.currentUser?.displayName;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   bool hasInternet = true;
@@ -52,7 +53,7 @@ class _StartPageState extends State<StartPage> {
   @override
   void initState() {
     widget.chatPageSliderIndex ??= 0;
-    noProfil = ownProfil["id"] == null;
+    noProfil = ownProfil == null || ownProfil["id"] == null;
     _networkConnectivity = NetworkConnectivity(context);
 
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
@@ -391,6 +392,7 @@ class _StartPageState extends State<StartPage> {
 }
 
 class CustomBottomNavigationBar extends StatelessWidget {
+  final String userId = FirebaseAuth.instance.currentUser?.uid;
   final Function onNavigationItemTapped;
   final int selectNavigationItem;
 

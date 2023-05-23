@@ -114,6 +114,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ImageCrop(
       imageData: imageData,
       typ: "meetup",
+      meetupCommunityData: widget.meetupData
     ))).then((_)=>setState((){
       widget.meetupData = getMeetupFromHive(widget.meetupData["id"]);
     }));
@@ -121,6 +122,9 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
 
   @override
   Widget build(BuildContext context) {
+    bool isAssetImage = widget.meetupData["bild"].substring(0, 5) == "asset" ? true : false;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     showImages() {
       List<Widget> allImages = [];
 
@@ -266,7 +270,20 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                       Center(child: Text(AppLocalizations.of(context).bildLadezeit))
                     ],
                   ))
-              : widget.child,
+              : ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
+              ),
+              child: isAssetImage
+                  ? Image.asset(widget.meetupData["bild"],
+                  fit: BoxFit.fitWidth)
+                  : Container(
+                  constraints:
+                  BoxConstraints(maxHeight: screenHeight / 2.08),
+                  child: Image.network(
+                    widget.meetupData["bild"],
+                  ))),
         ),
         onTapDown: !widget.isCreator
             ? null
