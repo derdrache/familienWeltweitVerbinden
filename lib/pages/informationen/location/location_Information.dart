@@ -244,15 +244,15 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     for (var profil in allProfils) {
       if(profil["ort"].isEmpty) continue;
 
-      var inLocation = widget.location["ort"]?.contains(profil["ort"]) ?? false;
-      List countryVariations = widget.location["ort"].split(" / ");
-      bool inCountry = false;
+      bool inLocation;
 
-      for(var country in countryVariations){
-        if(country == profil["ort"]) inCountry = true;
+      if(isCity){
+        inLocation = widget.location["ort"].contains(profil["ort"]) ?? false;
+      }else{
+        inLocation = widget.location["ort"].contains(profil["land"]) ?? false;
       }
 
-      if (inLocation || inCountry) {
+      if (inLocation) {
         familiesThere.add(profil["id"]);
         familiesOnLocation += 1;
       }
