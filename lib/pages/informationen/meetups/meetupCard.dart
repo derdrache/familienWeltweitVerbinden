@@ -22,6 +22,7 @@ class MeetupCard extends StatefulWidget {
   bool bigCard;
   bool fromMeetupPage;
   bool smallCard;
+  Function afterFavorite;
 
   MeetupCard({
     Key key,
@@ -32,7 +33,8 @@ class MeetupCard extends StatefulWidget {
     this.afterPageVisit,
     this.bigCard = false,
     this.fromMeetupPage = false,
-    this.smallCard = false
+    this.smallCard = false,
+    this.afterFavorite,
   })  : isCreator = meetupData["erstelltVon"] == userId,
         super(key: key);
 
@@ -248,6 +250,7 @@ class _MeetupCardState extends State<MeetupCard> {
                           hasIntereset:
                               widget.meetupData["interesse"].contains(userId),
                           id: widget.meetupData["id"],
+                          afterFavorite: widget.afterFavorite
                         )),
                 ],
               ),
@@ -331,8 +334,9 @@ class _MeetupCardState extends State<MeetupCard> {
 class InteresseButton extends StatefulWidget {
   bool hasIntereset;
   String id;
+  Function afterFavorite;
 
-  InteresseButton({Key key, this.hasIntereset, this.id}) : super(key: key);
+  InteresseButton({Key key, this.hasIntereset, this.id, this.afterFavorite}) : super(key: key);
 
   @override
   _InteresseButtonState createState() => _InteresseButtonState();
@@ -344,36 +348,26 @@ class _InteresseButtonState extends State<InteresseButton> {
   setInteresse() async {
     var myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
     var meetupData = getMeetupFromHive(widget.id);
-    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     widget.hasIntereset = !widget.hasIntereset;
 
     if (widget.hasIntereset) {
       meetupData["interesse"].add(userId);
       myInterestedMeetups.add(meetupData);
+
       MeetupDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
           "WHERE id ='${widget.id}'");
-
-      myGroupChats.add(getChatGroupFromHive(connectedWith: widget.id));
-      ChatGroupsDatabase().updateChatGroup(
-          "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
-          "WHERE connected LIKE '%${widget.id}%'");
-    } else {
+    }else{
       meetupData["interesse"].remove(userId);
       myInterestedMeetups.removeWhere((meetup) => meetup["id"] == widget.id);
       MeetupDatabase().update(
           "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
           "WHERE id ='${widget.id}'");
-
-      myGroupChats.removeWhere((chatGroup){
-        chatGroup["connected"].contains(widget.id);
-      });
-      ChatGroupsDatabase().updateChatGroup(
-          "users = JSON_REMOVE(users, '\$.$userId')",
-          "WHERE connected LIKE '%${widget.id}%'");
     }
 
     setState(() {   });
+
+    widget.afterFavorite();
   }
 
   @override

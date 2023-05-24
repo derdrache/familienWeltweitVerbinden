@@ -48,6 +48,7 @@ class _MeetupPageState extends State<MeetupPage> {
                 margin: const EdgeInsets.only(top: 10, bottom: 0, right: 20, left: 10),
                 withInteresse: withInteresse,
                 fromMeetupPage: true,
+                afterFavorite: () => setState((){}),
                 afterPageVisit: () => setState((){})),
             if (isOwner)
               Positioned(

@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hive/hive.dart';
 import '../../../global/global_functions.dart' as global_func;
 
 import 'community_details.dart';
@@ -98,9 +95,7 @@ class _CommunityCardState extends State<CommunityCard> {
                         top: 2,
                         right: 8,
                         child: InteresseButton(
-                            hasIntereset:
-                                widget.community["interesse"].contains(userId),
-                            id: widget.community["id"].toString(),
+                            communityData: widget.community,
                             afterFavorite: widget.afterFavorite)),
                 ],
               ),
@@ -148,11 +143,10 @@ class _CommunityCardState extends State<CommunityCard> {
 }
 
 class InteresseButton extends StatefulWidget {
-  bool hasIntereset;
-  String id;
+  Map communityData;
   Function afterFavorite;
 
-  InteresseButton({Key key, this.hasIntereset, this.id, this.afterFavorite})
+  InteresseButton({Key key, this.communityData, this.afterFavorite})
       : super(key: key);
 
   @override
@@ -161,40 +155,37 @@ class InteresseButton extends StatefulWidget {
 
 class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
+  bool hasIntereset;
+
 
   setInteresse() async {
-    var allCommunities = Hive.box('secureBox').get("communities") ?? [];
-    var communityIndex = allCommunities.indexWhere((community) => community["id"] == widget.id);
-    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-    widget.hasIntereset = !widget.hasIntereset;
+    String communityId = widget.communityData["id"];
+    hasIntereset = !hasIntereset;
 
-    if (widget.hasIntereset) {
-      allCommunities[communityIndex]["interesse"].add(userId);
+    if (hasIntereset) {
+      widget.communityData["interesse"].add(userId);
       CommunityDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id ='${widget.id}'");
-
-      myGroupChats.add(getChatGroupFromHive(connectedWith: widget.id));
-      ChatGroupsDatabase().updateChatGroup(
-          "users = JSON_MERGE_PATCH(users, '${json.encode({userId : {"newMessages": 0}})}')",
-          "WHERE connected LIKE '%${widget.id}%'");
-    } else {
-      allCommunities[communityIndex]["interesse"].remove(userId);
+          "WHERE id ='$communityId'");
+    }else{
+      widget.communityData["interesse"].remove(userId);
       CommunityDatabase().update(
           "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id ='${widget.id}'");
-
-      myGroupChats.removeWhere((chatGroup){
-        chatGroup["connected"].contains(widget.id);
-      });
-      ChatGroupsDatabase().updateChatGroup(
-          "users = JSON_REMOVE(users, '\$.$userId')",
-          "WHERE connected LIKE '%${widget.id}%'");
+          "WHERE id ='$communityId'");
     }
 
+    updateHiveCommunity(communityId, "interesse", widget.communityData["interesse"]);
     setState(() {});
 
     widget.afterFavorite();
+  }
+
+
+@override
+  void initState() {
+    hasIntereset = widget.communityData["interesse"].contains(userId);
+
+    super.initState();
   }
 
   @override
@@ -203,6 +194,6 @@ class _InteresseButtonState extends State<InteresseButton> {
         onTap: () => setInteresse(),
         child: Icon(Icons.star,
             size: 30,
-            color: widget.hasIntereset ? Colors.amberAccent : Colors.black));
+            color: hasIntereset ? Colors.amberAccent : Colors.black));
   }
 }
