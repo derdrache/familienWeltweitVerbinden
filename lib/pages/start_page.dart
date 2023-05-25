@@ -34,7 +34,11 @@ class StartPage extends StatefulWidget {
   var informationPageIndex;
   int chatPageSliderIndex;
 
-  StartPage({Key key, this.selectedIndex = 0, this.informationPageIndex = 0, this.chatPageSliderIndex}) : super(key: key);
+  StartPage({
+    Key key,
+    this.selectedIndex = 0,
+    this.informationPageIndex = 0,
+    this.chatPageSliderIndex}) : super(key: key);
 
   @override
   _StartPageState createState() => _StartPageState();
@@ -46,7 +50,7 @@ class _StartPageState extends State<StartPage> {
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   bool hasInternet = true;
   var checkedA2HS = false;
-  List<Widget> tabPages;
+  List<Widget> pages;
   var _networkConnectivity;
   bool noProfil;
 
@@ -278,7 +282,7 @@ class _StartPageState extends State<StartPage> {
 
   @override
   Widget build(BuildContext context) {
-    tabPages = <Widget>[
+    pages = [
       NewsPage(),
       ErkundenPage(),
       InformationPage(pageSelection: widget.informationPageIndex),
@@ -381,7 +385,7 @@ class _StartPageState extends State<StartPage> {
       upgrader: Upgrader(shouldPopScope: () => true),
       child: Scaffold(
           body: Center(
-            child: tabPages.elementAt(widget.selectedIndex),
+            child: pages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: CustomBottomNavigationBar(
             onNavigationItemTapped: _onItemTapped,
