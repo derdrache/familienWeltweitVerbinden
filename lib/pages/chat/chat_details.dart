@@ -2410,10 +2410,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                     ChatGroupsDatabase().leaveChat(widget.groupChatData["connected"]);
 
-                    setState(() {
-                      widget.groupChatData["users"]
-                          .removeWhere((key, value) => key == userId);
-                    });
+                    setState(() {});
                   },
                 ),
                 TextButton(

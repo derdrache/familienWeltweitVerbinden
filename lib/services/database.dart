@@ -574,16 +574,19 @@ class ChatGroupsDatabase {
 
   }
 
-  leaveChat(connectedId) {
-    var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-    var userId = FirebaseAuth.instance.currentUser.uid;
+  leaveChat(connected) {
+    Map chatData = getChatGroupFromHive(connectedWith: connected);
+    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    String userId = Hive.box("secureBox").get("ownProfil")["id"];
 
     myGroupChats.removeWhere(
-        (chat) => chat["connected"] == connectedId.toString());
+        (chat) => chat["connected"] == connected.toString());
+
+    chatData["users"].remove(userId);
 
     ChatGroupsDatabase().updateChatGroup(
         "users = JSON_REMOVE(users, '\$.$userId')",
-        "WHERE connected LIKE '%$connectedId'");
+        "WHERE connected LIKE '%$connected'");
   }
 }
 

@@ -250,45 +250,44 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   }
 
   deleteChat() async {
-    for (var choosenChatId in selectedChats) {
-      var chat = {};
+    for (var choosenChat in selectedChats) {
+      var selectedChatId = choosenChat["id"];
+      var isChatGroup = choosenChat["connected"] != null;
 
-      for (var myChat in myChats) {
-        if (myChat["id"] == choosenChatId) {
-          chat = myChat;
-        }
-      }
+      if(isChatGroup){
+        ChatGroupsDatabase().leaveChat(choosenChat["connected"]);
+      }else{
+        var chatUsers = choosenChat["users"];
 
-      var chatUsers = chat["users"];
-
-      if (chatUsers.length <= 1 || bothDelete) {
-        for (var myChat in myChats) {
-          if (myChat["id"] == choosenChatId) {
-            myChat["users"] = {};
-            myChat["id"] = "";
+        if (chatUsers.length <= 1 || bothDelete) {
+          for (var myChat in myChats) {
+            if (myChat["id"] == selectedChatId) {
+              myChat["users"] = {};
+              myChat["id"] = "";
+            }
           }
-        }
 
-        ChatDatabase().deleteChat(choosenChatId);
-        ChatDatabase().deleteAllMessages(choosenChatId);
-      } else {
-        var newChatUsersData = {};
+          ChatDatabase().deleteChat(selectedChatId);
+          ChatDatabase().deleteAllMessages(selectedChatId);
+        } else {
+          var newChatUsersData = {};
 
-        chatUsers.forEach((key, value) {
-          if (key != userId) {
-            newChatUsersData = {key: value};
+          chatUsers.forEach((key, value) {
+            if (key != userId) {
+              newChatUsersData = {key: value};
+            }
+          });
+
+          for (var myChat in myChats) {
+            if (myChat["id"] == selectedChatId) {
+              myChat["users"] = newChatUsersData;
+            }
           }
-        });
 
-        for (var myChat in myChats) {
-          if (myChat["id"] == choosenChatId) {
-            myChat["users"] = newChatUsersData;
-          }
+          ChatDatabase().updateChatGroup(
+              "users = '${json.encode(newChatUsersData)}'",
+              "WHERE id ='$selectedChatId'");
         }
-
-        ChatDatabase().updateChatGroup(
-            "users = '${json.encode(newChatUsersData)}'",
-            "WHERE id ='$choosenChatId'");
       }
     }
 
@@ -298,15 +297,21 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   deleteChatDialog(chatgroupData) {
     var countSelected = selectedChats.length;
     var chatPartnerName = "";
+    bool isChatGroup;
 
     if (countSelected == 1) {
-      var chatId = selectedChats[0];
-      var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
+      var selectedChatData = selectedChats[0];
+      isChatGroup = selectedChatData["connected"] != null;
 
-      for (var profil in dbProfilData) {
-        if (profil["id"] == chatPartnerId) {
-          chatPartnerName = profil["name"];
-          break;
+      if(!isChatGroup){
+        var chatId = selectedChats[0]["id"];
+        var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
+
+        for (var profil in dbProfilData) {
+          if (profil["id"] == chatPartnerId) {
+            chatPartnerName = profil["name"];
+            break;
+          }
         }
       }
     }
@@ -317,14 +322,14 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
           return StatefulBuilder(builder: (context, setState) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context).chatLoeschen,
-              height: countSelected == 1 ? 150 : 100,
+              height: countSelected == 1 && !isChatGroup ? 150 : 100,
               children: [
                 Center(
                     child: Text(countSelected == 1
                         ? AppLocalizations.of(context).chatWirklichLoeschen
                         : AppLocalizations.of(context).chatsWirklichLoeschen)),
-                if (countSelected == 1) const SizedBox(height: 20),
-                if (countSelected == 1)
+                if (countSelected == 1&& !isChatGroup) const SizedBox(height: 20),
+                if (countSelected == 1 && !isChatGroup)
                   Row(
                     children: [
                       Checkbox(
@@ -365,24 +370,17 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   pinChat() {
     var selectedIsPinned;
 
-    for (var choosenChatId in selectedChats) {
-      var chat = {};
+    for (var choosenChat in selectedChats) {
+      var selectedChatId = choosenChat["id"];
 
-      for (var myChat in myChats + myGroupChats) {
-        if (myChat["id"] == choosenChatId) {
-          chat = myChat;
-          break;
-        }
-      }
+      var chatIsPinned = choosenChat["users"][userId]["pinned"] ?? false;
 
-      var chatIsPinned = chat["users"][userId]["pinned"] ?? false;
-
-      chat["users"][userId]["pinned"] = !chatIsPinned;
+      choosenChat["users"][userId]["pinned"] = !chatIsPinned;
       selectedIsPinned ??= !chatIsPinned;
 
       ChatDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
-          "WHERE id = '${chat["id"]}'");
+          "WHERE id = '$selectedChatId'");
     }
 
     setState(() {
@@ -393,23 +391,16 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   muteChat() {
     var selectedIsMute;
 
-    for (var choosenChatId in selectedChats) {
-      var chat = {};
+    for (var choosenChat in selectedChats) {
+      var selectedChatId = choosenChat["id"];
+      var chatIsMute = choosenChat["users"][userId]["mute"] ?? false;
 
-      for (var myChat in myChats + myGroupChats) {
-        if (myChat["id"] == choosenChatId) {
-          chat = myChat;
-        }
-      }
-
-      var chatIsMute = chat["users"][userId]["mute"] ?? false;
-
-      chat["users"][userId]["mute"] = !chatIsMute;
+      choosenChat["users"][userId]["mute"] = !chatIsMute;
       selectedIsMute ??= !chatIsMute;
 
       ChatDatabase().updateChatGroup(
           "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
-          "WHERE id = '${chat["id"]}'");
+          "WHERE id = '$selectedChatId'");
     }
 
     setState(() {
@@ -668,9 +659,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
 
                   setState(() {
                     if (selectedChats.contains(group["id"])) {
-                      selectedChats.remove(group["id"]);
+                      selectedChats.remove(group);
                     } else {
-                      selectedChats.add(group["id"]);
+                      selectedChats.add(group);
                     }
 
                     if (selectedChats.isNotEmpty) markerOn = true;
@@ -708,7 +699,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                       group["users"][userId]["pinned"] ?? false;
 
                   firstSelectedIsMute = group["users"][userId]["mute"] ?? false;
-                  selectedChats.add(group["id"]);
+                  selectedChats.add(group);
                 });
               },
               child: Container(
@@ -726,7 +717,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                           if (chatPartnerProfil != null)
                             ProfilImage(chatPartnerProfil),
                           if (chatData != null) ProfilImage(chatData),
-                          if (selectedChats.contains(group["id"]))
+                          if (selectedChats.contains(group))
                             const Positioned(
                                 bottom: 0,
                                 right: 0,
