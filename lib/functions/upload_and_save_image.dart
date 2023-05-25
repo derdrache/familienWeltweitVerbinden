@@ -13,6 +13,8 @@ uploadAndSaveImage(context, typ, {meetupCommunityData}) async{
     var ownProfil = Hive.box("secureBox").get("ownProfil");
     var imageData = await pickImage(ownProfil, meetupCommunityData);
     var imageName = imageData["name"];
+    imageName = sanitizeString(imageName);
+
     var imageSavePath = "https://families-worldwide.com/bilder/" + imageName;
     var imageList = [imageSavePath];
 

@@ -246,6 +246,7 @@ String sanitizeString(String url) {
 
   RegExp regex = RegExp(r'[\\/:*?"<>|]');
   title = title.replaceAll(regex, '_');
+  title = title.replaceAll("'", '_');
   urlSplit[urlSplit.length -1] = title;
 
   return urlSplit.join("/");

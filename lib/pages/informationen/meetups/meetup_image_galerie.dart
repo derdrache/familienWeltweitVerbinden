@@ -5,12 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:image_picker/image_picker.dart';
 
+import '../../../functions/upload_and_save_image.dart';
 import '../../../global/custom_widgets.dart';
-import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
-import '../../imageCrop.dart';
 
 class MeetupImageGalerie extends StatefulWidget {
   var isCreator;
@@ -73,7 +71,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       widget.child = Image.asset(selectedImage, fit: BoxFit.fitWidth);
     }
 
-    updateHiveMeetup(widget.meetupData["id"],"bild",  selectedImage);
+    updateHiveMeetup(widget.meetupData["id"], "bild", selectedImage);
 
     setState(() {
       imageLoading = false;
@@ -81,48 +79,14 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
 
     DbDeleteImage(oldImage);
 
-
     MeetupDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.meetupData["id"]}'");
   }
 
-  pickImage() async{
-    var meetupName = widget.meetupData["name"] + "_";
-    var pickedImage = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 50);
-
-    if (pickedImage == null) {
-      customSnackbar(context, "Datei ist beschädigt");
-      return false;
-    }
-
-    var imageByte = await changeImageSize(pickedImage);
-
-    return {
-      "name" : meetupName + pickedImage.name,
-      "path": pickedImage.path,
-      "byte": imageByte
-    };
-
-  }
-
-  selectAndUploadImage() async {
-    var imageData = await pickImage();
-
-    if (imageData == null) return;
-
-    Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ImageCrop(
-      imageData: imageData,
-      typ: "meetup",
-      meetupCommunityData: widget.meetupData
-    ))).then((_)=>setState((){
-      widget.meetupData = getMeetupFromHive(widget.meetupData["id"]);
-    }));
-  }
-
   @override
   Widget build(BuildContext context) {
-    bool isAssetImage = widget.meetupData["bild"].substring(0, 5) == "asset" ? true : false;
+    bool isAssetImage =
+        widget.meetupData["bild"].substring(0, 5) == "asset" ? true : false;
     double screenHeight = MediaQuery.of(context).size.height;
 
     showImages() {
@@ -246,7 +210,13 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
           ),
           PopupMenuItem(
               child: Text(AppLocalizations.of(context).hochladen),
-              onTap: () => selectAndUploadImage()),
+              onTap: () async {
+                var newImage = await uploadAndSaveImage(context, "community",
+                    meetupCommunityData: widget.meetupData);
+                setState(() {
+                  widget.meetupData["bild"] = newImage[0];
+                });
+              }),
         ],
         elevation: 8.0,
       );
@@ -261,29 +231,30 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
           child: imageLoading
               ? Center(
                   child: Column(
-                    children: [
-                      Container(
-                          margin: const EdgeInsets.all(10),
-                          width: 80,
-                          height: 80,
-                          child: const CircularProgressIndicator()),
-                      Center(child: Text(AppLocalizations.of(context).bildLadezeit))
-                    ],
-                  ))
+                  children: [
+                    Container(
+                        margin: const EdgeInsets.all(10),
+                        width: 80,
+                        height: 80,
+                        child: const CircularProgressIndicator()),
+                    Center(
+                        child: Text(AppLocalizations.of(context).bildLadezeit))
+                  ],
+                ))
               : ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-              child: isAssetImage
-                  ? Image.asset(widget.meetupData["bild"],
-                  fit: BoxFit.fitWidth)
-                  : Container(
-                  constraints:
-                  BoxConstraints(maxHeight: screenHeight / 2.08),
-                  child: Image.network(
-                    widget.meetupData["bild"],
-                  ))),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
+                  ),
+                  child: isAssetImage
+                      ? Image.asset(widget.meetupData["bild"],
+                          fit: BoxFit.fitWidth)
+                      : Container(
+                          constraints:
+                              BoxConstraints(maxHeight: screenHeight / 2.08),
+                          child: Image.network(
+                            widget.meetupData["bild"],
+                          ))),
         ),
         onTapDown: !widget.isCreator
             ? null
