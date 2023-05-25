@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:crop_your_image/crop_your_image.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 

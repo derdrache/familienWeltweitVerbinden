@@ -3,12 +3,10 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:hive/hive.dart';
-import 'package:image_picker/image_picker.dart';
 
+import '../functions/upload_and_save_image.dart';
 import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
-import '../pages/imageCrop.dart';
 import '../services/database.dart';
 import 'dialogWindow.dart';
 
@@ -58,23 +56,6 @@ class _ProfilImageState extends State<ProfilImage> {
 
   deleteOldImage(oldLink) {
     DbDeleteImage(oldLink);
-  }
-
-  pickImage() async{
-    var userName = widget.profil["name"];
-    var pickedImage = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 50);
-
-    if (pickedImage == null) return;
-
-    var imageByte = await changeImageSize(pickedImage);
-
-    return {
-      "name" : userName + pickedImage.name,
-      "path": pickedImage.path,
-      "byte": imageByte
-    };
-
   }
 
   deleteProfilImage() async {
@@ -138,17 +119,11 @@ class _ProfilImageState extends State<ProfilImage> {
           PopupMenuItem(
             child: Text(AppLocalizations.of(context).hochladen),
             onTap: () async {
-              var imageData = await pickImage();
+              var newImage = await uploadAndSaveImage(context, "profil");
 
-              if(imageData == null) return;
-
-              Navigator.of(context).push(MaterialPageRoute(builder: (_)=>ImageCrop(
-                imageData: imageData,
-                typ: "profil",
-              ))).then((_)=>setState((){
-                widget.profil = Hive.box("secureBox").get("ownProfil");
-              }));
-
+              setState(() {
+                widget.profil["bild"] = newImage;
+              });
             },
           ),
           if (widget.profil["bild"].isNotEmpty)

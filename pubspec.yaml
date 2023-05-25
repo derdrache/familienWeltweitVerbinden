@@ -63,6 +63,7 @@ dependencies:
   connectivity_plus: ^3.0.2
   share_plus: ^5.0.0
   crop_your_image: ^0.7.4
+  image_cropper: ^4.0.1
 
   flutter_localizations:
     sdk: flutter

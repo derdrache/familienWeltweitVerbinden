@@ -455,6 +455,7 @@
     "genauesDatum": "Accurate date",
     "bisDatumFalsch": "End date must be greater than the start date",
     "zeitraumSuche": "Period selection",
-    "vollesDatumEingeben": "enter full date"
+    "vollesDatumEingeben": "enter full date",
+    "bildBearbeiten", "edit image"
 }
 
