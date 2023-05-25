@@ -428,16 +428,23 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       Widget newsWidget;
 
       if(isSingleNews){
-        String travelPlanVon =
-          newTravelPlan["von"].split(" ")[0].split("-").reversed.join("-");
-        String travelPlanbis =
-          newTravelPlan["bis"].split(" ")[0].split("-").reversed.join("-");
+        bool isExact = newTravelPlan["von"].split(" ")[1] == "01:00:00.000";
+        List travelPlanVon =
+          newTravelPlan["von"].split(" ")[0].split("-").reversed.toList();
+        List travelPlanbis =
+          newTravelPlan["bis"].split(" ")[0].split("-").reversed.toList();
+
+        if(!isExact){
+          travelPlanVon.removeAt(0);
+          travelPlanbis.removeAt(0);
+        }
+
         String travelPlanCity = newTravelPlan["ortData"]["city"];
         String travelPlanCountry = newTravelPlan["ortData"]["countryname"];
         String textTitle = friendProfil["name"] +
             "\n" +
             AppLocalizations.of(context).friendNewTravelPlan;
-        String textDate = travelPlanVon + " - " + travelPlanbis;
+        String textDate = travelPlanVon.join("-") + " - " + travelPlanbis.join("-");
         String textLocation = travelPlanCity + " / " + travelPlanCountry;
         newsWidget = InkWell(
           onTap: () {
@@ -497,14 +504,21 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
         List<Widget> columnItems = [];
 
         for( var i = 0 ; i < newTravelPlan["von"].length; i++){
-          String travelPlanVon =
-            newTravelPlan["von"][i].split(" ")[0].split("-").reversed.join("-");
-          String travelPlanbis =
-            newTravelPlan["bis"][i].split(" ")[0].split("-").reversed.join("-");
+          bool isExact = newTravelPlan["von"][i].split(" ")[1] == "01:00:00.000";
+          List travelPlanVon =
+            newTravelPlan["von"][i].split(" ")[0].split("-").reversed.toList();
+          List travelPlanbis =
+            newTravelPlan["bis"][i].split(" ")[0].split("-").reversed.toList();
+
+          if(!isExact){
+            travelPlanVon.removeAt(0);
+            travelPlanbis.removeAt(0);
+          }
+
           String travelPlanCity = newTravelPlan["ortData"][i]["city"];
           String travelPlanCountry = newTravelPlan["ortData"][i]["countryname"];
 
-          String textDate = travelPlanVon + " - " + travelPlanbis;
+          String textDate = travelPlanVon.join("-") + " - " + travelPlanbis.join("-");
           String textLocation = travelPlanCity + " / " + travelPlanCountry;
 
           columnItems.add(Column(children: [
