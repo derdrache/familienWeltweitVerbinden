@@ -368,7 +368,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
     for (var choosenChatId in selectedChats) {
       var chat = {};
 
-      for (var myChat in myChats) {
+      for (var myChat in myChats + myGroupChats) {
         if (myChat["id"] == choosenChatId) {
           chat = myChat;
           break;
@@ -396,7 +396,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
     for (var choosenChatId in selectedChats) {
       var chat = {};
 
-      for (var myChat in myChats) {
+      for (var myChat in myChats + myGroupChats) {
         if (myChat["id"] == choosenChatId) {
           chat = myChat;
         }

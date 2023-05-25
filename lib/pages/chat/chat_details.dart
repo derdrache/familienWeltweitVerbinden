@@ -299,7 +299,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "message": message,
       "von": ownProfilId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
-      "zu": chatPartnerProfil["id"],
+      "zu": widget.isChatgroup ? null :  chatPartnerProfil["id"],
       "responseId": messageExtraInformationId ??= "0",
       "forward": "",
       "language": "auto"
@@ -356,6 +356,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       await ChatDatabase().addNewMessageAndSendNotification(
           widget.groupChatData["id"], messageData, isBlocked);
     }
+    messages = await _getAllDbMessages();
+    setState(() {});
   }
 
   _openProfil(){
@@ -537,12 +539,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     if (messageId != lastMessage["id"]) return;
 
-    widget.groupChatData["lastMessage"] = secondLastMessage["message"];
-    widget.groupChatData["lastMessageDate"] = secondLastMessage["date"];
+    String messageText = secondLastMessage["message"];
+    widget.groupChatData["lastMessageDate"] = int.parse(secondLastMessage["date"]);
+
+    if (messageText.contains("</eventId=")) {
+      messageText = "<Event Card>";
+    }
+    if (messageText.contains("</communityId=")) {
+      messageText = "<Community Card>";
+    }
+    if (messageText.contains("</cityId=")) {
+      messageText = "<Location Card>";
+    }
 
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateChatGroup(
-          "lastMessage = '${secondLastMessage["message"]}' , lastMessageDate = '${secondLastMessage["date"]}'",
+          "lastMessage = '$messageText' , lastMessageDate = '${secondLastMessage["date"]}'",
           "WHERE id = '${widget.chatId}'");
 
     } else {
@@ -2084,6 +2096,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   child: TextField(
                     maxLines: null,
                     focusNode: messageInputNode,
+                    autofocus: true,
                     textInputAction: TextInputAction.newline,
                     controller: nachrichtController,
                     textAlignVertical: TextAlignVertical.center,
