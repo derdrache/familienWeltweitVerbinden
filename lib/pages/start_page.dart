@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:upgrader/upgrader.dart';
-import "package:universal_html/js.dart" as js;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../global/encryption.dart';
 import '../global/global_functions.dart';
@@ -25,7 +23,6 @@ import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
 import 'force_update.dart';
-
 
 
 //ignore: must_be_immutable
@@ -300,84 +297,6 @@ class _StartPageState extends State<StartPage> {
         widget.selectedIndex = index;
       });
     }
-
-    Future<bool> showAddHomePageDialog(BuildContext context) async {
-      return showDialog<bool>(
-        context: context,
-        builder: (context) {
-          return Dialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                      child: Icon(
-                    Icons.add_circle,
-                    size: 70,
-                    color: Theme.of(context).primaryColor,
-                  )),
-                  const SizedBox(height: 20.0),
-                  Text(
-                    AppLocalizations.of(context).a2hsTitle,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 20.0),
-                  Text(
-                    AppLocalizations.of(context).a2hsBody,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 20.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            js.context.callMethod("presentAddToHome");
-                            Navigator.pop(context, false);
-                            Hive.box('secureBox').put("a2hs", true);
-                          },
-                          child: Text(AppLocalizations.of(context).ja)),
-                      const SizedBox(width: 50),
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context, false);
-                            Hive.box('secureBox').put("a2hs", false);
-                          },
-                          child: Text(AppLocalizations.of(context).nein))
-                    ],
-                  )
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    }
-
-    checkA2HS() {
-      if (kIsWeb && !checkedA2HS) {
-        checkedA2HS = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          var usedA2HS = Hive.box('secureBox').get("a2hs");
-          if (usedA2HS == null) {
-            final bool isDeferredNotNull =
-                js.context.callMethod("isDeferredNotNull") as bool;
-
-            if (isDeferredNotNull) {
-              Hive.box('secureBox').put("a2hs", true);
-              await showAddHomePageDialog(context);
-            }
-          }
-        });
-      }
-    }
-
-    checkA2HS();
-
 
     if(noProfil) return Scaffold();
 
