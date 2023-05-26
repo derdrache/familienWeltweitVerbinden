@@ -43,8 +43,8 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     final Map leaveCity = getCityFromHive(cityName: oldLocation) ?? {};
     String chatConnectId = leaveCity["id"].toString();
 
-    ChatGroupsDatabase().leaveChat(chatConnectId);
     ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
+    ChatGroupsDatabase().leaveChat(chatConnectId);
   }
 
   addVisitedCountries(newCountry) async {
@@ -200,7 +200,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     joindAndRemoveChatGroups(locationDict, oldLocation);
     deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);
-    notifications.prepareNewFamilieLocationNotification();
+    notifications.prepareNewLocationNotification();
 
     deleteOldTravelPlan(locationDict);
     addVisitedCountries(locationDict["countryname"]);
@@ -217,6 +217,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
   @override
   Widget build(BuildContext context) {
     autoComplete.hintText = AppLocalizations.of(context).neuenOrtEingeben;
+    notifications.prepareNewLocationNotification();
 
     return Scaffold(
       appBar: CustomAppBar(

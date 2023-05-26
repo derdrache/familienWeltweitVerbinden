@@ -305,51 +305,86 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
   }
 }
 
-prepareNewFamilieLocationNotification(){
+prepareNewLocationNotification(){
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
   List allProfils = Hive.box('secureBox').get("profils") ?? [];
+  List friendTokenListGer = [];
+  List friendTokenListEng = [];
+  List newFamilieTokenListGer = [];
+  List newFamilieTokenListEng = [];
 
   for(Map profil in allProfils){
     double profilFamiliesRange = profil["familiesDistance"].toDouble();
     bool notificationAllowed = profil["notificationstatus"] == 1;
     bool rangeNotificationAllowed = profilFamiliesRange > 0;
     bool isOwnProfil = profil["is"] == ownProfil["id"];
-
-    if(!rangeNotificationAllowed || !notificationAllowed || isOwnProfil) continue;
-
-    var ownLatt = ownProfil["latt"];
-    var ownLongt = ownProfil["longt"];
-    var profilLatt = profil["latt"];
-    var profilLongt = profil["longt"];
-    bool inRange = global_funcs.calculateDistance(
-        ownLatt, ownLongt, profilLatt, profilLongt) <= profilFamiliesRange;
-
-    if(!inRange) continue;
-
-    String profilId = profil["id"];
-    String ownProfilId = ownProfil["id"];
     var profilToken = profil["token"];
     bool canGerman = profil["sprachen"].contains("Deutsch") || profil["sprachen"].contains("german");
-    var notificationInformation = {
-      "token": profilToken,
-      "title": "",
-      "inhalt": "",
-      "zu": profilId,
-      "changePageId": ownProfilId,
-      "typ": "newFriend"
-    };
+    bool isFriend = profil["friendlist"].contains(ownProfil["id"]);
 
-    if(profilToken != "" && profilToken != null){
+    if(!rangeNotificationAllowed
+        || !notificationAllowed
+        || isOwnProfil
+        || profilToken == null
+        || profilToken.isEmpty) continue;
+
+
+    if(isFriend){
       if(canGerman){
-        notificationInformation["title"] = "Neue Familie in deiner Nähe";
-        notificationInformation["inhalt"] = "Es gibt eine neue Familie in oder um deinen Ort";
+        friendTokenListGer.add(profilToken);
       }else{
-        notificationInformation["title"] = "New Familie near you";
-        notificationInformation["inhalt"] = "There is a new family in or around your location";
+        friendTokenListEng.add(profilToken);
       }
-      sendNotification(notificationInformation);
+    }else{
+      var ownLatt = ownProfil["latt"];
+      var ownLongt = ownProfil["longt"];
+      var profilLatt = profil["latt"];
+      var profilLongt = profil["longt"];
+      bool inRange = global_funcs.calculateDistance(
+          ownLatt, ownLongt, profilLatt, profilLongt) <= profilFamiliesRange;
+
+      if(!inRange) continue;
+
+      if(canGerman){
+        newFamilieTokenListGer.add(profilToken);
+      }else{
+        newFamilieTokenListEng.add(profilToken);
+      }
     }
   }
+  var friendNotificationInformationGer = {
+    "title": "Ein Freund hat seinen Standort gewechselt",
+    "inhalt": "",
+    "toList": friendTokenListGer,
+    "changePageId": ownProfil["id"],
+    "typ": "newFriend"
+  };
+  var friendNotificationInformationEng = {
+    "title": "A friend has changed his location",
+    "inhalt": "",
+    "toList": friendTokenListEng,
+    "changePageId": ownProfil["id"],
+    "typ": "newFriend"
+  };
+  sendNotification(friendNotificationInformationGer, isGroupNotification: true);
+  sendNotification(friendNotificationInformationEng, isGroupNotification: true);
+
+  var newFamilieNotificationInformationGer = {
+    "title": "Neue Familie in deiner Nähe",
+    "inhalt": "Es gibt eine neue Familie in oder um deinen Ort",
+    "toList": newFamilieTokenListGer,
+    "changePageId": ownProfil["id"],
+    "typ": "newFriend"
+  };
+  var newFamilieNotificationInformationEng = {
+    "title": "New Familie near you",
+    "inhalt": "There is a new family in or around your location",
+    "toList": newFamilieTokenListEng,
+    "changePageId": ownProfil["id"],
+    "typ": "newFriend"
+  };
+  sendNotification(newFamilieNotificationInformationGer, isGroupNotification: true);
+  sendNotification(newFamilieNotificationInformationEng, isGroupNotification: true);
 }
 
 prepareNewTravelPlanNotification(){
@@ -368,8 +403,8 @@ prepareNewTravelPlanNotification(){
     if(!travelPlanNotificationAllowed
         || !notificationAllowed
         || !isFriend
-        || profilToken.isEmpty
-        || profilToken == null) continue;
+        || profilToken == null
+        || profilToken.isEmpty) continue;
 
     if(canGerman){
       notificationTokenListGer.add(profilToken);

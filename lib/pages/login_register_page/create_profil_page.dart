@@ -138,7 +138,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       });
       await refreshHiveNewsPage();
 
-      notifications.prepareNewFamilieLocationNotification();
+      notifications.prepareNewLocationNotification();
 
       global_functions.changePageForever(context, StartPage());
 
