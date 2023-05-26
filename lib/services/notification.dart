@@ -8,6 +8,8 @@ import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 sendEmail(notificationInformation, {targetEmail}) async {
+  print("email Noti");
+  print(notificationInformation);
   return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == "appStoreViewAccount") return;
@@ -24,19 +26,23 @@ sendEmail(notificationInformation, {targetEmail}) async {
       }));
 }
 
-sendNotification(notificationInformation, {isChatGroup = false}) async {
+sendNotification(notificationInformation, {isGroupNotification = false}) async {
+  print("phone Noti");
+  print(notificationInformation);
   return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
 
-  var url = Uri.parse(databaseUrl + (isChatGroup
+  var url = Uri.parse(databaseUrl + (isGroupNotification
       ? phpSendGroupNotification
       : phpSendNotification));
 
   if (userId == "appStoreViewAccount") return;
 
-  if(isChatGroup){
+  if(isGroupNotification){
     var allSendIds = notificationInformation["toList"];
+
+    if(allSendIds.isEmpty) return;
 
     while (allSendIds.length > 1000){
       groupLists.add(notificationInformation["toList"].sublist(0,1000));
@@ -168,7 +174,7 @@ prepareChatGroupNotification({chatId, idList, inhalt, chatGroup = ""}) async {
 
   notificationInformation["toList"] = confirmNotificationList;
 
-  sendNotification(notificationInformation, isChatGroup: true);
+  sendNotification(notificationInformation, isGroupNotification: true);
 
 }
 
@@ -197,7 +203,7 @@ prepareMeetupNotification({meetupId, toId, meetupName, typ}) async {
 
   if (notificationInformation["token"] == "" ||
       notificationInformation["token"] == null) {
-    var chatPartnerProfil = getProfilFromHive(profilId: toId, getNameOnly: true);
+    var chatPartnerProfil = getProfilFromHive(profilId: toId);
     var chatPartnerName = chatPartnerProfil["name"];
 
     var wantNotifikations = chatPartnerProfil["eventNotificationOn"] == 1 ? true : false;
@@ -307,8 +313,9 @@ prepareNewFamilieLocationNotification(){
     double profilFamiliesRange = profil["familiesDistance"].toDouble();
     bool notificationAllowed = profil["notificationstatus"] == 1;
     bool rangeNotificationAllowed = profilFamiliesRange > 0;
+    bool isOwnProfil = profil["is"] == ownProfil["id"];
 
-    if(!rangeNotificationAllowed || !notificationAllowed) continue;
+    if(!rangeNotificationAllowed || !notificationAllowed || isOwnProfil) continue;
 
     var ownLatt = ownProfil["latt"];
     var ownLongt = ownProfil["longt"];
@@ -348,36 +355,44 @@ prepareNewFamilieLocationNotification(){
 prepareNewTravelPlanNotification(){
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
   List allProfils = Hive.box('secureBox').get("profils") ?? [];
+  List notificationTokenListGer = [];
+  List notificationTokenListEng = [];
 
   for(Map profil in allProfils){
     bool travelPlanNotificationAllowed = profil["travelPlanNotification"] == 1;
     bool notificationAllowed = profil["notificationstatus"] == 1;
-    bool isFriend = profil["friendlist"].contains(profil["id"]);
-
-    if(!travelPlanNotificationAllowed || !notificationAllowed || !isFriend) continue;
-
-    String profilId = profil["id"];
-    String ownProfilId = ownProfil["id"];
+    bool isFriend = profil["friendlist"].contains(ownProfil["id"]);
     var profilToken = profil["token"];
     bool canGerman = profil["sprachen"].contains("Deutsch") || profil["sprachen"].contains("german");
-    var notificationInformation = {
-      "token": profilToken,
-      "title": "",
-      "inhalt": "",
-      "zu": profilId,
-      "changePageId": ownProfilId,
-      "typ": "newFriend"
-    };
 
-    if(profilToken != "" && profilToken != null){
-      if(canGerman){
-        notificationInformation["title"] = "Neue Reiseplanung von einem Freund";
-        notificationInformation["inhalt"] = "Ein Freund von dir hat eine neue Reiseplanung erstellt";
-      }else{
-        notificationInformation["title"] = "New travel plan from friend";
-        notificationInformation["inhalt"] = "A friend of yours has made a new travel plan";
-      }
-      sendNotification(notificationInformation);
+    if(!travelPlanNotificationAllowed
+        || !notificationAllowed
+        || !isFriend
+        || profilToken.isEmpty
+        || profilToken == null) continue;
+
+    if(canGerman){
+      notificationTokenListGer.add(profilToken);
+    }else{
+      notificationTokenListEng.add(profilToken);
     }
   }
+
+  var notificationInformationGer = {
+    "title": "Neue Reiseplanung von einem Freund",
+    "inhalt": "Ein Freund von dir hat eine neue Reiseplanung erstellt",
+    "toList": notificationTokenListGer,
+    "changePageId": ownProfil["id"],
+    "typ": "newFriend"
+  };
+  var notificationInformationEng = {
+    "title": "New travel plan from friend",
+    "inhalt": "A friend of yours has made a new travel plan",
+    "toList": notificationTokenListEng,
+    "changePageId": ownProfil["id"],
+    "typ": "newFriend"
+  };
+
+  sendNotification(notificationInformationGer, isGroupNotification: true);
+  sendNotification(notificationInformationEng, isGroupNotification: true);
 }
