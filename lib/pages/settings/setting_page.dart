@@ -21,6 +21,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../global/global_functions.dart' as global_func;
+import '../../global/global_functions.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
@@ -97,7 +98,7 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver{
           }),
           child:
               ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
-            _NameSection(),
+            const _NameSection(),
             _ProfilSection(afterChange: () => setState(() {}),),
             const _SettingSection(),
             const _SupportInformation()
@@ -337,10 +338,10 @@ class _ProfilSection extends StatelessWidget {
                       fontSize: fontSize+4,
                       fontWeight: FontWeight.bold)),
               const Expanded(child: SizedBox.shrink()),
-              Icon(Icons.arrow_downward),
+              const Icon(Icons.arrow_downward),
               Text(AppLocalizations.of(context).antippenZumAendern,
                   style: const TextStyle(color: Colors.grey, fontSize: 14)),
-              Icon(Icons.arrow_downward),
+              const Icon(Icons.arrow_downward),
               const Expanded(child: SizedBox()),
               GestureDetector(
                   onTap: () {
@@ -356,7 +357,7 @@ class _ProfilSection extends StatelessWidget {
             Wrap(
               children: [
                 profilThemeContainer(userProfil["ort"],
-                    AppLocalizations.of(context).aktuelleOrt, ChangeLocationPage()),
+                    AppLocalizations.of(context).aktuelleOrt, const ChangeLocationPage()),
                 profilThemeContainer(
                     reiseArtInput.getSelected(),
                     AppLocalizations.of(context).artDerReise,
@@ -476,13 +477,13 @@ class _SettingSection extends StatelessWidget {
                 AppLocalizations.of(context).privatsphaereSicherheit,
                 Icons.lock,
                 () => global_func.changePage(
-                    context, PrivacySecurityPage())),
+                    context, const PrivacySecurityPage())),
             const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context).benachrichtigungen,
                 Icons.notifications,
                 () => global_func.changePage(
-                    context, NotificationsOptionsPage())),
+                    context, const NotificationsOptionsPage())),
           ],
         ));
   }
@@ -521,9 +522,29 @@ class _SupportInformation extends StatelessWidget {
             return CustomAlertDialog(
               title: "families worldwide app",
               children: [
-                const SizedBox(height: 20),
-                Text("Version: " + packageInfo.version),
-                const SizedBox(height: 20)
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Text("App Version: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(packageInfo.version),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                InkWell(
+                  onTap: () => openURL("https://github.com/derdrache/familienWeltweitVerbinden"),
+                  child: Row(children: const [
+                    Text("Open Source: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("Github Repo", style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue,),)
+                  ],),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Text("Framework:  ", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("Flutter"),
+                  ],
+                ),
+                const SizedBox(height: 10),
               ],
             );
           });
