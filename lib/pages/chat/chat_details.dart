@@ -787,6 +787,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     setState(() {
       widget.groupChatData["users"][userId] = newUserInformation;
+      userJoinedChat = true;
     });
 
     myGroupChats.add(widget.groupChatData);
@@ -2410,7 +2411,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
                     ChatGroupsDatabase().leaveChat(widget.groupChatData["connected"]);
 
-                    setState(() {});
+                    setState(() {
+                      userJoinedChat = false;
+                    });
                   },
                 ),
                 TextButton(
