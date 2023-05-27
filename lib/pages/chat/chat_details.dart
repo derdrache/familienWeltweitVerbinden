@@ -98,6 +98,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     userJoinedChat = widget.groupChatData["users"][userId] != null;
     widget.chatId ??= widget.groupChatData["id"].toString();
     _setConnectionData();
+    _checkSecretChatMember();
     _changeUserChatStatus(1);
     _setScrollbarListener();
     _resetNewMessageCounter();
@@ -128,8 +129,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  _changeUserChatStatus(int status){
-    if(!userJoinedChat) return;
+  _changeUserChatStatus(int status) {
+    if (!userJoinedChat) return;
 
     Function databaseUpdate = widget.isChatgroup
         ? ChatGroupsDatabase().updateChatGroup
@@ -140,12 +141,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "WHERE id = '${widget.chatId}'");
   }
 
-  _getAndSetChatData(){
-    if(widget.isChatgroup){
+  _getAndSetChatData() {
+    if (widget.isChatgroup) {
       widget.groupChatData ??= getChatGroupFromHive(
           chatId: widget.chatId, connectedWith: widget.connectedWith);
 
-      if(widget.groupChatData == null){
+      if (widget.groupChatData == null) {
         widget.groupChatData ??= {
           "id": -1,
           "lastMessageDate": DateTime.now().millisecondsSinceEpoch,
@@ -155,28 +156,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         };
         _createNewChatgroup();
       }
-    }else{
+    } else {
       chatPartnerProfil = getProfilFromHive(
           profilId: widget.chatPartnerId, profilName: widget.chatPartnerName);
 
       widget.groupChatData ??= getChatFromHive(
           widget.chatId ?? global_functions.getChatID(chatPartnerProfil["id"]));
 
-      widget.groupChatData ??= ChatDatabase().addNewChatGroup(chatPartnerProfil["id"]);
+      widget.groupChatData ??=
+          ChatDatabase().addNewChatGroup(chatPartnerProfil["id"]);
     }
 
     if (userJoinedChat) {
       unreadMessages += widget.groupChatData["users"][userId]["newMessages"];
     }
-
   }
 
-  _createNewChatgroup() async{
-    widget.groupChatData = await ChatGroupsDatabase().addNewChatGroup(null, widget.connectedWith);
+  _createNewChatgroup() async {
+    widget.groupChatData =
+        await ChatGroupsDatabase().addNewChatGroup(null, widget.connectedWith);
   }
 
-  _setConnectionData(){
-    if(!widget.isChatgroup) return;
+  _setConnectionData() {
+    if (!widget.isChatgroup) return;
 
     var connectedId = widget.groupChatData["connected"] == null
         ? ""
@@ -200,16 +202,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       connectedData = {
         "name": location["ort"],
         "bild": Hive.box('secureBox').get("allgemein")["cityImage"],
-
       };
-      pageDetailsPage =
-          LocationInformationPage(ortName: connectedData["name"]);
-    } else if(widget.groupChatData["connected"].contains("world")){
+      pageDetailsPage = LocationInformationPage(ortName: connectedData["name"]);
+    } else if (widget.groupChatData["connected"].contains("world")) {
       connectedData = {
         "name": "World Chat",
         "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
       };
-    } else if(widget.groupChatData["connected"].contains("support")){
+    } else if (widget.groupChatData["connected"].contains("support")) {
       connectedData = {
         "name": "Support Chat",
         "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
@@ -299,7 +299,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "message": message,
       "von": ownProfilId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
-      "zu": widget.isChatgroup ? null :  chatPartnerProfil["id"],
+      "zu": widget.isChatgroup ? null : chatPartnerProfil["id"],
       "responseId": messageExtraInformationId ??= "0",
       "forward": "",
       "language": "auto"
@@ -313,7 +313,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     _saveNewMessageDB(messageData);
   }
 
-  _restartTimer(){
+  _restartTimer() {
     timer.cancel();
     timer = Timer.periodic(const Duration(seconds: 30), (Timer t) async {
       messages = await _getAllDbMessages();
@@ -321,7 +321,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
   }
 
-  _saveNewMessageDB(messageData) async{
+  _saveNewMessageDB(messageData) async {
     var groupText = messageData["message"];
 
     if (messageData["message"].contains("</eventId=")) {
@@ -352,7 +352,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.groupChatData["id"]}'");
 
-      var isBlocked = ownProfil["geblocktVon"].contains(chatPartnerProfil["id"]);
+      var isBlocked =
+          ownProfil["geblocktVon"].contains(chatPartnerProfil["id"]);
       await ChatDatabase().addNewMessageAndSendNotification(
           widget.groupChatData["id"], messageData, isBlocked);
     }
@@ -360,7 +361,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     setState(() {});
   }
 
-  _openProfil(){
+  _openProfil() {
     if (chatPartnerProfil.isEmpty || widget.isChatgroup) return;
 
     global_functions.changePage(
@@ -421,7 +422,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ));
   }
 
-  _requestMessageInputNode(){
+  _requestMessageInputNode() {
     Future.delayed(const Duration(milliseconds: 50), () {
       messageInputNode.requestFocus();
     });
@@ -492,7 +493,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _deleteMessageWindow(messageId) {
-    Future.delayed(const Duration(seconds: 0), () => showDialog(
+    Future.delayed(
+        const Duration(seconds: 0),
+        () => showDialog(
             context: context,
             builder: (BuildContext context) {
               return CustomAlertDialog(
@@ -521,7 +524,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             }));
   }
 
-  _deleteMessage(messageId){
+  _deleteMessage(messageId) {
     _checkIfLastMessageAndChangeChatGroup(messageId);
 
     if (widget.isChatgroup) {
@@ -540,7 +543,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (messageId != lastMessage["id"]) return;
 
     String messageText = secondLastMessage["message"];
-    widget.groupChatData["lastMessageDate"] = int.parse(secondLastMessage["date"]);
+    widget.groupChatData["lastMessageDate"] =
+        int.parse(secondLastMessage["date"]);
 
     if (messageText.contains("</eventId=")) {
       messageText = "<Event Card>";
@@ -556,7 +560,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       ChatGroupsDatabase().updateChatGroup(
           "lastMessage = '$messageText' , lastMessageDate = '${secondLastMessage["date"]}'",
           "WHERE id = '${widget.chatId}'");
-
     } else {
       ChatDatabase().updateChatGroup(
           "lastMessage = '${secondLastMessage["message"]}' , lastMessageDate = '${secondLastMessage["date"]}'",
@@ -570,15 +573,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     ReportsDatabase().add(
         userId,
         "Message ${message["id"]} in $reportTitle gemeldet",
-        message["message"]
-    );
+        message["message"]);
 
     customSnackbar(context, AppLocalizations.of(context).nachrichtGemeldet,
         color: Colors.green, duration: const Duration(seconds: 2));
   }
 
-  _getPinnedMessages(){
-    var pinnedMessages = widget.groupChatData["users"][userId]["pinnedMessages"];
+  _getPinnedMessages() {
+    var pinnedMessages =
+        widget.groupChatData["users"][userId]["pinnedMessages"];
     if (pinnedMessages.runtimeType == String) {
       return json.decode(pinnedMessages);
     }
@@ -589,7 +592,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     List pinnedMessages = _getPinnedMessages();
 
     if (pinnedMessages == null || pinnedMessages.isEmpty) {
-      widget.groupChatData["users"][userId]["pinnedMessages"] = [int.parse(message["id"])];
+      widget.groupChatData["users"][userId]
+          ["pinnedMessages"] = [int.parse(message["id"])];
 
       setState(() {
         angehefteteMessageShowIndex =
@@ -698,7 +702,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     angehefteteMessageShowIndex = angehefteteMessageShowIndex - 1;
 
     if (angehefteteMessageShowIndex < 0) {
-      angehefteteMessageShowIndex = _getPinnedMessages().length -1;
+      angehefteteMessageShowIndex = _getPinnedMessages().length - 1;
     }
 
     _scrollToMessage(index);
@@ -750,7 +754,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         curve: Curves.easeInOutCubic);
   }
 
-  _highlightMessage(int messageIndex){
+  _highlightMessage(int messageIndex) {
     setState(() {
       highlightMessages.add(messageIndex);
     });
@@ -781,7 +785,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  _joinChatGroup(){
+  _joinChatGroup() {
     List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
     Map newUserInformation = {"newMessages": 0};
 
@@ -861,6 +865,25 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     return data;
+  }
+
+  _checkSecretChatMember(){
+    if(connectedData.isEmpty) return;
+
+    bool hasSecretChat = connectedData["secretChat"] == 1;
+
+    if(!hasSecretChat) return;
+
+    List removeUser = [];
+
+    for(var user in widget.groupChatData["users"].keys.toList()){
+      if(!connectedData["members"].contains(user)) removeUser.add(user);
+    }
+
+    for(var user in removeUser){
+      widget.groupChatData["users"].remove(user);
+    }
+
   }
 
   @override
@@ -1114,7 +1137,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           child: TextButton(
               child: Text(AppLocalizations.of(context).uebersetzen),
               onPressed: () async {
-                String translationMessage = message["message"].replaceAll("'", "");
+                String translationMessage =
+                    message["message"].replaceAll("'", "");
 
                 var translation = await translator.translate(translationMessage,
                     from: "auto", to: ownLanguage);
@@ -1172,7 +1196,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               }));
     }
 
-    _cardMessage(int index, Map message, Map messageBoxInformation, String cardType) {
+    _cardMessage(
+        int index, Map message, Map messageBoxInformation, String cardType) {
       Map cardData;
       bool hasForward = message["forward"].isNotEmpty;
       Map forwardProfil;
@@ -1520,8 +1545,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                       width: 2,
                                                       color: replyColor))),
                                           child: Container(
-                                            height:
-                                                replyFromId != null ? containsCard ? 142 : 39 : 18,
+                                            height: replyFromId != null
+                                                ? containsCard
+                                                    ? 142
+                                                    : 39
+                                                : 18,
                                             constraints: BoxConstraints(
                                                 maxWidth: MediaQuery.of(context)
                                                         .size
@@ -1544,7 +1572,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                                           .bold,
                                                                   color:
                                                                       replyColor)),
-                                                      if(!containsCard) const SizedBox(height: 3),
+                                                      if (!containsCard)
+                                                        const SizedBox(
+                                                            height: 3),
                                                       Flexible(
                                                         child: !containsCard
                                                             ? Text(
@@ -1937,8 +1967,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           messageBox
               .add(_cardMessage(i, message, messageBoxInformation, "event"));
         } else if (message["message"].contains("</communityId=")) {
-          messageBox
-              .add(_cardMessage(i, message, messageBoxInformation, "community"));
+          messageBox.add(
+              _cardMessage(i, message, messageBoxInformation, "community"));
         } else if (message["message"].contains("</cityId=")) {
           messageBox
               .add(_cardMessage(i, message, messageBoxInformation, "location"));
@@ -2117,8 +2147,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         padding: EdgeInsets.zero,
                         onPressed: () {
                           _restartTimer();
-                          _saveNewMessage(
-                              nachrichtController.text);
+                          _saveNewMessage(nachrichtController.text);
 
                           _resetExtraInputInformation();
 
@@ -2166,7 +2195,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    _getMemberList(){
+    _getMemberList() {
       List<Widget> memberList = [];
 
       widget.groupChatData["users"].forEach((memberUserId, data) {
@@ -2325,7 +2354,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    _deleteWindow(){
+    _deleteWindow() {
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -2335,18 +2364,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 height: 150,
                 children: [
                   Center(
-                      child: Text(AppLocalizations.of(context)
-                          .chatWirklichLoeschen)),
+                      child: Text(
+                          AppLocalizations.of(context).chatWirklichLoeschen)),
                   const SizedBox(height: 20),
                   Row(
                     children: [
                       Checkbox(
                           value: bothDelete,
                           onChanged: (value) => {
-                            setState(() {
-                              bothDelete = value;
-                            })
-                          }),
+                                setState(() {
+                                  bothDelete = value;
+                                })
+                              }),
                       Expanded(
                         child: Text(
                             AppLocalizations.of(context).auchBeiLoeschen +
@@ -2391,7 +2420,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    _leaveWindow(){
+    _leaveWindow() {
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -2400,8 +2429,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               height: 100,
               children: [
                 Center(
-                    child: Text(AppLocalizations.of(context)
-                        .gruppeWirklichVerlassen)),
+                    child: Text(
+                        AppLocalizations.of(context).gruppeWirklichVerlassen)),
               ],
               actions: [
                 TextButton(
@@ -2409,7 +2438,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   onPressed: () async {
                     Navigator.pop(context);
 
-                    ChatGroupsDatabase().leaveChat(widget.groupChatData["connected"]);
+                    ChatGroupsDatabase()
+                        .leaveChat(widget.groupChatData["connected"]);
 
                     setState(() {
                       userJoinedChat = false;
@@ -2476,93 +2506,125 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           });
     }
 
-    _appBar() {
-        if (textSearchIsActive) {
-        return CustomAppBar(
-            title: TextField(
-              cursorColor: Colors.black,
-              focusNode: searchInputNode,
-              controller: searchTextKontroller,
-              textInputAction: TextInputAction.search,
-              maxLines: 1,
-              style: const TextStyle(fontSize: 18),
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: AppLocalizations.of(context).suche,
-                  suffixIcon: CloseButton(
-                    color: Colors.white,
-                    onPressed: () {
-                      searchTextKontroller.clear();
-                    },
-                  )),
-              onSubmitted: (value) {
-                _searchTextInMessages(value);
+    _appBarTextSearch() {
+      return CustomAppBar(
+          title: TextField(
+            cursorColor: Colors.black,
+            focusNode: searchInputNode,
+            controller: searchTextKontroller,
+            textInputAction: TextInputAction.search,
+            maxLines: 1,
+            style: const TextStyle(fontSize: 18),
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: AppLocalizations.of(context).suche,
+                suffixIcon: CloseButton(
+                  color: Colors.white,
+                  onPressed: () {
+                    searchTextKontroller.clear();
+                  },
+                )),
+            onSubmitted: (value) {
+              _searchTextInMessages(value);
 
-                setState(() {
-                  isTextSearching = true;
-                });
+              setState(() {
+                isTextSearching = true;
+              });
 
-                var searchScrollIndex = messagesWithSearchText[0]["index"];
-                _scrollToMessage(searchScrollIndex);
-                _highlightMessage(searchScrollIndex);
-              },
-            ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_sharp),
-              onPressed: () {
-                setState(() {
-                  textSearchIsActive = false;
-                  isTextSearching = false;
-                });
-              },
-            ));
-      } else if (chatPartnerProfil == null && !widget.isChatgroup) {
-        return CustomAppBar(
-            title: AppLocalizations.of(context).geloeschterUser,
-            buttons: [
-              IconButton(
-                  onPressed: () => _moreMenuWindow(),
-                  icon: const Icon(
-                    Icons.more_vert,
-                    color: Colors.white,
-                  ))
-            ]);
-      } else if (chatPartnerProfil != null || widget.isChatgroup) {
-        var chatImage = widget.isChatgroup ? connectedData : chatPartnerProfil;
-        String title = widget.isChatgroup ? connectedData["name"] : chatPartnerProfil["name"];
+              var searchScrollIndex = messagesWithSearchText[0]["index"];
+              _scrollToMessage(searchScrollIndex);
+              _highlightMessage(searchScrollIndex);
+            },
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_sharp),
+            onPressed: () {
+              setState(() {
+                textSearchIsActive = false;
+                isTextSearching = false;
+              });
+            },
+          ));
+    }
 
-        return CustomAppBar(
-          title: widget.isChatgroup
-              ? Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title),
-                      const SizedBox(height: 3),
-                      Text(
-                        widget.groupChatData["users"].length.toString() +
-                            AppLocalizations.of(context).teilnehmerSimple,
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.grey),
-                      )
-                    ],
-                  ),
-                )
-              : title,
-          leading: widget.backToChatPage
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_back_sharp),
-                  onPressed: () async {
-                    _resetNewMessageCounter();
-                    global_functions.changePageForever(
-                        context,
-                        StartPage(
-                            selectedIndex: 3,
-                            chatPageSliderIndex: widget.chatPageSliderIndex));
-                  })
-              : null,
-          profilBildProfil: chatImage,
-          onTap: () => widget.isChatgroup ? _mitgliederWindow() : _openProfil(),
+    _appBarChatGroup() {
+      var chatConnectData = connectedData;
+      String title = connectedData["name"];
+
+      return CustomAppBar(
+        title: Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title),
+              const SizedBox(height: 3),
+              Text(
+                widget.groupChatData["users"].length.toString() +
+                    AppLocalizations.of(context).teilnehmerSimple,
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              )
+            ],
+          ),
+        ),
+        leading: widget.backToChatPage
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_sharp),
+                onPressed: () async {
+                  _resetNewMessageCounter();
+                  global_functions.changePageForever(
+                      context,
+                      StartPage(
+                          selectedIndex: 3,
+                          chatPageSliderIndex: widget.chatPageSliderIndex));
+                })
+            : null,
+        profilBildProfil: chatConnectData,
+        onTap: () => _mitgliederWindow(),
+        buttons: [
+          IconButton(
+              onPressed: () => _moreMenuWindow(),
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ))
+        ],
+      );
+    }
+
+    _appBarPrivatChat() {
+      var chatImageProfil = chatPartnerProfil;
+      String title = chatPartnerProfil["name"];
+
+      return CustomAppBar(
+        title: title,
+        leading: widget.backToChatPage
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_sharp),
+                onPressed: () async {
+                  _resetNewMessageCounter();
+                  global_functions.changePageForever(
+                      context,
+                      StartPage(
+                          selectedIndex: 3,
+                          chatPageSliderIndex: widget.chatPageSliderIndex));
+                })
+            : null,
+        profilBildProfil: chatImageProfil,
+        onTap: () => _openProfil(),
+        buttons: [
+          IconButton(
+              onPressed: () => _moreMenuWindow(),
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ))
+        ],
+      );
+    }
+
+    _appBarDeletedUser() {
+      return CustomAppBar(
+          title: AppLocalizations.of(context).geloeschterUser,
           buttons: [
             IconButton(
                 onPressed: () => _moreMenuWindow(),
@@ -2570,14 +2632,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   Icons.more_vert,
                   color: Colors.white,
                 ))
-          ],
-        );
-      }
+          ]);
     }
 
     return SelectionArea(
       child: Scaffold(
-        appBar: _appBar(),
+        appBar: textSearchIsActive
+            ? _appBarTextSearch
+            : widget.isChatgroup
+                ? _appBarChatGroup()
+                : chatPartnerProfil != null
+                    ? _appBarPrivatChat()
+                    : _appBarDeletedUser(),
         body: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -2593,6 +2659,3 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     );
   }
 }
-
-
-

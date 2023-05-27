@@ -596,6 +596,11 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
               "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
             };
           }
+
+          bool hasSecretChat = chatData["secretChat"] == 1;
+          bool secretChatMember = chatData["members"]?.contains(userId);
+
+          if(hasSecretChat && !secretChatMember) continue;
         } else if (users.isNotEmpty){
           users.forEach((key, value) async {
             if (key != userId) {
