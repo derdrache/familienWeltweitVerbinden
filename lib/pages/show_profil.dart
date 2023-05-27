@@ -57,9 +57,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         : Platform.localeName == "de_DE";
     familyProfil = getFamilyProfil(familyMember: profil["id"]);
 
-    if (familyProfil == null ||
-        familyProfil["mainProfil"].isEmpty ||
-        familyProfil["name"].isEmpty) {
+    if (familyProfil == null
+        || familyProfil["active"] == 0
+        || familyProfil["mainProfil"].isEmpty
+        || familyProfil["name"].isEmpty) {
       familyProfil = null;
       return;
     }
