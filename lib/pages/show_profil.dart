@@ -615,12 +615,12 @@ class _UserInformationDisplay extends StatelessWidget {
           children: [
             Text(
               AppLocalizations.of(context).aktuelleOrt + ": ",
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold,decoration: TextDecoration.underline),
             ),
             Flexible(
                 child: Text(
               profil["ort"],
-              style: TextStyle(fontSize: textSize),
+              style: TextStyle(fontSize: textSize, decoration: TextDecoration.underline),
               maxLines: 2,
             ))
           ],
@@ -851,9 +851,9 @@ class _UserInformationDisplay extends StatelessWidget {
           child: Row(children: [
             Text(AppLocalizations.of(context).besuchteLaender + ": ",
                 style:
-                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold, decoration: TextDecoration.underline), ),
             Text(profil["besuchteLaender"].length.toString(),
-                style: TextStyle(fontSize: textSize))
+                style: TextStyle(fontSize: textSize, decoration: TextDecoration.underline))
           ]),
         ),
       );
