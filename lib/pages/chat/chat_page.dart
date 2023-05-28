@@ -328,7 +328,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                     child: Text(countSelected == 1
                         ? AppLocalizations.of(context).chatWirklichLoeschen
                         : AppLocalizations.of(context).chatsWirklichLoeschen)),
-                if (countSelected == 1&& !isChatGroup) const SizedBox(height: 20),
+                if (countSelected == 1 && !isChatGroup) const SizedBox(height: 20),
                 if (countSelected == 1 && !isChatGroup)
                   Row(
                     children: [
@@ -372,15 +372,22 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
 
     for (var choosenChat in selectedChats) {
       var selectedChatId = choosenChat["id"];
-
+      bool isChatGroup = choosenChat["connected"] != null;
       var chatIsPinned = choosenChat["users"][userId]["pinned"] ?? false;
 
       choosenChat["users"][userId]["pinned"] = !chatIsPinned;
       selectedIsPinned ??= !chatIsPinned;
 
-      ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
-          "WHERE id = '$selectedChatId'");
+
+      if(isChatGroup){
+        ChatGroupsDatabase().updateChatGroup(
+            "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
+            "WHERE id = '$selectedChatId'");
+      }else{
+        ChatDatabase().updateChatGroup(
+            "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
+            "WHERE id = '$selectedChatId'");
+      }
     }
 
     setState(() {
@@ -393,14 +400,21 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
 
     for (var choosenChat in selectedChats) {
       var selectedChatId = choosenChat["id"];
+      bool isChatGroup = choosenChat["connected"] != null;
       var chatIsMute = choosenChat["users"][userId]["mute"] ?? false;
 
       choosenChat["users"][userId]["mute"] = !chatIsMute;
       selectedIsMute ??= !chatIsMute;
 
-      ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
-          "WHERE id = '$selectedChatId'");
+      if(isChatGroup){
+        ChatGroupsDatabase().updateChatGroup(
+            "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
+            "WHERE id = '$selectedChatId'");
+      }else{
+        ChatDatabase().updateChatGroup(
+            "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
+            "WHERE id = '$selectedChatId'");
+      }
     }
 
     setState(() {
@@ -581,10 +595,17 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
             chatData = getCommunityFromHive(connectedId);
             chatName = chatData["name"];
           } else if (group["connected"].contains("stadt")) {
-            chatName = getCityFromHive(cityId: connectedId, getName: true);
-            chatData = {
-              "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
-            };
+            chatData = Map.of(getCityFromHive(cityId: connectedId));
+            chatName = chatData["ort"];
+            var cityImage = chatData["bild"].isEmpty
+                ? Hive.box('secureBox').get("allgemein")["cityImage"]
+                : chatData["bild"];
+            var countryImage = chatData["bild"].isEmpty
+                ? "assets/bilder/land.jpg"
+                : "assets/bilder/flaggen/${chatData["bild"]}.jpeg";
+
+            chatData["bild"] = chatData["isCity"] == 1 ? cityImage : countryImage;
+
           } else if (group["connected"].contains("world")) {
             chatName = AppLocalizations.of(context).weltChat;
             chatData = {
@@ -663,7 +684,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                   var markerOn = false;
 
                   setState(() {
-                    if (selectedChats.contains(group["id"])) {
+                    if (selectedChats.contains(group)) {
                       selectedChats.remove(group);
                     } else {
                       selectedChats.add(group);

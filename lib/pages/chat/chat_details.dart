@@ -198,10 +198,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       adminList.add(connectedData["erstelltVon"]);
     } else if (widget.groupChatData["connected"].contains("stadt")) {
       Map location = getCityFromHive(cityId: connectedId);
+      bool iscity = location["isCity"] == 1;
+      var cityImage = location["bild"].isEmpty
+          ? Hive.box('secureBox').get("allgemein")["cityImage"]
+          : location["bild"];
+      var countryImage = location["bild"].isEmpty
+          ? "assets/bilder/land.jpg"
+          : "assets/bilder/flaggen/${location["bild"]}.jpeg";
 
       connectedData = {
         "name": location["ort"],
-        "bild": Hive.box('secureBox').get("allgemein")["cityImage"],
+        "bild": iscity ? cityImage : countryImage
       };
       pageDetailsPage = LocationInformationPage(ortName: connectedData["name"]);
     } else if (widget.groupChatData["connected"].contains("world")) {
@@ -716,8 +723,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     for (var message in messages) {
       index = index + 1;
 
-      if (message["message"].contains(searchText) ||
-          message["message"].contains(searchText.toLowerCase())) {
+      if (message["message"].toLowerCase().contains(searchText.toLowerCase())) {
         message["index"] = index;
         messagesWithSearchText.add(message);
       }
@@ -2638,7 +2644,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return SelectionArea(
       child: Scaffold(
         appBar: textSearchIsActive
-            ? _appBarTextSearch
+            ? _appBarTextSearch()
             : widget.isChatgroup
                 ? _appBarChatGroup()
                 : chatPartnerProfil != null

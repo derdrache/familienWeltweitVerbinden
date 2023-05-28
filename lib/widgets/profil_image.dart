@@ -227,6 +227,7 @@ class OwnProfilImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var image = profil["bild"] is String ? profil["bild"] : profil["bild"][0];
+    bool isUrl = image.contains("http");
 
     showBigImage() {
       showDialog(
@@ -235,7 +236,7 @@ class OwnProfilImage extends StatelessWidget {
             return AlertDialog(
                 insetPadding: EdgeInsets.zero,
                 backgroundColor: Colors.transparent,
-                content: Image.network(image));
+                content: isUrl ? Image.network(image) : Image.asset(image));
           });
     }
 
@@ -245,7 +246,7 @@ class OwnProfilImage extends StatelessWidget {
           padding: EdgeInsets.zero,
           child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
-              child: image.contains("http")
+              child: isUrl
                   ? CachedNetworkImage(
                       width:55,
                       height: 55,
