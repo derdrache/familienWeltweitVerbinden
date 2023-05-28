@@ -87,7 +87,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
       updateHiveOwnProfil("aufreiseBis", null);
     } else if(pastTravler){
       ProfilDatabase().updateProfil(
-          "aufreiseSeit = '${widget.aufreiseSeit.toString()}'"
+          "aufreiseSeit = '${widget.aufreiseSeit.toString()}',"
               "aufreiseBis = '${widget.aufreiseBis.toString()}'",
           "WHERE id = '$userId'");
       updateHiveOwnProfil("aufreiseSeit", widget.aufreiseSeit.toString());
