@@ -49,13 +49,6 @@ class ChangeEmailPage extends StatelessWidget {
         return false;
       }
 
-      var emailInUse = await ProfilDatabase()
-          .getData("id", "WHERE email = '${emailKontroller.text}'");
-      if (emailInUse != false) {
-        customSnackbar(context, AppLocalizations.of(context).emailInBenutzung);
-        return false;
-      }
-
       var loginUser = await userLogin(passwortKontroller.text);
       if (loginUser == null) {
         customSnackbar(
@@ -69,17 +62,19 @@ class ChangeEmailPage extends StatelessWidget {
     save() async {
       bool isValid = await checkValidationAndError();
       var encryptedEmail = encrypt(emailKontroller.text);
+
       if(!isValid) return;
 
-      FirebaseAuth.instance.currentUser
-          .verifyBeforeUpdateEmail(emailKontroller.text);
+      try{
+        await FirebaseAuth.instance.currentUser.updateEmail(emailKontroller.text);
+      }catch(error){
+        customSnackbar(context, AppLocalizations.of(context).emailInBenutzung);
+        return;
+      }
+
       updateHiveOwnProfil("email", emailKontroller.text);
       ProfilDatabase().updateProfil(
           "email = '$encryptedEmail'", "WHERE id = '$userId'");
-
-      customSnackbar(
-          context, AppLocalizations.of(context).neueEmailVerifizieren,
-          color: Colors.green);
 
       Navigator.pop(context);
     }

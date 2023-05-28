@@ -214,7 +214,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
                 datePicker: FlexibleDatePicker(
                   startYear: DateTime.now().year-18,
                   endYear: DateTime.now().year,
-                  selectedDate: DateTime.parse(dates[i]),
+                  selectedDate: dates[i] == null ? null : DateTime.parse(dates[i]),
                 ),
                 deleteFunction: deleteFunction(),
                 dateIsSelected: dates[i] != null

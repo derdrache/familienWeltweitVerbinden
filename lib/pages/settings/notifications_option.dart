@@ -39,6 +39,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
                 ownProfil["eventNotificationOn"] = notificationOn;
                 ownProfil["newFriendNotificationOn"] = notificationOn;
                 ownProfil["familiesDistance"] = value ? 50 : 0;
+                ownProfil["travelPlanNotification"] = notificationOn;
               });
 
               ProfilDatabase().updateProfil(
@@ -46,7 +47,8 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
                       "chatNotificationOn = '$notificationOn', "
                       "eventNotificationOn = '$notificationOn',"
                       "newFriendNotificationOn = '$notificationOn',"
-                      "familiesDistance = ${value ? 50 : 0}",
+                      "familiesDistance = ${value ? 50 : 0},"
+                      "travelPlanNotification = '$notificationOn'",
                   "WHERE id = '$userId'");
             })
       ],

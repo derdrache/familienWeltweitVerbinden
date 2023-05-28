@@ -24,7 +24,7 @@ class ChangeNamePage extends StatelessWidget {
         return;
       }
 
-      var newUserName = nameKontroller.text.replaceAll("'", "\\'");
+      var newUserName = nameKontroller.text.replaceAll("'", "''");
 
       if (newUserName.length > 40) {
         customSnackbar(context, AppLocalizations.of(context).usernameZuLang);

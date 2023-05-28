@@ -56,8 +56,7 @@ class SettingPage extends StatefulWidget {
   _SettingPageState createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver{
-
+class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
@@ -87,6 +86,7 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver{
     return Scaffold(
       appBar: _SettingsAppBar(
         userProfil: userProfil,
+        refresh: () => setState(() {}),
       ),
       body: SafeArea(
           child: Container(
@@ -98,8 +98,10 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver{
           }),
           child:
               ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
-            const _NameSection(),
-            _ProfilSection(afterChange: () => setState(() {}),),
+            _NameSection(),
+            _ProfilSection(
+              afterChange: () => setState(() {}),
+            ),
             const _SettingSection(),
             const _SupportInformation()
           ]),
@@ -111,8 +113,9 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver{
 
 class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Map userProfil;
+  Function refresh;
 
-  const _SettingsAppBar({Key key, this.userProfil}) : super(key: key);
+  _SettingsAppBar({Key key, this.userProfil, this.refresh}) : super(key: key);
 
   @override
   Size get preferredSize => const Size.fromHeight(60.0);
@@ -134,26 +137,32 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
             PopupMenuItem(
                 child: TextButton(
                     onPressed: () {
+                      Navigator.pop(context);
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (_) => ChangeNamePage(
                                     oldName: userProfil["name"],
-                                  )));
+                                  ))).then((_) =>refresh()
+                      );
                     },
                     child: Text(AppLocalizations.of(context).nameAendern,
                         style: TextStyle(color: textColor)))),
             PopupMenuItem(
                 child: TextButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => ChangeEmailPage()));
+                      Navigator.pop(context);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => ChangeEmailPage())).then((_)=>refresh());
                     },
                     child: Text(AppLocalizations.of(context).emailAendern,
                         style: TextStyle(color: textColor)))),
             PopupMenuItem(
                 child: TextButton(
                     onPressed: () {
+                      Navigator.pop(context);
                       global_func.changePage(context, ChangePasswortPage());
                     },
                     child: Text(AppLocalizations.of(context).passwortVeraendern,
@@ -161,6 +170,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
             PopupMenuItem(
                 child: TextButton(
                     onPressed: () {
+                      Navigator.pop(context);
                       global_func.changePage(
                           context, const FamilieProfilPage());
                     },
@@ -177,10 +187,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
           ]);
     }
 
-    return CustomAppBar(
-        title: "",
-        withLeading: false,
-        buttons: [
+    return CustomAppBar(title: "", withLeading: false, buttons: [
       IconButton(
           onPressed: () => openSettingWindow(),
           icon: Icon(Icons.more_vert, color: textColor))
@@ -189,7 +196,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _NameSection extends StatelessWidget {
-  const _NameSection({Key key}) : super(key: key);
+  _NameSection({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -319,7 +326,6 @@ class _ProfilSection extends StatelessWidget {
       return text;
     }
 
-
     setData();
 
     return Container(
@@ -335,7 +341,7 @@ class _ProfilSection extends StatelessWidget {
               Text("Profil",
                   style: TextStyle(
                       color: headLineColor,
-                      fontSize: fontSize+4,
+                      fontSize: fontSize + 4,
                       fontWeight: FontWeight.bold)),
               const Expanded(child: SizedBox.shrink()),
               const Icon(Icons.arrow_downward),
@@ -356,8 +362,10 @@ class _ProfilSection extends StatelessWidget {
             const SizedBox(height: 5),
             Wrap(
               children: [
-                profilThemeContainer(userProfil["ort"],
-                    AppLocalizations.of(context).aktuelleOrt, const ChangeLocationPage()),
+                profilThemeContainer(
+                    userProfil["ort"],
+                    AppLocalizations.of(context).aktuelleOrt,
+                    const ChangeLocationPage()),
                 profilThemeContainer(
                     reiseArtInput.getSelected(),
                     AppLocalizations.of(context).artDerReise,
@@ -422,16 +430,15 @@ class _ProfilSection extends StatelessWidget {
                         selected: besuchteLaender,
                         isGerman: spracheIstDeutsch)),
                 profilThemeContainer(
-                  userProfil["socialMediaLinks"].isEmpty
-                      ? "0" :  userProfil["socialMediaLinks"].length.toString(),
-                  "Social Media Links",
-                  const ChangeSocialMediaLinks()
-                ),
+                    userProfil["socialMediaLinks"].isEmpty
+                        ? "0"
+                        : userProfil["socialMediaLinks"].length.toString(),
+                    "Social Media Links",
+                    const ChangeSocialMediaLinks()),
                 profilThemeContainer(
                     userProfil["tradeNotize"],
                     AppLocalizations.of(context).verkaufenTauschenSchenken,
                     ChangeTradePage(oldText: userProfil["tradeNotize"])),
-
               ],
             ),
           ],
@@ -454,7 +461,8 @@ class _SettingSection extends StatelessWidget {
           children: [
             Icon(icon),
             const SizedBox(width: 20),
-            Text(title,
+            Text(
+              title,
               style: TextStyle(fontSize: fontSize - 4, color: color),
             )
           ],
@@ -525,22 +533,34 @@ class _SupportInformation extends StatelessWidget {
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    const Text("App Version: ", style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text("App Version: ",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(packageInfo.version),
                   ],
                 ),
                 const SizedBox(height: 10),
                 InkWell(
-                  onTap: () => openURL("https://github.com/derdrache/familienWeltweitVerbinden"),
-                  child: Row(children: const [
-                    Text("Open Source: ", style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("Github Repo", style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue,),)
-                  ],),
+                  onTap: () => openURL(
+                      "https://github.com/derdrache/familienWeltweitVerbinden"),
+                  child: Row(
+                    children: const [
+                      Text("Open Source: ",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        "Github Repo",
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.blue,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    const Text("Framework:  ", style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text("Framework:  ",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     Text("Flutter"),
                   ],
                 ),
@@ -564,10 +584,13 @@ class _SupportInformation extends StatelessWidget {
             settingThemeContainer("Feedback", Icons.feedback,
                 () => global_func.changePage(context, FeedbackPage())),
             const SizedBox(height: 20),
-            settingThemeContainer("Support Chat", Icons.chat,
-                    () => global_func.changePage(context, ChatDetailsPage(
-                        isChatgroup: true, connectedWith: "</support=1"
-                    ))),
+            settingThemeContainer(
+                "Support Chat",
+                Icons.chat,
+                () => global_func.changePage(
+                    context,
+                    ChatDetailsPage(
+                        isChatgroup: true, connectedWith: "</support=1"))),
             const SizedBox(height: 20),
             settingThemeContainer("Patch Notes", Icons.format_list_bulleted,
                 () => PatchnotesWindow(context: context).openWindow()),
@@ -579,9 +602,9 @@ class _SupportInformation extends StatelessWidget {
             const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context).mitFreundenTeilen,
-              Icons.share,
-                () => Share.share(AppLocalizations.of(context).teilenLinkText + '\nhttps://families-worldwide.com/')
-            ),
+                Icons.share,
+                () => Share.share(AppLocalizations.of(context).teilenLinkText +
+                    '\nhttps://families-worldwide.com/')),
             /*
               SizedBox(height: 20),
               settingThemeContainer("Über das Projekt", Icons.description,
@@ -594,12 +617,10 @@ class _SupportInformation extends StatelessWidget {
             settingThemeContainer(
                 AppLocalizations.of(context).spenden, Icons.card_giftcard,
                 () async {
-              var url = Uri.parse("https://www.paypal.com/paypalme/DominikMast");
+              var url =
+                  Uri.parse("https://www.paypal.com/paypalme/DominikMast");
 
-              await launchUrl(
-                  url,
-                  mode: LaunchMode.inAppWebView
-              );
+              await launchUrl(url, mode: LaunchMode.inAppWebView);
             }),
             const SizedBox(height: 20),
             settingThemeContainer(AppLocalizations.of(context).ueber,
