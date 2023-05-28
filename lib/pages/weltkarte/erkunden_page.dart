@@ -36,14 +36,14 @@ class _ErkundenPageState extends State<ErkundenPage>
   var profils = [];
   var profilsBackup = [];
   var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
-  var allLocations = Hive.box('secureBox').get("stadtinfo") ?? [];
+  var allCities = Hive.box('secureBox').get("stadtinfo") ?? [];
   var events = [];
   var communities = Hive.box('secureBox').get("communities") ?? [];
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
   MapController mapController = MapController();
   Set<String> allUserName = {};
   var countriesList = LocationService().getAllCountryNames();
-  List<String> allLocationNames = [];
+  List<String> allCitiesNames = [];
   List filterList = [];
   List aktiveProfils = [];
   List aktiveEvents = [];
@@ -143,7 +143,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       allCityUserInformation.add(userInfo["ort"]);
     }
 
-    for (var city in allLocations) {
+    for (var city in allCities) {
       var hasCityUserInfo = false;
       var condition = city["isCity"] == 1 &&
           (city["kosten"] != null ||
@@ -163,10 +163,10 @@ class _ErkundenPageState extends State<ErkundenPage>
       if (condition || hasCityUserInfo) {
         newAllCities.add(city);
       }
-      allLocationNames.add(city["ort"]);
+      if(city["isCity"] == 1) allCitiesNames.add(city["ort"]);
     }
 
-    allLocations = newAllCities;
+    allCities = newAllCities;
   }
 
   removeProfilsAndCreateAllUserName() {
@@ -264,11 +264,14 @@ class _ErkundenPageState extends State<ErkundenPage>
   }
 
   setSearchAutocomplete() {
+    var countryList =
+    spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
+
     changeAllCitiesAndCreateCityNames();
 
     searchAutocomplete = SearchAutocomplete(
         searchableItems:
-        allUserName.toList() + allLocationNames,
+        allUserName.toList() + countryList + allCitiesNames,
         onConfirm: () {
           filterList = searchAutocomplete.getSelected();
           friendMarkerOn = false;
@@ -351,7 +354,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     checkMatch(filterList, [profilName], allUserName, simpleSearch: true);
     var countryMatch = checkMatch(
         filterList, [profilLand], countriesList["ger"] + countriesList["eng"]);
-    var cityMatch = checkMatch(filterList, [profilOrt], allLocationNames);
+    var cityMatch = checkMatch(filterList, [profilOrt], allCitiesNames);
     var kinderMatch = checkMatch(filterList, profilKinderYear,
         List.generate(18, (i) => (i + 1).toString()),
         simpleSearch: true);
@@ -451,11 +454,11 @@ class _ErkundenPageState extends State<ErkundenPage>
 
   addCityProfils() {
     if (filterList.isEmpty) {
-      profils = allLocations + profils;
+      profils = allCities + profils;
     } else {
       var matchFilter = [];
 
-      for (var city in allLocations) {
+      for (var city in allCities) {
         if (filterList.contains(city["ort"]) ||
             filterList.contains(city["land"])) {
           matchFilter.add(city);
