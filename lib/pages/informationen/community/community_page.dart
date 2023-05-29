@@ -280,7 +280,8 @@ class _CommunityPageState extends State<CommunityPage> {
               });
             },
             child: Icon(onSearch ? Icons.close : Icons.search),
-          )
+          ),
+          if(getInvite) SizedBox(height: 110),
         ],
       ),
     );
