@@ -431,3 +431,27 @@ prepareNewTravelPlanNotification(){
   sendNotification(notificationInformationGer, isGroupNotification: true);
   sendNotification(notificationInformationEng, isGroupNotification: true);
 }
+
+prepareAddMemberNotification(community, userId){
+  Map userProfil = getProfilFromHive(profilId: userId);
+  String profilToken = userProfil["token"];
+  bool notificationAllowed = userProfil["notificationstatus"] == 1;
+  bool speakGerman = userProfil["sprachen"].contains("Deutsch") || userProfil["sprachen"].contains("german");
+  var notificationInformation = {
+    "zu": profilToken,
+    "changePageId": community["id"],
+    "typ": "community"
+  };
+
+  if(!notificationAllowed || profilToken == null) return;
+
+  if(speakGerman){
+    notificationInformation["title"] = "Einladung zur Gemeinschaft";
+    notificationInformation["inhalt"] = "Du wurdest eingeladen, der Gemeinschaft ${community["name"]} beizutreten";
+  }else{
+    notificationInformation["title"] = "Community invitation";
+    notificationInformation["inhalt"] = "You have been invited to join the ${community["name"]} community";
+  }
+
+  sendNotification(notificationInformation);
+}

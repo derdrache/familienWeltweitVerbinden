@@ -17,6 +17,7 @@ import 'package:translator/translator.dart';
 import '../../../functions/upload_and_save_image.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../services/database.dart';
+import '../../../services/notification.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/search_autocomplete.dart';
@@ -91,9 +92,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _getDBDataSetAllUserNames() async {
-    var dbProfils = await ProfilDatabase().getData("name, id", "");
+    var allProfils = Hive.box('secureBox').get("profils");
 
-    for (var profil in dbProfils) {
+    for (var profil in allProfils) {
       allUserNames.add(profil["name"]);
       allUserIds.add(profil["id"]);
     }
@@ -580,6 +581,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$newMemberId')",
           "WHERE id = '${widget.community["id"]}'");
     }
+
+    prepareAddMemberNotification(widget.community, newMemberId);
 
     customSnackbar(context,
         newMember + AppLocalizations.of(context).wurdeEingeladenCommunity,
