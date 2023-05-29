@@ -818,7 +818,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                       allInformations.remove(information);
                       secureBox.put("stadtinfoUser", allInformations);
 
-                      setState(() {});
+                      setState(() {
+                        usersCityInformation.remove(information);
+                      });
 
                       Navigator.pop(context);
                     },
