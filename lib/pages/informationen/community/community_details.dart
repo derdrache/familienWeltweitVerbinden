@@ -55,6 +55,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var scrollbarOnBottom = true;
   var imageLoading = false;
   final translator = GoogleTranslator();
+  bool isCreator;
+  bool isMember;
 
   @override
   void initState() {
@@ -222,7 +224,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
-  _windowOptions(saveFunction) {
+  _windowOptions(saveFunction, {add = false}) {
     return Container(
       margin: const EdgeInsets.only(right: 10),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -232,7 +234,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           onPressed: () => Navigator.pop(context),
         ),
         TextButton(
-            child: Text(AppLocalizations.of(context).speichern,
+            child: Text(add ? AppLocalizations.of(context).speichern : AppLocalizations.of(context).hinzufuegen,
                 style: TextStyle(fontSize: fontsize)),
             onPressed: () {
               saveFunction();
@@ -545,33 +547,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     return friendsBoxen;
   }
 
-  _addMemberWindow() {
-    var newUser = "";
-
-    searchAutocomplete = SearchAutocomplete(
-      hintText: AppLocalizations.of(context).personSuchen,
-      searchableItems: allUserNames,
-      onConfirm: () {
-        newUser = searchAutocomplete.getSelected()[0];
-      },
-    );
-
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            height: 600,
-            title: AppLocalizations.of(context).mitgliedHinzufuegen,
-            children: [
-              searchAutocomplete,
-              const SizedBox(height: 15),
-              _windowOptions(() => _saveNewMember(newUser)),
-              ...createFriendlistBox(),
-            ],
-          );
-        });
-  }
-
   _saveNewMember(newMember) {
     var userIndex = allUserNames.indexOf(newMember);
     var newMemberId = allUserIds[userIndex];
@@ -611,55 +586,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         color: Colors.green);
   }
 
-  _showMembersWindow() async {
-    var membersID = widget.community["members"];
-    var allProfils = Hive.box("secureBox").get("profils");
-    var membersProfils = [];
-    List<Widget> membersBoxes = [];
-
-    for (var memberId in membersID) {
-      for (var profil in allProfils) {
-        if (profil["id"] == memberId) {
-          membersProfils.add(profil);
-          break;
-        }
-      }
-    }
-
-    for (var member in membersProfils) {
-      membersBoxes.add(InkWell(
-          onTap: () {
-            global_func.changePage(
-                context,
-                ShowProfilPage(
-                  userName: member["name"],
-                  profil: member,
-                ));
-          },
-          child: Container(
-              margin: const EdgeInsets.all(10),
-              child: Text(
-                member["name"],
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.secondary),
-              ))));
-    }
-
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            title: AppLocalizations.of(context).member,
-            children: membersBoxes,
-          );
-        });
-  }
-
   _openGroupChat() {
     bool hasSecretChat = widget.community["secretChat"]?.isOdd ?? false;
-    bool isMember = widget.community["members"].contains(userId) ||
-        widget.community["erstelltVon"] == userId;
-    bool hasAccess = !hasSecretChat || isMember;
+    bool hasAccess = !hasSecretChat || isMember || isCreator;
 
     if (!hasAccess) {
       customSnackbar(context, AppLocalizations.of(context).geheimerChatMeldung);
@@ -682,12 +611,79 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         "secretChat = '$secretChat'", "WHERE id = '${widget.community["id"]}'");
   }
 
+  _removeMember(memberId){
+    setState(() {
+      widget.community["members"].remove(memberId);
+    });
+
+    CommunityDatabase().update(
+        "members = JSON_REMOVE(members, JSON_UNQUOTE(JSON_SEARCH(members, 'one', '$memberId')))",
+        "WHERE id ='${widget.community["id"]}'"
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     fontsize = isWebDesktop ? 12 : 16;
-    var isCreator = widget.community["erstelltVon"].contains(userId);
+    isCreator = widget.community["erstelltVon"].contains(userId);
+    isMember = widget.community["members"].contains(userId);
+
+    _showMembersWindow() async {
+      var membersID = widget.community["members"];
+      var allProfils = Hive.box("secureBox").get("profils");
+      var membersProfils = [];
+      List<Widget> membersBoxes = [];
+
+      for (var memberId in membersID) {
+        for (var profil in allProfils) {
+          if (profil["id"] == memberId) {
+            membersProfils.add(profil);
+            break;
+          }
+        }
+      }
+
+      for (var member in membersProfils) {
+        membersBoxes.add(Row(
+          children: [
+            InkWell(
+                onTap: () {
+                  global_func.changePage(
+                      context,
+                      ShowProfilPage(
+                        userName: member["name"],
+                        profil: member,
+                      ));
+                },
+                child: Container(
+                    margin: const EdgeInsets.all(10),
+                    child: Text(
+                      member["name"],
+                      style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                    ))),
+            Expanded(child: SizedBox()),
+            if(isCreator) CloseButton(
+                color: Colors.red,
+                onPressed: () {
+                  Navigator.pop(context);
+                  _removeMember(member["id"]);
+                }),
+          ],
+        ));
+      }
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).member,
+              children: membersBoxes,
+            );
+          });
+    }
 
     _deleteWindow() {
       showDialog(
@@ -780,6 +776,49 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
+    _showMemberDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.group),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).member),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          _showMembersWindow();
+        },
+      );
+    }
+
+    _addMemberWindow() {
+      var newUser = "";
+
+      searchAutocomplete = SearchAutocomplete(
+        hintText: AppLocalizations.of(context).personSuchen,
+        searchableItems: allUserNames,
+        onConfirm: () {
+          newUser = searchAutocomplete.getSelected()[0];
+        },
+      );
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              height: 600,
+              title: AppLocalizations.of(context).mitgliedHinzufuegen,
+              children: [
+                searchAutocomplete,
+                const SizedBox(height: 15),
+                _windowOptions(() => _saveNewMember(newUser)),
+                ...createFriendlistBox(),
+              ],
+            );
+          });
+    }
+
     _addMemberDialog() {
       return SimpleDialogOption(
         child: Row(
@@ -845,14 +884,30 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       return SimpleDialogOption(
         child: Row(
           children: [
-            const Icon(Icons.delete),
+            const Icon(Icons.delete, color: Colors.red),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).communityLoeschen),
+            Text(AppLocalizations.of(context).communityLoeschen, style: TextStyle(color: Colors.red),),
           ],
         ),
         onPressed: () {
           Navigator.pop(context);
           _deleteWindow();
+        },
+      );
+    }
+
+    _leaveDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.logout, color: Colors.red,),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).verlassen, style: TextStyle(color: Colors.red),),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          _removeMember(userId);
         },
       );
     }
@@ -871,10 +926,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     insetPadding:
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
+                      _showMemberDialog(),
                       if (!isCreator) _reportDialog(),
                       if (isCreator) _addMemberDialog(),
                       if (isCreator) _settingDialog(),
                       if (isCreator) _deleteDialog(),
+                      if (!isCreator && isMember) _leaveDialog()
                     ],
                   ),
                 ),
@@ -953,8 +1010,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             child: Row(
               children: [
                 Text(AppLocalizations.of(context).ort,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(widget.community["ort"] + " / " + widget.community["land"])
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                         decoration: isCreator ? TextDecoration.none : TextDecoration.underline)),
+                Text(
+                  widget.community["ort"] + " / " + widget.community["land"],
+                  style: TextStyle(decoration: isCreator ? TextDecoration.none : TextDecoration.underline),
+                )
               ],
             ),
           ),
@@ -1004,7 +1066,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         width: screenWidth - 20,
         margin: const EdgeInsets.all(10),
         child: Row(
-          //mainAxisAlignment: MainAxisAlignment.end,
+
           children: [
             InkWell(
               onTap: () => _showMembersWindow(),

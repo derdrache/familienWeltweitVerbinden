@@ -455,5 +455,7 @@
     "bisDatumFalsch": "Enddatum muss größer als das Startdatum sein",
     "zeitraumSuche": "Zeitraum auswahl",
     "vollesDatumEingeben": "vollständiges Datum eingeben",
-    "bildBearbeiten": "Bild bearbeiten"
+    "bildBearbeiten": "Bild bearbeiten",
+    "hinzufuegen": "Hinzufügen",
+    "verlassen": "Verlassen"
 }
