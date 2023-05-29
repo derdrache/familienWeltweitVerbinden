@@ -25,6 +25,8 @@ class NewsPage extends StatefulWidget {
 class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
   final String userId = FirebaseAuth.instance.currentUser.uid;
   List newsFeedData;
+  int displayDataEntries = 30;
+  bool loadMore = false;
   List events;
   List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
@@ -42,20 +44,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       ownSettingProfil = _addNewSettingProfil();
     }
 
-    _controller.addListener(() {
-      bool isTop = _controller.position.pixels == 0;
-      if (isTop) {
-        if (!scrollbarOnBottom) {
-          scrollbarOnBottom = true;
-          setState(() {});
-        }
-      } else {
-        if (scrollbarOnBottom) {
-          scrollbarOnBottom = false;
-          setState(() {});
-        }
-      }
-    });
+    _scrollBar();
 
     WidgetsBinding.instance.addObserver(this);
     super.initState();
@@ -71,6 +60,31 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       await _refreshData();
       setState(() {});
     }
+  }
+
+  _scrollBar(){
+    _controller.addListener(() {
+      bool isTop = _controller.position.pixels == 0;
+      bool isBottom = _controller.position.atEdge;
+
+      if (isTop) {
+        if (!scrollbarOnBottom) {
+          scrollbarOnBottom = true;
+          setState(() {});
+        }
+      } else {
+        if (scrollbarOnBottom) {
+          scrollbarOnBottom = false;
+          setState(() {});
+        }
+      }
+
+      if(isBottom){
+        setState(() {
+          displayDataEntries += 30;
+        });
+      }
+    });
   }
 
   _refreshData() async{
@@ -855,9 +869,10 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
     createNewsFeed() {
       newsFeed = [];
+      loadMore = newsFeedData.length <=displayDataEntries;
       var myLastLocationChangeDate = _getMyLastLocationChangeDate();
 
-      for (var news in newsFeedData) {
+      for (var news in newsFeedData.reversed.take(displayDataEntries).toList().reversed.toList()) {
         addLocationWelcome(news);
 
         if (news["erstelltVon"].contains(userId)) continue;
