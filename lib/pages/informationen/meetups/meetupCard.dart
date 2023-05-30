@@ -365,7 +365,7 @@ class _InteresseButtonState extends State<InteresseButton> {
           "WHERE id ='${widget.id}'");
     }
 
-    setState(() {   });
+    setState(() {});
 
     widget.afterFavorite();
   }

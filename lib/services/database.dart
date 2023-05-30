@@ -595,7 +595,7 @@ class MeetupDatabase {
 
     meetupData["name"] = meetupData["name"].replaceAll("'", "''");
     meetupData["stadt"] = meetupData["stadt"].replaceAll("'", "''");
-    meetupData["countryname"] = meetupData["countryname"].replaceAll("'", "''");
+    meetupData["countryname"] = meetupData["land"].replaceAll("'", "''");
     meetupData["beschreibung"] = meetupData["beschreibung"].replaceAll("'", "''");
     meetupData["beschreibungGer"] = meetupData["beschreibungGer"].replaceAll("'", "''");
     meetupData["beschreibungEng"] = meetupData["beschreibungEng"].replaceAll("'", "''");
@@ -678,7 +678,7 @@ class CommunityDatabase {
   addNewCommunity(communityData) async {
     communityData["name"] = communityData["name"].replaceAll("'", "''");
     communityData["ort"] = communityData["ort"].replaceAll("'", "''");
-    communityData["countryname"] = communityData["countryname"].replaceAll("'", "''");
+    communityData["countryname"] = communityData["land"].replaceAll("'", "''");
     communityData["beschreibung"] = communityData["beschreibung"].replaceAll("'", "''");
     communityData["beschreibungGer"] = communityData["beschreibungGer"].replaceAll("'", "''");
     communityData["beschreibungEng"] = communityData["beschreibungEng"].replaceAll("'", "''");

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hive/hive.dart';
 
 import '../../../global/global_functions.dart';
 import '../../../global/variablen.dart' as global_var;
@@ -122,55 +123,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
         });
 
     return newOwnerIsInitsiator;
-  }
-
-  changeOrganisatorWindow() {
-    TextEditingController inputKontroller = TextEditingController();
-
-    searchAutocomplete = SearchAutocomplete(
-      hintText: AppLocalizations.of(context).benutzerEingeben,
-      searchableItems: getAllProfilNames(),
-      onConfirm: () {
-        inputKontroller.text = searchAutocomplete.getSelected()[0];
-      },
-    );
-
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-              height: 250,
-              title: AppLocalizations.of(context).organisatorAbgeben,
-              children: [
-                searchAutocomplete,
-                const SizedBox(height: 40),
-                FloatingActionButton.extended(
-                  label: Text(AppLocalizations.of(context).uebertragen),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    bool isInitiator = await isOwnerWindow();
-                    String selectedUserId = getProfilFromHive(
-                        profilName: inputKontroller.text, getIdOnly: true);
-
-                    setState(() {
-                      widget.meetupData["erstelltVon"] = selectedUserId;
-                      widget.meetupData["isOwner"] = isInitiator;
-                    });
-
-                    customSnackbar(
-                        context,
-                        AppLocalizations.of(context).meetupUebergebenAn1 +
-                            inputKontroller.text +
-                            AppLocalizations.of(context).meetupUebergebenAn2,
-                        color: Colors.green);
-
-                    await MeetupDatabase().update(
-                        "erstelltVon = '$selectedUserId', ownEvent = '$isInitiator'",
-                        "WHERE id = '${widget.meetupData["id"]}'");
-                  },
-                )
-              ]);
-        });
   }
 
   takePartDecision(bool confirm) async {
@@ -481,6 +433,58 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                             ]);
                       });
                 });
+          });
+    }
+
+    changeOrganisatorWindow() {
+      TextEditingController inputKontroller = TextEditingController();
+
+      searchAutocomplete = SearchAutocomplete(
+        hintText: AppLocalizations.of(context).benutzerEingeben,
+        searchableItems: getAllProfilNames(),
+        onConfirm: () {
+          inputKontroller.text = searchAutocomplete.getSelected()[0];
+        },
+      );
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+                height: 250,
+                title: AppLocalizations.of(context).organisatorAbgeben,
+                children: [
+                  searchAutocomplete,
+                  const SizedBox(height: 40),
+                  FloatingActionButton.extended(
+                    label: Text(AppLocalizations.of(context).uebertragen),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      bool isInitiator = await isOwnerWindow();
+                      String selectedUserId = getProfilFromHive(
+                          profilName: inputKontroller.text, getIdOnly: true);
+
+                      setState(() {
+                        widget.meetupData["erstelltVon"] = selectedUserId;
+                        widget.meetupData["isOwner"] = isInitiator;
+                      });
+
+                      var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
+                      myOwnMeetups.remove(widget.meetupData);
+
+                      customSnackbar(
+                          context,
+                          AppLocalizations.of(context).meetupUebergebenAn1 +
+                              inputKontroller.text +
+                              AppLocalizations.of(context).meetupUebergebenAn2,
+                          color: Colors.green);
+
+                      await MeetupDatabase().update(
+                          "erstelltVon = '$selectedUserId', ownEvent = '$isInitiator'",
+                          "WHERE id = '${widget.meetupData["id"]}'");
+                    },
+                  )
+                ]);
           });
     }
 

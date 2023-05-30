@@ -302,10 +302,10 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
                     ),
                   ),
                 ),
-                searchAutocomplete,
+                Container(margin: EdgeInsets.only(right: 35) ,child: searchAutocomplete),
                 Positioned(
                   top: 10,
-                  right: 10,
+                  right: 0,
                   child: filterButton(),
                 )
               ])),

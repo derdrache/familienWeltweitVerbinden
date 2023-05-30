@@ -244,8 +244,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
   checkAndSaveNewTimeZone() {
     String newTimeZone = changeTextInputController.text;
+    var isInt = int.tryParse(newTimeZone);
 
-    if (newTimeZone.isEmpty) return false;
+    if (newTimeZone.isEmpty || isInt == null) return false;
 
     widget.meetupData["zeitzone"] = newTimeZone;
     updateHiveMeetup(widget.meetupData["id"], "zeitzone", newTimeZone);
@@ -526,11 +527,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       if(!widget.isCreator) {
         global_func.changePage(
           context,
-          LocationInformationPage(ortName: widget.meetupData["ort"]));
+          LocationInformationPage(ortName: widget.meetupData["stadt"]));
         return;
       }
-
-      
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
@@ -657,15 +656,16 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     meetupBeschreibung() {
-      if (widget.meetupData["beschreibungGer"].isEmpty) {
-        widget.meetupData["beschreibungGer"] = widget.meetupData["beschreibung"];
+      var discription = "";
+
+      if (widget.isCreator) {
+        discription = widget.meetupData["beschreibung"];
+      } else if (isGerman) {
+        discription = widget.meetupData["beschreibungGer"];
+      } else {
+        discription = widget.meetupData["beschreibungEng"];
       }
-      if (widget.meetupData["beschreibungEng"].isEmpty) {
-        widget.meetupData["beschreibungEng"] = widget.meetupData["beschreibung"];
-      }
-      var usedDiscription = isGerman
-          ? widget.meetupData["beschreibungGer"]
-          : widget.meetupData["beschreibungEng"];
+
 
       return Container(
           margin:
@@ -677,7 +677,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                     minHeight: 50.0,
                   ),
                   child: TextWithHyperlinkDetection(
-                      text: usedDiscription,
+                      text: discription.isNotEmpty ? discription : widget.meetupData["beschreibung"],
                       onTextTab: widget.isCreator
                           ? () => openChangeWindow(
                               AppLocalizations.of(context)

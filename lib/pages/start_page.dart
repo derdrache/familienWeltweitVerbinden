@@ -325,10 +325,15 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   _eventNotification() {
     var eventNotification = 0;
-    var myEvents = Hive.box('secureBox').get("myEvents") ?? [];
+    var myMeetups = Hive.box('secureBox').get("myEvents") ?? [];
 
-    for (var event in myEvents) {
-      eventNotification += event["freischalten"].length;
+    for (var meetup in myMeetups) {
+      bool isOwner = meetup["erstelltVon"] == userId;
+      bool isNotPublic = meetup["art"] != "public" && meetup["art"] != "öffentlich";
+
+      if(isOwner && isNotPublic){
+        eventNotification += meetup["freischalten"].length;
+      }
     }
 
     return eventNotification;

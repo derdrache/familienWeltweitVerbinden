@@ -40,6 +40,7 @@ class _MeetupPageState extends State<MeetupPage> {
       for (var meetup in meetups) {
         bool isOwner = meetup["erstelltVon"] == userId;
         var freischaltenCount = meetup["freischalten"].length;
+        bool isNotPublic = meetup["art"] != "public" && meetup["art"] != "öffentlich";
 
         meetupCards.add(Stack(
           children: [
@@ -50,7 +51,7 @@ class _MeetupPageState extends State<MeetupPage> {
                 fromMeetupPage: true,
                 afterFavorite: () => setState((){}),
                 afterPageVisit: () => setState((){})),
-            if (isOwner)
+            if (isOwner && isNotPublic)
               Positioned(
                 right: 10,
                 top: 10,
