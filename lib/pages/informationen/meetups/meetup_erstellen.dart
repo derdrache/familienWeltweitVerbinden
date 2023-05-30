@@ -123,6 +123,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       };
     }
 
+
     var languageCheck = await translator.translate(meetupBeschreibungKontroller.text);
     descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
@@ -175,6 +176,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     meetupData["sprache"] = jsonDecode(meetupData["sprache"]);
     meetupData["interesse"] = jsonDecode(meetupData["interesse"]);
     meetupData["tags"] = [];
+    meetupData["immerZusagen"] = [];
 
     var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
     myOwnMeetups.add(meetupData);

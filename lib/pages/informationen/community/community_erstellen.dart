@@ -39,30 +39,13 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = const Uuid();
     var communityId = uuid.v4();
-    bool descriptionIsGerman = true;
-    String beschreibungGer = "";
-    String beschreibungEng = "";
-
-    var languageCheck = await translator.translate(beschreibungKontroller.text);
-    descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
-
-    if(descriptionIsGerman){
-      beschreibungGer = beschreibungKontroller.text;
-      beschreibungEng = await descriptionTranslation(beschreibungGer, "auto");
-      beschreibungEng += "\n\nThis is an automatic translation";
-    }else{
-      beschreibungEng = beschreibungKontroller.text;
-      beschreibungGer = await descriptionTranslation(
-          beschreibungEng + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
-      beschreibungGer = beschreibungGer + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
-    }
 
     var communityData = {
       "id": communityId,
       "name": nameController.text,
       "beschreibung": beschreibungKontroller.text,
-      "beschreibungGer":beschreibungGer,
-      "beschreibungEng": beschreibungEng,
+      "beschreibungGer":beschreibungKontroller.text,
+      "beschreibungEng": beschreibungKontroller.text,
       "link": linkKontroller.text,
       "ort": locationData["city"],
       "land": locationData["countryname"],
@@ -77,7 +60,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     if (!checkValidationAndSendError(communityData)) return false;
 
-    await CommunityDatabase().addNewCommunity(Map.of(communityData));
+    saveDB(communityData, locationData);
 
     communityData["bild"] = "assets/bilder/village.jpg";
     communityData["interesse"] = [];
@@ -87,12 +70,32 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     var allCommunities = Hive.box('secureBox').get("communities") ?? [];
     allCommunities.add(communityData);
 
+    return communityData;
+  }
+
+  saveDB(communityData, locationData) async{
+    bool descriptionIsGerman = true;
+
+    var languageCheck = await translator.translate(communityData["beschreibung"]);
+    descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if(descriptionIsGerman){
+      communityData["beschreibungGer"] = communityData["beschreibung"];
+      communityData["beschreibungEng"] = await descriptionTranslation(communityData["beschreibungGer"], "auto");
+      communityData["beschreibungEng"] += "\n\nThis is an automatic translation";
+    }else{
+      communityData["beschreibungEng"] = communityData["beschreibung"];
+      communityData["beschreibungGer"] = await descriptionTranslation(
+          communityData["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
+      communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+    }
+
+    await CommunityDatabase().addNewCommunity(Map.of(communityData));
+
     StadtinfoDatabase().addNewCity(locationData);
     ChatGroupsDatabase().addNewChatGroup(
-        userId, "</community=$communityId"
+        userId, "</community=${communityData["id"]}"
     );
-
-    return communityId;
   }
 
   descriptionTranslation(text, targetLanguage) async{
@@ -195,15 +198,12 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
           buttons: [
             IconButton(
                 onPressed: () async {
-                  var communityId = await saveCommunity();
-                  
-                  var community = await CommunityDatabase()
-                      .getData("*", "WHERE id = '$communityId'");
+                  var communityData = await saveCommunity();
 
                   global_func.changePageForever(
                       context, StartPage(selectedIndex: 2, informationPageIndex: 2,));
                   global_func.changePage(
-                      context, CommunityDetails(community: community));
+                      context, CommunityDetails(community: communityData));
                 },
                 icon: const Icon(Icons.done, size: 30))
           ]),

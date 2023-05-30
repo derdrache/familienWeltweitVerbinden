@@ -1619,6 +1619,8 @@ refreshHiveNewsSetting() async{
   if(userId == null) return;
   var ownNewsSetting = await NewsSettingsDatabase().getData("*", "WHERE id = '$userId'");
 
+  if (ownNewsSetting == false) ownNewsSetting = {};
+
   Hive.box('secureBox').put("ownNewsSetting", ownNewsSetting);
 }
 
