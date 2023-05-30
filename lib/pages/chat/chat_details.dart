@@ -91,6 +91,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   final translator = GoogleTranslator();
   String ownLanguage = WidgetsBinding.instance.window.locales[0].languageCode;
   bool userJoinedChat = false;
+  int displayDataEntries = 50;
 
   @override
   void initState() {
@@ -226,6 +227,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   _setScrollbarListener() {
     itemPositionListener.itemPositions.addListener(() {
+      var isBottom = itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1;
+
       if (itemPositionListener.itemPositions.value.first.index == 0 &&
           !hasStartPosition) {
         setState(() {
@@ -235,6 +238,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           hasStartPosition) {
         setState(() {
           hasStartPosition = false;
+        });
+      }
+
+      if(isBottom){
+        setState(() {
+          displayDataEntries += 50;
         });
       }
     });
@@ -1904,9 +1913,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     _messageList(List messages) {
       List<Widget> messageBox = [];
       String newMessageDate;
+      var changedMessageList = messages.reversed.take(displayDataEntries).toList().reversed.toList();
 
-      for (var i = messages.length - 1; i >= 0; i--) {
-        Map message = messages[i];
+      for (var i = changedMessageList.length - 1; i >= 0; i--) {
+        Map message = changedMessageList[i];
         DateTime messageDateTime =
             DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         String messageDate = DateFormat('dd.MM.yy').format(messageDateTime);
