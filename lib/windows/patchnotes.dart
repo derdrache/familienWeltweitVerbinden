@@ -134,13 +134,25 @@ var patchVorlage={
 };
 
 var patch1100E={
-  "title" : "1.10.0 - xx.xx.2023",
+  "title" : "1.10.0 - xx.06.2023",
   "inhalt": [
+    "New news and notification - when a family has been added in your area",
+    "Secret chat for communities",
+    "Your own private notes can be created for other families",
+    "Events has been renamed to Meetups",
+    "many improvements",
+    "many bug fixes"
   ]
 };
 var patch1100D={
-  "title" : "1.10.0 - xx.xx.2023",
+  "title" : "1.10.0 - xx.06.2023",
   "inhalt": [
+    "Neue News und Notification - Wenn eine Familie in deinem Umkreis hinzugekommen ist",
+    "Geheimer Chat für Gemeinschaften",
+    "Eigene private Notizen können für andere Familien angelegt werden",
+    "Events wurde in Meetups umbenannt",
+    "viele Verbesserungen",
+    "viele Fehlerbehebungen"
   ]
 };
 
