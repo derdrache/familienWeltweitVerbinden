@@ -601,7 +601,8 @@ class MeetupDatabase {
     meetupData["beschreibungEng"] = meetupData["beschreibungEng"].replaceAll("'", "''");
 
     var url = Uri.parse(databaseUrl + databasePathNewMeetUp);
-    await http.post(url, body: json.encode(meetupData));
+    var test = await http.post(url, body: json.encode(meetupData));
+    print(test.body);
   }
 
   update(whatData, queryEnd) async {

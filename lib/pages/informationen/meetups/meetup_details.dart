@@ -1,7 +1,6 @@
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -19,7 +18,7 @@ import '../../show_profil.dart';
 import '../../start_page.dart';
 import 'meetup_card_details.dart';
 
-var userId = FirebaseAuth.instance.currentUser.uid;
+var userId = Hive.box("secureBox").get("ownProfil")["id"];
 
 class MeetupDetailsPage extends StatefulWidget {
   Map meetupData;
@@ -786,7 +785,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                 future: MeetupDatabase().getData(
                     "freischalten", "WHERE id = '${widget.meetupData["id"]}'"),
                 builder: (context, snap) {
-                  var data = snap.hasData ? snap.data.length.toString() : "";
+                  var data = snap.data != false && snap.data != null ? snap.data.length.toString() : "";
                   if (data == "0") data = "";
 
                   return IconButton(

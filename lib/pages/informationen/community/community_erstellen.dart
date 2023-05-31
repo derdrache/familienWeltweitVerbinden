@@ -4,7 +4,6 @@ import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -28,7 +27,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var beschreibungKontroller = TextEditingController();
   var linkKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true,);
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = Hive.box("secureBox").get("ownProfil")["id"];
   var ownCommunity = true;
   final translator = GoogleTranslator();
   bool chooseCurrentLocation = false;
@@ -155,7 +154,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     ownCommunityBox() {
       return Padding(
-        padding: EdgeInsets.only(left:15, right: 15),
+        padding: const EdgeInsets.only(left:15, right: 15),
         child: Row(
           children: [
             Expanded(
@@ -175,7 +174,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     secretChatQuestionBox(){
       return Padding(
-        padding: EdgeInsets.only(left: 15, right: 15),
+        padding: const EdgeInsets.only(left: 15, right: 15),
         child: Row(
           children: [
             Expanded(child: Text(AppLocalizations.of(context).geheimerChat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),

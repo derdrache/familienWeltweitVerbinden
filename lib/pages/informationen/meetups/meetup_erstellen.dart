@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
 import 'package:familien_suche/pages/start_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
@@ -29,6 +28,7 @@ class MeetupErstellen extends StatefulWidget {
 }
 
 class _MeetupErstellenState extends State<MeetupErstellen> {
+  var userID = Hive.box("secureBox").get("ownProfil")["id"];
   var isGerman = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
@@ -93,12 +93,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = const Uuid();
     var meetupId = uuid.v4();
-    var userID = FirebaseAuth.instance.currentUser?.uid;
     var allValid = checkValidations(locationData);
     var interval = meetupIntervalDropdown.getSelected();
-    bool descriptionIsGerman = true;
-    String beschreibungGer = "";
-    String beschreibungEng = "";
     DateTime bisDate;
 
     FocusManager.instance.primaryFocus?.unfocus();
@@ -123,33 +119,18 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       };
     }
 
-
-    var languageCheck = await translator.translate(meetupBeschreibungKontroller.text);
-    descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
-
-    if(descriptionIsGerman){
-      beschreibungGer = meetupBeschreibungKontroller.text;
-      beschreibungEng = await descriptionTranslation(beschreibungGer, "auto");
-      beschreibungEng += "\n\nThis is an automatic translation";
-    }else{
-      beschreibungEng = meetupBeschreibungKontroller.text;
-      beschreibungGer = await descriptionTranslation(
-          beschreibungEng + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
-      beschreibungGer = beschreibungGer + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
-    }
-
     var meetupData = {
       "id": meetupId,
       "name": meetupNameKontroller.text,
       "erstelltAm": DateTime.now().toString(),
       "erstelltVon": userID,
       "beschreibung": meetupBeschreibungKontroller.text,
-      "beschreibungGer":beschreibungGer,
-      "beschreibungEng": beschreibungEng,
+      "beschreibungGer":meetupBeschreibungKontroller.text,
+      "beschreibungEng": meetupBeschreibungKontroller.text,
       "stadt": locationData["city"],
       "art": meetupArtDropdown.getSelected(),
       "wann": wannDate.toString(),
-      "bis": bisDate.toString(),
+      "bis": bisDate?.toString(),
       "typ": ortTypDropdown.getSelected(),
       "sprache": json.encode(sprachenAuswahlBox.getSelected()),
       "interval": interval,
@@ -162,19 +143,18 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       "zeitzone": DateTime.now().timeZoneOffset.inHours.toString(),
       "interesse": json.encode([userID]),
       "bild": "assets/bilder/strand.jpg",
-      "ownMeetup": ownMeetup
+      "ownEvent": ownMeetup
     };
 
-    await MeetupDatabase().addNewMeetup(Map.of(meetupData));
+    saveDB(meetupData, locationData);
 
     meetupData["freischalten"] = [];
     meetupData["eventInterval"] = meetupData["interval"];
-    meetupData["bis"] = meetupData["bis"] == "null" ? null : meetupData["bis"];
     meetupData["absage"] = [];
     meetupData["zusage"] = [];
     meetupData["freigegeben"] = [];
-    meetupData["sprache"] = jsonDecode(meetupData["sprache"]);
-    meetupData["interesse"] = jsonDecode(meetupData["interesse"]);
+    meetupData["sprache"] = json.decode(meetupData["sprache"]);
+    meetupData["interesse"] = json.decode(meetupData["interesse"]);
     meetupData["tags"] = [];
     meetupData["immerZusagen"] = [];
 
@@ -183,17 +163,31 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var meetups = Hive.box('secureBox').get("events") ?? [];
     meetups.add(meetupData);
 
-    StadtinfoDatabase().addNewCity(locationData);
-    var dbMeetupData =
-        await MeetupDatabase().getData("*", "WHERE id = '$meetupId'");
-    ChatGroupsDatabase().addNewChatGroup(
-        userID, "</event=$meetupId"
-    );
-
-    if (dbMeetupData == false) return;
-
     global_functions.changePage(context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
-    global_functions.changePage(context, MeetupDetailsPage(meetupData: dbMeetupData));
+    global_functions.changePage(context, MeetupDetailsPage(meetupData: meetupData));
+  }
+
+  saveDB(meetupData, locationData) async{
+    var languageCheck = await translator.translate(meetupData["beschreibung"]);
+    bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if(descriptionIsGerman){
+      meetupData["beschreibungGer"] = meetupData["beschreibung"];
+      meetupData["beschreibungEng"] = await descriptionTranslation(meetupData["beschreibungGer"], "auto");
+      meetupData["beschreibungEng"] += "\n\nThis is an automatic translation";
+    }else{
+      meetupData["beschreibungEng"] = meetupData["beschreibung"];
+      meetupData["beschreibungGer"] = await descriptionTranslation(
+      meetupData["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
+      meetupData["beschreibungGer"] = meetupData["beschreibungGer"] + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+    }
+
+    await MeetupDatabase().addNewMeetup(Map.of(meetupData));
+
+    StadtinfoDatabase().addNewCity(locationData);
+    ChatGroupsDatabase().addNewChatGroup(
+        userID, "</event=${meetupData["id"]}"
+    );
   }
 
   descriptionTranslation(text, targetLanguage) async{
@@ -331,7 +325,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     }
 
     chooseOwnLocationBox(){
-      if(ortTypDropdown.selected == "online") return SizedBox.shrink();
+      if(ortTypDropdown.selected == "online") return const SizedBox.shrink();
 
       return Container(
         margin: const EdgeInsets.only(left: 15, right: 15),
