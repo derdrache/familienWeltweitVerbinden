@@ -146,7 +146,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       "ownEvent": ownMeetup
     };
 
-    saveDB(meetupData, locationData);
+    saveDB(Map.of(meetupData), locationData);
+
 
     meetupData["freischalten"] = [];
     meetupData["eventInterval"] = meetupData["interval"];
@@ -167,26 +168,27 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     global_functions.changePage(context, MeetupDetailsPage(meetupData: meetupData));
   }
 
-  saveDB(meetupData, locationData) async{
-    var languageCheck = await translator.translate(meetupData["beschreibung"]);
+  saveDB(meetup, locationData) async{
+    var languageCheck = await translator.translate(meetup["beschreibung"]);
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
     if(descriptionIsGerman){
-      meetupData["beschreibungGer"] = meetupData["beschreibung"];
-      meetupData["beschreibungEng"] = await descriptionTranslation(meetupData["beschreibungGer"], "auto");
-      meetupData["beschreibungEng"] += "\n\nThis is an automatic translation";
+      meetup["beschreibungGer"] = meetup["beschreibung"];
+      meetup["beschreibungEng"] = await descriptionTranslation(meetup["beschreibungGer"], "auto");
+      meetup["beschreibungEng"] += "\n\nThis is an automatic translation";
     }else{
-      meetupData["beschreibungEng"] = meetupData["beschreibung"];
-      meetupData["beschreibungGer"] = await descriptionTranslation(
-      meetupData["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
-      meetupData["beschreibungGer"] = meetupData["beschreibungGer"] + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      meetup["beschreibungEng"] = meetup["beschreibung"];
+      meetup["beschreibungGer"] = await descriptionTranslation(
+          meetup["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
+      meetup["beschreibungGer"] = meetup["beschreibungGer"] + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
     }
 
-    await MeetupDatabase().addNewMeetup(Map.of(meetupData));
+
+    await MeetupDatabase().addNewMeetup(meetup);
 
     StadtinfoDatabase().addNewCity(locationData);
     ChatGroupsDatabase().addNewChatGroup(
-        userID, "</event=${meetupData["id"]}"
+        userID, "</event=${meetup["id"]}"
     );
   }
 
