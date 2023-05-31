@@ -8,9 +8,9 @@ import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 sendEmail(notificationInformation, {targetEmail}) async {
-  print("email Noti");
-  print(notificationInformation);
-  return;
+  //print("email Noti");
+  //print(notificationInformation);
+  //return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == "appStoreViewAccount") return;
 
@@ -27,9 +27,9 @@ sendEmail(notificationInformation, {targetEmail}) async {
 }
 
 sendNotification(notificationInformation, {isGroupNotification = false}) async {
-  print("phone Noti");
-  print(notificationInformation);
-  return;
+  //print("phone Noti");
+  //print(notificationInformation);
+  //return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
 

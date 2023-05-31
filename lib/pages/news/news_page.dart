@@ -25,8 +25,7 @@ class NewsPage extends StatefulWidget {
 class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
   final String userId = FirebaseAuth.instance.currentUser.uid;
   List newsFeedData;
-  int displayDataEntries = 30;
-  bool loadMore = false;
+  int displayDataEntries = 10;
   List events;
   List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
@@ -81,7 +80,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
       if(isBottom){
         setState(() {
-          displayDataEntries += 30;
+          displayDataEntries += 10;
         });
       }
     });
@@ -151,7 +150,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
     double screenHeight = MediaQuery.of(context).size.height;
     var widgetList = [];
 
-    for (var item in newsFeed) {
+    for (var item in newsFeed.reversed.toList().take(displayDataEntries).toList().reversed.toList()) {
       widgetList.add(item["newsWidget"]);
     }
 
@@ -869,10 +868,9 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
     createNewsFeed() {
       newsFeed = [];
-      loadMore = newsFeedData.length <=displayDataEntries;
       var myLastLocationChangeDate = _getMyLastLocationChangeDate();
 
-      for (var news in newsFeedData.reversed.take(displayDataEntries).toList().reversed.toList()) {
+      for (var news in newsFeedData) {
         addLocationWelcome(news);
 
         if (news["erstelltVon"].contains(userId)) continue;
