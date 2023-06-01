@@ -287,12 +287,69 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     double fontSize = 18;
     var anzahlFamilien = widget.location["familien"]?.length ?? 0;
 
-    allgemeineInfoBox() {
+    _showCurrentlyThere(){
       var familiesOnLocation = getFamiliesThere();
-      String internetSpeedText = widget.location["internet"] == null
-          ? "?"
-          : widget.location["internet"].toString();
 
+      return InkWell(
+        onTap: () => showFamilyVisitWindow(familiesThere),
+        child: Container(
+          margin: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Icon(Icons.pin_drop, size: iconSize),
+              const SizedBox(width: 10),
+              Text(
+                  AppLocalizations.of(context).aktuellDort +
+                      familiesOnLocation.toString() +
+                      AppLocalizations.of(context).familien,
+                  style: TextStyle(fontSize: fontSize)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    _showVisited(){
+      return InkWell(
+        onTap: () => showFamilyVisitWindow(widget.location["familien"]),
+        child: Container(
+          margin: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Icon(Icons.family_restroom, size: iconSize),
+              const SizedBox(width: 10),
+              Text(
+                  AppLocalizations.of(context).besuchtVon +
+                      anzahlFamilien.toString() +
+                      AppLocalizations.of(context).familien,
+                  style: TextStyle(fontSize: fontSize)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    _showInsiderCount(){
+      return Container(
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Icon(
+              Icons.tips_and_updates,
+              size: iconSize,
+            ),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).insiderInformation + ": ",
+                style: TextStyle(fontSize: fontSize)),
+            const SizedBox(width: 5),
+            Text(widget.usersCityInformation.length.toString(),
+                style: TextStyle(fontSize: fontSize))
+          ],
+        ),
+      );
+    }
+
+    _showCost(){
       setCostIconColor(indikator) {
         if (indikator <= 1) return Colors.green[800];
         if (indikator <= 2) return Colors.green;
@@ -301,6 +358,36 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
         return Colors.red;
       }
+
+      return Container(
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Icon(
+              Icons.monetization_on_outlined,
+              color: widget.location["kosten"] == null
+                  ? null
+                  : setCostIconColor(widget.location["kosten"]),
+              size: iconSize,
+            ),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).kosten,
+                style: TextStyle(fontSize: fontSize)),
+            const SizedBox(width: 5),
+            Text(
+                widget.location["kosten"] == null
+                    ? "?"
+                    : "\$ " * widget.location["kosten"],
+                style: TextStyle(fontSize: fontSize))
+          ],
+        ),
+      );
+    }
+
+    _showInternetSpeed(){
+      String internetSpeedText = widget.location["internet"] == null
+          ? "?"
+          : widget.location["internet"].toString();
 
       setInternetIconColor(indikator) {
         if (indikator <= 20) return Colors.red;
@@ -312,128 +399,51 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       }
 
       return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.all(10),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          InkWell(
-            onTap: () => showFamilyVisitWindow(familiesThere),
-            child: Container(
-              margin: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Icon(Icons.pin_drop, size: iconSize),
-                  const SizedBox(width: 10),
-                  Text(
-                      AppLocalizations.of(context).aktuellDort +
-                          familiesOnLocation.toString() +
-                          AppLocalizations.of(context).familien,
-                      style: TextStyle(fontSize: fontSize)),
-                ],
-              ),
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Icon(
+              Icons.network_check_outlined,
+              color: widget.location["internet"] == null
+                  ? null
+                  : setInternetIconColor(widget.location["internet"]),
+              size: iconSize,
             ),
-          ),
-          InkWell(
-            onTap: () => showFamilyVisitWindow(widget.location["familien"]),
-            child: Container(
-              margin: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Icon(Icons.family_restroom, size: iconSize),
-                  const SizedBox(width: 10),
-                  Text(
-                      AppLocalizations.of(context).besuchtVon +
-                          anzahlFamilien.toString() +
-                          AppLocalizations.of(context).familien,
-                      style: TextStyle(fontSize: fontSize)),
-                ],
-              ),
+            const SizedBox(width: 10),
+            Text("Internet: ", style: TextStyle(fontSize: fontSize)),
+            const SizedBox(width: 5),
+            Text(
+                widget.location["internet"] == null
+                    ? "?"
+                    : "Ø $internetSpeedText Mbps",
+                style: TextStyle(fontSize: fontSize))
+          ],
+        ),
+      );
+    }
+
+    _showWeather(){
+      return Container(
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Icon(
+              Icons.thermostat,
+              size: iconSize,
             ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.tips_and_updates,
-                  size: iconSize,
-                ),
-                const SizedBox(width: 10),
-                Text(AppLocalizations.of(context).insiderInformation + ": ",
-                    style: TextStyle(fontSize: fontSize)),
-                const SizedBox(width: 5),
-                Text(widget.usersCityInformation.length.toString(),
-                    style: TextStyle(fontSize: fontSize))
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.monetization_on_outlined,
-                  color: widget.location["kosten"] == null
-                      ? null
-                      : setCostIconColor(widget.location["kosten"]),
-                  size: iconSize,
-                ),
-                const SizedBox(width: 10),
-                Text(AppLocalizations.of(context).kosten,
-                    style: TextStyle(fontSize: fontSize)),
-                const SizedBox(width: 5),
-                Text(
-                    widget.location["kosten"] == null
-                        ? "?"
-                        : "\$ " * widget.location["kosten"],
-                    style: TextStyle(fontSize: fontSize))
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.network_check_outlined,
-                  color: widget.location["internet"] == null
-                      ? null
-                      : setInternetIconColor(widget.location["internet"]),
-                  size: iconSize,
-                ),
-                const SizedBox(width: 10),
-                Text("Internet: ", style: TextStyle(fontSize: fontSize)),
-                const SizedBox(width: 5),
-                Text(
-                    widget.location["internet"] == null
-                        ? "?"
-                        : "Ø $internetSpeedText Mbps",
-                    style: TextStyle(fontSize: fontSize))
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.thermostat,
-                  size: iconSize,
-                ),
-                const SizedBox(width: 10),
-                Text(AppLocalizations.of(context).wetter,
-                    style: TextStyle(fontSize: fontSize)),
-                if (widget.location["wetter"] != null)
-                  Flexible(
-                      child: InkWell(
-                          onTap: () => global_func.openURL(widget.location["wetter"]),
-                          child: Text(widget.location["wetter"],
-                              style: TextStyle(
-                                  color: Colors.blue, fontSize: fontSize),
-                              overflow: TextOverflow.ellipsis)))
-              ],
-            ),
-          ),
-        ]),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).wetter,
+                style: TextStyle(fontSize: fontSize)),
+            if (widget.location["wetter"] != null)
+              Flexible(
+                  child: InkWell(
+                      onTap: () => global_func.openURL(widget.location["wetter"]),
+                      child: Text(widget.location["wetter"],
+                          style: TextStyle(
+                              color: Colors.blue, fontSize: fontSize),
+                          overflow: TextOverflow.ellipsis)))
+          ],
+        ),
       );
     }
 
@@ -442,7 +452,18 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
         child: Scaffold(
           body: Column(
             children: [
-              allgemeineInfoBox(),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.all(10),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  _showCurrentlyThere(),
+                  _showVisited(),
+                  _showInsiderCount(),
+                  _showCost(),
+                  _showInternetSpeed(),
+                  _showWeather(),
+                ]),
+              ),
             ],
           ),
           floatingActionButton: FloatingActionButton(
