@@ -1364,7 +1364,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   constraints: BoxConstraints(
                                       maxWidth:
                                           MediaQuery.of(context).size.width *
-                                              0.85),
+                                              0.8),
                                   margin: const EdgeInsets.all(10),
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
