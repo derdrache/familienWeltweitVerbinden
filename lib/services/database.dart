@@ -427,12 +427,13 @@ class ChatGroupsDatabase {
   updateChatGroup(whatData, queryEnd) async {
     var url = Uri.parse(databaseUrl + databasePathUpdate);
 
-    await http.post(url,
+    var test = await http.post(url,
         body: json.encode({
           "table": "chat_groups",
           "whatData": whatData,
           "queryEnd": queryEnd
         }));
+    print(test.body);
   }
 
   getAllChatMessages(chatId) async {
@@ -499,7 +500,7 @@ class ChatGroupsDatabase {
       if (!isActive) {
         chatData["users"][userId]["newMessages"] += 1;
         whatQuery +=
-            ",'\$.$userId.newMessages', JSON_VALUE(users, '\$.$userId.newMessages') + 1)";
+            ",'\$.$userId.newMessages', JSON_VALUE(users, '\$.$userId.newMessages') + 1";
 
         if(!isMute) notificationList.add(userId);
       }
@@ -512,6 +513,7 @@ class ChatGroupsDatabase {
         chatGroup: chatGroupName);
 
     whatQuery += ")";
+
     ChatGroupsDatabase()
         .updateChatGroup(whatQuery, "WHERE id = '${chatData["id"]}'");
   }
