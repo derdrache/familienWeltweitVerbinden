@@ -10,6 +10,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
+import '../../../functions/is_user_inactive.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../../../widgets/custom_appbar.dart';
@@ -43,7 +44,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
   @override
   void initState() {
     location = getCityFromHive(cityName: widget.ortName);
-    if(location == null) Navigator.pop(context);
+    if (location == null) Navigator.pop(context);
 
     location["familien"].remove(userId);
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
@@ -58,14 +59,13 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
     ];
     addLastTab();
 
-
     super.initState();
   }
 
-  addLastTab(){
-    if(isCity){
+  addLastTab() {
+    if (isCity) {
       tabPages.add(WorldmapMini(location: location));
-    }else{
+    } else {
       tabPages.add(CountryCitiesPage(countryName: widget.ortName));
     }
   }
@@ -112,10 +112,16 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
           IconButton(
             icon: const Icon(Icons.link),
             onPressed: () async {
-              Clipboard.setData(ClipboardData(
-                  text: "</cityId=" + location["id"].toString()));
-              customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
-              global_func.changePageForever(context, StartPage(selectedIndex: 3,));
+              Clipboard.setData(
+                  ClipboardData(text: "</cityId=" + location["id"].toString()));
+              customSnackbar(
+                  context, AppLocalizations.of(context).linkWurdekopiert,
+                  color: Colors.green);
+              global_func.changePageForever(
+                  context,
+                  StartPage(
+                    selectedIndex: 3,
+                  ));
             },
           ),
           IconButton(
@@ -143,10 +149,11 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
             icon: const Icon(Icons.tips_and_updates),
             label: AppLocalizations.of(context).insiderInformation,
           ),
-          if(isCity) BottomNavigationBarItem(
-            icon: const Icon(Icons.map),
-            label: AppLocalizations.of(context).karte,
-          ),
+          if (isCity)
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.map),
+              label: AppLocalizations.of(context).karte,
+            ),
           if (!isCity)
             BottomNavigationBarItem(
               icon: const Icon(Icons.location_city),
@@ -163,7 +170,11 @@ class GeneralInformationPage extends StatefulWidget {
   List usersCityInformation;
   bool fromCityPage;
 
-  GeneralInformationPage({Key key, this.location, this.usersCityInformation, this.fromCityPage = false})
+  GeneralInformationPage(
+      {Key key,
+      this.location,
+      this.usersCityInformation,
+      this.fromCityPage = false})
       : super(key: key);
 
   @override
@@ -185,34 +196,44 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     super.initState();
   }
 
-  removeInactiveFamilies(familyList){
+  removeInactiveFamilies(familyList) {
     List allActiveProfils = List.of(getAllActiveProfilsHive());
     List activeFamilies = [];
 
-
-    for(var profil in allActiveProfils){
-      if(familyList.contains(profil["id"])) activeFamilies.add(profil["id"]);
+    for (var profil in allActiveProfils) {
+      if (familyList.contains(profil["id"])) activeFamilies.add(profil["id"]);
     }
 
     return activeFamilies;
   }
 
   showFamilyVisitWindow(list) {
-    list = removeInactiveFamilies(list);
     List<Widget> familiesList = [];
 
     for (var family in list) {
-      var profil = getProfilFromHive(profilId: family, onlyActive: true);
+      print(family);
+      var profil = getProfilFromHive(profilId: family);
+      var isInactive = isUserInactive(profil);
 
       if (profil == null) continue;
+
       familiesList.add(InkWell(
         onTap: () =>
             global_func.changePage(context, ShowProfilPage(profil: profil)),
         child: Container(
             padding: const EdgeInsets.all(10),
-            child: Text(
-              profil["name"],
-              style: const TextStyle(fontSize: 20),
+            child: Row(
+              children: [
+                Text(
+                  profil["name"],
+                  style: const TextStyle(fontSize: 20),
+                ),
+                if (isInactive)
+                  Text(
+                    " - ${AppLocalizations.of(context).inaktiv}",
+                    style: TextStyle(color: Colors.red),
+                  )
+              ],
             )),
       ));
     }
@@ -241,13 +262,13 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     var allProfils = getAllActiveProfilsHive();
 
     for (var profil in allProfils) {
-      if(profil["ort"].isEmpty) continue;
+      if (profil["ort"].isEmpty) continue;
 
       bool inLocation;
 
-      if(isCity){
+      if (isCity) {
         inLocation = widget.location["ort"].contains(profil["ort"]) ?? false;
-      }else{
+      } else {
         inLocation = widget.location["ort"].contains(profil["land"]) ?? false;
       }
 
@@ -270,7 +291,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     if (checkChatGroup != false) return;
 
     var newChatId =
-    await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$locationId");
+        await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$locationId");
     var hiveChatGroups = Hive.box('secureBox').get("chatGroups");
     hiveChatGroups.add({
       "id": newChatId,
@@ -287,7 +308,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     double fontSize = 18;
     var anzahlFamilien = widget.location["familien"]?.length ?? 0;
 
-    _showCurrentlyThere(){
+    _showCurrentlyThere() {
       var familiesOnLocation = getFamiliesThere();
 
       return InkWell(
@@ -302,14 +323,14 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   AppLocalizations.of(context).aktuellDort +
                       familiesOnLocation.toString() +
                       AppLocalizations.of(context).familien,
-                  style: TextStyle(fontSize: fontSize)),
+                  style: TextStyle(fontSize: fontSize, decoration: TextDecoration.underline)),
             ],
           ),
         ),
       );
     }
 
-    _showVisited(){
+    _showVisited() {
       return InkWell(
         onTap: () => showFamilyVisitWindow(widget.location["familien"]),
         child: Container(
@@ -322,14 +343,14 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   AppLocalizations.of(context).besuchtVon +
                       anzahlFamilien.toString() +
                       AppLocalizations.of(context).familien,
-                  style: TextStyle(fontSize: fontSize)),
+                  style: TextStyle(fontSize: fontSize, decoration: TextDecoration.underline)),
             ],
           ),
         ),
       );
     }
 
-    _showInsiderCount(){
+    _showInsiderCount() {
       return Container(
         margin: const EdgeInsets.all(5),
         child: Row(
@@ -349,7 +370,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showCost(){
+    _showCost() {
       setCostIconColor(indikator) {
         if (indikator <= 1) return Colors.green[800];
         if (indikator <= 2) return Colors.green;
@@ -384,7 +405,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showInternetSpeed(){
+    _showInternetSpeed() {
       String internetSpeedText = widget.location["internet"] == null
           ? "?"
           : widget.location["internet"].toString();
@@ -422,7 +443,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showWeather(){
+    _showWeather() {
       return Container(
         margin: const EdgeInsets.all(5),
         child: Row(
@@ -437,10 +458,11 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
             if (widget.location["wetter"] != null)
               Flexible(
                   child: InkWell(
-                      onTap: () => global_func.openURL(widget.location["wetter"]),
+                      onTap: () =>
+                          global_func.openURL(widget.location["wetter"]),
                       child: Text(widget.location["wetter"],
-                          style: TextStyle(
-                              color: Colors.blue, fontSize: fontSize),
+                          style:
+                              TextStyle(color: Colors.blue, fontSize: fontSize),
                           overflow: TextOverflow.ellipsis)))
           ],
         ),
@@ -455,14 +477,16 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.all(10),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  _showCurrentlyThere(),
-                  _showVisited(),
-                  _showInsiderCount(),
-                  _showCost(),
-                  _showInternetSpeed(),
-                  _showWeather(),
-                ]),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _showCurrentlyThere(),
+                      _showVisited(),
+                      _showInsiderCount(),
+                      _showCost(),
+                      _showInternetSpeed(),
+                      _showWeather(),
+                    ]),
               ),
             ],
           ),
@@ -499,7 +523,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   final translator = GoogleTranslator();
   List usersCityInformation;
 
-
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
     var informationTextKontroller = TextEditingController();
@@ -522,12 +545,18 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                        child: Text(AppLocalizations.of(context).speichern, style: const TextStyle(fontSize: 20),),
+                        child: Text(
+                          AppLocalizations.of(context).speichern,
+                          style: const TextStyle(fontSize: 20),
+                        ),
                         onPressed: () => saveNewInformation(
                             title: titleTextKontroller.text,
                             inhalt: informationTextKontroller.text)),
                     TextButton(
-                      child: Text(AppLocalizations.of(context).abbrechen, style: const TextStyle(fontSize: 20),),
+                      child: Text(
+                        AppLocalizations.of(context).abbrechen,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -613,25 +642,28 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     secureBox.put("stadtinfoUser", allInformations);
 
     newUserInformation["ort"] = newUserInformation["ort"].replaceAll("'", "''");
-    newUserInformation["titleGer"] = newUserInformation["titleGer"].replaceAll("'", "''");
-    newUserInformation["informationGer"] = newUserInformation["informationGer"].replaceAll("'", "''");
-    newUserInformation["titleEng"] = newUserInformation["titleEng"].replaceAll("'", "''");
-    newUserInformation["informationEng"] = newUserInformation["informationEng"].replaceAll("'", "''");
+    newUserInformation["titleGer"] =
+        newUserInformation["titleGer"].replaceAll("'", "''");
+    newUserInformation["informationGer"] =
+        newUserInformation["informationGer"].replaceAll("'", "''");
+    newUserInformation["titleEng"] =
+        newUserInformation["titleEng"].replaceAll("'", "''");
+    newUserInformation["informationEng"] =
+        newUserInformation["informationEng"].replaceAll("'", "''");
 
     StadtinfoUserDatabase().addNewInformation(newUserInformation);
-
   }
 
   setThumbUp(index) {
     var infoId = usersCityInformation[index]["id"];
 
-    if (usersCityInformation[index]["thumbUp"].contains(userId)){
+    if (usersCityInformation[index]["thumbUp"].contains(userId)) {
       usersCityInformation[index]["thumbUp"].remove(userId);
 
       StadtinfoUserDatabase().update(
           "thumbUp = JSON_REMOVE(thumbUp, JSON_UNQUOTE(JSON_SEARCH(thumbUp, 'one', '$userId')))",
           "WHERE id ='$infoId'");
-    }else{
+    } else {
       usersCityInformation[index]["thumbUp"].add(userId);
       usersCityInformation[index]["thumbDown"].remove(userId);
 
@@ -640,19 +672,18 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           "WHERE id ='$infoId'");
     }
     setState(() {});
-
   }
 
-  setThumbDown(index)  {
+  setThumbDown(index) {
     var infoId = usersCityInformation[index]["id"];
 
-    if (usersCityInformation[index]["thumbDown"].contains(userId)){
+    if (usersCityInformation[index]["thumbDown"].contains(userId)) {
       usersCityInformation[index]["thumbDown"].remove(userId);
 
       StadtinfoUserDatabase().update(
           "thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))",
           "WHERE id ='$infoId'");
-    }else{
+    } else {
       usersCityInformation[index]["thumbDown"].add(userId);
       usersCityInformation[index]["thumbUp"].remove(userId);
 
@@ -746,7 +777,11 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     Navigator.pop(context);
   }
 
-  updateDatabase(id, newTitle, newInformation, ) async{
+  updateDatabase(
+    id,
+    newTitle,
+    newInformation,
+  ) async {
     String titleGer, informationGer, titleEng, informationEng;
 
     var languageCheck = await translator.translate(newInformation);
@@ -804,12 +839,15 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         "WHERE id ='$id'");
   }
 
-  copyInformationDialog(information){
-    var informationText = isGerman ? information["informationGer"]: information["informationGer"];
+  copyInformationDialog(information) {
+    var informationText = isGerman
+        ? information["informationGer"]
+        : information["informationGer"];
 
     Clipboard.setData(ClipboardData(text: informationText));
 
-    customSnackbar(context, AppLocalizations.of(context).informationKopiert, color: Colors.green);
+    customSnackbar(context, AppLocalizations.of(context).informationKopiert,
+        color: Colors.green);
   }
 
   deleteInformationDialog(information) async {
@@ -940,7 +978,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     };
   }
 
-@override
+  @override
   void initState() {
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
     super.initState();

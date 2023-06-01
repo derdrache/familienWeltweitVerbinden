@@ -864,7 +864,6 @@ class _UserInformationDisplay extends StatelessWidget {
       var text = "";
       var color = Colors.grey;
       var size = textSize - 2;
-      var monthsUntilInactive = 3;
       var timeDifferenceLastLogin = Duration(
           microseconds: (DateTime.now().microsecondsSinceEpoch -
                   DateTime.parse(profil["lastLogin"].toString())

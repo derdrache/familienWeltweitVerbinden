@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 Color borderColorGrey = const Color(0xFFDFDDDD);
+var monthsUntilInactive = 3;
 
 List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
   "Auto/Unterkünfte", "Wohnmobile/Camping", "Boot"];
