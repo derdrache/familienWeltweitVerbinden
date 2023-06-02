@@ -137,6 +137,7 @@ var patch1100E={
   "title" : "1.10.0 - xx.06.2023",
   "inhalt": [
     "New news and notification - when a family has been added in your area",
+    "Support Chat has been added - accessible under Settings => App Information",
     "Secret chat for communities",
     "Your own private notes can be created for other families",
     "Events has been renamed to Meetups",
@@ -148,6 +149,7 @@ var patch1100D={
   "title" : "1.10.0 - xx.06.2023",
   "inhalt": [
     "Neue News und Notification - Wenn eine Familie in deinem Umkreis hinzugekommen ist",
+    "Support Chat wurde eingebaut - Unter Settings => App Information erreichbar",
     "Geheimer Chat für Gemeinschaften",
     "Eigene private Notizen können für andere Familien angelegt werden",
     "Events wurde in Meetups umbenannt",
