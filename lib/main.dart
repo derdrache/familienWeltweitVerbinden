@@ -125,7 +125,6 @@ class MyApp extends StatelessWidget {
   }
 
 
-
   _setFirebaseNotifications() {
     final FlutterLocalNotificationsPlugin _notificationsPlugin =
         FlutterLocalNotificationsPlugin();
@@ -183,11 +182,9 @@ class MyApp extends StatelessWidget {
   }
 
   _changeToChat(chatId) async {
-    var groupChatData = getChatFromHive(chatId);
-
     navigatorKey.currentState?.push(MaterialPageRoute(
         builder: (_) => ChatDetailsPage(
-            groupChatData: groupChatData,
+            chatId: chatId.toString(),
         )));
   }
 

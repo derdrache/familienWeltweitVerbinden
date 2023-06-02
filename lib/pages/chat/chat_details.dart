@@ -143,6 +143,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _getAndSetChatData() {
+    if(!widget.isChatgroup && widget.chatId != null){
+      widget.isChatgroup = !widget.chatId.contains("_");
+    }
+
     if (widget.isChatgroup) {
       widget.groupChatData ??= getChatGroupFromHive(
           chatId: widget.chatId, connectedWith: widget.connectedWith);
@@ -158,9 +162,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         _createNewChatgroup();
       }
     } else {
+      var chatPartnerId = widget.chatPartnerId;
+      if(chatPartnerId == null && widget.chatId != null){
+        chatPartnerId = widget.chatId.replaceAll(ownProfil["id"], "");
+        chatPartnerId = chatPartnerId.replaceAll("_", "");
+      }
       chatPartnerProfil = getProfilFromHive(
-          profilId: widget.chatPartnerId, profilName: widget.chatPartnerName);
-
+          profilId: chatPartnerId, profilName: widget.chatPartnerName);
       widget.groupChatData ??= getChatFromHive(
           widget.chatId ?? global_functions.getChatID(chatPartnerProfil["id"]));
 
