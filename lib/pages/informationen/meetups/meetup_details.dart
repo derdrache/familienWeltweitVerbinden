@@ -134,23 +134,35 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             "WHERE id = '${widget.meetupData["id"]}'");
       }
 
+      if(widget.meetupData["absage"].contains(userId)){
+        MeetupDatabase().update(
+            "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
+      }else{
+        MeetupDatabase().update(
+            "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
+      }
+
       teilnahme = true;
       absage = false;
       widget.meetupData["zusage"].add(userId);
       widget.meetupData["absage"].remove(userId);
-
-      MeetupDatabase().update(
-          "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
-          "WHERE id = '${widget.meetupData["id"]}'");
     } else {
+      if(widget.meetupData["zusage"].contains(userId)){
+        MeetupDatabase().update(
+            "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId'))),absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
+      }else{
+        MeetupDatabase().update(
+            "absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
+      }
       teilnahme = false;
       absage = true;
       widget.meetupData["zusage"].remove(userId);
       widget.meetupData["absage"].add(userId);
 
-      MeetupDatabase().update(
-          "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId'))),absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
-          "WHERE id = '${widget.meetupData["id"]}'");
     }
 
     setState(() {});

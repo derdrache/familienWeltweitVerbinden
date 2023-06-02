@@ -248,7 +248,7 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
       for (var meetup in allMeetups) {
         meineMeetups.add(MeetupCard(
             margin:
-                const EdgeInsets.only(top: 10, bottom: 10, left: 17, right: 17),
+                const EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
             withInteresse: true,
             meetupData: meetup,
             afterPageVisit: () async {

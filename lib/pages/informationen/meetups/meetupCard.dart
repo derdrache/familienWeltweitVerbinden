@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,49 +53,43 @@ class _MeetupCardState extends State<MeetupCard> {
     super.initState();
   }
 
-  confirmMeetup(bool confirm) async {
+  takePartDecision(bool confirm) async {
     if (confirm) {
-      var onInteresseList = widget.meetupData["interesse"].contains(userId);
-
-      if (!onInteresseList) {
+      if (!widget.meetupData["interesse"].contains(userId)) {
         widget.meetupData["interesse"].add(userId);
+        MeetupDatabase().update(
+            "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
       }
 
-      setState(() {
-        widget.meetupData["zusage"].add(userId);
-        widget.meetupData["absage"].remove(userId);
-        onZusageList = true;
-        onAbsageList = false;
-      });
+      if(widget.meetupData["absage"].contains(userId)){
+        MeetupDatabase().update(
+            "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
+      }else{
+        MeetupDatabase().update(
+            "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
+      }
+
+      widget.meetupData["zusage"].add(userId);
+      widget.meetupData["absage"].remove(userId);
     } else {
-      setState(() {
-        widget.meetupData["absage"].add(userId);
-        widget.meetupData["zusage"].remove(userId);
-        onAbsageList = true;
-        onZusageList = false;
-      });
+      if(widget.meetupData["zusage"].contains(userId)){
+        MeetupDatabase().update(
+            "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId'))),absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
+      }else{
+        MeetupDatabase().update(
+            "absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
+            "WHERE id = '${widget.meetupData["id"]}'");
+      }
+
+      widget.meetupData["zusage"].remove(userId);
+      widget.meetupData["absage"].add(userId);
     }
 
-    var dbData = await MeetupDatabase().getData(
-        "absage, zusage, interesse", "WHERE id = '${widget.meetupData["id"]}'");
-
-    var zusageList = dbData["zusage"];
-    var absageList = dbData["absage"];
-    var interessenList = dbData["interesse"];
-
-    if (confirm) {
-      if (!interessenList.contains(userId)) interessenList.add(userId);
-      zusageList.add(userId);
-      absageList.remove(userId);
-    } else {
-      zusageList.remove(userId);
-      absageList.add(userId);
-    }
-
-    MeetupDatabase().update(
-        "absage = '${json.encode(absageList)}', "
-            "zusage = '${json.encode(zusageList)}', interesse = '${json.encode(interessenList)}'",
-        "WHERE id = '${widget.meetupData["id"]}'");
+    setState(() {});
   }
 
   createDatetimeText() {
@@ -171,7 +163,7 @@ class _MeetupCardState extends State<MeetupCard> {
                   Text(AppLocalizations.of(context).teilnehmen),
                 ],
               ),
-              onTap: () => confirmMeetup(true),
+              onTap: () => takePartDecision(true),
             ),
           if (!onAbsageList)
             PopupMenuItem(
@@ -185,7 +177,7 @@ class _MeetupCardState extends State<MeetupCard> {
                   Text(AppLocalizations.of(context).absage),
                 ],
               ),
-              onTap: () => confirmMeetup(false),
+              onTap: () => takePartDecision(false),
             ),
         ],
       );
