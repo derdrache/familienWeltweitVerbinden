@@ -8,9 +8,6 @@ import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 sendEmail(notificationInformation, {targetEmail}) async {
-  //print("email Noti");
-  //print(notificationInformation);
-  //return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   if (userId == "appStoreViewAccount") return;
 
@@ -27,9 +24,6 @@ sendEmail(notificationInformation, {targetEmail}) async {
 }
 
 sendNotification(notificationInformation, {isGroupNotification = false}) async {
-  //print("phone Noti");
-  //print(notificationInformation);
-  //return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
 
@@ -317,7 +311,7 @@ prepareNewLocationNotification(){
     double profilFamiliesRange = profil["familiesDistance"].toDouble();
     bool notificationAllowed = profil["notificationstatus"] == 1;
     bool rangeNotificationAllowed = profilFamiliesRange > 0;
-    bool isOwnProfil = profil["is"] == ownProfil["id"];
+    bool isOwnProfil = profil["id"] == ownProfil["id"];
     var profilToken = profil["token"];
     bool canGerman = profil["sprachen"].contains("Deutsch") || profil["sprachen"].contains("german");
     bool isFriend = profil["friendlist"].contains(ownProfil["id"]);
@@ -438,7 +432,8 @@ prepareAddMemberNotification(community, userId){
   bool notificationAllowed = userProfil["notificationstatus"] == 1;
   bool speakGerman = userProfil["sprachen"].contains("Deutsch") || userProfil["sprachen"].contains("german");
   var notificationInformation = {
-    "zu": profilToken,
+    "token": profilToken,
+    "zu": userId,
     "changePageId": community["id"],
     "typ": "community"
   };
