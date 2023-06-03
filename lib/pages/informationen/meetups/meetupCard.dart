@@ -191,7 +191,7 @@ class _MeetupCardState extends State<MeetupCard> {
             MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
             whenComplete: () =>  widget.afterPageVisit()),
       child: Container(
-          width: (130 + ((screenHeight - 600) / 5)) * sizeRefactor,
+          width: (120 + ((screenHeight - 600) / 5)) * sizeRefactor,
           height: screenHeight / 3.2 * sizeRefactor,
           margin: widget.margin,
           decoration: BoxDecoration(

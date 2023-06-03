@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../../global/style.dart';
 import '../informationen/community/community_page.dart';
 import '../informationen/meetups/meetup_page.dart';
 import 'location/location_page.dart';
@@ -84,9 +83,6 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
     double cardAbstandWidth = screenWidth > handyScreenWidth ? screenWidth / 17.5 : 0;
 
     pageCards(title, icon, image, pageIndex) {
-      var h1FontSize = getResponsiveFontSize(context, "h1");
-
-
       return GestureDetector(
         onTap: () {
           setState(() {
@@ -102,8 +98,8 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Container(
-                width: (screenWidth / 2) -40,
-                height: (screenHeight / 3.5),
+                width: 150,// (screenWidth / 2) -40,
+                height: 200,//(screenHeight / 3.5),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
                     image: image == null ? null : DecorationImage(
@@ -128,7 +124,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
                       child: Text(
                         title,
                         style: TextStyle(
-                            fontSize: h1FontSize, fontWeight: FontWeight.bold),
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],

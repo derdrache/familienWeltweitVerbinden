@@ -7,7 +7,7 @@ getResponsiveFontSize(context, fontType){
   if(fontType == "h1"){
     size = 5 * unitHeightValue;
 
-    if(size > 30) size = 30;
+    if(size > 25) size = 25;
 
     return size;
   } else if(fontType == "p"){
