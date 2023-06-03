@@ -9,7 +9,8 @@ import 'package:collection/collection.dart';
 
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
-import '../../widgets/month_picker.dart';
+import '../../widgets/flexible_date_picker.dart';
+import '../../services/notification.dart';
 
 class ChangeReiseplanungPage extends StatefulWidget {
   final String userId = FirebaseAuth.instance.currentUser.uid;
@@ -25,25 +26,32 @@ class ChangeReiseplanungPage extends StatefulWidget {
 }
 
 class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
-  var vonDate = MonthPickerBox();
-  var bisDate = MonthPickerBox();
+  var datePicker = FlexibleDatePicker(
+                    startYear: DateTime.now().year,
+                    withMonth: true,
+                    multiDate: true,
+                  );
   var ortInput = GoogleAutoComplete();
 
-  saveProfilReiseplanung(){
-    ProfilDatabase().updateProfil(
-        "reisePlanung = '${jsonEncode(widget.reiseplanung)}'",
-        "WHERE id = '${widget.userId}'");
+  saveProfilReiseplanung(newReiseplan){
     updateHiveOwnProfil("reisePlanung", widget.reiseplanung);
+
+    ProfilDatabase().updateProfil(
+        "reisePlanung = '${json.encode(widget.reiseplanung)}'",
+        "WHERE id = '${widget.userId}'");
+
   }
 
-  saveInDatabase(){
+  saveInDatabase(newReiseplan){
     if(checkDuplicateEntry()){
       widget.reiseplanung.removeLast();
       customSnackbar(context, "Doppelter Eintrag");
       return;
     }
 
-    saveProfilReiseplanung();
+    saveProfilReiseplanung(newReiseplan);
+    var newLocation = ortInput.googleSearchResult;
+    StadtinfoDatabase().addNewCity(newLocation);
 
     NewsPageDatabase().addNewNews({
       "typ": "reiseplanung",
@@ -84,22 +92,28 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   addNewTravelPlan() {
     var ortData = ortInput.getGoogleLocationData();
 
-    if (vonDate.getDate() == null ||
-        bisDate.getDate() == null ||
-        ortData["city"] == null) {
+    if(datePicker.getDate() == null){
       customSnackbar(context,
-          AppLocalizations.of(context).vollstaendigeDatenZukunftsOrtEingeben);
+          AppLocalizations.of(context).datumEingeben);
+      return;
+    }
+    if(ortData["city"] == null){
+      customSnackbar(context,
+          AppLocalizations.of(context).ortEingeben);
       return;
     }
 
-    if (bisDate.getDate().isBefore(vonDate.getDate())) {
+    var startDate = datePicker.getDate()[0];
+    var endDate = datePicker.getDate()[1];
+
+    if (endDate.isBefore(startDate)) {
       customSnackbar(context, AppLocalizations.of(context).vonKleinerAlsBis);
       return;
     }
 
     var newReiseplan = {
-      "von": vonDate.getDate().toString(),
-      "bis": bisDate.getDate().toString(),
+      "von": startDate.toString(),
+      "bis": endDate.toString(),
       "ortData": ortData
     };
 
@@ -111,11 +125,11 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
     widget.reiseplanung.add(newReiseplan);
 
-    saveInDatabase();
+    saveInDatabase(newReiseplan);
+    prepareNewTravelPlanNotification();
 
     setState(() {
-      vonDate = MonthPickerBox();
-      bisDate = MonthPickerBox();
+      datePicker.clear();
       ortInput.clear();
     });
   }
@@ -123,15 +137,15 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   deleteReiseplan(reiseplan) {
     widget.reiseplanung.remove(reiseplan);
 
-    saveProfilReiseplanung();
+    ProfilDatabase().updateProfil(
+        "reisePlanung = '${json.encode(widget.reiseplanung)}'",
+        "WHERE id = '${widget.userId}'");
 
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    vonDate.hintText = AppLocalizations.of(context).von;
-    bisDate.hintText = AppLocalizations.of(context).bis;
     ortInput.hintText = AppLocalizations.of(context).ort;
 
     transformDateToText(dateString) {
@@ -149,13 +163,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
               Column(
                 children: [
                   SizedBox(width: 300,child: ortInput),
-                  Row(
-                    children: [
-                      vonDate,
-                      const SizedBox(width: 40),
-                      bisDate,
-                    ],
-                  ),
+                  datePicker
                 ],
               ),
               Expanded(

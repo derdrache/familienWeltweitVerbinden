@@ -1,10 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:math' show cos, sqrt, asin;
+import 'package:image/image.dart' as image_pack;
 
 import 'package:familien_suche/global/variablen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+double calculateDistance(lat1, lon1, lat2, lon2){
+  var p = 0.017453292519943295;
+  var c = cos;
+  var a = 0.5 - c((lat2 - lat1) * p)/2 +
+      c(lat1 * p) * c(lat2 * p) *
+          (1 - c((lon2 - lon1) * p))/2;
+  return 12742 * asin(sqrt(a));
+}
 
 checkValidatorEmpty(context) {
   return (value){
@@ -115,7 +125,7 @@ changeGermanToEnglish(list){
   }
   if(list.runtimeType == String && checkList.isEmpty){
     var reiseartenIndex = reisearten.indexOf(list);
-    var eventIntervalIndex = eventInterval.indexOf(list);
+    var eventIntervalIndex = meetupInterval.indexOf(list);
     var eventArtIndex = eventArt.indexOf(list);
     var aufreiseIndex = aufreise.indexOf(list);
     var standortBestimmungIndex = standortbestimmung.indexOf(list);
@@ -123,7 +133,7 @@ changeGermanToEnglish(list){
     var interesseIndex = interessenListe.indexOf(list);
 
     if(reiseartenIndex > -1) return reiseartenEnglisch[reiseartenIndex];
-    if(eventIntervalIndex > -1) return eventIntervalEnglisch[eventIntervalIndex];
+    if(eventIntervalIndex > -1) return meetupIntervalEnglisch[eventIntervalIndex];
     if(eventArtIndex > -1) return eventArtEnglisch[eventArtIndex];
     if(aufreiseIndex > -1) return aufreiseEnglisch[aufreiseIndex];
     if(standortBestimmungIndex > -1) return standortbestimmungEnglisch[standortBestimmungIndex];
@@ -160,7 +170,7 @@ changeEnglishToGerman(list){
 
   if(list.runtimeType == String && checkList.isEmpty){
     var reiseartenIndex = reiseartenEnglisch.indexOf(list);
-    var eventIntervalIndex = eventIntervalEnglisch.indexOf(list);
+    var eventIntervalIndex = meetupIntervalEnglisch.indexOf(list);
     var eventArtIndex = eventArtEnglisch.indexOf(list);
     var aufreiseIndex = aufreiseEnglisch.indexOf(list);
     var standortBestimmungIndex = standortbestimmungEnglisch.indexOf(list);
@@ -168,7 +178,7 @@ changeEnglishToGerman(list){
     var interessenIndex = interessenListeEnglisch.indexOf(list);
 
     if(reiseartenIndex > -1) return reisearten[reiseartenIndex];
-    if(eventIntervalIndex > -1) return eventInterval[eventIntervalIndex];
+    if(eventIntervalIndex > -1) return meetupInterval[eventIntervalIndex];
     if(eventArtIndex > -1) return eventArt[eventArtIndex];
     if(aufreiseIndex > -1) return aufreise[aufreiseIndex];
     if(standortBestimmungIndex > -1) return standortbestimmung[standortBestimmungIndex];
@@ -193,13 +203,20 @@ changeEnglishToGerman(list){
 openURL(url) async{
   if(url.contains("http")){
     url = Uri.parse(url);
+  }else if(isPhoneNumber(url)){
+    var tel = Uri(
+      scheme: 'tel',
+      path: url,
+    );
+    launchUrl(tel);
+    return;
   }else{
     url = Uri.https(url);
   }
 
   await launchUrl(
       url,
-      mode: LaunchMode.inAppWebView
+      mode: LaunchMode.externalApplication
   );
 }
 
@@ -214,4 +231,48 @@ bool isLink(String input) {
         r"(/([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#\.]?[\w-]+)*\/?/gm)");
 
   return matcher.hasMatch(input);
+}
+
+bool isPhoneNumber(String input){
+  input = input.replaceAll(" ", "");
+  final matcher = RegExp(r'^(?:[+0][1-9])?[0-9]{10,12}$');
+
+  return matcher.hasMatch(input);
+}
+
+String sanitizeString(String url) {
+  List urlSplit = url.split("/");
+  String title = urlSplit.last;
+
+  RegExp regex = RegExp(r'[\\/:*?"<>|]');
+  title = title.replaceAll(regex, '_');
+  title = title.replaceAll("'", '_');
+  urlSplit[urlSplit.length -1] = title;
+
+  return urlSplit.join("/");
+}
+
+changeImageSize(pickedImage) async {
+  var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
+  var originalWidth = imageByte.width;
+  var originalHeight = imageByte.height;
+  var minPixel = 400;
+  var newWidth = 0;
+  var newHeight = 0;
+
+  if (originalWidth > originalHeight) {
+    var factor = originalWidth / originalHeight;
+    newHeight = minPixel;
+    newWidth = (minPixel * factor).round();
+  } else {
+    var factor = originalHeight / originalWidth;
+    newWidth = minPixel;
+    newHeight = (minPixel * factor).round();
+  }
+
+  var imageResizeThumbnail =
+  image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
+  var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 25);
+
+  return imageJpgByte;
 }

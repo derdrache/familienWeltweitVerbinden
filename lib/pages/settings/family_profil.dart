@@ -103,6 +103,9 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   changeFamilyProfilStatus(active) async {
     FamiliesDatabase()
         .update("active = '$active'", "WHERE id = '${familyProfil["id"]}'");
+
+    var hiveFamilyProfil = getFamilyProfil(familyId: familyProfil["id"]);
+    hiveFamilyProfil["active"] =active;
   }
 
   createFamilyProfil() async {
@@ -333,7 +336,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
               height: 600,
-              title: AppLocalizations.of(context).mitgliedHinzufuegen,
+              title: AppLocalizations.of(context).member,
               children: allMemberName,
             );
           });

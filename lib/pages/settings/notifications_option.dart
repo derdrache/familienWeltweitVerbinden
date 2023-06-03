@@ -19,26 +19,36 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   var userId = FirebaseAuth.instance.currentUser.uid;
 
+
   allNotificationSetting() {
     return Row(
       children: [
         const SizedBox(width: 20),
         Text(
-            kIsWeb
-                ? AppLocalizations.of(context).emailErhalten
-                : AppLocalizations.of(context)
-                    .benachrichtigungenErhalten, //email erhalten
+            AppLocalizations.of(context).alleBenachrichtigungen,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
             value: ownProfil["notificationstatus"] == 1 ? true : false,
             onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
               setState(() {
-                ownProfil["notificationstatus"] = value == true ? 1 : 0;
+                ownProfil["notificationstatus"] = notificationOn;
+                ownProfil["chatNotificationOn"] = notificationOn;
+                ownProfil["eventNotificationOn"] = notificationOn;
+                ownProfil["newFriendNotificationOn"] = notificationOn;
+                ownProfil["familiesDistance"] = value ? 50 : 0;
+                ownProfil["travelPlanNotification"] = notificationOn;
               });
 
               ProfilDatabase().updateProfil(
-                  "notificationstatus = '${ownProfil["notificationstatus"]}'",
+                  "notificationstatus = '$notificationOn', "
+                      "chatNotificationOn = '$notificationOn', "
+                      "eventNotificationOn = '$notificationOn',"
+                      "newFriendNotificationOn = '$notificationOn',"
+                      "familiesDistance = ${value ? 50 : 0},"
+                      "travelPlanNotification = '$notificationOn'",
                   "WHERE id = '$userId'");
             })
       ],
@@ -50,19 +60,19 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            kIsWeb
-                ? AppLocalizations.of(context).chatEmailErhalten
-                : AppLocalizations.of(context).chatNotificationErhalten,
+            AppLocalizations.of(context).chatNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
             value: ownProfil["chatNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
               setState(() {
-                ownProfil["chatNotificationOn"] = value == true ? 1 : 0;
+                ownProfil["chatNotificationOn"] = notificationOn;
               });
-              ProfilDatabase().updateProfil("chatNotificationOn = '$value'",
-                  "WHERE id = '${ownProfil["chatNotificationOn"]}'");
+              ProfilDatabase().updateProfil("chatNotificationOn = '$notificationOn'",
+                  "WHERE id = '${ownProfil["id"]}'");
             })
       ],
     );
@@ -73,19 +83,19 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            kIsWeb
-                ? AppLocalizations.of(context).eventEmailErhalten
-                : AppLocalizations.of(context).eventNotificationErhalten,
+            AppLocalizations.of(context).meetupNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
             value: ownProfil["eventNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
               setState(() {
-                ownProfil["eventNotificationOn"] = value == true ? 1 : 0;
+                ownProfil["eventNotificationOn"] = notificationOn;
               });
-              ProfilDatabase().updateProfil("eventNotificationOn = '$value'",
-                  "WHERE id = '${ownProfil["eventNotificationOn"]}'");
+              ProfilDatabase().updateProfil("eventNotificationOn = '$notificationOn'",
+                  "WHERE id = '${ownProfil["id"]}'");
             })
       ],
     );
@@ -96,21 +106,100 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            kIsWeb
-                ? AppLocalizations.of(context).friendEmailErhalten
-                : AppLocalizations.of(context).friendNotificationErhalten,
+            AppLocalizations.of(context).friendNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
             value: ownProfil["newFriendNotificationOn"] == 1 ? true : false,
             onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
               setState(() {
-                ownProfil["newFriendNotificationOn"] =
-                    value == true ? 1 : 0;
+                ownProfil["newFriendNotificationOn"] = notificationOn;
               });
               ProfilDatabase().updateProfil(
-                  "newFriendNotificationOn = '$value'",
-                  "WHERE id = '${ownProfil["newFriendNotificationOn"]}'");
+                  "newFriendNotificationOn = '$notificationOn'",
+                  "WHERE id = '${ownProfil["id"]}'");
+            })
+      ],
+    );
+  }
+
+  familieInRangeNotificationSetting(){
+    double distance = ownProfil["familiesDistance"].toDouble() ?? 50.0;
+    bool familieInRangeNotificationOn = distance > 0;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const SizedBox(width: 20),
+            Text(
+                AppLocalizations.of(context).familieInRangeNotification,
+                style: const TextStyle(fontSize: 20)),
+            const Expanded(child: SizedBox(width: 20)),
+            Switch(
+                value: familieInRangeNotificationOn,
+                onChanged: (value) {
+                  var distance = value ? 50 : 0;
+
+                  setState(() {
+                    ownProfil["familiesDistance"] = distance;
+                  });
+
+                  ProfilDatabase().updateProfil(
+                      "familiesDistance = $distance",
+                      "WHERE id = '$userId'"
+                  );
+                }
+            )
+          ],
+        ),
+        if(familieInRangeNotificationOn) Text(
+            "${distance.round()} km ${AppLocalizations.of(context).umkreis}"
+        ),
+        if(familieInRangeNotificationOn) Slider(
+          value: distance,
+          min: 5,
+          max: 200,
+          divisions: 100,
+          label: '${distance.round()} km',
+          onChanged: (newDistance){
+            setState(() {
+              distance = newDistance;
+              ownProfil["familiesDistance"] = newDistance;
+            });
+          },
+          onChangeEnd: (newDistance){
+            ProfilDatabase().updateProfil(
+                "familiesDistance = $newDistance",
+                "WHERE id = '$userId'"
+            );
+          },
+        )
+      ],
+    );
+  }
+
+  friendsTravelPlanNotificationSetting(){
+    return Row(
+      children: [
+        const SizedBox(width: 20),
+        Text(
+            AppLocalizations.of(context).reiseplanungNotification,
+            style: const TextStyle(fontSize: 20)),
+        const Expanded(child: SizedBox(width: 20)),
+        Switch(
+            value: ownProfil["travelPlanNotification"] == 1 ? true : false,
+            onChanged: (value) {
+              var notificationOn = value == true ? 1 : 0;
+
+              setState(() {
+                ownProfil["travelPlanNotification"] = notificationOn;
+              });
+              ProfilDatabase().updateProfil(
+                  "travelPlanNotification = '$notificationOn'",
+                  "WHERE id = '${ownProfil["id"]}'");
             })
       ],
     );
@@ -118,6 +207,8 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool notificationsAllowed = ownProfil["notificationstatus"] == 1;
+
     return Scaffold(
       appBar:
           CustomAppBar(
@@ -129,12 +220,11 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
             height: 20,
           ),
           allNotificationSetting(),
-          if (ownProfil["notificationstatus"] == 1)
-            chatNotificationSetting(),
-          if (ownProfil["notificationstatus"] == 1)
-            eventNotificationSetting(),
-          if (ownProfil["notificationstatus"] == 1)
-            newFriendNotificationSetting(),
+          if (notificationsAllowed) chatNotificationSetting(),
+          if (notificationsAllowed) eventNotificationSetting(),
+          if (notificationsAllowed) newFriendNotificationSetting(),
+          if (notificationsAllowed) familieInRangeNotificationSetting(),
+          if (notificationsAllowed) friendsTravelPlanNotificationSetting(),
         ],
       ),
     );

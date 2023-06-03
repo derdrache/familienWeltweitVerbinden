@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/informationen/events/event_card_details.dart';
+import 'package:familien_suche/pages/informationen/meetups/meetup_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +10,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
 
+import '../../../functions/is_user_inactive.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../../../widgets/custom_appbar.dart';
@@ -19,6 +18,7 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import '../../start_page.dart';
+import 'weltkarte_mini.dart';
 
 class LocationInformationPage extends StatefulWidget {
   var ortName;
@@ -44,6 +44,8 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
   @override
   void initState() {
     location = getCityFromHive(cityName: widget.ortName);
+    if (location == null) Navigator.pop(context);
+
     location["familien"].remove(userId);
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
     isCity = location["isCity"] == 1;
@@ -53,11 +55,19 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         usersCityInformation: usersCityInformation,
         fromCityPage: widget.fromCityPage,
       ),
-      InsiderInformationPage(location: location, usersCityInformation: usersCityInformation),
-      CountryCitiesPage(countryName: widget.ortName),
+      InsiderInformationPage(location: location),
     ];
+    addLastTab();
 
     super.initState();
+  }
+
+  addLastTab() {
+    if (isCity) {
+      tabPages.add(WorldmapMini(location: location));
+    } else {
+      tabPages.add(CountryCitiesPage(countryName: widget.ortName));
+    }
   }
 
   changeIntereset() {
@@ -88,7 +98,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    hasInterest = location["interesse"].contains(userId);
+    hasInterest = location["interesse"]?.contains(userId) ?? false;
 
     return SelectionArea(
         child: Scaffold(
@@ -102,10 +112,16 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
           IconButton(
             icon: const Icon(Icons.link),
             onPressed: () async {
-              Clipboard.setData(ClipboardData(
-                  text: "</cityId=" + location["id"].toString()));
-
-              customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
+              Clipboard.setData(
+                  ClipboardData(text: "</cityId=" + location["id"].toString()));
+              customSnackbar(
+                  context, AppLocalizations.of(context).linkWurdekopiert,
+                  color: Colors.green);
+              global_func.changePageForever(
+                  context,
+                  StartPage(
+                    selectedIndex: 3,
+                  ));
             },
           ),
           IconButton(
@@ -133,6 +149,11 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
             icon: const Icon(Icons.tips_and_updates),
             label: AppLocalizations.of(context).insiderInformation,
           ),
+          if (isCity)
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.map),
+              label: AppLocalizations.of(context).karte,
+            ),
           if (!isCity)
             BottomNavigationBarItem(
               icon: const Icon(Icons.location_city),
@@ -149,7 +170,11 @@ class GeneralInformationPage extends StatefulWidget {
   List usersCityInformation;
   bool fromCityPage;
 
-  GeneralInformationPage({Key key, this.location, this.usersCityInformation, this.fromCityPage = false})
+  GeneralInformationPage(
+      {Key key,
+      this.location,
+      this.usersCityInformation,
+      this.fromCityPage = false})
       : super(key: key);
 
   @override
@@ -171,34 +196,44 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     super.initState();
   }
 
-  removeInactiveFamilies(familyList){
+  removeInactiveFamilies(familyList) {
     List allActiveProfils = List.of(getAllActiveProfilsHive());
     List activeFamilies = [];
 
-
-    for(var profil in allActiveProfils){
-      if(familyList.contains(profil["id"])) activeFamilies.add(profil["id"]);
+    for (var profil in allActiveProfils) {
+      if (familyList.contains(profil["id"])) activeFamilies.add(profil["id"]);
     }
 
     return activeFamilies;
   }
 
   showFamilyVisitWindow(list) {
-    list = removeInactiveFamilies(list);
     List<Widget> familiesList = [];
 
     for (var family in list) {
-      var profil = getProfilFromHive(profilId: family, onlyActive: true);
+      print(family);
+      var profil = getProfilFromHive(profilId: family);
+      var isInactive = isUserInactive(profil);
 
       if (profil == null) continue;
+
       familiesList.add(InkWell(
         onTap: () =>
             global_func.changePage(context, ShowProfilPage(profil: profil)),
         child: Container(
             padding: const EdgeInsets.all(10),
-            child: Text(
-              profil["name"],
-              style: const TextStyle(fontSize: 20),
+            child: Row(
+              children: [
+                Text(
+                  profil["name"],
+                  style: const TextStyle(fontSize: 20),
+                ),
+                if (isInactive)
+                  Text(
+                    " - ${AppLocalizations.of(context).inaktiv}",
+                    style: TextStyle(color: Colors.red),
+                  )
+              ],
             )),
       ));
     }
@@ -227,10 +262,17 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     var allProfils = getAllActiveProfilsHive();
 
     for (var profil in allProfils) {
-      var inLocation = profil["ort"].isNotEmpty && widget.location["ort"].contains(profil["ort"]);
-      var inCountry = profil["ort"].isNotEmpty && widget.location["ort"].contains(profil["land"]);
+      if (profil["ort"].isEmpty) continue;
 
-      if (inLocation || inCountry) {
+      bool inLocation;
+
+      if (isCity) {
+        inLocation = widget.location["ort"].contains(profil["ort"]) ?? false;
+      } else {
+        inLocation = widget.location["ort"].contains(profil["land"]) ?? false;
+      }
+
+      if (inLocation) {
         familiesThere.add(profil["id"]);
         familiesOnLocation += 1;
       }
@@ -241,7 +283,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
   createNewChatGroup(lcationId) async {
     String locationId = lcationId.toString();
-    var chatGroup = getChatGroupFromHive(locationId.toString());
+    var chatGroup = getChatGroupFromHive(connectedWith: locationId.toString());
     if (chatGroup != null) return;
 
     var checkChatGroup = await ChatGroupsDatabase()
@@ -249,7 +291,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     if (checkChatGroup != false) return;
 
     var newChatId =
-    await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$locationId");
+        await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$locationId");
     var hiveChatGroups = Hive.box('secureBox').get("chatGroups");
     hiveChatGroups.add({
       "id": newChatId,
@@ -264,13 +306,75 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   Widget build(BuildContext context) {
     double iconSize = 28;
     double fontSize = 18;
+    var anzahlFamilien = widget.location["familien"]?.length ?? 0;
 
-    allgemeineInfoBox() {
+    _showCurrentlyThere() {
       var familiesOnLocation = getFamiliesThere();
-      String internetSpeedText = widget.location["internet"] == null
-          ? "?"
-          : widget.location["internet"].toString();
 
+      return InkWell(
+        onTap: () => showFamilyVisitWindow(familiesThere),
+        child: Container(
+          margin: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Icon(Icons.pin_drop, size: iconSize),
+              const SizedBox(width: 10),
+              Text(
+                  AppLocalizations.of(context).aktuellDort +
+                      familiesOnLocation.toString() +
+                      AppLocalizations.of(context).familien,
+                  style: TextStyle(
+                      fontSize: fontSize,
+                      decoration: TextDecoration.underline)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    _showVisited() {
+      return InkWell(
+        onTap: () => showFamilyVisitWindow(widget.location["familien"]),
+        child: Container(
+          margin: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Icon(Icons.family_restroom, size: iconSize),
+              const SizedBox(width: 10),
+              Text(
+                  AppLocalizations.of(context).besuchtVon +
+                      anzahlFamilien.toString() +
+                      AppLocalizations.of(context).familien,
+                  style: TextStyle(
+                      fontSize: fontSize,
+                      decoration: TextDecoration.underline)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    _showInsiderCount() {
+      return Container(
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Icon(
+              Icons.tips_and_updates,
+              size: iconSize,
+            ),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).insiderInformation + ": ",
+                style: TextStyle(fontSize: fontSize)),
+            const SizedBox(width: 5),
+            Text(widget.usersCityInformation.length.toString(),
+                style: TextStyle(fontSize: fontSize))
+          ],
+        ),
+      );
+    }
+
+    _showCost() {
       setCostIconColor(indikator) {
         if (indikator <= 1) return Colors.green[800];
         if (indikator <= 2) return Colors.green;
@@ -279,6 +383,36 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
         return Colors.red;
       }
+
+      return Container(
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Icon(
+              Icons.monetization_on_outlined,
+              color: widget.location["kosten"] == null
+                  ? null
+                  : setCostIconColor(widget.location["kosten"]),
+              size: iconSize,
+            ),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).kosten,
+                style: TextStyle(fontSize: fontSize)),
+            const SizedBox(width: 5),
+            Text(
+                widget.location["kosten"] == null
+                    ? "?"
+                    : "\$ " * widget.location["kosten"],
+                style: TextStyle(fontSize: fontSize))
+          ],
+        ),
+      );
+    }
+
+    _showInternetSpeed() {
+      String internetSpeedText = widget.location["internet"] == null
+          ? "?"
+          : widget.location["internet"].toString();
 
       setInternetIconColor(indikator) {
         if (indikator <= 20) return Colors.red;
@@ -290,128 +424,52 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       }
 
       return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.all(10),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          InkWell(
-            onTap: () => showFamilyVisitWindow(familiesThere),
-            child: Container(
-              margin: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Icon(Icons.pin_drop, size: iconSize),
-                  const SizedBox(width: 10),
-                  Text(
-                      AppLocalizations.of(context).aktuellDort +
-                          familiesOnLocation.toString() +
-                          AppLocalizations.of(context).familien,
-                      style: TextStyle(fontSize: fontSize)),
-                ],
-              ),
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Icon(
+              Icons.network_check_outlined,
+              color: widget.location["internet"] == null
+                  ? null
+                  : setInternetIconColor(widget.location["internet"]),
+              size: iconSize,
             ),
-          ),
-          InkWell(
-            onTap: () => showFamilyVisitWindow(widget.location["familien"]),
-            child: Container(
-              margin: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Icon(Icons.family_restroom, size: iconSize),
-                  const SizedBox(width: 10),
-                  Text(
-                      AppLocalizations.of(context).besuchtVon +
-                          widget.location["familien"].length.toString() +
-                          AppLocalizations.of(context).familien,
-                      style: TextStyle(fontSize: fontSize)),
-                ],
-              ),
+            const SizedBox(width: 10),
+            Text("Internet: ", style: TextStyle(fontSize: fontSize)),
+            const SizedBox(width: 5),
+            Text(
+                widget.location["internet"] == null
+                    ? "?"
+                    : "Ø $internetSpeedText Mbps",
+                style: TextStyle(fontSize: fontSize))
+          ],
+        ),
+      );
+    }
+
+    _showWeather() {
+      return Container(
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            Icon(
+              Icons.thermostat,
+              size: iconSize,
             ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.tips_and_updates,
-                  size: iconSize,
-                ),
-                const SizedBox(width: 10),
-                Text(AppLocalizations.of(context).insiderInformation + ": ",
-                    style: TextStyle(fontSize: fontSize)),
-                const SizedBox(width: 5),
-                Text(widget.usersCityInformation.length.toString(),
-                    style: TextStyle(fontSize: fontSize))
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.monetization_on_outlined,
-                  color: widget.location["kosten"] == null
-                      ? null
-                      : setCostIconColor(widget.location["kosten"]),
-                  size: iconSize,
-                ),
-                const SizedBox(width: 10),
-                Text(AppLocalizations.of(context).kosten,
-                    style: TextStyle(fontSize: fontSize)),
-                const SizedBox(width: 5),
-                Text(
-                    widget.location["kosten"] == null
-                        ? "?"
-                        : "\$ " * widget.location["kosten"],
-                    style: TextStyle(fontSize: fontSize))
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.network_check_outlined,
-                  color: widget.location["internet"] == null
-                      ? null
-                      : setInternetIconColor(widget.location["internet"]),
-                  size: iconSize,
-                ),
-                const SizedBox(width: 10),
-                Text("Internet: ", style: TextStyle(fontSize: fontSize)),
-                const SizedBox(width: 5),
-                Text(
-                    widget.location["internet"] == null
-                        ? "?"
-                        : "Ø $internetSpeedText Mbps",
-                    style: TextStyle(fontSize: fontSize))
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.thermostat,
-                  size: iconSize,
-                ),
-                const SizedBox(width: 10),
-                Text(AppLocalizations.of(context).wetter,
-                    style: TextStyle(fontSize: fontSize)),
-                if (widget.location["wetter"] != null)
-                  Flexible(
-                      child: InkWell(
-                          onTap: () => global_func.openURL(widget.location["wetter"]),
-                          child: Text(widget.location["wetter"],
-                              style: TextStyle(
-                                  color: Colors.blue, fontSize: fontSize),
-                              overflow: TextOverflow.ellipsis)))
-              ],
-            ),
-          ),
-        ]),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).wetter,
+                style: TextStyle(fontSize: fontSize)),
+            if (widget.location["wetter"] != null)
+              Flexible(
+                  child: InkWell(
+                      onTap: () =>
+                          global_func.openURL(widget.location["wetter"]),
+                      child: Text(widget.location["wetter"],
+                          style:
+                              TextStyle(color: Colors.blue, fontSize: fontSize),
+                          overflow: TextOverflow.ellipsis)))
+          ],
+        ),
       );
     }
 
@@ -420,7 +478,20 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
         child: Scaffold(
           body: Column(
             children: [
-              allgemeineInfoBox(),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.all(10),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _showCurrentlyThere(),
+                      _showVisited(),
+                      _showInsiderCount(),
+                      _showCost(),
+                      _showInternetSpeed(),
+                      _showWeather(),
+                    ]),
+              ),
             ],
           ),
           floatingActionButton: FloatingActionButton(
@@ -431,7 +502,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   context,
                   ChatDetailsPage(
                     isChatgroup: true,
-                    connectedId: "</stadt=${widget.location["id"]}",
+                    connectedWith: "</stadt=${widget.location["id"]}",
                   ));
             },
             child: const Icon(Icons.message),
@@ -444,9 +515,8 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
 class InsiderInformationPage extends StatefulWidget {
   Map location;
-  List usersCityInformation;
 
-  InsiderInformationPage({Key key, this.location, this.usersCityInformation}) : super(key: key);
+  InsiderInformationPage({Key key, this.location}) : super(key: key);
 
   @override
   State<InsiderInformationPage> createState() => _InsiderInformationPageState();
@@ -455,6 +525,7 @@ class InsiderInformationPage extends StatefulWidget {
 class _InsiderInformationPageState extends State<InsiderInformationPage> {
   final String userId = FirebaseAuth.instance.currentUser.uid;
   final translator = GoogleTranslator();
+  List usersCityInformation;
 
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
@@ -478,12 +549,18 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                        child: Text(AppLocalizations.of(context).speichern, style: const TextStyle(fontSize: 20),),
+                        child: Text(
+                          AppLocalizations.of(context).speichern,
+                          style: const TextStyle(fontSize: 20),
+                        ),
                         onPressed: () => saveNewInformation(
                             title: titleTextKontroller.text,
                             inhalt: informationTextKontroller.text)),
                     TextButton(
-                      child: Text(AppLocalizations.of(context).abbrechen, style: const TextStyle(fontSize: 20),),
+                      child: Text(
+                        AppLocalizations.of(context).abbrechen,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -512,6 +589,25 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       return;
     }
 
+    var newUserInformation = {
+      "ort": widget.location["ort"],
+      "sprache": "auto",
+      "titleGer": title,
+      "informationGer": inhalt,
+      "titleEng": title,
+      "informationEng": inhalt,
+      "erstelltAm": nowFormatted,
+      "erstelltVon": userId,
+      "thumbUp": [],
+      "thumbDown": []
+    };
+
+    setState(() {
+      usersCityInformation.add(newUserInformation);
+    });
+
+    Navigator.pop(context);
+
     var languageCheck = await translator.translate(inhalt);
     var languageCode = languageCheck.sourceLanguage.code;
     if (languageCode == "auto") languageCode = "en";
@@ -538,75 +634,72 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       informationEng = informationTranslation.toString();
     }
 
-    var newUserInformation = {
-      "ort": widget.location["ort"],
-      "sprache": languageCode,
-      "titleGer": titleGer,
-      "informationGer": informationGer,
-      "titleEng": titleEng,
-      "informationEng": informationEng,
-      "erstelltAm": nowFormatted,
-      "thumbUp": [],
-      "thumbDown": []
-    };
-
-    StadtinfoUserDatabase().addNewInformation(newUserInformation);
+    newUserInformation["sprache"] = languageCode;
+    newUserInformation["titleGer"] = titleGer;
+    newUserInformation["informationGer"] = informationGer;
+    newUserInformation["titleEng"] = titleEng;
+    newUserInformation["informationEng"] = informationEng;
 
     var secureBox = Hive.box("secureBox");
     var allInformations = secureBox.get("stadtinfoUser");
     allInformations.add(newUserInformation);
     secureBox.put("stadtinfoUser", allInformations);
 
-    Navigator.pop(context);
+    newUserInformation["ort"] = newUserInformation["ort"].replaceAll("'", "''");
+    newUserInformation["titleGer"] =
+        newUserInformation["titleGer"].replaceAll("'", "''");
+    newUserInformation["informationGer"] =
+        newUserInformation["informationGer"].replaceAll("'", "''");
+    newUserInformation["titleEng"] =
+        newUserInformation["titleEng"].replaceAll("'", "''");
+    newUserInformation["informationEng"] =
+        newUserInformation["informationEng"].replaceAll("'", "''");
+
+    StadtinfoUserDatabase().addNewInformation(newUserInformation);
+  }
+
+  setThumbUp(index) {
+    var infoId = usersCityInformation[index]["id"];
+
+    if (usersCityInformation[index]["thumbUp"].contains(userId)) {
+      usersCityInformation[index]["thumbUp"].remove(userId);
+
+      StadtinfoUserDatabase().update(
+          "thumbUp = JSON_REMOVE(thumbUp, JSON_UNQUOTE(JSON_SEARCH(thumbUp, 'one', '$userId')))",
+          "WHERE id ='$infoId'");
+    } else {
+      usersCityInformation[index]["thumbUp"].add(userId);
+      usersCityInformation[index]["thumbDown"].remove(userId);
+
+      StadtinfoUserDatabase().update(
+          "thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId'))), thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')",
+          "WHERE id ='$infoId'");
+    }
+    setState(() {});
+  }
+
+  setThumbDown(index) {
+    var infoId = usersCityInformation[index]["id"];
+
+    if (usersCityInformation[index]["thumbDown"].contains(userId)) {
+      usersCityInformation[index]["thumbDown"].remove(userId);
+
+      StadtinfoUserDatabase().update(
+          "thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))",
+          "WHERE id ='$infoId'");
+    } else {
+      usersCityInformation[index]["thumbDown"].add(userId);
+      usersCityInformation[index]["thumbUp"].remove(userId);
+
+      StadtinfoUserDatabase().update(
+          "thumbUp = JSON_REMOVE(thumbUp, JSON_UNQUOTE(JSON_SEARCH(thumbUp, 'one', '$userId'))), thumbDown = JSON_ARRAY_APPEND(thumbDown, '\$', '$userId')",
+          "WHERE id ='$infoId'");
+    }
 
     setState(() {});
   }
 
-  setThumb(thumb, index) async {
-    var infoId = widget.usersCityInformation[index]["id"];
-
-    if (thumb == "up") {
-      if (widget.usersCityInformation[index]["thumbUp"].contains(userId)) return;
-
-      setState(() {
-        widget.usersCityInformation[index]["thumbUp"].add(userId);
-        widget.usersCityInformation[index]["thumbDown"].remove(userId);
-      });
-
-      var dbData = await StadtinfoUserDatabase()
-          .getData("thumbUp, thumbDown", "WHERE id ='$infoId'");
-      var dbThumbUpList = dbData["thumbUp"];
-      var dbThumbDownList = dbData["thumbDown"];
-
-      dbThumbUpList.add(userId);
-      dbThumbDownList.remove(userId);
-
-      await StadtinfoUserDatabase().update(
-          "thumbUp = '${jsonEncode(dbThumbUpList)}', thumbDown = '${jsonEncode(dbThumbDownList)}'",
-          "WHERE id ='$infoId'");
-    } else if (thumb == "down") {
-      if (widget.usersCityInformation[index]["thumbDown"].contains(userId)) return;
-
-      setState(() {
-        widget.usersCityInformation[index]["thumbDown"].add(userId);
-        widget.usersCityInformation[index]["thumbUp"].remove(userId);
-      });
-
-      var dbData = await StadtinfoUserDatabase()
-          .getData("thumbUp, thumbDown", "WHERE id ='$infoId'");
-      var dbThumbUpList = dbData["thumbUp"];
-      var dbThumbDownList = dbData["thumbDown"];
-
-      dbThumbDownList.add(userId);
-      dbThumbUpList.remove(userId);
-
-      await StadtinfoUserDatabase().update(
-          "thumbUp = '${jsonEncode(dbThumbUpList)}', thumbDown = '${jsonEncode(dbThumbDownList)}'",
-          "WHERE id ='$infoId'");
-    }
-  }
-
-  sortThumb(data) {
+  sortInformation(data) {
     data.sort((a, b) => (b["thumbUp"].length - b["thumbDown"].length)
         .compareTo(a["thumbUp"].length - a["thumbDown"].length) as int);
     return data;
@@ -640,7 +733,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                         TextButton(
                           child: Text(AppLocalizations.of(context).speichern),
                           onPressed: () => changeInformation(
-                              information: information,
+                              id: information["id"],
                               newTitle: titleTextKontroller.text,
                               newInformation: informationTextKontroller.text),
                         ),
@@ -655,8 +748,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             }));
   }
 
-  changeInformation({information, newTitle, newInformation}) async {
-    String titleGer, informationGer, titleEng, informationEng;
+  changeInformation({id, newTitle, newInformation}) async {
     newTitle = newTitle.trim();
     newInformation = newInformation.trim();
 
@@ -672,6 +764,29 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           AppLocalizations.of(context).beschreibungStadtinformationEingeben);
       return;
     }
+
+    for (var i = 0; i < usersCityInformation.length; i++) {
+      if (usersCityInformation[i]["id"] == id) {
+        usersCityInformation[i]["titleGer"] = newTitle;
+        usersCityInformation[i]["informationGer"] = newInformation;
+        usersCityInformation[i]["titleEng"] = newTitle;
+        usersCityInformation[i]["informationEng"] = newInformation;
+        break;
+      }
+    }
+
+    updateDatabase(id, newTitle, newInformation);
+
+    setState(() {});
+    Navigator.pop(context);
+  }
+
+  updateDatabase(
+    id,
+    newTitle,
+    newInformation,
+  ) async {
+    String titleGer, informationGer, titleEng, informationEng;
 
     var languageCheck = await translator.translate(newInformation);
     var languageCode = languageCheck.sourceLanguage.code;
@@ -703,7 +818,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     var allInformations = secureBox.get("stadtinfoUser");
 
     for (var i = 0; i < allInformations.length; i++) {
-      if (allInformations[i]["id"] == information["id"]) {
+      if (allInformations[i]["id"] == id) {
         allInformations[i]["sprache"] = languageCode;
         allInformations[i]["titleGer"] = titleGer;
         allInformations[i]["informationGer"] = informationGer;
@@ -712,27 +827,31 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         break;
       }
     }
-
     secureBox.put("stadtinfoUser", allInformations);
 
-    setState(() {});
-    Navigator.pop(context);
+    titleGer = titleGer.replaceAll("'", "''");
+    informationGer = informationGer.replaceAll("'", "''");
+    titleEng = titleEng.replaceAll("'", "''");
+    informationEng = informationEng.replaceAll("'", "''");
 
-    StadtinfoUserDatabase().update(
+    await StadtinfoUserDatabase().update(
         "sprache ='$languageCode',  "
             "titleGer = '$titleGer', "
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
             "informationEng = '$informationEng'",
-        "WHERE id ='${information["id"]}'");
+        "WHERE id ='$id'");
   }
 
-  copyInformationDialog(information){
-    var informationText = isGerman ? information["informationGer"]: information["informationGer"];
+  copyInformationDialog(information) {
+    var informationText = isGerman
+        ? information["informationGer"]
+        : information["informationGer"];
 
     Clipboard.setData(ClipboardData(text: informationText));
 
-    customSnackbar(context, AppLocalizations.of(context).informationKopiert, color: Colors.green);
+    customSnackbar(context, AppLocalizations.of(context).informationKopiert,
+        color: Colors.green);
   }
 
   deleteInformationDialog(information) async {
@@ -761,7 +880,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                       allInformations.remove(information);
                       secureBox.put("stadtinfoUser", allInformations);
 
-                      setState(() {});
+                      setState(() {
+                        usersCityInformation.remove(information);
+                      });
 
                       Navigator.pop(context);
                     },
@@ -862,11 +983,20 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   }
 
   @override
+  void initState() {
+    usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    usersCityInformation = sortInformation(usersCityInformation);
+
     openInformationMenu(positionDetails, information) async {
       double left = positionDetails.globalPosition.dx;
       double top = positionDetails.globalPosition.dy;
       bool canChange = information["erstelltVon"] == userId;
+      usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
 
       await showMenu(
           context: context,
@@ -960,7 +1090,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   IconButton(
-                      onPressed: () => setThumb("up", index),
+                      onPressed: () => setThumbUp(index),
                       icon: Icon(
                         Icons.thumb_up,
                         color: information["thumbUp"].contains(userId)
@@ -972,7 +1102,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                       .toString()),
                   IconButton(
                       //padding: EdgeInsets.all(5),
-                      onPressed: () => setThumb("down", index),
+                      onPressed: () => setThumbDown(index),
                       icon: Icon(Icons.thumb_down,
                           color: information["thumbDown"].contains(userId)
                               ? Colors.red
@@ -1006,8 +1136,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     userInfoBox() {
       List<Widget> userCityInfo = [];
 
-      for (var i = 0; i < widget.usersCityInformation.length; i++) {
-        userCityInfo.add(insiderInfoBox(widget.usersCityInformation[i], i));
+      for (var i = 0; i < usersCityInformation.length; i++) {
+        userCityInfo.add(insiderInfoBox(usersCityInformation[i], i));
       }
 
       if (userCityInfo.isEmpty) {

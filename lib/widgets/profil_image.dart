@@ -1,13 +1,12 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as image_pack;
 
+import '../functions/upload_and_save_image.dart';
 import '../global/custom_widgets.dart';
+import '../global/global_functions.dart';
 import '../services/database.dart';
 import 'dialogWindow.dart';
 
@@ -45,6 +44,8 @@ class _ProfilImageState extends State<ProfilImage> {
       deleteOldImage(widget.profil["bild"][0]);
     }
 
+    newLink[0] = sanitizeString(newLink[0]);
+
     setState(() {
       widget.profil["bild"] = newLink;
     });
@@ -55,50 +56,6 @@ class _ProfilImageState extends State<ProfilImage> {
 
   deleteOldImage(oldLink) {
     DbDeleteImage(oldLink);
-  }
-
-  pickAndUploadImage() async {
-    var userName = FirebaseAuth.instance.currentUser.displayName;
-    var pickedImage = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 50);
-
-    var imageName = userName + pickedImage.name;
-
-    if (pickedImage == null) {
-      customSnackbar(context, "Datei ist beschädigt");
-      return false;
-    }
-
-    var imageByte = await changeImageSize(pickedImage);
-
-    await uploadImage(pickedImage.path, imageName, imageByte);
-
-    return imageName;
-  }
-
-  changeImageSize(pickedImage) async {
-    var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
-    var originalWidth = imageByte.width;
-    var originalHeight = imageByte.height;
-    var minPixel = 400;
-    var newWidth = 0;
-    var newHeight = 0;
-
-    if (originalWidth > originalHeight) {
-      var factor = originalWidth / originalHeight;
-      newHeight = minPixel;
-      newWidth = (minPixel * factor).round();
-    } else {
-      var factor = originalHeight / originalWidth;
-      newWidth = minPixel;
-      newHeight = (minPixel * factor).round();
-    }
-
-    var imageResizeThumbnail =
-        image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
-    var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 25);
-
-    return imageJpgByte;
   }
 
   deleteProfilImage() async {
@@ -162,12 +119,11 @@ class _ProfilImageState extends State<ProfilImage> {
           PopupMenuItem(
             child: Text(AppLocalizations.of(context).hochladen),
             onTap: () async {
-              var imageName = await pickAndUploadImage();
+              var newImage = await uploadAndSaveImage(context, "profil");
 
-              if (imageName == false) return;
-              profilImageLinkKontroller.text =
-                  "https://families-worldwide.com/bilder/" + imageName;
-              checkAndSaveImage();
+              setState(() {
+                widget.profil["bild"] = newImage;
+              });
             },
           ),
           if (widget.profil["bild"].isNotEmpty)
@@ -271,6 +227,7 @@ class OwnProfilImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var image = profil["bild"] is String ? profil["bild"] : profil["bild"][0];
+    bool isUrl = image.contains("http");
 
     showBigImage() {
       showDialog(
@@ -279,7 +236,7 @@ class OwnProfilImage extends StatelessWidget {
             return AlertDialog(
                 insetPadding: EdgeInsets.zero,
                 backgroundColor: Colors.transparent,
-                content: Image.network(image));
+                content: isUrl ? Image.network(image) : Image.asset(image));
           });
     }
 
@@ -289,7 +246,7 @@ class OwnProfilImage extends StatelessWidget {
           padding: EdgeInsets.zero,
           child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
-              child: image.contains("http")
+              child: isUrl
                   ? CachedNetworkImage(
                       width:55,
                       height: 55,

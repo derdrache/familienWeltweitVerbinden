@@ -86,7 +86,7 @@ Widget customFloatbuttonExtended(text, function){
   );
 }
 
-customSnackbar(context, text, {color = Colors.red, duration = const Duration(seconds: 5)}){
+customSnackbar(context, text, {color = Colors.red, duration = const Duration(seconds: 3)}){
   var snackbar = SnackBar(
         duration: duration,
           backgroundColor: color,
@@ -137,9 +137,8 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
     changeSelectToList(select){
       widget.selected = select;
-      widget.onConfirm();
+      if(select.isNotEmpty) widget.onConfirm();
     }
-
 
     return Container(
       width: webWidth,
@@ -159,7 +158,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
         chipDisplay: MultiSelectChipDisplay(
           onTap: (value){
             widget.selected.remove(value);
-            widget.onConfirm();
+            if(widget.selected.length > 1) widget.onConfirm();
             return widget.selected;
           },
         ),

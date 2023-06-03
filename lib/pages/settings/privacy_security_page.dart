@@ -134,33 +134,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     setExactLocationDropdown();
 
 
-    emailSettingContainer() {
-      return Container(
-        margin: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Text(
-              AppLocalizations.of(context).emailAlleSichtbar,
-              style: TextStyle(fontSize: fontsize),
-            ),
-            const Expanded(child: SizedBox(width: 20)),
-            Switch(
-                value: ownProfil["emailAnzeigen"] == 1 ? true : false,
-                inactiveThumbColor: Colors.grey[700],
-                activeColor: Theme.of(context).colorScheme.primary,
-                onChanged: (value) {
-                  setState(() {
-                    ownProfil["emailAnzeigen"] = value == true ? 1 : 0;
-                  });
-                  ProfilDatabase().updateProfil(
-                      "emailAnzeigen = '${ownProfil["emailAnzeigen"]}'",
-                      "WHERE id = '$userId'");
-                })
-          ],
-        ),
-      );
-    }
-
     automaticLocationContainer() {
       return Container(
         margin: const EdgeInsets.all(10),
@@ -208,8 +181,32 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       );
     }
 
-    chooseProfilIdWindow(){
+    chooseProfilIdWindow() async{
+      String deleteId;
+      TextEditingController idController = TextEditingController();
 
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: "Accountid zum löschen eingeben",
+              height: 150,
+              children: [
+                Center(child: customTextInput("Account id eingeben", idController))
+              ],
+              actions: [
+                TextButton(
+                  child: const Text("Ok"),
+                  onPressed: () {
+                    deleteId = idController.text;
+                    Navigator.pop(context);
+                  }
+                ),
+              ],
+            );
+          });
+
+      return deleteId;
     }
 
     deleteProfilWindow() {
@@ -228,21 +225,14 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
               actions: [
                 TextButton(
                   child: const Text("Ok"),
-                  onPressed: () {
+                  onPressed: () async{
                     var deleteProfil = ownProfil;
 
-                    if(userId == mainAdmin){
-                      var choosenProfilId = chooseProfilIdWindow();
-                      deleteProfil = getProfilFromHive(profilId: choosenProfilId);
-                    }
-
-                    print(deleteProfil["id"]);
-                    return;
                     ProfilDatabase().deleteProfil(deleteProfil["id"]);
                     DbDeleteImage(deleteProfil["bild"]);
+
                     setState(() {});
-                    global_functions.changePageForever(
-                        context, LoginPage());
+                    global_functions.changePageForever(context, LoginPage());
                   },
                 ),
                 TextButton(
@@ -258,7 +248,16 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       return FloatingActionButton.extended(
           backgroundColor: Colors.red,
           label: Text(AppLocalizations.of(context).accountLoeschen),
-          onPressed: () => deleteProfilWindow());
+          onPressed: () async {
+            if(userId == mainAdmin){
+              String choosenProfilId = await chooseProfilIdWindow();
+              ProfilDatabase().deleteProfil(choosenProfilId);
+              Map deleteProfil = getProfilFromHive(profilId: choosenProfilId);
+              DbDeleteImage(deleteProfil["bild"]);
+            }else{
+              deleteProfilWindow();
+            }
+          });
     }
 
     return Scaffold(
@@ -267,7 +266,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
       body: SafeArea(
         child: Column(
           children: [
-            emailSettingContainer(),
             automaticLocationContainer(),
             exactLocationBox(),
             reiseplanungBox(),

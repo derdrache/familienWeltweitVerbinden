@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../global/style.dart';
 import '../informationen/community/community_page.dart';
-import '../informationen/events/event_page.dart';
+import '../informationen/meetups/meetup_page.dart';
 import 'location/location_page.dart';
+import '../../services/database.dart';
 
 class InformationPage extends StatefulWidget {
   var pageSelection;
@@ -14,10 +16,10 @@ class InformationPage extends StatefulWidget {
   State<InformationPage> createState() => _InformationPageState();
 }
 
-class _InformationPageState extends State<InformationPage> {
+class _InformationPageState extends State<InformationPage> with WidgetsBindingObserver{
   var pageList = [
     "",
-    const EventPage(),
+    const MeetupPage(),
     const CommunityPage(),
     LocationPage(forCity: true,),
     LocationPage(forLand: true,)
@@ -25,10 +27,15 @@ class _InformationPageState extends State<InformationPage> {
 
   getNumberEventNotification(){
     var eventNotification = 0;
-    var myEvents = Hive.box('secureBox').get("myEvents") ?? [];
+    var myMeetups = Hive.box('secureBox').get("myEvents") ?? [];
 
-    for (var event in myEvents) {
-      eventNotification += event["freischalten"].length;
+    for (var meetup in myMeetups) {
+      bool isOwner = meetup["erstelltVon"] == userId;
+      bool isNotPublic = meetup["art"] != "public" && meetup["art"] != "öffentlich";
+
+      if(isOwner && isNotPublic){
+        eventNotification += meetup["freischalten"].length;
+      }
     }
 
     return eventNotification;
@@ -46,9 +53,40 @@ class _InformationPageState extends State<InformationPage> {
   }
 
   @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+      setState(() {});
+    }
+  }
+
+  _refreshData() async{
+    refreshHiveStadtInfo();
+    refreshHiveStadtInfoUser();
+    refreshHiveNewsPage();
+    refreshHiveChats();
+    refreshHiveMeetups();
+    refreshHiveProfils();
+    refreshHiveCommunities();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery. of(context). size. width;
+    double screenHeight = MediaQuery. of(context). size. height;
+    double handyScreenWidth = 400;
+    double cardAbstandWidth = screenWidth > handyScreenWidth ? screenWidth / 17.5 : 0;
 
     pageCards(title, icon, image, pageIndex) {
+      var h1FontSize = getResponsiveFontSize(context, "h1");
+
+
       return GestureDetector(
         onTap: () {
           setState(() {
@@ -56,8 +94,7 @@ class _InformationPageState extends State<InformationPage> {
           });
         },
         child: Container(
-          margin:
-          const EdgeInsets.only(left: 10, right: 10, top: 30, bottom: 30),
+          margin: EdgeInsets.only(left: 10, right: 10),
           child: Card(
             elevation: 25,
             shadowColor: Colors.black,
@@ -65,24 +102,22 @@ class _InformationPageState extends State<InformationPage> {
               borderRadius: BorderRadius.circular(15.0),
             ),
             child: Container(
-                width: 160,
-                height: 220,
+                width: (screenWidth / 2) -40,
+                height: (screenHeight / 3.5),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
                     image: image == null ? null : DecorationImage(
-                        fit: BoxFit.fitHeight,
+                        fit: BoxFit.fill,
                         colorFilter: ColorFilter.mode(
                             Colors.black.withOpacity(0.9), BlendMode.dstATop),
                         image: AssetImage(image))),
+                constraints: BoxConstraints(
+                  maxWidth: screenHeight / 2.5
+                ),
                 padding: const EdgeInsets.all(5),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      icon,
-                      color: Colors.black,
-                      size: 50,
-                    ),
                     const SizedBox(height: 50),
                     Container(
                       padding: const EdgeInsets.all(10),
@@ -92,8 +127,8 @@ class _InformationPageState extends State<InformationPage> {
                       ),
                       child: Text(
                         title,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: h1FontSize, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -104,15 +139,15 @@ class _InformationPageState extends State<InformationPage> {
     }
 
     badgeCard(card, number){
-      return Stack(children: [
+      return Stack(clipBehavior: Clip.none, children: [
         card,
-        if(number != 0) Positioned(top: 15, right: 0,child: Container(
+        if(number != 0) Positioned(top: -15, right: 0,child: Container(
           width: 40, height: 40,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
             color: Theme.of(context).colorScheme.secondary,
           ),
-          child: Center(child: Text(number.toString(), style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.white),)),
+          child: Center(child: Text(number.toString(), style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.white),)),
         ))
       ],);
     }
@@ -123,17 +158,19 @@ class _InformationPageState extends State<InformationPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 badgeCard(
                   pageCards(
-                      "Events",
+                      "Meetups",
                       Icons.calendar_month,
                       "assets/bilder/museum.jpg",
                       1),
                     getNumberEventNotification()
                 ),
+                SizedBox(width: cardAbstandWidth),
                 badgeCard(
                   pageCards(
                       "Communities",
@@ -144,6 +181,7 @@ class _InformationPageState extends State<InformationPage> {
                 )
               ],
             ),
+            const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -152,13 +190,15 @@ class _InformationPageState extends State<InformationPage> {
                     Icons.location_city,
                     "assets/bilder/city.jpg",
                     3),
+                SizedBox(width: cardAbstandWidth),
                 pageCards(
                     AppLocalizations.of(context).countries,
                     Icons.flag,
                     "assets/bilder/land.jpg",
                     4),
               ],
-            )
+            ),
+            const SizedBox(height: 30),
           ],
         ),
       ),

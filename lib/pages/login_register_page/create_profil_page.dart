@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
 
+import 'package:familien_suche/global/encryption.dart';
+import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +11,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../services/notification.dart' as notifications;
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/global_functions.dart';
-import '../../services/notification.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_variablen;
@@ -61,7 +63,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             ? global_variablen.interessenListe
             : global_variablen.interessenListeEnglisch);
 
-    refreshHiveEvents();
+    refreshHiveMeetups();
 
     super.initState();
   }
@@ -77,6 +79,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   saveFunction() async {
+
     changeLoading();
 
     if (!_formKey.currentState.validate()) {
@@ -111,7 +114,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
       var data = {
         "id": userID,
-        "email": email,
+        "email": encrypt(email),
         "name": userName,
         "ort": ortMapData["city"],
         "interessen": interessenAuswahlBox.getSelected(),
@@ -135,6 +138,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       });
       await refreshHiveNewsPage();
 
+      notifications.prepareNewLocationNotification();
+
       global_functions.changePageForever(context, StartPage());
 
       additionalDatabaseOperations(ortMapData, userID);
@@ -156,10 +161,10 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             })}')",
         "WHERE id = '1'");
     List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-    myGroupChats.add(getChatGroupFromHive(""));
+    myGroupChats.add(getChatGroupFromHive(chatId: "1"));
 
     await refreshHiveChats();
-    await refreshHiveEvents();
+    await refreshHiveMeetups();
   }
 
   childrenInputValidation() {
@@ -174,42 +179,38 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   checkAllValidation(userExist, userName) {
-    bool noError = true;
+    bool hasError = false;
     String errorString =
         AppLocalizations.of(context).bitteEingabeKorrigieren + "\n";
 
     if (userExist) {
       errorString +=
           "- " + AppLocalizations.of(context).usernameInVerwendung + "\n";
-    }
-    if (reiseArtenAuswahlBox.getSelected().isEmpty) {
+    }else if (reiseArtenAuswahlBox.getSelected().isEmpty) {
       errorString +=
           "- " + AppLocalizations.of(context).reiseartAuswaehlen + "\n";
-    }
-    if (interessenAuswahlBox.getSelected().isEmpty) {
-      errorString +=
-          "- " + AppLocalizations.of(context).interessenAuswaehlen + "\n";
-    }
-    if (sprachenAuswahlBox.getSelected().isEmpty) {
+    } else if (sprachenAuswahlBox.getSelected().isEmpty) {
       errorString +=
           "- " + AppLocalizations.of(context).spracheAuswaehlen + "\n";
-    }
-    if (childrenAgePickerBox.getDates().length == 0 ||
+    } else if (interessenAuswahlBox.getSelected().isEmpty) {
+      errorString +=
+          "- " + AppLocalizations.of(context).interessenAuswaehlen + "\n";
+    }else if (childrenAgePickerBox.getDates().length == 0 ||
         !childrenInputValidation()) {
       errorString +=
           "- " + AppLocalizations.of(context).geburtsdatumEingeben + "\n";
-    }
-    if (userName.length > 40) {
+    }else if (userName.length > 40) {
       errorString += "- " + AppLocalizations.of(context).usernameZuLang;
     }
 
+
     if (errorString.length > 29) {
-      noError = false;
+      hasError = true;
 
       customSnackbar(context, errorString);
     }
 
-    return noError;
+    return !hasError;
   }
 
   @override
@@ -223,79 +224,69 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
     ortAuswahlBox.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
 
-    pageTitle() {
-      return Align(
-        child: SizedBox(
-          height: 60,
-          width: 600,
-          child: Row(children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back, size: 35),
-              onPressed: () {
-                changePage(context, LoginPage());
-              },
-            ),
-            const Expanded(child: SizedBox.shrink()),
-            Text(
-              AppLocalizations.of(context).profilErstellen,
-              style: const TextStyle(fontSize: 30),
-            ),
-            const Expanded(child: SizedBox.shrink()),
-            isLoading
-                ? const CircularProgressIndicator()
-                : TextButton(
-                    onPressed: saveFunction,
-                    child: const Icon(
-                      Icons.done,
-                      size: 30,
-                    ),
-                  )
-          ]),
-        ),
-      );
-    }
-
     return Scaffold(
-      body: Container(
-        margin: const EdgeInsets.only(top: 30),
-        child: Form(
-          key: _formKey,
-          child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            }),
-            child: ListView(
-              children: [
-                pageTitle(),
-                customTextInput(AppLocalizations.of(context).benutzername,
-                    userNameKontroller,
-                    validator: global_functions.checkValidatorEmpty(context)),
-                Align(
-                    child: Container(
-                        margin: const EdgeInsets.only(left: 5, right: 5),
-                        child: ortAuswahlBox)),
-                reiseArtenAuswahlBox,
-                sprachenAuswahlBox,
-                interessenAuswahlBox,
-                Align(
+      appBar: CustomAppBar(
+        title: AppLocalizations.of(context).profilErstellen,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, size: 35),
+          onPressed: () {
+            changePage(context, LoginPage());
+          },
+        ),
+        buttons: [
+          isLoading
+              ? const CircularProgressIndicator()
+              : IconButton(
+                  onPressed: () => saveFunction(),
+                  icon: const Icon(
+                    Icons.done,
+                    size: 30,
+                  ),
+                )
+        ],
+      ),
+      body: Form(
+        key: _formKey,
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+            PointerDeviceKind.touch,
+            PointerDeviceKind.mouse,
+          }),
+          child: ListView(
+            children: [
+              customTextInput(AppLocalizations.of(context).benutzername,
+                  userNameKontroller,
+                  validator: global_functions.checkValidatorEmpty(context)),
+              Align(
                   child: Container(
-                      width: 600,
-                      padding: const EdgeInsets.all(10),
-                      child: Text(
-                        AppLocalizations.of(context).anzahlUndAlterKinder,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      )),
-                ),
-                childrenAgePickerBox,
-                customTextInput(
-                    AppLocalizations.of(context).aboutusHintText +
-                        " *optional*",
-                    aboutusKontroller,
-                    moreLines: 4)
-              ],
-            ),
+                      margin: const EdgeInsets.only(left: 5, right: 5),
+                      child: ortAuswahlBox)),
+              reiseArtenAuswahlBox,
+              sprachenAuswahlBox,
+              interessenAuswahlBox,
+              Align(
+                child: Container(
+                    width: 600,
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      AppLocalizations.of(context).anzahlUndAlterKinder,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    )),
+              ),
+              childrenAgePickerBox,
+              customTextInput(
+                  AppLocalizations.of(context).aboutusHintText +
+                      " *optional*",
+                  aboutusKontroller,
+                  moreLines: 4),
+              Container(
+                margin:
+                    const EdgeInsets.only(top: 10, bottom: 5, right: 15, left: 15),
+                child: FloatingActionButton.extended(
+                    onPressed: () => saveFunction(), label: Text(AppLocalizations.of(context).profilErstellen)),
+              )
+            ],
           ),
         ),
       ),

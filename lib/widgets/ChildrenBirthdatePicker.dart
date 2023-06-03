@@ -1,27 +1,25 @@
-import 'package:familien_suche/widgets/year_picker.dart';
 import 'package:flutter/material.dart';
+import '../widgets/flexible_date_picker.dart';
 
 double sideSpace = 10;
 
 
 class CustomDatePicker extends StatefulWidget {
-  var pickedDate;
   var hintText;
   var deleteFunction;
   bool dateIsSelected;
+  var datePicker;
 
   getPickedDate(){
-    return pickedDate;
-  }
+    if(datePicker == null) return;
 
-  setDate(date){
-    pickedDate = date;
+    return datePicker.getDate();
   }
 
   CustomDatePicker({
     Key key,
     this.hintText,
-    this.pickedDate,
+    this.datePicker,
     this.deleteFunction,
     this.dateIsSelected = false
   }) : super(key: key);
@@ -34,65 +32,24 @@ class CustomDatePickerState extends State<CustomDatePicker> {
   double boxHeight = 50;
   double borderRounding = 5;
 
-  datePicker() async{
-    return showYearPicker(
-        context: context,
-        firstDate: DateTime(DateTime.now().year - 18, DateTime.now().month),
-        lastDate: DateTime(DateTime.now().year, DateTime.now().month),
-        initialDate: DateTime.now()
-    );
-  }
 
-  showDate(){
-    return () async{
-      widget.pickedDate = await datePicker();
-      var dateList = widget.pickedDate.toString().split(" ")[0].split("-");
-      String newHintText = dateList[0];
-
-      setState(() {
-        if(widget.pickedDate != null){
-          widget.hintText = newHintText;
-          widget.dateIsSelected = true;
-        }
-
-      });
-    };
-  }
+  @override
+  void initState() {
+    super.initState();
+  }            
 
   @override
   Widget build(BuildContext context) {
-
-    differentText(){
-      if (widget.dateIsSelected){
-        return Text(widget.hintText, style: const TextStyle(fontSize: 16, color: Colors.black));
-      } else{
-        return const Text("Year", style: TextStyle(fontSize: 13, color: Colors.grey));
-      }
-    }
-
-    return GestureDetector(
-      onTap: showDate(),
-      child: FractionallySizedBox(
-        widthFactor: 0.25,
-        child: Stack(
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            children: [
-              Container(
-                  height: boxHeight,
-                  margin: EdgeInsets.all(sideSpace),
-                  padding: EdgeInsets.only(left: sideSpace, right: sideSpace/2),
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 1),
-                      borderRadius: BorderRadius.all(Radius.circular(borderRounding))
-                  ),
-                  child: Row(
-                      children: [
-                        differentText(),
-                        const Expanded(child: SizedBox.shrink()),
-                      ]
-                  )
-              ),
-              widget.deleteFunction == null ? const SizedBox.shrink() : Positioned(
+    return FractionallySizedBox(
+      widthFactor: 0.25,
+      child: Stack(
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: widget.datePicker,
+          ),
+             widget.deleteFunction == null ? const SizedBox.shrink() : Positioned(
                 width: 20,
                 right: 1.0,
                 top: -5.0,
@@ -103,9 +60,8 @@ class CustomDatePickerState extends State<CustomDatePicker> {
                     backgroundColor: Colors.red,
                   ),
                 ),
-              ),
-            ]
-        ),
+              )  
+        ],
       ),
     );
 
@@ -156,7 +112,11 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
       childrensBirthDatePickerList.add(
           CustomDatePicker(
               hintText: birthDate.reversed.join("-"),
-              pickedDate: date,
+              datePicker: FlexibleDatePicker(
+                startYear: DateTime.now().year-18,
+                endYear: DateTime.now().year,
+                selectedDate: date,
+              ),
               dateIsSelected: true
           )
       );
@@ -239,7 +199,11 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
         newPicker.add(
             CustomDatePicker(
                 hintText: hintText.split(" ")[0].split("-")[0],
-                pickedDate: dates[i],
+                datePicker: FlexibleDatePicker(
+                  startYear: DateTime.now().year-18,
+                  endYear: DateTime.now().year,
+                  selectedDate: dates[i] == null ? null :DateTime.parse(dates[i]),
+                ),
                 dateIsSelected: dates[i] != null
             )
         );
@@ -247,7 +211,11 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
         newPicker.add(
             CustomDatePicker(
                 hintText: hintText.split(" ")[0].split("-")[0],
-                pickedDate: dates[i],
+                datePicker: FlexibleDatePicker(
+                  startYear: DateTime.now().year-18,
+                  endYear: DateTime.now().year,
+                  selectedDate: dates[i] == null ? null : DateTime.parse(dates[i]),
+                ),
                 deleteFunction: deleteFunction(),
                 dateIsSelected: dates[i] != null
             )

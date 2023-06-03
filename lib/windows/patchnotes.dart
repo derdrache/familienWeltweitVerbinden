@@ -56,6 +56,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch1100D),
                   _patch(patch194D),
                   _patch(patch193D),
                   _patch(patch192D),
@@ -87,6 +88,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch1100E),
                   _patch(patch194E),
                   _patch(patch193E),
                   _patch(patch192E),
@@ -131,8 +133,33 @@ var patchVorlage={
   ]
 };
 
+var patch1100E={
+  "title" : "1.10.0 - xx.06.2023",
+  "inhalt": [
+    "New news and notification - when a family has been added in your area",
+    "Support Chat has been added - accessible under Settings => App Information",
+    "Secret chat for communities",
+    "Your own private notes can be created for other families",
+    "Events has been renamed to Meetups",
+    "many improvements",
+    "many bug fixes"
+  ]
+};
+var patch1100D={
+  "title" : "1.10.0 - xx.06.2023",
+  "inhalt": [
+    "Neue News und Notification - Wenn eine Familie in deinem Umkreis hinzugekommen ist",
+    "Support Chat wurde eingebaut - Unter Settings => App Information erreichbar",
+    "Geheimer Chat für Gemeinschaften",
+    "Eigene private Notizen können für andere Familien angelegt werden",
+    "Events wurde in Meetups umbenannt",
+    "viele Verbesserungen",
+    "viele Fehlerbehebungen"
+  ]
+};
+
 var patch194E={
-  "title" : "1.9.3 - 22.01.2023",
+  "title" : "1.9.4 - 22.01.2023",
   "inhalt": [
     "Registration - White screen after registration process has been fixed",
     "Chat - New message display now disappears immediately after chat visit",

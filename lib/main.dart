@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/informationen/community/community_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:hive_flutter/hive_flutter.dart';
@@ -14,13 +15,29 @@ import 'firebase_options.dart';
 import 'pages/start_page.dart';
 import 'pages/show_profil.dart';
 import 'pages/chat/chat_details.dart';
-import 'pages/informationen/events/event_details.dart';
+import 'pages/informationen/meetups/meetup_details.dart';
 import 'pages/login_register_page/login_page.dart';
 import 'services/database.dart';
 import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 
+refreshData(messageTyp) async{
+  if (messageTyp == "chat") {
+    refreshHiveChats();
+  }else if (messageTyp == "event"){
+    refreshHiveMeetups();
+  }
+  else if (messageTyp == "newFriend") {
+    refreshHiveProfils();
+  }else if(messageTyp == "community"){
+    refreshHiveCommunities();
+  }
+}
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  var messageData = json.decode(message.data["info"]);
+  refreshData(messageData["typ"]);
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -58,13 +75,21 @@ refreshHiveData() async {
 
   await refreshHiveProfils();
   await refreshHiveChats();
-  await refreshHiveEvents();
+  await refreshHiveMeetups();
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  bool isPhone = getDeviceType() == "phone";
+
+  if(isPhone){
+    await SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  }else{
+    await SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown, DeviceOrientation.landscapeLeft,DeviceOrientation.landscapeRight]);
+  }
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -80,6 +105,11 @@ void main() async {
   refreshHiveData();
 
   runApp(MyApp());
+}
+
+String getDeviceType() {
+  final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+  return data.size.shortestSide < 550 ? 'phone' :'tablet';
 }
 
 class MyApp extends StatelessWidget {
@@ -104,14 +134,15 @@ class MyApp extends StatelessWidget {
   notificationLeadPage(notification) {
     if (notification["typ"] == "chat") {
       _changeToChat(notification["link"]);
+    }else if (notification["typ"] == "event"){
+      _changeToEvent(notification["link"]);
     }
-    if (notification["typ"] == "event") _changeToEvent(notification["link"]);
-    if (notification["typ"] == "newFriend") {
+    else if (notification["typ"] == "newFriend") {
       _changeToProfil(notification["link"]);
+    }else if(notification["typ"] == "community"){
+      _changeToCommunity(notification["link"]);
     }
   }
-
-
 
   _setFirebaseNotifications() {
     final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -132,7 +163,6 @@ class MyApp extends StatelessWidget {
     _notificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (payload) async {
       final Map<String, dynamic> payLoadMap = json.decode(payload);
-
       notificationLeadPage(payLoadMap);
     });
 
@@ -146,6 +176,8 @@ class MyApp extends StatelessWidget {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       if (message.data.isNotEmpty) {
         var messageData = json.decode(message.data["info"]);
+
+        refreshData(messageData["typ"]);
 
         if (messageData["typ"] == "chat") {
           var chatId = messageData["link"];
@@ -170,19 +202,17 @@ class MyApp extends StatelessWidget {
   }
 
   _changeToChat(chatId) async {
-    var groupChatData = getChatFromHive(chatId);
-
     navigatorKey.currentState?.push(MaterialPageRoute(
         builder: (_) => ChatDetailsPage(
-            groupChatData: groupChatData,
+            chatId: chatId.toString(),
         )));
   }
 
   _changeToEvent(eventId) async {
-    var eventData = getEventFromHive(eventId);
+    var eventData = getMeetupFromHive(eventId);
 
     navigatorKey.currentState?.push(
-        MaterialPageRoute(builder: (_) => EventDetailsPage(event: eventData)));
+        MaterialPageRoute(builder: (_) => MeetupDetailsPage(meetupData: eventData)));
   }
 
   _changeToProfil(profilId) async {
@@ -192,6 +222,13 @@ class MyApp extends StatelessWidget {
         builder: (_) => ShowProfilPage(
               profil: profilData,
             )));
+  }
+
+  _changeToCommunity(communityId) async{
+    var communityData = getCommunityFromHive(communityId);
+
+    navigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (_) => CommunityDetails(community: communityData,)));
   }
 
   @override

@@ -28,7 +28,7 @@ class ChatPage extends StatefulWidget {
   _ChatPageState createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   var userId = FirebaseAuth.instance.currentUser.uid;
   var searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
@@ -55,11 +55,29 @@ class _ChatPageState extends State<ChatPage> {
     checkNewMessageCounter();
     initilizeCreateChatData();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      refreshChatDataFromDb();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) async{
+      await refreshHiveChats();
+      setState(() {});
     });
 
     super.initState();
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+      setState(() {});
+    }
+  }
+
+  _refreshData() async{
+    await refreshHiveChats();
+    refreshHiveProfils();
+    refreshHiveNewsPage();
+    refreshHiveMeetups();
+    refreshHiveCommunities();
   }
 
   checkNewMessageCounter() async {
@@ -232,45 +250,44 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   deleteChat() async {
-    for (var choosenChatId in selectedChats) {
-      var chat = {};
+    for (var choosenChat in selectedChats) {
+      var selectedChatId = choosenChat["id"];
+      var isChatGroup = choosenChat["connected"] != null;
 
-      for (var myChat in myChats) {
-        if (myChat["id"] == choosenChatId) {
-          chat = myChat;
-        }
-      }
+      if(isChatGroup){
+        ChatGroupsDatabase().leaveChat(choosenChat["connected"]);
+      }else{
+        var chatUsers = choosenChat["users"];
 
-      var chatUsers = chat["users"];
-
-      if (chatUsers.length <= 1 || bothDelete) {
-        for (var myChat in myChats) {
-          if (myChat["id"] == choosenChatId) {
-            myChat["users"] = {};
-            myChat["id"] = "";
+        if (chatUsers.length <= 1 || bothDelete) {
+          for (var myChat in myChats) {
+            if (myChat["id"] == selectedChatId) {
+              myChat["users"] = {};
+              myChat["id"] = "";
+            }
           }
-        }
 
-        ChatDatabase().deleteChat(choosenChatId);
-        ChatDatabase().deleteAllMessages(choosenChatId);
-      } else {
-        var newChatUsersData = {};
+          ChatDatabase().deleteChat(selectedChatId);
+          ChatDatabase().deleteAllMessages(selectedChatId);
+        } else {
+          var newChatUsersData = {};
 
-        chatUsers.forEach((key, value) {
-          if (key != userId) {
-            newChatUsersData = {key: value};
+          chatUsers.forEach((key, value) {
+            if (key != userId) {
+              newChatUsersData = {key: value};
+            }
+          });
+
+          for (var myChat in myChats) {
+            if (myChat["id"] == selectedChatId) {
+              myChat["users"] = newChatUsersData;
+            }
           }
-        });
 
-        for (var myChat in myChats) {
-          if (myChat["id"] == choosenChatId) {
-            myChat["users"] = newChatUsersData;
-          }
+          ChatDatabase().updateChatGroup(
+              "users = '${json.encode(newChatUsersData)}'",
+              "WHERE id ='$selectedChatId'");
         }
-
-        ChatDatabase().updateChatGroup(
-            "users = '${json.encode(newChatUsersData)}'",
-            "WHERE id ='$choosenChatId'");
       }
     }
 
@@ -280,15 +297,21 @@ class _ChatPageState extends State<ChatPage> {
   deleteChatDialog(chatgroupData) {
     var countSelected = selectedChats.length;
     var chatPartnerName = "";
+    bool isChatGroup;
 
     if (countSelected == 1) {
-      var chatId = selectedChats[0];
-      var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
+      var selectedChatData = selectedChats[0];
+      isChatGroup = selectedChatData["connected"] != null;
 
-      for (var profil in dbProfilData) {
-        if (profil["id"] == chatPartnerId) {
-          chatPartnerName = profil["name"];
-          break;
+      if(!isChatGroup){
+        var chatId = selectedChats[0]["id"];
+        var chatPartnerId = chatId.replaceAll(userId, "").replaceAll("_", "");
+
+        for (var profil in dbProfilData) {
+          if (profil["id"] == chatPartnerId) {
+            chatPartnerName = profil["name"];
+            break;
+          }
         }
       }
     }
@@ -299,14 +322,14 @@ class _ChatPageState extends State<ChatPage> {
           return StatefulBuilder(builder: (context, setState) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context).chatLoeschen,
-              height: countSelected == 1 ? 150 : 100,
+              height: countSelected == 1 && !isChatGroup ? 150 : 100,
               children: [
                 Center(
                     child: Text(countSelected == 1
                         ? AppLocalizations.of(context).chatWirklichLoeschen
                         : AppLocalizations.of(context).chatsWirklichLoeschen)),
-                if (countSelected == 1) const SizedBox(height: 20),
-                if (countSelected == 1)
+                if (countSelected == 1 && !isChatGroup) const SizedBox(height: 20),
+                if (countSelected == 1 && !isChatGroup)
                   Row(
                     children: [
                       Checkbox(
@@ -347,24 +370,24 @@ class _ChatPageState extends State<ChatPage> {
   pinChat() {
     var selectedIsPinned;
 
-    for (var choosenChatId in selectedChats) {
-      var chat = {};
+    for (var choosenChat in selectedChats) {
+      var selectedChatId = choosenChat["id"];
+      bool isChatGroup = choosenChat["connected"] != null;
+      var chatIsPinned = choosenChat["users"][userId]["pinned"] ?? false;
 
-      for (var myChat in myChats) {
-        if (myChat["id"] == choosenChatId) {
-          chat = myChat;
-          break;
-        }
-      }
-
-      var chatIsPinned = chat["users"][userId]["pinned"] ?? false;
-
-      chat["users"][userId]["pinned"] = !chatIsPinned;
+      choosenChat["users"][userId]["pinned"] = !chatIsPinned;
       selectedIsPinned ??= !chatIsPinned;
 
-      ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
-          "WHERE id = '${chat["id"]}'");
+
+      if(isChatGroup){
+        ChatGroupsDatabase().updateChatGroup(
+            "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
+            "WHERE id = '$selectedChatId'");
+      }else{
+        ChatDatabase().updateChatGroup(
+            "users = JSON_SET(users, '\$.$userId.pinned', ${!chatIsPinned})",
+            "WHERE id = '$selectedChatId'");
+      }
     }
 
     setState(() {
@@ -375,23 +398,23 @@ class _ChatPageState extends State<ChatPage> {
   muteChat() {
     var selectedIsMute;
 
-    for (var choosenChatId in selectedChats) {
-      var chat = {};
+    for (var choosenChat in selectedChats) {
+      var selectedChatId = choosenChat["id"];
+      bool isChatGroup = choosenChat["connected"] != null;
+      var chatIsMute = choosenChat["users"][userId]["mute"] ?? false;
 
-      for (var myChat in myChats) {
-        if (myChat["id"] == choosenChatId) {
-          chat = myChat;
-        }
-      }
-
-      var chatIsMute = chat["users"][userId]["mute"] ?? false;
-
-      chat["users"][userId]["mute"] = !chatIsMute;
+      choosenChat["users"][userId]["mute"] = !chatIsMute;
       selectedIsMute ??= !chatIsMute;
 
-      ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
-          "WHERE id = '${chat["id"]}'");
+      if(isChatGroup){
+        ChatGroupsDatabase().updateChatGroup(
+            "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
+            "WHERE id = '$selectedChatId'");
+      }else{
+        ChatDatabase().updateChatGroup(
+            "users = JSON_SET(users, '\$.$userId.mute', ${!chatIsMute})",
+            "WHERE id = '$selectedChatId'");
+      }
     }
 
     setState(() {
@@ -419,17 +442,32 @@ class _ChatPageState extends State<ChatPage> {
     myChats = Hive.box("secureBox").get("myChats") ?? [];
     myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
 
-    getChatGroupName(chatConnected, {withPrivateEvents}) {
+    getChatGroupName(chatConnected) {
       if (chatConnected.isEmpty) return AppLocalizations.of(context).weltChat;
 
       var connectedId = chatConnected.split("=")[1];
       if (chatConnected.contains("event")) {
-        var eventData = getEventFromHive(connectedId);
+        var eventData = getMeetupFromHive(connectedId);
+
+        if(eventData.isEmpty) return;
+
         var isPrivate = ["privat", "private"].contains(eventData["art"]);
-        return isPrivate ? "" : eventData["name"];
+        var hasAccsess = eventData["freigegeben"].contains(userId)
+            || eventData["erstelltVon"] == userId;
+
+        return isPrivate && !hasAccsess ? "" : eventData["name"];
       }
       if (chatConnected.contains("community")) {
-        return getCommunityFromHive(connectedId)["name"];
+        var communityData = getCommunityFromHive(connectedId);
+
+        if(communityData.isEmpty) return;
+
+        bool hasSecretChat = communityData["secretChat"]?.isOdd ?? false;
+        bool isMember = communityData["members"].contains(userId)
+            || communityData["erstelltVon"] == userId;
+        bool hasAccess = !hasSecretChat || isMember;
+
+        return !hasAccess ? "" :getCommunityFromHive(connectedId)["name"];
       }
       if (chatConnected.contains("stadt")) {
         return getCityFromHive(cityId: connectedId, getName: true);
@@ -448,9 +486,10 @@ class _ChatPageState extends State<ChatPage> {
       if (value.length > 1) firstLetterBig += value.substring(1);
 
       List allMyChats = myChats + myGroupChats;
+
       for (var chat in allMyChats) {
         bool isChatGroup = chat["connected"] != null;
-        var chatName = "";
+        String chatName = "";
 
         if (isChatGroup) {
           chatName = getChatGroupName(chat["connected"]);
@@ -467,6 +506,23 @@ class _ChatPageState extends State<ChatPage> {
 
         if (chatName.contains(value) || chatName.contains(firstLetterBig)) {
           searchListMyGroups.add(chat);
+        }
+      }
+
+      for(var userProfil in dbProfilData){
+        String userName = userProfil["name"];
+        String chatPartnerId = userProfil["id"];
+
+        var containCondition =
+            userName.contains(value) || userName.contains(firstLetterBig);
+        bool chatExist = false;
+
+        for(var chat in myChats){
+          if(chat["users"][chatPartnerId] != null) chatExist = true;
+        }
+
+        if(containCondition && !chatExist){
+          searchListAllChatgroups.add(userProfil);
         }
       }
 
@@ -521,15 +577,52 @@ class _ChatPageState extends State<ChatPage> {
         Map chatPartnerProfil;
         String chatPartnerId;
 
-        var users = group["users"];
-        var isNotChatGroup = group["connected"] == null;
+        var users = group["users"] ?? {};
+        var isChatGroup = group["connected"] != null;
         var chatData;
 
         if (group["lastMessage"] is int) {
           group["lastMessage"] = group["lastMessage"].toString();
         }
 
-        if (isNotChatGroup) {
+        if(isChatGroup){
+          var connectedId = group["connected"].split("=")[1];
+
+          if (group["connected"].contains("event")) {
+            chatData = getMeetupFromHive(connectedId);
+            chatName = chatData["name"];
+          } else if (group["connected"].contains("community")) {
+            chatData = getCommunityFromHive(connectedId);
+            chatName = chatData["name"];
+          } else if (group["connected"].contains("stadt")) {
+            chatData = Map.of(getCityFromHive(cityId: connectedId));
+            chatName = chatData["ort"];
+            var cityImage = chatData["bild"].isEmpty
+                ? Hive.box('secureBox').get("allgemein")["cityImage"]
+                : chatData["bild"];
+            var countryImage = chatData["bild"].isEmpty
+                ? "assets/bilder/land.jpg"
+                : "assets/bilder/flaggen/${chatData["bild"]}.jpeg";
+
+            chatData["bild"] = chatData["isCity"] == 1 ? cityImage : countryImage;
+
+          } else if (group["connected"].contains("world")) {
+            chatName = AppLocalizations.of(context).weltChat;
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
+            };
+          } else if(group["connected"].contains("support")){
+            chatName = "Support Chat";
+            chatData = {
+              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
+            };
+          }
+
+          bool hasSecretChat = chatData["secretChat"] == 1;
+          bool secretChatMember = chatData["members"]?.contains(userId);
+
+          if(hasSecretChat && !secretChatMember) continue;
+        } else if (users.isNotEmpty){
           users.forEach((key, value) async {
             if (key != userId) {
               chatPartnerId = key;
@@ -556,38 +649,24 @@ class _ChatPageState extends State<ChatPage> {
               isBlocked) {
             continue;
           }
-        } else if (group["connected"].isNotEmpty) {
-          var connectedId = group["connected"].split("=")[1];
+        }else{
+          chatName = group["name"];
+          chatPartnerProfil = group;
 
-          if (group["connected"].contains("event")) {
-            chatData = getEventFromHive(connectedId);
-            chatName = chatData["name"];
-          } else if (group["connected"].contains("community")) {
-            chatData = getCommunityFromHive(connectedId);
-            chatName = chatData["name"];
-          } else if (group["connected"].contains("stadt")) {
-            chatName = getCityFromHive(cityId: connectedId, getName: true);
-            chatData = {
-              "bild": Hive.box('secureBox').get("allgemein")["cityImage"]
-            };
-          } else if (group["connected"].contains("world")) {
-            chatName = AppLocalizations.of(context).weltChat;
-            chatData = {
-              "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
-            };
-          }
+          var isBlocked = group["geblocktVon"].contains(userId);
+          if(isBlocked) continue;
         }
 
         if (chatName == null) continue;
 
-        var lastMessage = cutMessage(group["lastMessage"]);
+        var lastMessage = cutMessage(group["lastMessage"] ?? "");
         var ownChatNewMessages =
             users[userId] != null ? users[userId]["newMessages"] : 0;
 
         var isPinned =
             users[userId] != null ? users[userId]["pinned"] ?? false : false;
         var lastMessageTime =
-            DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"]);
+            DateTime.fromMillisecondsSinceEpoch(group["lastMessageDate"] ?? 0);
         var sortIndex = chatGroupContainers.length;
 
         if (isPinned) sortIndex = 0;
@@ -605,10 +684,10 @@ class _ChatPageState extends State<ChatPage> {
                   var markerOn = false;
 
                   setState(() {
-                    if (selectedChats.contains(group["id"])) {
-                      selectedChats.remove(group["id"]);
+                    if (selectedChats.contains(group)) {
+                      selectedChats.remove(group);
                     } else {
-                      selectedChats.add(group["id"]);
+                      selectedChats.add(group);
                     }
 
                     if (selectedChats.isNotEmpty) markerOn = true;
@@ -624,13 +703,13 @@ class _ChatPageState extends State<ChatPage> {
                           context,
                           MaterialPageRoute(
                               builder: (_) => ChatDetailsPage(
-                                  chatPartnerName: isNotChatGroup
-                                      ? chatPartnerProfil["name"]
-                                      : null,
+                                  chatPartnerName: isChatGroup
+                                      ? null
+                                      : chatPartnerProfil["name"],
                                   groupChatData: group,
                                   backToChatPage: true,
                                   chatPageSliderIndex: mainSlider,
-                                  isChatgroup: !isNotChatGroup)))
+                                  isChatgroup: isChatGroup)))
                       .whenComplete(() => changePageForever(
                           context,
                           StartPage(
@@ -646,7 +725,7 @@ class _ChatPageState extends State<ChatPage> {
                       group["users"][userId]["pinned"] ?? false;
 
                   firstSelectedIsMute = group["users"][userId]["mute"] ?? false;
-                  selectedChats.add(group["id"]);
+                  selectedChats.add(group);
                 });
               },
               child: Container(
@@ -664,7 +743,7 @@ class _ChatPageState extends State<ChatPage> {
                           if (chatPartnerProfil != null)
                             ProfilImage(chatPartnerProfil),
                           if (chatData != null) ProfilImage(chatData),
-                          if (selectedChats.contains(group["id"]))
+                          if (selectedChats.contains(group))
                             const Positioned(
                                 bottom: 0,
                                 right: 0,
@@ -818,6 +897,7 @@ class _ChatPageState extends State<ChatPage> {
                   setState(() {
                     activeChatSearch = true;
                   });
+                  seachSearchInputNode.requestFocus();
                 },
                 icon: const Icon(
                   Icons.search,

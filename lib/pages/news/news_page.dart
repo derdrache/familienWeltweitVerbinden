@@ -10,9 +10,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
-import '../../../services/database.dart';
+import '../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
-import '../informationen/events/eventCard.dart';
+import '../informationen/meetups/meetupCard.dart';
 import '../informationen/location/location_Information.dart';
 import 'news_page_settings.dart';
 
@@ -22,10 +22,11 @@ class NewsPage extends StatefulWidget {
   _NewsPageState createState() => _NewsPageState();
 }
 
-class _NewsPageState extends State<NewsPage>{
+class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
   final String userId = FirebaseAuth.instance.currentUser.uid;
   List newsFeedData;
-  List events = Hive.box('secureBox').get("events") ?? [];
+  int displayDataEntries = 10;
+  List events;
   List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
   List userNewsContentHive = Hive.box('secureBox').get("userNewsContent") ?? [];
@@ -38,12 +39,33 @@ class _NewsPageState extends State<NewsPage>{
 
   @override
   void initState() {
-    if(ownSettingProfil == false || ownSettingProfil == null){
+    if (ownSettingProfil == false || ownSettingProfil == null) {
       ownSettingProfil = _addNewSettingProfil();
     }
 
+    _scrollBar();
+
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      await refreshHiveNewsPage();
+      setState(() {});
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+      setState(() {});
+    }
+  }
+
+  _scrollBar(){
     _controller.addListener(() {
       bool isTop = _controller.position.pixels == 0;
+      bool isBottom = _controller.position.atEdge;
+
       if (isTop) {
         if (!scrollbarOnBottom) {
           scrollbarOnBottom = true;
@@ -55,14 +77,24 @@ class _NewsPageState extends State<NewsPage>{
           setState(() {});
         }
       }
-    });
 
-    super.initState();
+      if(isBottom){
+        setState(() {
+          displayDataEntries += 10;
+        });
+      }
+    });
   }
 
+  _refreshData() async{
+    await refreshHiveNewsPage();
+    refreshHiveChats();
+    refreshHiveMeetups();
+    refreshHiveProfils();
+    refreshHiveCommunities();
+  }
 
-
-  _addNewSettingProfil(){
+  _addNewSettingProfil() {
     var newProfil = {
       "id": userId,
       "showFriendAdded": true,
@@ -89,7 +121,9 @@ class _NewsPageState extends State<NewsPage>{
     }
 
     String newsPagePatchDate = "2022-08-01";
-    if (lastLocationChangeDate.isEmpty) lastLocationChangeDate = newsPagePatchDate;
+    if (lastLocationChangeDate.isEmpty) {
+      lastLocationChangeDate = newsPagePatchDate;
+    }
 
     return lastLocationChangeDate;
   }
@@ -116,14 +150,14 @@ class _NewsPageState extends State<NewsPage>{
     double screenHeight = MediaQuery.of(context).size.height;
     var widgetList = [];
 
-    for (var item in newsFeed) {
+    for (var item in newsFeed.reversed.toList().take(displayDataEntries).toList().reversed.toList()) {
       widgetList.add(item["newsWidget"]);
     }
 
     if (_checkWidgetListIsEmpty(widgetList)) {
       widgetList.add(Center(
           child: Container(
-              padding: EdgeInsets.only(top: screenHeight/3),
+              padding: EdgeInsets.only(top: screenHeight / 3),
               child: Text(
                 AppLocalizations.of(context).keineNewsVorhanden,
                 style: const TextStyle(fontSize: 20),
@@ -169,10 +203,40 @@ class _NewsPageState extends State<NewsPage>{
     return true;
   }
 
-  Widget build(BuildContext context) {
+  _getCombineInformationIfSameUser(news){
+    var lastNews = newsFeed.length > 0 ?newsFeed.last["news"] : null;
+    var newInformation = {};
 
-    const double titleFontSize = 15;
+    if(lastNews == null) return news["information"];
+
+    bool sameUser = lastNews["erstelltVon"] == news["erstelltVon"];
+    bool sameTyp = lastNews["typ"] == news["typ"];
+
+    if(!sameUser || !sameTyp) return news["information"];
+
+    newsFeed.removeLast();
+
+    bool isSingleNews = lastNews["information"]["von"].runtimeType == String;
+
+    if(isSingleNews){
+      newInformation["von"] = [lastNews["information"]["von"],news["information"]["von"]];
+      newInformation["bis"] = [lastNews["information"]["bis"], news["information"]["bis"]];
+      newInformation["ortData"] = [lastNews["information"]["ortData"], news["information"]["ortData"]];
+
+    }else{
+      newInformation["von"] = [...lastNews["information"]["von"],news["information"]["von"]];
+      newInformation["bis"] = [...lastNews["information"]["bis"],news["information"]["bis"]];
+      newInformation["ortData"] = [...lastNews["information"]["ortData"], news["information"]["ortData"]];
+    }
+
+    return newInformation;
+  }
+
+  Widget build(BuildContext context) {
     newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
+    events = Hive.box('secureBox').get("events") ?? [];
+    ownSettingProfil = Hive.box('secureBox').get("ownNewsSetting") ;
+    const double titleFontSize = 15;
 
     friendsDisplay(news) {
       String addedUser = news["information"].split(" ")[1];
@@ -194,57 +258,60 @@ class _NewsPageState extends State<NewsPage>{
       userNewsContent
           .add({"news": news["information"], "ersteller": news["erstelltVon"]});
 
-      return InkWell(
-        onTap: () {
-          global_func.changePage(context, ShowProfilPage(profil: friendProfil));
-        },
-        child: Align(
-          child: Stack(
-            children: [
-              Container(
-                  width: 800,
-                  margin:
-                      const EdgeInsets.only(bottom: 45, left: 20, right: 20),
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 15, bottom: 15),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset:
-                            const Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Text(text,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: titleFontSize))),
-              Positioned(
-                  bottom: 20,
-                  right: 35,
-                  child: NewsStamp(
-                      date: news["erstelltAm"],
-                      isNew:
-                          _checkIfNew(news["information"], news["erstelltVon"])))
-            ],
+      newsFeed.add({
+        "newsWidget": InkWell(
+          onTap: () {
+            global_func.changePage(context, ShowProfilPage(profil: friendProfil));
+          },
+          child: Align(
+            child: Stack(
+              children: [
+                Container(
+                    width: 800,
+                    margin:
+                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 15, bottom: 15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset:
+                          const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Text(text,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: titleFontSize))),
+                Positioned(
+                    bottom: 20,
+                    right: 35,
+                    child: NewsStamp(
+                        date: news["erstelltAm"],
+                        isNew: _checkIfNew(
+                            news["information"], news["erstelltVon"])))
+              ],
+            ),
           ),
         ),
-      );
+        "date": news["erstelltAm"]
+      });
     }
 
     changePlaceDisplay(news, myLastLocationDate) {
       String newsUserId = news["erstelltVon"];
       Map familyProfil = getFamilyProfil(familyMember: newsUserId);
-      Map newsUserProfil = getProfilFromHive(profilId: familyProfil != null
-          ? familyProfil["mainProfil"]
-          : newsUserId);
+      Map newsUserProfil = getProfilFromHive(
+          profilId:
+              familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
       bool isFriend = ownProfil["friendlist"].contains(newsUserId);
       String text = "";
       String newsOrt = news["information"]["city"];
@@ -252,169 +319,292 @@ class _NewsPageState extends State<NewsPage>{
       String ownOrt = ownProfil["ort"];
       var locationTimeCheck = DateTime.parse(news["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
-      bool samePlaceAndTime = ownOrt == newsOrt &&
+      double distance = global_func.calculateDistance(ownProfil["latt"], ownProfil["longt"],
+          news["information"]["latt"], news["information"]["longt"]);
+      bool inDistance = distance <= (ownSettingProfil["distance"] ?? 50);
+      bool samePlaceAndTime = (inDistance || ownOrt == newsOrt) &&
           locationTimeCheck >= 0 &&
           ownSettingProfil["showNewFamilyLocation"] == 1;
+      bool sameFamily = familyProfil != null ? familyProfil["members"].contains(userId) : false;
 
       if (newsUserProfil == null ||
           newsOrt == null ||
           newsLand == null ||
           ownSettingProfil["showFriendChangedLocation"] == 0 ||
           ownSettingProfil["showNewFamilyLocation"] == 0 ||
-          !(isFriend || samePlaceAndTime)) {
+          !(isFriend || samePlaceAndTime) ||
+          sameFamily) {
         return const SizedBox.shrink();
       }
 
       String newsOrtInfo =
           newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
       newsUserProfil = Map.from(newsUserProfil);
-      if(familyProfil != null) newsUserProfil["name"] = "Familie " + familyProfil["name"];
+      if (familyProfil != null) {
+        newsUserProfil["name"] =
+            AppLocalizations.of(context).familie + " " + familyProfil["name"];
+      }
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"] == 1) {
         text = newsUserProfil["name"] +
-            AppLocalizations.of(context).freundOrtsWechsel +
+            AppLocalizations
+                .of(context)
+                .freundOrtsWechsel +
             "\n" +
             newsOrtInfo;
-      } else if (ownOrt == newsOrt && samePlaceAndTime) {
+      }else if (ownOrt == newsOrt) {
         text = newsUserProfil["name"] +
             AppLocalizations.of(context).familieInDeinemOrt;
+      }else if(inDistance) {
+        text = newsUserProfil["name"] + AppLocalizations.of(context).imUmkreis;
       }
 
-      userNewsContent
+        userNewsContent
           .add({"news": news["information"], "ersteller": news["erstelltVon"]});
 
-      return InkWell(
-        onTap: () {
-          global_func.changePage(
-              context, ShowProfilPage(profil: newsUserProfil));
-        },
-        child: Align(
-          child: Stack(
-            children: [
-              Container(
-                  width: 800,
-                  margin:
-                      const EdgeInsets.only(bottom: 45, left: 20, right: 20),
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 15, bottom: 15),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset:
-                            const Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Text(text,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: titleFontSize))),
-              Positioned(
-                  bottom: 20,
-                  right: 35,
-                  child: NewsStamp(
-                      date: news["erstelltAm"],
-                      isNew:
-                          _checkIfNew(news["information"], news["erstelltVon"])))
-            ],
+      newsFeed.add({
+        "newsWidget": InkWell(
+          onTap: () {
+            global_func.changePage(
+                context, ShowProfilPage(profil: newsUserProfil));
+          },
+          child: Align(
+            child: Stack(
+              children: [
+                Container(
+                    width: 800,
+                    margin:
+                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 15, bottom: 15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset:
+                          const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Text(text,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: titleFontSize))),
+                Positioned(
+                    bottom: 20,
+                    right: 35,
+                    child: NewsStamp(
+                        date: news["erstelltAm"],
+                        isNew: _checkIfNew(
+                            news["information"], news["erstelltVon"])))
+              ],
+            ),
           ),
         ),
-      );
+        "date": news["erstelltAm"]
+      });
     }
 
     friendsNewTravelPlanDisplay(news) {
       String newsUserId = news["erstelltVon"];
       Map familyProfil = getFamilyProfil(familyMember: newsUserId);
-      Map friendProfil = getProfilFromHive(profilId: familyProfil != null
-          ? familyProfil["mainProfil"]
-          : newsUserId);
-
+      Map friendProfil = getProfilFromHive(
+          profilId:
+              familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
+      bool isFamilymember = familyProfil != null ? familyProfil["members"].contains(userId) : false;
       bool isFriend = familyProfil != null
-          ? ownProfil["friendlist"].toSet().intersection(familyProfil["members"].toSet()).isNotEmpty
+          ? ownProfil["friendlist"]
+              .toSet()
+              .intersection(familyProfil["members"].toSet())
+              .isNotEmpty
           : ownProfil["friendlist"].contains(newsUserId);
 
-      if (!isFriend ||
-          friendProfil == null ||
-          ownSettingProfil["showFriendTravelPlan"] == 0) {
-        return const SizedBox.shrink();
+      if (!isFriend || friendProfil == null ||
+          ownSettingProfil["showFriendTravelPlan"] == 0 || isFamilymember) {
+        return null;
       }
 
-      friendProfil = Map.from(friendProfil);
-      if(familyProfil != null) friendProfil["name"] = "Familie " + familyProfil["name"];
+      Map newTravelPlan = _getCombineInformationIfSameUser(news);
 
-      Map newTravelPlan = news["information"];
-      String travelPlanVon =
-          newTravelPlan["von"].split(" ")[0].split("-").reversed.join("-");
-      String travelPlanbis =
-          newTravelPlan["bis"].split(" ")[0].split("-").reversed.join("-");
-      String travelPlanCity = newTravelPlan["ortData"]["city"];
-      String travelPlanCountry = newTravelPlan["ortData"]["countryname"];
-      String textTitle = friendProfil["name"] + "\n" +
-          AppLocalizations.of(context).friendNewTravelPlan;
-      String textDate = travelPlanVon + " - " + travelPlanbis;
-      String textLocation = travelPlanCity + " / " + travelPlanCountry;
+      friendProfil = Map.from(friendProfil);
+      if (familyProfil != null) {
+        friendProfil["name"] = "Familie " + familyProfil["name"];
+      }
+
+      bool isSingleNews = newTravelPlan["von"].runtimeType == String;
+      Widget newsWidget;
+
+      if(isSingleNews){
+        bool isExact = newTravelPlan["von"].split(" ")[1] == "01:00:00.000";
+        List travelPlanVon =
+          newTravelPlan["von"].split(" ")[0].split("-").reversed.toList();
+        List travelPlanbis =
+          newTravelPlan["bis"].split(" ")[0].split("-").reversed.toList();
+
+        if(!isExact){
+          travelPlanVon.removeAt(0);
+          travelPlanbis.removeAt(0);
+        }
+
+        String travelPlanCity = newTravelPlan["ortData"]["city"];
+        String travelPlanCountry = newTravelPlan["ortData"]["countryname"];
+        String textTitle = friendProfil["name"] +
+            "\n" +
+            AppLocalizations.of(context).friendNewTravelPlan;
+        String textDate = travelPlanVon.join("-") + " - " + travelPlanbis.join("-");
+        String textLocation = travelPlanCity + " / " + travelPlanCountry;
+        newsWidget = InkWell(
+          onTap: () {
+            global_func.changePage(context, ShowProfilPage(profil: friendProfil));
+          },
+          child: Align(
+            child: Stack(
+              children: [
+                Container(
+                    width: 800,
+                    margin:
+                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 15, bottom: 15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset:
+                          const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(textTitle,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: titleFontSize)),
+                        const SizedBox(height: 10),
+                        Text(textDate),
+                        Text(textLocation),
+                      ],
+                    )),
+                Positioned(
+                    bottom: 20,
+                    right: 35,
+                    child: NewsStamp(
+                        date: news["erstelltAm"],
+                        isNew: _checkIfNew(
+                            news["information"], news["erstelltVon"])))
+              ],
+            ),
+          ),
+        );
+      }else{
+        String textTitle = friendProfil["name"] +
+            "\n" +
+            AppLocalizations.of(context).friendNewTravelPlan;
+        List<Widget> columnItems = [];
+
+        for( var i = 0 ; i < newTravelPlan["von"].length; i++){
+          bool isExact = newTravelPlan["von"][i].split(" ")[1] == "01:00:00.000";
+          List travelPlanVon =
+            newTravelPlan["von"][i].split(" ")[0].split("-").reversed.toList();
+          List travelPlanbis =
+            newTravelPlan["bis"][i].split(" ")[0].split("-").reversed.toList();
+
+          if(!isExact){
+            travelPlanVon.removeAt(0);
+            travelPlanbis.removeAt(0);
+          }
+
+          String travelPlanCity = newTravelPlan["ortData"][i]["city"];
+          String travelPlanCountry = newTravelPlan["ortData"][i]["countryname"];
+
+          String textDate = travelPlanVon.join("-") + " - " + travelPlanbis.join("-");
+          String textLocation = travelPlanCity + " / " + travelPlanCountry;
+
+          columnItems.add(Column(children: [
+            const SizedBox(height: 10),
+            Text(textDate),
+            Text(textLocation),
+          ],));
+        }
+
+        newsWidget = InkWell(
+          onTap: () {
+            global_func.changePage(context, ShowProfilPage(profil: friendProfil));
+          },
+          child: Align(
+            child: Stack(
+              children: [
+                Container(
+                    width: 800,
+                    margin:
+                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 15, bottom: 15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset:
+                          const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(textTitle,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: titleFontSize)),
+                        ...columnItems
+                      ],
+                    )),
+                Positioned(
+                    bottom: 20,
+                    right: 35,
+                    child: NewsStamp(
+                        date: news["erstelltAm"],
+                        isNew: _checkIfNew(
+                            news["information"], news["erstelltVon"])))
+              ],
+            ),
+          ),
+        );
+      }
+
 
       userNewsContent
           .add({"news": news["information"], "ersteller": news["erstelltVon"]});
 
-      return InkWell(
-        onTap: () {
-          global_func.changePage(context, ShowProfilPage(profil: friendProfil));
-        },
-        child: Align(
-          child: Stack(
-            children: [
-              Container(
-                  width: 800,
-                  margin:
-                      const EdgeInsets.only(bottom: 45, left: 20, right: 20),
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 15, bottom: 15),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset:
-                            const Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(textTitle,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: titleFontSize)),
-                      const SizedBox(height: 10),
-                      Text(textDate),
-                      Text(textLocation),
-                    ],
-                  )),
-              Positioned(
-                  bottom: 20,
-                  right: 35,
-                  child: NewsStamp(
-                      date: news["erstelltAm"],
-                      isNew:
-                          _checkIfNew(news["information"], news["erstelltVon"])))
-            ],
-          ),
-        ),
-      );
+      newsFeed.add({
+        "newsWidget": newsWidget,
+        "date": news["erstelltAm"],
+        "news": {
+          "typ": news["typ"],
+          "erstelltVon": news["erstelltVon"],
+          "information": newTravelPlan
+        }
+      });
     }
 
     eventsDisplay(event, myLastLocationDate) {
@@ -435,47 +625,52 @@ class _NewsPageState extends State<NewsPage>{
         return const SizedBox.shrink();
       }
 
-      if(isOnline){
-        eventText = AppLocalizations.of(context).newsPageOnlineEventVorschlag + _evenTagMatch(event["tags"]).toString();
-      }else{
-        eventText = AppLocalizations.of(context).newsPageOfflineEventVorschlag;
+      if (isOnline) {
+        eventText = AppLocalizations.of(context).newsPageOnlineMeetupVorschlag +
+            _evenTagMatch(event["tags"]).toString();
+      } else {
+        eventText = AppLocalizations.of(context).newsPageOfflineMeetupVorschlag;
       }
 
       userNewsContent.add(
           {"news": event["beschreibung"], "ersteller": event["erstelltVon"]});
 
-      return Align(
-          alignment: Alignment.center,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 20),
-            child: Column(
-              children: [
-                EventCard(
-                  margin: const EdgeInsets.all(15),
-                  event: event,
-                  withInteresse: true,
-                ),
-                Row(
-                  children: [
-                    const SizedBox(width: 10),
-                    Icon(
-                      Icons.fiber_new,
-                      size: 30,
-                      color: _checkIfNew(event["beschreibung"], event["erstelltVon"])
-                          ? null
-                          : Colors.transparent,
-                    ),
-                    const SizedBox(width: 70),
-                    Expanded(child: Text(eventText)),
-                    const SizedBox(width: 10),
-                    Text(event["erstelltAm"].split(" ")[0],
-                        style: TextStyle(color: Colors.grey[600])),
-                    const SizedBox(width: 10),
-                  ],
-                )
-              ],
-            ),
-          ));
+      newsFeed.add({
+        "newsWidget": Align(
+            alignment: Alignment.center,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                children: [
+                  MeetupCard(
+                    margin: const EdgeInsets.all(15),
+                    meetupData: event,
+                    withInteresse: true,
+                  ),
+                  Row(
+                    children: [
+                      const SizedBox(width: 10),
+                      Icon(
+                        Icons.fiber_new,
+                        size: 30,
+                        color: _checkIfNew(
+                            event["beschreibung"], event["erstelltVon"])
+                            ? null
+                            : Colors.transparent,
+                      ),
+                      const SizedBox(width: 70),
+                      Expanded(child: Text(eventText)),
+                      const SizedBox(width: 10),
+                      Text(event["erstelltAm"].split(" ")[0],
+                          style: TextStyle(color: Colors.grey[600])),
+                      const SizedBox(width: 10),
+                    ],
+                  )
+                ],
+              ),
+            )),
+        "date": event["erstelltAm"]
+      });
     }
 
     neueStadtinformationDisplay(info, myLastLocationDate) {
@@ -497,56 +692,58 @@ class _NewsPageState extends State<NewsPage>{
           spracheIstDeutsch ? info["informationGer"] : info["informationEng"];
 
       userNewsContent.add({"news": textBody, "ersteller": info["erstelltVon"]});
-
-      return InkWell(
-        onTap: () {
-          global_func.changePage(
-              context, LocationInformationPage(ortName: info["ort"]));
-        },
-        child: Align(
-          child: Stack(
-            children: [
-              Container(
-                  width: 800,
-                  margin:
-                      const EdgeInsets.only(bottom: 45, left: 20, right: 20),
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 15, bottom: 15),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset:
-                            const Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(textHeader,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: titleFontSize)),
-                      const SizedBox(height: 10),
-                      Text(textBody),
-                    ],
-                  )),
-              Positioned(
-                  bottom: 20,
-                  right: 35,
-                  child: NewsStamp(
-                      date: info["erstelltAm"],
-                      isNew: _checkIfNew(textBody, info["erstelltVon"])))
-            ],
+      newsFeed.add({
+        "newsWidget": InkWell(
+          onTap: () {
+            global_func.changePage(
+                context, LocationInformationPage(ortName: info["ort"]));
+          },
+          child: Align(
+            child: Stack(
+              children: [
+                Container(
+                    width: 800,
+                    margin:
+                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 15, bottom: 15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset:
+                          const Offset(0, 3), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(textHeader,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: titleFontSize)),
+                        const SizedBox(height: 10),
+                        Text(textBody),
+                      ],
+                    )),
+                Positioned(
+                    bottom: 20,
+                    right: 35,
+                    child: NewsStamp(
+                        date: info["erstelltAm"],
+                        isNew: _checkIfNew(textBody, info["erstelltVon"])))
+              ],
+            ),
           ),
         ),
-      );
+        "date": info["erstelltAm"]
+      });
     }
 
     addLocationWelcome(news) {
@@ -675,37 +872,24 @@ class _NewsPageState extends State<NewsPage>{
 
       for (var news in newsFeedData) {
         addLocationWelcome(news);
+
         if (news["erstelltVon"].contains(userId)) continue;
 
         if (news["typ"] == "friendlist") {
-          newsFeed.add(
-              {"newsWidget": friendsDisplay(news), "date": news["erstelltAm"]});
+          friendsDisplay(news);
         } else if (news["typ"] == "ortswechsel") {
-          newsFeed.add({
-            "newsWidget": changePlaceDisplay(news, myLastLocationChangeDate),
-            "date": news["erstelltAm"]
-          });
+          changePlaceDisplay(news, myLastLocationChangeDate);
         } else if (news["typ"] == "reiseplanung") {
-          newsFeed.add({
-            "newsWidget": friendsNewTravelPlanDisplay(news),
-            "date": news["erstelltAm"]
-          });
+          friendsNewTravelPlanDisplay(news);
         }
       }
 
       for (var event in events) {
-        newsFeed.add({
-          "newsWidget": eventsDisplay(event, myLastLocationChangeDate),
-          "date": event["erstelltAm"]
-        });
+        eventsDisplay(event, myLastLocationChangeDate);
       }
 
       for (var info in cityUserInfo) {
-        newsFeed.add({
-          "newsWidget":
-              neueStadtinformationDisplay(info, myLastLocationChangeDate),
-          "date": info["erstelltAm"]
-        });
+        neueStadtinformationDisplay(info, myLastLocationChangeDate);
       }
 
       addMonthYearDivider();

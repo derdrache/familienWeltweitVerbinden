@@ -7,9 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:upgrader/upgrader.dart';
-import "package:universal_html/js.dart" as js;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../global/encryption.dart';
 import '../global/global_functions.dart';
 import '../global/variablen.dart';
 import '../services/database.dart';
@@ -25,7 +24,6 @@ import 'chat/chat_page.dart';
 import 'settings/setting_page.dart';
 import 'force_update.dart';
 
-final String userId = FirebaseAuth.instance.currentUser?.uid;
 
 //ignore: must_be_immutable
 class StartPage extends StatefulWidget {
@@ -33,44 +31,37 @@ class StartPage extends StatefulWidget {
   var informationPageIndex;
   int chatPageSliderIndex;
 
-  StartPage({Key key, this.selectedIndex = 0, this.informationPageIndex = 0, this.chatPageSliderIndex}) : super(key: key);
+  StartPage({
+    Key key,
+    this.selectedIndex = 0,
+    this.informationPageIndex = 0,
+    this.chatPageSliderIndex}) : super(key: key);
 
   @override
   _StartPageState createState() => _StartPageState();
 }
 
-class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
+class _StartPageState extends State<StartPage> {
+  final String userId = FirebaseAuth.instance.currentUser?.uid;
   final String userName = FirebaseAuth.instance.currentUser?.displayName;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   bool hasInternet = true;
   var checkedA2HS = false;
-  List<Widget> tabPages;
+  List<Widget> pages;
   var _networkConnectivity;
+  bool noProfil;
 
   @override
   void initState() {
     widget.chatPageSliderIndex ??= 0;
+    noProfil = ownProfil == null || ownProfil["id"] == null;
     _networkConnectivity = NetworkConnectivity(context);
 
-    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
 
     _networkConnectivity.checkInternetStatusStream();
-  }
-
-  @override
-  void dispose(){
-    _networkConnectivity.disposeStream();
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _refreshHiveDb();
-    }
   }
 
   _asyncMethod() async {
@@ -138,11 +129,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   _updateOwnEmail() async {
     final String userAuthEmail = FirebaseAuth.instance.currentUser?.email;
+    String enryptEmail = encrypt(userAuthEmail);
     var userDBEmail = ownProfil["email"];
 
     if (userAuthEmail != userDBEmail) {
       ProfilDatabase()
-          .updateProfil("email = '$userAuthEmail'", "WHERE id = '$userId'");
+          .updateProfil("email = '$enryptEmail'", "WHERE id = '$userId'");
     }
   }
 
@@ -269,14 +261,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
     ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
   }
 
-  _refreshHiveDb() async {
-    await refreshHiveChats();
-    await refreshHiveEvents();
-    await refreshHiveProfils();
-    await refreshHiveCommunities();
-    await refreshHiveNewsPage();
-  }
-
   _oldUserAutomaticJoinChats(ort) async {
     var savedVersion = Hive.box('secureBox').get("version");
     var lastLoginBeforeUpdate = savedVersion == null && DateTime.parse(ownProfil["lastLogin"])
@@ -295,9 +279,9 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    tabPages = <Widget>[
-      const NewsPage(),
-      const ErkundenPage(),
+    pages = [
+      NewsPage(),
+      ErkundenPage(),
       InformationPage(pageSelection: widget.informationPageIndex),
       ChatPage(
           chatPageSliderIndex: widget.chatPageSliderIndex
@@ -314,88 +298,13 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
       });
     }
 
-    Future<bool> showAddHomePageDialog(BuildContext context) async {
-      return showDialog<bool>(
-        context: context,
-        builder: (context) {
-          return Dialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                      child: Icon(
-                    Icons.add_circle,
-                    size: 70,
-                    color: Theme.of(context).primaryColor,
-                  )),
-                  const SizedBox(height: 20.0),
-                  Text(
-                    AppLocalizations.of(context).a2hsTitle,
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 20.0),
-                  Text(
-                    AppLocalizations.of(context).a2hsBody,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 20.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            js.context.callMethod("presentAddToHome");
-                            Navigator.pop(context, false);
-                            Hive.box('secureBox').put("a2hs", true);
-                          },
-                          child: Text(AppLocalizations.of(context).ja)),
-                      const SizedBox(width: 50),
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context, false);
-                            Hive.box('secureBox').put("a2hs", false);
-                          },
-                          child: Text(AppLocalizations.of(context).nein))
-                    ],
-                  )
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    }
-
-    checkA2HS() {
-      if (kIsWeb && !checkedA2HS) {
-        checkedA2HS = true;
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          var usedA2HS = Hive.box('secureBox').get("a2hs");
-          if (usedA2HS == null) {
-            final bool isDeferredNotNull =
-                js.context.callMethod("isDeferredNotNull") as bool;
-
-            if (isDeferredNotNull) {
-              Hive.box('secureBox').put("a2hs", true);
-              await showAddHomePageDialog(context);
-            }
-          }
-        });
-      }
-    }
-
-    checkA2HS();
+    if(noProfil) return Scaffold();
 
     return UpgradeAlert(
       upgrader: Upgrader(shouldPopScope: () => true),
       child: Scaffold(
           body: Center(
-            child: tabPages.elementAt(widget.selectedIndex),
+            child: pages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: CustomBottomNavigationBar(
             onNavigationItemTapped: _onItemTapped,
@@ -406,6 +315,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver {
 }
 
 class CustomBottomNavigationBar extends StatelessWidget {
+  final String userId = FirebaseAuth.instance.currentUser?.uid;
   final Function onNavigationItemTapped;
   final int selectNavigationItem;
 
@@ -415,10 +325,15 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   _eventNotification() {
     var eventNotification = 0;
-    var myEvents = Hive.box('secureBox').get("myEvents") ?? [];
+    var myMeetups = Hive.box('secureBox').get("myEvents") ?? [];
 
-    for (var event in myEvents) {
-      eventNotification += event["freischalten"].length;
+    for (var meetup in myMeetups) {
+      bool isOwner = meetup["erstelltVon"] == userId;
+      bool isNotPublic = meetup["art"] != "public" && meetup["art"] != "öffentlich";
+
+      if(isOwner && isNotPublic){
+        eventNotification += meetup["freischalten"].length;
+      }
     }
 
     return eventNotification;

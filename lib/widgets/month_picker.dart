@@ -140,6 +140,7 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
       ),
       color: theme.dialogBackgroundColor,
     );
+
     return Theme(
         data: Theme.of(context)
             .copyWith(dialogBackgroundColor: Colors.transparent),

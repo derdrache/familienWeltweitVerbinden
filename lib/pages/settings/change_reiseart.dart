@@ -36,14 +36,13 @@ class ChangeReiseartPage extends StatelessWidget {
       }
     }
 
-
-    reiseArtInput.onChange = () => save();
+    reiseArtInput.onChange = ()=>save();
 
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context).reiseartAendern
       ),
-      body: reiseArtInput,
+      body: reiseArtInput
     );
   }
 }

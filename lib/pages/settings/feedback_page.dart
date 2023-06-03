@@ -1,22 +1,25 @@
 import 'package:familien_suche/services/database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:familien_suche/global/custom_widgets.dart';
+import 'package:hive/hive.dart';
 import '../../global/global_functions.dart';
 import '../../widgets/custom_appbar.dart';
 
 class FeedbackPage extends StatelessWidget {
   TextEditingController feedbackTextKontroller = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  final String userEmail = FirebaseAuth.instance.currentUser.email;
+  final String userName = Hive.box("secureBox").get("ownProfil")["name"];
 
   feedbackSendenAndClose(context) async {
-    if(feedbackTextKontroller.text.isEmpty) return;
+    String text = feedbackTextKontroller.text;
 
-    ChatDatabase().addAdminMessage(
-        feedbackTextKontroller.text, userEmail);
+    if(text.isEmpty) return;
+
+    text = text.replaceAll("'", "''");
+
+    ChatDatabase().addAdminMessage(text, userName);
 
     feedbackTextKontroller.clear();
 

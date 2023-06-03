@@ -18,10 +18,16 @@ class ChangeTradePage extends StatelessWidget {
     textKontroller.text = oldText;
 
     save() {
-      ProfilDatabase().updateProfil(
-          "tradeNotize = '${textKontroller.text}'", "WHERE id = '$userId'");
+      String text = textKontroller.text;
 
-      updateHiveOwnProfil("tradeNotize", textKontroller.text);
+      updateHiveOwnProfil("tradeNotize", text);
+
+      text = text.replaceAll("'", "''");
+
+      ProfilDatabase().updateProfil(
+          "tradeNotize = '$text'", "WHERE id = '$userId'");
+
+
 
       customSnackbar(
           context,

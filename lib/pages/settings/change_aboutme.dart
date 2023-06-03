@@ -19,9 +19,13 @@ class ChangeAboutmePage extends StatelessWidget {
     textKontroller.text = oldText;
 
     save() async{
-      await ProfilDatabase().updateProfil("aboutme = '${textKontroller.text}'",
-          "WHERE id = '$userId'");
+      String text = textKontroller.text;
+
       updateHiveOwnProfil("aboutme", textKontroller.text);
+
+      text = text.replaceAll("'","''");
+      await ProfilDatabase().updateProfil("aboutme = '$text'", "WHERE id = '$userId'");
+
 
       customSnackbar(context,
           AppLocalizations.of(context).ueberMich + " "+

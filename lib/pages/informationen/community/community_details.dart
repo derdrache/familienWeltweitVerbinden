@@ -12,24 +12,26 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:hive/hive.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as image_pack;
 import 'package:translator/translator.dart';
 
+import '../../../functions/upload_and_save_image.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../services/database.dart';
+import '../../../services/notification.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../start_page.dart';
 import '../../../global/variablen.dart' as global_var;
+import '../location/location_Information.dart';
 
 class CommunityDetails extends StatefulWidget {
   Map community;
   bool fromCommunityPage;
 
-  CommunityDetails({Key key, this.community, this.fromCommunityPage = false}) : super(key: key);
+  CommunityDetails({Key key, this.community, this.fromCommunityPage = false})
+      : super(key: key);
 
   @override
   State<CommunityDetails> createState() => _CommunityDetailsState();
@@ -54,10 +56,18 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var scrollbarOnBottom = true;
   var imageLoading = false;
   final translator = GoogleTranslator();
-
+  bool isCreator;
+  bool isMember;
 
   @override
   void initState() {
+    if (widget.community["beschreibungGer"].isEmpty) {
+      widget.community["beschreibungGer"] = widget.community["beschreibung"];
+    }
+    if (widget.community["beschreibungEng"].isEmpty) {
+      widget.community["beschreibungEng"] = widget.community["beschreibung"];
+    }
+
     _setCreatorText();
     _initImages();
     _getDBDataSetAllUserNames();
@@ -82,9 +92,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _getDBDataSetAllUserNames() async {
-    var dbProfils = await ProfilDatabase().getData("name, id", "");
+    var allProfils = Hive.box('secureBox').get("profils");
 
-    for (var profil in dbProfils) {
+    for (var profil in allProfils) {
       allUserNames.add(profil["name"]);
       allUserIds.add(profil["id"]);
     }
@@ -136,7 +146,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         ),
         PopupMenuItem(
             child: Text(AppLocalizations.of(context).hochladen),
-            onTap: () => _selectAndUploadImage()),
+            onTap: () async {
+              var newImage = await uploadAndSaveImage(context, "community",
+                  meetupCommunityData: widget.community);
+
+              setState(() {
+                widget.community["bild"] = newImage[0];
+              });
+            }),
       ],
       elevation: 8.0,
     );
@@ -189,71 +206,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     );
   }
 
-  _pickAndUploadImage() async {
-    var eventName = widget.community["name"] + "_";
-    var pickedImage = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 50);
-
-    if (pickedImage == null) return;
-
-    setState(() {
-      imageLoading = true;
-    });
-
-    var imageName = eventName + pickedImage.name;
-    imageName = imageName.replaceAll(" ", "_");
-    imageName = imageName.replaceAll("/", "_");
-
-    if (pickedImage == null) {
-      customSnackbar(context, AppLocalizations.of(context).dateiBeschaedigt);
-      return false;
-    }
-
-    var imageByte = await _changeImageSize(pickedImage);
-
-    await uploadImage(pickedImage.path, imageName, imageByte);
-
-    return imageName;
-  }
-
-  _changeImageSize(pickedImage) async {
-    var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
-    var originalWidth = imageByte.width;
-    var originalHeight = imageByte.height;
-    var minPixel = 1000;
-    var newWidth = 0;
-    var newHeight = 0;
-
-    if (originalWidth > originalHeight) {
-      var factor = originalWidth / originalHeight;
-      newHeight = minPixel;
-      newWidth = (minPixel * factor).round();
-    } else {
-      var factor = originalHeight / originalWidth;
-      newWidth = minPixel;
-      newHeight = (minPixel * factor).round();
-    }
-
-    var imageResizeThumbnail =
-        image_pack.copyResize(imageByte, width: newWidth, height: newHeight);
-    var imageJpgByte = image_pack.encodeJpg(imageResizeThumbnail, quality: 20);
-
-    return imageJpgByte;
-  }
-
-  _selectAndUploadImage() async {
-    var imageName = await _pickAndUploadImage();
-    var oldImage = widget.community["bild"];
-
-    if (imageName == false) return;
-
-    imageName = imageName.replaceAll("/", "_");
-    var image = "https://families-worldwide.com/bilder/" + imageName;
-    _saveChangeImage(image);
-
-    DbDeleteImage(oldImage);
-  }
-
   _windowChangeImageWithLink() async {
     return await showDialog(
         context: context,
@@ -273,7 +225,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
-  _windowOptions(saveFunction) {
+  _windowOptions(saveFunction, {add = false}) {
     return Container(
       margin: const EdgeInsets.only(right: 10),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -283,7 +235,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           onPressed: () => Navigator.pop(context),
         ),
         TextButton(
-            child: Text(AppLocalizations.of(context).speichern,
+            child: Text(add ? AppLocalizations.of(context).speichern : AppLocalizations.of(context).hinzufuegen,
                 style: TextStyle(fontSize: fontsize)),
             onPressed: () {
               saveFunction();
@@ -326,7 +278,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _changeNameWindow() {
-    var newNameKontroller = TextEditingController(text: widget.community["name"]);
+    var newNameKontroller =
+        TextEditingController(text: widget.community["name"]);
 
     showDialog(
         context: context,
@@ -355,6 +308,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["name"] = newName;
     });
 
+    newName = newName.replaceAll("'", "''");
+
     CommunityDatabase()
         .update("name = '$newName'", "WHERE id = '${widget.community["id"]}'");
   }
@@ -372,19 +327,21 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             children: [
               ortAuswahlBox,
               const SizedBox(height: 15),
-              _windowOptions(() =>
-                  _saveChangeLocation(ortAuswahlBox.getGoogleLocationData()))
+              _windowOptions(() {
+                var newLocation = ortAuswahlBox.getGoogleLocationData();
+                if (newLocation["city"].isEmpty) {
+                  customSnackbar(
+                      context, AppLocalizations.of(context).ortEingeben);
+                  return;
+                }
+                _saveChangeLocation(newLocation);
+              })
             ],
           );
         });
   }
 
   _saveChangeLocation(newLocationData) {
-    if (newLocationData["city"].isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context).ortEingeben);
-      return;
-    }
-
     setState(() {
       widget.community["ort"] = newLocationData["city"];
       widget.community["land"] = newLocationData["countryname"];
@@ -393,9 +350,16 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     });
 
     updateHiveCommunity(widget.community["id"], "ort", newLocationData["city"]);
-    updateHiveCommunity(widget.community["id"], "land", newLocationData["countryname"]);
-    updateHiveCommunity(widget.community["id"], "latt", newLocationData["latt"]);
-    updateHiveCommunity(widget.community["id"], "longt", newLocationData["longt"]);
+    updateHiveCommunity(
+        widget.community["id"], "land", newLocationData["countryname"]);
+    updateHiveCommunity(
+        widget.community["id"], "latt", newLocationData["latt"]);
+    updateHiveCommunity(
+        widget.community["id"], "longt", newLocationData["longt"]);
+
+    newLocationData["city"] = newLocationData["city"].replaceAll("'", "''");
+    newLocationData["countryname"] =
+        newLocationData["countryname"].replaceAll("'", "''");
 
     CommunityDatabase().updateLocation(widget.community["id"], newLocationData);
   }
@@ -429,7 +393,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _changeLinkWindow() {
-    var newLinkKontroller = TextEditingController(text: widget.community["link"]);
+    var newLinkKontroller =
+        TextEditingController(text: widget.community["link"]);
 
     showDialog(
         context: context,
@@ -483,48 +448,61 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   newBeschreibungKontroller,
                   moreLines: 13,
                   textInputAction: TextInputAction.newline),
-              _windowOptions(
-                  () => _saveChangeBeschreibung(newBeschreibungKontroller.text))
+              _windowOptions(() {
+                String newBeschreibung = newBeschreibungKontroller.text;
+                if (newBeschreibung.isEmpty) {
+                  customSnackbar(
+                      context,
+                      AppLocalizations.of(context)
+                          .bitteCommunityBeschreibungEingeben);
+                  return;
+                }
+
+                _saveChangeBeschreibung(newBeschreibung);
+              })
             ],
           );
         });
   }
 
-  _saveChangeBeschreibung(newBeschreibung) async{
-    if (newBeschreibung.isEmpty) {
-      customSnackbar(context,
-          AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
-      return;
-    }
-
-    var languageCheck = await translator.translate(newBeschreibung);
-    bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
-
-    if(descriptionIsGerman){
-      widget.community["beschreibung"] = newBeschreibung;
-      widget.community["beschreibungGer"] = newBeschreibung;
-      var translation = await _descriptionTranslation(newBeschreibung, "auto");
-      widget.community["beschreibungEng"] = translation + "\n\nThis is an automatic translation";
-    }else{
-      widget.community["beschreibung"] = newBeschreibung;
-      widget.community["beschreibungEng"] = newBeschreibung;
-      var translation = await _descriptionTranslation(newBeschreibung,"de");
-      widget.community["beschreibungGer"] = translation+ "\n\nHierbei handelt es sich um eine automatische Übersetzung";
-    }
-
+  _saveChangeBeschreibung(newBeschreibung) async {
     setState(() {
       widget.community["beschreibung"] = newBeschreibung;
     });
 
-    CommunityDatabase().update("beschreibung = '$newBeschreibung', beschreibungGer = '${widget.community["beschreibungGer"]}', beschreibungEng = '${widget.community["beschreibungEng"]}'",
+    var languageCheck = await translator.translate(newBeschreibung);
+    bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if (descriptionIsGerman) {
+      widget.community["beschreibung"] = newBeschreibung;
+      widget.community["beschreibungGer"] = newBeschreibung;
+      var translation = await _descriptionTranslation(newBeschreibung, "auto");
+      widget.community["beschreibungEng"] =
+          translation + "\n\nThis is an automatic translation";
+    } else {
+      widget.community["beschreibung"] = newBeschreibung;
+      widget.community["beschreibungEng"] = newBeschreibung;
+      var translation = await _descriptionTranslation(newBeschreibung, "de");
+      widget.community["beschreibungGer"] = translation +
+          "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+    }
+
+    newBeschreibung = newBeschreibung.replaceAll("'", "''");
+    var beschreibungGer =
+        widget.community["beschreibungGer"].replaceAll("'", "''");
+    var beschreibungEng =
+        widget.community["beschreibungEng"].replaceAll("'", "''");
+
+    CommunityDatabase().update(
+        "beschreibung = '$newBeschreibung', beschreibungGer = '$beschreibungGer', beschreibungEng = '$beschreibungEng'",
         "WHERE id = '${widget.community["id"]}'");
   }
 
-  _descriptionTranslation(text, targetLanguage) async{
+  _descriptionTranslation(text, targetLanguage) async {
     text = text.replaceAll("'", "");
 
-    var translation = await translator.translate(text,
-        from: "auto", to: targetLanguage);
+    var translation =
+        await translator.translate(text, from: "auto", to: targetLanguage);
 
     return translation.toString();
   }
@@ -570,33 +548,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     return friendsBoxen;
   }
 
-  _addMemberWindow() {
-    var newUser = "";
-
-    searchAutocomplete = SearchAutocomplete(
-      hintText: AppLocalizations.of(context).personSuchen,
-      searchableItems: allUserNames,
-      onConfirm: () {
-        newUser = searchAutocomplete.getSelected()[0];
-      },
-    );
-
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            height: 600,
-            title: AppLocalizations.of(context).mitgliedHinzufuegen,
-            children: [
-              searchAutocomplete,
-              const SizedBox(height: 15),
-              _windowOptions(() => _saveNewMember(newUser)),
-              ...createFriendlistBox(),
-            ],
-          );
-        });
-  }
-
   _saveNewMember(newMember) {
     var userIndex = allUserNames.indexOf(newMember);
     var newMemberId = allUserIds[userIndex];
@@ -618,65 +569,60 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["einladung"].add(newMemberId);
     });
 
-    updateHiveCommunity(widget.community["id"], "einladung", widget.community["einladung"]);
+    updateHiveCommunity(
+        widget.community["id"], "einladung", widget.community["einladung"]);
 
     CommunityDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$newMemberId')",
         "WHERE id = '${widget.community["id"]}'");
 
-    if(!widget.community["interesse"].contains(newMemberId)){
+    if (!widget.community["interesse"].contains(newMemberId)) {
       CommunityDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$newMemberId')",
           "WHERE id = '${widget.community["id"]}'");
     }
+
+    prepareAddMemberNotification(widget.community, newMemberId);
 
     customSnackbar(context,
         newMember + AppLocalizations.of(context).wurdeEingeladenCommunity,
         color: Colors.green);
   }
 
-  _showMembersWindow() async {
-    var membersID = widget.community["members"];
-    var allProfils = Hive.box("secureBox").get("profils");
-    var membersProfils = [];
-    List<Widget> membersBoxes = [];
+  _openGroupChat() {
+    bool hasSecretChat = widget.community["secretChat"]?.isOdd ?? false;
+    bool hasAccess = !hasSecretChat || isMember || isCreator;
 
-    for (var memberId in membersID) {
-      for (var profil in allProfils) {
-        if (profil["id"] == memberId) {
-          membersProfils.add(profil);
-          break;
-        }
-      }
+    if (!hasAccess) {
+      customSnackbar(context, AppLocalizations.of(context).geheimerChatMeldung);
+      return;
     }
 
-    for (var member in membersProfils) {
-      membersBoxes.add(InkWell(
-          onTap: () {
-            global_func.changePage(
-                context,
-                ShowProfilPage(
-                  userName: member["name"],
-                  profil: member,
-                ));
-          },
-          child: Container(
-              margin: const EdgeInsets.all(10),
-              child: Text(
-                member["name"],
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.secondary),
-              ))));
-    }
+    global_func.changePage(
+        context,
+        ChatDetailsPage(
+          connectedWith: "</community=" + widget.community["id"],
+          isChatgroup: true,
+        ));
+  }
 
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            title: AppLocalizations.of(context).member,
-            children: membersBoxes,
-          );
-        });
+  _changeSecretChatOption(newValue) {
+    int secretChat = newValue ? 1 : 0;
+
+    updateHiveCommunity(widget.community["id"], "secretChat", secretChat);
+    CommunityDatabase().update(
+        "secretChat = '$secretChat'", "WHERE id = '${widget.community["id"]}'");
+  }
+
+  _removeMember(memberId){
+    setState(() {
+      widget.community["members"].remove(memberId);
+    });
+
+    CommunityDatabase().update(
+        "members = JSON_REMOVE(members, JSON_UNQUOTE(JSON_SEARCH(members, 'one', '$memberId')))",
+        "WHERE id ='${widget.community["id"]}'"
+    );
   }
 
   @override
@@ -684,8 +630,63 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     fontsize = isWebDesktop ? 12 : 16;
-    var isCreator = widget.community["erstelltVon"].contains(userId);
+    isCreator = widget.community["erstelltVon"].contains(userId);
+    isMember = widget.community["members"].contains(userId);
 
+    _showMembersWindow() async {
+      var membersID = widget.community["members"];
+      var allProfils = Hive.box("secureBox").get("profils");
+      var membersProfils = [];
+      List<Widget> membersBoxes = [];
+
+      for (var memberId in membersID) {
+        for (var profil in allProfils) {
+          if (profil["id"] == memberId) {
+            membersProfils.add(profil);
+            break;
+          }
+        }
+      }
+
+      for (var member in membersProfils) {
+        membersBoxes.add(Row(
+          children: [
+            InkWell(
+                onTap: () {
+                  global_func.changePage(
+                      context,
+                      ShowProfilPage(
+                        userName: member["name"],
+                        profil: member,
+                      ));
+                },
+                child: Container(
+                    margin: const EdgeInsets.all(10),
+                    child: Text(
+                      member["name"],
+                      style:
+                      TextStyle(color: Theme.of(context).colorScheme.secondary),
+                    ))),
+            Expanded(child: SizedBox()),
+            if(isCreator) CloseButton(
+                color: Colors.red,
+                onPressed: () {
+                  Navigator.pop(context);
+                  _removeMember(member["id"]);
+                }),
+          ],
+        ));
+      }
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context).member,
+              children: membersBoxes,
+            );
+          });
+    }
 
     _deleteWindow() {
       showDialog(
@@ -703,17 +704,23 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: () async {
+                    CommunityDatabase().delete(widget.community["id"]);
+                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(
+                        connectedWith:
+                            "</community=${widget.community["id"]}")["id"]);
 
                     var communities = Hive.box('secureBox').get("communities");
-                    communities.removeWhere((community) => community["id"] == widget.community["id"]);
-
-                    await CommunityDatabase().delete(widget.community["id"]);
-                    ChatGroupsDatabase().deleteChat(getChatGroupFromHive(widget.community["id"]));
+                    communities.removeWhere((community) =>
+                        community["id"] == widget.community["id"]);
 
                     DbDeleteImage(widget.community["bild"]);
 
                     global_func.changePageForever(
-                        context, StartPage(selectedIndex: 2, informationPageIndex: 2,));
+                        context,
+                        StartPage(
+                          selectedIndex: 2,
+                          informationPageIndex: 2,
+                        ));
                   },
                 ),
                 TextButton(
@@ -746,7 +753,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                           Navigator.pop(context);
                           ReportsDatabase().add(
                               userId,
-                              "Melde Community id: " + widget.community["id"].toString(),
+                              "Melde Community id: " +
+                                  widget.community["id"].toString(),
                               reportController.text);
                         },
                         label: Text(AppLocalizations.of(context).senden)),
@@ -771,6 +779,49 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
+    _showMemberDialog() {
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.group),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).member),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          _showMembersWindow();
+        },
+      );
+    }
+
+    _addMemberWindow() {
+      var newUser = "";
+
+      searchAutocomplete = SearchAutocomplete(
+        hintText: AppLocalizations.of(context).personSuchen,
+        searchableItems: allUserNames,
+        onConfirm: () {
+          newUser = searchAutocomplete.getSelected()[0];
+        },
+      );
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              height: 600,
+              title: AppLocalizations.of(context).mitgliedHinzufuegen,
+              children: [
+                searchAutocomplete,
+                const SizedBox(height: 15),
+                _windowOptions(() => _saveNewMember(newUser)),
+                ...createFriendlistBox(),
+              ],
+            );
+          });
+    }
+
     _addMemberDialog() {
       return SimpleDialogOption(
         child: Row(
@@ -787,18 +838,79 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
+    _settingDialog() {
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              const Icon(Icons.settings),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context).settings),
+            ],
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+
+            showDialog(
+                context: context,
+                builder: (BuildContext buildContext) {
+                  return StatefulBuilder(
+                      builder: (buildContext, dialogSetState) {
+                    return CustomAlertDialog(
+                        title: AppLocalizations.of(context).settings,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: Text(AppLocalizations.of(context)
+                                      .geheimerChat)),
+                              Switch(
+                                value: widget.community["secretChat"]?.isOdd ??
+                                    false,
+                                inactiveThumbColor: Colors.grey[700],
+                                activeColor:
+                                    Theme.of(context).colorScheme.primary,
+                                onChanged: (value) {
+                                  _changeSecretChatOption(value);
+                                  dialogSetState(() {});
+                                  setState(() {});
+                                },
+                              )
+                            ],
+                          )
+                        ]);
+                  });
+                });
+          });
+    }
+
     _deleteDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
-            const Icon(Icons.delete),
+            const Icon(Icons.delete, color: Colors.red),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).communityLoeschen),
+            Text(AppLocalizations.of(context).communityLoeschen, style: TextStyle(color: Colors.red),),
           ],
         ),
         onPressed: () {
           Navigator.pop(context);
           _deleteWindow();
+        },
+      );
+    }
+
+    _leaveDialog(){
+      return SimpleDialogOption(
+        child: Row(
+          children: [
+            const Icon(Icons.logout, color: Colors.red,),
+            const SizedBox(width: 10),
+            Text(AppLocalizations.of(context).verlassen, style: TextStyle(color: Colors.red),),
+          ],
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+          _removeMember(userId);
         },
       );
     }
@@ -817,9 +929,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     insetPadding:
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
+                      _showMemberDialog(),
                       if (!isCreator) _reportDialog(),
                       if (isCreator) _addMemberDialog(),
+                      if (isCreator) _settingDialog(),
                       if (isCreator) _deleteDialog(),
+                      if (!isCreator && isMember) _leaveDialog()
                     ],
                   ),
                 ),
@@ -840,9 +955,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           _changeImageWindow(getTabPostion);
         },
         child: isAssetImage
-            ? Image.asset(widget.community["bild"], height: screenWidth > 600 ? screenHeight /3  : null)
+            ? Image.asset(widget.community["bild"],
+                height: screenWidth > 600 ? screenHeight / 3 : null)
             : Image.network(widget.community["bild"],
-            height: screenHeight / 3, fit: screenWidth > 600 ? null :  BoxFit.fitWidth),
+                height: screenHeight / 3,
+                fit: screenWidth > 600 ? null : BoxFit.fitWidth),
       );
     }
 
@@ -851,11 +968,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       var isGerman = kIsWeb
           ? window.locale.languageCode == "de"
           : Platform.localeName == "de_DE";
-      if(widget.community["beschreibungGer"].isEmpty) widget.community["beschreibungGer"] = widget.community["beschreibung"];
-      if(widget.community["beschreibungEng"].isEmpty) widget.community["beschreibungEng"] = widget.community["beschreibung"];
-      var usedDiscription = isGerman
-          ? widget.community["beschreibungGer"]
-          : widget.community["beschreibungEng"];
+      var discription = "";
+
+      if (isCreator) {
+        discription = widget.community["beschreibung"];
+      } else if (isGerman) {
+        discription = widget.community["beschreibungGer"];
+      } else {
+        discription = widget.community["beschreibungEng"];
+      }
 
       return [
         Padding(
@@ -864,10 +985,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             onTap: () => isCreator ? _changeNameWindow() : null,
             child: Center(
                 child: Text(
-                  widget.community["name"],
-                  style:
-                  const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                )),
+              widget.community["name"],
+              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            )),
           ),
         ),
         const SizedBox(height: 20),
@@ -886,14 +1006,20 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: InkWell(
-            onTap: () => isCreator ? _changeOrtWindow() : null,
+            onTap: () => isCreator
+                ? _changeOrtWindow()
+                : global_func.changePage(context,
+                    LocationInformationPage(ortName: widget.community["ort"])),
             child: Row(
               children: [
                 Text(AppLocalizations.of(context).ort,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(widget.community["ort"] +
-                    " / " +
-                    widget.community["land"])
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                         decoration: isCreator ? TextDecoration.none : TextDecoration.underline)),
+                Text(
+                  widget.community["ort"] + " / " + widget.community["land"],
+                  style: TextStyle(decoration: isCreator ? TextDecoration.none : TextDecoration.underline),
+                )
               ],
             ),
           ),
@@ -930,12 +1056,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
-            child: TextWithHyperlinkDetection(
-                text: usedDiscription,
-              onTextTab: () => isCreator ? _changeBeschreibungWindow(): null,
-            )
-
-          ),
+              child: TextWithHyperlinkDetection(
+            text: discription,
+            onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
+          )),
         )
       ];
     }
@@ -945,7 +1069,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         width: screenWidth - 20,
         margin: const EdgeInsets.all(10),
         child: Row(
-          //mainAxisAlignment: MainAxisAlignment.end,
+
           children: [
             InkWell(
               onTap: () => _showMembersWindow(),
@@ -988,19 +1112,18 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),
-                onPressed: () => global_func.changePage(context, ChatDetailsPage(
-                  connectedId: "</community="+widget.community["id"],
-                  isChatgroup: true,
-                )),
+                onPressed: () => _openGroupChat(),
               ),
               IconButton(
                 icon: const Icon(Icons.link),
-                onPressed: (){
+                onPressed: () {
                   Clipboard.setData(ClipboardData(
-                      text: "</communityId=" + widget.community["id"].toString()
-                  ));
+                      text: "</communityId=" +
+                          widget.community["id"].toString()));
 
-                  customSnackbar(context, AppLocalizations.of(context).linkWurdekopiert, color: Colors.green);
+                  customSnackbar(
+                      context, AppLocalizations.of(context).linkWurdekopiert,
+                      color: Colors.green);
                 },
               ),
               IconButton(
@@ -1014,7 +1137,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               children: [
                 Container(
                   height: screenHeight,
-                  padding: EdgeInsets.only(bottom: 50),
+                  padding: const EdgeInsets.only(bottom: 50),
                   child: ListView(
                     controller: _controller,
                     shrinkWrap: true,
@@ -1028,7 +1151,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                                   height: 100,
                                   child: const CircularProgressIndicator()))
                           : _communityImage(),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       ..._communityInformation()
                     ],
                   ),
