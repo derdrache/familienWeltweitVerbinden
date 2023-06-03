@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/informationen/community/community_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:hive_flutter/hive_flutter.dart';
@@ -20,7 +21,23 @@ import 'services/database.dart';
 import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 
+refreshData(messageTyp) async{
+  if (messageTyp == "chat") {
+    refreshHiveChats();
+  }else if (messageTyp == "event"){
+    refreshHiveMeetups();
+  }
+  else if (messageTyp == "newFriend") {
+    refreshHiveProfils();
+  }else if(messageTyp == "community"){
+    refreshHiveCommunities();
+  }
+}
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  var messageData = json.decode(message.data["info"]);
+  refreshData(messageData["typ"]);
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -117,13 +134,15 @@ class MyApp extends StatelessWidget {
   notificationLeadPage(notification) {
     if (notification["typ"] == "chat") {
       _changeToChat(notification["link"]);
+    }else if (notification["typ"] == "event"){
+      _changeToEvent(notification["link"]);
     }
-    if (notification["typ"] == "event") _changeToEvent(notification["link"]);
-    if (notification["typ"] == "newFriend") {
+    else if (notification["typ"] == "newFriend") {
       _changeToProfil(notification["link"]);
+    }else if(notification["typ"] == "community"){
+      _changeToCommunity(notification["link"]);
     }
   }
-
 
   _setFirebaseNotifications() {
     final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -144,7 +163,6 @@ class MyApp extends StatelessWidget {
     _notificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (payload) async {
       final Map<String, dynamic> payLoadMap = json.decode(payload);
-
       notificationLeadPage(payLoadMap);
     });
 
@@ -158,6 +176,8 @@ class MyApp extends StatelessWidget {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       if (message.data.isNotEmpty) {
         var messageData = json.decode(message.data["info"]);
+
+        refreshData(messageData["typ"]);
 
         if (messageData["typ"] == "chat") {
           var chatId = messageData["link"];
@@ -202,6 +222,13 @@ class MyApp extends StatelessWidget {
         builder: (_) => ShowProfilPage(
               profil: profilData,
             )));
+  }
+
+  _changeToCommunity(communityId) async{
+    var communityData = getCommunityFromHive(communityId);
+
+    navigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (_) => CommunityDetails(community: communityData,)));
   }
 
   @override
