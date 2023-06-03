@@ -2151,7 +2151,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   child: TextField(
                     maxLines: null,
                     focusNode: messageInputNode,
-                    autofocus: true,
                     textInputAction: TextInputAction.newline,
                     controller: nachrichtController,
                     textAlignVertical: TextAlignVertical.center,

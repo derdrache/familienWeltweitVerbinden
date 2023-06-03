@@ -323,7 +323,9 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   AppLocalizations.of(context).aktuellDort +
                       familiesOnLocation.toString() +
                       AppLocalizations.of(context).familien,
-                  style: TextStyle(fontSize: fontSize, decoration: TextDecoration.underline)),
+                  style: TextStyle(
+                      fontSize: fontSize,
+                      decoration: TextDecoration.underline)),
             ],
           ),
         ),
@@ -343,7 +345,9 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   AppLocalizations.of(context).besuchtVon +
                       anzahlFamilien.toString() +
                       AppLocalizations.of(context).familien,
-                  style: TextStyle(fontSize: fontSize, decoration: TextDecoration.underline)),
+                  style: TextStyle(
+                      fontSize: fontSize,
+                      decoration: TextDecoration.underline)),
             ],
           ),
         ),

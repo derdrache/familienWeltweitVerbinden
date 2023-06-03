@@ -427,13 +427,12 @@ class ChatGroupsDatabase {
   updateChatGroup(whatData, queryEnd) async {
     var url = Uri.parse(databaseUrl + databasePathUpdate);
 
-    var test = await http.post(url,
+    await http.post(url,
         body: json.encode({
           "table": "chat_groups",
           "whatData": whatData,
           "queryEnd": queryEnd
         }));
-    print(test.body);
   }
 
   getAllChatMessages(chatId) async {
