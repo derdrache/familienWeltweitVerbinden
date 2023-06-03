@@ -211,7 +211,6 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     List<Widget> familiesList = [];
 
     for (var family in list) {
-      print(family);
       var profil = getProfilFromHive(profilId: family);
       var isInactive = isUserInactive(profil);
 

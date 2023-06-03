@@ -3,6 +3,8 @@ import '../global/variablen.dart';
 isUserInactive(profilData){
   if(profilData == null) return;
 
+  profilData["lastLogin"] ??= DateTime.parse("2022-02-13");
+
   var timeDifferenceLastLogin = Duration(
       microseconds: (DateTime.now().microsecondsSinceEpoch -
           DateTime.parse(profilData["lastLogin"].toString())
