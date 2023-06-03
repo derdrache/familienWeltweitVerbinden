@@ -23,8 +23,28 @@ class _LocationPageState extends State<LocationPage> {
   var onSearch = false;
   TextEditingController citySearchKontroller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
+  final _scrollController = ScrollController();
+  int displayDataEntries = 20;
 
-  getAllInterestCities() {
+  @override
+  void initState() {
+    _scrollBar();
+    super.initState();
+  }
+
+  _scrollBar(){
+    _scrollController.addListener(() {
+      bool isBottom = _scrollController.position.atEdge;
+
+      if(isBottom){
+        setState(() {
+          displayDataEntries += 20;
+        });
+      }
+    });
+  }
+
+  getAllInterestLocations() {
     var allCities = Hive.box('secureBox').get("stadtinfo");
     var interestCities = [];
 
@@ -38,17 +58,17 @@ class _LocationPageState extends State<LocationPage> {
     return interestCities;
   }
 
-  getAllSearchedCities(){
+  getAllSearchedLocations(){
     var allCities = Hive.box('secureBox').get("stadtinfo");
     var searchText = citySearchKontroller.text;
     var searchedCities = [];
 
-    if(searchText.isEmpty) return searchedCities;
-
-    var searchTextFirstLetterBig = searchText.replaceFirst(searchText[0], searchText[0].toUpperCase());
+    var searchTextFirstLetterBig = searchText.isEmpty ? "" :searchText.replaceFirst(searchText[0], searchText[0].toUpperCase());
 
     for (var city in allCities) {
-      var containsSearch = city["ort"].contains(searchTextFirstLetterBig) || city["ort"].contains(searchText);
+      var containsSearch = city["ort"].contains(searchTextFirstLetterBig)
+          || city["ort"].contains(searchText)
+          || searchText.isEmpty;
       var isCity = city["isCity"] == 1;
 
       if (containsSearch && (widget.forLand ? !isCity : isCity)) searchedCities.add(city);
@@ -58,8 +78,8 @@ class _LocationPageState extends State<LocationPage> {
 
   }
 
-  showAllCities() {
-    List interesetCities = onSearch ? getAllSearchedCities() : getAllInterestCities();
+  showAllLocations() {
+    List interesetCities = onSearch ? getAllSearchedLocations() : getAllInterestLocations();
     List<Widget> interestCitiyCards = [];
     var emptyText = widget.forCity
         ? AppLocalizations.of(context).nochKeineStaedteVorhanden
@@ -76,12 +96,14 @@ class _LocationPageState extends State<LocationPage> {
       ));
     }
 
-    for (var city in interesetCities) {
+    for (var city in interesetCities.take(displayDataEntries).toList()) {
       interestCitiyCards.add(LocationCard(location: city, fromCityPage: true,));
     }
 
     return interestCitiyCards;
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -103,11 +125,12 @@ class _LocationPageState extends State<LocationPage> {
             Container(
               height: double.infinity,
               child: SingleChildScrollView(
+                controller: _scrollController,
                   child: Container(
                     width: double.infinity,
                     child: Wrap(
                       alignment: WrapAlignment.center,
-                      children: showAllCities(),
+                      children: showAllLocations(),
                     ),
               )),
             ),
