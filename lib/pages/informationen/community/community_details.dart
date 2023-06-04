@@ -393,8 +393,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _changeLinkWindow() {
-    var newLinkKontroller =
-        TextEditingController(text: widget.community["link"]);
+    var newLinkKontroller = TextEditingController();
 
     showDialog(
         context: context,
