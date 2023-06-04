@@ -114,6 +114,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
 
       return Wrap(
         children: allImages,
+        alignment: WrapAlignment.center,
       );
     }
 
@@ -215,8 +216,6 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                 setState(() {
                   widget.meetupData["bild"] = newImage[0];
                 });
-
-                //MeetupDatabase().update("bild = '${newImage[0]}'", "WHERE id = '${widget.meetupData["id"]}'");
               }),
         ],
         elevation: 8.0,

@@ -113,6 +113,8 @@ class _CommunityCardState extends State<CommunityCard> {
                       children: [
                         Text(widget.community["name"],
                             textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: fontSize + 1)),

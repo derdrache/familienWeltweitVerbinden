@@ -258,6 +258,8 @@ class _MeetupCardState extends State<MeetupCard> {
                     child: Column(
                       children: [
                         Text(widget.meetupData["name"],
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
