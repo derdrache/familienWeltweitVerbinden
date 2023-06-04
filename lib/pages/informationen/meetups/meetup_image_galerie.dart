@@ -93,21 +93,20 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       List<Widget> allImages = [];
 
       for (var image in imagePaths) {
-        var imageDecode = Uri.decodeComponent(image);
 
         allImages.add(InkWell(
           child: Container(
               margin: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                   border: Border.all(
-                      width: selectedImage == imageDecode ? 3 : 1,
-                      color: selectedImage == imageDecode
+                      width: selectedImage == image ? 3 : 1,
+                      color: selectedImage == image
                           ? Colors.green
                           : Colors.black)),
-              child: Image.asset(imageDecode,
+              child: Image.asset(image,
                   fit: BoxFit.fill, width: 80, height: 60)),
           onTap: () {
-            selectedImage = imageDecode;
+            selectedImage = image;
             windowSetState(() {});
           },
         ));
@@ -211,11 +210,13 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
           PopupMenuItem(
               child: Text(AppLocalizations.of(context).hochladen),
               onTap: () async {
-                var newImage = await uploadAndSaveImage(context, "community",
+                var newImage = await uploadAndSaveImage(context, "meetup",
                     meetupCommunityData: widget.meetupData);
                 setState(() {
                   widget.meetupData["bild"] = newImage[0];
                 });
+
+                //MeetupDatabase().update("bild = '${newImage[0]}'", "WHERE id = '${widget.meetupData["id"]}'");
               }),
         ],
         elevation: 8.0,
