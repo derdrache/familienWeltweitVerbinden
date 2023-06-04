@@ -32,7 +32,9 @@ class TextWithHyperlinkDetection extends StatelessWidget {
     addHyperlinkText(text){
       newTextList.add(TextSpan(
           text: text + " ",
-          recognizer: TapGestureRecognizer()..onTap = () => global_func.openURL(text.trim()),
+          recognizer: TapGestureRecognizer()..onTap = onTextTab == null
+              ? () => global_func.openURL(text.trim())
+              : () => onTextTab(),
           style: TextStyle(fontSize: fontsize, color: Colors.blue,)
       ));
     }
