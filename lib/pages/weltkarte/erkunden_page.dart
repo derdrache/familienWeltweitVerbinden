@@ -769,7 +769,6 @@ class _ErkundenPageState extends State<ErkundenPage>
                         }
                       }
 
-
                       setLookForReiseplanung(selectedDate[0], selectedDate[1]);
 
                       Navigator.pop(context);
@@ -808,8 +807,15 @@ class _ErkundenPageState extends State<ErkundenPage>
 
     for (var profil in profils) {
       var reiseplanung = profil["reisePlanung"];
+      bool hasFixedLocation = profil["reiseart"] == global_var.reisearten[0]
+          || profil["reiseart"] == global_var.reiseartenEnglisch[0];
 
-      if (reiseplanung == null || profil["id"] == userId) continue;
+      if(profil["id"] == userId) continue;
+      if(hasFixedLocation){
+        selectedProfils.add(profil);
+        continue;
+      }
+      if(reiseplanung == null) continue;
 
       for (var planung in reiseplanung) {
         var planungVon = DateTime.parse(planung["von"]);
