@@ -78,10 +78,10 @@ class _StartPageState extends State<StartPage> {
     if (userName == null || ownProfil == null) return;
 
     _oldUserAutomaticJoinChats(ownProfil["ort"]);
-    _updateOwnLastLogin();
-    _updateAutomaticLocation();
+    _setOwnLocation();
     _updateOwnEmail();
     _updateOwnToken();
+    _updateOwnLastLogin();
   }
 
   _checkForceUpdate() async {
@@ -149,19 +149,23 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
-  _updateAutomaticLocation() async {
+  _setOwnLocation(){
     var automaticLocation = ownProfil["automaticLocation"];
     bool automaticLocationOff = automaticLocation == standortbestimmung[0] ||
         automaticLocation == standortbestimmungEnglisch[0];
     var dateDifference =
-        DateTime.now().difference(DateTime.parse(ownProfil["lastLogin"]));
+    DateTime.now().difference(DateTime.parse(ownProfil["lastLogin"]));
     var firstTimeOnDay = dateDifference.inDays > 0;
 
-    if (automaticLocation == null || automaticLocationOff || !firstTimeOnDay) {
-      return;
+    if(automaticLocation == null || automaticLocationOff || !firstTimeOnDay){
+      _checkTravelPlanAndUpdateLocation();
+    }else{
+      _setAutomaticLoaction(automaticLocation);
     }
+  }
 
-    _setAutomaticLoaction(automaticLocation);
+  _checkTravelPlanAndUpdateLocation(){
+
   }
 
   _setAutomaticLoaction(automaticLocationStatus) async {
