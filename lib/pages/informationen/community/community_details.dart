@@ -181,21 +181,19 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     List<Widget> allImages = [];
 
     for (var image in imagePaths) {
-      var imageDecode = Uri.decodeComponent(image);
-
       allImages.add(InkWell(
         child: Container(
             margin: const EdgeInsets.all(5),
             decoration: BoxDecoration(
                 border: Border.all(
-                    width: selectedImage == imageDecode ? 3 : 1,
-                    color: selectedImage == imageDecode
+                    width: selectedImage == image ? 3 : 1,
+                    color: selectedImage == image
                         ? Colors.green
                         : Colors.black)),
-            child: Image.asset(imageDecode,
+            child: Image.asset(image,
                 fit: BoxFit.fill, width: 80, height: 60)),
         onTap: () {
-          selectedImage = imageDecode;
+          selectedImage = image;
           windowSetState(() {});
         },
       ));
