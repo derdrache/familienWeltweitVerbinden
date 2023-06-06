@@ -564,7 +564,8 @@ class _SupportInformation extends StatelessWidget {
                     Text("Flutter"),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
+                Text(AppLocalizations.of(context).aboutAppText)
               ],
             );
           });
