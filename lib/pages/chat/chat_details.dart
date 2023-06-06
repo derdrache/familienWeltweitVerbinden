@@ -91,7 +91,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   final translator = GoogleTranslator();
   String ownLanguage = WidgetsBinding.instance.window.locales[0].languageCode;
   bool userJoinedChat = false;
-  int displayDataEntries = 50;
+  int displayDataEntries = 20;
 
   @override
   void initState() {
@@ -251,7 +251,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       if(isBottom){
         setState(() {
-          displayDataEntries += 50;
+          displayDataEntries += 20;
         });
       }
     });
