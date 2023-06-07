@@ -21,7 +21,7 @@ import 'services/database.dart';
 import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 
-refreshData(messageTyp) async{
+refreshDataOnNotification(messageTyp) async{
   if (messageTyp == "chat") {
     refreshHiveChats();
   }else if (messageTyp == "event"){
@@ -36,7 +36,7 @@ refreshData(messageTyp) async{
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   var messageData = json.decode(message.data["info"]);
-  refreshData(messageData["typ"]);
+  refreshDataOnNotification(messageData["typ"]);
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -177,7 +177,7 @@ class MyApp extends StatelessWidget {
       if (message.data.isNotEmpty) {
         var messageData = json.decode(message.data["info"]);
 
-        refreshData(messageData["typ"]);
+        refreshDataOnNotification(messageData["typ"]);
 
         if (messageData["typ"] == "chat") {
           var chatId = messageData["link"];
