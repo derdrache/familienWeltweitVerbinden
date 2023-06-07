@@ -678,6 +678,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                   ),
                   child: TextWithHyperlinkDetection(
                       text: discription.isNotEmpty ? discription : widget.meetupData["beschreibung"],
+                      withoutActiveHyperLink: widget.isCreator,
                       onTextTab: widget.isCreator
                           ? () => openChangeWindow(
                               AppLocalizations.of(context)
@@ -690,7 +691,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                                   textInputAction: TextInputAction.newline),
                               checkAndSaveNewBeschreibung,
                               height: 400)
-                          : null))));
+                          : null)
+              )));
     }
 
     cardShadowColor() {

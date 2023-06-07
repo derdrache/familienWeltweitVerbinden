@@ -10,9 +10,10 @@ class TextWithHyperlinkDetection extends StatelessWidget {
   Function onTextTab;
   var hyperlinkColor = Colors.blue[700];
   var textColor = Colors.black;
+  bool withoutActiveHyperLink;
 
   TextWithHyperlinkDetection(
-      {Key key, this.text, this.fontsize = 15, this.onTextTab})
+      {Key key, this.text, this.fontsize = 15, this.onTextTab, this.withoutActiveHyperLink = false})
       : super(key: key);
 
   @override
@@ -30,11 +31,13 @@ class TextWithHyperlinkDetection extends StatelessWidget {
     }
 
     addHyperlinkText(text){
+
+
       newTextList.add(TextSpan(
           text: text + " ",
-          recognizer: TapGestureRecognizer()..onTap = onTextTab == null
-              ? () => global_func.openURL(text.trim())
-              : () => onTextTab(),
+          recognizer: TapGestureRecognizer()..onTap = withoutActiveHyperLink
+              ? () => onTextTab()
+              : () => global_func.openURL(text.trim()),
           style: TextStyle(fontSize: fontsize, color: Colors.blue,)
       ));
     }

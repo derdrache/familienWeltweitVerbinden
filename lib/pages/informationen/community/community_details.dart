@@ -1055,6 +1055,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           child: SizedBox(
               child: TextWithHyperlinkDetection(
             text: discription,
+            withoutActiveHyperLink: isCreator,
             onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
           )),
         )
