@@ -22,20 +22,20 @@ import 'chat_details.dart';
 class ChatPage extends StatefulWidget {
   int chatPageSliderIndex;
 
-  ChatPage({Key key, this.chatPageSliderIndex}) : super(key: key);
+  ChatPage({Key? key, required this.chatPageSliderIndex}) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser!.uid;
   var searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
   List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
   var ownProfil = Hive.box('secureBox').get("ownProfil");
-  List allName, userFriendlist;
+  List<String>? allName, userFriendlist;
   bool changeBarOn = false;
   var selectedChats = [];
   bool firstSelectedIsPinned = false;
@@ -109,7 +109,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
       if (!ownProfil["geblocktVon"].contains(data["id"]) &&
           data["id"] != "bbGp4rxJvCMywMI7eTahtZMHY2o2" &&
           data["id"] != userId) {
-        allName.add(data["name"]);
+        allName!.add(data["name"]);
       }
 
       if (!userFriendIdList.contains(data["id"])) continue;
@@ -117,7 +117,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
       for (var user in userFriendIdList) {
         if (data["id"] == user &&
             !ownProfil["geblocktVon"].contains(data["id"])) {
-          userFriendlist.add(data["name"]);
+          userFriendlist!.add(data["name"]);
         }
       }
     }
@@ -133,8 +133,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   selectChatpartnerWindow() async {
     userFriendlist ??= [];
     searchAutocomplete = SearchAutocomplete(
-      hintText: AppLocalizations.of(context).personSuchen,
-      searchableItems: allName,
+      hintText: AppLocalizations.of(context)!.personSuchen,
+      searchableItems: allName!,
       onConfirm: () {
         Navigator.pop(context);
         searchUser(searchAutocomplete.getSelected()[0]);
@@ -146,7 +146,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             height: 800,
-            title: AppLocalizations.of(context).neuenChatEroeffnen,
+            title: AppLocalizations.of(context)!.neuenChatEroeffnen,
             children: [
               Center(child: SizedBox(width: 300, child: searchAutocomplete)),
               ...createFriendlistBox(userFriendlist)
@@ -194,7 +194,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
       return [
         Center(
             heightFactor: 10,
-            child: Text(AppLocalizations.of(context).nochKeineFreundeVorhanden,
+            child: Text(AppLocalizations.of(context)!.nochKeineFreundeVorhanden,
                 style: const TextStyle(color: Colors.grey)))
       ];
     }
@@ -297,7 +297,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
   deleteChatDialog(chatgroupData) {
     var countSelected = selectedChats.length;
     var chatPartnerName = "";
-    bool isChatGroup;
+    late bool isChatGroup;
 
     if (countSelected == 1) {
       var selectedChatData = selectedChats[0];
@@ -321,13 +321,13 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
         builder: (BuildContext context) {
           return StatefulBuilder(builder: (context, setState) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).chatLoeschen,
+              title: AppLocalizations.of(context)!.chatLoeschen,
               height: countSelected == 1 && !isChatGroup ? 150 : 100,
               children: [
                 Center(
                     child: Text(countSelected == 1
-                        ? AppLocalizations.of(context).chatWirklichLoeschen
-                        : AppLocalizations.of(context).chatsWirklichLoeschen)),
+                        ? AppLocalizations.of(context)!.chatWirklichLoeschen
+                        : AppLocalizations.of(context)!.chatsWirklichLoeschen)),
                 if (countSelected == 1 && !isChatGroup) const SizedBox(height: 20),
                 if (countSelected == 1 && !isChatGroup)
                   Row(
@@ -336,12 +336,12 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                           value: bothDelete,
                           onChanged: (value) {
                             setState(() {
-                              bothDelete = value;
+                              bothDelete = value!;
                             });
                           }),
                       Expanded(
                         child: Text(
-                            AppLocalizations.of(context).auchBeiLoeschen +
+                            AppLocalizations.of(context)!.auchBeiLoeschen +
                                 chatPartnerName),
                       ) //widget.chatPartnerName)
                     ],
@@ -349,7 +349,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
               ],
               actions: [
                 TextButton(
-                  child: Text(AppLocalizations.of(context).loeschen),
+                  child: Text(AppLocalizations.of(context)!.loeschen),
                   onPressed: () async {
                     Navigator.pop(context);
                     changeBarOn = false;
@@ -358,7 +358,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                   },
                 ),
                 TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -443,7 +443,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
     myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
 
     getChatGroupName(chatConnected) {
-      if (chatConnected.isEmpty) return AppLocalizations.of(context).weltChat;
+      if (chatConnected.isEmpty) return AppLocalizations.of(context)!.weltChat;
 
       var connectedId = chatConnected.split("=")[1];
       if (chatConnected.contains("event")) {
@@ -489,11 +489,11 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
 
       for (var chat in allMyChats) {
         bool isChatGroup = chat["connected"] != null;
-        String chatName = "";
+        String? chatName = "";
 
         if (isChatGroup) {
           chatName = getChatGroupName(chat["connected"]);
-          chatName ??= AppLocalizations.of(context).weltChat;
+          chatName ??= AppLocalizations.of(context)!.weltChat;
         } else {
           var chatUsers = chat["users"].keys.toList();
           var userPartnerId =
@@ -530,7 +530,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
       for (var chatGroup in allChatGroups) {
         var chatConnected = chatGroup["connected"];
         var chatName = getChatGroupName(chatConnected);
-        chatName ??= AppLocalizations.of(context).weltChat;
+        chatName ??= AppLocalizations.of(context)!.weltChat;
 
         var containCondition =
             chatName.contains(value) || chatName.contains(firstLetterBig);
@@ -574,8 +574,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
 
       for (dynamic group in chatData) {
         String chatName = "";
-        Map chatPartnerProfil;
-        String chatPartnerId;
+        Map? chatPartnerProfil;
+        String? chatPartnerId;
 
         var users = group["users"] ?? {};
         var isChatGroup = group["connected"] != null;
@@ -607,7 +607,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
             chatData["bild"] = chatData["isCity"] == 1 ? cityImage : countryImage;
 
           } else if (group["connected"].contains("world")) {
-            chatName = AppLocalizations.of(context).weltChat;
+            chatName = AppLocalizations.of(context)!.weltChat;
             chatData = {
               "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
             };
@@ -638,7 +638,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
           }
 
           if (chatName.isEmpty) {
-            chatName = AppLocalizations.of(context).geloeschterUser;
+            chatName = AppLocalizations.of(context)!.geloeschterUser;
           }
 
           if (chatPartnerProfil == null || users[userId] == null) continue;
@@ -657,8 +657,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
           if(isBlocked) continue;
         }
 
-        if (chatName == null) continue;
-
         var lastMessage = cutMessage(group["lastMessage"] ?? "");
         var ownChatNewMessages =
             users[userId] != null ? users[userId]["newMessages"] : 0;
@@ -671,9 +669,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
 
         if (isPinned) sortIndex = 0;
         if (lastMessage == "<weiterleitung>") {
-          lastMessage = AppLocalizations.of(context).weitergeleitet;
+          lastMessage = AppLocalizations.of(context)!.weitergeleitet;
         } else if (lastMessage == "</neuer Chat") {
-          lastMessage = AppLocalizations.of(context).neuerChat;
+          lastMessage = AppLocalizations.of(context)!.neuerChat;
         }
 
         chatGroupContainers.insert(
@@ -705,7 +703,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                               builder: (_) => ChatDetailsPage(
                                   chatPartnerName: isChatGroup
                                       ? null
-                                      : chatPartnerProfil["name"],
+                                      : chatPartnerProfil!["name"],
                                   groupChatData: group,
                                   backToChatPage: true,
                                   chatPageSliderIndex: mainSlider,
@@ -785,7 +783,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                                     .format(lastMessageTime),
                                 style: TextStyle(color: Colors.grey[600])),
                             const SizedBox(height: 10),
-                            newMessageAndPinnedBox(ownChatNewMessages, isPinned)
+                            newMessageAndPinnedBox(ownChatNewMessages, isPinned)!
                           ])
                     ],
                   )),
@@ -796,7 +794,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
         chatGroupContainers.add(Padding(
           padding: const EdgeInsets.only(top: 300),
           child: Center(
-              child: Text(AppLocalizations.of(context).nochKeineChatsVorhanden,
+              child: Text(AppLocalizations.of(context)!.nochKeineChatsVorhanden,
                   style: const TextStyle(fontSize: 20, color: Colors.grey))),
         ));
       }
@@ -817,7 +815,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
               style: const TextStyle(fontSize: 18),
               decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: AppLocalizations.of(context).suche,
+                  hintText: AppLocalizations.of(context)!.suche,
                   suffixIcon: CloseButton(
                     color: Colors.white,
                     onPressed: () {
@@ -873,12 +871,12 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
             child: CupertinoSlidingSegmentedControl(
               children: {
                 0: Text(
-                  AppLocalizations.of(context).alle,
+                  AppLocalizations.of(context)!.alle,
                   style: const TextStyle(color: Colors.black),
                 ),
-                1: Text(AppLocalizations.of(context).private,
+                1: Text(AppLocalizations.of(context)!.private,
                     style: const TextStyle(color: Colors.black)),
-                2: Text(AppLocalizations.of(context).gruppen,
+                2: Text(AppLocalizations.of(context)!.gruppen,
                     style: const TextStyle(color: Colors.black))
               },
               backgroundColor: Colors.transparent,
@@ -946,8 +944,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                             )
                           : Center(
                               child: Text(
-                              AppLocalizations.of(context).keineErgebnisse,
-                              style: TextStyle(fontSize: 20),
+                              AppLocalizations.of(context)!.keineErgebnisse,
+                              style: const TextStyle(fontSize: 20),
                             )),
                     ),
                     Container(
@@ -955,7 +953,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                         decoration: const BoxDecoration(
                             border: Border(top: BorderSide())),
                         padding: const EdgeInsets.all(10),
-                        child: Text(AppLocalizations.of(context).globaleSuche,
+                        child: Text(AppLocalizations.of(context)!.globaleSuche,
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 20))),
                     Expanded(
@@ -967,8 +965,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                             )
                           : Center(
                               child: Text(
-                                  AppLocalizations.of(context).keineErgebnisse,
-                                  style: TextStyle(fontSize: 20))),
+                                  AppLocalizations.of(context)!.keineErgebnisse,
+                                  style: const TextStyle(fontSize: 20))),
                     ),
                   ],
                 ),

@@ -34,17 +34,17 @@ import '../informationen/location/location_Information.dart';
 import '../informationen/location/location_card.dart';
 
 class ChatDetailsPage extends StatefulWidget {
-  String chatPartnerId;
-  String chatPartnerName;
-  String chatId;
-  Map groupChatData;
+  String? chatPartnerId;
+  String? chatPartnerName;
+  String? chatId;
+  Map? groupChatData;
   bool backToChatPage;
   bool isChatgroup;
-  String connectedWith;
-  int chatPageSliderIndex;
+  String? connectedWith;
+  int? chatPageSliderIndex;
 
   ChatDetailsPage(
-      {Key key,
+      {Key? key,
       this.chatPartnerId,
       this.chatPartnerName,
       this.chatId,
@@ -62,21 +62,21 @@ class ChatDetailsPage extends StatefulWidget {
 class _ChatDetailsPageState extends State<ChatDetailsPage>
     with WidgetsBindingObserver {
   TextEditingController nachrichtController = TextEditingController();
-  String userId = FirebaseAuth.instance.currentUser.uid;
-  Timer timer;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
+  late Timer timer;
   List<dynamic> messages = [];
-  Map chatPartnerProfil;
+  Map? chatPartnerProfil;
   bool bothDelete = false;
   FocusNode messageInputNode = FocusNode();
   FocusNode searchInputNode = FocusNode();
-  String messageExtraInformationId;
-  String changeMessageInputModus;
+  String? messageExtraInformationId;
+  String? changeMessageInputModus;
   Widget extraInputInformationBox = const SizedBox.shrink();
   final _scrollController = ItemScrollController();
   var itemPositionListener = ItemPositionsListener.create();
   bool hasStartPosition = true;
   Map ownProfil = Hive.box('secureBox').get("ownProfil");
-  int angehefteteMessageShowIndex;
+  int? angehefteteMessageShowIndex;
   bool isLoading = true;
   bool textSearchIsActive = false;
   TextEditingController searchTextKontroller = TextEditingController();
@@ -86,7 +86,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   List highlightMessages = [];
   Map connectedData = {};
   var pageDetailsPage;
-  int unreadMessages = 0;
+  num unreadMessages = 0;
   List adminList = [mainAdmin];
   final translator = GoogleTranslator();
   String ownLanguage = WidgetsBinding.instance.window.locales[0].languageCode;
@@ -96,15 +96,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   void initState() {
     _getAndSetChatData();
-    userJoinedChat = widget.groupChatData["users"][userId] != null;
-    widget.chatId ??= widget.groupChatData["id"].toString();
+    userJoinedChat = widget.groupChatData!["users"][userId] != null;
+    widget.chatId ??= widget.groupChatData!["id"].toString();
     _setConnectionData();
     _checkSecretChatMember();
     _changeUserChatStatus(1);
     _setScrollbarListener();
     _resetNewMessageCounter();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _asyncMethod());
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -137,14 +137,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         ? ChatGroupsDatabase().updateChatGroup
         : ChatDatabase().updateChatGroup;
 
-    widget.groupChatData["users"][userId]["isActive"] = status;
+    widget.groupChatData!["users"][userId]["isActive"] = status;
     databaseUpdate("users = JSON_SET(users, '\$.$userId.isActive', $status)",
         "WHERE id = '${widget.chatId}'");
   }
 
   _getAndSetChatData() {
     if(!widget.isChatgroup && widget.chatId != null){
-      widget.isChatgroup = !widget.chatId.contains("_");
+      widget.isChatgroup = !widget.chatId!.contains("_");
     }
 
     if (widget.isChatgroup) {
@@ -164,20 +164,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     } else {
       var chatPartnerId = widget.chatPartnerId;
       if(chatPartnerId == null && widget.chatId != null){
-        chatPartnerId = widget.chatId.replaceAll(ownProfil["id"], "");
+        chatPartnerId = widget.chatId!.replaceAll(ownProfil["id"], "");
         chatPartnerId = chatPartnerId.replaceAll("_", "");
       }
       chatPartnerProfil = getProfilFromHive(
           profilId: chatPartnerId, profilName: widget.chatPartnerName);
       widget.groupChatData ??= getChatFromHive(
-          widget.chatId ?? global_functions.getChatID(chatPartnerProfil["id"]));
+          widget.chatId ?? global_functions.getChatID(chatPartnerProfil!["id"]));
 
       widget.groupChatData ??=
-          ChatDatabase().addNewChatGroup(chatPartnerProfil["id"]);
+          ChatDatabase().addNewChatGroup(chatPartnerProfil!["id"]);
     }
 
     if (userJoinedChat) {
-      unreadMessages += widget.groupChatData["users"][userId]["newMessages"];
+      unreadMessages += widget.groupChatData!["users"][userId]["newMessages"];
     }
   }
 
@@ -189,23 +189,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   _setConnectionData() {
     if (!widget.isChatgroup) return;
 
-    var connectedId = widget.groupChatData["connected"] == null
+    var connectedId = widget.groupChatData!["connected"] == null
         ? ""
-        : widget.groupChatData["connected"].split("=")[1];
+        : widget.groupChatData!["connected"].split("=")[1];
 
-    if (widget.groupChatData["connected"].contains("event")) {
+    if (widget.groupChatData!["connected"].contains("event")) {
       connectedData = getMeetupFromHive(connectedId);
       pageDetailsPage = MeetupDetailsPage(
         meetupData: connectedData,
       );
       adminList.add(connectedData["erstelltVon"]);
-    } else if (widget.groupChatData["connected"].contains("community")) {
+    } else if (widget.groupChatData!["connected"].contains("community")) {
       connectedData = getCommunityFromHive(connectedId);
       pageDetailsPage = CommunityDetails(
         community: connectedData,
       );
       adminList.add(connectedData["erstelltVon"]);
-    } else if (widget.groupChatData["connected"].contains("stadt")) {
+    } else if (widget.groupChatData!["connected"].contains("stadt")) {
       Map location = getCityFromHive(cityId: connectedId);
       bool iscity = location["isCity"] == 1;
       var cityImage = location["bild"].isEmpty
@@ -220,12 +220,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "bild": iscity ? cityImage : countryImage
       };
       pageDetailsPage = LocationInformationPage(ortName: connectedData["name"]);
-    } else if (widget.groupChatData["connected"].contains("world")) {
+    } else if (widget.groupChatData!["connected"].contains("world")) {
       connectedData = {
         "name": "World Chat",
         "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
       };
-    } else if (widget.groupChatData["connected"].contains("support")) {
+    } else if (widget.groupChatData!["connected"].contains("support")) {
       connectedData = {
         "name": "Support Chat",
         "bild": Hive.box('secureBox').get("allgemein")["worldChatImage"]
@@ -272,7 +272,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _getAllDbMessages() async {
-    var chatId = widget.groupChatData["id"];
+    var chatId = widget.groupChatData!["id"];
 
     List<dynamic> allDbMessages = widget.isChatgroup
         ? await ChatGroupsDatabase().getAllChatMessages(chatId)
@@ -284,7 +284,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _checkCardDataForNewMessages() async {
-    List newMessages = messages.take(unreadMessages).toList();
+    List newMessages = messages.take(unreadMessages.toInt()).toList();
 
     for (var message in newMessages) {
       if (message["message"].contains("</eventId=")) {
@@ -300,7 +300,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   _resetNewMessageCounter() async {
     if (!userJoinedChat) return;
 
-    widget.groupChatData["users"][userId]["newMessages"] = 0;
+    widget.groupChatData!["users"][userId]["newMessages"] = 0;
 
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateChatGroup(
@@ -308,30 +308,30 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "WHERE id = '${widget.chatId}'");
     } else {
       ChatDatabase().updateChatGroup(
-          "users = JSON_SET(users, '\$.$userId.newMessages', ${widget.groupChatData["users"][userId]["newMessages"]})",
-          "WHERE id = '${widget.groupChatData["id"]}'");
+          "users = JSON_SET(users, '\$.$userId.newMessages', ${widget.groupChatData!["users"][userId]["newMessages"]})",
+          "WHERE id = '${widget.groupChatData!["id"]}'");
     }
   }
 
   _saveNewMessage(String message) async {
-    String ownProfilId = FirebaseAuth.instance.currentUser.uid;
+    String ownProfilId = FirebaseAuth.instance.currentUser!.uid;
     String checkMessage = message.split("\n").join();
     if (checkMessage.isEmpty) return;
 
     var messageData = {
-      "chatId": widget.groupChatData["id"],
+      "chatId": widget.groupChatData!["id"],
       "message": message,
       "von": ownProfilId,
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
-      "zu": widget.isChatgroup ? null : chatPartnerProfil["id"],
+      "zu": widget.isChatgroup ? null : chatPartnerProfil!["id"],
       "responseId": messageExtraInformationId ??= "0",
       "forward": "",
       "language": "auto"
     };
 
     messages.add(messageData);
-    widget.groupChatData["lastMessage"] = message;
-    widget.groupChatData["lastMessageDate"] = int.parse(messageData["date"]);
+    widget.groupChatData!["lastMessage"] = message;
+    widget.groupChatData!["lastMessageDate"] = int.parse(messageData["date"]);
     messageExtraInformationId = null;
 
     _saveNewMessageDB(messageData);
@@ -363,35 +363,35 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateChatGroup(
           "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.groupChatData["id"]}'");
+          "WHERE id = '${widget.groupChatData!["id"]}'");
 
       var languageCheck = await translator.translate(messageData["message"]);
       var languageCode = languageCheck.sourceLanguage.code;
       messageData["language"] = languageCode;
 
       await ChatGroupsDatabase().addNewMessageAndNotification(
-          widget.groupChatData["id"], messageData, connectedData["name"]);
+          widget.groupChatData!["id"], messageData, connectedData["name"]);
     } else {
       ChatDatabase().updateChatGroup(
           "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.groupChatData["id"]}'");
+          "WHERE id = '${widget.groupChatData!["id"]}'");
 
       var isBlocked =
-          ownProfil["geblocktVon"].contains(chatPartnerProfil["id"]);
+          ownProfil["geblocktVon"].contains(chatPartnerProfil!["id"]);
       await ChatDatabase().addNewMessageAndSendNotification(
-          widget.groupChatData["id"], messageData, isBlocked);
+          widget.groupChatData!["id"], messageData, isBlocked);
     }
     messages = await _getAllDbMessages();
     setState(() {});
   }
 
   _openProfil() {
-    if (chatPartnerProfil.isEmpty || widget.isChatgroup) return;
+    if (chatPartnerProfil!.isEmpty || widget.isChatgroup) return;
 
     global_functions.changePage(
         context,
         ShowProfilPage(
-          profil: chatPartnerProfil,
+          profil: chatPartnerProfil!,
         ));
   }
 
@@ -404,7 +404,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _deletePrivatChat() {
-    var chatUsers = widget.groupChatData["users"];
+    var chatUsers = widget.groupChatData!["users"];
     List myChats = Hive.box("secureBox").get("myChats") ?? [];
 
     if (chatUsers.length <= 1 || bothDelete) {
@@ -475,14 +475,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   _copyMessage(String messageText) {
     Clipboard.setData(ClipboardData(text: messageText));
     customSnackbar(
-        context, AppLocalizations.of(context).nachrichtZwischenAblage,
+        context, AppLocalizations.of(context)!.nachrichtZwischenAblage,
         color: Colors.green, duration: const Duration(seconds: 1));
   }
 
   _forwardedMessage(Map message) async {
     var allUserSelectWindow = AllUserSelectWindow(
         context: context,
-        title: AppLocalizations.of(context).empfaengerWaehlen);
+        title: AppLocalizations.of(context)!.empfaengerWaehlen);
     var selectedUserId = await allUserSelectWindow.openWindow();
     var selectedChatId = global_functions.getChatID(selectedUserId);
     var chatGroupData =
@@ -523,16 +523,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             context: context,
             builder: (BuildContext context) {
               return CustomAlertDialog(
-                title: AppLocalizations.of(context).nachrichtLoeschen,
+                title: AppLocalizations.of(context)!.nachrichtLoeschen,
                 height: 100,
                 children: [
                   Center(
-                      child: Text(AppLocalizations.of(context)
+                      child: Text(AppLocalizations.of(context)!
                           .nachrichtWirklichLoeschen))
                 ],
                 actions: [
                   TextButton(
-                    child: Text(AppLocalizations.of(context).loeschen),
+                    child: Text(AppLocalizations.of(context)!.loeschen),
                     onPressed: () {
                       _deleteMessage(messageId);
                       setState(() {});
@@ -540,7 +540,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     },
                   ),
                   TextButton(
-                    child: Text(AppLocalizations.of(context).abbrechen),
+                    child: Text(AppLocalizations.of(context)!.abbrechen),
                     onPressed: () => Navigator.pop(context),
                   )
                 ],
@@ -567,7 +567,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (messageId != lastMessage["id"]) return;
 
     String messageText = secondLastMessage["message"];
-    widget.groupChatData["lastMessageDate"] =
+    widget.groupChatData!["lastMessageDate"] =
         int.parse(secondLastMessage["date"]);
 
     if (messageText.contains("</eventId=")) {
@@ -599,13 +599,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "Message ${message["id"]} in $reportTitle gemeldet",
         message["message"]);
 
-    customSnackbar(context, AppLocalizations.of(context).nachrichtGemeldet,
+    customSnackbar(context, AppLocalizations.of(context)!.nachrichtGemeldet,
         color: Colors.green, duration: const Duration(seconds: 2));
   }
 
   _getPinnedMessages() {
     var pinnedMessages =
-        widget.groupChatData["users"][userId]["pinnedMessages"];
+        widget.groupChatData!["users"][userId]["pinnedMessages"];
     if (pinnedMessages.runtimeType == String) {
       return json.decode(pinnedMessages);
     }
@@ -613,15 +613,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _pinMessage(Map message) async {
-    List pinnedMessages = _getPinnedMessages();
+    List? pinnedMessages = _getPinnedMessages();
 
     if (pinnedMessages == null || pinnedMessages.isEmpty) {
-      widget.groupChatData["users"][userId]
+      widget.groupChatData!["users"][userId]
           ["pinnedMessages"] = [int.parse(message["id"])];
 
       setState(() {
         angehefteteMessageShowIndex =
-            widget.groupChatData["users"][userId]["pinnedMessages"].length - 1;
+            widget.groupChatData!["users"][userId]["pinnedMessages"].length - 1;
       });
 
       if (widget.isChatgroup) {
@@ -639,7 +639,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     } else {
       pinnedMessages.add(int.parse(message["id"]));
-      widget.groupChatData["users"][userId]["pinnedMessages"] = pinnedMessages;
+      widget.groupChatData!["users"][userId]["pinnedMessages"] = pinnedMessages;
 
       setState(() {
         angehefteteMessageShowIndex = pinnedMessages.length - 1;
@@ -662,7 +662,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     pinnedMessages.remove(int.parse(message["id"]));
 
-    widget.groupChatData["users"][userId]["pinnedMessages"] = pinnedMessages;
+    widget.groupChatData!["users"][userId]["pinnedMessages"] = pinnedMessages;
 
     setState(() {
       angehefteteMessageShowIndex = pinnedMessages.length - 1;
@@ -723,9 +723,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _jumpToMessageAndShowNextAngeheftet(int index) {
-    angehefteteMessageShowIndex = angehefteteMessageShowIndex - 1;
+    angehefteteMessageShowIndex = angehefteteMessageShowIndex! - 1;
 
-    if (angehefteteMessageShowIndex < 0) {
+    if (angehefteteMessageShowIndex! < 0) {
       angehefteteMessageShowIndex = _getPinnedMessages().length - 1;
     }
 
@@ -794,7 +794,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     pinnedMessages.remove(int.parse(message["id"]));
 
-    widget.groupChatData["users"][userId]["pinnedMessages"] = pinnedMessages;
+    widget.groupChatData!["users"][userId]["pinnedMessages"] = pinnedMessages;
     angehefteteMessageShowIndex = pinnedMessages.length - 1;
 
     if (widget.isChatgroup) {
@@ -813,7 +813,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     Map newUserInformation = {"newMessages": 0};
 
     setState(() {
-      widget.groupChatData["users"][userId] = newUserInformation;
+      widget.groupChatData!["users"][userId] = newUserInformation;
       userJoinedChat = true;
     });
 
@@ -899,12 +899,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     List removeUser = [];
 
-    for(var user in widget.groupChatData["users"].keys.toList()){
+    for(var user in widget.groupChatData!["users"].keys.toList()){
       if(!connectedData["members"].contains(user)) removeUser.add(user);
     }
 
     for(var user in removeUser){
-      widget.groupChatData["users"].remove(user);
+      widget.groupChatData!["users"].remove(user);
     }
 
   }
@@ -914,22 +914,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     Color ownMessageBoxColor =
         Theme.of(context).colorScheme.secondary.withOpacity(0.7);
     Color chatpartnerMessageBoxColor = Colors.white;
-    Color timeStampColor = Colors.grey[600];
-    Offset _tabPosition;
+    Color? timeStampColor = Colors.grey[600];
+    Offset? _tabPosition;
 
     _angehefteteNachrichten() {
       if (!userJoinedChat) {
         return const SizedBox.shrink();
       }
 
-      List pinnedMessages = _getPinnedMessages();
+      List? pinnedMessages = _getPinnedMessages();
 
       if (pinnedMessages == null || pinnedMessages.isEmpty) {
         return const SizedBox.shrink();
       }
 
       angehefteteMessageShowIndex ??= pinnedMessages.length - 1;
-      int displayedMessageId = pinnedMessages[angehefteteMessageShowIndex];
+      int displayedMessageId = pinnedMessages[angehefteteMessageShowIndex!];
       String displayedMessageText = "";
       int index = -1;
 
@@ -954,7 +954,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      AppLocalizations.of(context).angehefteteNachrichten,
+                      AppLocalizations.of(context)!.angehefteteNachrichten,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
@@ -1026,13 +1026,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     _openMessageMenu(Map message, int index) {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
       bool isMyMessage = message["von"] == userId;
       bool isInPinned = false;
       List angehefteteMessages = [];
 
       if (userJoinedChat &&
-          widget.groupChatData["users"][userId]["pinnedMessages"] != null) {
+          widget.groupChatData!["users"][userId]["pinnedMessages"] != null) {
         angehefteteMessages = _getPinnedMessages();
       }
 
@@ -1064,7 +1064,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 children: [
                   const Icon(Icons.reply),
                   const SizedBox(width: 20),
-                  Text(AppLocalizations.of(context).antworten),
+                  Text(AppLocalizations.of(context)!.antworten),
                 ],
               ),
             ),
@@ -1080,8 +1080,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       : const Icon(Icons.push_pin),
                   const SizedBox(width: 20),
                   Text(isInPinned
-                      ? AppLocalizations.of(context).losloesen
-                      : AppLocalizations.of(context).anheften),
+                      ? AppLocalizations.of(context)!.losloesen
+                      : AppLocalizations.of(context)!.anheften),
                 ],
               ),
             ),
@@ -1089,7 +1089,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             PopupMenuItem(
               onTap: () {
                 extraInputInformationBox = _inputInformationBox(Icons.edit,
-                    AppLocalizations.of(context).nachrichtBearbeiten, "");
+                    AppLocalizations.of(context)!.nachrichtBearbeiten, "");
 
                 _editMessage(message);
               },
@@ -1097,7 +1097,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 children: [
                   const Icon(Icons.edit),
                   const SizedBox(width: 20),
-                  Text(AppLocalizations.of(context).bearbeiten),
+                  Text(AppLocalizations.of(context)!.bearbeiten),
                 ],
               ),
             ),
@@ -1107,7 +1107,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               children: [
                 const Icon(Icons.copy),
                 const SizedBox(width: 20),
-                Text(AppLocalizations.of(context).textKopieren),
+                Text(AppLocalizations.of(context)!.textKopieren),
               ],
             ),
           ),
@@ -1119,7 +1119,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 children: [
                   const Icon(Icons.forward),
                   const SizedBox(width: 20),
-                  Text(AppLocalizations.of(context).weiterleiten),
+                  Text(AppLocalizations.of(context)!.weiterleiten),
                 ],
               ),
             ),
@@ -1133,7 +1133,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 children: [
                   const Icon(Icons.delete),
                   const SizedBox(width: 20),
-                  Text(AppLocalizations.of(context).loeschenGross),
+                  Text(AppLocalizations.of(context)!.loeschenGross),
                 ],
               ),
             ),
@@ -1144,7 +1144,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 children: [
                   const Icon(Icons.report),
                   const SizedBox(width: 20),
-                  Text(AppLocalizations.of(context).meldenGross),
+                  Text(AppLocalizations.of(context)!.meldenGross),
                 ],
               ),
             ),
@@ -1158,7 +1158,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           right: 5,
           bottom: -10,
           child: TextButton(
-              child: Text(AppLocalizations.of(context).uebersetzen),
+              child: Text(AppLocalizations.of(context)!.uebersetzen),
               onPressed: () async {
                 String translationMessage =
                     message["message"].replaceAll("'", "");
@@ -1181,7 +1181,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(AppLocalizations.of(context).uebersetzen,
+                                Text(AppLocalizations.of(context)!.uebersetzen,
                                     style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold)),
@@ -1200,7 +1200,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   width: double.maxFinite,
                                   child: FloatingActionButton.extended(
                                     onPressed: () => Navigator.pop(context),
-                                    label: Text(AppLocalizations.of(context)
+                                    label: Text(AppLocalizations.of(context)!
                                         .uebersetzungSchliessen),
                                   ),
                                 )
@@ -1221,9 +1221,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     _cardMessage(
         int index, Map message, Map messageBoxInformation, String cardType) {
-      Map cardData;
+      Map cardData = {};
       bool hasForward = message["forward"].isNotEmpty;
-      Map forwardProfil;
+      Map forwardProfil = {};
       Map creatorProfilData = getProfilFromHive(profilId: message["von"]);
       String creatorName = creatorProfilData["name"];
       var creatorColor = creatorProfilData["bildStandardFarbe"];
@@ -1247,7 +1247,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       String replaceText = cardData["name"] ?? cardData["ort"];
       String removeId = cardIdData["text"];
 
-      String changedMessageText =
+      String? changedMessageText =
           message["message"].replaceAll(removeId, replaceText).trim();
 
       if (cardData.isEmpty) return const SizedBox.shrink();
@@ -1303,7 +1303,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               profil: forwardProfil,
                             )),
                         child: Text(
-                          AppLocalizations.of(context).weitergeleitetVon +
+                          AppLocalizations.of(context)!.weitergeleitetVon +
                               forwardProfil["name"],
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -1350,13 +1350,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   _replyMessage(message);
                                 },
                                 child: Text(
-                                    AppLocalizations.of(context).antworten)),
+                                    AppLocalizations.of(context)!.antworten)),
                             TextButton(
                                 onPressed: () {
                                   _forwardedMessage(message);
                                 },
                                 child: Text(
-                                    AppLocalizations.of(context).weiterleiten)),
+                                    AppLocalizations.of(context)!.weiterleiten)),
                             Text(messageBoxInformation["messageTime"],
                                 style: TextStyle(color: timeStampColor)),
                             if (messageBoxInformation["textAlign"] ==
@@ -1417,7 +1417,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     _responseMessage(int index, Map message, Map messageBoxInformation) {
-      Map replyMessage;
+      Map replyMessage = {};
       int replyIndex = messages.length;
       Map cardData = {};
       String textAddition = "";
@@ -1434,8 +1434,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
-      replyMessage ??= {};
-      String replyFromId = replyMessage["von"];
+      String? replyFromId = replyMessage["von"];
       Map messageFromProfil = getProfilFromHive(profilId: replyFromId) ?? {};
       var replyColor = messageFromProfil["bildStandardFarbe"] == 4285132974
           ? Colors.greenAccent[100]
@@ -1566,7 +1565,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                               border: Border(
                                                   left: BorderSide(
                                                       width: 2,
-                                                      color: replyColor))),
+                                                      color: replyColor!))),
                                           child: Container(
                                             height: replyFromId != null
                                                 ? containsCard
@@ -1622,7 +1621,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                     ],
                                                   )
                                                 : Text(
-                                                    AppLocalizations.of(context)
+                                                    AppLocalizations.of(context)!
                                                         .geloeschteNachricht,
                                                     style: const TextStyle(
                                                         fontWeight:
@@ -1750,7 +1749,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     profil: forwardProfil,
                                   )),
                               child: Text(
-                                AppLocalizations.of(context).weitergeleitetVon +
+                                AppLocalizations.of(context)!.weitergeleitetVon +
                                     forwardProfil["name"],
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
@@ -1920,7 +1919,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     _messageList(List messages) {
       List<Widget> messageBox = [];
-      String newMessageDate;
+      String newMessageDate = "";
       var changedMessageList = messages.reversed.take(displayDataEntries).toList().reversed.toList();
 
       for (var i = changedMessageList.length - 1; i >= 0; i--) {
@@ -1937,7 +1936,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "messageTime": DateFormat('HH:mm').format(messageDateTime),
           "messageEdit": message["editDate"] == null
               ? ""
-              : AppLocalizations.of(context).bearbeitet + " "
+              : AppLocalizations.of(context)!.bearbeitet + " "
         };
 
         if (message["message"] == "") continue;
@@ -1956,7 +1955,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           message["showTranslationButton"] = false;
         }
 
-        if (newMessageDate == null) {
+        if (newMessageDate.isEmpty) {
           newMessageDate = messageDate;
         } else if (newMessageDate != messageDate) {
           messageBox.add(Align(
@@ -1982,7 +1981,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             (i == messages.length - 1 - unreadMessages)) {
           messageBox.add(Center(
               child: Text(
-            AppLocalizations.of(context).ungeleseneNachrichten,
+            AppLocalizations.of(context)!.ungeleseneNachrichten,
             style: const TextStyle(fontWeight: FontWeight.bold),
           )));
         }
@@ -2046,7 +2045,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               : messages.isEmpty
                   ? Center(
                       child: Text(
-                      AppLocalizations.of(context).nochKeineNachrichtVorhanden,
+                      AppLocalizations.of(context)!.nochKeineNachrichtVorhanden,
                       style: const TextStyle(fontSize: 20),
                     ))
                   : _messageList(messages),
@@ -2100,7 +2099,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               Expanded(
                   child: Center(
                       child: Text(messagesWithSearchText.isEmpty
-                          ? AppLocalizations.of(context).keineErgebnisse
+                          ? AppLocalizations.of(context)!.keineErgebnisse
                           : "${searchTextIndex + 1} von ${messagesWithSearchText.length}"))),
               _searchIndexKontrollButton("up", Icons.keyboard_arrow_up),
               _searchIndexKontrollButton("down", Icons.keyboard_arrow_down),
@@ -2123,7 +2122,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 ),
               ]),
               child: Center(
-                  child: Text(AppLocalizations.of(context).gruppeBeitreten))),
+                  child: Text(AppLocalizations.of(context)!.gruppeBeitreten))),
         );
       } else {
         return Container(
@@ -2155,7 +2154,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     controller: nachrichtController,
                     textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
-                      hintText: AppLocalizations.of(context).nachricht,
+                      hintText: AppLocalizations.of(context)!.nachricht,
                       hintStyle: const TextStyle(fontSize: 20),
                       border: InputBorder.none,
                       focusedBorder: InputBorder.none,
@@ -2203,7 +2202,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           children: [
             const Icon(Icons.search),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).suche),
+            Text(AppLocalizations.of(context)!.suche),
           ],
         ),
         onPressed: () {
@@ -2221,7 +2220,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     _getMemberList() {
       List<Widget> memberList = [];
 
-      widget.groupChatData["users"].forEach((memberUserId, data) {
+      widget.groupChatData!["users"].forEach((memberUserId, data) {
         Map userProfil = getProfilFromHive(profilId: memberUserId) ?? {};
         String userName = userProfil["name"];
 
@@ -2231,7 +2230,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           onTap: () => global_functions.changePage(
               context,
               ShowProfilPage(
-                userName: userName,
                 profil: userProfil,
               )),
           child: Container(
@@ -2278,7 +2276,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         ),
                       ),
                     ),
-                  Text(AppLocalizations.of(context).member,
+                  Text(AppLocalizations.of(context)!.member,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   Expanded(
@@ -2296,7 +2294,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           children: [
             const Icon(Icons.groups),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).member),
+            Text(AppLocalizations.of(context)!.member),
           ],
         ),
         onPressed: () {
@@ -2308,7 +2306,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     _pinChatDialog() {
       bool chatIsPinned =
-          widget.groupChatData["users"][userId]["pinned"] ?? false;
+          widget.groupChatData!["users"][userId]["pinned"] ?? false;
 
       return SimpleDialogOption(
         child: Row(
@@ -2318,15 +2316,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 : const Icon(Icons.push_pin),
             const SizedBox(width: 10),
             Text(chatIsPinned
-                ? AppLocalizations.of(context).losloesen
-                : AppLocalizations.of(context).anheften),
+                ? AppLocalizations.of(context)!.losloesen
+                : AppLocalizations.of(context)!.anheften),
           ],
         ),
         onPressed: () {
           Navigator.pop(context);
 
           setState(() {
-            widget.groupChatData["users"][userId]["pinned"] = !chatIsPinned;
+            widget.groupChatData!["users"][userId]["pinned"] = !chatIsPinned;
           });
 
           if (widget.isChatgroup) {
@@ -2343,7 +2341,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     _muteDialog() {
-      bool chatIsMute = widget.groupChatData["users"][userId]["mute"] ?? false;
+      bool chatIsMute = widget.groupChatData!["users"][userId]["mute"] ?? false;
 
       return SimpleDialogOption(
         child: Row(
@@ -2353,15 +2351,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 : Icons.notifications_off),
             const SizedBox(width: 10),
             Text(chatIsMute
-                ? AppLocalizations.of(context).stummAus
-                : AppLocalizations.of(context).stummEin),
+                ? AppLocalizations.of(context)!.stummAus
+                : AppLocalizations.of(context)!.stummEin),
           ],
         ),
         onPressed: () {
           Navigator.pop(context);
 
           setState(() {
-            widget.groupChatData["users"][userId]["mute"] = !chatIsMute;
+            widget.groupChatData!["users"][userId]["mute"] = !chatIsMute;
           });
 
           if (widget.isChatgroup) {
@@ -2383,12 +2381,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           builder: (BuildContext context) {
             return StatefulBuilder(builder: (ontext, setState) {
               return CustomAlertDialog(
-                title: AppLocalizations.of(context).chatLoeschen,
+                title: AppLocalizations.of(context)!.chatLoeschen,
                 height: 150,
                 children: [
                   Center(
                       child: Text(
-                          AppLocalizations.of(context).chatWirklichLoeschen)),
+                          AppLocalizations.of(context)!.chatWirklichLoeschen)),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -2396,26 +2394,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           value: bothDelete,
                           onChanged: (value) => {
                                 setState(() {
-                                  bothDelete = value;
+                                  bothDelete = value!;
                                 })
                               }),
                       Expanded(
                         child: Text(
-                            AppLocalizations.of(context).auchBeiLoeschen +
-                                chatPartnerProfil["name"]),
+                            AppLocalizations.of(context)!.auchBeiLoeschen +
+                                chatPartnerProfil!["name"]),
                       )
                     ],
                   )
                 ],
                 actions: [
                   TextButton(
-                    child: Text(AppLocalizations.of(context).loeschen),
+                    child: Text(AppLocalizations.of(context)!.loeschen),
                     onPressed: () async {
                       _deletePrivatChat();
                     },
                   ),
                   TextButton(
-                    child: Text(AppLocalizations.of(context).abbrechen),
+                    child: Text(AppLocalizations.of(context)!.abbrechen),
                     onPressed: () => Navigator.pop(context),
                   )
                 ],
@@ -2431,7 +2429,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             const Icon(Icons.delete, color: Colors.red),
             const SizedBox(width: 10),
             Text(
-              AppLocalizations.of(context).chatLoeschen,
+              AppLocalizations.of(context)!.chatLoeschen,
               style: const TextStyle(color: Colors.red),
             ),
           ],
@@ -2448,21 +2446,21 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).gruppeVerlassen,
+              title: AppLocalizations.of(context)!.gruppeVerlassen,
               height: 100,
               children: [
                 Center(
                     child: Text(
-                        AppLocalizations.of(context).gruppeWirklichVerlassen)),
+                        AppLocalizations.of(context)!.gruppeWirklichVerlassen)),
               ],
               actions: [
                 TextButton(
-                  child: Text(AppLocalizations.of(context).gruppeVerlassen),
+                  child: Text(AppLocalizations.of(context)!.gruppeVerlassen),
                   onPressed: () async {
                     Navigator.pop(context);
 
                     ChatGroupsDatabase()
-                        .leaveChat(widget.groupChatData["connected"]);
+                        .leaveChat(widget.groupChatData!["connected"]);
 
                     setState(() {
                       userJoinedChat = false;
@@ -2470,7 +2468,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   },
                 ),
                 TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -2485,7 +2483,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             const Icon(Icons.logout, color: Colors.red),
             const SizedBox(width: 10),
             Text(
-              AppLocalizations.of(context).gruppeVerlassen,
+              AppLocalizations.of(context)!.gruppeVerlassen,
               style: const TextStyle(color: Colors.red),
             ),
           ],
@@ -2540,7 +2538,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             style: const TextStyle(fontSize: 18),
             decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: AppLocalizations.of(context).suche,
+                hintText: AppLocalizations.of(context)!.suche,
                 suffixIcon: CloseButton(
                   color: Colors.white,
                   onPressed: () {
@@ -2582,8 +2580,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               Text(title),
               const SizedBox(height: 3),
               Text(
-                widget.groupChatData["users"].length.toString() +
-                    AppLocalizations.of(context).teilnehmerSimple,
+                widget.groupChatData!["users"].length.toString() +
+                    AppLocalizations.of(context)!.teilnehmerSimple,
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               )
             ],
@@ -2616,7 +2614,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     _appBarPrivatChat() {
       var chatImageProfil = chatPartnerProfil;
-      String title = chatPartnerProfil["name"];
+      String title = chatPartnerProfil!["name"];
 
       return CustomAppBar(
         title: title,
@@ -2647,7 +2645,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     _appBarDeletedUser() {
       return CustomAppBar(
-          title: AppLocalizations.of(context).geloeschterUser,
+          title: AppLocalizations.of(context)!.geloeschterUser,
           buttons: [
             IconButton(
                 onPressed: () => _moreMenuWindow(),

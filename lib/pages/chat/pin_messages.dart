@@ -10,10 +10,10 @@ class pinMessagesPage extends StatelessWidget {
   var pinMessages;
   var ownMessageBoxColor = Colors.greenAccent;
   var chatpartnerMessageBoxColor = Colors.white;
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser!.uid;
 
 
-  pinMessagesPage({this.pinMessages, Key key}) : super(key: key);
+  pinMessagesPage({this.pinMessages, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class pinMessagesPage extends StatelessWidget {
         var messageTime = DateFormat('HH:mm').format(messageDateTime);
         var messageEdit = message["editDate"] == null
             ? ""
-            : AppLocalizations.of(context).bearbeitet;
+            : AppLocalizations.of(context)!.bearbeitet;
 
         if (message["von"] == userId) {
           textAlign = Alignment.centerRight;
@@ -80,7 +80,7 @@ class pinMessagesPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: AppLocalizations.of(context).angehefteteNachrichten,
+        title: AppLocalizations.of(context)!.angehefteteNachrichten,
       ),
       body: ListView(reverse: true, children: _showMessages().reversed.toList(),),
     );

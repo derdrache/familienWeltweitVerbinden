@@ -11,25 +11,25 @@ import '../../widgets/custom_appbar.dart';
 
 class ChangeAufreisePage extends StatefulWidget {
   final bool isGerman;
-  DateTime aufreiseSeit;
-  DateTime aufreiseBis;
+  DateTime? aufreiseSeit;
+  DateTime? aufreiseBis;
 
   ChangeAufreisePage({
     this.aufreiseSeit,
     this.aufreiseBis,
-    this.isGerman,
-    Key key}) : super(key: key);
+    required this.isGerman,
+    Key? key}) : super(key: key);
 
   @override
   _ChangeAufreisePageState createState() => _ChangeAufreisePageState();
 }
 
 class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
-  String reiseStatus;
-  var aufreiseDropdownButton = CustomDropDownButton();
-  bool noTraveling;
-  bool pastTravler;
-  bool stillTraveling;
+  late String reiseStatus;
+  late var aufreiseDropdownButton;
+  late bool noTraveling;
+  late bool pastTravler;
+  late bool stillTraveling;
 
   @override
   void initState() {
@@ -62,12 +62,12 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
     if(noTraveling) return true;
 
     if(widget.aufreiseSeit == null) {
-      customSnackbar(context, AppLocalizations.of(context).eingebenSeitWannReise);
+      customSnackbar(context, AppLocalizations.of(context)!.eingebenSeitWannReise);
       return false;
     }
 
     if(widget.aufreiseBis == null && pastTravler){
-      customSnackbar(context, AppLocalizations.of(context).eingebenBisWannReise);
+      customSnackbar(context, AppLocalizations.of(context)!.eingebenBisWannReise);
       return false;
     }
 
@@ -75,7 +75,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
   }
 
   save() async{
-    final String userId = FirebaseAuth.instance.currentUser.uid;
+    final String userId = FirebaseAuth.instance.currentUser!.uid;
     bool validation = checkValidation();
 
     if(!validation) return;
@@ -114,7 +114,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
 
 
     aufreiseBox(text, reiseDatum){
-      String aufreiseString = AppLocalizations.of(context).datumAuswaehlen;
+      String aufreiseString = AppLocalizations.of(context)!.datumAuswaehlen;
 
       if(reiseDatum != null) {
         var dateFormat = DateFormat('MM-yyyy');
@@ -139,8 +139,8 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
                   firstDate: DateTime(DateTime.now().year - 100),
                 );
 
-                if(text == AppLocalizations.of(context).seit) widget.aufreiseSeit = reiseDatum;
-                if(text == AppLocalizations.of(context).bis) widget.aufreiseBis = reiseDatum;
+                if(text == AppLocalizations.of(context)!.seit) widget.aufreiseSeit = reiseDatum;
+                if(text == AppLocalizations.of(context)!.bis) widget.aufreiseBis = reiseDatum;
 
                 setState(() {});
               },
@@ -152,31 +152,31 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
 
     return Scaffold(
         appBar: CustomAppBar(
-            title: AppLocalizations.of(context).aufReiseAendern,
+            title: AppLocalizations.of(context)!.aufReiseAendern,
         ),
         body: Column(children: [
           aufreiseDropdownButton,
           if(!noTraveling) aufreiseBox(
-              AppLocalizations.of(context).seit,
+              AppLocalizations.of(context)!.seit,
               widget.aufreiseSeit,
           ),
           if(pastTravler) aufreiseBox(
-              AppLocalizations.of(context).bis,
+              AppLocalizations.of(context)!.bis,
               widget.aufreiseBis,
           ),
           if(stillTraveling) Container(
             margin: const EdgeInsets.only(left: 10),
             width: 600,
             child: Row(children: [
-              Text(AppLocalizations.of(context).bis, style: const TextStyle(fontSize: 20)),
+              Text(AppLocalizations.of(context)!.bis, style: const TextStyle(fontSize: 20)),
               const SizedBox(width: 20),
-              Text(AppLocalizations.of(context).offen, style: const TextStyle(fontSize: 20)),
+              Text(AppLocalizations.of(context)!.offen, style: const TextStyle(fontSize: 20)),
             ],),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           FloatingActionButton.extended(
               label: Text(
-                AppLocalizations.of(context).speichern,
+                AppLocalizations.of(context)!.speichern,
                 style: const TextStyle(fontSize: 20),
               ),
               icon: const Icon(Icons.save),

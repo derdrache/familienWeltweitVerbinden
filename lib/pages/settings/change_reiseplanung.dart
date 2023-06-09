@@ -13,12 +13,12 @@ import '../../widgets/flexible_date_picker.dart';
 import '../../services/notification.dart';
 
 class ChangeReiseplanungPage extends StatefulWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   List reiseplanung;
   bool isGerman;
 
   ChangeReiseplanungPage(
-      {Key key,this.reiseplanung, this.isGerman})
+      {Key? key,required this.reiseplanung, required this.isGerman})
       : super(key: key);
 
   @override
@@ -94,12 +94,12 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
     if(datePicker.getDate() == null){
       customSnackbar(context,
-          AppLocalizations.of(context).datumEingeben);
+          AppLocalizations.of(context)!.datumEingeben);
       return;
     }
     if(ortData["city"] == null){
       customSnackbar(context,
-          AppLocalizations.of(context).ortEingeben);
+          AppLocalizations.of(context)!.ortEingeben);
       return;
     }
 
@@ -107,7 +107,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     var endDate = datePicker.getDate()[1];
 
     if (endDate.isBefore(startDate)) {
-      customSnackbar(context, AppLocalizations.of(context).vonKleinerAlsBis);
+      customSnackbar(context, AppLocalizations.of(context)!.vonKleinerAlsBis);
       return;
     }
 
@@ -119,7 +119,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
     if (checkOverlappingPeriods(newReiseplan)) {
       customSnackbar(
-          context, AppLocalizations.of(context).zeitraumUeberschneidetSich);
+          context, AppLocalizations.of(context)!.zeitraumUeberschneidetSich);
       return;
     }
 
@@ -146,7 +146,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
   @override
   Widget build(BuildContext context) {
-    ortInput.hintText = AppLocalizations.of(context).ort;
+    ortInput.hintText = AppLocalizations.of(context)!.ort;
 
     transformDateToText(dateString) {
       DateTime date = DateTime.parse(dateString);
@@ -225,7 +225,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: AppLocalizations.of(context).reisePlanungVeraendern,
+        title: AppLocalizations.of(context)!.reisePlanungVeraendern,
       ),
       body: Column(
         children: [

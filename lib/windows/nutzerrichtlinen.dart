@@ -14,7 +14,7 @@ class NutzerrichtlinenAnzeigen extends StatelessWidget {
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
-  NutzerrichtlinenAnzeigen({Key key, this.page}) : super(key: key);
+  NutzerrichtlinenAnzeigen({Key? key,  required this.page}) : super(key: key);
 
   getPageClickOn() {
     if (page == "register") {
@@ -39,16 +39,14 @@ class NutzerrichtlinenAnzeigen extends StatelessWidget {
         ? " und stimmen zu, unsere Benachrichtigungen / E-Mails zu erhalten, die Sie jederzeit selbst abschalten können"
         : " and agree to receive our notifications / emails, which you can turn off yourself at any time";
 
-    var satzverbindung = isGerman ? " und der " : " and ";
-
     termsOfUseWindow() {
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-                title: AppLocalizations.of(context).nutzungsbedingungen,
+                title: AppLocalizations.of(context)!.nutzungsbedingungen,
                 children: [ isGerman
-                  ? Text("""Indem Sie auf unser Angebot zugreifen bestätigen Sie, dass Sie diese Nutzungsbedingungen annehmen. Wenn Sie nicht zustimmen, sind Sie nicht berechtigt, auf unsere Angebote zuzugreifen oder diese zu nutzen.
+                  ? const Text("""Indem Sie auf unser Angebot zugreifen bestätigen Sie, dass Sie diese Nutzungsbedingungen annehmen. Wenn Sie nicht zustimmen, sind Sie nicht berechtigt, auf unsere Angebote zuzugreifen oder diese zu nutzen.
 
 Sie erhalten innerhab der families worldwide App verschiedene Möglichkeiten eigene Inhalte zu erstellen. Jeder von Ihnen erstellte Inhalt wird automatisch mit anderen Usern geteilt.
 Möglichkeiten für eigene Inhalte:
@@ -71,7 +69,7 @@ Families worldwide ist berechtigt, den User-Account eines Nutzers ohne Angabe vo
 
 Alle Nutzer verpflichten sich, die Families worldwide von jeglicher Haftung und von allen Verpflichtungen, Aufwendungen und Ansprüchen, die sich aus Schäden wegen übler Nachrede, Beleidigung, Verletzung von Persönlichkeitsrechten, wegen des Ausfalls von Dienstleistungen für Nutzer, wegen der Verletzung von immateriellen Gütern oder sonstigen Rechten ergeben, freizustellen. Die dem Dienst bzw. seinen Mitarbeitenden und/oder Dritten diesbezüglich entstehenden Kosten einer angemessenen Rechtsverteidigung und -verfolgung gegenüber den Dritten trägt der Nutzer.
                   """)
-                  : Text("""By accessing our Offerings, you confirm that you accept these Terms of Use. If you do not agree, you are not authorized to access or use our Offerings.
+                  : const Text("""By accessing our Offerings, you confirm that you accept these Terms of Use. If you do not agree, you are not authorized to access or use our Offerings.
 
 You will have several opportunities to create your own content within the families worldwide app. Any content you create will automatically be shared with other users.
 Possibilities for own content:
@@ -100,7 +98,7 @@ All users commit themselves to exempt the Families worldwide from any liability 
 
     termsOfUse() {
       return TextSpan(
-          text: AppLocalizations.of(context).nutzungsbedingungen,
+          text: AppLocalizations.of(context)!.nutzungsbedingungen,
           recognizer: TapGestureRecognizer()..onTap = () => termsOfUseWindow(),
           style: TextStyle(
               fontSize: fontSize,
@@ -114,14 +112,14 @@ All users commit themselves to exempt the Families worldwide from any liability 
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-                title: AppLocalizations.of(context).datenschutzrichtlinie,
-                children: []);
+                title: AppLocalizations.of(context)!.datenschutzrichtlinie,
+                children: const []);
           });
     }
 
     privacyPolicy() {
       return TextSpan(
-          text: AppLocalizations.of(context).datenschutzrichtlinie,
+          text: AppLocalizations.of(context)!.datenschutzrichtlinie,
           recognizer: TapGestureRecognizer()
             ..onTap = () => privacyPolicyWindow(),
           style: TextStyle(

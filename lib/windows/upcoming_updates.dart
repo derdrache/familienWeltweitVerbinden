@@ -22,7 +22,7 @@ class UmcomingUpdatesWindow{
   }
 
   openWindow(){
-    var patchnotesTitle = AppLocalizations.of(context).geplanteErweiterungen;
+    var patchnotesTitle = AppLocalizations.of(context)!.geplanteErweiterungen;
 
     showDialog(
         context: context,
@@ -30,12 +30,12 @@ class UmcomingUpdatesWindow{
           return CustomAlertDialog(
               title: patchnotesTitle,
               children: [
-                _update(AppLocalizations.of(context).chatErweiterung),
-                _update(AppLocalizations.of(context).weitereAnemdlungsMoeglichkeiten),
-                _update(AppLocalizations.of(context).meetupErweiterung),
-                _update(AppLocalizations.of(context).communityErweiterung),
-                _update(AppLocalizations.of(context).layoutVerbessern),
-                _update(AppLocalizations.of(context).schwarzesBrett),
+                _update(AppLocalizations.of(context)!.chatErweiterung),
+                _update(AppLocalizations.of(context)!.weitereAnemdlungsMoeglichkeiten),
+                _update(AppLocalizations.of(context)!.meetupErweiterung),
+                _update(AppLocalizations.of(context)!.communityErweiterung),
+                _update(AppLocalizations.of(context)!.layoutVerbessern),
+                _update(AppLocalizations.of(context)!.schwarzesBrett),
               ]
           );
         });

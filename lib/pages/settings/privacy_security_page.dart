@@ -19,19 +19,19 @@ import '../../widgets/dialogWindow.dart';
 import '../login_register_page/login_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
-  const PrivacySecurityPage({Key key}) : super(key: key);
+  const PrivacySecurityPage({Key? key}) : super(key: key);
 
   @override
   _PrivacySecurityPageState createState() => _PrivacySecurityPageState();
 }
 
 class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   final double fontsize = 20;
-  var automaticLocationDropdown = CustomDropDownButton();
-  var reiseplanungDropdown = CustomDropDownButton();
-  var exactLocationDropdown = CustomDropDownButton();
+  late var automaticLocationDropdown;
+  late var reiseplanungDropdown;
+  late var exactLocationDropdown;
   final bool spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
@@ -39,7 +39,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   
   saveAutomaticLocation() async {
     if(ownProfil["reiseart"] == "fixed location" || ownProfil["reiseart"] == "Fester Standort"){
-      customSnackbar(context, AppLocalizations.of(context).automatischerStandortNichtMoeglich);
+      customSnackbar(context, AppLocalizations.of(context)!.automatischerStandortNichtMoeglich);
       return;
     }
 
@@ -141,7 +141,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           children: [
             Expanded(
               child: Text(
-                AppLocalizations.of(context).automatischeStandortbestimmung,
+                AppLocalizations.of(context)!.automatischeStandortbestimmung,
                 style: TextStyle(fontSize: fontsize),
               ),
             ),
@@ -157,7 +157,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           child: Row(children: [
             Expanded(
               child: Text(
-                AppLocalizations.of(context).genauerStandortSichtbarFuer,
+                AppLocalizations.of(context)!.genauerStandortSichtbarFuer,
                 style: TextStyle(fontSize: fontsize),
               ),
             ),
@@ -172,7 +172,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
         child: Row(children: [
           Expanded(
             child: Text(
-              AppLocalizations.of(context).reiseplanungSichtbarFuer,
+              AppLocalizations.of(context)!.reiseplanungSichtbarFuer,
               style: TextStyle(fontSize: fontsize),
             ),
           ),
@@ -182,7 +182,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     }
 
     chooseProfilIdWindow() async{
-      String deleteId;
+      String deleteId = "";
       TextEditingController idController = TextEditingController();
 
       await showDialog(
@@ -214,13 +214,13 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).accountLoeschen,
+              title: AppLocalizations.of(context)!.accountLoeschen,
               height: 90,
               children: [
                 const SizedBox(height: 10),
                 Center(
                     child: Text(
-                        AppLocalizations.of(context).accountWirklichLoeschen))
+                        AppLocalizations.of(context)!.accountWirklichLoeschen))
               ],
               actions: [
                 TextButton(
@@ -236,7 +236,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                   },
                 ),
                 TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -247,7 +247,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     deleteProfilContainer() {
       return FloatingActionButton.extended(
           backgroundColor: Colors.red,
-          label: Text(AppLocalizations.of(context).accountLoeschen),
+          label: Text(AppLocalizations.of(context)!.accountLoeschen),
           onPressed: () async {
             if(userId == mainAdmin){
               String choosenProfilId = await chooseProfilIdWindow();
@@ -262,7 +262,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).privatsphaereSicherheit),
+          title: AppLocalizations.of(context)!.privatsphaereSicherheit),
       body: SafeArea(
         child: Column(
           children: [

@@ -6,7 +6,7 @@ import '../global/variablen.dart' as global_var;
 class GoogleAutoComplete extends StatefulWidget {
   List searchableItems = [];
   List autoCompleteItems = [];
-  double width;
+  double? width;
   var isDense = false;
   var searchKontroller = TextEditingController();
   bool isSearching = false;
@@ -14,7 +14,7 @@ class GoogleAutoComplete extends StatefulWidget {
   String hintText;
   var googleSearchResult;
   var sessionToken = const Uuid().v4();
-  Function onConfirm;
+  Function? onConfirm;
   bool withoutTopMargin;
 
   getGoogleLocationData() {
@@ -49,8 +49,8 @@ class GoogleAutoComplete extends StatefulWidget {
   }
 
   GoogleAutoComplete({
-    Key key,
-    this.hintText,
+    Key? key,
+    this.hintText = "",
     this.width,
     this.suche = true,
     this.onConfirm,
@@ -114,7 +114,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
               await getGoogleSearchLocationData(item["place_id"]);
           widget.searchKontroller.text = item["description"];
           resetSearchBar();
-          if(widget.onConfirm != null) widget.onConfirm();
+          if(widget.onConfirm != null) widget.onConfirm!();
         },
         child: Container(
             padding: const EdgeInsets.all(10),

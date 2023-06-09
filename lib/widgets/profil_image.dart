@@ -16,7 +16,7 @@ class ProfilImage extends StatefulWidget {
   var fullScreenWindow;
 
   ProfilImage(this.profil,
-      {Key key, this.changeable = false, this.fullScreenWindow = false})
+      {Key? key, this.changeable = false, this.fullScreenWindow = false})
       : super(key: key);
 
   @override
@@ -34,7 +34,7 @@ class _ProfilImageState extends State<ProfilImage> {
       return;
     } else if (newLink.substring(0, 4) != "http" &&
         newLink.substring(0, 3) != "www") {
-      customSnackbar(context, AppLocalizations.of(context).ungueltigerLink);
+      customSnackbar(context, AppLocalizations.of(context)!.ungueltigerLink);
       return;
     } else {
       newLink = [newLink];
@@ -82,19 +82,19 @@ class _ProfilImageState extends State<ProfilImage> {
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).profilbildAendern,
+              title: AppLocalizations.of(context)!.profilbildAendern,
               children: [
                 customTextInput(
-                    AppLocalizations.of(context).linkProfilbildEingeben,
+                    AppLocalizations.of(context)!.linkProfilbildEingeben,
                     profilImageLinkKontroller),
               ],
               actions: [
                 TextButton(
-                  child: Text(AppLocalizations.of(context).speichern),
+                  child: Text(AppLocalizations.of(context)!.speichern),
                   onPressed: () => checkAndSaveImage(),
                 ),
                 TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -103,7 +103,7 @@ class _ProfilImageState extends State<ProfilImage> {
     }
 
     _showPopupMenu(tabPosition) async {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
 
       await showMenu(
         context: context,
@@ -113,11 +113,11 @@ class _ProfilImageState extends State<ProfilImage> {
             ),
         items: [
           PopupMenuItem(
-              child: Text(AppLocalizations.of(context).link),
+              child: Text(AppLocalizations.of(context)!.link),
               onTap: () => Future.delayed(
                   const Duration(seconds: 0), () => changeImageWindow())),
           PopupMenuItem(
-            child: Text(AppLocalizations.of(context).hochladen),
+            child: Text(AppLocalizations.of(context)!.hochladen),
             onTap: () async {
               var newImage = await uploadAndSaveImage(context, "profil");
 
@@ -128,7 +128,7 @@ class _ProfilImageState extends State<ProfilImage> {
           ),
           if (widget.profil["bild"].isNotEmpty)
             PopupMenuItem(
-                child: Text(AppLocalizations.of(context).loeschen),
+                child: Text(AppLocalizations.of(context)!.loeschen),
                 onTap: () {
                   deleteProfilImage();
                 })
@@ -162,7 +162,7 @@ class _ProfilImageState extends State<ProfilImage> {
 class DefaultProfilImage extends StatelessWidget {
   var profil;
 
-  DefaultProfilImage(this.profil, {Key key}) : super(key: key);
+  DefaultProfilImage(this.profil, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +221,7 @@ class OwnProfilImage extends StatelessWidget {
   var profil;
   var fullScreenWindow;
 
-  OwnProfilImage(this.profil, {Key key, this.fullScreenWindow})
+  OwnProfilImage(this.profil, {Key? key, this.fullScreenWindow})
       : super(key: key);
 
   @override

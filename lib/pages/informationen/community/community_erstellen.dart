@@ -16,7 +16,7 @@ import '../../../widgets/google_autocomplete.dart';
 import '../../start_page.dart';
 
 class CommunityErstellen extends StatefulWidget {
-  const CommunityErstellen({Key key}) : super(key: key);
+  const CommunityErstellen({Key? key}) : super(key: key);
 
   @override
   State<CommunityErstellen> createState() => _CommunityErstellenState();
@@ -108,12 +108,12 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
   checkValidationAndSendError(communityData) {
     if (communityData["name"].isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context).bitteNameEingeben);
+      customSnackbar(context, AppLocalizations.of(context)!.bitteNameEingeben);
     } else if (communityData["beschreibung"].isEmpty) {
       customSnackbar(context,
-          AppLocalizations.of(context).bitteCommunityBeschreibungEingeben);
+          AppLocalizations.of(context)!.bitteCommunityBeschreibungEingeben);
     } else if (communityData["ort"] == null || communityData["ort"].isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context).bitteStadtEingeben);
+      customSnackbar(context, AppLocalizations.of(context)!.bitteStadtEingeben);
     } else {
       return true;
     }
@@ -123,13 +123,13 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
   @override
   Widget build(BuildContext context) {
-    ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
+    ortAuswahlBox.hintText = AppLocalizations.of(context)!.stadtEingeben;
 
     chooseOwnLocationBox(){
       return Container(
         margin: const EdgeInsets.only(left: 15, right: 15),
         child: Row(children: [
-          Text(AppLocalizations.of(context).aktuellenOrtVerwenden, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(AppLocalizations.of(context)!.aktuellenOrtVerwenden, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const Expanded(child: SizedBox.shrink()),
           Switch(value: chooseCurrentLocation, onChanged: (bool){
             if(bool){
@@ -158,13 +158,13 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
         child: Row(
           children: [
             Expanded(
-                child: Text(AppLocalizations.of(context).frageTeilGemeinschaft,
+                child: Text(AppLocalizations.of(context)!.frageTeilGemeinschaft,
                     maxLines: 2, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
             Checkbox(
                 value: ownCommunity,
                 onChanged: (value) {
                   setState(() {
-                    ownCommunity = value;
+                    ownCommunity = value!;
                   });
                 }),
           ],
@@ -177,7 +177,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
         padding: const EdgeInsets.only(left: 15, right: 15),
         child: Row(
           children: [
-            Expanded(child: Text(AppLocalizations.of(context).geheimerChat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+            Expanded(child: Text(AppLocalizations.of(context)!.geheimerChat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
             Switch(
                 value: secretChat,
                 onChanged: (newValue){
@@ -193,7 +193,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).communityErstellen,
+          title: AppLocalizations.of(context)!.communityErstellen,
           buttons: [
             IconButton(
                 onPressed: () async {
@@ -209,12 +209,12 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       body: ListView(
         children: [
           customTextInput(
-              AppLocalizations.of(context).communityName, nameController),
+              AppLocalizations.of(context)!.communityName, nameController),
           chooseOwnLocationBox(),
           ortAuswahlBox,
-          customTextInput(AppLocalizations.of(context).linkEingebenOptional,
+          customTextInput(AppLocalizations.of(context)!.linkEingebenOptional,
               linkKontroller),
-          customTextInput(AppLocalizations.of(context).beschreibungCommunity,
+          customTextInput(AppLocalizations.of(context)!.beschreibungCommunity,
               beschreibungKontroller,
               moreLines: 5, textInputAction: TextInputAction.newline),
           Center(child: secretChatQuestionBox()),

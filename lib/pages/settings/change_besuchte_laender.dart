@@ -10,12 +10,12 @@ import '../../services/locationsService.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeBesuchteLaenderPage extends StatefulWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   var selected;
   bool isGerman;
 
   ChangeBesuchteLaenderPage(
-      {Key key, this.selected, this.isGerman})
+      {Key? key, this.selected, required this.isGerman})
       : super(key: key);
 
   @override
@@ -24,7 +24,7 @@ class ChangeBesuchteLaenderPage extends StatefulWidget {
 }
 
 class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
-  var besuchteLaenderDropdown = CustomMultiTextForm();
+  late var besuchteLaenderDropdown;
 
   @override
   void initState() {
@@ -64,11 +64,11 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
   @override
   Widget build(BuildContext context) {
     besuchteLaenderDropdown.hintText =
-        AppLocalizations.of(context).besuchteLaender;
+        AppLocalizations.of(context)!.besuchteLaender;
 
     return Scaffold(
         appBar: CustomAppBar(
-          title: AppLocalizations.of(context).besucheLaenderVeraendern,
+          title: AppLocalizations.of(context)!.besucheLaenderVeraendern,
         ),
         body: ListView(
           children: [

@@ -8,7 +8,7 @@ class WorldmapMini extends StatelessWidget {
   double maxMapZoom = 14;
   Map location;
 
-  WorldmapMini({Key key, this.location}) : super(key: key);
+  WorldmapMini({Key? key, required this.location}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

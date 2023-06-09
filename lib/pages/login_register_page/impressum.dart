@@ -2,7 +2,7 @@ import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 
 class ImpressumPage extends StatelessWidget {
-  const ImpressumPage({Key key}) : super(key: key);
+  const ImpressumPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -8,7 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class ChangeSocialMediaLinks extends StatefulWidget {
-  const ChangeSocialMediaLinks({Key key}) : super(key: key);
+  const ChangeSocialMediaLinks({Key? key}) : super(key: key);
 
   @override
   State<ChangeSocialMediaLinks> createState() => _ChangeSocialMediaLinksState();
@@ -45,7 +45,7 @@ class _ChangeSocialMediaLinksState extends State<ChangeSocialMediaLinks> {
                     const SizedBox(height: 30),
                     Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                       if(incorrectInput) Text(
-                          AppLocalizations.of(context).eingabeKeinLink,
+                          AppLocalizations.of(context)!.eingabeKeinLink,
                          style: const TextStyle(color: Colors.red),
                       ),
                       const Expanded(child: SizedBox.shrink()),
@@ -129,7 +129,7 @@ class _ChangeSocialMediaLinksState extends State<ChangeSocialMediaLinks> {
 
     return Scaffold(
         appBar: CustomAppBar(
-          title: AppLocalizations.of(context).socialMediaLinkAendern
+          title: AppLocalizations.of(context)!.socialMediaLinkAendern
       ),
       body: Column(children: showSocialMediaLinks(),),
       floatingActionButton: FloatingActionButton(

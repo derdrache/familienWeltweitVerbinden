@@ -9,10 +9,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeChildrenPage extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   var childrenBirthdatePickerBox;
 
-  ChangeChildrenPage({Key key,this.childrenBirthdatePickerBox}) : super(key: key);
+  ChangeChildrenPage({Key? key,this.childrenBirthdatePickerBox}) : super(key: key);
 
 
 
@@ -29,7 +29,7 @@ class ChangeChildrenPage extends StatelessWidget {
       }
 
       if(!allFilled || childrenBirthdatePickerBox.getDates().isEmpty){
-        customSnackbar(context, AppLocalizations.of(context).geburtsdatumEingeben);
+        customSnackbar(context, AppLocalizations.of(context)!.geburtsdatumEingeben);
       } else{
         await ProfilDatabase().updateProfil(
             "kinder = '${jsonEncode(childrenBirthdatePickerBox.getDates())}'",
@@ -39,22 +39,22 @@ class ChangeChildrenPage extends StatelessWidget {
 
 
         customSnackbar(context,
-            AppLocalizations.of(context).anzahlUndAlterKinder +" "+
-                AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+            AppLocalizations.of(context)!.anzahlUndAlterKinder +" "+
+                AppLocalizations.of(context)!.erfolgreichGeaender, color: Colors.green);
         Navigator.pop(context);
       }
     }
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).kinderAendern,
+          title: AppLocalizations.of(context)!.kinderAendern,
       ),
       body: Column(children: [
         childrenBirthdatePickerBox,
         const SizedBox(height: 10),
         FloatingActionButton.extended(
             label: Text(
-              AppLocalizations.of(context).speichern,
+              AppLocalizations.of(context)!.speichern,
               style: const TextStyle(fontSize: 20),
             ),
             icon: const Icon(Icons.save),

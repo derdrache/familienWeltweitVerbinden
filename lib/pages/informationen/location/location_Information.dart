@@ -24,7 +24,7 @@ class LocationInformationPage extends StatefulWidget {
   var ortName;
   var fromCityPage;
 
-  LocationInformationPage({Key key, this.ortName, this.fromCityPage = false})
+  LocationInformationPage({Key? key, this.ortName, this.fromCityPage = false})
       : super(key: key);
 
   @override
@@ -33,18 +33,17 @@ class LocationInformationPage extends StatefulWidget {
 }
 
 class _LocationInformationPageState extends State<LocationInformationPage> {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
-  bool isCity;
-  bool hasInterest;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  late bool isCity;
+  late bool hasInterest;
   Map location = {};
   int _selectNavigationIndex = 0;
-  List tabPages;
-  List usersCityInformation;
+  late List tabPages;
+  late List usersCityInformation;
 
   @override
   void initState() {
     location = getCityFromHive(cityName: widget.ortName);
-    if (location == null) Navigator.pop(context);
 
     location["familien"].remove(userId);
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
@@ -115,7 +114,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
               Clipboard.setData(
                   ClipboardData(text: "</cityId=" + location["id"].toString()));
               customSnackbar(
-                  context, AppLocalizations.of(context).linkWurdekopiert,
+                  context, AppLocalizations.of(context)!.linkWurdekopiert,
                   color: Colors.green);
               global_func.changePageForever(
                   context,
@@ -147,17 +146,17 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.tips_and_updates),
-            label: AppLocalizations.of(context).insiderInformation,
+            label: AppLocalizations.of(context)!.insiderInformation,
           ),
           if (isCity)
             BottomNavigationBarItem(
               icon: const Icon(Icons.map),
-              label: AppLocalizations.of(context).karte,
+              label: AppLocalizations.of(context)!.karte,
             ),
           if (!isCity)
             BottomNavigationBarItem(
               icon: const Icon(Icons.location_city),
-              label: AppLocalizations.of(context).cities,
+              label: AppLocalizations.of(context)!.cities,
             ),
         ],
       ),
@@ -171,9 +170,9 @@ class GeneralInformationPage extends StatefulWidget {
   bool fromCityPage;
 
   GeneralInformationPage(
-      {Key key,
-      this.location,
-      this.usersCityInformation,
+      {Key? key,
+      required this.location,
+      required this.usersCityInformation,
       this.fromCityPage = false})
       : super(key: key);
 
@@ -182,10 +181,10 @@ class GeneralInformationPage extends StatefulWidget {
 }
 
 class _GeneralInformationPageState extends State<GeneralInformationPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser!.uid;
   bool canGerman = false;
   bool canEnglish = false;
-  bool isCity;
+  late bool isCity;
   final translator = GoogleTranslator();
   List familiesThere = [];
 
@@ -229,8 +228,8 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                 ),
                 if (isInactive)
                   Text(
-                    " - ${AppLocalizations.of(context).inaktiv}",
-                    style: TextStyle(color: Colors.red),
+                    " - ${AppLocalizations.of(context)!.inaktiv}",
+                    style: const TextStyle(color: Colors.red),
                   )
               ],
             )),
@@ -240,7 +239,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     if (familiesList.isEmpty) {
       familiesList.add(Container(
           margin: const EdgeInsets.all(10),
-          child: Text(AppLocalizations.of(context).keineFamilieStadt)));
+          child: Text(AppLocalizations.of(context)!.keineFamilieStadt)));
     } else {
       familiesList.add(const SizedBox(height: 10));
     }
@@ -251,7 +250,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
             context: context,
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
-                  title: AppLocalizations.of(context).besuchtVon,
+                  title: AppLocalizations.of(context)!.besuchtVon,
                   children: familiesList);
             }));
   }
@@ -319,9 +318,9 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               Icon(Icons.pin_drop, size: iconSize),
               const SizedBox(width: 10),
               Text(
-                  AppLocalizations.of(context).aktuellDort +
+                  AppLocalizations.of(context)!.aktuellDort +
                       familiesOnLocation.toString() +
-                      AppLocalizations.of(context).familien,
+                      AppLocalizations.of(context)!.familien,
                   style: TextStyle(
                       fontSize: fontSize,
                       decoration: TextDecoration.underline)),
@@ -341,9 +340,9 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               Icon(Icons.family_restroom, size: iconSize),
               const SizedBox(width: 10),
               Text(
-                  AppLocalizations.of(context).besuchtVon +
+                  AppLocalizations.of(context)!.besuchtVon +
                       anzahlFamilien.toString() +
-                      AppLocalizations.of(context).familien,
+                      AppLocalizations.of(context)!.familien,
                   style: TextStyle(
                       fontSize: fontSize,
                       decoration: TextDecoration.underline)),
@@ -363,7 +362,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               size: iconSize,
             ),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).insiderInformation + ": ",
+            Text(AppLocalizations.of(context)!.insiderInformation + ": ",
                 style: TextStyle(fontSize: fontSize)),
             const SizedBox(width: 5),
             Text(widget.usersCityInformation.length.toString(),
@@ -395,7 +394,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               size: iconSize,
             ),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).kosten,
+            Text(AppLocalizations.of(context)!.kosten,
                 style: TextStyle(fontSize: fontSize)),
             const SizedBox(width: 5),
             Text(
@@ -456,7 +455,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               size: iconSize,
             ),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context).wetter,
+            Text(AppLocalizations.of(context)!.wetter,
                 style: TextStyle(fontSize: fontSize)),
             if (widget.location["wetter"] != null)
               Flexible(
@@ -515,16 +514,16 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 class InsiderInformationPage extends StatefulWidget {
   Map location;
 
-  InsiderInformationPage({Key key, this.location}) : super(key: key);
+  InsiderInformationPage({Key? key, required this.location}) : super(key: key);
 
   @override
   State<InsiderInformationPage> createState() => _InsiderInformationPageState();
 }
 
 class _InsiderInformationPageState extends State<InsiderInformationPage> {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   final translator = GoogleTranslator();
-  List usersCityInformation;
+  late List usersCityInformation;
 
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
@@ -534,12 +533,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-              title: AppLocalizations.of(context).insiderInformationHinzufuegen,
+              title: AppLocalizations.of(context)!.insiderInformationHinzufuegen,
               children: [
                 customTextInput(
-                    AppLocalizations.of(context).titel, titleTextKontroller),
+                    AppLocalizations.of(context)!.titel, titleTextKontroller),
                 const SizedBox(height: 10),
-                customTextInput(AppLocalizations.of(context).beschreibung,
+                customTextInput(AppLocalizations.of(context)!.beschreibung,
                     informationTextKontroller,
                     moreLines: 8, textInputAction: TextInputAction.newline),
                 const SizedBox(height: 5),
@@ -549,7 +548,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   children: [
                     TextButton(
                         child: Text(
-                          AppLocalizations.of(context).speichern,
+                          AppLocalizations.of(context)!.speichern,
                           style: const TextStyle(fontSize: 20),
                         ),
                         onPressed: () => saveNewInformation(
@@ -557,7 +556,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                             inhalt: informationTextKontroller.text)),
                     TextButton(
                       child: Text(
-                        AppLocalizations.of(context).abbrechen,
+                        AppLocalizations.of(context)!.abbrechen,
                         style: const TextStyle(fontSize: 20),
                       ),
                       onPressed: () => Navigator.pop(context),
@@ -577,14 +576,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     if (title.isEmpty) {
       customSnackbar(
-          context, AppLocalizations.of(context).titelStadtinformationEingeben);
+          context, AppLocalizations.of(context)!.titelStadtinformationEingeben);
       return;
     } else if (title.length > 100) {
-      customSnackbar(context, AppLocalizations.of(context).titleZuLang);
+      customSnackbar(context, AppLocalizations.of(context)!.titleZuLang);
       return;
     } else if (title.isEmpty) {
       customSnackbar(context,
-          AppLocalizations.of(context).beschreibungStadtinformationEingeben);
+          AppLocalizations.of(context)!.beschreibungStadtinformationEingeben);
       return;
     }
 
@@ -717,12 +716,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             context: context,
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
-                  title: AppLocalizations.of(context).informationAendern,
+                  title: AppLocalizations.of(context)!.informationAendern,
                   children: [
-                    customTextInput(AppLocalizations.of(context).titel,
+                    customTextInput(AppLocalizations.of(context)!.titel,
                         titleTextKontroller),
                     const SizedBox(height: 10),
-                    customTextInput(AppLocalizations.of(context).beschreibung,
+                    customTextInput(AppLocalizations.of(context)!.beschreibung,
                         informationTextKontroller,
                         moreLines: 8, textInputAction: TextInputAction.newline),
                     const SizedBox(height: 20),
@@ -730,14 +729,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          child: Text(AppLocalizations.of(context).speichern),
+                          child: Text(AppLocalizations.of(context)!.speichern),
                           onPressed: () => changeInformation(
                               id: information["id"],
                               newTitle: titleTextKontroller.text,
                               newInformation: informationTextKontroller.text),
                         ),
                         TextButton(
-                          child: Text(AppLocalizations.of(context).abbrechen),
+                          child: Text(AppLocalizations.of(context)!.abbrechen),
                           onPressed: () => Navigator.pop(context),
                         )
                       ],
@@ -753,14 +752,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     if (newTitle.isEmpty) {
       customSnackbar(
-          context, AppLocalizations.of(context).titelStadtinformationEingeben);
+          context, AppLocalizations.of(context)!.titelStadtinformationEingeben);
       return;
     } else if (newTitle.length > 100) {
-      customSnackbar(context, AppLocalizations.of(context).titleZuLang);
+      customSnackbar(context, AppLocalizations.of(context)!.titleZuLang);
       return;
     } else if (newInformation.isEmpty) {
       customSnackbar(context,
-          AppLocalizations.of(context).beschreibungStadtinformationEingeben);
+          AppLocalizations.of(context)!.beschreibungStadtinformationEingeben);
       return;
     }
 
@@ -849,7 +848,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     Clipboard.setData(ClipboardData(text: informationText));
 
-    customSnackbar(context, AppLocalizations.of(context).informationKopiert,
+    customSnackbar(context, AppLocalizations.of(context)!.informationKopiert,
         color: Colors.green);
   }
 
@@ -860,12 +859,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             context: context,
             builder: (BuildContext context) {
               return CustomAlertDialog(
-                title: AppLocalizations.of(context).informationLoeschen,
+                title: AppLocalizations.of(context)!.informationLoeschen,
                 height: 90,
                 children: [
                   const SizedBox(height: 10),
                   Center(
-                      child: Text(AppLocalizations.of(context)
+                      child: Text(AppLocalizations.of(context)!
                           .informationWirklichLoeschen))
                 ],
                 actions: [
@@ -887,7 +886,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     },
                   ),
                   TextButton(
-                    child: Text(AppLocalizations.of(context).abbrechen),
+                    child: Text(AppLocalizations.of(context)!.abbrechen),
                     onPressed: () => Navigator.pop(context),
                   )
                 ],
@@ -905,11 +904,11 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
                   height: 500,
-                  title: AppLocalizations.of(context).informationMelden,
+                  title: AppLocalizations.of(context)!.informationMelden,
                   children: [
                     customTextInput("", reportTextKontroller,
                         moreLines: 10,
-                        hintText: AppLocalizations.of(context)
+                        hintText: AppLocalizations.of(context)!
                             .informationMeldenFrage),
                     Container(
                       margin:
@@ -923,7 +922,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                                     information["id"].toString(),
                                 reportTextKontroller.text);
                           },
-                          label: Text(AppLocalizations.of(context).senden)),
+                          label: Text(AppLocalizations.of(context)!.senden)),
                     )
                   ]);
             }));
@@ -1003,20 +1002,20 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           items: [
             if (canChange)
               PopupMenuItem(
-                child: Text(AppLocalizations.of(context).bearbeiten),
+                child: Text(AppLocalizations.of(context)!.bearbeiten),
                 onTap: () => changeInformationDialog(information),
               ),
             PopupMenuItem(
-              child: Text(AppLocalizations.of(context).kopieren),
+              child: Text(AppLocalizations.of(context)!.kopieren),
               onTap: () => copyInformationDialog(information),
             ),
             PopupMenuItem(
-              child: Text(AppLocalizations.of(context).melden),
+              child: Text(AppLocalizations.of(context)!.melden),
               onTap: () => reportInformationDialog(information),
             ),
             if (canChange)
               PopupMenuItem(
-                  child: Text(AppLocalizations.of(context).loeschen),
+                  child: Text(AppLocalizations.of(context)!.loeschen),
                   onTap: () {
                     deleteInformationDialog(information);
                   }),
@@ -1077,7 +1076,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      AppLocalizations.of(context).automatischeUebersetzung,
+                      AppLocalizations.of(context)!.automatischeUebersetzung,
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     )
                   ],
@@ -1145,7 +1144,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           padding: const EdgeInsets.all(30),
           child: Center(
             child: Text(
-              AppLocalizations.of(context).keineInsiderInformation,
+              AppLocalizations.of(context)!.keineInsiderInformation,
               style: const TextStyle(color: Colors.grey, fontSize: 20),
             ),
           ),
@@ -1181,7 +1180,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 class CountryCitiesPage extends StatefulWidget {
   final String countryName;
 
-  CountryCitiesPage({Key key, this.countryName}) : super(key: key);
+  CountryCitiesPage({Key? key, required this.countryName}) : super(key: key);
 
   @override
   State<CountryCitiesPage> createState() => _CountryCitiesPageState();
@@ -1262,12 +1261,12 @@ class _CountryCitiesPageState extends State<CountryCitiesPage> {
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 5),
-                    Text(AppLocalizations.of(context).stadtInformationen +
+                    Text(AppLocalizations.of(context)!.stadtInformationen +
                         getCityUserInfoCount(city["ort"]).toString()),
                     const SizedBox(height: 5),
-                    Text(AppLocalizations.of(context).besuchtVon +
+                    Text(AppLocalizations.of(context)!.besuchtVon +
                         city["familien"].length.toString() +
-                        AppLocalizations.of(context).familien),
+                        AppLocalizations.of(context)!.familien),
                   ],
                 ),
               ),

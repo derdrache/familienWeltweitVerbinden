@@ -46,11 +46,11 @@ import 'change_email.dart';
 var borderColor = Colors.grey[200];
 double globalPadding = 30;
 double fontSize = 20;
-var userID = FirebaseAuth.instance.currentUser.uid;
+var userID = FirebaseAuth.instance.currentUser!.uid;
 var userProfil;
 
 class SettingPage extends StatefulWidget {
-  const SettingPage({Key key}) : super(key: key);
+  const SettingPage({Key? key}) : super(key: key);
 
   @override
   _SettingPageState createState() => _SettingPageState();
@@ -115,7 +115,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Map userProfil;
   Function refresh;
 
-  _SettingsAppBar({Key key, this.userProfil, this.refresh}) : super(key: key);
+  _SettingsAppBar({Key? key, required this.userProfil, required this.refresh}) : super(key: key);
 
   @override
   Size get preferredSize => const Size.fromHeight(60.0);
@@ -146,7 +146,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                                   ))).then((_) =>refresh()
                       );
                     },
-                    child: Text(AppLocalizations.of(context).nameAendern,
+                    child: Text(AppLocalizations.of(context)!.nameAendern,
                         style: TextStyle(color: textColor)))),
             PopupMenuItem(
                 child: TextButton(
@@ -157,7 +157,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                           MaterialPageRoute(
                               builder: (_) => ChangeEmailPage())).then((_)=>refresh());
                     },
-                    child: Text(AppLocalizations.of(context).emailAendern,
+                    child: Text(AppLocalizations.of(context)!.emailAendern,
                         style: TextStyle(color: textColor)))),
             PopupMenuItem(
                 child: TextButton(
@@ -165,7 +165,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                       Navigator.pop(context);
                       global_func.changePage(context, ChangePasswortPage());
                     },
-                    child: Text(AppLocalizations.of(context).passwortVeraendern,
+                    child: Text(AppLocalizations.of(context)!.passwortVeraendern,
                         style: TextStyle(color: textColor)))),
             PopupMenuItem(
                 child: TextButton(
@@ -174,7 +174,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                       global_func.changePage(
                           context, const FamilieProfilPage());
                     },
-                    child: Text(AppLocalizations.of(context).familyProfil,
+                    child: Text(AppLocalizations.of(context)!.familyProfil,
                         style: TextStyle(color: textColor)))),
             PopupMenuItem(
                 child: TextButton(
@@ -182,7 +182,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                       await FirebaseAuth.instance.signOut();
                       global_func.changePageForever(context, LoginPage());
                     },
-                    child: Text(AppLocalizations.of(context).abmelden,
+                    child: Text(AppLocalizations.of(context)!.abmelden,
                         style: TextStyle(color: textColor)))),
           ]);
     }
@@ -196,7 +196,7 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _NameSection extends StatelessWidget {
-  _NameSection({Key key}) : super(key: key);
+  _NameSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +206,7 @@ class _NameSection extends StatelessWidget {
         width: double.maxFinite,
         padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 10, color: borderColor))),
+            border: Border(bottom: BorderSide(width: 10, color: borderColor!))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
             children: [
@@ -264,7 +264,7 @@ class _ProfilSection extends StatelessWidget {
         : global_func.changeGermanToEnglish(userProfil["sprachen"]));
   }
 
-  _ProfilSection({Key key, this.afterChange}) : super(key: key);
+  _ProfilSection({Key? key, required this.afterChange}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -308,11 +308,11 @@ class _ProfilSection extends StatelessWidget {
     }
 
     createAufreiseText() {
-      String text = AppLocalizations.of(context).nein;
-      String seit = userProfil["aufreiseSeit"];
-      String bis = userProfil["aufreiseBis"];
+      String text = AppLocalizations.of(context)!.nein;
+      String? seit = userProfil["aufreiseSeit"];
+      String? bis = userProfil["aufreiseBis"];
 
-      if (seit == null) return AppLocalizations.of(context).nein;
+      if (seit == null) return AppLocalizations.of(context)!.nein;
 
       text = seit.split(" ")[0].split("-").take(2).toList().reversed.join("-");
 
@@ -333,7 +333,7 @@ class _ProfilSection extends StatelessWidget {
         padding:
             const EdgeInsets.only(top: 10, bottom: 15, left: 15, right: 15),
         decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 10, color: borderColor))),
+            border: Border(bottom: BorderSide(width: 10, color: borderColor!))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -345,7 +345,7 @@ class _ProfilSection extends StatelessWidget {
                       fontWeight: FontWeight.bold)),
               const Expanded(child: SizedBox.shrink()),
               const Icon(Icons.arrow_downward),
-              Text(AppLocalizations.of(context).antippenZumAendern,
+              Text(AppLocalizations.of(context)!.antippenZumAendern,
                   style: const TextStyle(color: Colors.grey, fontSize: 14)),
               const Icon(Icons.arrow_downward),
               const Expanded(child: SizedBox()),
@@ -364,11 +364,11 @@ class _ProfilSection extends StatelessWidget {
               children: [
                 profilThemeContainer(
                     userProfil["ort"],
-                    AppLocalizations.of(context).aktuelleOrt,
+                    AppLocalizations.of(context)!.aktuelleOrt,
                     const ChangeLocationPage()),
                 profilThemeContainer(
                     reiseArtInput.getSelected(),
-                    AppLocalizations.of(context).artDerReise,
+                    AppLocalizations.of(context)!.artDerReise,
                     ChangeReiseartPage(
                       oldInput: reiseArtInput.getSelected(),
                       isGerman: spracheIstDeutsch,
@@ -380,7 +380,7 @@ class _ProfilSection extends StatelessWidget {
                             .getDates(years: true)
                             .reversed
                             .join(", "),
-                    AppLocalizations.of(context).alterDerKinder,
+                    AppLocalizations.of(context)!.alterDerKinder,
                     ChangeChildrenPage(
                       childrenBirthdatePickerBox: kinderAgeBox,
                     )),
@@ -388,7 +388,7 @@ class _ProfilSection extends StatelessWidget {
                     interessenInputBox.getSelected() == null
                         ? ""
                         : interessenInputBox.getSelected().join(", "),
-                    AppLocalizations.of(context).interessen,
+                    AppLocalizations.of(context)!.interessen,
                     ChangeInteressenPage(
                       selected: interessenInputBox.getSelected(),
                       isGerman: spracheIstDeutsch,
@@ -397,18 +397,18 @@ class _ProfilSection extends StatelessWidget {
                     sprachenInputBox.getSelected() == null
                         ? ""
                         : sprachenInputBox.getSelected().join(", "),
-                    AppLocalizations.of(context).sprachen,
+                    AppLocalizations.of(context)!.sprachen,
                     ChangeSprachenPage(
                       selected: sprachenInputBox.getSelected(),
                       isGerman: spracheIstDeutsch,
                     )),
                 profilThemeContainer(
                     userProfil["aboutme"],
-                    AppLocalizations.of(context).ueberMich,
+                    AppLocalizations.of(context)!.ueberMich,
                     ChangeAboutmePage(oldText: userProfil["aboutme"])),
                 profilThemeContainer(
                     createAufreiseText(),
-                    AppLocalizations.of(context).aufReise,
+                    AppLocalizations.of(context)!.aufReise,
                     ChangeAufreisePage(
                         aufreiseSeit: userProfil["aufreiseSeit"] == null
                             ? null
@@ -419,13 +419,13 @@ class _ProfilSection extends StatelessWidget {
                         isGerman: spracheIstDeutsch)),
                 profilThemeContainer(
                     reisePlanung.length.toString(),
-                    AppLocalizations.of(context).reisePlanung,
+                    AppLocalizations.of(context)!.reisePlanung,
                     ChangeReiseplanungPage(
                         reiseplanung: reisePlanung,
                         isGerman: spracheIstDeutsch)),
                 profilThemeContainer(
                     besuchteLaender.length.toString(),
-                    AppLocalizations.of(context).besuchteLaender,
+                    AppLocalizations.of(context)!.besuchteLaender,
                     ChangeBesuchteLaenderPage(
                         selected: besuchteLaender,
                         isGerman: spracheIstDeutsch)),
@@ -437,7 +437,7 @@ class _ProfilSection extends StatelessWidget {
                     const ChangeSocialMediaLinks()),
                 profilThemeContainer(
                     userProfil["tradeNotize"],
-                    AppLocalizations.of(context).verkaufenTauschenSchenken,
+                    AppLocalizations.of(context)!.verkaufenTauschenSchenken,
                     ChangeTradePage(oldText: userProfil["tradeNotize"])),
               ],
             ),
@@ -447,7 +447,7 @@ class _ProfilSection extends StatelessWidget {
 }
 
 class _SettingSection extends StatelessWidget {
-  const _SettingSection({Key key}) : super(key: key);
+  const _SettingSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -475,20 +475,20 @@ class _SettingSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppLocalizations.of(context).einstellungen,
+            Text(AppLocalizations.of(context)!.einstellungen,
                 style: TextStyle(
                     color: headLineColor,
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             settingThemeContainer(
-                AppLocalizations.of(context).privatsphaereSicherheit,
+                AppLocalizations.of(context)!.privatsphaereSicherheit,
                 Icons.lock,
                 () => global_func.changePage(
                     context, const PrivacySecurityPage())),
             const SizedBox(height: 20),
             settingThemeContainer(
-                AppLocalizations.of(context).benachrichtigungen,
+                AppLocalizations.of(context)!.benachrichtigungen,
                 Icons.notifications,
                 () => global_func.changePage(
                     context, const NotificationsOptionsPage())),
@@ -498,7 +498,7 @@ class _SettingSection extends StatelessWidget {
 }
 
 class _SupportInformation extends StatelessWidget {
-  const _SupportInformation({Key key}) : super(key: key);
+  const _SupportInformation({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -542,8 +542,8 @@ class _SupportInformation extends StatelessWidget {
                 InkWell(
                   onTap: () => openURL(
                       "https://github.com/derdrache/familienWeltweitVerbinden"),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Text("Open Source: ",
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       Text(
@@ -557,15 +557,15 @@ class _SupportInformation extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
+                const Row(
                   children: [
-                    const Text("Framework:  ",
+                    Text("Framework:  ",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     Text("Flutter"),
                   ],
                 ),
                 const SizedBox(height: 20),
-                Text(AppLocalizations.of(context).aboutAppText)
+                Text(AppLocalizations.of(context)!.aboutAppText)
               ],
             );
           });
@@ -576,7 +576,7 @@ class _SupportInformation extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(AppLocalizations.of(context).appInformation,
+            Text(AppLocalizations.of(context)!.appInformation,
                 style: TextStyle(
                     color: headLineColor,
                     fontSize: fontSize,
@@ -597,14 +597,14 @@ class _SupportInformation extends StatelessWidget {
                 () => PatchnotesWindow(context: context).openWindow()),
             const SizedBox(height: 20),
             settingThemeContainer(
-                AppLocalizations.of(context).geplanteErweiterungen,
+                AppLocalizations.of(context)!.geplanteErweiterungen,
                 Icons.update,
                 () => UmcomingUpdatesWindow(context: context).openWindow()),
             const SizedBox(height: 20),
             settingThemeContainer(
-                AppLocalizations.of(context).mitFreundenTeilen,
+                AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
-                () => Share.share(AppLocalizations.of(context).teilenLinkText +
+                () => Share.share(AppLocalizations.of(context)!.teilenLinkText +
                     '\nhttps://families-worldwide.com/')),
             /*
               SizedBox(height: 20),
@@ -616,7 +616,7 @@ class _SupportInformation extends StatelessWidget {
 
             const SizedBox(height: 20),
             settingThemeContainer(
-                AppLocalizations.of(context).spenden, Icons.card_giftcard,
+                AppLocalizations.of(context)!.spenden, Icons.card_giftcard,
                 () async {
               var url =
                   Uri.parse("https://www.paypal.com/paypalme/DominikMast");
@@ -624,7 +624,7 @@ class _SupportInformation extends StatelessWidget {
               await launchUrl(url, mode: LaunchMode.inAppWebView);
             }),
             const SizedBox(height: 20),
-            settingThemeContainer(AppLocalizations.of(context).ueber,
+            settingThemeContainer(AppLocalizations.of(context)!.ueber,
                 Icons.info, () => aboutAppWindow()),
           ],
         ));

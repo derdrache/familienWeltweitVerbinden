@@ -7,11 +7,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeNamePage extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   final String oldName;
   TextEditingController nameKontroller = TextEditingController();
 
-  ChangeNamePage({Key key, this.oldName}) : super(key: key);
+  ChangeNamePage({Key? key, required this.oldName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +20,14 @@ class ChangeNamePage extends StatelessWidget {
     save() async {
       if (nameKontroller.text.isEmpty) {
         customSnackbar(
-            context, AppLocalizations.of(context).neuenNamenEingeben);
+            context, AppLocalizations.of(context)!.neuenNamenEingeben);
         return;
       }
 
       var newUserName = nameKontroller.text.replaceAll("'", "''");
 
       if (newUserName.length > 40) {
-        customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
+        customSnackbar(context, AppLocalizations.of(context)!.usernameZuLang);
         return;
       }
 
@@ -35,7 +35,7 @@ class ChangeNamePage extends StatelessWidget {
           await ProfilDatabase().getData("id", "WHERE name = '$newUserName'");
       if (checkUserProfilExist != false) {
         customSnackbar(
-            context, AppLocalizations.of(context).usernameInVerwendung);
+            context, AppLocalizations.of(context)!.usernameInVerwendung);
         return;
       }
 
@@ -47,7 +47,7 @@ class ChangeNamePage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).nameAendern,),
+          title: AppLocalizations.of(context)!.nameAendern,),
       body: Container(
         margin: const EdgeInsets.only(top: 20),
         child: Column(children: [
@@ -56,7 +56,7 @@ class ChangeNamePage extends StatelessWidget {
           const SizedBox(height: 10),
           FloatingActionButton.extended(
               label: Text(
-                AppLocalizations.of(context).speichern,
+                AppLocalizations.of(context)!.speichern,
                 style: const TextStyle(fontSize: 20),
               ),
               icon: const Icon(Icons.save),

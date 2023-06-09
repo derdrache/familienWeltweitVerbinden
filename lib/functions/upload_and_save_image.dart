@@ -21,7 +21,7 @@ uploadAndSaveImage(context, typ, {meetupCommunityData}) async{
 
     if(imageData == null) return;
 
-    CroppedFile croppedFile = await ImageCropper().cropImage(
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: imageData["path"],
       aspectRatioPresets: [
         CropAspectRatioPreset.square,
@@ -32,7 +32,7 @@ uploadAndSaveImage(context, typ, {meetupCommunityData}) async{
       ],
       uiSettings: [
         AndroidUiSettings(
-            toolbarTitle: AppLocalizations.of(context).bildBearbeiten,
+            toolbarTitle: AppLocalizations.of(context)!.bildBearbeiten,
             toolbarColor: Theme.of(context).colorScheme.primary,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
@@ -47,7 +47,7 @@ uploadAndSaveImage(context, typ, {meetupCommunityData}) async{
     );
 
     await uploadImage(
-        croppedFile.path, imageName, await croppedFile.readAsBytes());
+        croppedFile?.path, imageName, await croppedFile?.readAsBytes());
 
     if (typ == "profil") {
       saveDBProfil(imageList, ownProfil);

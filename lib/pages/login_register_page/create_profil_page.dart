@@ -23,7 +23,7 @@ import '../start_page.dart';
 import 'login_page.dart';
 
 class CreateProfilPage extends StatefulWidget {
-  const CreateProfilPage({Key key}) : super(key: key);
+  const CreateProfilPage({Key? key}) : super(key: key);
 
   @override
   _CreateProfilPageState createState() => _CreateProfilPageState();
@@ -37,9 +37,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var isGerman = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  var sprachenAuswahlBox = CustomMultiTextForm();
-  var reiseArtenAuswahlBox = CustomDropDownButton();
-  var interessenAuswahlBox = CustomMultiTextForm();
+  late var sprachenAuswahlBox,reiseArtenAuswahlBox,interessenAuswahlBox;
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
   bool isLoading = false;
 
@@ -82,7 +80,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
     changeLoading();
 
-    if (!_formKey.currentState.validate()) {
+    if (!_formKey.currentState!.validate()) {
       changeLoading();
       return;
     }
@@ -95,7 +93,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
     if (userExist) {
       customSnackbar(
-          context, AppLocalizations.of(context).benutzerNamevergeben);
+          context, AppLocalizations.of(context)!.benutzerNamevergeben);
       changeLoading();
       return;
     }
@@ -107,14 +105,14 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var ortMapData = ortAuswahlBox.getGoogleLocationData();
 
       if (ortMapData["city"] == null) {
-        customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+        customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
         changeLoading();
         return;
       }
 
       var data = {
         "id": userID,
-        "email": encrypt(email),
+        "email": encrypt(email!),
         "name": userName,
         "ort": ortMapData["city"],
         "interessen": interessenAuswahlBox.getSelected(),
@@ -181,26 +179,26 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   checkAllValidation(userExist, userName) {
     bool hasError = false;
     String errorString =
-        AppLocalizations.of(context).bitteEingabeKorrigieren + "\n";
+        AppLocalizations.of(context)!.bitteEingabeKorrigieren + "\n";
 
     if (userExist) {
       errorString +=
-          "- " + AppLocalizations.of(context).usernameInVerwendung + "\n";
+          "- " + AppLocalizations.of(context)!.usernameInVerwendung + "\n";
     }else if (reiseArtenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context).reiseartAuswaehlen + "\n";
+          "- " + AppLocalizations.of(context)!.reiseartAuswaehlen + "\n";
     } else if (sprachenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context).spracheAuswaehlen + "\n";
+          "- " + AppLocalizations.of(context)!.spracheAuswaehlen + "\n";
     } else if (interessenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context).interessenAuswaehlen + "\n";
+          "- " + AppLocalizations.of(context)!.interessenAuswaehlen + "\n";
     }else if (childrenAgePickerBox.getDates().length == 0 ||
         !childrenInputValidation()) {
       errorString +=
-          "- " + AppLocalizations.of(context).geburtsdatumEingeben + "\n";
+          "- " + AppLocalizations.of(context)!.geburtsdatumEingeben + "\n";
     }else if (userName.length > 40) {
-      errorString += "- " + AppLocalizations.of(context).usernameZuLang;
+      errorString += "- " + AppLocalizations.of(context)!.usernameZuLang;
     }
 
 
@@ -216,21 +214,21 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   @override
   Widget build(BuildContext context) {
     sprachenAuswahlBox.hintText =
-        AppLocalizations.of(context).spracheAuswaehlen;
+        AppLocalizations.of(context)!.spracheAuswaehlen;
     reiseArtenAuswahlBox.hintText =
-        AppLocalizations.of(context).artDerReiseAuswaehlen;
+        AppLocalizations.of(context)!.artDerReiseAuswaehlen;
     interessenAuswahlBox.hintText =
-        AppLocalizations.of(context).interessenAuswaehlen;
-    childrenAgePickerBox.hintText = AppLocalizations.of(context).geburtsdatum;
-    ortAuswahlBox.hintText = AppLocalizations.of(context).aktuellenOrtEingeben;
+        AppLocalizations.of(context)!.interessenAuswaehlen;
+    childrenAgePickerBox.hintText = AppLocalizations.of(context)!.geburtsdatum;
+    ortAuswahlBox.hintText = AppLocalizations.of(context)!.aktuellenOrtEingeben;
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: AppLocalizations.of(context).profilErstellen,
+        title: AppLocalizations.of(context)!.profilErstellen,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, size: 35),
           onPressed: () {
-            changePage(context, LoginPage());
+            changePage(context, const LoginPage());
           },
         ),
         buttons: [
@@ -254,7 +252,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           }),
           child: ListView(
             children: [
-              customTextInput(AppLocalizations.of(context).benutzername,
+              customTextInput(AppLocalizations.of(context)!.benutzername,
                   userNameKontroller,
                   validator: global_functions.checkValidatorEmpty(context)),
               Align(
@@ -269,14 +267,14 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                     width: 600,
                     padding: const EdgeInsets.all(10),
                     child: Text(
-                      AppLocalizations.of(context).anzahlUndAlterKinder,
+                      AppLocalizations.of(context)!.anzahlUndAlterKinder,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16),
                     )),
               ),
               childrenAgePickerBox,
               customTextInput(
-                  AppLocalizations.of(context).aboutusHintText +
+                  AppLocalizations.of(context)!.aboutusHintText +
                       " *optional*",
                   aboutusKontroller,
                   moreLines: 4),
@@ -284,7 +282,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                 margin:
                     const EdgeInsets.only(top: 10, bottom: 5, right: 15, left: 15),
                 child: FloatingActionButton.extended(
-                    onPressed: () => saveFunction(), label: Text(AppLocalizations.of(context).profilErstellen)),
+                    onPressed: () => saveFunction(), label: Text(AppLocalizations.of(context)!.profilErstellen)),
               )
             ],
           ),

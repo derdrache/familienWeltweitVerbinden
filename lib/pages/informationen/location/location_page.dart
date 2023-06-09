@@ -12,14 +12,14 @@ class LocationPage extends StatefulWidget {
   bool forCity;
   bool forLand;
 
-  LocationPage({Key key, this.forCity = false, this.forLand = false}) : super(key: key);
+  LocationPage({Key? key, this.forCity = false, this.forLand = false}) : super(key: key);
 
   @override
   State<LocationPage> createState() => _LocationPageState();
 }
 
 class _LocationPageState extends State<LocationPage> {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   var onSearch = false;
   TextEditingController citySearchKontroller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
@@ -82,9 +82,9 @@ class _LocationPageState extends State<LocationPage> {
     List interesetCities = onSearch ? getAllSearchedLocations() : getAllInterestLocations();
     List<Widget> interestCitiyCards = [];
     var emptyText = widget.forCity
-        ? AppLocalizations.of(context).nochKeineStaedteVorhanden
-        : AppLocalizations.of(context).nochKeineCountriesVorhanden;
-    var emptySearchText = AppLocalizations.of(context).sucheKeineErgebnisse;
+        ? AppLocalizations.of(context)!.nochKeineStaedteVorhanden
+        : AppLocalizations.of(context)!.nochKeineCountriesVorhanden;
+    var emptySearchText = AppLocalizations.of(context)!.sucheKeineErgebnisse;
 
     if (interesetCities.isEmpty) {
       interestCitiyCards.add(SizedBox(
@@ -112,21 +112,21 @@ class _LocationPageState extends State<LocationPage> {
     return Scaffold(
       appBar: CustomAppBar(
         title: widget.forCity
-            ? AppLocalizations.of(context).cities
-            : AppLocalizations.of(context).countries,
+            ? AppLocalizations.of(context)!.cities
+            : AppLocalizations.of(context)!.countries,
         leading: IconButton(
           onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
         ),
       ),
       body: SafeArea(
         child: Stack(
           children: [
-            Container(
+            SizedBox(
               height: double.infinity,
               child: SingleChildScrollView(
                 controller: _scrollController,
-                  child: Container(
+                  child: SizedBox(
                     width: double.infinity,
                     child: Wrap(
                       alignment: WrapAlignment.center,
@@ -143,15 +143,15 @@ class _LocationPageState extends State<LocationPage> {
                   decoration: BoxDecoration(
                     border: Border.all(),
                     color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20))
+                    borderRadius: const BorderRadius.all(Radius.circular(20))
                   ),
                   child: TextField(
                     controller: citySearchKontroller,
                     focusNode: searchFocusNode,
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context).suche,
+                      labelText: AppLocalizations.of(context)!.suche,
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10)
+                      contentPadding: const EdgeInsets.all(10)
                     ),
                     onChanged: (_) => setState((){}),
                   ),

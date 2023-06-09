@@ -4,9 +4,9 @@ class BadgeIcon extends StatelessWidget {
   var icon;
   var text;
   var color;
-  double size;
+  double? size;
 
-  BadgeIcon({Key key, this.icon, this.text, this.color, this.size}) : super(key: key);
+  BadgeIcon({Key? key, this.icon, this.text, this.color, this.size}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

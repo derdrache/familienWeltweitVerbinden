@@ -13,7 +13,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   var backgroundColor;
 
   CustomAppBar(
-      {Key key,
+      {Key? key,
       this.title,
       this.buttons,
       this.elevation = 4.0,

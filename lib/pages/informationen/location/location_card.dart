@@ -11,8 +11,8 @@ class LocationCard extends StatefulWidget {
   bool smallCard;
 
   LocationCard(
-      {Key key,
-      this.location,
+      {Key? key,
+      required this.location,
       this.fromCityPage = false,
       this.smallCard = false})
       : super(key: key);
@@ -22,9 +22,9 @@ class LocationCard extends StatefulWidget {
 }
 
 class _LocationCardState extends State<LocationCard> {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
-  bool hasInterest;
-  bool isCity;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  late bool hasInterest;
+  late bool isCity;
 
   @override
   void initState() {
@@ -118,15 +118,13 @@ class _LocationCardState extends State<LocationCard> {
                       child: Image(image: getLocationImageWidget(), fit: BoxFit.fitWidth,)),
                 ),
                 Expanded(
-                  child: Container(
-                    child: Center(
-                      child: Text(
-                        widget.location["ort"],
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 22 * sizeRefactor,
-                            fontWeight: FontWeight.bold),
-                      ),
+                  child: Center(
+                    child: Text(
+                      widget.location["ort"],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 22 * sizeRefactor,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

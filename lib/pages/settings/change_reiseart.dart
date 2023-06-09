@@ -8,12 +8,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeReiseartPage extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   String oldInput;
   var reiseArtInput;
   final bool isGerman;
 
-  ChangeReiseartPage({Key key, this.oldInput, this.isGerman})
+  ChangeReiseartPage({Key? key, required this.oldInput, required this.isGerman})
       : reiseArtInput = CustomDropDownButton(
           items: isGerman
               ? global_variablen.reisearten
@@ -40,7 +40,7 @@ class ChangeReiseartPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).reiseartAendern
+          title: AppLocalizations.of(context)!.reiseartAendern
       ),
       body: reiseArtInput
     );

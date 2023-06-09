@@ -15,7 +15,7 @@ import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChangeLocationPage extends StatefulWidget {
-  const ChangeLocationPage({Key key}) : super(key: key);
+  const ChangeLocationPage({Key? key}) : super(key: key);
 
   @override
   _ChangeLocationPageState createState() => _ChangeLocationPageState();
@@ -56,8 +56,9 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
         ? allCountries["eng"].indexOf(newCountry)
         : allCountries["ger"].indexOf(newCountry);
 
-    if (wrongLanguageIndex > -1)
+    if (wrongLanguageIndex > -1) {
       newCountry = allCountries["ger"][wrongLanguageIndex];
+    }
 
     if (visitedCountries.contains(newCountry)) return;
 
@@ -94,7 +95,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
   deleteChangeCityNewsSameDay() async {
     var now = DateTime.now();
     var nextDay = DateTime(now.year, now.month, now.day + 1);
-    var formatter = new DateFormat('yyyy-MM-dd');
+    var formatter = DateFormat('yyyy-MM-dd');
     String today = formatter.format(now);
     String tomorrow = formatter.format(nextDay);
     String dateQuery =
@@ -183,7 +184,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     var locationData = autoComplete.getGoogleLocationData();
 
     if (locationData["city"] == null) {
-      customSnackbar(context, AppLocalizations.of(context).ortEingeben);
+      customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
       return;
     }
 
@@ -207,20 +208,20 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
     customSnackbar(
         context,
-        AppLocalizations.of(context).aktuelleOrt +
+        AppLocalizations.of(context)!.aktuelleOrt +
             " " +
-            AppLocalizations.of(context).erfolgreichGeaender,
+            AppLocalizations.of(context)!.erfolgreichGeaender,
         color: Colors.green);
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    autoComplete.hintText = AppLocalizations.of(context).neuenOrtEingeben;
+    autoComplete.hintText = AppLocalizations.of(context)!.neuenOrtEingeben;
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: AppLocalizations.of(context).ortAendern,
+        title: AppLocalizations.of(context)!.ortAendern,
       ),
       body: Center(
         child: Column(
