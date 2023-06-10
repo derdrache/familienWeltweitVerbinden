@@ -7,7 +7,7 @@ class FlexibleDatePicker extends StatefulWidget {
   final int? startYear;
   final int? endYear;
   int? selectedDay, selectedMonth, selectedYear;
-  late int? selectedEndDay, selectedEndMonth, selectedEndYear;
+  int? selectedEndDay, selectedEndMonth, selectedEndYear;
   bool withMonth;
   bool withDay;
   bool multiDate;
@@ -377,7 +377,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
         ),
         child: DropdownButton(
           value: dropdownValue,
-          items: items.map<DropdownMenuItem>((item) {
+          items: items.map<DropdownMenuItem<Object>>((item) {
             var value = item.runtimeType == int ? item : item["id"];
             var text =
                 item.runtimeType == int ? item.toString() : item["value"];
