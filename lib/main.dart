@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:familien_suche/pages/informationen/community/community_details.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,9 @@ import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 
 refreshDataOnNotification(messageTyp) async{
+  Random random = new Random();
+  int randomNumber = random.nextInt(60);
+  await Future.delayed(Duration(seconds: randomNumber), (){});
   if (messageTyp == "chat") {
     refreshHiveChats();
   }else if (messageTyp == "event"){
@@ -103,7 +107,6 @@ void main() async {
   await setGeoData();
 
   refreshHiveData();
-
   runApp(MyApp());
 }
 
