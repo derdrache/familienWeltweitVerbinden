@@ -67,7 +67,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     var familyName = familyProfil!["name"];
     var mainMemberProfil = Map.of(getProfilFromHive(profilId: familyProfil!["mainProfil"]));
     mainMemberProfil["name"] =
-        (spracheIstDeutsch ? "Familie" : "Family") + " " + familyName;
+        "${spracheIstDeutsch ? "Familie" : "Family"} " + familyName;
     profil = mainMemberProfil;
   }
 
@@ -584,7 +584,7 @@ class _UserInformationDisplay extends StatelessWidget {
               date.year == DateTime.now().year) ||
           date.year > DateTime.now().year ||
           onlyMonth) {
-        return date.month.toString() + "." + date.year.toString();
+        return "${date.month}.${date.year}";
       } else {
         return AppLocalizations.of(context)!.jetzt;
       }
@@ -614,7 +614,7 @@ class _UserInformationDisplay extends StatelessWidget {
         child: Row(
           children: [
             Text(
-              AppLocalizations.of(context)!.aktuelleOrt + ": ",
+              "${AppLocalizations.of(context)!.aktuelleOrt}: ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold,decoration: TextDecoration.underline),
             ),
             Flexible(
@@ -629,7 +629,7 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     travelTypBox() {
-      var themaText = AppLocalizations.of(context)!.artDerReise + ": ";
+      var themaText = "${AppLocalizations.of(context)!.artDerReise}: ";
       var inhaltText =
           global_functions.changeGermanToEnglish(profil["reiseart"]);
 
@@ -647,7 +647,7 @@ class _UserInformationDisplay extends StatelessWidget {
     aufreiseBox() {
       if (profil["aufreiseSeit"] == null) return const SizedBox.shrink();
 
-      var themenText = AppLocalizations.of(context)!.aufReise + ": ";
+      var themenText = "${AppLocalizations.of(context)!.aufReise}: ";
       var seitText =
           profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
       var inhaltText = "";
@@ -676,7 +676,7 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     sprachenBox() {
-      var themenText = AppLocalizations.of(context)!.sprachen + ": ";
+      var themenText = "${AppLocalizations.of(context)!.sprachen}: ";
       var inhaltText =
           global_functions.changeGermanToEnglish(profil["sprachen"]).join(", ");
 
@@ -707,7 +707,7 @@ class _UserInformationDisplay extends StatelessWidget {
 
       return Row(
         children: [
-          Text(AppLocalizations.of(context)!.kinder + ": ",
+          Text("${AppLocalizations.of(context)!.kinder}: ",
               style:
                   TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
           Text(childrenList.reversed.join(", "),
@@ -717,7 +717,7 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     interessenBox() {
-      var themenText = AppLocalizations.of(context)!.interessen + ": ";
+      var themenText = "${AppLocalizations.of(context)!.interessen}: ";
       var inhaltText = global_functions
           .changeGermanToEnglish(profil["interessen"])
           .join(", ");
@@ -748,7 +748,7 @@ class _UserInformationDisplay extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context)!.ueberMich + ": ",
+              "${AppLocalizations.of(context)!.ueberMich}: ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
@@ -768,7 +768,7 @@ class _UserInformationDisplay extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context)!.verkaufenTauschenSchenken + ": ",
+              "${AppLocalizations.of(context)!.verkaufenTauschenSchenken}: ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
@@ -808,15 +808,13 @@ class _UserInformationDisplay extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 5),
             child: Row(
               children: [
-                Expanded(
-                  child: Text(
-                      transformDateToText(reiseplan["von"]) +
-                          " - " +
-                          transformDateToText(reiseplan["bis"], onlyMonth: true) +
-                          " in " +
-                          ortText,
+                Row(children: [
+                  Text(
+                      "${transformDateToText(reiseplan["von"])} - ${transformDateToText(reiseplan["bis"], onlyMonth: true)} in ",
                       style: TextStyle(fontSize: textSize)),
-                ),
+                  Text(ortText,
+                      style: TextStyle(fontSize: textSize, decoration: TextDecoration.underline))
+                ],),
               ],
             ),
           ),
@@ -827,14 +825,12 @@ class _UserInformationDisplay extends StatelessWidget {
         Row(
           children: [
             Text(
-              AppLocalizations.of(context)!.reisePlanung + ": ",
+              "${AppLocalizations.of(context)!.reisePlanung}: ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             if (isOwnProfil)
-              Text("(" +
-                  AppLocalizations.of(context)!.fuer +
-                  reiseplanungPrivacy +
-                  ")")
+              Text("${"(${AppLocalizations.of(context)!.fuer}" +
+                  reiseplanungPrivacy})")
           ],
         ),
         const SizedBox(height: 5),
@@ -849,7 +845,7 @@ class _UserInformationDisplay extends StatelessWidget {
         child: Container(
           margin: EdgeInsets.only(top: columnSpacing, bottom: columnSpacing),
           child: Row(children: [
-            Text(AppLocalizations.of(context)!.besuchteLaender + ": ",
+            Text("${AppLocalizations.of(context)!.besuchteLaender}: ",
                 style:
                     TextStyle(fontSize: textSize, fontWeight: FontWeight.bold, decoration: TextDecoration.underline), ),
             Text(profil["besuchteLaender"].length.toString(),
