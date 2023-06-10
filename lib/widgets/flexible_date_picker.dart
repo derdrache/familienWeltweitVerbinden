@@ -6,7 +6,7 @@ import 'dart:io';
 class FlexibleDatePicker extends StatefulWidget {
   final int? startYear;
   final int? endYear;
-  late int? selectedDay, selectedMonth, selectedYear;
+  int? selectedDay, selectedMonth, selectedYear;
   late int? selectedEndDay, selectedEndMonth, selectedEndYear;
   bool withMonth;
   bool withDay;

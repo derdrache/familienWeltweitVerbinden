@@ -241,7 +241,7 @@ class _MeetupCardState extends State<MeetupCard> {
                           hasIntereset:
                               widget.meetupData["interesse"].contains(userId),
                           id: widget.meetupData["id"],
-                          afterFavorite: widget.afterFavorite!
+                          afterFavorite: widget.afterFavorite != null ? widget.afterFavorite! : null
                         )),
                 ],
               ),

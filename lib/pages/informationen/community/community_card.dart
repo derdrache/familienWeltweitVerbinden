@@ -96,7 +96,7 @@ class _CommunityCardState extends State<CommunityCard> {
                         right: 8,
                         child: InteresseButton(
                             communityData: widget.community,
-                            afterFavorite: widget.afterFavorite!)),
+                            afterFavorite: widget.afterFavorite != null ? widget.afterFavorite! : null)),
                 ],
               ),
               Expanded(
@@ -146,7 +146,7 @@ class _CommunityCardState extends State<CommunityCard> {
 
 class InteresseButton extends StatefulWidget {
   Map communityData;
-  Function afterFavorite;
+  Function? afterFavorite;
 
   InteresseButton({Key? key, required this.communityData, required this.afterFavorite})
       : super(key: key);
@@ -179,7 +179,7 @@ class _InteresseButtonState extends State<InteresseButton> {
     updateHiveCommunity(communityId, "interesse", widget.communityData["interesse"]);
     setState(() {});
 
-    widget.afterFavorite();
+    widget.afterFavorite!();
   }
 
 

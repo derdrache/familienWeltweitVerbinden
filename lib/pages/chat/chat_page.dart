@@ -573,7 +573,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
       var chatData = spezialData ?? getSelectedChatData();
 
       for (dynamic group in chatData) {
-        String chatName = "";
+        String? chatName = "";
         Map? chatPartnerProfil;
         String? chatPartnerId;
 
@@ -590,6 +590,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
 
           if (group["connected"].contains("event")) {
             chatData = getMeetupFromHive(connectedId);
+
             chatName = chatData["name"];
           } else if (group["connected"].contains("community")) {
             chatData = getCommunityFromHive(connectedId);
@@ -618,8 +619,10 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
             };
           }
 
+          if(chatName == null) continue;
+
           bool hasSecretChat = chatData["secretChat"] == 1;
-          bool secretChatMember = chatData["members"]?.contains(userId);
+          bool secretChatMember = chatData["members"] != null ?chatData["members"].contains(userId): false;
 
           if(hasSecretChat && !secretChatMember) continue;
         } else if (users.isNotEmpty){
@@ -637,7 +640,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
             }
           }
 
-          if (chatName.isEmpty) {
+          if (chatName!.isEmpty) {
             chatName = AppLocalizations.of(context)!.geloeschterUser;
           }
 
@@ -761,7 +764,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(chatName,
+                              Text(chatName!,
                                   style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold)),

@@ -54,7 +54,6 @@ class _StartPageState extends State<StartPage> {
   @override
   void initState() {
     widget.chatPageSliderIndex ??= 0;
-    print(ownProfil);
     noProfil = ownProfil == null || ownProfil["id"] == null;
     _networkConnectivity = NetworkConnectivity(context);
 
