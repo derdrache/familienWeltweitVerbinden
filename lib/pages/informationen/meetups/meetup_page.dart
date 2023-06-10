@@ -181,7 +181,7 @@ class _MeetupPageState extends State<MeetupPage> {
       ),
       floatingActionButton: FloatingActionButton(
           heroTag: "meetup hinzufügen",
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.create),
           onPressed: () =>
               global_functions.changePage(context, const MeetupErstellen())),
     );

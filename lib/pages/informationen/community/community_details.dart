@@ -48,7 +48,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   late double fontsize;
   var windowSetState;
   late List<String> imagePaths;
-  late String selectedImage;
+  String? selectedImage;
   List<String> allUserNames = [];
   List allUserIds = [];
   late var searchAutocomplete;
@@ -267,7 +267,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     DbDeleteImage(oldImage);
 
-    await CommunityDatabase().update(
+    CommunityDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.community["id"]}'");
 
     setState(() {
@@ -664,7 +664,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                       TextStyle(color: Theme.of(context).colorScheme.secondary),
                     ))),
             const Expanded(child: SizedBox()),
-            if(isCreator) CloseButton(
+            if(isCreator && member["id"] != userId) CloseButton(
                 color: Colors.red,
                 onPressed: () {
                   Navigator.pop(context);

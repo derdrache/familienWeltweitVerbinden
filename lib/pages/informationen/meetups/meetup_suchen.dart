@@ -22,7 +22,7 @@ class MeetupSuchenPage extends StatefulWidget {
 
 class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
   var userId = FirebaseAuth.instance.currentUser!.uid;
-  late var searchAutocomplete;
+  var searchAutocomplete = SearchAutocomplete(searchableItems: [],);
   dynamic meetupsBackup = [];
   var allMeetups = [];
   var allMeetupCities = [];

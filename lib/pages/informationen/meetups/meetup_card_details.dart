@@ -318,8 +318,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     return true;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -1291,14 +1289,9 @@ class _CardFeetState extends State<CardFeet> {
   var teilnehmerAnzahl = "";
 
   @override
-  void initState() {
+  Widget build(BuildContext context) {
     organisatorProfil = getProfilFromHive(profilId: widget.organisator);
 
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     showTeilnehmerWindow() {
       var zusagenIds = widget.meetupData["zusage"];
       var allProfils = Hive.box("secureBox").get("profils");

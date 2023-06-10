@@ -36,7 +36,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   DateTime? meetupWannDatum;
   DateTime? meetupBisDatum;
   TimeOfDay? meetupWannUhrzeit;
-  late TimeOfDay meetupBisUhrzeit;
+  TimeOfDay? meetupBisUhrzeit;
   var meetupBeschreibungKontroller = TextEditingController();
   var meetupOrtKontroller = TextEditingController();
   late var sprachenAuswahlBox;
@@ -91,7 +91,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var meetupId = uuid.v4();
     var allValid = checkValidations(locationData);
     var interval = meetupIntervalDropdown.getSelected();
-    late DateTime bisDate;
+    DateTime? bisDate;
 
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -103,7 +103,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
         meetupWannDatum!.day, meetupWannUhrzeit!.hour, meetupWannUhrzeit!.minute);
     if (isMultiDayMeetup(interval)) {
       bisDate = DateTime(meetupBisDatum!.year, meetupBisDatum!.month,
-          meetupBisDatum!.day, meetupBisUhrzeit.hour, meetupBisUhrzeit.minute);
+          meetupBisDatum!.day, meetupBisUhrzeit!.hour, meetupBisUhrzeit!.minute);
     }
 
     if (locationData["latt"] == null) {
@@ -126,7 +126,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       "stadt": locationData["city"],
       "art": meetupArtDropdown.getSelected(),
       "wann": wannDate.toString(),
-      "bis": bisDate.toString(),
+      "bis": bisDate?.toString(),
       "typ": ortTypDropdown.getSelected(),
       "sprache": json.encode(sprachenAuswahlBox.getSelected()),
       "interval": interval,

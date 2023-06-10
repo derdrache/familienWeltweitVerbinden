@@ -1371,7 +1371,7 @@ getProfilFromHive(
 }
 
 getAllProfilNames() {
-  var allNames = [];
+  List<String> allNames = [];
 
   var allProfils = Hive.box('secureBox').get("profils");
   for (var profil in allProfils) {
