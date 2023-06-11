@@ -46,9 +46,7 @@ class _ProfilImageState extends State<ProfilImage> {
 
     newLink[0] = sanitizeString(newLink[0]);
 
-    setState(() {
-      widget.profil["bild"] = newLink;
-    });
+    widget.profil["bild"] = newLink;
 
     ProfilDatabase().updateProfil("bild = '${json.encode(newLink)}'",
         "WHERE id = '${widget.profil["id"]}'");

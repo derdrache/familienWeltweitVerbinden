@@ -24,7 +24,6 @@ import '../../global/global_functions.dart' as global_func;
 import '../../global/global_functions.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
-import '../../services/database.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/profil_image.dart';
 import '../../windows/upcoming_updates.dart';
@@ -60,23 +59,7 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-
     super.initState();
-  }
-
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed && this.mounted) {
-      await _refreshData();
-      setState(() {});
-    }
-  }
-
-  _refreshData() async {
-    await refreshHiveProfils();
-    refreshHiveNewsPage();
-    refreshHiveChats();
-    refreshHiveMeetups();
-    refreshHiveCommunities();
   }
 
   @override
