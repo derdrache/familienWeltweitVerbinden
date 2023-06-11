@@ -25,8 +25,8 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
   var searchAutocomplete = SearchAutocomplete(searchableItems: [],);
   dynamic meetupsBackup = [];
   var allMeetups = [];
-  var allMeetupCities = [];
-  var allMeetupCountries = [];
+  List<String> allMeetupCities = [];
+  List<String> allMeetupCountries = [];
   bool filterOn = false;
   var filterList = [];
   var isLoading = true;
@@ -67,7 +67,7 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
 
     searchAutocomplete = SearchAutocomplete(
         hintText: AppLocalizations.of(context)!.filterMeetupSuche,
-        searchableItems: allMeetupCities.toList() + allMeetupCountries.toList() as List<String>,
+        searchableItems: allMeetupCities.toList()  + allMeetupCountries.toList(),
         onConfirm: () => filterShowMeetups(),
         onRemove: () {
           filterList = [];

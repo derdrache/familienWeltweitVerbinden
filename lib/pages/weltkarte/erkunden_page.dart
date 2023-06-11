@@ -53,9 +53,10 @@ class _ErkundenPageState extends State<ErkundenPage>
       profilsBetween,
       profilsCities,
       profilsExact;
-  late List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
-  late List communitiesContinents,
-      communitiesCountries,
+  late List eventsCountries, eventsBetween, eventsCities;
+  List? eventsKontinente;
+  List? communitiesContinents;
+  late List communitiesCountries,
       communitiesBetween,
       communitiesCities;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
@@ -273,6 +274,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         searchableItems:
         allUserName.toList() + countryList + allCitiesNames,
         onConfirm: () {
+          FocusManager.instance.primaryFocus?.unfocus();
           filterList = searchAutocomplete.getSelected();
           friendMarkerOn = false;
           eventMarkerOn = false;
@@ -684,10 +686,9 @@ class _ErkundenPageState extends State<ErkundenPage>
       selectedComunityList = communitiesCountries;
     } else {
       choosenProfils = profilsContinents;
-      selectedEventList = eventsKontinente;
-      selectedComunityList = communitiesContinents;
+      selectedEventList = eventsKontinente != null ? eventsKontinente! : [];
+      selectedComunityList = communitiesContinents != null ? communitiesContinents! : [];;
     }
-
 
     if (mounted) {
       setState(() {

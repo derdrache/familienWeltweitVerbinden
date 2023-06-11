@@ -75,7 +75,9 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                           onTap: () {
                             onSelected(option);
                             widget.selected = option;
-                            if (widget.onConfirm != null) widget.onConfirm!();
+                            if (widget.onConfirm != null){
+                              widget.onConfirm!();
+                            }
                           },
                           child: ListTile(
                             title: Text(option, style: const TextStyle(color: Colors.black)),
