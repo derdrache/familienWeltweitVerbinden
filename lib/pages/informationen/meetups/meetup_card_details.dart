@@ -298,9 +298,11 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (newInterval.isEmpty) return false;
 
     widget.meetupData["eventInterval"] = newInterval;
-    updateHiveMeetup(widget.meetupData["id"], "eventInterval", newInterval);
+    widget.meetupData["bis"] = DateTime.parse(widget.meetupData["wann"]).add(const Duration(days: 1)).toString();
     MeetupDatabase().update(
-        "eventInterval = '$newInterval'", "WHERE id = '${widget.meetupData["id"]}'");
+        "eventInterval = '$newInterval'", "bis = '${widget.meetupData["bis"]}'"
+        "WHERE id = '${widget.meetupData["id"]}'"
+    );
 
     return true;
   }
@@ -1054,6 +1056,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     List wannTimeList = wannDatetimeList[1].split(":");
 
     if (!isSingeDay) {
+      String wannDateText = wannDateList.reversed.take(2).toList().join(".");
       var bisDatetimeList = widget.meetupData["bis"]?.split(" ");
       var bisDateText = "?";
       var bisTimeText = "?";
@@ -1066,13 +1069,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
         bisTimeText = bisTimeList.take(2).join(":");
       }
 
-      return wannDateList.last +
-          " - " +
-          bisDateText +
-          "\n " +
-          wannTimeList.take(2).join(":") +
-          " - " +
-          bisTimeText;
+      return "$wannDateText - $bisDateText \n ${wannTimeList.take(2).join(":")} - $bisTimeText";
     } else {
       return wannDateList.reversed.join(".") +
           " " +
