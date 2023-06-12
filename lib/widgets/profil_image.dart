@@ -101,7 +101,8 @@ class _ProfilImageState extends State<ProfilImage> {
     }
 
     _showPopupMenu(tabPosition) async {
-      final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+      final overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
 
       await showMenu(
         context: context,
@@ -166,7 +167,7 @@ class DefaultProfilImage extends StatelessWidget {
   Widget build(BuildContext context) {
     var symbols =
         "QWERTZUIOPÜASDFGHJKLÖÄYXCVBNMqwertzuiopüasdfghjklöäyxcvbnm1234567890ß";
-    var nameToList = profil["name"].split(" ");
+    var nameToList = profil["name"]?.split(" ") ?? ["Delete"];
     var imageText = "";
 
     for (var letter in nameToList[0].split("")) {
@@ -185,7 +186,7 @@ class DefaultProfilImage extends StatelessWidget {
       }
     }
 
-    if (profil["bildStandardFarbe"] == null) {
+    if (profil["bildStandardFarbe"] == null && profil.isNotEmpty) {
       var colorList = [
         Colors.blue,
         Colors.red,
@@ -202,16 +203,29 @@ class DefaultProfilImage extends StatelessWidget {
           "bildStandardFarbe = '$selectColor'", "WHERE id = '${profil["id"]}'");
     }
 
-    return CircleAvatar(
-      radius: 30,
-      backgroundColor: Color(profil["bildStandardFarbe"]),
-      child: Center(
-          child: Text(
-        imageText.toUpperCase(),
-        style: const TextStyle(
-            fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-      )),
-    );
+    return profil.isEmpty
+        ? const CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.black,
+            child: Center(
+                child: Text("X",
+              style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            )))
+        : CircleAvatar(
+            radius: 30,
+            backgroundColor: Color(profil["bildStandardFarbe"] ?? 4293467747),
+            child: Center(
+                child: Text(
+              imageText.toUpperCase(),
+              style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            )),
+          );
   }
 }
 
@@ -246,14 +260,13 @@ class OwnProfilImage extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               child: isUrl
                   ? CachedNetworkImage(
-                      width:55,
+                      width: 55,
                       height: 55,
                       fit: BoxFit.cover,
                       imageUrl: image,
                       placeholder: (context, url) => Container(
                             color: Colors.black12,
                           ))
-
                   : Image.asset(image,
                       width: 55, height: 55, fit: BoxFit.cover)),
         ));
