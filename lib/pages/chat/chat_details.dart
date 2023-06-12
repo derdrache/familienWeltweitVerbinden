@@ -1225,9 +1225,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       Map cardData = {};
       bool hasForward = message["forward"].isNotEmpty;
       Map forwardProfil = {};
-      Map creatorProfilData = getProfilFromHive(profilId: message["von"]);
-      String creatorName = creatorProfilData["name"];
-      var creatorColor = creatorProfilData["bildStandardFarbe"];
+      Map creatorProfilData = getProfilFromHive(profilId: message["von"]) ?? {};
+      String creatorName = creatorProfilData["name"] ?? "";
+      var creatorColor = creatorProfilData["bildStandardFarbe"] ?? 4293467747;
       bool isMyMessage = message["von"] == userId;
 
       if (hasForward) {
@@ -1277,7 +1277,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 child: Column(children: [
                   if (widget.isChatgroup && message["von"] != userId)
                     GestureDetector(
-                      onTap: () => global_functions.changePage(
+                      onTap: creatorProfilData.isEmpty ? null : () => global_functions.changePage(
                           context,
                           ShowProfilPage(
                             profil: creatorProfilData,
@@ -1298,7 +1298,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       padding:
                           const EdgeInsets.only(top: 5, left: 10, right: 5),
                       child: GestureDetector(
-                        onTap: () => global_functions.changePage(
+                        onTap: forwardProfil.isEmpty ? null : () => () => global_functions.changePage(
                             context,
                             ShowProfilPage(
                               profil: forwardProfil,
@@ -1422,9 +1422,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       int replyIndex = messages.length;
       Map cardData = {};
       String textAddition = "";
-      Map creatorData = getProfilFromHive(profilId: message["von"]);
-      String creatorName = creatorData["name"];
-      var creatorColor = creatorData["bildStandardFarbe"];
+      Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
+      String creatorName = creatorData["name"] ?? "";
+      var creatorColor = creatorData["bildStandardFarbe"] ?? 4293467747;
 
       for (Map lookMessage in messages.reversed.toList()) {
         replyIndex -= 1;
@@ -1495,7 +1495,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
                       child: ProfilImage(creatorData),
-                      onTap: () => global_functions.changePage(
+                      onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
                           context,
                           ShowProfilPage(
                             profil: creatorData,
@@ -1532,7 +1532,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   if (widget.isChatgroup &&
                                       message["von"] != userId)
                                     GestureDetector(
-                                      onTap: () => global_functions.changePage(
+                                      onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
                                           context,
                                           ShowProfilPage(
                                             profil: creatorData,
@@ -1587,7 +1587,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                       Text(
                                                           messageFromProfil[
                                                                   "name"] ??
-                                                              "gelöschter Account",
+                                                              AppLocalizations.of(context)!.geloeschterUser,
                                                           style:
                                                               TextStyle(
                                                                   fontWeight:
@@ -1716,7 +1716,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
                       child: ProfilImage(creatorData),
-                      onTap: () => global_functions.changePage(
+                      onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
                           context,
                           ShowProfilPage(
                             profil: creatorData,
@@ -1744,7 +1744,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             padding: const EdgeInsets.only(
                                 top: 5, left: 10, right: 5),
                             child: GestureDetector(
-                              onTap: () => global_functions.changePage(
+                              onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
                                   context,
                                   ShowProfilPage(
                                     profil: forwardProfil,
@@ -1803,7 +1803,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     normalMessage(int index, Map message, Map messageBoxInformation) {
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName = creatorData["name"];
+      String creatorName = creatorData["name"] ?? "";
       var creatorColor = creatorData["bildStandardFarbe"];
 
       if (creatorData.isEmpty) return const SizedBox.shrink();
@@ -1834,7 +1834,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
                       child: ProfilImage(creatorData),
-                      onTap: () => global_functions.changePage(
+                      onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
                           context,
                           ShowProfilPage(
                             profil: creatorData,
@@ -1866,7 +1866,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           children: [
                             if (widget.isChatgroup && message["von"] != userId)
                               GestureDetector(
-                                onTap: () => global_functions.changePage(
+                                onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
                                     context,
                                     ShowProfilPage(
                                       profil: creatorData,
@@ -2223,12 +2223,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       widget.groupChatData!["users"].forEach((memberUserId, data) {
         Map userProfil = getProfilFromHive(profilId: memberUserId) ?? {};
-        String userName = userProfil["name"];
 
         if (userProfil.isEmpty) return;
 
         memberList.add(GestureDetector(
-          onTap: () => global_functions.changePage(
+          onTap: userProfil.isEmpty ? null :() => global_functions.changePage(
               context,
               ShowProfilPage(
                 profil: userProfil,
@@ -2240,7 +2239,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 top: BorderSide(width: 1.0, color: global_var.borderColorGrey),
               ),
             ),
-            child: Text(userName),
+            child: Text(userProfil["name"]),
           ),
         ));
       });
