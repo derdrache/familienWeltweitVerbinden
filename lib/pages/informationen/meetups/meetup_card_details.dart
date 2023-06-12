@@ -57,6 +57,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   var ortAuswahlBox = GoogleAutoComplete();
   var beschreibungInputKontroller = TextEditingController();
   late var changeDropdownInput;
+  late var timeZoneDropdown;
   late var changeMultiDropdownInput;
   bool chooseCurrentLocation = false;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
@@ -243,10 +244,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   }
 
   checkAndSaveNewTimeZone() {
-    String newTimeZone = changeTextInputController.text;
-    var isInt = int.tryParse(newTimeZone);
+    String newTimeZone = timeZoneDropdown.getSelected();
 
-    if (newTimeZone.isEmpty || isInt == null) return false;
+    if (newTimeZone.isEmpty) return false;
 
     widget.meetupData["zeitzone"] = newTimeZone;
     updateHiveMeetup(widget.meetupData["id"], "zeitzone", newTimeZone);
@@ -512,13 +512,17 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     timeZoneInformation() {
+      timeZoneDropdown = CustomDropDownButton(
+          items: global_var.eventZeitzonen,
+          selected: widget.meetupData["zeitzone"].toString()
+      );
+
       return meetupInformationRow(
         AppLocalizations.of(context)!.zeitzone,
         "GMT " + widget.meetupData["zeitzone"].toString(),
         () => openChangeWindow(
             AppLocalizations.of(context)!.meetupZeitzoneAendern,
-            customTextInput(AppLocalizations.of(context)!.neueZeitzoneEingeben,
-                changeTextInputController),
+            timeZoneDropdown,
             checkAndSaveNewTimeZone),
       );
     }
