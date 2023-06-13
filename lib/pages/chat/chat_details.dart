@@ -91,20 +91,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   final translator = GoogleTranslator();
   String ownLanguage =
       WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
-
+  int deletedUserColor = 4293467747;
   bool userJoinedChat = false;
-  int displayDataEntries = 20;
+  int displayDataEntries = 50;
+  late int globalMessageIndex;
+  int lastReadMessageIndex = 0;
 
   @override
   void initState() {
     _getAndSetChatData();
-    userJoinedChat = widget.groupChatData!["users"][userId] != null;
     widget.chatId ??= widget.groupChatData!["id"].toString();
     _setConnectionData();
     _checkSecretChatMember();
     _changeUserChatStatus(1);
     _setScrollbarListener();
-    _resetNewMessageCounter();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _asyncMethod());
     WidgetsBinding.instance.addObserver(this);
@@ -178,6 +178,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ChatDatabase().addNewChatGroup(chatPartnerProfil!["id"]);
     }
 
+    userJoinedChat = widget.groupChatData!["users"][userId] != null;
+
     if (userJoinedChat) {
       unreadMessages += widget.groupChatData!["users"][userId]["newMessages"];
     }
@@ -237,9 +239,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   _setScrollbarListener() {
     itemPositionListener.itemPositions.addListener(() {
-      var isBottom =
-          itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1;
-
       if (itemPositionListener.itemPositions.value.first.index == 0 &&
           !hasStartPosition) {
         setState(() {
@@ -252,9 +251,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         });
       }
 
+      var isBottom =
+          itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1;
       if (isBottom) {
         setState(() {
-          displayDataEntries += 20;
+          displayDataEntries += 50;
         });
       }
     });
@@ -268,10 +269,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       isLoading = false;
     });
 
+    _delayForPinnedMessages();
+
     timer = Timer.periodic(const Duration(seconds: 30), (Timer t) async {
       messages = await _getAllDbMessages();
       setState(() {});
     });
+  }
+
+  _delayForPinnedMessages() async {
+    await Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {});
+    });
+
+    if(unreadMessages != 0){
+      _scrollToMessage(lastReadMessageIndex);
+      _resetNewMessageCounter();
+    }
   }
 
   _getAllDbMessages() async {
@@ -732,19 +746,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       angehefteteMessageShowIndex = _getPinnedMessages().length - 1;
     }
 
+
+
     _scrollToMessage(index);
     _highlightMessage(index);
   }
 
   _searchTextInMessages(String searchText) {
     messagesWithSearchText = [];
-    var index = -1;
 
     for (var message in messages) {
-      index = index + 1;
-
       if (message["message"].toLowerCase().contains(searchText.toLowerCase())) {
-        message["index"] = index;
         messagesWithSearchText.add(message);
       }
     }
@@ -770,7 +782,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _scrollToMessage(int messageIndex) {
-    int scrollToIndex = messages.length - 1 - messageIndex;
+    int scrollToIndex = globalMessageIndex - 1 - messageIndex;
 
     if (scrollToIndex < 0) scrollToIndex = 0;
 
@@ -911,6 +923,23 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
+  getLastReadMessageIndex(messageBox){
+    int unreadMessagesCounter = unreadMessages as int;
+    int lastReadMessageIndex = 0;
+
+    for(var message in messageBox.reversed){
+      lastReadMessageIndex += 1;
+
+      if(message.runtimeType != Align){
+        unreadMessagesCounter -= 1;
+      }
+
+      if(unreadMessagesCounter == 0) break;
+    }
+
+    return messageBox.length - lastReadMessageIndex;
+  }
+
   @override
   Widget build(BuildContext context) {
     Color ownMessageBoxColor =
@@ -933,18 +962,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       angehefteteMessageShowIndex ??= pinnedMessages.length - 1;
       int displayedMessageId = pinnedMessages[angehefteteMessageShowIndex!];
       String displayedMessageText = "";
-      int index = -1;
+      int messageIndex = 0;
 
       for (var message in messages) {
-        index = index + 1;
         if (message["id"] == displayedMessageId.toString()) {
+          messageIndex = message["index"] ?? 0;
           displayedMessageText = message["message"];
           break;
         }
       }
 
       return GestureDetector(
-        onTap: () => _jumpToMessageAndShowNextAngeheftet(index),
+        onTap: () => _jumpToMessageAndShowNextAngeheftet(messageIndex),
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration:
@@ -980,7 +1009,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    inputInformationBox(IconData icon, String title, String bodyText) {
+    inputInformationBox(IconData icon, String? title, String bodyText) {
       return Container(
           decoration: BoxDecoration(
               color: Colors.white,
@@ -992,7 +1021,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 0,
                   blurRadius: 7,
-                  offset: const Offset(0, -2), // changes position of shadow
+                  offset: const Offset(0, -2),
                 ),
               ]),
           child: Row(children: [
@@ -1004,7 +1033,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
+                    Text(title ?? AppLocalizations.of(context)!.geloeschterUser,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.bold)),
@@ -1014,7 +1043,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               ),
             if (bodyText.isEmpty)
               Expanded(
-                child: Text(title,
+                child: Text(title!,
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.secondary,
                         fontWeight: FontWeight.bold,
@@ -1055,7 +1084,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           if (userJoinedChat)
             PopupMenuItem(
               onTap: () {
-                String replyUserName = getProfilFromHive(
+                String? replyUserName = getProfilFromHive(
                     profilId: message["von"], getNameOnly: true);
 
                 extraInputInformationBox = inputInformationBox(
@@ -1230,7 +1259,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       Map creatorProfilData = getProfilFromHive(profilId: message["von"]) ?? {};
       String creatorName = creatorProfilData["name"] ??
           AppLocalizations.of(context)!.geloeschterUser;
-      var creatorColor = creatorProfilData["bildStandardFarbe"] ?? 4293467747;
+      var creatorColor = creatorProfilData["bildStandardFarbe"] ?? deletedUserColor;
       bool isMyMessage = message["von"] == userId;
 
       if (hasForward) {
@@ -1255,6 +1284,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           message["message"].replaceAll(removeId, replaceText).trim();
 
       if (cardData.isEmpty) return const SizedBox.shrink();
+
+      message["index"] = index;
 
       return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -1442,7 +1473,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
       String creatorName =
           creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
-      var creatorColor = creatorData["bildStandardFarbe"] ?? 4293467747;
+      var creatorColor = creatorData["bildStandardFarbe"] ?? deletedUserColor;
 
       for (Map lookMessage in messages.reversed.toList()) {
         replyIndex -= 1;
@@ -1455,7 +1486,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       String? replyFromId = replyMessage["von"];
       Map messageFromProfil = getProfilFromHive(profilId: replyFromId) ?? {};
-      var replyColor = messageFromProfil["bildStandardFarbe"] == 4285132974
+      var replyColor = messageFromProfil["bildStandardFarbe"] == deletedUserColor
           ? Colors.greenAccent[100]
           : messageFromProfil["bildStandardFarbe"] != null
               ? Color(messageFromProfil["bildStandardFarbe"])
@@ -1488,6 +1519,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           cardTyp = "location";
         }
       }
+
+      message["index"] = index;
 
       return Listener(
         onPointerHover: (details) => tabPosition = details.position,
@@ -1718,6 +1751,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       String messageAutorId = message["forward"].split(":")[1];
       Map forwardProfil = getProfilFromHive(profilId: messageAutorId);
       Map creatorData = getProfilFromHive(profilId: message["von"]);
+      message["index"] = index;
 
       return Listener(
         onPointerHover: (details) => tabPosition = details.position,
@@ -1836,8 +1870,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       String creatorName =
           creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"];
-
-      if (creatorData.isEmpty) return const SizedBox.shrink();
+      message["index"] = index;
 
       return Listener(
         onPointerHover: (details) {
@@ -1913,7 +1946,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(creatorColor)),
+                                          color: Color(creatorColor ?? deletedUserColor)),
                                     )),
                               ),
                             Wrap(
@@ -1955,14 +1988,31 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     messageList(List messages) {
       List<Widget> messageBox = [];
-      String newMessageDate = "";
       var changedMessageList =
-          messages.reversed.take(displayDataEntries).toList().reversed.toList();
+      messages.reversed.take(displayDataEntries).toList().reversed.toList();
+      String oldMessageDate = DateFormat('dd.MM.yy').format(DateTime.fromMillisecondsSinceEpoch(int.parse(changedMessageList[0]["date"]))).toString();
+      globalMessageIndex = 1;
 
-      for (var i = changedMessageList.length - 1; i >= 0; i--) {
-        Map message = changedMessageList[i];
+      messageBox.add(Align(
+        child: Container(
+          width: 80,
+          margin: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: const BorderRadius.all(Radius.circular(20))),
+          child: Center(
+              child: Text(
+                oldMessageDate,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )),
+        ),
+      ));
+
+      for(var checkMessage in changedMessageList){
+        Map message = checkMessage;
         DateTime messageDateTime =
-            DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
+        DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         String messageDate = DateFormat('dd.MM.yy').format(messageDateTime);
         var forwardData = message["forward"];
 
@@ -1992,9 +2042,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           message["showTranslationButton"] = false;
         }
 
-        if (newMessageDate.isEmpty) {
-          newMessageDate = messageDate;
-        } else if (newMessageDate != messageDate) {
+        if (oldMessageDate != messageDate) {
           messageBox.add(Align(
             child: Container(
               width: 80,
@@ -2005,57 +2053,42 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   borderRadius: const BorderRadius.all(Radius.circular(20))),
               child: Center(
                   child: Text(
-                newMessageDate,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )),
+                    messageDate,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  )),
             ),
           ));
 
-          newMessageDate = messageDate;
-        }
-
-        if (unreadMessages != 0 &&
-            (i == messages.length - 1 - unreadMessages)) {
-          messageBox.add(Center(
-              child: Text(
-            AppLocalizations.of(context)!.ungeleseneNachrichten,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          )));
+          globalMessageIndex += 1;
+          oldMessageDate = messageDate;
         }
 
         if (message["message"].contains("</eventId=")) {
-          messageBox
-              .add(cardMessage(i, message, messageBoxInformation, "event"));
+          messageBox.add(cardMessage(globalMessageIndex, message, messageBoxInformation, "event"));
         } else if (message["message"].contains("</communityId=")) {
-          messageBox
-              .add(cardMessage(i, message, messageBoxInformation, "community"));
+          messageBox.add(cardMessage(globalMessageIndex, message, messageBoxInformation, "community"));
         } else if (message["message"].contains("</cityId=")) {
-          messageBox
-              .add(cardMessage(i, message, messageBoxInformation, "location"));
+          messageBox.add(cardMessage(globalMessageIndex, message, messageBoxInformation, "location"));
         } else if (int.parse(message["responseId"]) != 0) {
-          messageBox.add(responseMessage(i, message, messageBoxInformation));
+          messageBox.add(responseMessage(globalMessageIndex, message, messageBoxInformation));
         } else if (forwardData.isNotEmpty) {
-          messageBox.add(forwardMessage(i, message, messageBoxInformation));
+          messageBox.add(forwardMessage(globalMessageIndex, message, messageBoxInformation));
         } else {
-          messageBox.add(normalMessage(i, message, messageBoxInformation));
+          messageBox.add(normalMessage(globalMessageIndex, message, messageBoxInformation));
         }
+        globalMessageIndex += 1;
       }
 
-      messageBox.add(Align(
-        child: Container(
-          width: 80,
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: const BorderRadius.all(Radius.circular(20))),
-          child: Center(
-              child: Text(
-            newMessageDate,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          )),
-        ),
-      ));
+      if (unreadMessages != 0) {
+        lastReadMessageIndex = getLastReadMessageIndex(messageBox);
+        messageBox.insert(lastReadMessageIndex, Center(
+            child: Text(
+              AppLocalizations.of(context)!.ungeleseneNachrichten,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            )));
+      }
+
+      messageBox = messageBox.reversed.toList();
 
       return ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
@@ -2127,7 +2160,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 5,
               blurRadius: 7,
-              offset: const Offset(0, 3), // changes position of shadow
+              offset: const Offset(0, 3),
             ),
           ]),
           child: Row(
@@ -2155,7 +2188,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   color: Colors.grey.withOpacity(0.5),
                   spreadRadius: 5,
                   blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3),
                 ),
               ]),
               child: Center(
@@ -2176,7 +2209,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                              const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3),
                         ),
                       ]
                     : []),
@@ -2629,7 +2662,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_sharp),
                 onPressed: () async {
-                  _resetNewMessageCounter();
                   global_functions.changePageForever(
                       context,
                       StartPage(
@@ -2661,7 +2693,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_sharp),
                 onPressed: () async {
-                  _resetNewMessageCounter();
                   global_functions.changePageForever(
                       context,
                       StartPage(
