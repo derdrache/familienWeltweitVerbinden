@@ -1226,7 +1226,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       bool hasForward = message["forward"].isNotEmpty;
       Map forwardProfil = {};
       Map creatorProfilData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName = creatorProfilData["name"] ?? "";
+      String creatorName = creatorProfilData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorProfilData["bildStandardFarbe"] ?? 4293467747;
       bool isMyMessage = message["von"] == userId;
 
@@ -1423,7 +1423,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       Map cardData = {};
       String textAddition = "";
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName = creatorData["name"] ?? "";
+      String creatorName = creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"] ?? 4293467747;
 
       for (Map lookMessage in messages.reversed.toList()) {
@@ -1803,7 +1803,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     normalMessage(int index, Map message, Map messageBoxInformation) {
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName = creatorData["name"] ?? "";
+      String creatorName = creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"];
 
       if (creatorData.isEmpty) return const SizedBox.shrink();
