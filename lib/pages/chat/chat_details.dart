@@ -89,7 +89,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   num unreadMessages = 0;
   List adminList = [mainAdmin];
   final translator = GoogleTranslator();
-  String ownLanguage = WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+  String ownLanguage =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
 
   bool userJoinedChat = false;
   int displayDataEntries = 20;
@@ -144,7 +145,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _getAndSetChatData() {
-    if(!widget.isChatgroup && widget.chatId != null){
+    if (!widget.isChatgroup && widget.chatId != null) {
       widget.isChatgroup = !widget.chatId!.contains("_");
     }
 
@@ -164,14 +165,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     } else {
       var chatPartnerId = widget.chatPartnerId;
-      if(chatPartnerId == null && widget.chatId != null){
+      if (chatPartnerId == null && widget.chatId != null) {
         chatPartnerId = widget.chatId!.replaceAll(ownProfil["id"], "");
         chatPartnerId = chatPartnerId.replaceAll("_", "");
       }
       chatPartnerProfil = getProfilFromHive(
           profilId: chatPartnerId, profilName: widget.chatPartnerName);
-      widget.groupChatData ??= getChatFromHive(
-          widget.chatId ?? global_functions.getChatID(chatPartnerProfil!["id"]));
+      widget.groupChatData ??= getChatFromHive(widget.chatId ??
+          global_functions.getChatID(chatPartnerProfil!["id"]));
 
       widget.groupChatData ??=
           ChatDatabase().addNewChatGroup(chatPartnerProfil!["id"]);
@@ -236,7 +237,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   _setScrollbarListener() {
     itemPositionListener.itemPositions.addListener(() {
-      var isBottom = itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1;
+      var isBottom =
+          itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1;
 
       if (itemPositionListener.itemPositions.value.first.index == 0 &&
           !hasStartPosition) {
@@ -250,7 +252,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         });
       }
 
-      if(isBottom){
+      if (isBottom) {
         setState(() {
           displayDataEntries += 20;
         });
@@ -891,23 +893,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return data;
   }
 
-  _checkSecretChatMember(){
-    if(connectedData.isEmpty) return;
+  _checkSecretChatMember() {
+    if (connectedData.isEmpty) return;
 
     bool hasSecretChat = connectedData["secretChat"] == 1;
 
-    if(!hasSecretChat) return;
+    if (!hasSecretChat) return;
 
     List removeUser = [];
 
-    for(var user in widget.groupChatData!["users"].keys.toList()){
-      if(!connectedData["members"].contains(user)) removeUser.add(user);
+    for (var user in widget.groupChatData!["users"].keys.toList()) {
+      if (!connectedData["members"].contains(user)) removeUser.add(user);
     }
 
-    for(var user in removeUser){
+    for (var user in removeUser) {
       widget.groupChatData!["users"].remove(user);
     }
-
   }
 
   @override
@@ -1027,7 +1028,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     openMessageMenu(Map message, int index) {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+      final RenderBox overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
       bool isMyMessage = message["von"] == userId;
       bool isInPinned = false;
       List angehefteteMessages = [];
@@ -1226,7 +1228,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       bool hasForward = message["forward"].isNotEmpty;
       Map forwardProfil = {};
       Map creatorProfilData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName = creatorProfilData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
+      String creatorName = creatorProfilData["name"] ??
+          AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorProfilData["bildStandardFarbe"] ?? 4293467747;
       bool isMyMessage = message["von"] == userId;
 
@@ -1274,144 +1277,158 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             curve: Curves.easeIn,
             child: Align(
                 alignment: messageBoxInformation["textAlign"],
-                child: Column(children: [
-                  if (widget.isChatgroup && message["von"] != userId)
-                    GestureDetector(
-                      onTap: creatorProfilData.isEmpty ? null : () => global_functions.changePage(
-                          context,
-                          ShowProfilPage(
-                            profil: creatorProfilData,
-                          )),
-                      child: Container(
-                          margin: const EdgeInsets.only(bottom: 5),
-                          child: Text(
-                            creatorName,
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(creatorColor)),
-                          )),
-                    ),
-                  if (hasForward)
-                    Container(
-                      alignment: messageBoxInformation["textAlign"],
-                      padding:
-                          const EdgeInsets.only(top: 5, left: 10, right: 5),
-                      child: GestureDetector(
-                        onTap: forwardProfil.isEmpty ? null : () => () => global_functions.changePage(
-                            context,
-                            ShowProfilPage(
-                              profil: forwardProfil,
-                            )),
-                        child: Text(
-                          AppLocalizations.of(context)!.weitergeleitetVon +
-                              forwardProfil["name"],
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                child: Column(
+                    crossAxisAlignment: messageBoxInformation["textAlign"] ==
+                            Alignment.centerLeft
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.end,
+                    children: [
+                      if (widget.isChatgroup && message["von"] != userId)
+                        GestureDetector(
+                          onTap: creatorProfilData.isEmpty
+                              ? null
+                              : () => global_functions.changePage(
+                                  context,
+                                  ShowProfilPage(
+                                    profil: creatorProfilData,
+                                  )),
+                          child: Container(
+                              margin: const EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                creatorName,
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(creatorColor)),
+                              )),
                         ),
-                      ),
-                    ),
-                  Container(
-                      alignment: messageBoxInformation["textAlign"],
-                      child: Stack(
-                        children: [
-                          _getDisplayedCard(cardType, cardData),
-                          if (isMyMessage || adminList.contains(userId))
-                            Positioned(
-                              top: 2,
-                              right: 2,
-                              child: InkWell(
-                                onTap: () {
-                                  _checkAndRemovePinnedMessage(message);
-                                  _deleteMessageWindow(message["id"]);
-                                },
-                                child: const CircleAvatar(
-                                    radius: 12.0,
-                                    backgroundColor: Colors.red,
-                                    child: Icon(Icons.close,
-                                        color: Colors.white, size: 18)),
-                              ),
-                            )
-                        ],
-                      )),
-                  cardIdData["hasOnlyId"]
-                      ? Row(
-                          children: [
-                            if (messageBoxInformation["textAlign"] ==
-                                Alignment.centerLeft)
-                              const SizedBox(width: 10),
-                            TextButton(
-                                onPressed: () {
-                                  var replyUser = getProfilFromHive(
-                                      profilId: message["von"],
-                                      getNameOnly: true);
-
-                                  extraInputInformationBox =
-                                      inputInformationBox(Icons.reply,
-                                          replyUser, message["message"]);
-                                  _replyMessage(message);
-                                },
-                                child: Text(
-                                    AppLocalizations.of(context)!.antworten)),
-                            TextButton(
-                                onPressed: () {
-                                  _forwardedMessage(message);
-                                },
-                                child: Text(
-                                    AppLocalizations.of(context)!.weiterleiten)),
-                            Text(messageBoxInformation["messageTime"],
-                                style: TextStyle(color: timeStampColor)),
-                            if (messageBoxInformation["textAlign"] ==
-                                Alignment.centerRight)
-                              const SizedBox(width: 10),
-                          ],
-                        )
-                      : Align(
+                      if (hasForward)
+                        Container(
+                          alignment: messageBoxInformation["textAlign"],
+                          padding:
+                              const EdgeInsets.only(top: 5, left: 10, right: 5),
+                          child: GestureDetector(
+                            onTap: forwardProfil.isEmpty
+                                ? null
+                                : () => () => global_functions.changePage(
+                                    context,
+                                    ShowProfilPage(
+                                      profil: forwardProfil,
+                                    )),
+                            child: Text(
+                              AppLocalizations.of(context)!.weitergeleitetVon +
+                                  forwardProfil["name"],
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      Container(
                           alignment: messageBoxInformation["textAlign"],
                           child: Stack(
                             children: [
-                              Container(
-                                  constraints: BoxConstraints(
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width *
-                                              0.8),
-                                  margin: const EdgeInsets.all(10),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      color: messageBoxInformation[
-                                          "messageBoxColor"],
-                                      border: Border.all(),
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(10))),
-                                  child: Wrap(
-                                    alignment: WrapAlignment.end,
-                                    children: [
-                                      TextWithHyperlinkDetection(
-                                          text: changedMessageText ?? "",
-                                          fontsize: 16,
-                                          onTextTab: () =>
-                                              openMessageMenu(message, index)),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                          messageBoxInformation["messageEdit"] +
-                                              " " +
-                                              messageBoxInformation[
-                                                  "messageTime"],
-                                          style: const TextStyle(
-                                              color: Colors.transparent))
-                                    ],
-                                  )),
-                              Positioned(
-                                right: 20,
-                                bottom: 15,
-                                child: Text(
-                                    messageBoxInformation["messageEdit"] +
-                                        messageBoxInformation["messageTime"],
-                                    style: TextStyle(color: timeStampColor)),
-                              ),
+                              _getDisplayedCard(cardType, cardData),
+                              if (isMyMessage || adminList.contains(userId))
+                                Positioned(
+                                  top: 2,
+                                  right: 2,
+                                  child: InkWell(
+                                    onTap: () {
+                                      _checkAndRemovePinnedMessage(message);
+                                      _deleteMessageWindow(message["id"]);
+                                    },
+                                    child: const CircleAvatar(
+                                        radius: 12.0,
+                                        backgroundColor: Colors.red,
+                                        child: Icon(Icons.close,
+                                            color: Colors.white, size: 18)),
+                                  ),
+                                )
                             ],
-                          ),
-                        )
-                ])),
+                          )),
+                      cardIdData["hasOnlyId"]
+                          ? Row(
+                              children: [
+                                if (messageBoxInformation["textAlign"] ==
+                                    Alignment.centerLeft)
+                                  const SizedBox(width: 10),
+                                TextButton(
+                                    onPressed: () {
+                                      var replyUser = getProfilFromHive(
+                                          profilId: message["von"],
+                                          getNameOnly: true);
+
+                                      extraInputInformationBox =
+                                          inputInformationBox(Icons.reply,
+                                              replyUser, message["message"]);
+                                      _replyMessage(message);
+                                    },
+                                    child: Text(AppLocalizations.of(context)!
+                                        .antworten)),
+                                TextButton(
+                                    onPressed: () {
+                                      _forwardedMessage(message);
+                                    },
+                                    child: Text(AppLocalizations.of(context)!
+                                        .weiterleiten)),
+                                Text(messageBoxInformation["messageTime"],
+                                    style: TextStyle(color: timeStampColor)),
+                                if (messageBoxInformation["textAlign"] ==
+                                    Alignment.centerRight)
+                                  const SizedBox(width: 10),
+                              ],
+                            )
+                          : Align(
+                              alignment: messageBoxInformation["textAlign"],
+                              child: Stack(
+                                children: [
+                                  Container(
+                                      constraints: BoxConstraints(
+                                          maxWidth: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.8),
+                                      margin: const EdgeInsets.all(10),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          color: messageBoxInformation[
+                                              "messageBoxColor"],
+                                          border: Border.all(),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: Wrap(
+                                        alignment: WrapAlignment.end,
+                                        children: [
+                                          TextWithHyperlinkDetection(
+                                              text: changedMessageText ?? "",
+                                              fontsize: 16,
+                                              onTextTab: () => openMessageMenu(
+                                                  message, index)),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                              messageBoxInformation[
+                                                      "messageEdit"] +
+                                                  " " +
+                                                  messageBoxInformation[
+                                                      "messageTime"],
+                                              style: const TextStyle(
+                                                  color: Colors.transparent))
+                                        ],
+                                      )),
+                                  Positioned(
+                                    right: 20,
+                                    bottom: 15,
+                                    child: Text(
+                                        messageBoxInformation["messageEdit"] +
+                                            messageBoxInformation[
+                                                "messageTime"],
+                                        style:
+                                            TextStyle(color: timeStampColor)),
+                                  ),
+                                ],
+                              ),
+                            )
+                    ])),
           ),
         ],
       );
@@ -1423,7 +1440,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       Map cardData = {};
       String textAddition = "";
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName = creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
+      String creatorName =
+          creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"] ?? 4293467747;
 
       for (Map lookMessage in messages.reversed.toList()) {
@@ -1495,11 +1513,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
                       child: ProfilImage(creatorData),
-                      onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
-                          context,
-                          ShowProfilPage(
-                            profil: creatorData,
-                          )),
+                      onTap: creatorData.isEmpty
+                          ? null
+                          : () => global_functions.changePage(
+                              context,
+                              ShowProfilPage(
+                                profil: creatorData,
+                              )),
                     )),
               Expanded(
                 child: Row(
@@ -1532,11 +1552,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   if (widget.isChatgroup &&
                                       message["von"] != userId)
                                     GestureDetector(
-                                      onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
-                                          context,
-                                          ShowProfilPage(
-                                            profil: creatorData,
-                                          )),
+                                      onTap: creatorData.isEmpty
+                                          ? null
+                                          : () => global_functions.changePage(
+                                              context,
+                                              ShowProfilPage(
+                                                profil: creatorData,
+                                              )),
                                       child: Container(
                                           margin: const EdgeInsets.only(
                                               left: 10, top: 10),
@@ -1587,7 +1609,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                       Text(
                                                           messageFromProfil[
                                                                   "name"] ??
-                                                              AppLocalizations.of(context)!.geloeschterUser,
+                                                              AppLocalizations.of(
+                                                                      context)!
+                                                                  .geloeschterUser,
                                                           style:
                                                               TextStyle(
                                                                   fontWeight:
@@ -1622,7 +1646,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                     ],
                                                   )
                                                 : Text(
-                                                    AppLocalizations.of(context)!
+                                                    AppLocalizations.of(
+                                                            context)!
                                                         .geloeschteNachricht,
                                                     style: const TextStyle(
                                                         fontWeight:
@@ -1716,11 +1741,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
                       child: ProfilImage(creatorData),
-                      onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
-                          context,
-                          ShowProfilPage(
-                            profil: creatorData,
-                          )),
+                      onTap: creatorData.isEmpty
+                          ? null
+                          : () => global_functions.changePage(
+                              context,
+                              ShowProfilPage(
+                                profil: creatorData,
+                              )),
                     )),
               Stack(
                 children: [
@@ -1744,13 +1771,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             padding: const EdgeInsets.only(
                                 top: 5, left: 10, right: 5),
                             child: GestureDetector(
-                              onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
-                                  context,
-                                  ShowProfilPage(
-                                    profil: forwardProfil,
-                                  )),
+                              onTap: creatorData.isEmpty
+                                  ? null
+                                  : () => global_functions.changePage(
+                                      context,
+                                      ShowProfilPage(
+                                        profil: forwardProfil,
+                                      )),
                               child: Text(
-                                AppLocalizations.of(context)!.weitergeleitetVon +
+                                AppLocalizations.of(context)!
+                                        .weitergeleitetVon +
                                     forwardProfil["name"],
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold),
@@ -1803,7 +1833,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     normalMessage(int index, Map message, Map messageBoxInformation) {
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName = creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
+      String creatorName =
+          creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"];
 
       if (creatorData.isEmpty) return const SizedBox.shrink();
@@ -1834,11 +1865,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
                       child: ProfilImage(creatorData),
-                      onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
-                          context,
-                          ShowProfilPage(
-                            profil: creatorData,
-                          )),
+                      onTap: creatorData.isEmpty
+                          ? null
+                          : () => global_functions.changePage(
+                              context,
+                              ShowProfilPage(
+                                profil: creatorData,
+                              )),
                     )),
               GestureDetector(
                 onTap: () => openMessageMenu(message, index),
@@ -1866,11 +1899,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           children: [
                             if (widget.isChatgroup && message["von"] != userId)
                               GestureDetector(
-                                onTap: creatorData.isEmpty ? null :() => global_functions.changePage(
-                                    context,
-                                    ShowProfilPage(
-                                      profil: creatorData,
-                                    )),
+                                onTap: creatorData.isEmpty
+                                    ? null
+                                    : () => global_functions.changePage(
+                                        context,
+                                        ShowProfilPage(
+                                          profil: creatorData,
+                                        )),
                                 child: Container(
                                     margin: const EdgeInsets.only(bottom: 5),
                                     child: Text(
@@ -1921,7 +1956,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     messageList(List messages) {
       List<Widget> messageBox = [];
       String newMessageDate = "";
-      var changedMessageList = messages.reversed.take(displayDataEntries).toList().reversed.toList();
+      var changedMessageList =
+          messages.reversed.take(displayDataEntries).toList().reversed.toList();
 
       for (var i = changedMessageList.length - 1; i >= 0; i--) {
         Map message = changedMessageList[i];
@@ -1991,8 +2027,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           messageBox
               .add(cardMessage(i, message, messageBoxInformation, "event"));
         } else if (message["message"].contains("</communityId=")) {
-          messageBox.add(
-              cardMessage(i, message, messageBoxInformation, "community"));
+          messageBox
+              .add(cardMessage(i, message, messageBoxInformation, "community"));
         } else if (message["message"].contains("</cityId=")) {
           messageBox
               .add(cardMessage(i, message, messageBoxInformation, "location"));
@@ -2227,11 +2263,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         if (userProfil.isEmpty) return;
 
         memberList.add(GestureDetector(
-          onTap: userProfil.isEmpty ? null :() => global_functions.changePage(
-              context,
-              ShowProfilPage(
-                profil: userProfil,
-              )),
+          onTap: userProfil.isEmpty
+              ? null
+              : () => global_functions.changePage(
+                  context,
+                  ShowProfilPage(
+                    profil: userProfil,
+                  )),
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
