@@ -746,8 +746,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       angehefteteMessageShowIndex = _getPinnedMessages().length - 1;
     }
 
-
-
     _scrollToMessage(index);
     _highlightMessage(index);
   }
@@ -1545,7 +1543,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
-                      child: ProfilImage(creatorData),
                       onTap: creatorData.isEmpty
                           ? null
                           : () => global_functions.changePage(
@@ -1553,6 +1550,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               ShowProfilPage(
                                 profil: creatorData,
                               )),
+                      child: ProfilImage(creatorData),
                     )),
               Expanded(
                 child: Row(
@@ -1774,7 +1772,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
-                      child: ProfilImage(creatorData),
                       onTap: creatorData.isEmpty
                           ? null
                           : () => global_functions.changePage(
@@ -1782,6 +1779,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               ShowProfilPage(
                                 profil: creatorData,
                               )),
+                      child: ProfilImage(creatorData),
                     )),
               Stack(
                 children: [
@@ -1897,7 +1895,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         left: 5,
                         bottom: message["showTranslationButton"] ? 25 : 10),
                     child: GestureDetector(
-                      child: ProfilImage(creatorData),
                       onTap: creatorData.isEmpty
                           ? null
                           : () => global_functions.changePage(
@@ -1905,6 +1902,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               ShowProfilPage(
                                 profil: creatorData,
                               )),
+                      child: ProfilImage(creatorData),
                     )),
               GestureDetector(
                 onTap: () => openMessageMenu(message, index),
