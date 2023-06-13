@@ -50,7 +50,8 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               Center(
                   child: Text(AppLocalizations.of(context)!.passwortResetLink)),
               customTextInput("Email", emailController,
-                  validator: globa_functions.checkValidationEmail(context)),
+                  validator: globa_functions.checkValidationEmail(context),
+                  keyboardType: TextInputType.emailAddress),
               customFloatbuttonExtended(
                   AppLocalizations.of(context)!.emailSenden, () async {
                 var wasReset = await resetPassword();
