@@ -118,7 +118,7 @@ class ProfilDatabase {
 
     _deleteInTable("profils", "id", userId);
     _deleteInTable("newsSettings", "id", userId);
-    _deleteInTable("news_page", "id", userId);
+    _deleteInTable("news_page", "erstelltVon", userId);
 
     updateProfil(
         "friendlist = JSON_REMOVE(friendlist, JSON_UNQUOTE(JSON_SEARCH(friendlist, 'one', '$userId')))",
