@@ -1073,6 +1073,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
+      messageInputNode.unfocus();
+
       showMenu(
         context: context,
         position: RelativeRect.fromRect(
