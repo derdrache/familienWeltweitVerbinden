@@ -38,7 +38,8 @@ class ProfilDatabase {
       "sprachen": json.encode(profilData["sprachen"]),
       "token": profilData["token"],
       "lastLogin": profilData["lastLogin"],
-      "aboutme": profilData["aboutme"]
+      "aboutme": profilData["aboutme"],
+      "besuchteLaender": json.encode(profilData["besuchteLaender"]),
     };
 
     await http.post(url, body: json.encode(data));

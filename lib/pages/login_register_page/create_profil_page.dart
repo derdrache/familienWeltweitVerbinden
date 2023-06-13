@@ -124,10 +124,12 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         "sprachen": sprachenAuswahlBox.getSelected(),
         "token": !kIsWeb ? await FirebaseMessaging.instance.getToken() : null,
         "lastLogin": DateTime.now().toString(),
-        "aboutme": aboutusKontroller.text
+        "aboutme": aboutusKontroller.text,
+        "besuchteLaender":[ortMapData["countryname"]]
       };
 
       await ProfilDatabase().addNewProfil(data);
+
       await refreshHiveProfils();
 
       await NewsPageDatabase().addNewNews({
@@ -150,7 +152,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     await StadtinfoDatabase().addNewCity(ortMapData);
     StadtinfoDatabase().update(
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-        "WHERE ort LIKE '${ortMapData["city"]}' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+        "WHERE ort LIKE '%${ortMapData["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
 
     await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"]);
     await ChatGroupsDatabase().updateChatGroup(
