@@ -99,24 +99,22 @@ customSnackbar(context, text, {color = Colors.red, duration = const Duration(sec
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
-  List selected;
+  List? selected;
   String hintText;
-  Function onConfirm;
+  Function? onConfirm;
   var validator;
-  Icon icon;
 
   getSelected(){
     return selected;
   }
 
 
-  CustomMultiTextForm({Key key,
-    this.auswahlList,
+  CustomMultiTextForm({Key? key,
+    required this.auswahlList,
     this.selected,
     this.hintText = "",
     this.onConfirm,
-    this.validator,
-    this.icon
+    this.validator
   }) : super(key: key);
 
   @override
@@ -137,7 +135,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
     changeSelectToList(select){
       widget.selected = select;
-      if(select.isNotEmpty) widget.onConfirm();
+      if(select.isNotEmpty) widget.onConfirm!();
     }
 
     return Container(
@@ -148,7 +146,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
           borderRadius: BorderRadius.circular(5)
       ),
       child: MultiSelectDialogField(
-        initialValue: widget.selected,
+        initialValue: widget.selected!,
         items: widget.auswahlList.map((e) => MultiSelectItem(e, e)).toList(),
         listType: MultiSelectListType.LIST,
         searchable: true,
@@ -157,8 +155,8 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
         buttonText: Text(widget.hintText),
         chipDisplay: MultiSelectChipDisplay(
           onTap: (value){
-            widget.selected.remove(value);
-            if(widget.selected.length > 1) widget.onConfirm();
+            widget.selected!.remove(value);
+            if(widget.selected!.length > 1) widget.onConfirm!();
             return widget.selected;
           },
         ),
@@ -172,12 +170,12 @@ class CustomDropDownButton extends StatefulWidget {
   List<String> items;
   String hintText;
   String labelText;
-  String selected;
-  double width;
+  String? selected;
+  double? width;
   var onChange;
 
-  CustomDropDownButton({Key key,
-    this.items,
+  CustomDropDownButton({Key? key,
+    required this.items,
     this.hintText = "",
     this.selected = "",
     this.labelText = "",
@@ -211,7 +209,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
       width: widget.width ?? webWidth,
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.only(left: 10),
-      constraints: new BoxConstraints(
+      constraints: const BoxConstraints(
         minHeight: 50.0,
         maxHeight: 70.0,
       ),

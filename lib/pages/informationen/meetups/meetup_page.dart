@@ -14,14 +14,14 @@ import 'meetupCard.dart';
 import 'meetup_erstellen.dart';
 
 class MeetupPage extends StatefulWidget {
-  const MeetupPage({Key key}) : super(key: key);
+  const MeetupPage({Key? key}) : super(key: key);
 
   @override
   _MeetupPageState createState() => _MeetupPageState();
 }
 
 class _MeetupPageState extends State<MeetupPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser!.uid;
   double textSizeHeadline = 20.0;
   var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
   var myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
@@ -80,7 +80,7 @@ class _MeetupPageState extends State<MeetupPage> {
               Container(
                   margin: const EdgeInsets.only(left: 10),
                   child: Text(
-                    AppLocalizations.of(context).favoritenMeetups,
+                    AppLocalizations.of(context)!.favoritenMeetups,
                     style: TextStyle(fontSize: textSizeHeadline),
                   )),
               FutureBuilder(
@@ -100,7 +100,7 @@ class _MeetupPageState extends State<MeetupPage> {
                     return Center(
                         heightFactor: 5,
                         child: Text(
-                          AppLocalizations.of(context)
+                          AppLocalizations.of(context)!
                               .nochKeineMeetupsAusgewaehlt,
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -121,7 +121,7 @@ class _MeetupPageState extends State<MeetupPage> {
               Container(
                   margin: const EdgeInsets.only(left: 10),
                   child: Text(
-                    AppLocalizations.of(context).meineMeetups,
+                    AppLocalizations.of(context)!.meineMeetups,
                     style: TextStyle(fontSize: textSizeHeadline),
                   )),
               FutureBuilder(
@@ -141,7 +141,7 @@ class _MeetupPageState extends State<MeetupPage> {
                     return Center(
                         heightFactor: 5,
                         child: Text(
-                          AppLocalizations.of(context).nochKeineMeetupsErstellt,
+                          AppLocalizations.of(context)!.nochKeineMeetupsErstellt,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontSize: textSizeHeadline, color: Colors.grey),
@@ -156,7 +156,7 @@ class _MeetupPageState extends State<MeetupPage> {
         title: "Meetups",
         leading: IconButton(
           onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
         ),
         buttons: [
           IconButton(
@@ -181,7 +181,7 @@ class _MeetupPageState extends State<MeetupPage> {
       ),
       floatingActionButton: FloatingActionButton(
           heroTag: "meetup hinzufügen",
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.create),
           onPressed: () =>
               global_functions.changePage(context, const MeetupErstellen())),
     );

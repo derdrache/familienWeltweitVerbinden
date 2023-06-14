@@ -25,8 +25,8 @@ class MeetupDetailsPage extends StatefulWidget {
   bool fromMeetupPage;
 
   MeetupDetailsPage({
-    Key key,
-    this.meetupData,
+    Key? key,
+    required this.meetupData,
     this.fromMeetupPage = false
   }):super(key: key);
 
@@ -35,12 +35,12 @@ class MeetupDetailsPage extends StatefulWidget {
 }
 
 class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
-  bool teilnahme;
-  bool absage;
-  bool isCreator;
-  bool isApproved;
+  late bool teilnahme;
+  late bool absage;
+  late bool isCreator;
+  late bool isApproved;
   var searchAutocomplete;
-  bool isNotPublic;
+  late bool isNotPublic;
 
   @override
   void initState() {
@@ -100,7 +100,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            title: AppLocalizations.of(context).newOwnerIsInitiator,
+            title: AppLocalizations.of(context)!.newOwnerIsInitiator,
             children: const [],
             actions: [
               TextButton(
@@ -108,14 +108,14 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                     newOwnerIsInitsiator = true;
                     Navigator.pop(context);
                   },
-                  child: Text(AppLocalizations.of(context).ja)
+                  child: Text(AppLocalizations.of(context)!.ja)
               ),
               TextButton(
                   onPressed: () {
                     newOwnerIsInitsiator = false;
                     Navigator.pop(context);
                   },
-                  child: Text(AppLocalizations.of(context).nein)
+                  child: Text(AppLocalizations.of(context)!.nein)
               ),
             ],
           );
@@ -217,7 +217,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     bool hasAccsess = widget.meetupData["erstelltAm"] == userId || widget.meetupData["freigegeben"].contains(userId);
 
     if(isPrivat && !hasAccsess){
-      customSnackbar(context, AppLocalizations.of(context).geheimerChatMeldung);
+      customSnackbar(context, AppLocalizations.of(context)!.geheimerChatMeldung);
       return;
     }
 
@@ -242,13 +242,13 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).meetupLoeschen,
+              title: AppLocalizations.of(context)!.meetupLoeschen,
               height: 90,
               children: [
                 Center(
                     child: Text(
                         AppLocalizations
-                            .of(context)
+                            .of(context)!
                             .meetupWirklichLoeschen))
               ],
               actions: [
@@ -263,7 +263,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   },
                 ),
                 TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -279,9 +279,9 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
                 height: 380,
-                title: AppLocalizations.of(context).meetupMelden,
+                title: AppLocalizations.of(context)!.meetupMelden,
                 children: [
-                  customTextInput(AppLocalizations.of(context).meetupMeldenFrage,
+                  customTextInput(AppLocalizations.of(context)!.meetupMeldenFrage,
                       reportController,
                       moreLines: 10),
                   Container(
@@ -294,7 +294,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                               reportController.text);
                         },
                         label: Text(AppLocalizations
-                            .of(context)
+                            .of(context)!
                             .senden)),
                   )
                 ]);
@@ -308,7 +308,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             const Icon(Icons.delete),
             const SizedBox(width: 10),
             Text(AppLocalizations
-                .of(context)
+                .of(context)!
                 .meetupLoeschen),
           ],
         ),
@@ -326,7 +326,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             const Icon(Icons.report),
             const SizedBox(width: 10),
             Text(AppLocalizations
-                .of(context)
+                .of(context)!
                 .meetupMelden),
           ],
         ),
@@ -345,8 +345,8 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       int meetupUnsure = meetupInteressierte - meetupZusagen - meetupAbsagen;
 
       return SimpleDialogOption(
-          child: Row(
-            children: const [
+          child: const Row(
+            children: [
               Icon(Icons.info),
               SizedBox(width: 10),
               Text("Meetup Info"),
@@ -361,32 +361,32 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                       const SizedBox(height: 10),
                       Text(
                           AppLocalizations
-                              .of(context)
+                              .of(context)!
                               .interessierte +
                               meetupInteressierte.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       Text(
                           AppLocalizations
-                              .of(context)
+                              .of(context)!
                               .zusagen +
                               meetupZusagen.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       Text(
-                          AppLocalizations.of(context).absagen +
+                          AppLocalizations.of(context)!.absagen +
                               meetupAbsagen.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       Text(
-                          AppLocalizations.of(context).unsicher
+                          AppLocalizations.of(context)!.unsicher
                               + meetupUnsure.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       if (isNotPublic)
                         Text(
                             AppLocalizations
-                                .of(context)
+                                .of(context)!
                                 .freigegeben +
                                 (meetupFreigegebene + 1).toString(),
                             style: TextStyle(fontSize: fontsize)),
@@ -402,7 +402,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             children: [
               const Icon(Icons.settings),
               const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).meetupOptionen),
+              Text(AppLocalizations.of(context)!.meetupOptionen),
             ],
           ),
           onPressed: () {
@@ -414,14 +414,14 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   return StatefulBuilder(
                       builder: (buildContext, dialogSetState) {
                         return CustomAlertDialog(
-                            title: AppLocalizations.of(context).meetupOptionen,
+                            title: AppLocalizations.of(context)!.meetupOptionen,
                             children: [
                               Row(
                                 children: [
                                   Expanded(
                                       child: Text(
                                           AppLocalizations
-                                              .of(context)
+                                              .of(context)!
                                               .immerDabei)),
                                   Switch(
                                     value: widget.meetupData["immerZusagen"]
@@ -451,7 +451,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       TextEditingController inputKontroller = TextEditingController();
 
       searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context).benutzerEingeben,
+        hintText: AppLocalizations.of(context)!.benutzerEingeben,
         searchableItems: getAllProfilNames(),
         onConfirm: () {
           inputKontroller.text = searchAutocomplete.getSelected()[0];
@@ -463,12 +463,12 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
                 height: 250,
-                title: AppLocalizations.of(context).organisatorAbgeben,
+                title: AppLocalizations.of(context)!.organisatorAbgeben,
                 children: [
                   searchAutocomplete,
                   const SizedBox(height: 40),
                   FloatingActionButton.extended(
-                    label: Text(AppLocalizations.of(context).uebertragen),
+                    label: Text(AppLocalizations.of(context)!.uebertragen),
                     onPressed: () async {
                       Navigator.pop(context);
                       bool isInitiator = await isOwnerWindow();
@@ -485,9 +485,9 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
                       customSnackbar(
                           context,
-                          AppLocalizations.of(context).meetupUebergebenAn1 +
+                          AppLocalizations.of(context)!.meetupUebergebenAn1 +
                               inputKontroller.text +
-                              AppLocalizations.of(context).meetupUebergebenAn2,
+                              AppLocalizations.of(context)!.meetupUebergebenAn2,
                           color: Colors.green);
 
                       await MeetupDatabase().update(
@@ -506,7 +506,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             const Icon(Icons.change_circle),
             const SizedBox(width: 10),
             Text(AppLocalizations
-                .of(context)
+                .of(context)!
                 .bestitzerWechseln),
           ],
         ),
@@ -559,14 +559,13 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
         children: [
           if(isRepeating) Column(children: [
             Text(AppLocalizations
-                .of(context)
+                .of(context)!
                 .immerDabei),
             Switch(
               value: widget.meetupData["immerZusagen"].contains(userId),
               onChanged: (value) {
                 changeImmerZusage(value);
                 setState(() {});
-                print(widget.meetupData);
               },)
           ],),
           if (teilnahme != true)
@@ -583,7 +582,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                     sendTakePartNotification(widget.meetupData);
                   },
                   label: Text(AppLocalizations
-                      .of(context)
+                      .of(context)!
                       .teilnehmen)),
             ),
           if (absage != true)
@@ -596,7 +595,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                     .colorScheme
                     .primary,
                 label: Text(AppLocalizations
-                    .of(context)
+                    .of(context)!
                     .absage),
                 onPressed: () => takePartDecision(false),
               ),
@@ -621,7 +620,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                           changePage(
                               context,
                               ShowProfilPage(
-                                userName: profil["name"],
                                 profil: profil,
                               )),
                       child: Text(profil["name"])),
@@ -645,7 +643,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           child: Center(
             child: Text(
               AppLocalizations
-                  .of(context)
+                  .of(context)!
                   .keineFamilienFreigebenVorhanden,
               style: const TextStyle(color: Colors.grey),
             ),
@@ -672,7 +670,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                           changePage(
                               context,
                               ShowProfilPage(
-                                userName: profil["name"],
                                 profil: profil,
                               )),
                       child: Text(profil["name"])),
@@ -694,7 +691,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           child: Center(
             child: Text(
               AppLocalizations
-                  .of(context)
+                  .of(context)!
                   .keineFamilienFreigebenVorhanden,
               style: const TextStyle(color: Colors.grey),
             ),
@@ -724,7 +721,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                           margin: const EdgeInsets.all(10),
                           child: Text(
                             AppLocalizations
-                                .of(context)
+                                .of(context)!
                                 .familienFreigeben,
                             style: TextStyle(
                                 fontSize: fontsize,
@@ -747,7 +744,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                           margin: const EdgeInsets.all(10),
                           child: Text(
                             AppLocalizations
-                                .of(context)
+                                .of(context)!
                                 .freigegebeneFamilien,
                             style: TextStyle(
                                 fontSize: fontsize,
@@ -797,7 +794,14 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                 future: MeetupDatabase().getData(
                     "freischalten", "WHERE id = '${widget.meetupData["id"]}'"),
                 builder: (context, snap) {
-                  var data = snap.data != false && snap.data != null ? snap.data.length.toString() : "";
+                  String data = "";
+                  if(snap.data == null || snap.data == false) {
+                    data = "0";
+                  } else {
+                    List snapData = snap.data as List;
+                    data = snapData.length.toString();
+                  }
+
                   if (data == "0") data = "";
 
                   return IconButton(
@@ -814,7 +818,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   ClipboardData(text: "</eventId=" + widget.meetupData["id"]));
 
               customSnackbar(context, AppLocalizations
-                  .of(context)
+                  .of(context)!
                   .linkWurdekopiert, color: Colors.green);
             },
           ),
@@ -853,7 +857,7 @@ class MeetupArtButton extends StatefulWidget {
   bool isCreator;
   Function pageState;
 
-  MeetupArtButton({Key key, this.meetupData, this.isCreator, this.pageState})
+  MeetupArtButton({Key? key, required this.meetupData, required this.isCreator, required this.pageState})
       : super(key: key);
 
   @override
@@ -861,8 +865,8 @@ class MeetupArtButton extends StatefulWidget {
 }
 
 class _MeetupArtButtonState extends State<MeetupArtButton> {
-  var meetupTypInput = CustomDropDownButton();
-  IconData icon;
+  late var meetupTypInput;
+  late IconData icon;
 
   saveMeetupArt() {
     String select = meetupTypInput.getSelected();
@@ -889,7 +893,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                         return CustomAlertDialog(
                             height: 500,
                             title: AppLocalizations
-                                .of(context)
+                                .of(context)!
                                 .informationMeetupArt,
                             children: [
                               const SizedBox(height: 10),
@@ -905,7 +909,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                                       Expanded(
                                         child: Text(
                                           AppLocalizations
-                                              .of(context)
+                                              .of(context)!
                                               .privatInformationText,
                                           maxLines: 10,
                                           overflow: TextOverflow.ellipsis,
@@ -923,7 +927,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                                           width: 70,
                                           child: Text(
                                               AppLocalizations
-                                                  .of(context)
+                                                  .of(context)!
                                                   .halbOeffentlich,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold))),
@@ -931,7 +935,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                                       Expanded(
                                         child: Text(
                                           AppLocalizations
-                                              .of(context)
+                                              .of(context)!
                                               .halbOeffentlichInformationText,
                                           maxLines: 10,
                                           overflow: TextOverflow.ellipsis,
@@ -946,7 +950,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(AppLocalizations
-                                          .of(context)
+                                          .of(context)!
                                           .oeffentlich,
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold)),
@@ -954,7 +958,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                                       Expanded(
                                         child: Text(
                                           AppLocalizations
-                                              .of(context)
+                                              .of(context)!
                                               .oeffentlichInformationText,
                                           maxLines: 10,
                                           overflow: TextOverflow.ellipsis,
@@ -1003,7 +1007,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
                         title: AppLocalizations
-                            .of(context)
+                            .of(context)!
                             .meetupArtAendern,
                         height: 200,
                         children: [
@@ -1017,7 +1021,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                                   TextButton(
                                     child: Text(
                                         AppLocalizations
-                                            .of(context)
+                                            .of(context)!
                                             .abbrechen,
                                         style: TextStyle(fontSize: fontsize)),
                                     onPressed: () => Navigator.pop(context),
@@ -1025,7 +1029,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                                   TextButton(
                                       child: Text(
                                           AppLocalizations
-                                              .of(context)
+                                              .of(context)!
                                               .speichern,
                                           style: TextStyle(fontSize: fontsize)),
                                       onPressed: () {

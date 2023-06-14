@@ -12,17 +12,15 @@ import '../../../global/global_functions.dart' as global_functions;
 import 'community_card.dart';
 import 'community_erstellen.dart';
 
-final String userId = FirebaseAuth.instance.currentUser?.uid;
-
 class CommunityPage extends StatefulWidget {
-  const CommunityPage({Key key}) : super(key: key);
+  const CommunityPage({Key? key}) : super(key: key);
 
   @override
   State<CommunityPage> createState() => _CommunityPageState();
 }
 
 class _CommunityPageState extends State<CommunityPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser!.uid;
   var allCommunities = Hive.box('secureBox').get("communities") ?? [];
   var isLoading = true;
   bool filterOn = false;
@@ -30,7 +28,7 @@ class _CommunityPageState extends State<CommunityPage> {
   var allCommunitiesCities = [];
   var allCommunitiesCountries = [];
   bool getInvite = false;
-  int invitedCommunityIndex;
+  late int invitedCommunityIndex;
   bool onSearch = false;
   TextEditingController communitySearchKontroller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
@@ -38,7 +36,7 @@ class _CommunityPageState extends State<CommunityPage> {
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) => initialize());
+    WidgetsBinding.instance.addPostFrameCallback((_) => initialize());
 
     super.initState();
   }
@@ -132,8 +130,8 @@ class _CommunityPageState extends State<CommunityPage> {
     showCommunities() {
       List shownCommunities = onSearch ? getAllSearchCommunities() : getAllFavoritesCommunities();
       List<Widget> communities = [];
-      var emptyText = AppLocalizations.of(context).nochKeinegemeinschaftVorhanden;
-      var emptySearchText = AppLocalizations.of(context).sucheKeineErgebnisse;
+      var emptyText = AppLocalizations.of(context)!.nochKeinegemeinschaftVorhanden;
+      var emptySearchText = AppLocalizations.of(context)!.sucheKeineErgebnisse;
 
       if (shownCommunities.isEmpty) {
         communities.add(SizedBox(
@@ -181,7 +179,7 @@ class _CommunityPageState extends State<CommunityPage> {
         ),
         child: Column(
           children: [
-            Text(AppLocalizations.of(context).zurCommunityEingeladen),
+            Text(AppLocalizations.of(context)!.zurCommunityEingeladen),
             const SizedBox(height: 5),
             Text(
               allCommunities[invitedCommunityIndex]["name"],
@@ -192,14 +190,14 @@ class _CommunityPageState extends State<CommunityPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                    child: Text(AppLocalizations.of(context).annehmen),
+                    child: Text(AppLocalizations.of(context)!.annehmen),
                     onPressed: () => communityEinladungAnnehmen(),
                     style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all<Color>(Colors.green))),
                 const SizedBox(width: 30),
                 ElevatedButton(
-                    child: Text(AppLocalizations.of(context).ablehnen),
+                    child: Text(AppLocalizations.of(context)!.ablehnen),
                     onPressed: () => communityEinladungAblehnen(),
                     style: ButtonStyle(
                         backgroundColor:
@@ -243,7 +241,7 @@ class _CommunityPageState extends State<CommunityPage> {
                     controller: communitySearchKontroller,
                     focusNode: searchFocusNode,
                     decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context).suche,
+                        labelText: AppLocalizations.of(context)!.suche,
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.all(10)
                     ),
@@ -272,7 +270,7 @@ class _CommunityPageState extends State<CommunityPage> {
                 searchFocusNode.unfocus();
                 communitySearchKontroller.clear();
               }else{
-                pageTitle = AppLocalizations.of(context).suche +" "+ "Communities";
+                pageTitle = AppLocalizations.of(context)!.suche +" "+ "Communities";
               }
 
               setState(() {
@@ -281,7 +279,7 @@ class _CommunityPageState extends State<CommunityPage> {
             },
             child: Icon(onSearch ? Icons.close : Icons.search),
           ),
-          if(getInvite) SizedBox(height: 110),
+          if(getInvite) const SizedBox(height: 110),
         ],
       ),
     );

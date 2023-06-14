@@ -14,26 +14,26 @@ import '../../../services/database.dart';
 import 'meetupCard.dart';
 
 class MeetupSuchenPage extends StatefulWidget {
-  const MeetupSuchenPage({Key key}) : super(key: key);
+  const MeetupSuchenPage({Key? key}) : super(key: key);
 
   @override
   _MeetupSuchenPageState createState() => _MeetupSuchenPageState();
 }
 
 class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
-  var userId = FirebaseAuth.instance.currentUser.uid;
-  var searchAutocomplete = SearchAutocomplete();
+  var userId = FirebaseAuth.instance.currentUser!.uid;
+  var searchAutocomplete = SearchAutocomplete(searchableItems: [],);
   dynamic meetupsBackup = [];
   var allMeetups = [];
-  var allMeetupCities = [];
-  var allMeetupCountries = [];
+  List<String> allMeetupCities = [];
+  List<String> allMeetupCountries = [];
   bool filterOn = false;
   var filterList = [];
   var isLoading = true;
 
   @override
   void initState() {
-    WidgetsBinding.instance?.addPostFrameCallback((_) => initialize());
+    WidgetsBinding.instance.addPostFrameCallback((_) => initialize());
 
     super.initState();
   }
@@ -66,8 +66,8 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
     }
 
     searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context).filterMeetupSuche,
-        searchableItems: allMeetupCities.toList() + allMeetupCountries.toList(),
+        hintText: AppLocalizations.of(context)!.filterMeetupSuche,
+        searchableItems: allMeetupCities.toList()  + allMeetupCountries.toList(),
         onConfirm: () => filterShowMeetups(),
         onRemove: () {
           filterList = [];
@@ -161,7 +161,7 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
               title: "",
               children: [
                 createCheckBoxen(windowSetState, sprachenSelection,
-                    AppLocalizations.of(context).sprachen),
+                    AppLocalizations.of(context)!.sprachen),
                 createCheckBoxen(windowSetState, typSelection, "Meetup typ"),
               ],
             );
@@ -277,7 +277,7 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
     }
 
     return Scaffold(
-        appBar: CustomAppBar(title: AppLocalizations.of(context).alleMeetups),
+        appBar: CustomAppBar(title: AppLocalizations.of(context)!.alleMeetups),
         body: SafeArea(
           child: Container(
               padding: const EdgeInsets.only(top: 10),
@@ -294,7 +294,7 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
                               child: isLoading
                                   ? const CircularProgressIndicator()
                                   : Text(
-                                      AppLocalizations.of(context)
+                                      AppLocalizations.of(context)!
                                           .keineMeetupsVorhanden,
                                       style: const TextStyle(fontSize: 30),
                                     ))
@@ -302,7 +302,7 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
                     ),
                   ),
                 ),
-                Container(margin: EdgeInsets.only(right: 35) ,child: searchAutocomplete),
+                Container(margin: const EdgeInsets.only(right: 35) ,child: searchAutocomplete),
                 Positioned(
                   top: 10,
                   right: 0,

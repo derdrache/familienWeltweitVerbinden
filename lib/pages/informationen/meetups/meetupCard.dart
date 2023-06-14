@@ -8,22 +8,22 @@ import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_func;
 import 'meetup_details.dart';
 
-var userId = FirebaseAuth.instance.currentUser.uid;
+var userId = FirebaseAuth.instance.currentUser!.uid;
 
 class MeetupCard extends StatefulWidget {
   EdgeInsets margin;
   Map meetupData;
   bool withInteresse;
-  Function afterPageVisit;
+  Function? afterPageVisit;
   bool isCreator;
   bool bigCard;
   bool fromMeetupPage;
   bool smallCard;
-  Function afterFavorite;
+  Function? afterFavorite;
 
   MeetupCard({
-    Key key,
-    this.meetupData,
+    Key? key,
+    required this.meetupData,
     this.withInteresse = false,
     this.margin =
         const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
@@ -40,8 +40,8 @@ class MeetupCard extends StatefulWidget {
 }
 
 class _MeetupCardState extends State<MeetupCard> {
-  bool onAbsageList;
-  bool onZusageList;
+  late bool onAbsageList;
+  late bool onZusageList;
   var shadowColor = Colors.grey.withOpacity(0.8);
 
   @override
@@ -113,10 +113,10 @@ class _MeetupCardState extends State<MeetupCard> {
   }
 
   createOnlineMeetupTime() {
-    var meetupZeitzone = widget.meetupData["zeitzone"] is String
+    int meetupZeitzone = widget.meetupData["zeitzone"] is String
         ? int.parse(widget.meetupData["zeitzone"])
         : widget.meetupData["zeitzone"];
-    var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
+    int deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
     var meetupStart = widget.meetupData["wann"];
 
     meetupStart = DateTime.parse(meetupStart).add(Duration(hours: deviceZeitzone - meetupZeitzone));
@@ -145,7 +145,7 @@ class _MeetupCardState extends State<MeetupCard> {
     }
 
     cardMenu(tapPosition) {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
 
       showMenu(
         context: context,
@@ -159,7 +159,7 @@ class _MeetupCardState extends State<MeetupCard> {
                 children: [
                   const Icon(Icons.check_circle),
                   const SizedBox(width: 10),
-                  Text(AppLocalizations.of(context).teilnehmen),
+                  Text(AppLocalizations.of(context)!.teilnehmen),
                 ],
               ),
               onTap: () => takePartDecision(true),
@@ -173,7 +173,7 @@ class _MeetupCardState extends State<MeetupCard> {
                     color: Colors.red,
                   ),
                   const SizedBox(width: 10),
-                  Text(AppLocalizations.of(context).absage),
+                  Text(AppLocalizations.of(context)!.absage),
                 ],
               ),
               onTap: () => takePartDecision(false),
@@ -189,7 +189,7 @@ class _MeetupCardState extends State<MeetupCard> {
         onTap: () => global_func.changePage(
             context,
             MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
-            whenComplete: () =>  widget.afterPageVisit()),
+            whenComplete: () =>  widget.afterPageVisit!()),
       child: Container(
           width: (120 + ((screenHeight - 600) / 5)) * sizeRefactor,
           height: screenHeight / 3.2 * sizeRefactor,
@@ -241,7 +241,7 @@ class _MeetupCardState extends State<MeetupCard> {
                           hasIntereset:
                               widget.meetupData["interesse"].contains(userId),
                           id: widget.meetupData["id"],
-                          afterFavorite: widget.afterFavorite
+                          afterFavorite: widget.afterFavorite != null ? widget.afterFavorite! : null
                         )),
                 ],
               ),
@@ -267,7 +267,7 @@ class _MeetupCardState extends State<MeetupCard> {
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            Text(AppLocalizations.of(context).datum,
+                            Text(AppLocalizations.of(context)!.datum,
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: fontSize)),
@@ -296,7 +296,7 @@ class _MeetupCardState extends State<MeetupCard> {
                         if (!isOffline)
                           Row(
                             children: [
-                              Text(AppLocalizations.of(context).uhrzeit,
+                              Text(AppLocalizations.of(context)!.uhrzeit,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: fontSize)),
@@ -327,9 +327,9 @@ class _MeetupCardState extends State<MeetupCard> {
 class InteresseButton extends StatefulWidget {
   bool hasIntereset;
   String id;
-  Function afterFavorite;
+  Function? afterFavorite;
 
-  InteresseButton({Key key, this.hasIntereset, this.id, this.afterFavorite}) : super(key: key);
+  InteresseButton({Key? key, required this.hasIntereset, required this.id, this.afterFavorite}) : super(key: key);
 
   @override
   _InteresseButtonState createState() => _InteresseButtonState();
@@ -360,7 +360,7 @@ class _InteresseButtonState extends State<InteresseButton> {
 
     setState(() {});
 
-    widget.afterFavorite();
+    widget.afterFavorite!();
   }
 
   @override

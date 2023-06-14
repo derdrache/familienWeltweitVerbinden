@@ -29,10 +29,10 @@ import 'force_update.dart';
 class StartPage extends StatefulWidget {
   int selectedIndex;
   var informationPageIndex;
-  int chatPageSliderIndex;
+  int? chatPageSliderIndex;
 
   StartPage({
-    Key key,
+    Key? key,
     this.selectedIndex = 0,
     this.informationPageIndex = 0,
     this.chatPageSliderIndex}) : super(key: key);
@@ -42,14 +42,14 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
-  final String userId = FirebaseAuth.instance.currentUser?.uid;
-  final String userName = FirebaseAuth.instance.currentUser?.displayName;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final String? userName = FirebaseAuth.instance.currentUser!.displayName;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   bool hasInternet = true;
   var checkedA2HS = false;
-  List<Widget> pages;
+  late List<Widget> pages;
   var _networkConnectivity;
-  bool noProfil;
+  late bool noProfil;
 
   @override
   void initState() {
@@ -57,7 +57,7 @@ class _StartPageState extends State<StartPage> {
     noProfil = ownProfil == null || ownProfil["id"] == null;
     _networkConnectivity = NetworkConnectivity(context);
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _asyncMethod());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
 
@@ -128,8 +128,8 @@ class _StartPageState extends State<StartPage> {
   }
 
   _updateOwnEmail() async {
-    final String userAuthEmail = FirebaseAuth.instance.currentUser?.email;
-    String enryptEmail = encrypt(userAuthEmail);
+    final String? userAuthEmail = FirebaseAuth.instance.currentUser!.email;
+    String enryptEmail = encrypt(userAuthEmail!);
     var userDBEmail = ownProfil["email"];
 
     if (userAuthEmail != userDBEmail) {
@@ -288,7 +288,7 @@ class _StartPageState extends State<StartPage> {
       ErkundenPage(),
       InformationPage(pageSelection: widget.informationPageIndex),
       ChatPage(
-          chatPageSliderIndex: widget.chatPageSliderIndex
+          chatPageSliderIndex: widget.chatPageSliderIndex!
       ),
       const SettingPage()
     ];
@@ -319,16 +319,16 @@ class _StartPageState extends State<StartPage> {
 }
 
 class CustomBottomNavigationBar extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser?.uid;
-  final Function onNavigationItemTapped;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
+  final Function(int)  onNavigationItemTapped;
   final int selectNavigationItem;
 
   CustomBottomNavigationBar(
-      {Key key, this.onNavigationItemTapped, this.selectNavigationItem})
+      {Key? key, required this.onNavigationItemTapped, required this.selectNavigationItem})
       : super(key: key);
 
   _eventNotification() {
-    var eventNotification = 0;
+    num eventNotification = 0;
     var myMeetups = Hive.box('secureBox').get("myEvents") ?? [];
 
     for (var meetup in myMeetups) {
@@ -366,7 +366,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
     return FutureBuilder(
       future: getChatNewMessageCount(),
       builder: (context, snapshot) {
-        var newMessageCount = 0;
+        num newMessageCount = 0;
 
         List myChats = Hive.box("secureBox").get("myChats") ?? [];
         List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
@@ -378,7 +378,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
         if(snapshot.hasData && snapshot.data != false){
           newMessageCount = 0;
-          newMessageCount += snapshot.data;
+          newMessageCount += snapshot.data as num;
         }
 
         return BadgeIcon(

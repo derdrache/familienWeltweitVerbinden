@@ -5,21 +5,21 @@ import '../../../global/global_functions.dart' as global_func;
 
 import 'community_details.dart';
 
-var userId = FirebaseAuth.instance.currentUser.uid;
+var userId = FirebaseAuth.instance.currentUser!.uid;
 
 class CommunityCard extends StatefulWidget {
   EdgeInsets margin;
   Map community;
   bool withFavorite;
-  Function afterPageVisit;
+  Function? afterPageVisit;
   bool isCreator;
-  Function afterFavorite;
+  Function? afterFavorite;
   bool fromCommunityPage;
   bool smallCard;
 
   CommunityCard({
-    Key key,
-    this.community,
+    Key? key,
+    required this.community,
     this.withFavorite = false,
     this.afterFavorite,
     this.margin =
@@ -49,7 +49,7 @@ class _CommunityCardState extends State<CommunityCard> {
      onTap: () => global_func.changePage(
           context, 
           CommunityDetails(community: widget.community, fromCommunityPage: widget.fromCommunityPage),
-          whenComplete: () =>  widget.afterPageVisit()),
+          whenComplete: widget.afterPageVisit != null ? ()=>  widget.afterPageVisit!():null),
       child: Container(
           width: (120 + ((screenHeight - 600) / 5)) * sizeRefactor,
           height: screenHeight / 3.2 * sizeRefactor,
@@ -96,7 +96,7 @@ class _CommunityCardState extends State<CommunityCard> {
                         right: 8,
                         child: InteresseButton(
                             communityData: widget.community,
-                            afterFavorite: widget.afterFavorite)),
+                            afterFavorite: widget.afterFavorite != null ? widget.afterFavorite! : null)),
                 ],
               ),
               Expanded(
@@ -146,9 +146,9 @@ class _CommunityCardState extends State<CommunityCard> {
 
 class InteresseButton extends StatefulWidget {
   Map communityData;
-  Function afterFavorite;
+  Function? afterFavorite;
 
-  InteresseButton({Key key, this.communityData, this.afterFavorite})
+  InteresseButton({Key? key, required this.communityData, required this.afterFavorite})
       : super(key: key);
 
   @override
@@ -157,7 +157,7 @@ class InteresseButton extends StatefulWidget {
 
 class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
-  bool hasIntereset;
+  late bool hasIntereset;
 
 
   setInteresse() async {
@@ -179,7 +179,7 @@ class _InteresseButtonState extends State<InteresseButton> {
     updateHiveCommunity(communityId, "interesse", widget.communityData["interesse"]);
     setState(() {});
 
-    widget.afterFavorite();
+    widget.afterFavorite!();
   }
 
 

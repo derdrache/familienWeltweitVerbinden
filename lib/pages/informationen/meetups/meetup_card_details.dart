@@ -22,7 +22,7 @@ import '../location/location_Information.dart';
 import 'meetup_image_galerie.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 
-var userId = FirebaseAuth.instance.currentUser.uid;
+var userId = FirebaseAuth.instance.currentUser!.uid;
 var isWebDesktop = kIsWeb &&
     (defaultTargetPlatform != TargetPlatform.iOS ||
         defaultTargetPlatform != TargetPlatform.android);
@@ -40,7 +40,7 @@ class MeetupCardDetails extends StatefulWidget {
   bool isPublic;
 
   MeetupCardDetails(
-      {Key key, this.meetupData, this.offlineMeetup = true, this.isApproved = false})
+      {Key? key, required this.meetupData, this.offlineMeetup = true, this.isApproved = false})
       : isCreator = meetupData["erstelltVon"] == userId,
         isPublic = meetupData["art"] == "öffentlich" || meetupData["art"] == "public",
         super(key: key);
@@ -56,8 +56,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   TextEditingController changeTextInputController = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
   var beschreibungInputKontroller = TextEditingController();
-  var changeDropdownInput = CustomDropDownButton();
-  var changeMultiDropdownInput = CustomMultiTextForm();
+  late var changeDropdownInput;
+  late var timeZoneDropdown;
+  late var changeMultiDropdownInput;
   bool chooseCurrentLocation = false;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
 
@@ -97,7 +98,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   askForRelease(isOnList) async {
     if (isOnList) {
       customSnackbar(
-          context, AppLocalizations.of(context).meetupInteresseZurueckgenommen,
+          context, AppLocalizations.of(context)!.meetupInteresseZurueckgenommen,
           color: Colors.green);
 
       widget.meetupData["freischalten"].remove(userId);
@@ -108,7 +109,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           "WHERE id ='${widget.meetupData["id"]}'");
     } else {
       customSnackbar(
-          context, AppLocalizations.of(context).meetupInteresseMitgeteilt,
+          context, AppLocalizations.of(context)!.meetupInteresseMitgeteilt,
           color: Colors.green);
 
       widget.meetupData["freischalten"].add(userId);
@@ -131,8 +132,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   }
 
   convertMeetupDateIntoMyDate() {
-    var meetupZeitzone = widget.meetupData["zeitzone"];
-    var deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
+    int meetupZeitzone = widget.meetupData["zeitzone"];
+    int deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
     var meetupBeginn = widget.meetupData["wann"];
 
     meetupBeginn = DateTime.parse(meetupBeginn)
@@ -185,7 +186,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (newName.isEmpty) return false;
 
     if (newName.length > 40) {
-      customSnackbar(context, AppLocalizations.of(context).usernameZuLang);
+      customSnackbar(context, AppLocalizations.of(context)!.usernameZuLang);
     }
 
     widget.meetupData["name"] = newName;
@@ -243,10 +244,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   }
 
   checkAndSaveNewTimeZone() {
-    String newTimeZone = changeTextInputController.text;
-    var isInt = int.tryParse(newTimeZone);
+    String newTimeZone = timeZoneDropdown.getSelected();
 
-    if (newTimeZone.isEmpty || isInt == null) return false;
+    if (newTimeZone.isEmpty) return false;
 
     widget.meetupData["zeitzone"] = newTimeZone;
     updateHiveMeetup(widget.meetupData["id"], "zeitzone", newTimeZone);
@@ -280,7 +280,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (newLink.isEmpty) return false;
 
     if (!global_func.isLink(newLink)) {
-      customSnackbar(context, AppLocalizations.of(context).eingabeKeinLink);
+      customSnackbar(context, AppLocalizations.of(context)!.eingabeKeinLink);
       return;
     }
 
@@ -298,9 +298,11 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (newInterval.isEmpty) return false;
 
     widget.meetupData["eventInterval"] = newInterval;
-    updateHiveMeetup(widget.meetupData["id"], "eventInterval", newInterval);
+    widget.meetupData["bis"] = DateTime.parse(widget.meetupData["wann"]).add(const Duration(days: 1)).toString();
     MeetupDatabase().update(
-        "eventInterval = '$newInterval'", "WHERE id = '${widget.meetupData["id"]}'");
+        "eventInterval = '$newInterval'", "bis = '${widget.meetupData["bis"]}'"
+        "WHERE id = '${widget.meetupData["id"]}'"
+    );
 
     return true;
   }
@@ -318,8 +320,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     return true;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -329,7 +329,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     double cardHeight = screenHeight / 1.34;
     bool isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
         widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
-    ortAuswahlBox.hintText = AppLocalizations.of(context).neueStadtEingeben;
+    ortAuswahlBox.hintText = AppLocalizations.of(context)!.neueStadtEingeben;
     widget.meetupData["eventInterval"] = isGerman
         ? global_func.changeEnglishToGerman(widget.meetupData["eventInterval"])
         : global_func.changeGermanToEnglish(widget.meetupData["eventInterval"]);
@@ -338,7 +338,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       if (!widget.isCreator) return const SizedBox.shrink();
 
       return Center(
-        child: Text(AppLocalizations.of(context).antippenZumAendern,
+        child: Text(AppLocalizations.of(context)!.antippenZumAendern,
             style: const TextStyle(color: Colors.grey)),
       );
     }
@@ -351,7 +351,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       return Container(
         padding: const EdgeInsets.only(left: 10, right: 10),
         width: screenWidth * 0.8,
-        child: Text(AppLocalizations.of(context).nichtErstellerMeetup,
+        child: Text(AppLocalizations.of(context)!.nichtErstellerMeetup,
             textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.red, fontSize: 18),
             maxLines: 2),
@@ -395,21 +395,21 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                 margin: const EdgeInsets.only(right: 10),
                 child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   TextButton(
-                      child: Text(AppLocalizations.of(context).abbrechen,
+                      child: Text(AppLocalizations.of(context)!.abbrechen,
                           style: TextStyle(fontSize: fontsize)),
                       onPressed: () {
                         changeTextInputController = TextEditingController();
                         Navigator.pop(context);
                       }),
                   TextButton(
-                      child: Text(AppLocalizations.of(context).speichern,
+                      child: Text(AppLocalizations.of(context)!.speichern,
                           style: TextStyle(fontSize: fontsize)),
                       onPressed: () async {
                         bool saveSuccess = await saveFunction();
 
                         if (!saveSuccess) {
                           customSnackbar(context,
-                              AppLocalizations.of(context).keineEingabe);
+                              AppLocalizations.of(context)!.keineEingabe);
                           return;
                         }
 
@@ -424,7 +424,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     _changeOrOpenLinkWindow() async {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
 
       await showMenu(
         context: context,
@@ -434,20 +434,20 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
         ),
         items: [
           PopupMenuItem(
-              child: Text(AppLocalizations.of(context).linkBearbeiten),
+              child: Text(AppLocalizations.of(context)!.linkBearbeiten),
               onTap: () {
                 Future.delayed(
                     const Duration(seconds: 0), () => openChangeWindow(
-                      AppLocalizations.of(context).meetupMapLinkAendern,
+                      AppLocalizations.of(context)!.meetupMapLinkAendern,
                       customTextInput(
-                          AppLocalizations.of(context).neuenKartenlinkEingeben,
+                          AppLocalizations.of(context)!.neuenKartenlinkEingeben,
                           changeTextInputController),
                       checkAndSaveNewMapAndLink
                     )
                 );
               }),
           PopupMenuItem(
-            child: Text(AppLocalizations.of(context).linkOeffnen),
+            child: Text(AppLocalizations.of(context)!.linkOeffnen),
             onTap: () {
               Navigator.pop(context);
               global_func.openURL(widget.meetupData["link"]);
@@ -461,8 +461,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     nameInformation() {
       return InkWell(
         onTap: () => openChangeWindow(
-            AppLocalizations.of(context).meetupNameAendern,
-            customTextInput(AppLocalizations.of(context).neuenNamenEingeben,
+            AppLocalizations.of(context)!.meetupNameAendern,
+            customTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
                 changeTextInputController),
             checkAndSaveNewName),
         child: Text(widget.meetupData["name"],
@@ -512,13 +512,17 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     timeZoneInformation() {
+      timeZoneDropdown = CustomDropDownButton(
+          items: global_var.eventZeitzonen,
+          selected: widget.meetupData["zeitzone"].toString()
+      );
+
       return meetupInformationRow(
-        AppLocalizations.of(context).zeitzone,
+        AppLocalizations.of(context)!.zeitzone,
         "GMT " + widget.meetupData["zeitzone"].toString(),
         () => openChangeWindow(
-            AppLocalizations.of(context).meetupZeitzoneAendern,
-            customTextInput(AppLocalizations.of(context).neueZeitzoneEingeben,
-                changeTextInputController),
+            AppLocalizations.of(context)!.meetupZeitzoneAendern,
+            timeZoneDropdown,
             checkAndSaveNewTimeZone),
       );
     }
@@ -547,7 +551,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               }
 
               return CustomAlertDialog(
-                  title: AppLocalizations.of(context).meetupStadtAendern,
+                  title: AppLocalizations.of(context)!.meetupStadtAendern,
                   height: 400,
                   children: [
                     ortAuswahlBox,
@@ -555,7 +559,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                       margin: const EdgeInsets.only(left: 5, right: 5),
                       child: Row(
                         children: [
-                          Text(AppLocalizations.of(context)
+                          Text(AppLocalizations.of(context)!
                               .aktuellenOrtVerwenden),
                           const Expanded(child: SizedBox.shrink()),
                           Switch(
@@ -574,14 +578,14 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                           children: [
                             TextButton(
                                 child: Text(
-                                    AppLocalizations.of(context).abbrechen,
+                                    AppLocalizations.of(context)!.abbrechen,
                                     style: TextStyle(fontSize: fontsize)),
                                 onPressed: () {
                                   Navigator.pop(context);
                                 }),
                             TextButton(
                                 child: Text(
-                                    AppLocalizations.of(context).speichern,
+                                    AppLocalizations.of(context)!.speichern,
                                     style: TextStyle(fontSize: fontsize)),
                                 onPressed: () {
                                   checkAndSaveNewLocation();
@@ -597,7 +601,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     locationInformation() {
       return meetupInformationRow(
-          AppLocalizations.of(context).ort,
+          AppLocalizations.of(context)!.ort,
           widget.meetupData["stadt"] + ", " + widget.meetupData["land"],
           () => openLocationChangeWindow());
     }
@@ -624,7 +628,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           "Interval",
           widget.meetupData["eventInterval"],
           () => openChangeWindow(
-              AppLocalizations.of(context).meetupIntervalAendern,
+              AppLocalizations.of(context)!.meetupIntervalAendern,
               changeDropdownInput,
               checkAndSaveNewInterval));
     }
@@ -646,10 +650,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       );
 
       return meetupInformationRow(
-          AppLocalizations.of(context).sprache,
+          AppLocalizations.of(context)!.sprache,
           data,
           () => openChangeWindow(
-              AppLocalizations.of(context).meetupSpracheAendern,
+              AppLocalizations.of(context)!.meetupSpracheAendern,
               changeMultiDropdownInput,
               checkAndSaveNewSprache,
               height: 600));
@@ -681,10 +685,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                       withoutActiveHyperLink: widget.isCreator,
                       onTextTab: widget.isCreator
                           ? () => openChangeWindow(
-                              AppLocalizations.of(context)
+                              AppLocalizations.of(context)!
                                   .meetupBeschreibungAendern,
                               customTextInput(
-                                  AppLocalizations.of(context)
+                                  AppLocalizations.of(context)!
                                       .neueBeschreibungEingeben,
                                   beschreibungInputKontroller,
                                   moreLines: 13,
@@ -783,7 +787,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           builder: (BuildContext buildContext) {
             return StatefulBuilder(builder: (context, setStateMeetupTagWindow) {
               return CustomAlertDialog(
-                  title: AppLocalizations.of(context).tagsChange,
+                  title: AppLocalizations.of(context)!.tagsChange,
                   children: [
                     const SizedBox(height: 20),
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -794,7 +798,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                         child: DropdownButtonHideUnderline(
                             child: DropdownButton(
                                 hint: Center(
-                                    child: Text(AppLocalizations.of(context)
+                                    child: Text(AppLocalizations.of(context)!
                                         .tagHinzufuegen)),
                                 isExpanded: true,
                                 items: tagItems.map((String item) {
@@ -892,7 +896,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                     if (isOffline) locationInformation(),
                     if (!isOffline && !widget.isCreator)
                       meetupInformationRow(
-                          AppLocalizations.of(context).meinDatum,
+                          AppLocalizations.of(context)!.meinDatum,
                           convertMeetupDateIntoMyDate(),
                           null),
                     if (widget.isApproved || widget.isPublic)
@@ -937,16 +941,16 @@ class ShowDatetimeBox extends StatefulWidget {
   Map meetupData;
   bool isCreator;
 
-  ShowDatetimeBox({Key key, this.meetupData, this.isCreator}) : super(key: key);
+  ShowDatetimeBox({Key? key, required this.meetupData, required this.isCreator}) : super(key: key);
 
   @override
   _ShowDatetimeBoxState createState() => _ShowDatetimeBoxState();
 }
 
 class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
-  bool isSingeDay;
-  DateButton wannDateInputButton;
-  DateButton wannTimeInputButton;
+  late bool isSingeDay;
+  late DateButton wannDateInputButton;
+  late DateButton wannTimeInputButton;
   DateButton bisDateInputButton = DateButton(getDate: true);
   DateButton bisTimeInputButton = DateButton();
 
@@ -967,12 +971,12 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
       if (bisDate == null) {
         return customSnackbar(
-            context, AppLocalizations.of(context).eingebenBisTagMeetup);
+            context, AppLocalizations.of(context)!.eingebenBisTagMeetup);
       }
 
       if (bisTime == null) {
         return customSnackbar(
-            context, AppLocalizations.of(context).eingebenBisUhrzeitMeetup);
+            context, AppLocalizations.of(context)!.eingebenBisUhrzeitMeetup);
       }
 
       newBisDate = DateTime(bisDate.year, bisDate.month, bisDate.day,
@@ -1025,7 +1029,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-              title: AppLocalizations.of(context).meetupDatumAendern,
+              title: AppLocalizations.of(context)!.meetupDatumAendern,
               height: 300,
               children: [
                 const SizedBox(height: 20),
@@ -1036,12 +1040,12 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
                   child:
                       Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                     TextButton(
-                      child: Text(AppLocalizations.of(context).abbrechen,
+                      child: Text(AppLocalizations.of(context)!.abbrechen,
                           style: TextStyle(fontSize: fontsize)),
                       onPressed: () => Navigator.pop(context),
                     ),
                     TextButton(
-                        child: Text(AppLocalizations.of(context).speichern,
+                        child: Text(AppLocalizations.of(context)!.speichern,
                             style: TextStyle(fontSize: fontsize)),
                         onPressed: () => saveChanges()),
                   ]),
@@ -1056,6 +1060,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     List wannTimeList = wannDatetimeList[1].split(":");
 
     if (!isSingeDay) {
+      String wannDateText = wannDateList.reversed.take(2).toList().join(".");
       var bisDatetimeList = widget.meetupData["bis"]?.split(" ");
       var bisDateText = "?";
       var bisTimeText = "?";
@@ -1068,13 +1073,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
         bisTimeText = bisTimeList.take(2).join(":");
       }
 
-      return wannDateList.last +
-          " - " +
-          bisDateText +
-          "\n " +
-          wannTimeList.take(2).join(":") +
-          " - " +
-          bisTimeText;
+      return "$wannDateText - $bisDateText \n ${wannTimeList.take(2).join(":")} - $bisTimeText";
     } else {
       return wannDateList.reversed.join(".") +
           " " +
@@ -1122,7 +1121,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
           onTap: !widget.isCreator ? null : () => openChangeWindow(),
           child: Row(
             children: [
-              Text(AppLocalizations.of(context).datum + " ",
+              Text(AppLocalizations.of(context)!.datum + " ",
                   style: TextStyle(
                       fontSize: fontsize, fontWeight: FontWeight.bold)),
               const Expanded(child: SizedBox.shrink()),
@@ -1148,7 +1147,7 @@ class DateButton extends StatefulWidget {
   var meetupDatum;
   var getDate;
 
-  DateButton({Key key, this.meetupDatum, this.uhrZeit, this.getDate = false})
+  DateButton({Key? key, this.meetupDatum, this.uhrZeit, this.getDate = false})
       : super(key: key);
 
   @override
@@ -1157,7 +1156,7 @@ class DateButton extends StatefulWidget {
 
 class _DateButtonState extends State<DateButton> {
   dateBox() {
-    var dateString = AppLocalizations.of(context).datumAuswaehlen;
+    var dateString = AppLocalizations.of(context)!.datumAuswaehlen;
     if (widget.meetupDatum != null) {
       var dateFormat = DateFormat('dd.MM.yyyy');
       var dateTime = DateTime(widget.meetupDatum.year, widget.meetupDatum.month,
@@ -1182,7 +1181,7 @@ class _DateButtonState extends State<DateButton> {
   timeBox() {
     return ElevatedButton(
       child: Text(widget.uhrZeit == null
-          ? AppLocalizations.of(context).uhrzeitAuswaehlen
+          ? AppLocalizations.of(context)!.uhrzeitAuswaehlen
           : widget.uhrZeit.format(context)),
       onPressed: () async {
         widget.uhrZeit = await showTimePicker(
@@ -1209,7 +1208,7 @@ class InteresseButton extends StatefulWidget {
   bool hasIntereset;
   final String id;
 
-  InteresseButton({Key key, this.hasIntereset, this.id}) : super(key: key);
+  InteresseButton({Key? key, required this.hasIntereset, required this.id}) : super(key: key);
 
   @override
   _InteresseButtonState createState() => _InteresseButtonState();
@@ -1278,7 +1277,7 @@ class CardFeet extends StatefulWidget {
   var meetupZusage;
 
   CardFeet(
-      {Key key, this.organisator, this.width, this.meetupData, this.meetupZusage})
+      {Key? key, required this.organisator, required this.width, required this.meetupData, required this.meetupZusage})
       : super(key: key);
 
   @override
@@ -1286,19 +1285,14 @@ class CardFeet extends StatefulWidget {
 }
 
 class _CardFeetState extends State<CardFeet> {
-  Map organisatorProfil;
-  var ownName = FirebaseAuth.instance.currentUser.displayName;
+  late Map organisatorProfil;
+  var ownName = FirebaseAuth.instance.currentUser!.displayName;
   var teilnehmerAnzahl = "";
 
   @override
-  void initState() {
+  Widget build(BuildContext context) {
     organisatorProfil = getProfilFromHive(profilId: widget.organisator);
 
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     showTeilnehmerWindow() {
       var zusagenIds = widget.meetupData["zusage"];
       var allProfils = Hive.box("secureBox").get("profils");
@@ -1336,7 +1330,7 @@ class _CardFeetState extends State<CardFeet> {
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).teilnehmer,
+              title: AppLocalizations.of(context)!.teilnehmer,
               children: zusagenNameBoxes,
             );
           });
@@ -1351,7 +1345,7 @@ class _CardFeetState extends State<CardFeet> {
         child: Row(
           children: [
             InkWell(
-              child: Text(AppLocalizations.of(context).teilnehmer,
+              child: Text(AppLocalizations.of(context)!.teilnehmer,
                   style: TextStyle(
                       fontSize: fontsize,
                       color: Theme.of(context).colorScheme.secondary)),

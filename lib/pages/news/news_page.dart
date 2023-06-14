@@ -17,16 +17,16 @@ import '../informationen/location/location_Information.dart';
 import 'news_page_settings.dart';
 
 class NewsPage extends StatefulWidget {
-  const NewsPage({Key key}) : super(key: key);
+  const NewsPage({Key? key}) : super(key: key);
 
   _NewsPageState createState() => _NewsPageState();
 }
 
 class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
-  final String userId = FirebaseAuth.instance.currentUser.uid;
-  List newsFeedData;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
+  late List newsFeedData;
   int displayDataEntries = 10;
-  List events;
+  late List events;
   List cityUserInfo = Hive.box('secureBox').get("stadtinfoUser") ?? [];
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
   List userNewsContentHive = Hive.box('secureBox').get("userNewsContent") ?? [];
@@ -159,7 +159,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
           child: Container(
               padding: EdgeInsets.only(top: screenHeight / 3),
               child: Text(
-                AppLocalizations.of(context).keineNewsVorhanden,
+                AppLocalizations.of(context)!.keineNewsVorhanden,
                 style: const TextStyle(fontSize: 20),
               ))));
     }
@@ -241,7 +241,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
     friendsDisplay(news) {
       String addedUser = news["information"].split(" ")[1];
       String newsUserId = news["erstelltVon"];
-      Map friendProfil = getProfilFromHive(profilId: newsUserId);
+      Map? friendProfil = getProfilFromHive(profilId: newsUserId);
       String text = "";
 
       if (friendProfil == null ||
@@ -252,7 +252,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
       if (news["information"].contains("added")) {
         text = friendProfil["name"] +
-            AppLocalizations.of(context).alsFreundHinzugefuegt;
+            AppLocalizations.of(context)!.alsFreundHinzugefuegt;
       }
 
       userNewsContent
@@ -308,14 +308,14 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
     changePlaceDisplay(news, myLastLocationDate) {
       String newsUserId = news["erstelltVon"];
-      Map familyProfil = getFamilyProfil(familyMember: newsUserId);
-      Map newsUserProfil = getProfilFromHive(
+      Map? familyProfil = getFamilyProfil(familyMember: newsUserId);
+      Map? newsUserProfil = getProfilFromHive(
           profilId:
               familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
       bool isFriend = ownProfil["friendlist"].contains(newsUserId);
       String text = "";
-      String newsOrt = news["information"]["city"];
-      String newsLand = news["information"]["countryname"];
+      String? newsOrt = news["information"]["city"];
+      String? newsLand = news["information"]["countryname"];
       String ownOrt = ownProfil["ort"];
       var locationTimeCheck = DateTime.parse(news["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
@@ -342,21 +342,21 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       newsUserProfil = Map.from(newsUserProfil);
       if (familyProfil != null) {
         newsUserProfil["name"] =
-            AppLocalizations.of(context).familie + " " + familyProfil["name"];
+            AppLocalizations.of(context)!.familie + " " + familyProfil["name"];
       }
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"] == 1) {
         text = newsUserProfil["name"] +
             AppLocalizations
-                .of(context)
+                .of(context)!
                 .freundOrtsWechsel +
             "\n" +
             newsOrtInfo;
       }else if (ownOrt == newsOrt) {
         text = newsUserProfil["name"] +
-            AppLocalizations.of(context).familieInDeinemOrt;
+            AppLocalizations.of(context)!.familieInDeinemOrt;
       }else if(inDistance) {
-        text = newsUserProfil["name"] + AppLocalizations.of(context).imUmkreis;
+        text = newsUserProfil["name"] + AppLocalizations.of(context)!.imUmkreis;
       }
 
         userNewsContent
@@ -366,7 +366,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
         "newsWidget": InkWell(
           onTap: () {
             global_func.changePage(
-                context, ShowProfilPage(profil: newsUserProfil));
+                context, ShowProfilPage(profil: newsUserProfil!));
           },
           child: Align(
             child: Stack(
@@ -413,8 +413,8 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
     friendsNewTravelPlanDisplay(news) {
       String newsUserId = news["erstelltVon"];
-      Map familyProfil = getFamilyProfil(familyMember: newsUserId);
-      Map friendProfil = getProfilFromHive(
+      Map? familyProfil = getFamilyProfil(familyMember: newsUserId);
+      Map? friendProfil = getProfilFromHive(
           profilId:
               familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
       bool isFamilymember = familyProfil != null ? familyProfil["members"].contains(userId) : false;
@@ -456,12 +456,12 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
         String travelPlanCountry = newTravelPlan["ortData"]["countryname"];
         String textTitle = friendProfil["name"] +
             "\n" +
-            AppLocalizations.of(context).friendNewTravelPlan;
+            AppLocalizations.of(context)!.friendNewTravelPlan;
         String textDate = travelPlanVon.join("-") + " - " + travelPlanbis.join("-");
         String textLocation = travelPlanCity + " / " + travelPlanCountry;
         newsWidget = InkWell(
           onTap: () {
-            global_func.changePage(context, ShowProfilPage(profil: friendProfil));
+            global_func.changePage(context, ShowProfilPage(profil: friendProfil!));
           },
           child: Align(
             child: Stack(
@@ -513,7 +513,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       }else{
         String textTitle = friendProfil["name"] +
             "\n" +
-            AppLocalizations.of(context).friendNewTravelPlan;
+            AppLocalizations.of(context)!.friendNewTravelPlan;
         List<Widget> columnItems = [];
 
         for( var i = 0 ; i < newTravelPlan["von"].length; i++){
@@ -543,7 +543,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
 
         newsWidget = InkWell(
           onTap: () {
-            global_func.changePage(context, ShowProfilPage(profil: friendProfil));
+            global_func.changePage(context, ShowProfilPage(profil: friendProfil!));
           },
           child: Align(
             child: Stack(
@@ -626,10 +626,10 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
       }
 
       if (isOnline) {
-        eventText = AppLocalizations.of(context).newsPageOnlineMeetupVorschlag +
+        eventText = AppLocalizations.of(context)!.newsPageOnlineMeetupVorschlag +
             _evenTagMatch(event["tags"]).toString();
       } else {
-        eventText = AppLocalizations.of(context).newsPageOfflineMeetupVorschlag;
+        eventText = AppLocalizations.of(context)!.newsPageOfflineMeetupVorschlag;
       }
 
       userNewsContent.add(
@@ -687,7 +687,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
           ? window.locale.languageCode == "de"
           : Platform.localeName == "de_DE";
       String textHeader =
-          info["ort"] + AppLocalizations.of(context).hatNeueStadtinformation;
+          info["ort"] + AppLocalizations.of(context)!.hatNeueStadtinformation;
       String textBody =
           spracheIstDeutsch ? info["informationGer"] : info["informationEng"];
 
@@ -793,7 +793,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                     child: Column(
                       children: [
                         Text(
-                            AppLocalizations.of(context)
+                            AppLocalizations.of(context)!
                                     .newsLocationBegruessung +
                                 ortsName,
                             style: const TextStyle(
@@ -802,8 +802,8 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
                         const SizedBox(height: 5),
                         locationUserInfos.length == 0
                             ? Text(
-                                AppLocalizations.of(context).erfahrungenTeilen)
-                            : Text(AppLocalizations.of(context)
+                                AppLocalizations.of(context)!.erfahrungenTeilen)
+                            : Text(AppLocalizations.of(context)!
                                 .erfahrungenAnschauenUndTeilen)
                       ],
                     )),
@@ -900,7 +900,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
     _updateHiveUserNewsContent();
 
     return Scaffold(
-        floatingActionButtonAnimator: NoScalingAnimation(),
+        //floatingActionButtonAnimator: NoScalingAnimation(),
         floatingActionButtonLocation: scrollbarOnBottom
             ? FloatingActionButtonLocation.endTop
             : FloatingActionButtonLocation.endDocked,
@@ -935,7 +935,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
             ])));
   }
 }
-
+/*
 class NoScalingAnimation extends FloatingActionButtonAnimator {
   @override
   Offset getOffset({Offset begin, Offset end, double progress}) {
@@ -953,11 +953,13 @@ class NoScalingAnimation extends FloatingActionButtonAnimator {
   }
 }
 
+ */
+
 class NewsStamp extends StatelessWidget {
   var date;
   bool isNew;
 
-  NewsStamp({this.date, this.isNew, Key key}) : super(key: key);
+  NewsStamp({this.date, required this.isNew, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

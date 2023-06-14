@@ -21,7 +21,7 @@ import '../../../windows/nutzerrichtlinen.dart';
 import 'meetup_details.dart';
 
 class MeetupErstellen extends StatefulWidget {
-  const MeetupErstellen({Key key}) : super(key: key);
+  const MeetupErstellen({Key? key}) : super(key: key);
 
   @override
   _MeetupErstellenState createState() => _MeetupErstellenState();
@@ -33,17 +33,17 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
   var meetupNameKontroller = TextEditingController();
-  DateTime meetupWannDatum;
-  DateTime meetupBisDatum;
-  TimeOfDay meetupWannUhrzeit;
-  TimeOfDay meetupBisUhrzeit;
+  DateTime? meetupWannDatum;
+  DateTime? meetupBisDatum;
+  TimeOfDay? meetupWannUhrzeit;
+  TimeOfDay? meetupBisUhrzeit;
   var meetupBeschreibungKontroller = TextEditingController();
   var meetupOrtKontroller = TextEditingController();
-  var sprachenAuswahlBox = CustomMultiTextForm();
-  var meetupArtDropdown = CustomDropDownButton();
-  var ortTypDropdown = CustomDropDownButton();
+  late var sprachenAuswahlBox;
+  late var meetupArtDropdown;
+  late var ortTypDropdown;
   var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true);
-  var meetupIntervalDropdown = CustomDropDownButton();
+  late var meetupIntervalDropdown;
   var ownMeetup = true;
   final translator = GoogleTranslator();
   bool chooseCurrentLocation = false;
@@ -51,10 +51,6 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   @override
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
-        icon: const Icon(
-          Icons.arrow_downward,
-          color: Colors.black,
-        ),
         auswahlList: isGerman
             ? global_var.sprachenListe
             : global_var.sprachenListeEnglisch);
@@ -95,7 +91,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var meetupId = uuid.v4();
     var allValid = checkValidations(locationData);
     var interval = meetupIntervalDropdown.getSelected();
-    DateTime bisDate;
+    DateTime? bisDate;
 
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -103,11 +99,11 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       customSnackbar(context, allValid);
       return;
     }
-    var wannDate = DateTime(meetupWannDatum.year, meetupWannDatum.month,
-        meetupWannDatum.day, meetupWannUhrzeit.hour, meetupWannUhrzeit.minute);
+    var wannDate = DateTime(meetupWannDatum!.year, meetupWannDatum!.month,
+        meetupWannDatum!.day, meetupWannUhrzeit!.hour, meetupWannUhrzeit!.minute);
     if (isMultiDayMeetup(interval)) {
-      bisDate = DateTime(meetupBisDatum.year, meetupBisDatum.month,
-          meetupBisDatum.day, meetupBisUhrzeit.hour, meetupBisUhrzeit.minute);
+      bisDate = DateTime(meetupBisDatum!.year, meetupBisDatum!.month,
+          meetupBisDatum!.day, meetupBisUhrzeit!.hour, meetupBisUhrzeit!.minute);
     }
 
     if (locationData["latt"] == null) {
@@ -205,36 +201,36 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var validationFailText = "";
 
     if (meetupNameKontroller.text.isEmpty) {
-      validationFailText = AppLocalizations.of(context).bitteNameEingeben;
+      validationFailText = AppLocalizations.of(context)!.bitteNameEingeben;
     } else if (meetupNameKontroller.text.length > 40) {
-      validationFailText = AppLocalizations.of(context).usernameZuLang;
+      validationFailText = AppLocalizations.of(context)!.usernameZuLang;
     } else if (meetupArtDropdown.getSelected().isEmpty) {
-      validationFailText = AppLocalizations.of(context).bitteMeetupArtEingeben;
+      validationFailText = AppLocalizations.of(context)!.bitteMeetupArtEingeben;
     } else if (meetupIntervalDropdown.getSelected().isEmpty) {
       validationFailText =
-          AppLocalizations.of(context).bitteMeetupIntervalEingeben;
+          AppLocalizations.of(context)!.bitteMeetupIntervalEingeben;
     } else if (ortTypDropdown.getSelected().isEmpty) {
-      validationFailText = AppLocalizations.of(context).bitteMeetupTypEingeben;
+      validationFailText = AppLocalizations.of(context)!.bitteMeetupTypEingeben;
     } else if (ortTypDropdown.getSelected() == "offline" &&
         locationData["city"] == null) {
-      validationFailText = AppLocalizations.of(context).bitteStadtEingeben;
+      validationFailText = AppLocalizations.of(context)!.bitteStadtEingeben;
     } else if (ortTypDropdown.getSelected() == "online" &&
         meetupOrtKontroller.text.isEmpty) {
-      validationFailText = AppLocalizations.of(context).bitteLinkEingeben;
+      validationFailText = AppLocalizations.of(context)!.bitteLinkEingeben;
     } else if (sprachenAuswahlBox.getSelected().isEmpty) {
-      validationFailText = AppLocalizations.of(context).bitteSpracheEingeben;
+      validationFailText = AppLocalizations.of(context)!.bitteSpracheEingeben;
     } else if (meetupWannDatum == null) {
-      validationFailText = AppLocalizations.of(context).bitteMeetupDatumEingeben;
+      validationFailText = AppLocalizations.of(context)!.bitteMeetupDatumEingeben;
     } else if (meetupBisDatum == null &&
         isMultiDayMeetup(meetupIntervalDropdown.getSelected())) {
       validationFailText =
-          AppLocalizations.of(context).bitteEnddatumMeetupEingeben;
+          AppLocalizations.of(context)!.bitteEnddatumMeetupEingeben;
     } else if (meetupWannUhrzeit == null) {
       validationFailText =
-          AppLocalizations.of(context).bitteMeetupUhrzeitEingeben;
+          AppLocalizations.of(context)!.bitteMeetupUhrzeitEingeben;
     } else if (meetupBeschreibungKontroller.text.isEmpty) {
       validationFailText =
-          AppLocalizations.of(context).bitteMeetupBeschreibungEingeben;
+          AppLocalizations.of(context)!.bitteMeetupBeschreibungEingeben;
     }
 
     if (validationFailText.isEmpty) return true;
@@ -247,17 +243,17 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     sprachenAuswahlBox.hintText =
-        AppLocalizations.of(context).spracheAuswaehlen;
-    meetupArtDropdown.labelText =  AppLocalizations.of(context).meetupOeffentlichkeit;
-    meetupArtDropdown.hintText = AppLocalizations.of(context).meetupArten;
-    meetupIntervalDropdown.labelText = AppLocalizations.of(context).meetupWiederholung;
+        AppLocalizations.of(context)!.spracheAuswaehlen;
+    meetupArtDropdown.labelText =  AppLocalizations.of(context)!.meetupOeffentlichkeit;
+    meetupArtDropdown.hintText = AppLocalizations.of(context)!.meetupArten;
+    meetupIntervalDropdown.labelText = AppLocalizations.of(context)!.meetupWiederholung;
     meetupIntervalDropdown.hintText = isGerman
         ? global_var.meetupInterval.join(", ")
         : global_var.meetupIntervalEnglisch.join(", ");
-    ortAuswahlBox.hintText = AppLocalizations.of(context).stadtEingeben;
+    ortAuswahlBox.hintText = AppLocalizations.of(context)!.stadtEingeben;
 
     dateTimeBox(meetupDatum, meetupUhrzeit, dateTimeTyp) {
-      var dateString = AppLocalizations.of(context).datumAuswaehlen;
+      var dateString = AppLocalizations.of(context)!.datumAuswaehlen;
       if (meetupDatum != null) {
         var dateFormat = DateFormat('dd-MM-yyyy');
         var dateTime =
@@ -278,7 +274,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                     Text(
                       dateTimeTyp == "wann"
                           ? "Meetup start: "
-                          : AppLocalizations.of(context).meetupEnde,
+                          : AppLocalizations.of(context)!.meetupEnde,
                       style: const TextStyle(fontSize: 18),
                     ),
                     const SizedBox(width: 20),
@@ -292,9 +288,9 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                             lastDate: DateTime(DateTime.now().year + 1));
 
                         if (dateTimeTyp == "wann") {
-                          meetupWannDatum = pickedDate;
+                          meetupWannDatum = pickedDate!;
                         } else {
-                          meetupBisDatum = pickedDate;
+                          meetupBisDatum = pickedDate!;
                         }
 
                         setState(() {});
@@ -303,7 +299,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                     const SizedBox(width: 20),
                     ElevatedButton(
                       child: Text(meetupUhrzeit == null
-                          ? AppLocalizations.of(context).uhrzeitAuswaehlen
+                          ? AppLocalizations.of(context)!.uhrzeitAuswaehlen
                           : meetupUhrzeit.format(context)),
                       onPressed: () async {
                         var pickedTime = await showTimePicker(
@@ -312,9 +308,9 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                         );
 
                         if (dateTimeTyp == "wann") {
-                          meetupWannUhrzeit = pickedTime;
+                          meetupWannUhrzeit = pickedTime!;
                         } else {
-                          meetupBisUhrzeit = pickedTime;
+                          meetupBisUhrzeit = pickedTime!;
                         }
 
                         setState(() {});
@@ -332,7 +328,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       return Container(
         margin: const EdgeInsets.only(left: 15, right: 15),
         child: Row(children: [
-          Text(AppLocalizations.of(context).aktuellenOrtVerwenden),
+          Text(AppLocalizations.of(context)!.aktuellenOrtVerwenden),
           const Expanded(child: SizedBox.shrink()),
           Switch(value: chooseCurrentLocation, onChanged: (bool){
             if(bool){
@@ -358,7 +354,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     ortEingabeBox() {
       if (ortTypDropdown.selected == "online") {
         return customTextInput(
-            AppLocalizations.of(context).meetupLinkEingeben, meetupOrtKontroller,
+            AppLocalizations.of(context)!.meetupLinkEingeben, meetupOrtKontroller,
             validator: global_functions.checkValidatorEmpty(context));
       } else if (ortTypDropdown.selected == "offline") {
         return ortAuswahlBox;
@@ -378,7 +374,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
                         height: 500,
-                        title: AppLocalizations.of(context).informationMeetupArt,
+                        title: AppLocalizations.of(context)!.informationMeetupArt,
                         children: [
                           const SizedBox(height: 10),
                           Container(
@@ -392,7 +388,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                                   const SizedBox(width: 5),
                                   Expanded(
                                     child: Text(
-                                      AppLocalizations.of(context)
+                                      AppLocalizations.of(context)!
                                           .privatInformationText,
                                       maxLines: 10,
                                       overflow: TextOverflow.ellipsis,
@@ -409,14 +405,14 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                                   SizedBox(
                                       width: 70,
                                       child: Text(
-                                          AppLocalizations.of(context)
+                                          AppLocalizations.of(context)!
                                               .halbOeffentlich,
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold))),
                                   const SizedBox(width: 5),
                                   Expanded(
                                     child: Text(
-                                      AppLocalizations.of(context)
+                                      AppLocalizations.of(context)!
                                           .halbOeffentlichInformationText,
                                       maxLines: 10,
                                       overflow: TextOverflow.ellipsis,
@@ -430,13 +426,13 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                             child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(AppLocalizations.of(context).oeffentlich,
+                                  Text(AppLocalizations.of(context)!.oeffentlich,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold)),
                                   const SizedBox(width: 5),
                                   Expanded(
                                     child: Text(
-                                      AppLocalizations.of(context)
+                                      AppLocalizations.of(context)!
                                           .oeffentlichInformationText,
                                       maxLines: 10,
                                       overflow: TextOverflow.ellipsis,
@@ -456,7 +452,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
             Container(
                 padding: const EdgeInsets.only(left:10),
                 width: screenWidth * 0.75,
-                child: Text(AppLocalizations.of(context).frageErstellerMeetup,
+                child: Text(AppLocalizations.of(context)!.frageErstellerMeetup,
                     maxLines: 2, style: const TextStyle(fontSize: 18),)),
             const Expanded(
               child: SizedBox.shrink(),
@@ -465,7 +461,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                 value: ownMeetup,
                 onChanged: (value) {
                   setState(() {
-                    ownMeetup = value;
+                    ownMeetup = value!;
                   });
                 }),
           ],
@@ -475,7 +471,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).meetupErstellen,
+          title: AppLocalizations.of(context)!.meetupErstellen,
           buttons: [
             IconButton(
                 onPressed: () => saveMeetup(),
@@ -497,7 +493,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
             dateTimeBox(meetupWannDatum, meetupWannUhrzeit, "wann"),
             dateTimeBox(meetupBisDatum, meetupBisUhrzeit, "bis"),
             ownMeetupBox(),
-            customTextInput(AppLocalizations.of(context).meetupBeschreibung,
+            customTextInput(AppLocalizations.of(context)!.meetupBeschreibung,
                 meetupBeschreibungKontroller,
                 moreLines: 8, textInputAction: TextInputAction.newline),
             Center(child: NutzerrichtlinenAnzeigen(page: "create")),

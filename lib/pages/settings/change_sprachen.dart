@@ -10,11 +10,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeSprachenPage extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   final List selected;
   final bool isGerman;
 
-  ChangeSprachenPage({Key key, this.selected, this.isGerman})
+  ChangeSprachenPage({Key? key, required this.selected, required this.isGerman})
       : sprachenInputBox = CustomMultiTextForm(
             selected: selected,
             auswahlList: isGerman
@@ -26,7 +26,7 @@ class ChangeSprachenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    sprachenInputBox.hintText = AppLocalizations.of(context).spracheAuswaehlen;
+    sprachenInputBox.hintText = AppLocalizations.of(context)!.spracheAuswaehlen;
 
 
     save() {
@@ -47,7 +47,7 @@ class ChangeSprachenPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).spracheVeraendern,
+          title: AppLocalizations.of(context)!.spracheVeraendern,
       ),
       body: ListView(children: [
         sprachenInputBox,

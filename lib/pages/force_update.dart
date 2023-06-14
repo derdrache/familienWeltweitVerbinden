@@ -9,7 +9,7 @@ class ForceUpdatePage extends StatelessWidget {
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
-  ForceUpdatePage({Key key}) : super(key: key);
+  ForceUpdatePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class ForceUpdatePage extends StatelessWidget {
               child:
               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Image.asset('assets/WeltFlugzeug.png'),
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
                 Text(
                   spracheIstDeutsch
                       ? "Families worldwide hat wichtige Updates bekommen"

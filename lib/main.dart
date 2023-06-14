@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:familien_suche/pages/informationen/community/community_details.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,9 @@ import 'services/local_notification.dart';
 import 'auth/secrets.dart';
 
 refreshDataOnNotification(messageTyp) async{
+  Random random = new Random();
+  int randomNumber = random.nextInt(60);
+  await Future.delayed(Duration(seconds: randomNumber), (){});
   if (messageTyp == "chat") {
     refreshHiveChats();
   }else if (messageTyp == "event"){
@@ -63,7 +67,7 @@ setGeoData() async{
 }
 
 refreshHiveData() async {
-  String userId = FirebaseAuth.instance.currentUser?.uid;
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   await refreshHiveNewsPage();
   await refreshHiveCommunities();
@@ -103,27 +107,24 @@ void main() async {
   await setGeoData();
 
   refreshHiveData();
-
   runApp(MyApp());
 }
 
 String getDeviceType() {
-  final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+  final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
   return data.size.shortestSide < 550 ? 'phone' :'tablet';
 }
 
 class MyApp extends StatelessWidget {
-  String userId = FirebaseAuth.instance.currentUser?.uid;
-  BuildContext pageContext;
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
+  BuildContext? pageContext;
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
-  MyApp({Key key}) : super(key: key);
 
   _initialization() async {
     if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
-      userId = FirebaseAuth.instance.currentUser.uid;
+      userId = FirebaseAuth.instance.currentUser?.uid;
     }
 
     if (kIsWeb) return;
@@ -162,7 +163,7 @@ class MyApp extends StatelessWidget {
 
     _notificationsPlugin.initialize(initializationSettings,
         onSelectNotification: (payload) async {
-      final Map<String, dynamic> payLoadMap = json.decode(payload);
+      final Map<String, dynamic> payLoadMap = json.decode(payload!);
       notificationLeadPage(payLoadMap);
     });
 

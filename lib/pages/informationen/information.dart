@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -9,15 +10,16 @@ import '../../services/database.dart';
 
 class InformationPage extends StatefulWidget {
   var pageSelection;
-  InformationPage({Key key, this.pageSelection = 0}) : super(key: key);
+  InformationPage({Key? key, this.pageSelection = 0}) : super(key: key);
 
   @override
   State<InformationPage> createState() => _InformationPageState();
 }
 
 class _InformationPageState extends State<InformationPage> with WidgetsBindingObserver{
-  var pageList = [
-    "",
+  var userId = FirebaseAuth.instance.currentUser!.uid;
+  List<Widget> pageList = [
+    const SizedBox.shrink(),
     const MeetupPage(),
     const CommunityPage(),
     LocationPage(forCity: true,),
@@ -25,7 +27,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
   ];
 
   getNumberEventNotification(){
-    var eventNotification = 0;
+    num eventNotification = 0;
     var myMeetups = Hive.box('secureBox').get("myEvents") ?? [];
 
     for (var meetup in myMeetups) {
@@ -90,7 +92,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
           });
         },
         child: Container(
-          margin: EdgeInsets.only(left: 10, right: 10),
+          margin: const EdgeInsets.only(left: 10, right: 10),
           child: Card(
             elevation: 25,
             shadowColor: Colors.black,
@@ -123,7 +125,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
                       ),
                       child: Text(
                         title,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -148,56 +150,57 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
       ],);
     }
 
-
-    return widget.pageSelection == 0 ? Scaffold(
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                badgeCard(
+    return widget.pageSelection == 0
+        ? Scaffold(
+        body: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  badgeCard(
+                      pageCards(
+                          "Meetups",
+                          Icons.calendar_month,
+                          "assets/bilder/museum.jpg",
+                          1),
+                      getNumberEventNotification()
+                  ),
+                  SizedBox(width: cardAbstandWidth),
+                  badgeCard(
+                      pageCards(
+                          "Communities",
+                          Icons.home,
+                          "assets/bilder/village.jpg",
+                          2),
+                      getNumberCommunityNotification()
+                  )
+                ],
+              ),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   pageCards(
-                      "Meetups",
-                      Icons.calendar_month,
-                      "assets/bilder/museum.jpg",
-                      1),
-                    getNumberEventNotification()
-                ),
-                SizedBox(width: cardAbstandWidth),
-                badgeCard(
+                      AppLocalizations.of(context)!.cities,
+                      Icons.location_city,
+                      "assets/bilder/city.jpg",
+                      3),
+                  SizedBox(width: cardAbstandWidth),
                   pageCards(
-                      "Communities",
-                      Icons.home,
-                      "assets/bilder/village.jpg",
-                      2),
-                  getNumberCommunityNotification()
-                )
-              ],
-            ),
-            const SizedBox(height: 40),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                pageCards(
-                    AppLocalizations.of(context).cities,
-                    Icons.location_city,
-                    "assets/bilder/city.jpg",
-                    3),
-                SizedBox(width: cardAbstandWidth),
-                pageCards(
-                    AppLocalizations.of(context).countries,
-                    Icons.flag,
-                    "assets/bilder/land.jpg",
-                    4),
-              ],
-            ),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
-    ) : pageList[widget.pageSelection];
+                      AppLocalizations.of(context)!.countries,
+                      Icons.flag,
+                      "assets/bilder/land.jpg",
+                      4),
+                ],
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
+        )
+          )
+        : pageList[widget.pageSelection];
   }
 }

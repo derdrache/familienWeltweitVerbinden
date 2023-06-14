@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class LoadingButton extends StatelessWidget {
-  var color = Colors.white;
-  LoadingButton({Key key, this.color}) : super(key: key);
+  var color;
+  LoadingButton({Key? key, this.color = Colors.white}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

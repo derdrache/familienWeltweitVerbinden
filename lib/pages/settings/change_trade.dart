@@ -7,11 +7,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../widgets/custom_appbar.dart';
 
 class ChangeTradePage extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   final String oldText;
   TextEditingController textKontroller = TextEditingController();
 
-  ChangeTradePage({Key key, this.oldText}) : super(key: key);
+  ChangeTradePage({Key? key, required this.oldText}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +31,9 @@ class ChangeTradePage extends StatelessWidget {
 
       customSnackbar(
           context,
-          AppLocalizations.of(context).verkaufenTauschenSchenken +
+          AppLocalizations.of(context)!.verkaufenTauschenSchenken +
               " " +
-              AppLocalizations.of(context).erfolgreichGeaender,
+              AppLocalizations.of(context)!.erfolgreichGeaender,
           color: Colors.green);
 
       Navigator.pop(context);
@@ -41,19 +41,19 @@ class ChangeTradePage extends StatelessWidget {
 
     return Scaffold(
         appBar:
-            CustomAppBar(title: AppLocalizations.of(context).tradeVeraendern),
+            CustomAppBar(title: AppLocalizations.of(context)!.tradeVeraendern),
         body: Column(
           children: [
             customTextInput(
-                AppLocalizations.of(context).verkaufenTauschenSchenken,
+                AppLocalizations.of(context)!.verkaufenTauschenSchenken,
                 textKontroller,
                 moreLines: 15,
                 textInputAction: TextInputAction.newline,
-                hintText: AppLocalizations.of(context).tradeHintText),
+                hintText: AppLocalizations.of(context)!.tradeHintText),
             const SizedBox(height: 10),
             FloatingActionButton.extended(
                 label: Text(
-                  AppLocalizations.of(context).speichern,
+                  AppLocalizations.of(context)!.speichern,
                   style: const TextStyle(fontSize: 20),
                 ),
                 icon: const Icon(Icons.save),

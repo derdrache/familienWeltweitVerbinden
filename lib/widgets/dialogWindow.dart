@@ -4,19 +4,19 @@ import 'package:flutter/material.dart';
 import 'Window_topbar.dart';
 
 class CustomAlertDialog extends StatefulWidget {
-  var title = "";
-  List<Widget> children = [];
-  List<Widget> actions = [];
-  double height;
-  var backgroundColor = Colors.white;
+  String title;
+  List<Widget> children;
+  List<Widget>? actions;
+  double? height;
+  var backgroundColor;
 
   CustomAlertDialog(
-      {Key key,
-      this.title,
-      this.children,
+      {Key? key,
+      this.title = "",
+      required this.children,
       this.actions,
       this.height,
-      this.backgroundColor})
+      this.backgroundColor = Colors.white})
       : super(key: key);
 
   @override
@@ -35,7 +35,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20.0))),
       contentPadding: EdgeInsets.zero,
-      insetPadding: EdgeInsets.all(10),
+      insetPadding: const EdgeInsets.all(10),
       actions: widget.actions,
       content: SizedBox(
         height: widget.height,
@@ -58,7 +58,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
                           child: WindowTopbar(
                         title: widget.title,
                       )),
-                    if(widget.title.isNotEmpty) SizedBox(height: 10),
+                    if(widget.title.isNotEmpty) const SizedBox(height: 10),
                     const SizedBox(height: 10),
                     ...widget.children
                   ],

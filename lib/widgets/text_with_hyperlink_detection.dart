@@ -7,13 +7,13 @@ class TextWithHyperlinkDetection extends StatelessWidget {
   double fontsize;
   var hasLink = false;
   List<InlineSpan> textSpanList = [];
-  Function onTextTab;
+  Function? onTextTab;
   var hyperlinkColor = Colors.blue[700];
   var textColor = Colors.black;
   bool withoutActiveHyperLink;
 
   TextWithHyperlinkDetection(
-      {Key key, this.text, this.fontsize = 15, this.onTextTab, this.withoutActiveHyperLink = false})
+      {Key? key, required this.text, this.fontsize = 15, this.onTextTab, this.withoutActiveHyperLink = false})
       : super(key: key);
 
   @override
@@ -25,7 +25,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
     addNormalText(text){
       newTextList.add(TextSpan(
           text: text,
-          recognizer: TapGestureRecognizer()..onTap = onTextTab == null ? null :() => onTextTab(),
+          recognizer: TapGestureRecognizer()..onTap = onTextTab == null ? null :() => onTextTab!(),
           style: TextStyle(fontSize: fontsize, color: Colors.black,)
       ));
     }
@@ -36,7 +36,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       newTextList.add(TextSpan(
           text: text + " ",
           recognizer: TapGestureRecognizer()..onTap = withoutActiveHyperLink
-              ? () => onTextTab()
+              ? () => onTextTab!()
               : () => global_func.openURL(text.trim()),
           style: TextStyle(fontSize: fontsize, color: Colors.blue,)
       ));

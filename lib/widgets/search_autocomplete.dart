@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 class SearchAutocomplete extends StatefulWidget {
-  List searchableItems = [];
-  Function onConfirm;
+  List<String> searchableItems;
+  Function? onConfirm;
   String hintText;
-  Function onRemove;
+  Function? onRemove;
   var selected = "";
   final TextEditingController _textEditingController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
   SearchAutocomplete(
-      {Key key,
-      this.searchableItems,
+      {Key? key,
+      required this.searchableItems,
       this.onConfirm,
       this.onRemove,
       this.hintText = ""}) : super(key: key);
@@ -52,17 +52,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
       child: Stack(
         children: [
           RawAutocomplete(
-            textEditingController: widget._textEditingController,
-            focusNode: widget._focusNode,
-            optionsBuilder: (TextEditingValue textEditingValue) {
-              return textEditingValue.text.isNotEmpty ? widget.searchableItems.where((item) => item.toLowerCase()
-                  .contains(textEditingValue.text.toLowerCase())) : [];
-            },
-            optionsViewBuilder: (
-                BuildContext context,
-                AutocompleteOnSelected onSelected,
-                Iterable options
-                ) {
+            optionsViewBuilder: (BuildContext context, void Function(Object) onSelected, Iterable<Object> options) {
               return Align(
                 alignment: Alignment.topLeft,
                 child: Material(
@@ -70,22 +60,24 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                     width: MediaQuery.of(context).size.width - 21,
                     height: 300,
                     decoration: const BoxDecoration(
-                      border: Border(
-                          left: BorderSide(),
-                          right: BorderSide(),
-                        bottom: BorderSide()
-                      )
+                        border: Border(
+                            left: BorderSide(),
+                            right: BorderSide(),
+                            bottom: BorderSide()
+                        )
                     ),
                     child: ListView.builder(
                       padding: const EdgeInsets.all(10.0),
                       itemCount: options.length,
                       itemBuilder: (BuildContext context, int index) {
-                        final option = options.elementAt(index);
+                        final String option = options.elementAt(index) as String;
                         return GestureDetector(
                           onTap: () {
                             onSelected(option);
                             widget.selected = option;
-                            widget.onConfirm();
+                            if (widget.onConfirm != null){
+                              widget.onConfirm!();
+                            }
                           },
                           child: ListTile(
                             title: Text(option, style: const TextStyle(color: Colors.black)),
@@ -97,6 +89,10 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                 ),
               );
             },
+            optionsBuilder: (TextEditingValue textEditingValue) {
+              return textEditingValue.text.isNotEmpty ? widget.searchableItems.where((item) => item.toLowerCase()
+                  .contains(textEditingValue.text.toLowerCase())) : <String>[];
+            },
             fieldViewBuilder: (BuildContext context,
                 TextEditingController textEditingController,
                 FocusNode focusNode,
@@ -104,14 +100,14 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
               return TextFormField(
                 controller: textEditingController,
                 decoration: InputDecoration(
-                    hintText: widget.hintText,
+                  hintText: widget.hintText,
                   contentPadding: const EdgeInsets.all(10.0),
                 ),
                 focusNode: focusNode,
                 onChanged: (value){
                   if(value.isEmpty){
                     widget. selected = "";
-                    if(widget.onRemove != null) widget.onRemove();
+                    if(widget.onRemove != null) widget.onRemove!();
                   }
                   setState(() {
 
@@ -129,7 +125,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                 color: Colors.red,
                 onPressed: (){
                   widget.clearInput();
-                  widget.onRemove();
+                  if(widget.onRemove != null) widget.onRemove!();
                   setState(() {});
                 },
               ))

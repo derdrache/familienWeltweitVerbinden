@@ -10,12 +10,12 @@ import '../../global/variablen.dart' as global_variablen;
 import '../../widgets/custom_appbar.dart';
 
 class ChangeInteressenPage extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   List selected;
   var interessenInputBox;
   final bool isGerman;
 
-  ChangeInteressenPage({Key key, this.selected, this.isGerman})
+  ChangeInteressenPage({Key? key, required this.selected, required this.isGerman})
       : interessenInputBox = CustomMultiTextForm(
           auswahlList: isGerman
               ? global_variablen.interessenListe
@@ -25,7 +25,7 @@ class ChangeInteressenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    interessenInputBox.hintText = AppLocalizations.of(context).interessenAuswaehlen;
+    interessenInputBox.hintText = AppLocalizations.of(context)!.interessenAuswaehlen;
 
     save(){
       if (interessenInputBox.getSelected() == null ||
@@ -43,7 +43,7 @@ class ChangeInteressenPage extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).interessenVeraendern,
+          title: AppLocalizations.of(context)!.interessenVeraendern,
       ),
       body: ListView(
         children: [

@@ -8,22 +8,22 @@ import 'package:hive/hive.dart';
 class NewsPageSettingsPage extends StatefulWidget {
   Map settingsProfil;
 
-  NewsPageSettingsPage({Key key, this.settingsProfil}) : super(key: key);
+  NewsPageSettingsPage({Key? key, required this.settingsProfil}) : super(key: key);
 
   @override
   State<NewsPageSettingsPage> createState() => _NewsPageSettingsPageState();
 }
 
 class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
-  bool showFriendAdded;
-  bool showFriendChangedLocation;
-  bool showNewFamilyLocation;
-  bool showInterestingEvents;
-  bool showCityInformation;
-  bool showFriendTravelPlan;
-  double distance;
+  late bool showFriendAdded;
+  late bool showFriendChangedLocation;
+  late bool showNewFamilyLocation;
+  late bool showInterestingEvents;
+  late bool showCityInformation;
+  late bool showFriendTravelPlan;
+  late double distance;
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     _changeHiveOwnNewsPageSetting("showFriendAdded", intValue);
                   }),
               const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).newsSettingFriendAdd)
+              Text(AppLocalizations.of(context)!.newsSettingFriendAdd)
             ],
           ));
     }
@@ -93,7 +93,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                   }),
               const SizedBox(width: 10),
               Text(
-                  AppLocalizations.of(context).newsSettingFriendLocationChanged)
+                  AppLocalizations.of(context)!.newsSettingFriendLocationChanged)
             ],
           ));
     }
@@ -126,10 +126,10 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                         _changeHiveOwnNewsPageSetting("showNewFamilyLocation", intValue);
                       }),
                   const SizedBox(width: 10),
-                  Text(AppLocalizations.of(context).newsSettingNewFamilieLocation)
+                  Text(AppLocalizations.of(context)!.newsSettingNewFamilieLocation)
                 ],
               ),
-              if(showNewFamilyLocation) Text("${distance.round()} km ${AppLocalizations.of(context).umkreis}"),
+              if(showNewFamilyLocation) Text("${distance.round()} km ${AppLocalizations.of(context)!.umkreis}"),
               if(showNewFamilyLocation) Slider(
                 value: distance,
                 min: 5,
@@ -179,7 +179,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     _changeHiveOwnNewsPageSetting("showFriendTravelPlan", intValue);
                   }),
               const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).newsSettingShowTravelPlan)
+              Text(AppLocalizations.of(context)!.newsSettingShowTravelPlan)
             ],
           ));
     }
@@ -204,7 +204,7 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     _changeHiveOwnNewsPageSetting("showInterestingEvents", intValue);
                   }),
               const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).newsSettingShowMeetup)
+              Text(AppLocalizations.of(context)!.newsSettingShowMeetup)
             ],
           ));
     }
@@ -229,14 +229,14 @@ class _NewsPageSettingsPageState extends State<NewsPageSettingsPage> {
                     _changeHiveOwnNewsPageSetting("showCityInformation", intValue);
                   }),
               const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).newsSettingShowCityInformation)
+              Text(AppLocalizations.of(context)!.newsSettingShowCityInformation)
             ],
           ));
     }
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: AppLocalizations.of(context).newsSettingTitle,
+        title: AppLocalizations.of(context)!.newsSettingTitle,
       ),
       body: Container(
         margin: const EdgeInsets.all(20),

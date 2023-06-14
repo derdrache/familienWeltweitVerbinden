@@ -5,9 +5,9 @@ import 'package:intl/intl.dart';
 
 class MonthPickerBox extends StatefulWidget {
   String hintText;
-  DateTime selectedDate;
+  DateTime? selectedDate;
 
-  MonthPickerBox({Key key, this.hintText}) : super(key: key);
+  MonthPickerBox({Key? key, this.hintText = ""}) : super(key: key);
 
   getDate() {
     return selectedDate;
@@ -25,9 +25,9 @@ class _MonthPickerBoxState extends State<MonthPickerBox> {
   createText() {
     if (widget.selectedDate == null) return widget.hintText;
 
-    return widget.selectedDate.month.toString() +
+    return widget.selectedDate!.month.toString() +
         "." +
-        widget.selectedDate.year.toString();
+        widget.selectedDate!.year.toString();
   }
 
   @override
@@ -60,18 +60,18 @@ class _MonthPickerBoxState extends State<MonthPickerBox> {
   }
 }
 
-Future<DateTime> showMonthPicker({
-  @required BuildContext context,
-  @required DateTime initialDate,
-  DateTime firstDate,
-  DateTime lastDate,
+Future<DateTime?> showMonthPicker({
+  BuildContext? context,
+  DateTime? initialDate,
+  required DateTime firstDate,
+  required DateTime lastDate,
 }) async {
   assert(context != null);
   assert(initialDate != null);
   return await showDialog<DateTime>(
-      context: context,
+      context: context!,
       builder: (context) => _MonthPickerDialog(
-            initialDate: initialDate,
+            initialDate: initialDate!,
             firstDate: firstDate,
             lastDate: lastDate,
           ));
@@ -81,10 +81,10 @@ class _MonthPickerDialog extends StatefulWidget {
   final DateTime initialDate, firstDate, lastDate;
 
   const _MonthPickerDialog({
-    Key key,
-    this.initialDate,
-    this.firstDate,
-    this.lastDate,
+    Key? key,
+    required this.initialDate,
+    required this.firstDate,
+    required this.lastDate,
   }) : super(key: key);
 
   @override
@@ -92,13 +92,13 @@ class _MonthPickerDialog extends StatefulWidget {
 }
 
 class _MonthPickerDialogState extends State<_MonthPickerDialog> {
-  PageController pageController;
-  DateTime selectedDate;
-  int displayedPage;
+  late PageController pageController;
+  late DateTime selectedDate;
+  late int displayedPage;
   bool isYearSelection = false;
 
-  DateTime _firstDate;
-  DateTime _lastDate;
+  DateTime? _firstDate;
+  DateTime? _lastDate;
 
   @override
   void initState() {
@@ -107,12 +107,8 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
 
     super.initState();
     selectedDate = DateTime(widget.initialDate.year, widget.initialDate.month);
-    if (widget.firstDate != null) {
-      _firstDate = DateTime(widget.firstDate.year, widget.firstDate.month);
-    }
-    if (widget.lastDate != null) {
-      _lastDate = DateTime(widget.lastDate.year, widget.lastDate.month);
-    }
+    _firstDate = DateTime(widget.firstDate.year, widget.firstDate.month);
+    _lastDate = DateTime(widget.lastDate.year, widget.lastDate.month);
     displayedPage = selectedDate.year;
     pageController = PageController(initialPage: displayedPage);
   }
@@ -190,7 +186,7 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
                 children: <Widget>[
                   Text(
                     DateFormat.yMMM(locale).format(selectedDate),
-                    style: theme.primaryTextTheme.subtitle1,
+                    style: theme.primaryTextTheme.titleMedium,
                   ),
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -205,7 +201,7 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
                             },
                             child: Text(
                               DateFormat.y(locale).format(DateTime(displayedPage)),
-                              style: theme.primaryTextTheme.headline2,
+                              style: theme.primaryTextTheme.displayMedium,
                             ),
                           ),
                         if (isYearSelection)
@@ -215,15 +211,15 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
                               children: <Widget>[
                                 Text(
                                   DateFormat.y(locale).format(DateTime(displayedPage)),
-                                  style: theme.primaryTextTheme.headline4,
+                                  style: theme.primaryTextTheme.headlineMedium,
                                 ),
                                 Text(
                                   '-',
-                                  style: theme.primaryTextTheme.headline3,
+                                  style: theme.primaryTextTheme.displaySmall,
                                 ),
                                 Text(
                                   DateFormat.y(locale).format(DateTime(displayedPage + 11)),
-                                  style: theme.primaryTextTheme.headline4,
+                                  style: theme.primaryTextTheme.headlineMedium,
                                 )
                               ]),
                         Row(children: <Widget>[
@@ -309,24 +305,20 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
     if (_firstDate == null && _lastDate == null) {
       callback =
           () => setState(() => selectedDate = DateTime(date.year, date.month));
-    } else if (_firstDate != null &&
-        _lastDate != null &&
-        _firstDate.compareTo(date) <= 0 &&
-        _lastDate.compareTo(date) >= 0) {
+    } else if (_firstDate!.compareTo(date) <= 0 &&
+        _lastDate!.compareTo(date) >= 0) {
       callback =
           () => setState(() => selectedDate = DateTime(date.year, date.month));
-    } else if (_firstDate != null &&
-        _lastDate == null &&
-        _firstDate.compareTo(date) <= 0) {
+    } else if (_lastDate == null &&
+        _firstDate!.compareTo(date) <= 0) {
       callback =
           () => setState(() => selectedDate = DateTime(date.year, date.month));
     } else if (_firstDate == null &&
-        _lastDate != null &&
-        _lastDate.compareTo(date) >= 0) {
+        _lastDate!.compareTo(date) >= 0) {
       callback =
           () => setState(() => selectedDate = DateTime(date.year, date.month));
     } else {
-      callback = () => null;
+      callback = () {};
     }
     return TextButton(
       onPressed: callback,

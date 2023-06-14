@@ -17,7 +17,7 @@ class CustomDatePicker extends StatefulWidget {
   }
 
   CustomDatePicker({
-    Key key,
+    Key? key,
     this.hintText,
     this.datePicker,
     this.deleteFunction,
@@ -123,7 +123,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
     });
   }
 
-  ChildrenBirthdatePickerBox({Key key, hintText}) : super(key: key);
+  ChildrenBirthdatePickerBox({Key? key, hintText}) : super(key: key);
 
   @override
   _ChildrenBirthdatePickerBoxState createState() => _ChildrenBirthdatePickerBoxState();

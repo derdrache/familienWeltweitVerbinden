@@ -11,9 +11,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   var profilBildProfil;
   var withLeading;
   var backgroundColor;
+  double? fontSize;
 
   CustomAppBar(
-      {Key key,
+      {Key? key,
       this.title,
       this.buttons,
       this.elevation = 4.0,
@@ -21,7 +22,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.onTap,
       this.leading,
       this.profilBildProfil,
-      this.backgroundColor
+      this.backgroundColor,
+      this.fontSize
       })
       : super(key: key);
 
@@ -71,7 +73,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     behavior: HitTestBehavior.opaque,
                     child: Text(title,
                         style:
-                            const TextStyle(color: Colors.white, fontSize: 26)),
+                            TextStyle(color: Colors.white, fontSize: fontSize ?? 26)),
                   ),
                 )
               ]),

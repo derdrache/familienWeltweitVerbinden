@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 
-Future<DateTime> showYearPicker({
-  BuildContext context,
-  DateTime initialDate,
-  DateTime firstDate,
-  DateTime lastDate,
+Future<DateTime?> showYearPicker({
+  BuildContext? context,
+  DateTime? initialDate,
+  DateTime? firstDate,
+  DateTime? lastDate,
 }) async {
   assert(context != null);
   assert(initialDate != null);
   return await showDialog<DateTime>(
-      context: context,
+      context: context!,
       builder: (context) => _YearPickerDialog(
-        initialDate: initialDate,
+        initialDate: initialDate!,
         firstDate: firstDate,
         lastDate: lastDate,
       )
@@ -23,11 +23,12 @@ Future<DateTime> showYearPicker({
 }
 
 class _YearPickerDialog extends StatefulWidget {
-  final DateTime initialDate, firstDate, lastDate;
+  final DateTime initialDate;
+  final DateTime? firstDate, lastDate;
 
   const _YearPickerDialog({
-    Key key,
-    this.initialDate,
+    Key? key,
+    required this.initialDate,
     this.firstDate,
     this.lastDate,
   }) : super(key: key);
@@ -37,9 +38,9 @@ class _YearPickerDialog extends StatefulWidget {
 }
 
 class _YearPickerDialogState extends State<_YearPickerDialog> {
-  PageController pageController;
-  DateTime selectedDate;
-  int displayedPage;
+  late PageController pageController;
+  late DateTime selectedDate;
+  late int displayedPage;
   bool isYearSelection = false;
 
   var _firstDate;
@@ -47,15 +48,17 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
 
   @override
   void initState() {
-    _firstDate = DateTime(widget.firstDate.year, 1);
-    _lastDate = DateTime(widget.lastDate.year, 1);
+    _firstDate = DateTime(widget.firstDate!.year, 1);
+    _lastDate = DateTime(widget.lastDate!.year, 1);
 
     super.initState();
     selectedDate = DateTime(widget.initialDate.year, widget.initialDate.month);
-    if (widget.firstDate != null)
-      _firstDate = DateTime(widget.firstDate.year, widget.firstDate.month);
-    if (widget.lastDate != null)
-      _lastDate = DateTime(widget.lastDate.year, widget.lastDate.month);
+    if (widget.firstDate != null) {
+      _firstDate = DateTime(widget.firstDate!.year, widget.firstDate!.month);
+    }
+    if (widget.lastDate != null) {
+      _lastDate = DateTime(widget.lastDate!.year, widget.lastDate!.month);
+    }
     displayedPage = selectedDate.year - 11;
     pageController = PageController(initialPage: displayedPage);
   }
@@ -133,7 +136,7 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
                   Text(
                     //'${DateFormat.yMMM(locale).format(selectedDate)}',
                     '',
-                    style: theme.primaryTextTheme.subtitle1,
+                    style: theme.primaryTextTheme.titleMedium,
                   ),
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -147,8 +150,8 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
                               //pageController.jumpToPage(displayedPage ~/ 12);
                             },
                             child: Text(
-                              '${DateFormat.y(locale).format(selectedDate)}',
-                              style: theme.primaryTextTheme.headline2,
+                              DateFormat.y(locale).format(selectedDate),
+                              style: theme.primaryTextTheme.displayMedium,
                             ),
                           ),
                         if (isYearSelection)
@@ -157,16 +160,16 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  '${DateFormat.y(locale).format(DateTime(displayedPage))}',
-                                  style: theme.primaryTextTheme.headline4,
+                                  DateFormat.y(locale).format(DateTime(displayedPage)),
+                                  style: theme.primaryTextTheme.headlineMedium,
                                 ),
                                 Text(
                                   '-',
-                                  style: theme.primaryTextTheme.headline3,
+                                  style: theme.primaryTextTheme.displaySmall,
                                 ),
                                 Text(
-                                  '${DateFormat.y(locale).format(DateTime(displayedPage+11))}',
-                                  style: theme.primaryTextTheme.headline4,
+                                  DateFormat.y(locale).format(DateTime(displayedPage+11)),
+                                  style: theme.primaryTextTheme.headlineMedium,
                                 )
 
                               ]),
@@ -178,7 +181,7 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
                             ),
                             onPressed: () => pageController.animateToPage(
                                 displayedPage -22,
-                                duration: Duration(milliseconds: 10),
+                                duration: const Duration(milliseconds: 10),
                                 curve: Curves.easeInOut),
                           ),
                           IconButton(
@@ -188,7 +191,7 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
                             ),
                             onPressed: () => pageController.animateToPage(
                                 displayedPage + 11,
-                                duration: Duration(milliseconds: 10),
+                                duration: const Duration(milliseconds: 10),
                                 curve: Curves.easeInOut),
                           )
                         ])
@@ -202,7 +205,7 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
         width: 300.0,
         child: Theme(
             data: theme.copyWith(
-              buttonTheme: ButtonThemeData(
+              buttonTheme: const ButtonThemeData(
                 padding: EdgeInsets.all(2.0),
                 shape: CircleBorder(),
                 minWidth: 4.0,
@@ -218,13 +221,13 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
                 },
                 itemBuilder: (context, page) {
                   return GridView.count(
-                    padding: EdgeInsets.all(8.0),
-                    physics: NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(8.0),
+                    physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: 4,
                     children: List<int>.generate(12, (i) => page + i)
                         .map(
                           (year) => Padding(
-                        padding: EdgeInsets.all(4.0),
+                        padding: const EdgeInsets.all(4.0),
                         child: _getYearButton(year, theme, locale),
                       ),
                     ).toList()
@@ -235,26 +238,27 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
   Widget _getMonthButton(
       final DateTime date, final ThemeData theme, final String locale) {
     VoidCallback callback;
-    if (_firstDate == null && _lastDate == null)
+    if (_firstDate == null && _lastDate == null) {
       callback =
           () => setState(() => selectedDate = DateTime(date.year, date.month));
-    else if (_firstDate != null &&
+    } else if (_firstDate != null &&
         _lastDate != null &&
         _firstDate.compareTo(date) <= 0 &&
-        _lastDate.compareTo(date) >= 0)
+        _lastDate.compareTo(date) >= 0) {
       callback =
           () => setState(() => selectedDate = DateTime(date.year, date.month));
-    else if (_firstDate != null &&
+    } else if (_firstDate != null &&
         _lastDate == null &&
-        _firstDate.compareTo(date) <= 0)
+        _firstDate.compareTo(date) <= 0) {
       callback =
           () => setState(() => selectedDate = DateTime(date.year, date.month));
-    else if (_firstDate == null && _lastDate != null &&
-        _lastDate.compareTo(date) >= 0)
+    } else if (_firstDate == null && _lastDate != null &&
+        _lastDate.compareTo(date) >= 0) {
       callback = () => setState(() =>
           selectedDate = DateTime(date.year, date.month));
-    else
-      callback = () => null;
+    } else {
+      callback = () {};
+    }
     return TextButton(
       onPressed: callback,
       style: TextButton.styleFrom(
@@ -265,7 +269,7 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
       child: Text(
         DateFormat.MMM(locale).format(date),
         style: TextStyle(color: date.month == selectedDate.month && date.year == selectedDate.year
-            ? theme.accentTextTheme.button.color
+            ? theme.colorScheme.primary
             : date.month == DateTime.now().month &&
             date.year == DateTime.now().year
             ? theme.colorScheme.secondary
@@ -277,26 +281,27 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
   Widget _getYearButton(int year, ThemeData theme, String locale) {
     VoidCallback callback;
     var dateTimeYear = DateTime(year, 1);
-    if (_firstDate == null && _lastDate == null)
+    if (_firstDate == null && _lastDate == null) {
       callback =
           () => setState(() => selectedDate = DateTime(year, 1));
-    else if (_firstDate != null &&
+    } else if (_firstDate != null &&
         _lastDate != null &&
         _firstDate.compareTo(dateTimeYear) <= 0 &&
-        _lastDate.compareTo(dateTimeYear) >= 0)
+        _lastDate.compareTo(dateTimeYear) >= 0) {
       callback =
           () => setState(() => selectedDate = DateTime(year, 1));
-    else if (_firstDate != null &&
+    } else if (_firstDate != null &&
         _lastDate == null &&
-        _firstDate.compareTo(dateTimeYear) <= 0)
+        _firstDate.compareTo(dateTimeYear) <= 0) {
       callback =
           () => setState(() => selectedDate = DateTime(year, 1));
-    else if (_firstDate == null && _lastDate != null &&
-        _lastDate.compareTo(dateTimeYear) >= 0)
+    } else if (_firstDate == null && _lastDate != null &&
+        _lastDate.compareTo(dateTimeYear) >= 0) {
       callback = () => setState(() =>
       selectedDate = DateTime(year, 1));
-    else
-      callback = () => null;
+    } else {
+      callback = () {};
+    }
 
     return TextButton(
       onPressed: callback,

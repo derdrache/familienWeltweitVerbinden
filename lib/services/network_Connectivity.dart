@@ -37,7 +37,7 @@ class NetworkConnectivity {
       _internetStatus = newInternetStatus;
 
       if(connectionText.contains("Offline")){
-        customSnackbar(context, AppLocalizations.of(context).keineVerbindungInternet,
+        customSnackbar(context, AppLocalizations.of(context)!.keineVerbindungInternet,
             duration: const Duration(days: 365));
       } else {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();

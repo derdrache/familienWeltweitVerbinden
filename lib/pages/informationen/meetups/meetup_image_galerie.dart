@@ -15,7 +15,7 @@ class MeetupImageGalerie extends StatefulWidget {
   var meetupData;
   var child;
 
-  MeetupImageGalerie({Key key, this.child, this.isCreator, this.meetupData})
+  MeetupImageGalerie({Key? key, this.child, this.isCreator, this.meetupData})
       : super(key: key);
 
   @override
@@ -26,7 +26,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
   var isWebDesktop = kIsWeb &&
       (defaultTargetPlatform != TargetPlatform.iOS ||
           defaultTargetPlatform != TargetPlatform.android);
-  double fontsize;
+  double? fontsize;
   List<Widget> allImages = [];
   var ownPictureKontroller = TextEditingController();
   var selectedImage = "";
@@ -60,7 +60,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     var oldImage = widget.meetupData["bild"];
 
     if (selectedImage == "" && ownPictureKontroller.text == "") {
-      customSnackbar(context, AppLocalizations.of(context).bitteBildAussuchen);
+      customSnackbar(context, AppLocalizations.of(context)!.bitteBildAussuchen);
       return;
     }
 
@@ -122,7 +122,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       return SizedBox(
           width: 200,
           child: customTextInput(
-              AppLocalizations.of(context).eigenesBildLinkEingeben,
+              AppLocalizations.of(context)!.eigenesBildLinkEingeben,
               ownPictureKontroller, onSubmit: () {
             allImages.add(Image.network(ownPictureKontroller.text,
                 fit: BoxFit.fill, width: 80, height: 60));
@@ -137,12 +137,12 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
         margin: const EdgeInsets.only(right: 10),
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           TextButton(
-            child: Text(AppLocalizations.of(context).abbrechen,
+            child: Text(AppLocalizations.of(context)!.abbrechen,
                 style: TextStyle(fontSize: fontsize)),
             onPressed: () => Navigator.pop(context),
           ),
           TextButton(
-              child: Text(AppLocalizations.of(context).speichern,
+              child: Text(AppLocalizations.of(context)!.speichern,
                   style: TextStyle(fontSize: fontsize)),
               onPressed: () {
                 saveChanges();
@@ -159,7 +159,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
             return StatefulBuilder(builder: (context, setState) {
               windowSetState = setState;
               return CustomAlertDialog(
-                title: AppLocalizations.of(context).meetupBildAendern,
+                title: AppLocalizations.of(context)!.meetupBildAendern,
                 children: [
                   showImages(),
                   const SizedBox(height: 20),
@@ -175,7 +175,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).meetupBildAendern,
+              title: AppLocalizations.of(context)!.meetupBildAendern,
               children: [
                 ownLinkInput(),
                 const SizedBox(height: 20),
@@ -186,7 +186,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     }
 
     _showChangeImagePopupMenu(tabPosition) async {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
 
       await showMenu(
         context: context,
@@ -196,20 +196,20 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
             ),
         items: [
           PopupMenuItem(
-              child: Text(AppLocalizations.of(context).bilderauswahl),
+              child: Text(AppLocalizations.of(context)!.bilderauswahl),
               onTap: () {
                 Future.delayed(const Duration(seconds: 0),
                     () => windowChangeImageToPredetermined());
               }),
           PopupMenuItem(
-            child: Text(AppLocalizations.of(context).link),
+            child: Text(AppLocalizations.of(context)!.link),
             onTap: () {
               Future.delayed(const Duration(seconds: 0),
                   () => windowChangeImageWithLink());
             },
           ),
           PopupMenuItem(
-              child: Text(AppLocalizations.of(context).hochladen),
+              child: Text(AppLocalizations.of(context)!.hochladen),
               onTap: () async {
                 var newImage = await uploadAndSaveImage(context, "meetup",
                     meetupCommunityData: widget.meetupData);
@@ -238,7 +238,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                         height: 80,
                         child: const CircularProgressIndicator()),
                     Center(
-                        child: Text(AppLocalizations.of(context).bildLadezeit))
+                        child: Text(AppLocalizations.of(context)!.bildLadezeit))
                   ],
                 ))
               : ClipRRect(

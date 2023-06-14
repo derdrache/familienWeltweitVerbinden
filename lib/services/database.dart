@@ -38,12 +38,13 @@ class ProfilDatabase {
       "sprachen": json.encode(profilData["sprachen"]),
       "token": profilData["token"],
       "lastLogin": profilData["lastLogin"],
-      "aboutme": profilData["aboutme"]
+      "aboutme": profilData["aboutme"],
+      "besuchteLaender": json.encode(profilData["besuchteLaender"]),
     };
 
     await http.post(url, body: json.encode(data));
 
-    FirebaseAuth.instance.currentUser.updateDisplayName(profilData["name"]);
+    FirebaseAuth.instance.currentUser?.updateDisplayName(profilData["name"]);
   }
 
   updateProfil(whatData, queryEnd) async {
@@ -91,7 +92,7 @@ class ProfilDatabase {
   }
 
   updateProfilName(userId, newName) async {
-    FirebaseAuth.instance.currentUser.updateDisplayName(newName);
+    FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
 
     updateProfil("name = '$newName'", "WHERE id = '$userId'");
   }
@@ -117,7 +118,7 @@ class ProfilDatabase {
 
     _deleteInTable("profils", "id", userId);
     _deleteInTable("newsSettings", "id", userId);
-    _deleteInTable("news_page", "id", userId);
+    _deleteInTable("news_page", "erstelltVon", userId);
 
     updateProfil(
         "friendlist = JSON_REMOVE(friendlist, JSON_UNQUOTE(JSON_SEARCH(friendlist, 'one', '$userId')))",
@@ -164,10 +165,10 @@ class ProfilDatabase {
         "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId')"
     );
 
-    if(userId == FirebaseAuth.instance.currentUser.uid){
+    if(userId == FirebaseAuth.instance.currentUser?.uid){
       Hive.box("secureBox").deleteFromDisk();
       try {
-        await FirebaseAuth.instance.currentUser.delete();
+        await FirebaseAuth.instance.currentUser!.delete();
       } catch (_) {
         return false;
       }
@@ -179,7 +180,7 @@ class ProfilDatabase {
 
 class ChatDatabase {
   addNewChatGroup(chatPartner) {
-    var userId = FirebaseAuth.instance.currentUser.uid;
+    var userId = FirebaseAuth.instance.currentUser?.uid;
     var userKeysList = [userId, chatPartner];
     var chatID = global_functions.getChatID(chatPartner);
     var date = DateTime.now().millisecondsSinceEpoch;
@@ -537,7 +538,7 @@ class ChatGroupsDatabase {
   }
 
   joinAndCreateCityChat(cityName) async {
-    var userId = FirebaseAuth.instance.currentUser.uid;
+    var userId = FirebaseAuth.instance.currentUser?.uid;
     var isNewChat = false;
 
     var city = getCityFromHive(cityName: cityName);
@@ -1049,14 +1050,14 @@ class NewsPageDatabase {
 
     var url = Uri.parse(databaseUrl + databasePathNewNews);
     news["erstelltAm"] = DateTime.now().toString();
-    news["erstelltVon"] = FirebaseAuth.instance.currentUser.uid;
+    news["erstelltVon"] = FirebaseAuth.instance.currentUser?.uid;
 
     await http.post(url, body: json.encode(news));
     return true;
   }
 
   _checkIfInDatabase(newNews) async {
-    var userId = FirebaseAuth.instance.currentUser.uid;
+    var userId = FirebaseAuth.instance.currentUser?.uid;
     var allMyNews = await getData("*", "WHERE erstelltVon = '$userId'", returnList: true);
     if (allMyNews == false) allMyNews = [];
 
@@ -1144,7 +1145,7 @@ class NewsPageDatabase {
 class NewsSettingsDatabase {
   newProfil() async {
     var url = Uri.parse(databaseUrl + databasePathNewNewsProfil);
-    var userId = FirebaseAuth.instance.currentUser.uid;
+    var userId = FirebaseAuth.instance.currentUser?.uid;
 
     await http.post(url, body: json.encode({"userId": userId}));
   }
@@ -1209,7 +1210,7 @@ class NewsSettingsDatabase {
 class NotizDatabase{
   newNotize() async {
     var url = Uri.parse(databaseUrl + databasePathNewNotize);
-    var userId = FirebaseAuth.instance.currentUser.uid;
+    var userId = FirebaseAuth.instance.currentUser?.uid;
 
     await http.post(url, body: json.encode({"id": userId}));
   }
@@ -1371,7 +1372,7 @@ getProfilFromHive(
 }
 
 getAllProfilNames() {
-  var allNames = [];
+  List<String> allNames = [];
 
   var allProfils = Hive.box('secureBox').get("profils");
   for (var profil in allProfils) {
@@ -1516,7 +1517,7 @@ refreshHiveAllgemein() async {
 }
 
 refreshHiveChats() async {
-  String userId = FirebaseAuth.instance.currentUser?.uid;
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
 
   var myChatData = await ChatDatabase().getChatData(
       "*", "WHERE id like '%$userId%' ORDER BY lastMessageDate DESC",

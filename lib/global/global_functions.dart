@@ -19,7 +19,7 @@ double calculateDistance(lat1, lon1, lat2, lon2){
 checkValidatorEmpty(context) {
   return (value){
     if(value == null || value.isEmpty){
-      return AppLocalizations.of(context).diesesFeldAusfuellen;
+      return AppLocalizations.of(context)!.diesesFeldAusfuellen;
     }
     return null;
   };
@@ -33,11 +33,11 @@ checkValidationEmail(context, {emailCheck = ""}){
     if(emailHasAT) emailHasEnd = value.split("@")[1].contains(".");
 
     if(value == null || value.isEmpty){
-      return AppLocalizations.of(context).emailEingeben;
+      return AppLocalizations.of(context)!.emailEingeben;
     } else if(!emailHasAT || !emailHasEnd){
-      return AppLocalizations.of(context).gueltigeEmailEingeben;
+      return AppLocalizations.of(context)!.gueltigeEmailEingeben;
     } else if(emailCheck!= "" && value != emailCheck){
-      return AppLocalizations.of(context).emailStimmtNichtUeberein;
+      return AppLocalizations.of(context)!.emailStimmtNichtUeberein;
     }
   };
 }
@@ -45,9 +45,9 @@ checkValidationEmail(context, {emailCheck = ""}){
 checkValidatorPassword(context, {passwordCheck = ""}){
  return (value){
    if(value == null || value.isEmpty){
-     return AppLocalizations.of(context).passwortEingeben;
+     return AppLocalizations.of(context)!.passwortEingeben;
    } else if(passwordCheck!= "" && value != passwordCheck){
-     return AppLocalizations.of(context).passwortStimmtNichtUeberein;
+     return AppLocalizations.of(context)!.passwortStimmtNichtUeberein;
    }
    return null;
  };
@@ -56,7 +56,7 @@ checkValidatorPassword(context, {passwordCheck = ""}){
 checkValidationMultiTextForm(context){
   return (value){
     if(value == null || value.isEmpty){
-      return AppLocalizations.of(context).ausfuellen;
+      return AppLocalizations.of(context)!.ausfuellen;
     }
     return null;
   };
@@ -104,7 +104,7 @@ class ChangeTimeStamp{
 
 
 getChatID(chatPartnerId){
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser?.uid;
   var users = [userId, chatPartnerId];
   var sortedList = users.toList(growable: false)..sort();
   return sortedList.join("_");
@@ -254,7 +254,7 @@ String sanitizeString(String url) {
 
 changeImageSize(pickedImage) async {
   var imageByte = image_pack.decodeImage(await pickedImage.readAsBytes());
-  var originalWidth = imageByte.width;
+  var originalWidth = imageByte!.width;
   var originalHeight = imageByte.height;
   var minPixel = 400;
   var newWidth = 0;

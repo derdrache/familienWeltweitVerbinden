@@ -22,25 +22,24 @@ import '../widgets/profil_image.dart';
 import '../widgets/text_with_hyperlink_detection.dart';
 import 'informationen/location/location_Information.dart';
 
-var userId = FirebaseAuth.instance.currentUser.uid;
+var userId = FirebaseAuth.instance.currentUser?.uid;
 double columnSpacing = 15;
 double textSize = 16;
 double headlineTextSize = 18;
 
 // ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
-  String userName;
   Map profil;
 
-  ShowProfilPage({Key key, this.userName, this.profil}) : super(key: key);
+  ShowProfilPage({Key? key, required this.profil}) : super(key: key);
 
   @override
   _ShowProfilPageState createState() => _ShowProfilPageState();
 }
 
 class _ShowProfilPageState extends State<ShowProfilPage> {
-  Map profil;
-  Map familyProfil;
+  late Map profil;
+  late Map? familyProfil;
 
   @override
   void initState() {
@@ -58,17 +57,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     familyProfil = getFamilyProfil(familyMember: profil["id"]);
 
     if (familyProfil == null
-        || familyProfil["active"] == 0
-        || familyProfil["mainProfil"].isEmpty
-        || familyProfil["name"].isEmpty) {
+        || familyProfil!["active"] == 0
+        || familyProfil!["mainProfil"].isEmpty
+        || familyProfil!["name"].isEmpty) {
       familyProfil = null;
       return;
     }
 
-    var familyName = familyProfil["name"];
-    var mainMemberProfil = Map.of(getProfilFromHive(profilId: familyProfil["mainProfil"]));
+    var familyName = familyProfil!["name"];
+    var mainMemberProfil = Map.of(getProfilFromHive(profilId: familyProfil!["mainProfil"]));
     mainMemberProfil["name"] =
-        (spracheIstDeutsch ? "Familie" : "Family") + " " + familyName;
+        "${spracheIstDeutsch ? "Familie" : "Family"} " + familyName;
     profil = mainMemberProfil;
   }
 
@@ -103,9 +102,9 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
 class _AppBar extends StatefulWidget implements PreferredSizeWidget {
   final Map profil;
-  final Map familyProfil;
+  final Map? familyProfil;
 
-  const _AppBar({Key key, this.profil, this.familyProfil}) : super(key: key);
+  const _AppBar({Key? key, required this.profil, this.familyProfil}) : super(key: key);
 
   @override
   State<_AppBar> createState() => _AppBarState();
@@ -117,13 +116,13 @@ class _AppBar extends StatefulWidget implements PreferredSizeWidget {
 class _AppBarState extends State<_AppBar> {
   var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
   var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
-  String _userName;
-  bool _isOwnProfil;
+  late String _userName;
+  late bool _isOwnProfil;
 
   @override
   void initState(){
     bool isFmailyMember = widget.familyProfil != null
-        && widget.familyProfil["members"].contains(userId);
+        && widget.familyProfil!["members"].contains(userId);
     _isOwnProfil = widget.profil["id"] == userId || isFmailyMember;
     _userName = widget.profil["name"];
 
@@ -182,19 +181,19 @@ class _AppBarState extends State<_AppBar> {
               var userNotiz = notizen[widget.profil["id"]];
 
               return CustomAlertDialog(
-                  title: AppLocalizations.of(context).notizeUeber + _userName,
+                  title: AppLocalizations.of(context)!.notizeUeber + _userName,
                   children: [
                     if(userNotiz == null || changeNote) TextField(
                       controller: userNotizController,
                       maxLines: 10,
                       decoration: InputDecoration(
                         border: const OutlineInputBorder(),
-                        hintText: AppLocalizations.of(context).notizEingeben,
+                        hintText: AppLocalizations.of(context)!.notizEingeben,
                       ),
                     ),
                     const SizedBox(height: 10),
                     if(userNotiz== null || changeNote) FloatingActionButton.extended(
-                      label: Text(AppLocalizations.of(context).speichern),
+                      label: Text(AppLocalizations.of(context)!.speichern),
                         onPressed: (){
                           saveNotiz(userNotizController.text);
 
@@ -234,9 +233,9 @@ class _AppBarState extends State<_AppBar> {
             if (widget.familyProfil != null) {
               List<Widget> menuList = [];
 
-              widget.familyProfil["members"].remove(userId);
+              widget.familyProfil!["members"].remove(userId);
 
-              for (var memberId in widget.familyProfil["members"]) {
+              for (var memberId in widget.familyProfil!["members"]) {
                 var memberName =
                     getProfilFromHive(profilId: memberId, getNameOnly: true);
 
@@ -285,8 +284,8 @@ class _AppBarState extends State<_AppBar> {
               Icon(onFriendlist ? Icons.person_remove : Icons.person_add),
               const SizedBox(width: 10),
               Text(onFriendlist
-                  ? AppLocalizations.of(context).freundEntfernen
-                  : AppLocalizations.of(context).freundHinzufuegen)
+                  ? AppLocalizations.of(context)!.freundEntfernen
+                  : AppLocalizations.of(context)!.freundHinzufuegen)
             ],
           ),
           onPressed: () {
@@ -299,7 +298,7 @@ class _AppBarState extends State<_AppBar> {
             if (onFriendlist) {
               userFriendlist.remove(widget.profil["id"]);
               snackbarText =
-                  _userName + AppLocalizations.of(context).friendlistEntfernt;
+                  _userName + AppLocalizations.of(context)!.friendlistEntfernt;
 
               var newsId = getNewsId("added " + widget.profil["id"]);
 
@@ -307,7 +306,7 @@ class _AppBarState extends State<_AppBar> {
             } else {
               userFriendlist.add(widget.profil["id"]);
               snackbarText = _userName +
-                  AppLocalizations.of(context).friendlistHinzugefuegt;
+                  AppLocalizations.of(context)!.friendlistHinzugefuegt;
 
               prepareFriendNotification(
                   newFriendId: userId,
@@ -337,7 +336,7 @@ class _AppBarState extends State<_AppBar> {
     }
 
     userBlockierenButton() {
-      var ownId = FirebaseAuth.instance.currentUser.uid;
+      var ownId = FirebaseAuth.instance.currentUser?.uid;
       var onBlockList = widget.profil["geblocktVon"].contains(ownId);
 
       return SimpleDialogOption(
@@ -346,8 +345,8 @@ class _AppBarState extends State<_AppBar> {
               Icon(onBlockList ? Icons.do_not_touch : Icons.back_hand),
               const SizedBox(width: 10),
               Text(onBlockList
-                  ? AppLocalizations.of(context).freigeben
-                  : AppLocalizations.of(context).blockieren)
+                  ? AppLocalizations.of(context)!.freigeben
+                  : AppLocalizations.of(context)!.blockieren)
             ],
           ),
           onPressed: () {
@@ -359,12 +358,12 @@ class _AppBarState extends State<_AppBar> {
               widget.profil["geblocktVon"].remove(ownId);
               databaseQuery =
                   "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
-              snackbarText = AppLocalizations.of(context).benutzerFreigegeben;
+              snackbarText = AppLocalizations.of(context)!.benutzerFreigegeben;
             } else {
               widget.profil["geblocktVon"].add(ownId);
               databaseQuery =
                   "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
-              snackbarText = AppLocalizations.of(context).benutzerBlockieren;
+              snackbarText = AppLocalizations.of(context)!.benutzerBlockieren;
             }
 
             for (var profil in allProfils) {
@@ -391,7 +390,7 @@ class _AppBarState extends State<_AppBar> {
             children: [
               const Icon(Icons.report),
               const SizedBox(width: 10),
-              Text(AppLocalizations.of(context).melden),
+              Text(AppLocalizations.of(context)!.melden),
             ],
           ),
           onPressed: () {
@@ -403,10 +402,10 @@ class _AppBarState extends State<_AppBar> {
                 builder: (BuildContext buildContext) {
                   return CustomAlertDialog(
                     height: 380,
-                    title: AppLocalizations.of(context).benutzerMelden,
+                    title: AppLocalizations.of(context)!.benutzerMelden,
                     children: [
                       customTextInput(
-                          AppLocalizations.of(context).benutzerMeldenFrage,
+                          AppLocalizations.of(context)!.benutzerMeldenFrage,
                           meldeTextKontroller,
                           moreLines: 10),
                       const SizedBox(height: 20),
@@ -418,10 +417,10 @@ class _AppBarState extends State<_AppBar> {
                                 meldeTextKontroller.text);
                             Navigator.pop(context);
                             customSnackbar(context,
-                                AppLocalizations.of(context).benutzerGemeldet,
+                                AppLocalizations.of(context)!.benutzerGemeldet,
                                 color: Colors.green);
                           },
-                          label: Text(AppLocalizations.of(context).senden))
+                          label: Text(AppLocalizations.of(context)!.senden))
                     ],
                   );
                 });
@@ -469,9 +468,9 @@ class _AppBarState extends State<_AppBar> {
 // ignore: must_be_immutable
 class _UserNameDisplay extends StatelessWidget {
   Map profil;
-  Map familyProfil;
+  Map? familyProfil;
 
-  _UserNameDisplay({Key key, this.profil, this.familyProfil}) : super(key: key);
+  _UserNameDisplay({Key? key, required this.profil, this.familyProfil}) : super(key: key);
 
 
 
@@ -492,7 +491,7 @@ class _UserNameDisplay extends StatelessWidget {
       var familyMemberName = "";
 
       if (familyProfil != null) {
-        var familyMember = familyProfil["members"];
+        var familyMember = familyProfil!["members"];
         for (var member in familyMember) {
           familyMemberName +=
               getProfilFromHive(profilId: member, getNameOnly: true);
@@ -544,6 +543,8 @@ class _UserNameDisplay extends StatelessWidget {
 class _UserInformationDisplay extends StatelessWidget {
   final Map profil;
 
+  const _UserInformationDisplay({Key? key, required this.profil}) : super(key: key);
+
   checkAccessReiseplanung() {
     var ownProfil = Hive.box("secureBox").get("ownProfil");
     var hasAccess = false;
@@ -571,8 +572,6 @@ class _UserInformationDisplay extends StatelessWidget {
     return hasAccess;
   }
 
-  const _UserInformationDisplay({Key key, this.profil}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     var isOwnProfil = profil["id"] == userId;
@@ -585,9 +584,9 @@ class _UserInformationDisplay extends StatelessWidget {
               date.year == DateTime.now().year) ||
           date.year > DateTime.now().year ||
           onlyMonth) {
-        return date.month.toString() + "." + date.year.toString();
+        return "${date.month}.${date.year}";
       } else {
-        return AppLocalizations.of(context).jetzt;
+        return AppLocalizations.of(context)!.jetzt;
       }
     }
 
@@ -603,7 +602,7 @@ class _UserInformationDisplay extends StatelessWidget {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).besuchteLaender,
+              title: AppLocalizations.of(context)!.besuchteLaender,
               children: besuchteLaenderList,
             );
           });
@@ -615,7 +614,7 @@ class _UserInformationDisplay extends StatelessWidget {
         child: Row(
           children: [
             Text(
-              AppLocalizations.of(context).aktuelleOrt + ": ",
+              "${AppLocalizations.of(context)!.aktuelleOrt}: ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold,decoration: TextDecoration.underline),
             ),
             Flexible(
@@ -630,7 +629,7 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     travelTypBox() {
-      var themaText = AppLocalizations.of(context).artDerReise + ": ";
+      var themaText = "${AppLocalizations.of(context)!.artDerReise}: ";
       var inhaltText =
           global_functions.changeGermanToEnglish(profil["reiseart"]);
 
@@ -648,13 +647,13 @@ class _UserInformationDisplay extends StatelessWidget {
     aufreiseBox() {
       if (profil["aufreiseSeit"] == null) return const SizedBox.shrink();
 
-      var themenText = AppLocalizations.of(context).aufReise + ": ";
+      var themenText = "${AppLocalizations.of(context)!.aufReise}: ";
       var seitText =
           profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
       var inhaltText = "";
 
       if (profil["aufreiseBis"] == null) {
-        inhaltText = seitText + " - " + AppLocalizations.of(context).offen;
+        inhaltText = seitText + " - " + AppLocalizations.of(context)!.offen;
       } else {
         var bisText = profil["aufreiseBis"]
             .split("-")
@@ -677,7 +676,7 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     sprachenBox() {
-      var themenText = AppLocalizations.of(context).sprachen + ": ";
+      var themenText = "${AppLocalizations.of(context)!.sprachen}: ";
       var inhaltText =
           global_functions.changeGermanToEnglish(profil["sprachen"]).join(", ");
 
@@ -708,7 +707,7 @@ class _UserInformationDisplay extends StatelessWidget {
 
       return Row(
         children: [
-          Text(AppLocalizations.of(context).kinder + ": ",
+          Text("${AppLocalizations.of(context)!.kinder}: ",
               style:
                   TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
           Text(childrenList.reversed.join(", "),
@@ -718,7 +717,7 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     interessenBox() {
-      var themenText = AppLocalizations.of(context).interessen + ": ";
+      var themenText = "${AppLocalizations.of(context)!.interessen}: ";
       var inhaltText = global_functions
           .changeGermanToEnglish(profil["interessen"])
           .join(", ");
@@ -749,7 +748,7 @@ class _UserInformationDisplay extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context).ueberMich + ": ",
+              "${AppLocalizations.of(context)!.ueberMich}: ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
@@ -769,7 +768,7 @@ class _UserInformationDisplay extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context).verkaufenTauschenSchenken + ": ",
+              "${AppLocalizations.of(context)!.verkaufenTauschenSchenken}: ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
@@ -809,15 +808,13 @@ class _UserInformationDisplay extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 5),
             child: Row(
               children: [
-                Expanded(
-                  child: Text(
-                      transformDateToText(reiseplan["von"]) +
-                          " - " +
-                          transformDateToText(reiseplan["bis"], onlyMonth: true) +
-                          " in " +
-                          ortText,
+                Row(children: [
+                  Text(
+                      "${transformDateToText(reiseplan["von"])} - ${transformDateToText(reiseplan["bis"], onlyMonth: true)} in ",
                       style: TextStyle(fontSize: textSize)),
-                ),
+                  Text(ortText,
+                      style: TextStyle(fontSize: textSize, decoration: TextDecoration.underline))
+                ],),
               ],
             ),
           ),
@@ -828,14 +825,12 @@ class _UserInformationDisplay extends StatelessWidget {
         Row(
           children: [
             Text(
-              AppLocalizations.of(context).reisePlanung + ": ",
+              "${AppLocalizations.of(context)!.reisePlanung}: ",
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             if (isOwnProfil)
-              Text("(" +
-                  AppLocalizations.of(context).fuer +
-                  reiseplanungPrivacy +
-                  ")")
+              Text("${"(${AppLocalizations.of(context)!.fuer}" +
+                  reiseplanungPrivacy})")
           ],
         ),
         const SizedBox(height: 5),
@@ -850,7 +845,7 @@ class _UserInformationDisplay extends StatelessWidget {
         child: Container(
           margin: EdgeInsets.only(top: columnSpacing, bottom: columnSpacing),
           child: Row(children: [
-            Text(AppLocalizations.of(context).besuchteLaender + ": ",
+            Text("${AppLocalizations.of(context)!.besuchteLaender}: ",
                 style:
                     TextStyle(fontSize: textSize, fontWeight: FontWeight.bold, decoration: TextDecoration.underline), ),
             Text(profil["besuchteLaender"].length.toString(),
@@ -873,16 +868,16 @@ class _UserInformationDisplay extends StatelessWidget {
       var monthDifference = timeDifferenceLastLogin.inDays / 30.44;
 
       if (monthDifference >= monthsUntilInactive) {
-        text = AppLocalizations.of(context).inaktiv;
+        text = AppLocalizations.of(context)!.inaktiv;
         size = headlineTextSize;
       } else if (daysOffline > 30) {
-        text = AppLocalizations.of(context).langeZeitNichtGesehen;
+        text = AppLocalizations.of(context)!.langeZeitNichtGesehen;
       } else if (daysOffline > 7) {
-        text = AppLocalizations.of(context).innerhalbMonatsGesehen;
+        text = AppLocalizations.of(context)!.innerhalbMonatsGesehen;
       } else if (daysOffline > 1) {
-        text = AppLocalizations.of(context).innerhalbWocheGesehen;
+        text = AppLocalizations.of(context)!.innerhalbWocheGesehen;
       } else {
-        text = AppLocalizations.of(context).kuerzlichGesehen;
+        text = AppLocalizations.of(context)!.kuerzlichGesehen;
       }
 
       return Text(text, style: TextStyle(color: color, fontSize: size));

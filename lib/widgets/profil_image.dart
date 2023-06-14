@@ -16,7 +16,7 @@ class ProfilImage extends StatefulWidget {
   var fullScreenWindow;
 
   ProfilImage(this.profil,
-      {Key key, this.changeable = false, this.fullScreenWindow = false})
+      {Key? key, this.changeable = false, this.fullScreenWindow = false})
       : super(key: key);
 
   @override
@@ -34,7 +34,7 @@ class _ProfilImageState extends State<ProfilImage> {
       return;
     } else if (newLink.substring(0, 4) != "http" &&
         newLink.substring(0, 3) != "www") {
-      customSnackbar(context, AppLocalizations.of(context).ungueltigerLink);
+      customSnackbar(context, AppLocalizations.of(context)!.ungueltigerLink);
       return;
     } else {
       newLink = [newLink];
@@ -46,9 +46,7 @@ class _ProfilImageState extends State<ProfilImage> {
 
     newLink[0] = sanitizeString(newLink[0]);
 
-    setState(() {
-      widget.profil["bild"] = newLink;
-    });
+    widget.profil["bild"] = newLink;
 
     ProfilDatabase().updateProfil("bild = '${json.encode(newLink)}'",
         "WHERE id = '${widget.profil["id"]}'");
@@ -82,19 +80,19 @@ class _ProfilImageState extends State<ProfilImage> {
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).profilbildAendern,
+              title: AppLocalizations.of(context)!.profilbildAendern,
               children: [
                 customTextInput(
-                    AppLocalizations.of(context).linkProfilbildEingeben,
+                    AppLocalizations.of(context)!.linkProfilbildEingeben,
                     profilImageLinkKontroller),
               ],
               actions: [
                 TextButton(
-                  child: Text(AppLocalizations.of(context).speichern),
+                  child: Text(AppLocalizations.of(context)!.speichern),
                   onPressed: () => checkAndSaveImage(),
                 ),
                 TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -103,7 +101,8 @@ class _ProfilImageState extends State<ProfilImage> {
     }
 
     _showPopupMenu(tabPosition) async {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      final overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
 
       await showMenu(
         context: context,
@@ -113,11 +112,11 @@ class _ProfilImageState extends State<ProfilImage> {
             ),
         items: [
           PopupMenuItem(
-              child: Text(AppLocalizations.of(context).link),
+              child: Text(AppLocalizations.of(context)!.link),
               onTap: () => Future.delayed(
                   const Duration(seconds: 0), () => changeImageWindow())),
           PopupMenuItem(
-            child: Text(AppLocalizations.of(context).hochladen),
+            child: Text(AppLocalizations.of(context)!.hochladen),
             onTap: () async {
               var newImage = await uploadAndSaveImage(context, "profil");
 
@@ -128,7 +127,7 @@ class _ProfilImageState extends State<ProfilImage> {
           ),
           if (widget.profil["bild"].isNotEmpty)
             PopupMenuItem(
-                child: Text(AppLocalizations.of(context).loeschen),
+                child: Text(AppLocalizations.of(context)!.loeschen),
                 onTap: () {
                   deleteProfilImage();
                 })
@@ -162,13 +161,13 @@ class _ProfilImageState extends State<ProfilImage> {
 class DefaultProfilImage extends StatelessWidget {
   var profil;
 
-  DefaultProfilImage(this.profil, {Key key}) : super(key: key);
+  DefaultProfilImage(this.profil, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var symbols =
         "QWERTZUIOPÜASDFGHJKLÖÄYXCVBNMqwertzuiopüasdfghjklöäyxcvbnm1234567890ß";
-    var nameToList = profil["name"].split(" ");
+    var nameToList = profil["name"]?.split(" ") ?? ["Delete"];
     var imageText = "";
 
     for (var letter in nameToList[0].split("")) {
@@ -187,7 +186,7 @@ class DefaultProfilImage extends StatelessWidget {
       }
     }
 
-    if (profil["bildStandardFarbe"] == null) {
+    if (profil["bildStandardFarbe"] == null && profil.isNotEmpty) {
       var colorList = [
         Colors.blue,
         Colors.red,
@@ -204,16 +203,29 @@ class DefaultProfilImage extends StatelessWidget {
           "bildStandardFarbe = '$selectColor'", "WHERE id = '${profil["id"]}'");
     }
 
-    return CircleAvatar(
-      radius: 30,
-      backgroundColor: Color(profil["bildStandardFarbe"]),
-      child: Center(
-          child: Text(
-        imageText.toUpperCase(),
-        style: const TextStyle(
-            fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-      )),
-    );
+    return profil.isEmpty
+        ? const CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.black,
+            child: Center(
+                child: Text("X",
+              style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            )))
+        : CircleAvatar(
+            radius: 30,
+            backgroundColor: Color(profil["bildStandardFarbe"] ?? 4293467747),
+            child: Center(
+                child: Text(
+              imageText.toUpperCase(),
+              style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            )),
+          );
   }
 }
 
@@ -221,7 +233,7 @@ class OwnProfilImage extends StatelessWidget {
   var profil;
   var fullScreenWindow;
 
-  OwnProfilImage(this.profil, {Key key, this.fullScreenWindow})
+  OwnProfilImage(this.profil, {Key? key, this.fullScreenWindow})
       : super(key: key);
 
   @override
@@ -248,14 +260,13 @@ class OwnProfilImage extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               child: isUrl
                   ? CachedNetworkImage(
-                      width:55,
+                      width: 55,
                       height: 55,
                       fit: BoxFit.cover,
                       imageUrl: image,
                       placeholder: (context, url) => Container(
                             color: Colors.black12,
                           ))
-
                   : Image.asset(image,
                       width: 55, height: 55, fit: BoxFit.cover)),
         ));

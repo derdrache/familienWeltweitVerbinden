@@ -16,7 +16,7 @@ import '../../global/variablen.dart' as global_var;
 import '../../global/global_functions.dart' as global_func;
 
 class FamilieProfilPage extends StatefulWidget {
-  const FamilieProfilPage({Key key}) : super(key: key);
+  const FamilieProfilPage({Key? key}) : super(key: key);
 
   @override
   State<FamilieProfilPage> createState() => _FamilieProfilPageState();
@@ -24,16 +24,16 @@ class FamilieProfilPage extends StatefulWidget {
 
 class _FamilieProfilPageState extends State<FamilieProfilPage> {
   final Map ownProfil = Hive.box('secureBox').get("ownProfil");
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   List allProfils = Hive.box('secureBox').get("profils");
   bool familyProfilIsActive = false;
-  var searchAutocomplete = SearchAutocomplete();
+  late var searchAutocomplete;
   var familyProfil;
   var inviteFamilyProfil;
   TextEditingController nameFamilyKontroller = TextEditingController();
-  var mainProfilDropdown = CustomDropDownButton();
+  late var mainProfilDropdown;
   bool isLoding = true;
-  Map mainProfil;
+  late Map mainProfil;
   FocusNode nameFocusNode = FocusNode();
 
   @override
@@ -80,7 +80,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     if (nameIsUsed) {
       customSnackbar(
-          context, AppLocalizations.of(context).usernameInVerwendung);
+          context, AppLocalizations.of(context)!.usernameInVerwendung);
       return;
     }
 
@@ -145,19 +145,19 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     if (familyProfil["members"].contains(memberId)) {
       customSnackbar(context,
-          member + " " + AppLocalizations.of(context).isImFamilienprofil);
+          member + " " + AppLocalizations.of(context)!.isImFamilienprofil);
       return;
     }
     if (familyProfil["einladung"].contains(memberId)) {
       customSnackbar(context,
-          member + " " + AppLocalizations.of(context).wurdeSchonEingeladen);
+          member + " " + AppLocalizations.of(context)!.wurdeSchonEingeladen);
       return;
     }
 
     var hasFamilyProfil = await checkHasFamilyProfil(memberId);
     if (hasFamilyProfil) {
       customSnackbar(context,
-          member + " " + AppLocalizations.of(context).istInEinemFamilienprofil);
+          member + " " + AppLocalizations.of(context)!.istInEinemFamilienprofil);
       return;
     }
 
@@ -166,7 +166,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     });
 
     customSnackbar(context,
-        member + " " + AppLocalizations.of(context).familienprofilEingeladen);
+        member + " " + AppLocalizations.of(context)!.familienprofilEingeladen);
 
     FamiliesDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$memberId')",
@@ -244,7 +244,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           Center(
               heightFactor: 10,
               child: Text(
-                  AppLocalizations.of(context).nochKeineFreundeVorhanden,
+                  AppLocalizations.of(context)!.nochKeineFreundeVorhanden,
                   style: const TextStyle(color: Colors.grey)))
         ];
       }
@@ -257,12 +257,12 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
         margin: const EdgeInsets.only(right: 10),
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           TextButton(
-            child: Text(AppLocalizations.of(context).abbrechen,
+            child: Text(AppLocalizations.of(context)!.abbrechen,
                 style: const TextStyle()),
             onPressed: () => Navigator.pop(context),
           ),
           TextButton(
-              child: Text(AppLocalizations.of(context).speichern,
+              child: Text(AppLocalizations.of(context)!.speichern,
                   style: const TextStyle()),
               onPressed: () => saveFunction()),
         ]),
@@ -271,7 +271,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     addMemberWindow() {
       searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context).personSuchen,
+        hintText: AppLocalizations.of(context)!.personSuchen,
         searchableItems: getAllProfilName(),
         onConfirm: () {},
       );
@@ -281,7 +281,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
               height: 600,
-              title: AppLocalizations.of(context).mitgliedHinzufuegen,
+              title: AppLocalizations.of(context)!.mitgliedHinzufuegen,
               children: [
                 Center(child: SizedBox(width: 300, child: searchAutocomplete)),
                 windowOptions(() => addMember()),
@@ -295,7 +295,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(AppLocalizations.of(context).familienprofilAktivieren),
+          Text(AppLocalizations.of(context)!.familienprofilAktivieren),
           const SizedBox(width: 10),
           Switch(
             value: familyProfilIsActive,
@@ -336,7 +336,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
               height: 600,
-              title: AppLocalizations.of(context).member,
+              title: AppLocalizations.of(context)!.member,
               children: allMemberName,
             );
           });
@@ -347,12 +347,12 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
-              title: AppLocalizations.of(context).familyProfilloeschen,
+              title: AppLocalizations.of(context)!.familyProfilloeschen,
               height: 110,
               children: [
                 Center(
                     child: Text(
-                        AppLocalizations.of(context).familyProfilWirklichLoeschen))
+                        AppLocalizations.of(context)!.familyProfilWirklichLoeschen))
               ],
               actions: [
                 TextButton(
@@ -373,7 +373,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                   },
                 ),
                 TextButton(
-                  child: Text(AppLocalizations.of(context).abbrechen),
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -401,7 +401,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                             children: [
                               const Icon(Icons.list),
                               const SizedBox(width: 10),
-                              Text(AppLocalizations.of(context).member),
+                              Text(AppLocalizations.of(context)!.member),
                             ],
                           ),
                           onPressed: () {
@@ -415,7 +415,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                             children: [
                               const Icon(Icons.person_add),
                               const SizedBox(width: 10),
-                              Text(AppLocalizations.of(context)
+                              Text(AppLocalizations.of(context)!
                                   .mitgliedHinzufuegen),
                             ],
                           ),
@@ -429,7 +429,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                             children: [
                               const Icon(Icons.delete),
                               const SizedBox(width: 10),
-                              Text(AppLocalizations.of(context).loeschen),
+                              Text(AppLocalizations.of(context)!.loeschen),
                             ],
                           ),
                           onPressed: () {
@@ -449,7 +449,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       nameFamilyKontroller.text = familyProfil["name"];
 
       return Container(
-        child: customTextInput(AppLocalizations.of(context).familienprofilName,
+        child: customTextInput(AppLocalizations.of(context)!.familienprofilName,
             nameFamilyKontroller,
             focusNode: nameFocusNode, onSubmit: () => saveName()),
       );
@@ -472,7 +472,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       }
 
       mainProfilDropdown = CustomDropDownButton(
-          hintText: AppLocalizations.of(context).hauptprofilWaehlen,
+          hintText: AppLocalizations.of(context)!.hauptprofilWaehlen,
           selected: selectedName,
           items: allMembersName,
           onChange: () {
@@ -501,7 +501,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           margin: const EdgeInsets.all(20),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(
-              AppLocalizations.of(context).familienmitgliedHinzufuegen,
+              AppLocalizations.of(context)!.familienmitgliedHinzufuegen,
             ),
             const SizedBox(width: 10),
             const Icon(Icons.person_add)
@@ -513,7 +513,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     familyProfilDescription() {
       return Container(
           margin: const EdgeInsets.all(20),
-          child: Text(AppLocalizations.of(context).familienprofilBeschreibung));
+          child: Text(AppLocalizations.of(context)!.familienprofilBeschreibung));
     }
 
     familyProfilInvite() {
@@ -524,7 +524,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                 color: Theme.of(context).colorScheme.primary, width: 3)),
         child: Column(
           children: [
-            Text(AppLocalizations.of(context).familyprofilInvite),
+            Text(AppLocalizations.of(context)!.familyprofilInvite),
             const SizedBox(height: 5),
             Text(inviteFamilyProfil["name"],
                 style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -534,7 +534,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
               children: [
                 ElevatedButton(
                   onPressed: () => acceptFamilyInvite(),
-                  child: Text(AppLocalizations.of(context).annehmen),
+                  child: Text(AppLocalizations.of(context)!.annehmen),
                   style: ButtonStyle(
                       backgroundColor:
                           MaterialStateProperty.all<Color>(Colors.green)),
@@ -542,7 +542,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                 const SizedBox(width: 10),
                 ElevatedButton(
                     onPressed: () => refuseFamilyInvite(),
-                    child: Text(AppLocalizations.of(context).ablehnen),
+                    child: Text(AppLocalizations.of(context)!.ablehnen),
                     style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all<Color>(Colors.red))),
@@ -566,16 +566,13 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
               onTap: () => global_func.changePage(
                   context,
                   ShowProfilPage(
-                      userName: AppLocalizations.of(context).familie +
-                          " " +
-                          familyProfil["name"],
                       profil: mainProfil)),
               child: Container(
                 margin: const EdgeInsets.all(10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(AppLocalizations.of(context).familienprofilAnzeigen),
+                    Text(AppLocalizations.of(context)!.familienprofilAnzeigen),
                     const SizedBox(width: 5),
                     const Icon(
                       Icons.preview,
@@ -589,7 +586,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
               child: Container(
                 margin: const EdgeInsets.all(30),
                 child: Text(
-                  AppLocalizations.of(context).familienprofilUnvollstaendig,
+                  AppLocalizations.of(context)!.familienprofilUnvollstaendig,
                   style: const TextStyle(color: Colors.red, fontSize: 16),
                 ),
               ),
@@ -598,7 +595,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     return Scaffold(
         appBar: CustomAppBar(
-          title: AppLocalizations.of(context).familyProfil,
+          title: AppLocalizations.of(context)!.familyProfil,
           buttons: [
             IconButton(
               icon: const Icon(Icons.more_vert),

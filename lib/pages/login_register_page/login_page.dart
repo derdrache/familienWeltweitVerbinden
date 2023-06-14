@@ -20,7 +20,7 @@ import '../../services/database.dart';
 import 'impressum.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key key}) : super(key: key);
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   userLogin() async {
-    if (!_formKey.currentState.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       isLoading = true;
@@ -85,12 +85,12 @@ class _LoginPageState extends State<LoginPage> {
       });
       if (error.code == "user-not-found") {
         customSnackbar(
-            context, AppLocalizations.of(context).benutzerNichtGefunden);
+            context, AppLocalizations.of(context)!.benutzerNichtGefunden);
       } else if (error.code == "wrong-password") {
-        customSnackbar(context, AppLocalizations.of(context).passwortFalsch);
+        customSnackbar(context, AppLocalizations.of(context)!.passwortFalsch);
       } else if (error.code == "network-request-failed") {
         customSnackbar(
-            context, AppLocalizations.of(context).keineVerbindungInternet);
+            context, AppLocalizations.of(context)!.keineVerbindungInternet);
       }
     }
   }
@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
       final UserCredential userCredential =
           await FirebaseAuth.instance.signInWithPopup(authProvider);
 
-      User user = userCredential.user;
+      User? user = userCredential.user;
       return user;
     } catch (_) {
       setState(() {
@@ -115,10 +115,10 @@ class _LoginPageState extends State<LoginPage> {
 
   signInWithGoogleAndroid() async {
     try{
-      GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+      GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
+      await googleUser!.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage> {
     ChatDatabase().addAdminMessage(
         reportController.text, "Login/Hilfe");
 
-    customSnackbar(context, AppLocalizations.of(context).hilfeVersendetText,
+    customSnackbar(context, AppLocalizations.of(context)!.hilfeVersendetText,
         color: Colors.green);
   }
 
@@ -189,15 +189,15 @@ class _LoginPageState extends State<LoginPage> {
                     Column(
                       children: [
                         Center(
-                          child: Text(AppLocalizations.of(context).willkommenBeiAppName,
+                          child: Text(AppLocalizations.of(context)!.willkommenBeiAppName,
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          AppLocalizations.of(context).slogn1 +
+                          AppLocalizations.of(context)!.slogn1 +
                               "\n" +
-                              AppLocalizations.of(context).slogn2,
+                              AppLocalizations.of(context)!.slogn2,
                           textAlign: TextAlign.center,
                         )
                       ],
@@ -208,15 +208,15 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Center(child: Image.asset('assets/WeltFlugzeug.png')),
                     const SizedBox(height: 15),
-                    Text(AppLocalizations.of(context).willkommenBeiAppName,
+                    Text(AppLocalizations.of(context)!.willkommenBeiAppName,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
                     Text(
-                      AppLocalizations.of(context).slogn1 +
+                      AppLocalizations.of(context)!.slogn1 +
                           "\n" +
-                          AppLocalizations.of(context).slogn2,
+                          AppLocalizations.of(context)!.slogn2,
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -235,7 +235,7 @@ class _LoginPageState extends State<LoginPage> {
                 });
               }),
           const SizedBox(width: 10),
-          Text(AppLocalizations.of(context).angemeldetBleiben)
+          Text(AppLocalizations.of(context)!.angemeldetBleiben)
         ],
       );
     }
@@ -247,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               foregroundColor: Colors.black),
-          child: Text(AppLocalizations.of(context).passwortVergessen, style: const TextStyle(color: Colors.blue),),
+          child: Text(AppLocalizations.of(context)!.passwortVergessen, style: const TextStyle(color: Colors.blue),),
           onPressed: () {
             passwortController.text = "";
             global_functions.changePage(context, const ForgetPasswordPage());
@@ -261,7 +261,7 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               foregroundColor: Colors.black),
-          child: Text(AppLocalizations.of(context).hilfe, style: const TextStyle(color: Colors.blue),),
+          child: Text(AppLocalizations.of(context)!.hilfe, style: const TextStyle(color: Colors.blue),),
           onPressed: () {
             var reportController = TextEditingController();
 
@@ -270,7 +270,7 @@ class _LoginPageState extends State<LoginPage> {
                 builder: (BuildContext buildContext) {
                   return CustomAlertDialog(
                       height: 390,
-                      title: AppLocalizations.of(context).hilfe,
+                      title: AppLocalizations.of(context)!.hilfe,
                       children: [
                         TextField(
                           controller: reportController,
@@ -278,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
                             border: const OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.black),
                             ),
-                            hintText: AppLocalizations.of(context).hilfeVorschlag,
+                            hintText: AppLocalizations.of(context)!.hilfeVorschlag,
                             hintMaxLines: 10,
                           ),
                           maxLines: 10,
@@ -290,7 +290,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.pop(context);
                                 _sendeHilfe(reportController);
                               },
-                              label: Text(AppLocalizations.of(context).senden)),
+                              label: Text(AppLocalizations.of(context)!.senden)),
                         )
                       ]);
                 });
@@ -378,7 +378,7 @@ class _LoginPageState extends State<LoginPage> {
                     validator: global_functions.checkValidationEmail(context),
                     textInputAction: TextInputAction.next),
                 customTextInput(
-                    AppLocalizations.of(context).passwort, passwortController,
+                    AppLocalizations.of(context)!.passwort, passwortController,
                     validator: global_functions.checkValidatorPassword(context),
                     passwort: true,
                     textInputAction: TextInputAction.done,
@@ -388,10 +388,10 @@ class _LoginPageState extends State<LoginPage> {
                 Center(
                   child: Container(
                     width: 600,
-                    margin: EdgeInsets.only(left: 20, right: 20),
+                    margin: const EdgeInsets.only(left: 20, right: 20),
                     child: Row(mainAxisAlignment: MainAxisAlignment.center ,children: [
                       hilfeButton(),
-                      Expanded(child: SizedBox(width: 50)),
+                      const Expanded(child: SizedBox(width: 50)),
                       forgetPassButton(),
                     ],),
                   ),
@@ -407,7 +407,7 @@ class _LoginPageState extends State<LoginPage> {
                               customFloatbuttonExtended(
                                   "Login", () => userLogin()),
                               customFloatbuttonExtended(
-                                  AppLocalizations.of(context).registrieren,
+                                  AppLocalizations.of(context)!.registrieren,
                                   () {
                                 global_functions.changePage(
                                     context, const RegisterPage());
@@ -416,7 +416,7 @@ class _LoginPageState extends State<LoginPage> {
                           )
                         : customFloatbuttonExtended("Login", () => userLogin()),
                 customFloatbuttonExtended(
-                    AppLocalizations.of(context).registrieren, () {
+                    AppLocalizations.of(context)!.registrieren, () {
                   global_functions.changePage(context, const RegisterPage());
                 }),
                 const SizedBox(height: 10),

@@ -23,11 +23,12 @@ class FeedbackPage extends StatelessWidget {
 
     feedbackTextKontroller.clear();
 
-    customSnackbar(context, AppLocalizations.of(context).feedbackDanke,
+    customSnackbar(context, AppLocalizations.of(context)!.feedbackDanke,
         color: Colors.green);
 
     Navigator.pop(context);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +41,10 @@ class FeedbackPage extends StatelessWidget {
             Center(
               child: Container(
                   margin: const EdgeInsets.all(30),
-                  child: Text(AppLocalizations.of(context).feedbackText)),
+                  child: Text(AppLocalizations.of(context)!.feedbackText)),
             ),
             customTextInput(
-                AppLocalizations.of(context).feedback, feedbackTextKontroller,
+                AppLocalizations.of(context)!.feedback, feedbackTextKontroller,
                 moreLines: 10, validator: checkValidatorEmpty(context)),
             Align(
               child: Container(
@@ -51,7 +52,7 @@ class FeedbackPage extends StatelessWidget {
                 margin: const EdgeInsets.all(10),
                 child: FloatingActionButton.extended(
                     onPressed: () => feedbackSendenAndClose(context),
-                    label: Text(AppLocalizations.of(context).senden)),
+                    label: Text(AppLocalizations.of(context)!.senden)),
               ),
             )
           ],

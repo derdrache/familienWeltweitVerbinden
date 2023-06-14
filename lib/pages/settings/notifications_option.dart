@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -8,7 +7,7 @@ import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 
 class NotificationsOptionsPage extends StatefulWidget {
-  const NotificationsOptionsPage({Key key}) : super(key: key);
+  const NotificationsOptionsPage({Key? key}) : super(key: key);
 
   @override
   _NotificationsOptionsPageState createState() =>
@@ -17,7 +16,7 @@ class NotificationsOptionsPage extends StatefulWidget {
 
 class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser!.uid;
 
 
   allNotificationSetting() {
@@ -25,7 +24,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            AppLocalizations.of(context).alleBenachrichtigungen,
+            AppLocalizations.of(context)!.alleBenachrichtigungen,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -60,7 +59,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            AppLocalizations.of(context).chatNotification,
+            AppLocalizations.of(context)!.chatNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -83,7 +82,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            AppLocalizations.of(context).meetupNotification,
+            AppLocalizations.of(context)!.meetupNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -106,7 +105,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            AppLocalizations.of(context).friendNotification,
+            AppLocalizations.of(context)!.friendNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -135,7 +134,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
           children: [
             const SizedBox(width: 20),
             Text(
-                AppLocalizations.of(context).familieInRangeNotification,
+                AppLocalizations.of(context)!.familieInRangeNotification,
                 style: const TextStyle(fontSize: 20)),
             const Expanded(child: SizedBox(width: 20)),
             Switch(
@@ -156,7 +155,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
           ],
         ),
         if(familieInRangeNotificationOn) Text(
-            "${distance.round()} km ${AppLocalizations.of(context).umkreis}"
+            "${distance.round()} km ${AppLocalizations.of(context)!.umkreis}"
         ),
         if(familieInRangeNotificationOn) Slider(
           value: distance,
@@ -186,7 +185,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
       children: [
         const SizedBox(width: 20),
         Text(
-            AppLocalizations.of(context).reiseplanungNotification,
+            AppLocalizations.of(context)!.reiseplanungNotification,
             style: const TextStyle(fontSize: 20)),
         const Expanded(child: SizedBox(width: 20)),
         Switch(
@@ -212,7 +211,7 @@ class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {
     return Scaffold(
       appBar:
           CustomAppBar(
-              title: AppLocalizations.of(context).benachrichtigungen
+              title: AppLocalizations.of(context)!.benachrichtigungen
           ),
       body: Column(
         children: [

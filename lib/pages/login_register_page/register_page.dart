@@ -1,18 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:hive/hive.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
-import '../../services/database.dart';
 import '../../services/notification.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../windows/nutzerrichtlinen.dart';
 import 'create_profil_page.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key key}) : super(key: key);
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -40,7 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
   registration() async {
     var success = false;
 
-    if (formKey.currentState.validate()) {
+    if (formKey.currentState!.validate()) {
       var email = emailController.text;
       email = email.replaceAll(" ", "");
       var password = passwordController.text;
@@ -53,14 +51,14 @@ class _RegisterPageState extends State<RegisterPage> {
       } on FirebaseAuthException catch (error) {
         if (error.code == "email-already-in-use") {
           customSnackbar(
-              context, AppLocalizations.of(context).emailInBenutzung);
+              context, AppLocalizations.of(context)!.emailInBenutzung);
         } else if (error.code == "invalid-email") {
-          customSnackbar(context, AppLocalizations.of(context).emailUngueltig);
+          customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
         } else if (error.code == "weak-password") {
-          customSnackbar(context, AppLocalizations.of(context).passwortSchwach);
+          customSnackbar(context, AppLocalizations.of(context)!.passwortSchwach);
         } else if (error.code == "network-request-failed") {
           customSnackbar(
-              context, AppLocalizations.of(context).keineVerbindungInternet);
+              context, AppLocalizations.of(context)!.keineVerbindungInternet);
         } else {
           sendEmail({
             "title": "Registrierungs Problem",
@@ -89,7 +87,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: AppLocalizations.of(context).registrieren),
+      appBar: CustomAppBar(title: AppLocalizations.of(context)!.registrieren),
       body: Padding(
         padding: const EdgeInsets.only(top: 15.0),
         child: Center(
@@ -104,18 +102,18 @@ class _RegisterPageState extends State<RegisterPage> {
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress,
               ),
-              customTextInput(AppLocalizations.of(context).emailBestaetigen,
+              customTextInput(AppLocalizations.of(context)!.emailBestaetigen,
                   checkEmailController,
                   validator: global_functions.checkValidationEmail(context,
                       emailCheck: emailController.text),
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.emailAddress),
               customTextInput(
-                  AppLocalizations.of(context).passwort, passwordController,
+                  AppLocalizations.of(context)!.passwort, passwordController,
                   passwort: true,
                   validator: global_functions.checkValidatorPassword(context),
                   textInputAction: TextInputAction.next),
-              customTextInput(AppLocalizations.of(context).passwortBestaetigen,
+              customTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
                   checkPasswordController,
                   passwort: true,
                   validator: global_functions.checkValidatorPassword(context,
@@ -126,7 +124,7 @@ class _RegisterPageState extends State<RegisterPage> {
               isLoading
                   ? loadingBox()
                   : customFloatbuttonExtended(
-                      AppLocalizations.of(context).registrieren,
+                      AppLocalizations.of(context)!.registrieren,
                       () => registrationButton())
             ],
           ),

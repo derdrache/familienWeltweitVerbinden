@@ -11,9 +11,9 @@ import '../../global/variablen.dart' as global_var;
 class AllUserSelectWindow {
   var context;
   var title;
-  var allUserNames = [];
+  List<String> allUserNames = [];
   var allUserIds = [];
-  var searchAutocomplete = SearchAutocomplete();
+  late var searchAutocomplete;
   var selectedUserId;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
 
@@ -32,7 +32,7 @@ class AllUserSelectWindow {
 
   setSearchAutocomplete(){
     return SearchAutocomplete(
-      hintText: AppLocalizations.of(context).personSuchen,
+      hintText: AppLocalizations.of(context)!.personSuchen,
       searchableItems: allUserNames,
       onConfirm: () {
 
@@ -51,12 +51,12 @@ class AllUserSelectWindow {
       margin: const EdgeInsets.only(right: 10),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         TextButton(
-          child: Text(AppLocalizations.of(context).abbrechen,
+          child: Text(AppLocalizations.of(context)!.abbrechen,
               style: TextStyle(fontSize: fontsize)),
           onPressed: () => Navigator.pop(context),
         ),
         TextButton(
-            child: Text(AppLocalizations.of(context).speichern,
+            child: Text(AppLocalizations.of(context)!.speichern,
                 style: TextStyle(fontSize: fontsize)),
             onPressed: () {
               var selectedUser = searchAutocomplete.getSelected()[0];
@@ -103,7 +103,7 @@ class AllUserSelectWindow {
       return [
         Center(
             heightFactor: 10,
-            child: Text(AppLocalizations.of(context).nochKeineFreundeVorhanden,
+            child: Text(AppLocalizations.of(context)!.nochKeineFreundeVorhanden,
                 style: const TextStyle(color: Colors.grey)))
       ];
     }

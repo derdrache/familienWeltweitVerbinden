@@ -8,11 +8,11 @@ import '../../widgets/custom_appbar.dart';
 
 
 class ChangeAboutmePage extends StatelessWidget {
-  final String userId = FirebaseAuth.instance.currentUser.uid;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
   final String oldText;
   TextEditingController textKontroller = TextEditingController();
 
-  ChangeAboutmePage({Key key,this.oldText}) : super(key: key);
+  ChangeAboutmePage({Key? key,this.oldText = ""}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,27 +28,27 @@ class ChangeAboutmePage extends StatelessWidget {
 
 
       customSnackbar(context,
-          AppLocalizations.of(context).ueberMich + " "+
-              AppLocalizations.of(context).erfolgreichGeaender, color: Colors.green);
+          AppLocalizations.of(context)!.ueberMich + " "+
+              AppLocalizations.of(context)!.erfolgreichGeaender, color: Colors.green);
       Navigator.pop(context);
     }
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: AppLocalizations.of(context).ueberMichVeraendern,
+          title: AppLocalizations.of(context)!.ueberMichVeraendern,
       ),
       body: Column(
         children: [
           customTextInput(
-            AppLocalizations.of(context).ueberMich,
+            AppLocalizations.of(context)!.ueberMich,
             textKontroller,
             moreLines: 10,
-            hintText: AppLocalizations.of(context).aboutusHintText,
+            hintText: AppLocalizations.of(context)!.aboutusHintText,
             textInputAction: TextInputAction.newline
           ),
           const SizedBox(height: 10),
           FloatingActionButton.extended(
-              label: Text(AppLocalizations.of(context).speichern, style: const TextStyle(fontSize: 20),),
+              label: Text(AppLocalizations.of(context)!.speichern, style: const TextStyle(fontSize: 20),),
               icon: const Icon(Icons.save),
               onPressed: () => save()
           )

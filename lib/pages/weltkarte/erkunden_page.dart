@@ -24,7 +24,7 @@ import '../informationen/meetups/meetupCard.dart';
 import '../show_profil.dart';
 
 class ErkundenPage extends StatefulWidget {
-  const ErkundenPage({Key key}) : super(key: key);
+  const ErkundenPage({Key? key}) : super(key: key);
 
   @override
   _ErkundenPageState createState() => _ErkundenPageState();
@@ -32,7 +32,7 @@ class ErkundenPage extends StatefulWidget {
 
 class _ErkundenPageState extends State<ErkundenPage>
     with WidgetsBindingObserver {
-  var userId = FirebaseAuth.instance.currentUser.uid;
+  var userId = FirebaseAuth.instance.currentUser?.uid;
   var profils = [];
   var profilsBackup = [];
   var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
@@ -48,14 +48,15 @@ class _ErkundenPageState extends State<ErkundenPage>
   List aktiveProfils = [];
   List aktiveEvents = [];
   List aktiveCommunities = [];
-  List profilsContinents,
+  late List profilsContinents,
       profilsCountries,
       profilsBetween,
       profilsCities,
       profilsExact;
-  List eventsKontinente, eventsCountries, eventsBetween, eventsCities;
-  List communitiesContinents,
-      communitiesCountries,
+  late List eventsCountries, eventsBetween, eventsCities;
+  List? eventsKontinente;
+  List? communitiesContinents;
+  late List communitiesCountries,
       communitiesBetween,
       communitiesCities;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
@@ -65,8 +66,8 @@ class _ErkundenPageState extends State<ErkundenPage>
   double cityZoom = 8.5;
   double countryZoom = 5.5;
   double kontinentZoom = 3.5;
-  var searchAutocomplete = SearchAutocomplete();
-  LatLng mapPosition;
+  late var searchAutocomplete;
+  late LatLng mapPosition;
   bool popupActive = false;
   var popupTyp = "";
   List<Widget> popupItems = [];
@@ -103,7 +104,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     WidgetsBinding.instance.addObserver(this);
 
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) => mounted = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) => mounted = true);
   }
 
   void didChangeAppLifecycleState(AppLifecycleState state) async {
@@ -273,6 +274,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         searchableItems:
         allUserName.toList() + countryList + allCitiesNames,
         onConfirm: () {
+          FocusManager.instance.primaryFocus?.unfocus();
           filterList = searchAutocomplete.getSelected();
           friendMarkerOn = false;
           eventMarkerOn = false;
@@ -300,7 +302,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     if (filterList.isEmpty) {
       filterProfils = profilsBackup;
     } else {
-      for (var profilGroup in aktiveProfils ?? []) {
+      for (var profilGroup in aktiveProfils) {
         for (var profil in profilGroup["profils"]) {
           if (checkIfInFilter(profil)) {
             filterProfils.add(profil);
@@ -684,16 +686,15 @@ class _ErkundenPageState extends State<ErkundenPage>
       selectedComunityList = communitiesCountries;
     } else {
       choosenProfils = profilsContinents;
-      selectedEventList = eventsKontinente;
-      selectedComunityList = communitiesContinents;
+      selectedEventList = eventsKontinente != null ? eventsKontinente! : [];
+      selectedComunityList = communitiesContinents != null ? communitiesContinents! : [];;
     }
-
 
     if (mounted) {
       setState(() {
-        aktiveProfils = choosenProfils ?? [];
-        aktiveEvents = selectedEventList ?? [];
-        aktiveCommunities = selectedComunityList ?? [];
+        aktiveProfils = choosenProfils;
+        aktiveEvents = selectedEventList;
+        aktiveCommunities = selectedComunityList;
       });
     }
   }
@@ -738,7 +739,7 @@ class _ErkundenPageState extends State<ErkundenPage>
                   margin: const EdgeInsets.all(20),
                   child: Text(
                     AppLocalizations
-                        .of(context)
+                        .of(context)!
                         .weltkarteReiseplanungSuchen,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
@@ -753,7 +754,7 @@ class _ErkundenPageState extends State<ErkundenPage>
 
                       if (selectedDate == null) {
                         customSnackbar(context, AppLocalizations
-                            .of(context)
+                            .of(context)!
                             .datumEingeben);
                         return;
                       }
@@ -763,7 +764,7 @@ class _ErkundenPageState extends State<ErkundenPage>
                       } else {
                         if (selectedDate[1].isBefore(selectedDate[0])) {
                           customSnackbar(context, AppLocalizations
-                              .of(context)
+                              .of(context)!
                               .bisDatumFalsch);
                           return;
                         }
@@ -774,7 +775,7 @@ class _ErkundenPageState extends State<ErkundenPage>
                       Navigator.pop(context);
                     },
                     label: Text(AppLocalizations
-                        .of(context)
+                        .of(context)!
                         .anzeigen)),
               )
             ],
@@ -875,19 +876,19 @@ class _ErkundenPageState extends State<ErkundenPage>
               children: [
                 createCheckBoxen(windowSetState, reiseartSelection,
                     AppLocalizations
-                        .of(context)
+                        .of(context)!
                         .reisearten),
                 createCheckBoxen(windowSetState, alterKinderSelection,
                     AppLocalizations
-                        .of(context)
+                        .of(context)!
                         .alterDerKinder),
                 createCheckBoxen(windowSetState, interessenSelection,
                     AppLocalizations
-                        .of(context)
+                        .of(context)!
                         .interessen),
                 createCheckBoxen(windowSetState, sprachenSelection,
                     AppLocalizations
-                        .of(context)
+                        .of(context)!
                         .sprachen),
               ],
             );
@@ -1073,18 +1074,24 @@ class _ErkundenPageState extends State<ErkundenPage>
 
   selectPopupMenuText(profils, spezialActivation) {
     if (spezialActivation) {
-      if (friendMarkerOn) return AppLocalizations
-          .of(context)
+      if (friendMarkerOn) {
+        return AppLocalizations
+          .of(context)!
           .freundesListe;
-      if (filterOn) return AppLocalizations
-          .of(context)
+      }
+      if (filterOn) {
+        return AppLocalizations
+          .of(context)!
           .filterErgebnisse;
-      if (eventMarkerOn) return AppLocalizations
-          .of(context)
+      }
+      if (eventMarkerOn) {
+        return AppLocalizations
+          .of(context)!
           .neueMeetups;
+      }
       if (communityMarkerOn) {
         return AppLocalizations
-            .of(context)
+            .of(context)!
             .neueCommunities;
       }
     }
@@ -1148,7 +1155,7 @@ class _ErkundenPageState extends State<ErkundenPage>
   Widget build(BuildContext context) {
     List<Marker> allMarker = [];
     searchAutocomplete.hintText = AppLocalizations
-        .of(context)
+        .of(context)!
         .filterErkunden;
 
     createPopupCards({event, community, spezialActivation = false}) {
@@ -1496,11 +1503,11 @@ class _ErkundenPageState extends State<ErkundenPage>
           maxZoom: maxZoom,
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onPositionChanged: (position, changed) {
-            mapPosition = position.center;
+            mapPosition = position.center!;
             FocusScope.of(context).unfocus();
             if (currentMapZoom != position.zoom) {
-              mapController.move(mapPosition, position.zoom);
-              currentMapZoom = position.zoom;
+              mapController.move(mapPosition, position.zoom!);
+              currentMapZoom = position.zoom!;
               changeProfil(currentMapZoom);
             }
           },
