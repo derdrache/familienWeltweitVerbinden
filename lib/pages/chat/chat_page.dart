@@ -710,12 +710,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
                                   groupChatData: group,
                                   backToChatPage: true,
                                   chatPageSliderIndex: mainSlider,
-                                  isChatgroup: isChatGroup)))
-                      .whenComplete(() => changePageForever(
-                          context,
-                          StartPage(
-                            selectedIndex: 3,
-                          )));
+                                  isChatgroup: isChatGroup)));
                 }
               },
               onLongPress: () {
