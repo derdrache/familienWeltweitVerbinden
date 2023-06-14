@@ -29,8 +29,9 @@ import '../location/location_Information.dart';
 class CommunityDetails extends StatefulWidget {
   Map community;
   bool fromCommunityPage;
+  bool fromCommunityPageSearch;
 
-  CommunityDetails({Key? key, required this.community, this.fromCommunityPage = false})
+  CommunityDetails({Key? key, required this.community, this.fromCommunityPage = false, this.fromCommunityPageSearch = false})
       : super(key: key);
 
   @override
@@ -101,8 +102,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   setCreatorData() {
-    creatorProfil = getProfilFromHive(profilId: widget.community["erstelltVon"]);
-    creatorName = creatorProfil["name"];
+    creatorProfil = getProfilFromHive(profilId: widget.community["erstelltVon"]) ?? {};
+    creatorName = creatorProfil["name"] ?? "";
   }
 
   Future _initImages() async {
@@ -1099,7 +1100,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             title: widget.community["name"],
             leading: widget.fromCommunityPage
                 ? StartPage(selectedIndex: 2, informationPageIndex: 2)
-                : null,
+                : widget.fromCommunityPageSearch
+                  ? StartPage(selectedIndex: 2, informationPageIndex: 2, searchOn: true)
+                  : null,
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),

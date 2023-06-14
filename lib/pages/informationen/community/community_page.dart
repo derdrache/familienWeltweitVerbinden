@@ -13,7 +13,9 @@ import 'community_card.dart';
 import 'community_erstellen.dart';
 
 class CommunityPage extends StatefulWidget {
-  const CommunityPage({Key? key}) : super(key: key);
+  bool searchOn;
+
+  CommunityPage({Key? key, this.searchOn = false}) : super(key: key);
 
   @override
   State<CommunityPage> createState() => _CommunityPageState();
@@ -36,6 +38,8 @@ class _CommunityPageState extends State<CommunityPage> {
 
   @override
   void initState() {
+    print(onSearch);
+    onSearch = widget.searchOn;
     WidgetsBinding.instance.addPostFrameCallback((_) => initialize());
 
     super.initState();
@@ -148,8 +152,8 @@ class _CommunityPageState extends State<CommunityPage> {
             margin: const EdgeInsets.all(15),
             community: community,
             withFavorite: true,
-            fromCommunityPage: true,
-            afterPageVisit: () => setState(() {}),
+            fromCommunityPage: !onSearch,
+            fromCommunityPageSearch: onSearch,
             afterFavorite: (){
               setState(() {});
             })

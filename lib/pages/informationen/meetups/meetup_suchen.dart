@@ -11,6 +11,7 @@ import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../services/database.dart';
+import '../../start_page.dart';
 import 'meetupCard.dart';
 
 class MeetupSuchenPage extends StatefulWidget {
@@ -277,7 +278,7 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
     }
 
     return Scaffold(
-        appBar: CustomAppBar(title: AppLocalizations.of(context)!.alleMeetups),
+        appBar: CustomAppBar(title: AppLocalizations.of(context)!.alleMeetups, leading: StartPage(selectedIndex: 2, informationPageIndex: 1)),
         body: SafeArea(
           child: Container(
               padding: const EdgeInsets.only(top: 10),

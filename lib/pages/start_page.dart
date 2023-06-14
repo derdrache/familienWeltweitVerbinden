@@ -30,12 +30,15 @@ class StartPage extends StatefulWidget {
   int selectedIndex;
   var informationPageIndex;
   int? chatPageSliderIndex;
+  bool searchOn;
 
   StartPage({
     Key? key,
     this.selectedIndex = 0,
     this.informationPageIndex = 0,
-    this.chatPageSliderIndex}) : super(key: key);
+    this.chatPageSliderIndex,
+    this.searchOn = false
+  }) : super(key: key);
 
   @override
   _StartPageState createState() => _StartPageState();
@@ -285,7 +288,7 @@ class _StartPageState extends State<StartPage> {
     pages = [
       NewsPage(),
       ErkundenPage(),
-      InformationPage(pageSelection: widget.informationPageIndex),
+      InformationPage(pageSelection: widget.informationPageIndex, searchOn: widget.searchOn),
       ChatPage(
           chatPageSliderIndex: widget.chatPageSliderIndex!
       ),

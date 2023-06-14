@@ -10,7 +10,9 @@ import '../../services/database.dart';
 
 class InformationPage extends StatefulWidget {
   var pageSelection;
-  InformationPage({Key? key, this.pageSelection = 0}) : super(key: key);
+  bool searchOn;
+
+  InformationPage({Key? key, this.pageSelection = 0, this.searchOn = false}) : super(key: key);
 
   @override
   State<InformationPage> createState() => _InformationPageState();
@@ -18,13 +20,7 @@ class InformationPage extends StatefulWidget {
 
 class _InformationPageState extends State<InformationPage> with WidgetsBindingObserver{
   var userId = FirebaseAuth.instance.currentUser!.uid;
-  List<Widget> pageList = [
-    const SizedBox.shrink(),
-    const MeetupPage(),
-    const CommunityPage(),
-    LocationPage(forCity: true,),
-    LocationPage(forLand: true,)
-  ];
+  late List<Widget> pageList;
 
   getNumberEventNotification(){
     num eventNotification = 0;
@@ -55,6 +51,14 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
 
   @override
   void initState() {
+    pageList = [
+      const SizedBox.shrink(),
+      const MeetupPage(),
+      CommunityPage(searchOn: widget.searchOn,),
+      LocationPage(forCity: true,),
+      LocationPage(forLand: true,)
+    ];
+
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
