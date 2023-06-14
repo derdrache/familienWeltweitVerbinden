@@ -504,10 +504,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var selectedChatId = global_functions.getChatID(selectedUserId);
     var chatGroupData =
         await ChatDatabase().getChatData("*", "WHERE id = '$selectedChatId'");
+    if(chatGroupData == false){
+      chatGroupData = ChatDatabase().addNewChatGroup(selectedUserId);
+    }
     var forwardMessage = message["forward"].isEmpty
         ? message["von"]
         : message["forward"].split(":")[1].toString();
-
     var messageData = {
       "message": message["message"],
       "von": userId,
