@@ -1467,7 +1467,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     responseMessage(int index, Map message, Map messageBoxInformation) {
       Map replyMessage = {};
-      int replyIndex = messages.length;
+      int replyIndex = 0;
       Map cardData = {};
       String textAddition = "";
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
@@ -1476,10 +1476,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorColor = creatorData["bildStandardFarbe"] ?? deletedUserColor;
 
       for (Map lookMessage in messages.reversed.toList()) {
-        replyIndex -= 1;
-
         if (lookMessage["id"] == message["responseId"]) {
           replyMessage = lookMessage;
+          replyIndex = lookMessage["index"];
           break;
         }
       }
