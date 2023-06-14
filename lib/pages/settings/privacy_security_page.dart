@@ -191,9 +191,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             return CustomAlertDialog(
               title: "Accountid zum löschen eingeben",
               height: 150,
-              children: [
-                Center(child: customTextInput("Account id eingeben", idController))
-              ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
@@ -202,6 +199,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                     Navigator.pop(context);
                   }
                 ),
+              ],
+              children: [
+                Center(child: customTextInput("Account id eingeben", idController))
               ],
             );
           });
@@ -216,12 +216,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.accountLoeschen,
               height: 90,
-              children: [
-                const SizedBox(height: 10),
-                Center(
-                    child: Text(
-                        AppLocalizations.of(context)!.accountWirklichLoeschen))
-              ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
@@ -239,6 +233,12 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                   child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
+              ],
+              children: [
+                const SizedBox(height: 10),
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context)!.accountWirklichLoeschen))
               ],
             );
           });
