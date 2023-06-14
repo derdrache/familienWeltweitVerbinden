@@ -6,28 +6,28 @@ import 'package:intl/intl.dart';
 
 import '../../widgets/text_with_hyperlink_detection.dart';
 
-class pinMessagesPage extends StatelessWidget {
-  var pinMessages;
-  var ownMessageBoxColor = Colors.greenAccent;
-  var chatpartnerMessageBoxColor = Colors.white;
-  var userId = FirebaseAuth.instance.currentUser!.uid;
+class PinMessagesPage extends StatelessWidget {
+  List pinMessages;
+  MaterialAccentColor ownMessageBoxColor = Colors.greenAccent;
+  Color chatpartnerMessageBoxColor = Colors.white;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
 
 
-  pinMessagesPage({this.pinMessages, Key? key}) : super(key: key);
+  PinMessagesPage({required this.pinMessages, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
 
-    _showMessages(){
+    showMessages(){
       List<Widget> messagesBoxList = [];
 
-      for(var message in pinMessages){
-        var textAlign = Alignment.centerLeft;
-        var boxColor = chatpartnerMessageBoxColor;
-        var messageDateTime =
+      for(Map message in pinMessages){
+        Alignment textAlign = Alignment.centerLeft;
+        Color boxColor = chatpartnerMessageBoxColor;
+        DateTime messageDateTime =
         DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
-        var messageTime = DateFormat('HH:mm').format(messageDateTime);
-        var messageEdit = message["editDate"] == null
+        String messageTime = DateFormat('HH:mm').format(messageDateTime);
+        String messageEdit = message["editDate"] == null
             ? ""
             : AppLocalizations.of(context)!.bearbeitet;
 
@@ -35,7 +35,6 @@ class pinMessagesPage extends StatelessWidget {
           textAlign = Alignment.centerRight;
           boxColor = ownMessageBoxColor;
         }
-
 
         messagesBoxList.add(Align(
           alignment: textAlign,
@@ -67,7 +66,7 @@ class pinMessagesPage extends StatelessWidget {
               Positioned(
                 right: 20,
                 bottom: 15,
-                child: Text(messageEdit + " " + messageTime,
+                child: Text("$messageEdit $messageTime",
                     style: TextStyle(color: Colors.grey[600])),
               )
             ],
@@ -82,7 +81,10 @@ class pinMessagesPage extends StatelessWidget {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.angehefteteNachrichten,
       ),
-      body: ListView(reverse: true, children: _showMessages().reversed.toList(),),
+      body: ListView(
+        reverse: true,
+        children: showMessages().reversed.toList(),
+      ),
     );
   }
 }

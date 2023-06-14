@@ -748,7 +748,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     global_functions.changePage(
-        context, pinMessagesPage(pinMessages: allPinMessages));
+        context, PinMessagesPage(pinMessages: allPinMessages));
   }
 
   _jumpToMessageAndShowNextAngeheftet(int index) {
@@ -1490,7 +1490,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       for (Map lookMessage in messages.reversed.toList()) {
         if (lookMessage["id"] == message["responseId"]) {
           replyMessage = lookMessage;
-          replyIndex = lookMessage["index"];
+          replyIndex = lookMessage["index"] ?? 0;
           break;
         }
       }
