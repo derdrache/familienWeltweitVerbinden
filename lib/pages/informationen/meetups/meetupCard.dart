@@ -189,7 +189,7 @@ class _MeetupCardState extends State<MeetupCard> {
         onTap: () => global_func.changePage(
             context,
             MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
-            whenComplete: () =>  widget.afterPageVisit!()),
+            whenComplete: () =>  widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
       child: Container(
           width: (120 + ((screenHeight - 600) / 5)) * sizeRefactor,
           height: screenHeight / 3.2 * sizeRefactor,
