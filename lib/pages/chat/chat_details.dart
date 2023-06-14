@@ -607,8 +607,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     }
 
-
-    print(messageText);
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateChatGroup(
           "lastMessage = '$messageText' , lastMessageDate = '${secondLastMessage["date"]}'",
