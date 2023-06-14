@@ -581,31 +581,41 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   _checkIfLastMessageAndChangeChatGroup(messageId) {
     var lastMessage = messages.last;
-    var secondLastMessage = messages[messages.length - 2];
+    int secondLastMessageIndex = messages.length - 2;
+    String messageText;
+    Map secondLastMessage = {};
 
-    if (messageId != lastMessage["id"]) return;
+    if(secondLastMessageIndex < 0){
+      messageText = "";
+    }else{
+      secondLastMessage = messages[secondLastMessageIndex];
 
-    String messageText = secondLastMessage["message"];
-    widget.groupChatData!["lastMessageDate"] =
-        int.parse(secondLastMessage["date"]);
+      if (messageId != lastMessage["id"]) return;
 
-    if (messageText.contains("</eventId=")) {
-      messageText = "<Event Card>";
+      messageText = secondLastMessage["message"];
+      widget.groupChatData!["lastMessageDate"] =
+          int.parse(secondLastMessage["date"]);
+
+      if (messageText.contains("</eventId=")) {
+        messageText = "<Event Card>";
+      }
+      if (messageText.contains("</communityId=")) {
+        messageText = "<Community Card>";
+      }
+      if (messageText.contains("</cityId=")) {
+        messageText = "<Location Card>";
+      }
     }
-    if (messageText.contains("</communityId=")) {
-      messageText = "<Community Card>";
-    }
-    if (messageText.contains("</cityId=")) {
-      messageText = "<Location Card>";
-    }
 
+
+    print(messageText);
     if (widget.isChatgroup) {
       ChatGroupsDatabase().updateChatGroup(
           "lastMessage = '$messageText' , lastMessageDate = '${secondLastMessage["date"]}'",
           "WHERE id = '${widget.chatId}'");
     } else {
       ChatDatabase().updateChatGroup(
-          "lastMessage = '${secondLastMessage["message"]}' , lastMessageDate = '${secondLastMessage["date"]}'",
+          "lastMessage = '$messageText' , lastMessageDate = '${secondLastMessage["date"]}'",
           "WHERE id = '${widget.chatId}'");
     }
   }
