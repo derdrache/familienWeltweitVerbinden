@@ -73,7 +73,6 @@ class _StartPageState extends State<StartPage> {
 
     bool profileExist = await _checkProfilExist();
     if (!profileExist) changePageForever(context, const CreateProfilPage());
-    await _showPatchnotes();
 
     if (userName == null || ownProfil == null) return;
 
