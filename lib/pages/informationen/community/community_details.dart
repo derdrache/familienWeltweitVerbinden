@@ -42,7 +42,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   var isWebDesktop = kIsWeb &&
       (defaultTargetPlatform != TargetPlatform.iOS ||
           defaultTargetPlatform != TargetPlatform.android);
-  var creatorText = "";
+  var creatorName = "";
   late Map creatorProfil;
   var ownPictureKontroller = TextEditingController();
   late double fontsize;
@@ -68,12 +68,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["beschreibungEng"] = widget.community["beschreibung"];
     }
 
-    _setCreatorText();
+    setCreatorData();
     _initImages();
     _getDBDataSetAllUserNames();
 
     if (!widget.community["link"].contains("http")) {
-      widget.community["link"] = "http://" + widget.community["link"];
+      widget.community["link"] = "http://${widget.community["link"]}";
     }
 
     _controller.addListener(() {
@@ -100,12 +100,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     }
   }
 
-  _setCreatorText() async {
-    creatorProfil = await ProfilDatabase()
-        .getData("*", "WHERE id = '${widget.community["erstelltVon"]}'");
-    creatorText = creatorProfil["name"];
-
-    setState(() {});
+  setCreatorData() {
+    creatorProfil = getProfilFromHive(profilId: widget.community["erstelltVon"]);
+    creatorName = creatorProfil["name"];
   }
 
   Future _initImages() async {
@@ -598,7 +595,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     global_func.changePage(
         context,
         ChatDetailsPage(
-          connectedWith: "</community=" + widget.community["id"],
+          connectedWith: "</community=${widget.community["id"]}",
           isChatgroup: true,
         ));
   }
@@ -630,7 +627,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     isCreator = widget.community["erstelltVon"].contains(userId);
     isMember = widget.community["members"].contains(userId);
 
-    _showMembersWindow() async {
+    showMembersWindow() async {
       var membersID = widget.community["members"];
       var allProfils = Hive.box("secureBox").get("profils");
       var membersProfils = [];
@@ -684,18 +681,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           });
     }
 
-    _deleteWindow() {
+    deleteWindow() {
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.communityLoeschen,
               height: 120,
-              children: [
-                Center(
-                    child: Text(
-                        AppLocalizations.of(context)!.communityWirklichLoeschen))
-              ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
@@ -724,11 +716,16 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   onPressed: () => Navigator.pop(context),
                 )
               ],
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context)!.communityWirklichLoeschen))
+              ],
             );
           });
     }
 
-    _reportWindow() {
+    reportWindow() {
       var reportController = TextEditingController();
 
       showDialog(
@@ -749,8 +746,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                           Navigator.pop(context);
                           ReportsDatabase().add(
                               userId,
-                              "Melde Community id: " +
-                                  widget.community["id"].toString(),
+                              "Melde Community id: ${widget.community["id"]}",
                               reportController.text);
                         },
                         label: Text(AppLocalizations.of(context)!.senden)),
@@ -759,7 +755,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           });
     }
 
-    _reportDialog() {
+    reportDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -770,12 +766,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         ),
         onPressed: () {
           Navigator.pop(context);
-          _reportWindow();
+          reportWindow();
         },
       );
     }
 
-    _showMemberDialog() {
+    showMemberDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -786,12 +782,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         ),
         onPressed: () {
           Navigator.pop(context);
-          _showMembersWindow();
+          showMembersWindow();
         },
       );
     }
 
-    _addMemberWindow() {
+    addMemberWindow() {
       var newUser = "";
 
       searchAutocomplete = SearchAutocomplete(
@@ -818,7 +814,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           });
     }
 
-    _addMemberDialog() {
+    addMemberDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -829,12 +825,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         ),
         onPressed: () {
           Navigator.pop(context);
-          _addMemberWindow();
+          addMemberWindow();
         },
       );
     }
 
-    _settingDialog() {
+    settingDialog() {
       return SimpleDialogOption(
           child: Row(
             children: [
@@ -879,7 +875,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           });
     }
 
-    _deleteDialog() {
+    deleteDialog() {
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -890,12 +886,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         ),
         onPressed: () {
           Navigator.pop(context);
-          _deleteWindow();
+          deleteWindow();
         },
       );
     }
 
-    _leaveDialog(){
+    leaveDialog(){
       return SimpleDialogOption(
         child: Row(
           children: [
@@ -911,7 +907,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
-    _moreMenu() {
+    moreMenu() {
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -925,12 +921,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     insetPadding:
                         const EdgeInsets.only(top: 40, left: 0, right: 10),
                     children: [
-                      _showMemberDialog(),
-                      if (!isCreator) _reportDialog(),
-                      if (isCreator) _addMemberDialog(),
-                      if (isCreator) _settingDialog(),
-                      if (isCreator) _deleteDialog(),
-                      if (!isCreator && isMember) _leaveDialog()
+                      showMemberDialog(),
+                      if (!isCreator) reportDialog(),
+                      if (isCreator) addMemberDialog(),
+                      if (isCreator) settingDialog(),
+                      if (isCreator) deleteDialog(),
+                      if (!isCreator && isMember) leaveDialog()
                     ],
                   ),
                 ),
@@ -939,7 +935,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           });
     }
 
-    _communityImage() {
+    communityImage() {
       var isAssetImage =
           widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
@@ -959,7 +955,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
-    _communityInformation() {
+    communityInformation() {
       var fremdeCommunity = widget.community["ownCommunity"] == 0;
       var isGerman = kIsWeb
           ? window.locale.languageCode == "de"
@@ -1028,7 +1024,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             onTapDown: (tabDetails) {
               var getTabPostion = tabDetails.globalPosition;
               var link = widget.community["link"];
-              if (!link.contains("http")) link = "http://" + link;
+              if (!link.contains("http")) link = "http://$link";
 
               if (isCreator) _changeOrOpenLinkWindow(getTabPostion);
               if (!isCreator) global_func.openURL(widget.community["link"]);
@@ -1061,7 +1057,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       ];
     }
 
-    _footbar() {
+    footbar() {
       return Container(
         width: screenWidth - 20,
         margin: const EdgeInsets.all(10),
@@ -1069,11 +1065,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
           children: [
             InkWell(
-              onTap: () => _showMembersWindow(),
+              onTap: () => showMembersWindow(),
               child: Text(
-                widget.community["members"].length.toString() +
-                    " " +
-                    AppLocalizations.of(context)!.member,
+                "${widget.community["members"].length} ${AppLocalizations.of(context)!.member}",
                 style:
                     TextStyle(color: Theme.of(context).colorScheme.secondary),
               ),
@@ -1089,7 +1083,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                       profil: creatorProfil,
                     )),
                 child: Text(
-                  creatorText,
+                  creatorName,
                   style: TextStyle(
                       fontSize: fontsize,
                       color: Theme.of(context).colorScheme.secondary),
@@ -1115,8 +1109,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 icon: const Icon(Icons.link),
                 onPressed: () {
                   Clipboard.setData(ClipboardData(
-                      text: "</communityId=" +
-                          widget.community["id"].toString()));
+                      text: "</communityId=${widget.community["id"]}"));
 
                   customSnackbar(
                       context, AppLocalizations.of(context)?.linkWurdekopiert,
@@ -1125,7 +1118,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               ),
               IconButton(
                 icon: const Icon(Icons.more_vert),
-                onPressed: () => _moreMenu(),
+                onPressed: () => moreMenu(),
               )
             ],
           ),
@@ -1147,13 +1140,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                                   width: 100,
                                   height: 100,
                                   child: const CircularProgressIndicator()))
-                          : _communityImage(),
+                          : communityImage(),
                       const SizedBox(height: 10),
-                      ..._communityInformation()
+                      ...communityInformation()
                     ],
                   ),
                 ),
-                Positioned(bottom: 0, child: _footbar())
+                Positioned(bottom: 0, child: footbar())
               ],
             ),
           )),
