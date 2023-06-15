@@ -589,17 +589,9 @@ class _SupportInformation extends StatelessWidget {
                 Icons.share,
                 () => Share.share(AppLocalizations.of(context)!.teilenLinkText +
                     '\nhttps://families-worldwide.com/')),
-            /*
-              SizedBox(height: 20),
-              settingThemeContainer("Über das Projekt", Icons.description,
-                  () => AboutProject(context: context).openWindow()
-              ),
-
-               */
-
             const SizedBox(height: 20),
             settingThemeContainer(
-                AppLocalizations.of(context)!.spenden, Icons.card_giftcard,
+                AppLocalizations.of(context)!.spenden, Icons.favorite,
                 () async {
               var url =
                   Uri.parse("https://www.paypal.com/paypalme/DominikMast");
