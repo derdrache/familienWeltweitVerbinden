@@ -15,7 +15,6 @@ import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../services/network_Connectivity.dart';
 import '../widgets/badge_icon.dart';
-import '../windows/patchnotes.dart';
 import 'informationen/information.dart';
 import 'login_register_page/create_profil_page.dart';
 import 'news/news_page.dart';
@@ -105,15 +104,6 @@ class _StartPageState extends State<StartPage> {
     await ProfilDatabase().getData("name", "WHERE id = '$userId'");
 
     return profilExist != false;
-  }
-
-  _showPatchnotes() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    var buildNumber = int.parse(packageInfo.buildNumber);
-
-    if (buildNumber == Hive.box('secureBox').get("version")) return;
-
-    PatchnotesWindow(context: context).openWindow();
   }
 
   _updateOwnLastLogin() async {
