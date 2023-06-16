@@ -160,7 +160,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var meetups = Hive.box('secureBox').get("events") ?? [];
     meetups.add(meetupData);
 
-    global_functions.changePage(context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
+    Navigator.pop(context);
     global_functions.changePage(context, MeetupDetailsPage(meetupData: meetupData));
   }
 

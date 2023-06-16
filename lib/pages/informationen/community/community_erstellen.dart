@@ -199,8 +199,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                 onPressed: () async {
                   var communityData = await saveCommunity();
 
-                  global_func.changePageForever(
-                      context, StartPage(selectedIndex: 2, informationPageIndex: 2,));
+                  Navigator.pop(context);
                   global_func.changePage(
                       context, CommunityDetails(community: communityData));
                 },

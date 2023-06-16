@@ -704,12 +704,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
                     DbDeleteImage(widget.community["bild"]);
 
-                    global_func.changePageForever(
-                        context,
-                        StartPage(
-                          selectedIndex: 2,
-                          informationPageIndex: 2,
-                        ));
+                    Navigator.pop(context);
                   },
                 ),
                 TextButton(
@@ -1098,11 +1093,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       child: Scaffold(
           appBar: CustomAppBar(
             title: widget.community["name"],
-            leading: widget.fromCommunityPage
-                ? StartPage(selectedIndex: 2, informationPageIndex: 2)
-                : widget.fromCommunityPageSearch
-                  ? StartPage(selectedIndex: 2, informationPageIndex: 2, searchOn: true)
-                  : null,
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),

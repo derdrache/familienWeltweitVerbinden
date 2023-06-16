@@ -104,9 +104,6 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
         title: widget.ortName,
-        leading: widget.fromCityPage
-            ? StartPage(selectedIndex: 2, informationPageIndex: isCity ? 3 : 4)
-            : null,
         buttons: [
           IconButton(
             icon: const Icon(Icons.link),

@@ -38,7 +38,6 @@ class _CommunityPageState extends State<CommunityPage> {
 
   @override
   void initState() {
-    print(onSearch);
     onSearch = widget.searchOn;
     WidgetsBinding.instance.addPostFrameCallback((_) => initialize());
 

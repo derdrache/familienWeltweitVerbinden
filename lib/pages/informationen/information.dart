@@ -1,3 +1,4 @@
+import 'package:familien_suche/global/global_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -9,10 +10,8 @@ import 'location/location_page.dart';
 import '../../services/database.dart';
 
 class InformationPage extends StatefulWidget {
-  var pageSelection;
-  bool searchOn;
 
-  InformationPage({Key? key, this.pageSelection = 0, this.searchOn = false}) : super(key: key);
+  InformationPage({Key? key}) : super(key: key);
 
   @override
   State<InformationPage> createState() => _InformationPageState();
@@ -52,9 +51,8 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
   @override
   void initState() {
     pageList = [
-      const SizedBox.shrink(),
       const MeetupPage(),
-      CommunityPage(searchOn: widget.searchOn,),
+      CommunityPage(),
       LocationPage(forCity: true,),
       LocationPage(forLand: true,)
     ];
@@ -91,9 +89,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
     pageCards(title, icon, image, pageIndex) {
       return GestureDetector(
         onTap: () {
-          setState(() {
-            widget.pageSelection = pageIndex;
-          });
+          changePage(context, pageList[pageIndex]);
         },
         child: Container(
           margin: const EdgeInsets.only(left: 10, right: 10),
@@ -114,7 +110,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
                             Colors.black.withOpacity(0.9), BlendMode.dstATop),
                         image: AssetImage(image))),
                 constraints: BoxConstraints(
-                  maxWidth: screenHeight / 2.5
+                    maxWidth: screenHeight / 2.5
                 ),
                 padding: const EdgeInsets.all(5),
                 child: Column(
@@ -146,7 +142,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
         if(number != 0) Positioned(top: -15, right: 0,child: Container(
           width: 40, height: 40,
           decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
             color: Theme.of(context).colorScheme.secondary,
           ),
           child: Center(child: Text(number.toString(), style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold, color: Colors.white),)),
@@ -154,8 +150,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
       ],);
     }
 
-    return widget.pageSelection == 0
-        ? Scaffold(
+    return Scaffold(
         body: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -169,7 +164,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
                           "Meetups",
                           Icons.calendar_month,
                           "assets/bilder/museum.jpg",
-                          1),
+                          0),
                       getNumberEventNotification()
                   ),
                   SizedBox(width: cardAbstandWidth),
@@ -178,7 +173,7 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
                           "Communities",
                           Icons.home,
                           "assets/bilder/village.jpg",
-                          2),
+                          1),
                       getNumberCommunityNotification()
                   )
                 ],
@@ -191,20 +186,20 @@ class _InformationPageState extends State<InformationPage> with WidgetsBindingOb
                       AppLocalizations.of(context)!.cities,
                       Icons.location_city,
                       "assets/bilder/city.jpg",
-                      3),
+                      2),
                   SizedBox(width: cardAbstandWidth),
                   pageCards(
                       AppLocalizations.of(context)!.countries,
                       Icons.flag,
                       "assets/bilder/land.jpg",
-                      4),
+                      3),
                 ],
               ),
               const SizedBox(height: 30),
             ],
           ),
         )
-          )
-        : pageList[widget.pageSelection];
+    );
   }
 }
+

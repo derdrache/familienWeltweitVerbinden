@@ -27,16 +27,12 @@ import 'force_update.dart';
 //ignore: must_be_immutable
 class StartPage extends StatefulWidget {
   int selectedIndex;
-  var informationPageIndex;
   int? chatPageSliderIndex;
-  bool searchOn;
 
   StartPage({
     Key? key,
     this.selectedIndex = 0,
-    this.informationPageIndex = 0,
     this.chatPageSliderIndex,
-    this.searchOn = false
   }) : super(key: key);
 
   @override
@@ -278,7 +274,7 @@ class _StartPageState extends State<StartPage> {
     pages = [
       NewsPage(),
       ErkundenPage(),
-      InformationPage(pageSelection: widget.informationPageIndex, searchOn: widget.searchOn),
+      InformationPage(),
       ChatPage(
           chatPageSliderIndex: widget.chatPageSliderIndex!
       ),
@@ -286,9 +282,6 @@ class _StartPageState extends State<StartPage> {
     ];
 
     void _onItemTapped(int index) {
-      if(index == 2){
-        widget.informationPageIndex = 0;
-      }
       setState(() {
         widget.selectedIndex = index;
       });

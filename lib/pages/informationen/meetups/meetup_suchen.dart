@@ -278,7 +278,7 @@ class _MeetupSuchenPageState extends State<MeetupSuchenPage> {
     }
 
     return Scaffold(
-        appBar: CustomAppBar(title: AppLocalizations.of(context)!.alleMeetups, leading: StartPage(selectedIndex: 2, informationPageIndex: 1)),
+        appBar: CustomAppBar(title: AppLocalizations.of(context)!.alleMeetups),
         body: SafeArea(
           child: Container(
               padding: const EdgeInsets.only(top: 10),
