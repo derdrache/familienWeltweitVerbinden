@@ -28,10 +28,8 @@ import '../location/location_Information.dart';
 
 class CommunityDetails extends StatefulWidget {
   Map community;
-  bool fromCommunityPage;
-  bool fromCommunityPageSearch;
 
-  CommunityDetails({Key? key, required this.community, this.fromCommunityPage = false, this.fromCommunityPageSearch = false})
+  CommunityDetails({Key? key, required this.community})
       : super(key: key);
 
   @override
