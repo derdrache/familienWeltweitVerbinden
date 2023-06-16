@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
-import 'package:familien_suche/pages/start_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
