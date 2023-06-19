@@ -1490,8 +1490,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                         style:
                                             TextStyle(color: timeStampColor)),
                                   ),
-                                  if (message["showTranslationButton"])
-                                    translationButton(message)
+                                  translationButton(message)
                                 ],
                               ),
                             )
