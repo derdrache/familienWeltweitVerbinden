@@ -1,5 +1,4 @@
 import 'package:familien_suche/global/global_functions.dart';
-import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +7,6 @@ import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../services/locationsService.dart';
-import '../../../global/global_functions.dart' as global_functions;
 import 'community_card.dart';
 import 'community_erstellen.dart';
 
@@ -21,18 +19,16 @@ class CommunityPage extends StatefulWidget {
 
 class _CommunityPageState extends State<CommunityPage> {
   var userId = FirebaseAuth.instance.currentUser!.uid;
+  bool onSearch = false;
+  TextEditingController communitySearchKontroller = TextEditingController();
+  FocusNode searchFocusNode = FocusNode();
+  int displayDataEntries = 20;
+
   var allCommunities = Hive.box('secureBox').get("communities") ?? [];
-  var isLoading = true;
-  bool filterOn = false;
-  var filterList = [];
   var allCommunitiesCities = [];
   var allCommunitiesCountries = [];
   bool getInvite = false;
   late int invitedCommunityIndex;
-  bool onSearch = false;
-  TextEditingController communitySearchKontroller = TextEditingController();
-  FocusNode searchFocusNode = FocusNode();
-  String pageTitle = "Communities";
 
   @override
   void initState() {
@@ -49,8 +45,6 @@ class _CommunityPageState extends State<CommunityPage> {
       allCommunitiesCountries.add(
           spracheIstDeutsch ? countryData["nameGer"] : countryData["nameEng"]);
     }
-
-    isLoading = false;
 
     checkCommunityInvite();
 
@@ -126,6 +120,7 @@ class _CommunityPageState extends State<CommunityPage> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    String onSearchText = onSearch ? AppLocalizations.of(context)!.suche : "";
 
     showCommunities() {
       List shownCommunities = onSearch ? getAllSearchCommunities() : getAllFavoritesCommunities();
@@ -209,11 +204,7 @@ class _CommunityPageState extends State<CommunityPage> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: pageTitle,
-        leading: IconButton(
-          onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
-          icon: const Icon(Icons.arrow_back),
-        )
+        title: "$onSearchText Communities",
       ),
       body: SafeArea(
         child: Stack(
@@ -264,11 +255,8 @@ class _CommunityPageState extends State<CommunityPage> {
             backgroundColor: onSearch ? Colors.red : null,
             onPressed: () {
               if(onSearch){
-                pageTitle = "Communities";
                 searchFocusNode.unfocus();
                 communitySearchKontroller.clear();
-              }else{
-                pageTitle = AppLocalizations.of(context)!.suche +" "+ "Communities";
               }
 
               setState(() {
