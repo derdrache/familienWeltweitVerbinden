@@ -382,9 +382,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.groupChatData!["id"]}'");
 
-      var languageCheck = await translator.translate(messageData["message"]);
-      var languageCode = languageCheck.sourceLanguage.code;
+      var translateMessage = await translator.translate(messageData["message"]);
+      var languageCode = translateMessage.sourceLanguage.code;
+      if(languageCode == "auto") translateMessage = await translator.translate(messageData["message"], to: "de");
+
       messageData["language"] = languageCode;
+      messageData["translateMessage"] = translateMessage.text;
 
       await ChatGroupsDatabase().addNewMessageAndNotification(
           widget.groupChatData!["id"], messageData, connectedData["name"]);
@@ -948,6 +951,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return messageBox.length - lastReadMessageIndex;
   }
 
+  getTranslatedMessageText(message){
+    String messageLanguage = message["language"] == "auto" ? "en" : message["language"];
+
+    if(message["von"] == userId) return message["message"];
+
+    if(ownLanguage == messageLanguage || message["translateMessage"].isEmpty || (messageLanguage == "en" && ownLanguage != "de")) {
+      return message["message"];
+    }else{
+      return message["translateMessage"];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Color ownMessageBoxColor =
@@ -1196,69 +1211,74 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     translationButton(Map message) {
-      return Positioned(
-          right: 5,
-          bottom: -10,
-          child: TextButton(
-              child: Text(AppLocalizations.of(context)!.uebersetzen),
-              onPressed: () async {
-                String translationMessage =
-                    message["message"].replaceAll("'", "");
+      if (message["showTranslationButton"]){
+        return Positioned(
+            right: 5,
+            bottom: -10,
+            child: TextButton(
+                child: Text(AppLocalizations.of(context)!.uebersetzen),
+                onPressed: () async {
+                  String translationMessage =
+                  message["message"].replaceAll("'", "");
 
-                var translation = await translator.translate(translationMessage,
-                    from: "auto", to: ownLanguage);
+                  var translation = await translator.translate(translationMessage,
+                      from: "auto", to: ownLanguage);
 
-                showModalBottomSheet<void>(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Stack(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.only(
-                                top: 30, left: 30, bottom: 20, right: 15),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(AppLocalizations.of(context)!.uebersetzen,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 15),
-                                ListView(
-                                  shrinkWrap: true,
-                                  children: [
-                                    Text(
-                                      translation.toString(),
-                                      style: const TextStyle(fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 30),
-                                SizedBox(
-                                  width: double.maxFinite,
-                                  child: FloatingActionButton.extended(
-                                    onPressed: () => Navigator.pop(context),
-                                    label: Text(AppLocalizations.of(context)!
-                                        .uebersetzungSchliessen),
+                  showModalBottomSheet<void>(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      isScrollControlled: true,
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Stack(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.only(
+                                  top: 30, left: 30, bottom: 20, right: 15),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(AppLocalizations.of(context)!.uebersetzen,
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 15),
+                                  ListView(
+                                    shrinkWrap: true,
+                                    children: [
+                                      Text(
+                                        translation.toString(),
+                                        style: const TextStyle(fontSize: 18),
+                                      ),
+                                    ],
                                   ),
-                                )
-                              ],
+                                  const SizedBox(height: 30),
+                                  SizedBox(
+                                    width: double.maxFinite,
+                                    child: FloatingActionButton.extended(
+                                      onPressed: () => Navigator.pop(context),
+                                      label: Text(AppLocalizations.of(context)!
+                                          .uebersetzungSchliessen),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                          const Positioned(
-                              top: 0,
-                              right: 0,
-                              child: CloseButton(
-                                color: Colors.red,
-                              ))
-                        ],
-                      );
-                    });
-              }));
+                            const Positioned(
+                                top: 0,
+                                right: 0,
+                                child: CloseButton(
+                                  color: Colors.red,
+                                ))
+                          ],
+                        );
+                      });
+                }));
+      }else{
+        return SizedBox.shrink();
+      }
+
     }
 
     cardMessage(
@@ -1740,8 +1760,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 style: TextStyle(color: timeStampColor)),
                           ),
                         ),
-                        if (message["showTranslationButton"])
-                          translationButton(message)
+                        translationButton(message)
                       ],
                     ),
                     if (messageBoxInformation["textAlign"] ==
@@ -1864,8 +1883,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             messageBoxInformation["messageTime"],
                         style: TextStyle(color: timeStampColor)),
                   ),
-                  if (message["showTranslationButton"])
-                    translationButton(message)
+                  translationButton(message)
                 ],
               ),
             ],
@@ -1880,6 +1898,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"];
       message["index"] = index;
+      String messageText = getTranslatedMessageText(message);
 
       return Listener(
         onPointerHover: (details) {
@@ -1962,7 +1981,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               alignment: WrapAlignment.end,
                               children: [
                                 TextWithHyperlinkDetection(
-                                    text: message["message"] ?? "",
+                                    text: messageText ?? "",
                                     fontsize: 16,
                                     onTextTab: () =>
                                         openMessageMenu(message, index)),
@@ -1984,8 +2003,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               messageBoxInformation["messageTime"],
                           style: TextStyle(color: timeStampColor)),
                     ),
-                    if (message["showTranslationButton"])
-                      translationButton(message)
+                    translationButton(message)
                   ],
                 ),
               ),
