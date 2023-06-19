@@ -1404,7 +1404,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                         child: Icon(Icons.close,
                                             color: Colors.white, size: 18)),
                                   ),
-                                )
+                                ),
                             ],
                           )),
                       cardIdData["hasOnlyId"]
@@ -1449,7 +1449,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                                   .size
                                                   .width *
                                               0.8),
-                                      margin: const EdgeInsets.all(10),
+                                      margin: EdgeInsets.only(
+                                          left: 10,
+                                          right: 10,
+                                          top: 10,
+                                          bottom: message["showTranslationButton"] ? 25 : 10),
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                           color: messageBoxInformation[
@@ -1478,7 +1482,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                       )),
                                   Positioned(
                                     right: 20,
-                                    bottom: 15,
+                                    bottom: message["showTranslationButton"] ? 30 : 15,
                                     child: Text(
                                         messageBoxInformation["messageEdit"] +
                                             messageBoxInformation[
@@ -1486,6 +1490,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                         style:
                                             TextStyle(color: timeStampColor)),
                                   ),
+                                  if (message["showTranslationButton"])
+                                    translationButton(message)
                                 ],
                               ),
                             )
