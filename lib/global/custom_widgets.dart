@@ -9,7 +9,7 @@ double webWidth = 600;
 
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
-  onSubmit, informationWindow, hintText, focusNode, keyboardType}){
+  onSubmit, informationWindow, hintText, focusNode, keyboardType, maxLength}){
 
   return Stack(
     children: [
@@ -17,6 +17,7 @@ Widget customTextInput(text, controller, {validator, passwort = false,
         alignment: Alignment.center,
         child: Container(
             width: webWidth,
+            color: Colors.white,
             margin: EdgeInsets.all(sideSpace),
             child: TextFormField(
                 focusNode: focusNode,
@@ -40,7 +41,9 @@ Widget customTextInput(text, controller, {validator, passwort = false,
                   hintText: hintText,
                   labelText: text,
                   labelStyle: const TextStyle(fontSize: 15, color: Colors.grey),
+                  counterText: "",
                 ),
+                maxLength: maxLength,
                 validator: validator
             ),
         ),
