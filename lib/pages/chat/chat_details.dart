@@ -19,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:translator/translator.dart';
 
+import '../../services/languageService.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
 import '../informationen/meetups/meetupCard.dart';
@@ -952,12 +953,25 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getTranslatedMessageText(message){
+    List userLanguages = ownProfil["sprachen"];
     String messageLanguage = message["language"] == "auto" ? "en" : message["language"];
     bool showOriginalMessage = message["original"] ?? false;
+    bool understandMessageLanguage = false;
+
+    for(var language in userLanguages){
+      if(LanguageLocal().getDisplayLanguage(language) == messageLanguage){
+        understandMessageLanguage = true;
+      }
+    }
 
     if(message["von"] == userId) return message["message"];
 
-    if(ownLanguage == messageLanguage || message["translateMessage"].isEmpty || (messageLanguage == "en" && ownLanguage != "de") || showOriginalMessage) {
+    if(ownLanguage == messageLanguage
+        || message["translateMessage"].isEmpty
+        || (messageLanguage == "en" && ownLanguage != "de")
+        || showOriginalMessage
+        || understandMessageLanguage
+    ) {
       return message["message"];
     }else{
       return message["translateMessage"];
