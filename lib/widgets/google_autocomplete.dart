@@ -15,7 +15,7 @@ class GoogleAutoComplete extends StatefulWidget {
   var googleSearchResult;
   var sessionToken = const Uuid().v4();
   Function? onConfirm;
-  bool withoutTopMargin;
+  var margin;
 
   getGoogleLocationData() {
     return googleSearchResult ??
@@ -54,7 +54,7 @@ class GoogleAutoComplete extends StatefulWidget {
     this.width,
     this.suche = true,
     this.onConfirm,
-    this.withoutTopMargin = false
+    this.margin = const EdgeInsets.only(top: 5, bottom:5, left:10, right:10),
   }) : super(key: key);
 
   @override
@@ -150,7 +150,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
           borderRadius: const BorderRadius.all(Radius.circular(5)),
           border: Border.all()),
       height: dropdownExtraBoxHeight + dropdownItemSumHeight,
-      margin: EdgeInsets.only(top: widget.withoutTopMargin ? 0 : 5, bottom:5, left:10, right:10),
+      margin: widget.margin,
       child: Stack(
         clipBehavior: Clip.none,
         children: [

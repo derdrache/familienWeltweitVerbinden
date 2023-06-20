@@ -13,7 +13,6 @@ import 'package:uuid/uuid.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import 'community_details.dart';
 import '../../../widgets/google_autocomplete.dart';
-import '../../start_page.dart';
 
 class CommunityErstellen extends StatefulWidget {
   const CommunityErstellen({Key? key}) : super(key: key);
@@ -26,7 +25,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var nameController = TextEditingController();
   var beschreibungKontroller = TextEditingController();
   var linkKontroller = TextEditingController();
-  var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true,);
+  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10),);
   var userId = Hive.box("secureBox").get("ownProfil")["id"];
   var ownCommunity = true;
   final translator = GoogleTranslator();

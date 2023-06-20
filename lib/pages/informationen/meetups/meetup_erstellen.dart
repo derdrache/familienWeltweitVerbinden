@@ -41,7 +41,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   late var sprachenAuswahlBox;
   late var meetupArtDropdown;
   late var ortTypDropdown;
-  var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true);
+  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10));
   late var meetupIntervalDropdown;
   var ownMeetup = true;
   final translator = GoogleTranslator();
