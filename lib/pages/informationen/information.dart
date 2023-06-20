@@ -113,30 +113,28 @@ class _InformationPageState extends State<InformationPage>
                 child: Row(
                   children: [
                     Container(
-                        padding: EdgeInsets.only(left: 20),
-                        child: Container(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: SizedBox(
                             width: 30,
                             height: 30,
                             child: Image.asset(icon))),
-                    Container(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          child: Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    Expanded(child: SizedBox.shrink()),
+                    const Expanded(child: SizedBox.shrink()),
                     Container(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Icon(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: const Icon(
                         Icons.arrow_forward,
                         color: Colors.black,
                       ),
