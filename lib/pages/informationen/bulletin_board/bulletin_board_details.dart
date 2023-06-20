@@ -8,16 +8,16 @@ class BulletinBoardDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     showTitle() {
       return Container(
-          margin: const EdgeInsets.all(10),
+          margin: const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20),
           child: Text(
-            "B"*50,
+            "B"*45,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
           ));
     }
 
     showBasicInformation(title, body) {
       return Container(
-        margin: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+        margin: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
         child: Row(
           children: [
             Text("$title: ", style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -29,8 +29,8 @@ class BulletinBoardDetails extends StatelessWidget {
 
     showDescription() {
       return Container(
-          margin: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 10),
-          child: Text("H" * 700));
+          margin: const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 10),
+          child: Text("H" * 650));
     }
 
     showImages() {
