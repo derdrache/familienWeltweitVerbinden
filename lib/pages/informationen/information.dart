@@ -10,7 +10,6 @@ import '../informationen/meetups/meetup_page.dart';
 import 'location/location_page.dart';
 import '../../services/database.dart';
 
-
 class InformationPage extends StatefulWidget {
   InformationPage({Key? key}) : super(key: key);
 
@@ -91,7 +90,7 @@ class _InformationPageState extends State<InformationPage>
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
-    pageCards(title, icon, image, pageIndex) {
+    pageCards(title, icon, pageIndex) {
       return GestureDetector(
         onTap: () {
           changePage(context, pageList[pageIndex]);
@@ -107,17 +106,18 @@ class _InformationPageState extends State<InformationPage>
             child: Container(
                 width: 300,
                 height: 80,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15.0)
-                ),
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(15.0)),
                 constraints: BoxConstraints(maxWidth: screenHeight / 2.5),
                 padding: const EdgeInsets.all(5),
                 child: Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.only(left: 10), child: Container(width:30, height: 30, child: Image.asset("assets/community.png"))
-                    ),
-
+                        padding: EdgeInsets.only(left: 20),
+                        child: Container(
+                            width: 30,
+                            height: 30,
+                            child: Image.asset(icon))),
                     Container(
                       child: Align(
                         alignment: Alignment.centerLeft,
@@ -126,7 +126,9 @@ class _InformationPageState extends State<InformationPage>
                           child: Text(
                             title,
                             style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold, ),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -134,7 +136,10 @@ class _InformationPageState extends State<InformationPage>
                     Expanded(child: SizedBox.shrink()),
                     Container(
                       padding: EdgeInsets.only(right: 10),
-                      child: Icon(Icons.arrow_forward, color: Colors.black,),
+                      child: Icon(
+                        Icons.arrow_forward,
+                        color: Colors.black,
+                      ),
                     )
                   ],
                 )),
@@ -161,12 +166,12 @@ class _InformationPageState extends State<InformationPage>
                   ),
                   child: Center(
                       child: Text(
-                        number.toString(),
-                        style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      )),
+                    number.toString(),
+                    style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  )),
                 ))
         ],
       );
@@ -174,32 +179,27 @@ class _InformationPageState extends State<InformationPage>
 
     return Scaffold(
         body: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                const SizedBox(height: 15),
-                badgeCard(
-                    pageCards("Meetups", Icons.calendar_month,
-                        "assets/bilder/museum.jpg", 0),
-                    getNumberEventNotification()),
-                const SizedBox(height: 30),
-                badgeCard(
-                    pageCards(
-                        "Communities", Icons.home, "assets/bilder/village.jpg", 1),
-                    getNumberCommunityNotification()),
-                const SizedBox(height: 30),
-                pageCards(AppLocalizations.of(context)!.cities, Icons.location_city,
-                    "assets/bilder/city.jpg", 2),
-                const SizedBox(height: 30),
-                pageCards(AppLocalizations.of(context)!.countries, Icons.flag,
-                    "assets/bilder/land.jpg", 3),
-                const SizedBox(height: 30),
-                pageCards("Schwarzes Brett", Icons.flag,
-                    "assets/bilder/wandern.jpg", 4),
-                const SizedBox(height: 15),
-              ],
-            ),
-          ),
-        ));
+      child: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 15),
+            badgeCard(
+                pageCards("Meetups", "assets/icons/meetup.png", 0),
+                getNumberEventNotification()),
+            const SizedBox(height: 30),
+            badgeCard(
+                pageCards("Communities", "assets/icons/community.png", 1),
+                getNumberCommunityNotification()),
+            const SizedBox(height: 30),
+            pageCards(AppLocalizations.of(context)!.cities, "assets/icons/village.png", 2),
+            const SizedBox(height: 30),
+            pageCards(AppLocalizations.of(context)!.countries, "assets/icons/country_flags.png", 3),
+            const SizedBox(height: 30),
+            pageCards("Schwarzes Brett","assets/icons/schedule.png", 4),
+            const SizedBox(height: 15),
+          ],
+        ),
+      ),
+    ));
   }
 }
