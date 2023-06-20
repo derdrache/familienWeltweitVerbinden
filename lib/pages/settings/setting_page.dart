@@ -547,6 +547,14 @@ class _SupportInformation extends StatelessWidget {
                     Text("Flutter"),
                   ],
                 ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Text("Icons: ",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("created by Freepik - Flaticon"),
+                  ],
+                ),
                 const SizedBox(height: 20),
                 Text(AppLocalizations.of(context)!.aboutAppText)
               ],
