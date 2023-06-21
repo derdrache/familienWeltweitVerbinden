@@ -2,7 +2,9 @@ import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 
 class BulletinBoardDetails extends StatelessWidget {
-  const BulletinBoardDetails({Key? key});
+  Map note;
+
+  BulletinBoardDetails({Key? key, required this.note});
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +72,6 @@ class BulletinBoardDetails extends StatelessWidget {
           children: [
             showTitle(),
             showBasicInformation("Ort", "Weltweit"),
-            showBasicInformation("Kosten", "kostenlos"),
             showDescription(),
             const Expanded(child: SizedBox.shrink()),
             showImages()

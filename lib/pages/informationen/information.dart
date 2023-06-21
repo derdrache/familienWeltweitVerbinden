@@ -84,6 +84,7 @@ class _InformationPageState extends State<InformationPage>
     refreshHiveMeetups();
     refreshHiveProfils();
     refreshHiveCommunities();
+    refreshHiveBulletinBoardNotes();
   }
 
   @override

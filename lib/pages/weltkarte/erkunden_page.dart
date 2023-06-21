@@ -120,6 +120,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     refreshHiveChats();
     await refreshHiveMeetups();
     await refreshHiveCommunities();
+    refreshHiveBulletinBoardNotes();
   }
 
 

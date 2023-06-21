@@ -71,15 +71,15 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
                 height: double.infinity,
                 child: SingleChildScrollView(
                     controller: _scrollController,
-                    child: const SizedBox(
+                    child: SizedBox(
                       width: double.infinity,
                       child: Wrap(
                         alignment: WrapAlignment.center,
                         children: [
-                          BulletinBoardCard(),
-                          BulletinBoardCard(),
-                          BulletinBoardCard(),
-                          BulletinBoardCard()
+                          BulletinBoardCard(note: {}),
+                          BulletinBoardCard(note: {}),
+                          BulletinBoardCard(note: {}),
+                          BulletinBoardCard(note: {})
                         ],
                       ),
                     )),

@@ -5,7 +5,9 @@ import 'dart:math';
 import 'bulletin_board_details.dart';
 
 class BulletinBoardCard extends StatefulWidget {
-  const BulletinBoardCard({Key? key});
+  Map note;
+
+  BulletinBoardCard({Key? key, required this.note});
 
   @override
   State<BulletinBoardCard> createState() => _BulletinBoardCardState();
@@ -51,7 +53,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
   Widget build(BuildContext context) {
 
     return InkWell(
-      onTap: () => changePage(context, BulletinBoardDetails()),
+      onTap: () => changePage(context, BulletinBoardDetails(note: widget.note)),
       child: Container(
         margin: EdgeInsets.all(10),
         padding: EdgeInsets.all(5),

@@ -1270,11 +1270,84 @@ class NotizDatabase{
   }
 }
 
-uploadImage(imagePath, imageName, image) async {
+class BulletinBoardDatabase {
+  addNewNote(note) async {
+    note["titleGer"] = note["titleGer"].replaceAll("'", "''");
+    note["titleEng"] = note["titleEng"].replaceAll("'", "''");
+    note["beschreibungGer"] = note["beschreibungGer"].replaceAll("'", "''");
+    note["beschreibungEng"] = note["beschreibungEng"].replaceAll("'", "''");
+    note["location"] = json.encode(note["location"]);
+    note["bilder"] = json.encode(note["bilder"]);
+
+    var url = Uri.parse(databaseUrl + databasePathNewBulletinNote);
+    var test = await http.post(url, body: json.encode(note));
+    print(test.body);
+  }
+
+  update(whatData, queryEnd) async {
+    var url = Uri.parse(databaseUrl + databasePathUpdate);
+
+    await http.post(url,
+        body: json.encode({
+          "table": "bulletin_board_notes",
+          "whatData": whatData,
+          "queryEnd": queryEnd
+        }));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    var url = Uri.parse(databaseUrl + databasePathGetData);
+
+    var res = await http.post(url,
+        body: json.encode({
+          "whatData": whatData,
+          "queryEnd": queryEnd,
+          "table": "bulletin_board_notes"
+        }));
+
+    dynamic responseBody = res.body;
+
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if (responseBody.isEmpty) return false;
+
+    for (var i = 0; i < responseBody.length; i++) {
+      if (responseBody[i].keys.toList().length == 1) {
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for (var key in responseBody[i].keys.toList()) {
+        try {
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        } catch (_) {}
+      }
+    }
+
+    if (responseBody.length == 1 && !returnList) {
+      responseBody = responseBody[0];
+      try {
+        responseBody = jsonDecode(responseBody);
+      } catch (_) {}
+    }
+
+    return responseBody;
+  }
+
+  delete(newsId) {
+    _deleteInTable("bulletin_board_notes", "id", newsId);
+  }
+}
+
+uploadImage(imagePath, imageName, image, folder) async {
   var url = Uri.parse(databasePathUploadImage);
   var data = {
     "imagePath": imagePath,
     "imageName": imageName,
+    "folder": folder,
     "image": base64Encode(image),
   };
 
@@ -1644,6 +1717,13 @@ refreshHiveFamilyProfils() async {
       await FamiliesDatabase().getData("*", "", returnList: true);
   if (familyProfils == false) familyProfils = [];
   Hive.box("secureBox").put("familyProfils", familyProfils);
+}
+
+refreshHiveBulletinBoardNotes() async {
+  var bulletinBoardNotes =
+    await BulletinBoardDatabase().getData("*", "", returnList: true);
+  if (bulletinBoardNotes == false) bulletinBoardNotes = [];
+  Hive.box("secureBox").put("bulletinBoardNotes", bulletinBoardNotes);
 }
 
 decryptProfil(profil){
