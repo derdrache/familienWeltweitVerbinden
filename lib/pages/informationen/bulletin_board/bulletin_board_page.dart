@@ -1,3 +1,4 @@
+import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_erstellen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -8,12 +9,12 @@ import '../../../global/global_functions.dart' as global_functions;
 import '../../start_page.dart';
 import 'bulletin_board_note.dart';
 
-
 class BulletinBoardPage extends StatefulWidget {
   bool forCity;
   bool forLand;
 
-  BulletinBoardPage({Key? key, this.forCity = false, this.forLand = false}) : super(key: key);
+  BulletinBoardPage({Key? key, this.forCity = false, this.forLand = false})
+      : super(key: key);
 
   @override
   State<BulletinBoardPage> createState() => _BulletinBoardPageState();
@@ -33,11 +34,11 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
     super.initState();
   }
 
-  _scrollBar(){
+  _scrollBar() {
     _scrollController.addListener(() {
       bool isBottom = _scrollController.position.atEdge;
 
-      if(isBottom){
+      if (isBottom) {
         setState(() {
           displayDataEntries += 20;
         });
@@ -52,9 +53,14 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
 
     return Scaffold(
         appBar: CustomAppBar(
-          title: "$onSearchText ${AppLocalizations.of(context)!.schwarzesBrett}",
+          title:
+              "$onSearchText ${AppLocalizations.of(context)!.schwarzesBrett}",
           leading: IconButton(
-            onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
+            onPressed: () => global_functions.changePageForever(
+                context,
+                StartPage(
+                  selectedIndex: 2,
+                )),
             icon: const Icon(Icons.arrow_back),
           ),
         ),
@@ -65,37 +71,41 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
                 height: double.infinity,
                 child: SingleChildScrollView(
                     controller: _scrollController,
-                    child: SizedBox(
+                    child: const SizedBox(
                       width: double.infinity,
                       child: Wrap(
                         alignment: WrapAlignment.center,
-                        children: [const BulletinBoardCard(), const BulletinBoardCard(), const BulletinBoardCard(), const BulletinBoardCard()],
+                        children: [
+                          BulletinBoardCard(),
+                          BulletinBoardCard(),
+                          BulletinBoardCard(),
+                          BulletinBoardCard()
+                        ],
                       ),
                     )),
               ),
-              if(onSearch) Positioned(
-                  bottom: 15,
-                  right: 15,
-                  child: Container(
-                    width: width*0.9,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        border: Border.all(),
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.all(Radius.circular(20))
-                    ),
-                    child: TextField(
-                      controller: noteSearchKontroller,
-                      focusNode: searchFocusNode,
-                      decoration: InputDecoration(
-                          labelText: AppLocalizations.of(context)!.suche,
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(10)
+              if (onSearch)
+                Positioned(
+                    bottom: 15,
+                    right: 15,
+                    child: Container(
+                      width: width * 0.9,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          border: Border.all(),
+                          color: Colors.white,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(20))),
+                      child: TextField(
+                        controller: noteSearchKontroller,
+                        focusNode: searchFocusNode,
+                        decoration: InputDecoration(
+                            labelText: AppLocalizations.of(context)!.suche,
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.all(10)),
+                        onChanged: (_) => setState(() {}),
                       ),
-                      onChanged: (_) => setState((){}),
-                    ),
-                  )
-              )
+                    ))
             ],
           ),
         ),
@@ -105,13 +115,14 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
             FloatingActionButton(
                 heroTag: "create note",
                 child: const Icon(Icons.create),
-                onPressed: null),
+                onPressed: () => global_functions.changePage(
+                    context, const BulletonBoardCreate())),
             const SizedBox(height: 10),
             FloatingActionButton(
-              mini: onSearch ? true: false,
+              mini: onSearch ? true : false,
               backgroundColor: onSearch ? Colors.red : null,
               onPressed: () {
-                if(onSearch){
+                if (onSearch) {
                   searchFocusNode.unfocus();
                   noteSearchKontroller.clear();
                 }
@@ -123,7 +134,6 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
               child: Icon(onSearch ? Icons.close : Icons.search),
             ),
           ],
-        )
-    );
+        ));
   }
 }
