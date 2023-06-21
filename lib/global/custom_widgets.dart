@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 double sideSpace = 10;
@@ -9,22 +10,30 @@ double webWidth = 600;
 
 Widget customTextInput(text, controller, {validator, passwort = false,
   moreLines = 1,TextInputAction textInputAction = TextInputAction.done,
-  onSubmit, informationWindow, hintText, focusNode, keyboardType, maxLength}){
+  onSubmit, informationWindow, hintText, focusNode, keyboardType, maxLength, onlyNumbers = false}){
+
+  List<TextInputFormatter>? inputFormater;
+
+  if(onlyNumbers){
+    keyboardType = TextInputType.number;
+    inputFormater = [FilteringTextInputFormatter.digitsOnly];
+  }
 
   return Stack(
     children: [
       Align(
         alignment: Alignment.center,
         child: Container(
-            width: webWidth,
+            constraints: BoxConstraints(maxWidth: webWidth),
             color: Colors.white,
             margin: EdgeInsets.all(sideSpace),
             child: TextFormField(
+                inputFormatters: inputFormater,
                 focusNode: focusNode,
                 onFieldSubmitted: (string) {
                   if(onSubmit != null)onSubmit();
                 },
-                keyboardType: keyboardType == null ? null :  TextInputType.emailAddress,
+                keyboardType: keyboardType ?? TextInputType.emailAddress,
                 textInputAction: textInputAction,
                 textAlignVertical: TextAlignVertical.top,
                 maxLines: moreLines,
@@ -176,12 +185,14 @@ class CustomDropDownButton extends StatefulWidget {
   String? selected;
   double? width;
   var onChange;
+  var margin;
 
   CustomDropDownButton({Key? key,
     required this.items,
     this.hintText = "",
     this.selected = "",
     this.labelText = "",
+    this.margin = const EdgeInsets.all(10),
     this.onChange,
     this.width
   }) : super(key: key);
@@ -210,7 +221,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
   Widget build(BuildContext context) {
     return Container(
       width: widget.width ?? webWidth,
-      margin: const EdgeInsets.all(10),
+      margin: widget.margin,
       padding: const EdgeInsets.only(left: 10),
       constraints: const BoxConstraints(
         minHeight: 50.0,
@@ -218,6 +229,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
       ),
       decoration: BoxDecoration(
           border: Border.all(width: 1),
+          color: Colors.white,
           borderRadius: const BorderRadius.all(Radius.circular(5))
       ),
       child: DropdownButtonHideUnderline(
