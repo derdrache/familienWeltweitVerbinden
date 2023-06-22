@@ -27,6 +27,7 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
   FocusNode searchFocusNode = FocusNode();
   final _scrollController = ScrollController();
   int displayDataEntries = 20;
+  var allBulletinBoardNotes = Hive.box('secureBox').get("bulletinBoardNotes") ?? [];
 
   @override
   void initState() {
@@ -76,11 +77,8 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
                       child: Wrap(
                         alignment: WrapAlignment.center,
                         children: [
-                          BulletinBoardCard(note: {}),
-                          BulletinBoardCard(note: {}),
-                          BulletinBoardCard(note: {}),
-                          BulletinBoardCard(note: {})
-                        ],
+                          for ( var note in allBulletinBoardNotes ) BulletinBoardCard(note: note)
+                        ]
                       ),
                     )),
               ),

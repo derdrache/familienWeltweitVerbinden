@@ -77,6 +77,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
       newNote["beschreibungGer"] = descriptionKontroller.text;
       newNote["titleEng"] = titleTranslation.toString();
       newNote["beschreibungEng"] = descriptionTranslation.toString();
+      newNote["beschreibungEng"] += "\n\nThis is an automatic translation";
     } else {
       var titleTranslation = await translator.translate(titleKontroller.text,
           from: "auto", to: "de");
@@ -87,6 +88,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
       newNote["beschreibungEng"] = descriptionKontroller.text;
       newNote["titleGer"] = titleTranslation.toString();
       newNote["beschreibungGer"] = descriptionTranslation.toString();
+      newNote["beschreibungGer"] += "\n\nDies ist eine automatische Übersetzung";
     }
 
     await BulletinBoardDatabase().addNewNote(Map.of(newNote));
@@ -208,7 +210,6 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
                             Icon(Icons.close, color: Colors.white, size: 18)),
                   ),
                 )
-              //Positioned(right: -3, top: -3, child: Icon(Icons.close))
             ],
           ),
         ));

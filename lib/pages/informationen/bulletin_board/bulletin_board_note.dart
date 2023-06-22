@@ -1,5 +1,6 @@
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'dart:math';
 
 import 'bulletin_board_details.dart';
@@ -14,8 +15,26 @@ class BulletinBoardCard extends StatefulWidget {
 }
 
 class _BulletinBoardCardState extends State<BulletinBoardCard> {
-  String noteLocation = "Puerto Morelosss";
-  String noteCountry = "Mexico";
+  var ownProfil = Hive.box("secureBox").get("ownProfil");
+  String systemLanguage =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+  late String noteLocation;
+  late String noteCountry;
+  late bool noteLanguageGerman;
+  late bool userSpeakGerman;
+  late bool userSpeakEnglish;
+
+@override
+  void initState() {
+  noteLocation = widget.note["location"]["city"];
+  noteCountry = widget.note["location"]["countryname"];
+  noteLanguageGerman = widget.note["beschreibungGer"].contains("Dies ist eine automatische Übersetzung");
+  userSpeakGerman = ownProfil["sprachen"].contains("Deutsch")
+      || ownProfil["sprachen"].contains("german") || systemLanguage == "de";
+    userSpeakEnglish = ownProfil["sprachen"].contains("Englisch")
+      || ownProfil["sprachen"].contains("english") || systemLanguage == "en";
+    super.initState();
+  }
 
   double getRandomRange() {
     Random random = new Random();
@@ -32,12 +51,22 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
   }
 
   getNoteTitle(){
-    String noteTitle = "Bücher zu verschenken";
+    String title;
 
-    if(noteTitle.length > 30){
-      return "${noteTitle.substring(0,28)}...";
+    if(noteLanguageGerman && userSpeakGerman){
+      title = widget.note["titleGer"];
+    }else if (!noteLanguageGerman && userSpeakEnglish){
+      title = widget.note["titleEng"];
+    }else if(userSpeakGerman){
+      title = widget.note["titleGer"];
     }else{
-      return noteTitle;
+      title = widget.note["titleEng"];
+    }
+
+    if(title.length > 30){
+      return "${title.substring(0,28)}...";
+    }else{
+      return title;
     }
   }
 
