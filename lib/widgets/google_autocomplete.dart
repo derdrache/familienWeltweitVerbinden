@@ -1,5 +1,6 @@
 import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import '../global/variablen.dart' as global_var;
 
@@ -16,6 +17,7 @@ class GoogleAutoComplete extends StatefulWidget {
   var sessionToken = const Uuid().v4();
   Function? onConfirm;
   var margin;
+  bool withOwnLocation;
 
   getGoogleLocationData() {
     return googleSearchResult ??
@@ -33,6 +35,7 @@ class GoogleAutoComplete extends StatefulWidget {
     searchableItems = [];
     var googleSuche = await LocationService()
         .getGoogleAutocompleteItems(googleInput, sessionToken);
+
     if (googleSuche.isEmpty) return;
 
     final Map<String, dynamic> data = Map.from(googleSuche);
@@ -55,6 +58,7 @@ class GoogleAutoComplete extends StatefulWidget {
     this.suche = true,
     this.onConfirm,
     this.margin = const EdgeInsets.only(top: 5, bottom:5, left:10, right:10),
+    this.withOwnLocation = false
   }) : super(key: key);
 
   @override
@@ -63,6 +67,7 @@ class GoogleAutoComplete extends StatefulWidget {
 
 class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   double dropdownExtraBoxHeight = 50;
+  var ownProfil = Hive.box("secureBox").get("ownProfil");
 
   showAutoComplete(text) {
     if (text.length == 0) {
@@ -110,8 +115,15 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
     dropDownItem(item) {
       return GestureDetector(
         onTapDown: (details) async {
-          widget.googleSearchResult =
+          if(item["place_id"] == null){
+            widget.googleSearchResult = {
+              "city": ownProfil["ort"], "countryname": ownProfil["land"], "longt": ownProfil["longt"], "latt": ownProfil["latt"]};
+            item["description"] = "${ownProfil["ort"]}, ${ownProfil["land"]}";
+          }else{
+            widget.googleSearchResult =
               await getGoogleSearchLocationData(item["place_id"]);
+          }
+
           widget.searchKontroller.text = item["description"];
           resetSearchBar();
           if(widget.onConfirm != null) widget.onConfirm!();
@@ -126,10 +138,10 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
       );
     }
 
-    autoCompleteDropdownBox() {
+    autoCompleteDropdownBox(dropBoxItems) {
       List<Widget> autoCompleteList = [];
 
-      for (var item in widget.autoCompleteItems) {
+      for (var item in dropBoxItems) {
         autoCompleteList.add(dropDownItem(item));
       }
 
@@ -141,6 +153,15 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
           children: autoCompleteList,
         ),
       );
+    }
+
+    openOwnLocationSelection(focusOn){
+      if(!focusOn || !widget.withOwnLocation) return;
+
+      showAutoComplete("hallo");
+      widget.searchableItems.add({"description": "Eigener Standort"});
+      addAutoCompleteItems({"description": "Hallo"});
+
     }
 
     return Container(
@@ -158,26 +179,38 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 10),
-                child: TextField(
-                    textAlignVertical: TextAlignVertical.top,
-                    controller: widget.searchKontroller,
-                    decoration: InputDecoration(
-                        isDense: widget.isDense,
-                        border: InputBorder.none,
-                        hintText: widget.hintText,
-                        hintStyle:
-                            const TextStyle(fontSize: 15, color: Colors.grey)),
-                    style: const TextStyle(),
-                    onChanged: (value) async {
-                      await widget._googleAutoCompleteSuche(value);
+                child: FocusScope(
+                  child: Focus(
+                    onFocusChange: (focusOn){
+                      openOwnLocationSelection(focusOn);
+                    },
+                    child: TextField(
+                        textAlignVertical: TextAlignVertical.top,
+                        controller: widget.searchKontroller,
+                        decoration: InputDecoration(
+                            isDense: widget.isDense,
+                            border: InputBorder.none,
+                            hintText: widget.hintText,
+                            hintStyle:
+                                const TextStyle(fontSize: 15, color: Colors.grey)),
+                        style: const TextStyle(),
+                        onChanged: (value) async {
+                          if(value.isEmpty && widget.withOwnLocation){
+                            widget.searchableItems = [];
+                            openOwnLocationSelection(true);
+                          }else{
+                            await widget._googleAutoCompleteSuche(value);
 
-                      showAutoComplete(value);
-                      addAutoCompleteItems(value);
+                            showAutoComplete(value);
+                            addAutoCompleteItems(value);
+                          }
 
-                      setState(() {});
-                    }),
+                          setState(() {});
+                        }),
+                  ),
+                ),
               ),
-              if (widget.isSearching) autoCompleteDropdownBox()
+              if (widget.isSearching) autoCompleteDropdownBox(widget.autoCompleteItems)
             ],
           ),
           const Positioned(
