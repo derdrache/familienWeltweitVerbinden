@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 import '../global/variablen.dart' as global_var;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GoogleAutoComplete extends StatefulWidget {
   List searchableItems = [];
@@ -159,9 +160,8 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
       if(!focusOn || !widget.withOwnLocation) return;
 
       showAutoComplete("hallo");
-      widget.searchableItems.add({"description": "Eigener Standort"});
-      addAutoCompleteItems({"description": "Hallo"});
-
+      widget.searchableItems.add({"description": AppLocalizations.of(context)!.aktuellenOrtVerwenden});
+      addAutoCompleteItems({"description": ""});
     }
 
     return Container(
