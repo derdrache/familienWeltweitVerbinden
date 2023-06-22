@@ -462,6 +462,7 @@
     "aboutAppText": "Families worldwide was created to connect people. Everyone can be as anonymous as they want. There is no commercial background. Your data will not be shared or sold.\n\nThereby there is no budget for advertising and it is up to you, the community, if this app will grow in popularity over the years or not.\n\nThe code of the app is publicly available. Only the php files for the database link are under lock and key for security reasons.\n\nIf you miss a function in the app, you found a bug or a process does not run as fast / well as you would like, then write me a feedback or write me directly in the support chat of the app (both can be found under Settings).\n\nI am very happy about donations to cover the running costs of the app.\n\nThank you very much for your support\n\nDominik Mast",
     "schwarzesBrett": "Bulletin board",
     "titelEingeben": "Enter title",
-    "beschreibungEingeben": "Enter description"
+    "beschreibungEingeben": "Enter description",
+    "bulletinNoteLoeschen": "delete note"
 }
 

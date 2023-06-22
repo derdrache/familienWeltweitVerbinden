@@ -4,9 +4,9 @@ import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
-import 'package:translator/translator.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../functions/translation.dart';
 import '../../../functions/upload_and_save_image.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../widgets/dialogWindow.dart';
@@ -61,35 +61,13 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
   }
 
   saveInDB(newNote) async {
-    final translator = GoogleTranslator();
-    var languageCheck = await translator.translate(descriptionKontroller.text);
-    bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
+    var titleTranslationData = await translation(titleKontroller.text);
+    var descriptionTranslationData = await translation(descriptionKontroller.text);
 
-    newNote["sprache"] = languageCheck.sourceLanguage.code;
-
-    if (descriptionIsGerman) {
-      var titleTranslation = await translator.translate(titleKontroller.text,
-          from: "de", to: "auto");
-      var descriptionTranslation = await translator
-          .translate(descriptionKontroller.text, from: "de", to: "auto");
-
-      newNote["titleGer"] = titleKontroller.text;
-      newNote["beschreibungGer"] = descriptionKontroller.text;
-      newNote["titleEng"] = titleTranslation.toString();
-      newNote["beschreibungEng"] = descriptionTranslation.toString();
-      newNote["beschreibungEng"] += "\n\nThis is an automatic translation";
-    } else {
-      var titleTranslation = await translator.translate(titleKontroller.text,
-          from: "auto", to: "de");
-      var descriptionTranslation = await translator
-          .translate(descriptionKontroller.text, from: "auto", to: "de");
-
-      newNote["titleEng"] = titleKontroller.text;
-      newNote["beschreibungEng"] = descriptionKontroller.text;
-      newNote["titleGer"] = titleTranslation.toString();
-      newNote["beschreibungGer"] = descriptionTranslation.toString();
-      newNote["beschreibungGer"] += "\n\nDies ist eine automatische Übersetzung";
-    }
+    newNote["titleGer"] = titleTranslationData["ger"];
+    newNote["titleEng"] = titleTranslationData["eng"];
+    newNote["beschreibungGer"] = descriptionTranslationData["ger"];
+    newNote["beschreibungEng"] = descriptionTranslationData["eng"];
 
     await BulletinBoardDatabase().addNewNote(Map.of(newNote));
   }

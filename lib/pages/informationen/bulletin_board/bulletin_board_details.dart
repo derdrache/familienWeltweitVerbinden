@@ -1,26 +1,144 @@
+import 'dart:convert';
+
+import 'package:familien_suche/global/global_functions.dart';
+import 'package:familien_suche/pages/chat/chat_details.dart';
+import 'package:familien_suche/pages/informationen/location/location_Information.dart';
+import 'package:familien_suche/pages/show_profil.dart';
+import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../../functions/translation.dart';
+import '../../../functions/upload_and_save_image.dart';
+import '../../../global/custom_widgets.dart';
 import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/google_autocomplete.dart';
 
-class BulletinBoardDetails extends StatelessWidget {
+class BulletinBoardDetails extends StatefulWidget {
   Map note;
-  var ownProfil = Hive.box("secureBox").get("ownProfil");
-  String systemLanguage =
-      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
 
   BulletinBoardDetails({Key? key, required this.note});
 
+  @override
+  State<BulletinBoardDetails> createState() => _BulletinBoardDetailsState();
+}
+
+class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
+  var ownProfil = Hive.box("secureBox").get("ownProfil");
+  String systemLanguage =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+  bool changeNote = false;
+  late TextEditingController titleKontroller;
+  late var ortAuswahlBox;
+  late TextEditingController descriptionKontroller;
+  late List noteImages;
+
+  updateNote() {
+    return;
+    saveTitle();
+    saveDescription();
+    saveImages();
+  }
+
+  saveTitle() {
+    String newTitle = titleKontroller.text;
+
+    if (newTitle.isEmpty ||
+        newTitle == widget.note["titleGer"] ||
+        newTitle == widget.note["titleEng"]) return;
+
+    widget.note["titleGer"] = newTitle;
+    widget.note["titleEng"] = newTitle;
+
+    saveTitleDB(newTitle);
+  }
+
+  saveTitleDB(newTitle) async {
+    var translationData = await translation(newTitle);
+    String newTitleGer = translationData["ger"];
+    String newTitleEng = translationData["eng"];
+
+    BulletinBoardDatabase().update(
+        "titleGer = '$newTitleGer', titleEng = '$newTitleEng'",
+        "WHERE id = '${widget.note["id"]}'");
+  }
+
+  saveLocation() {
+    Map newLocation = ortAuswahlBox.getGoogleLocationData();
+    widget.note["location"] = newLocation;
+
+    BulletinBoardDatabase().update("location = '${json.encode(newLocation)}'",
+        "WHERE id = '${widget.note["id"]}'");
+  }
+
+  saveDescription() {
+    String newDescription = descriptionKontroller.text;
+
+    if (newDescription.isEmpty ||
+        newDescription == widget.note["titleGer"] ||
+        newDescription == widget.note["titleEng"]) return;
+
+    widget.note["beschreibungGer"] = newDescription;
+    widget.note["beschreibungEng"] = newDescription;
+
+    saveDescriptionDB(newDescription);
+  }
+
+  saveDescriptionDB(newDescription) async{
+    var translationData = await translation(newDescription);
+    String newDescriptionGer = translationData["ger"];
+    String newDescriptionEng = translationData["eng"];
+
+    BulletinBoardDatabase().update(
+        "beschreibungGer = '$newDescriptionGer', beschreibungEng = '$newDescriptionEng'",
+        "WHERE id = '${widget.note["id"]}'");
+  }
+
+  saveImages() {
+    List uploadedImages = noteImages.whereType<String>().toList();
+
+    widget.note["bilder"] = uploadedImages;
+
+    BulletinBoardDatabase().update("bilder = '${json.encode(uploadedImages)}'",
+        "WHERE id = '${widget.note["id"]}'");
+  }
+
+  uploadImage() async {
+    var imageList =
+        await uploadAndSaveImage(context, "notes", folder: "notes/");
+
+    for (var i = 0; i < widget.note["images"].length; i++) {
+      if (widget.note["images"][i] == null) {
+        widget.note["images"][i] = imageList[0];
+        break;
+      }
+    }
+
+    setState(() {});
+  }
+
+  deleteNote() {
+    BulletinBoardDatabase().delete(widget.note["id"]);
+    var allBulletinNotes = Hive.box('secureBox').get("bulletinBoardNotes");
+    allBulletinNotes.removeWhere((note) => note["id"] == widget.note["id"]);
+
+    for (var image in widget.note["bilder"]) {
+      DbDeleteImage(image);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    bool noteLanguageGerman = note["beschreibungGer"].contains("Dies ist eine automatische Übersetzung");
-    bool userSpeakGerman = ownProfil["sprachen"].contains("Deutsch")
-        || ownProfil["sprachen"].contains("german") || systemLanguage == "de";
-    bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch")
-        || ownProfil["sprachen"].contains("english") || systemLanguage == "en";
-
+    bool noteLanguageGerman = widget.note["beschreibungGer"]
+        .contains("Dies ist eine automatische Übersetzung");
+    bool userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
+        ownProfil["sprachen"].contains("german") ||
+        systemLanguage == "de";
+    bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
+        ownProfil["sprachen"].contains("english") ||
+        systemLanguage == "en";
 
     imageFullscreen(image) {
       showDialog(
@@ -36,86 +154,202 @@ class BulletinBoardDetails extends StatelessWidget {
     showTitle() {
       String title;
 
-      if(noteLanguageGerman && userSpeakGerman){
-        title = note["titleGer"];
-      }else if (!noteLanguageGerman && userSpeakEnglish){
-        title = note["titleEng"];
-      }else if(userSpeakGerman){
-        title = note["titleGer"];
-      }else{
-        title = note["titleEng"];
+      if (noteLanguageGerman && userSpeakGerman) {
+        title = widget.note["titleGer"];
+      } else if (!noteLanguageGerman && userSpeakEnglish) {
+        title = widget.note["titleEng"];
+      } else if (userSpeakGerman) {
+        title = widget.note["titleGer"];
+      } else {
+        title = widget.note["titleEng"];
       }
 
+      titleKontroller = TextEditingController(text: title);
+
       return Container(
-          margin: const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20),
-          child: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-          ));
+          margin:
+              const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20),
+          child: !changeNote
+              ? Text(
+                  title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 22),
+                )
+              : customTextInput("", titleKontroller, maxLength: 45));
     }
 
-    showBasicInformation(title, body) {
+    showLocation() {
+      ortAuswahlBox = GoogleAutoComplete(
+        margin: const EdgeInsets.only(left: 10, right: 10),
+        withOwnLocation: true,
+        hintText: widget.note["location"]["city"] +
+            " / " +
+            widget.note["location"]["countryname"],
+      );
+
       return Container(
-        margin: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-        child: Row(
-          children: [
-            Text("$title: ", style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text(body)
-          ],
-        ),
+        margin: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+        child: !changeNote
+            ? Row(
+                children: [
+                  Text("Ort: ",
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  InkWell(
+                    onTap: () => changePage(
+                        context,
+                        LocationInformationPage(
+                          ortName: widget.note["location"]["city"],
+                        )),
+                    child: Text(
+                      widget.note["location"]["city"] +
+                          " / " +
+                          widget.note["location"]["countryname"],
+                      style: TextStyle(decoration: TextDecoration.underline),
+                    ),
+                  )
+                ],
+              )
+            : ortAuswahlBox,
       );
     }
 
     showDescription() {
       String description;
 
-      if(noteLanguageGerman && userSpeakGerman){
-        description = note["beschreibungGer"];
-      }else if (!noteLanguageGerman && userSpeakEnglish){
-        description = note["beschreibungEng"];
-      }else if(userSpeakGerman){
-        description = note["beschreibungGer"];
-      }else{
-        description = note["beschreibungEng"];
+      if (noteLanguageGerman && userSpeakGerman) {
+        description = widget.note["beschreibungGer"];
+      } else if (!noteLanguageGerman && userSpeakEnglish) {
+        description = widget.note["beschreibungEng"];
+      } else if (userSpeakGerman) {
+        description = widget.note["beschreibungGer"];
+      } else {
+        description = widget.note["beschreibungEng"];
       }
 
+      descriptionKontroller = TextEditingController(text: description);
+
       return Container(
-          margin: const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 10),
-          child: Text(description));
+          margin:
+              const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 10),
+          child: !changeNote
+              ? Text(description)
+              : Column(
+                  children: [
+                    customTextInput("", descriptionKontroller,
+                        moreLines: 10,
+                        maxLength: 650,
+                        textInputAction: TextInputAction.newline),
+                  ],
+                ));
     }
 
     showImages() {
-      List noteImages = note["bilder"];
+      noteImages = List.of(widget.note["bilder"]);
+
+      if (changeNote) {
+        int NumberImages = noteImages.length;
+
+        for (var i = NumberImages; i < 4; i++) {
+          noteImages.add(null);
+        }
+      }
 
       return Container(
         margin: const EdgeInsets.all(5),
         child: Wrap(
           children: noteImages
               .map<Widget>((image) => InkWell(
-            onTap: () => imageFullscreen(image),
-            child: Stack(
-              children: [
-                Container(
-                  margin: const EdgeInsets.all(5),
-                  width: 80,
-                  height: 80,
-                  decoration:
-                  BoxDecoration(border: Border.all(), color: Colors.white),
-                  child: Image.network(image),
-                ),
-              ],
-            ),
-          ))
+                    onTap: () => imageFullscreen(image),
+                    child: Stack(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.all(5),
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                              border: Border.all(), color: Colors.white),
+                          child: image != null
+                              ? Image.network(image)
+                              : IconButton(
+                                  onPressed: () => uploadImage(),
+                                  icon: const Icon(Icons.upload)),
+                        ),
+                      ],
+                    ),
+                  ))
               .toList(),
         ),
       );
     }
 
-
+    deleteWindow() {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context)!.bulletinNoteLoeschen,
+              height: 120,
+              actions: [
+                TextButton(
+                  child: const Text("Ok"),
+                  onPressed: () async {
+                    deleteNote();
+                    Navigator.pop(context);
+                  },
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+              children: [
+                Center(
+                    child: Text(AppLocalizations.of(context)!
+                        .communityWirklichLoeschen))
+              ],
+            );
+          });
+    }
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: "test",
+        title: "Note Details",
+        buttons: [
+          IconButton(
+              onPressed: () => changePage(
+                  context,
+                  ShowProfilPage(
+                      profil: getProfilFromHive(
+                          profilId: widget.note["erstelltVon"]))),
+              icon: Icon(Icons.account_circle)),
+          IconButton(
+              onPressed: () => changePage(
+                  context,
+                  ChatDetailsPage(
+                    chatPartnerId: widget.note["erstelltVon"],
+                  )),
+              icon: Icon(Icons.chat)),
+          if (!changeNote)
+            IconButton(
+                onPressed: () => setState(() {
+                      changeNote = true;
+                    }),
+                icon: Icon(Icons.edit)),
+          if (changeNote)
+            IconButton(
+                onPressed: () {
+                  updateNote();
+                  setState(() {
+                    changeNote = false;
+                  });
+                },
+                icon: Icon(Icons.done)),
+          IconButton(
+              onPressed: () {
+                deleteWindow();
+              },
+              icon: Icon(Icons.delete))
+        ],
       ),
       body: Container(
         width: double.infinity,
@@ -128,9 +362,8 @@ class BulletinBoardDetails extends StatelessWidget {
         child: Column(
           children: [
             showTitle(),
-            showBasicInformation("Ort", note["location"]["city"] + " / " + note["location"]["countryname"]),
-            showDescription(),
-            const Expanded(child: SizedBox.shrink()),
+            showLocation(),
+            Expanded(child: showDescription()),
             showImages()
           ],
         ),
