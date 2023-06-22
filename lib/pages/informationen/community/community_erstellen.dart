@@ -85,7 +85,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       communityData["beschreibungEng"] = communityData["beschreibung"];
       communityData["beschreibungGer"] = await descriptionTranslation(
           communityData["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
-      communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nDies ist eine automatische Übersetzung";
     }
 
     await CommunityDatabase().addNewCommunity(Map.of(communityData));
