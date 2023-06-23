@@ -2,7 +2,7 @@ import 'package:translator/translator.dart';
 
 translation(text) async{
   final translator = GoogleTranslator();
-  var languageCheck = await translator.translate(text.text);
+  var languageCheck = await translator.translate(text);
   bool isGerman = languageCheck.sourceLanguage.code == "de";
   String textEng;
   String textGer;
