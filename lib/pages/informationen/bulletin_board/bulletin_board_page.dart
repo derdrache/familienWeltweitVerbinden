@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../services/locationsService.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../start_page.dart';
@@ -27,7 +28,8 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
   FocusNode searchFocusNode = FocusNode();
   final _scrollController = ScrollController();
   int displayDataEntries = 20;
-  var allBulletinBoardNotes = Hive.box('secureBox').get("bulletinBoardNotes") ?? [];
+  var allBulletinBoardNotes =
+      Hive.box('secureBox').get("bulletinBoardNotes") ?? [];
 
   @override
   void initState() {
@@ -47,6 +49,32 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
     });
   }
 
+  getAllSearchBulletinNotes() {
+    var resultNotes = [];
+    String searchText = noteSearchKontroller.text.toLowerCase();
+
+    if (searchText.isEmpty) return allBulletinBoardNotes;
+
+    for (var note in allBulletinBoardNotes) {
+      bool nameKondition =
+          note["titleGer"].toLowerCase().contains(searchText) ||
+              note["titleEng"].toLowerCase().contains(searchText);
+      bool countryKondition =
+          note["location"]["countryname"].toLowerCase().contains(searchText) ||
+              LocationService()
+                  .transformCountryLanguage(note["location"]["countryname"])
+                  .toLowerCase()
+                  .contains(searchText);
+      bool cityKondition =
+          note["location"]["city"].toLowerCase().contains(searchText);
+
+      if (nameKondition || countryKondition || cityKondition)
+        resultNotes.add(note);
+    }
+
+    return resultNotes;
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -54,7 +82,8 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
 
     return Scaffold(
         appBar: CustomAppBar(
-          title: "$onSearchText ${AppLocalizations.of(context)!.schwarzesBrett}",
+          title:
+              "$onSearchText ${AppLocalizations.of(context)!.schwarzesBrett}",
           leading: IconButton(
             onPressed: () => global_functions.changePageForever(
                 context,
@@ -73,12 +102,12 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
                     controller: _scrollController,
                     child: SizedBox(
                       width: double.infinity,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        children: [
-                          for ( var note in allBulletinBoardNotes ) BulletinBoardCard(note: note)
-                        ]
-                      ),
+                      child: Wrap(alignment: WrapAlignment.center, children: [
+                        for (var note in onSearch
+                            ? getAllSearchBulletinNotes()
+                            : allBulletinBoardNotes)
+                          BulletinBoardCard(note: note)
+                      ]),
                     )),
               ),
               if (onSearch)

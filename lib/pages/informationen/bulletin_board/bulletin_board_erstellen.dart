@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_details.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -29,6 +31,20 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
       withOwnLocation: true,);
   List images = [null, null, null, null];
 
+  double getRandomRange() {
+    Random random = new Random();
+    int randomNumber = random.nextInt(11);
+    int changedNumber = 0;
+
+    if(randomNumber < 5){
+      changedNumber = randomNumber * -1;
+    }else{
+      changedNumber =  randomNumber - 5;
+    }
+
+    return changedNumber / 100;
+  }
+
   saveNote() {
     String userId = Hive.box("secureBox").get("ownProfil")["id"];
     bool allFilled = checkValidation();
@@ -48,7 +64,8 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
       "bilder": uploadedImages,
       "erstelltVon": userId,
       "erstelltAm": DateTime.now().toString(),
-      "sprache": ""
+      "sprache": "",
+      "rotation": getRandomRange()
     };
 
     saveInDB(newNote);

@@ -1,7 +1,6 @@
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'dart:math';
 
 import 'bulletin_board_details.dart';
 
@@ -36,20 +35,6 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
     super.initState();
   }
 
-  double getRandomRange() {
-    Random random = new Random();
-    int randomNumber = random.nextInt(11);
-    int changedNumber = 0;
-
-    if(randomNumber < 5){
-      changedNumber = randomNumber * -1;
-    }else{
-      changedNumber =  randomNumber - 5;
-    }
-
-    return changedNumber / 100;
-  }
-
   getNoteTitle(){
     String title;
 
@@ -80,7 +65,6 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
 
   @override
   Widget build(BuildContext context) {
-
     return InkWell(
       onTap: () => changePage(context, BulletinBoardDetails(note: widget.note)),
       child: Container(
@@ -88,7 +72,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
         padding: EdgeInsets.all(5),
         width: 110,
         height: 120,
-        transform: Matrix4.rotationZ(getRandomRange()),
+        transform: Matrix4.rotationZ(widget.note["rotation"]),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           color: Colors.yellow[200],
