@@ -116,10 +116,14 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
     dropDownItem(item) {
       return GestureDetector(
         onTapDown: (details) async {
-          if(item["place_id"] == null){
+          if(item["place_id"] == "ownLocation"){
             widget.googleSearchResult = {
               "city": ownProfil["ort"], "countryname": ownProfil["land"], "longt": ownProfil["longt"], "latt": ownProfil["latt"]};
             item["description"] = "${ownProfil["ort"]}, ${ownProfil["land"]}";
+          }else if(item["place_id"] == "worldwide"){
+            widget.googleSearchResult = {
+              "city": "worldwide", "countryname": "worldwide", "longt": -50.1, "latt": 30.1};
+            item["description"] = AppLocalizations.of(context)!.weltweit;
           }else{
             widget.googleSearchResult =
               await getGoogleSearchLocationData(item["place_id"]);
@@ -156,11 +160,12 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
       );
     }
 
-    openOwnLocationSelection(focusOn){
+    addEmptySearchItems(focusOn){
       if(!focusOn || !widget.withOwnLocation) return;
 
-      showAutoComplete("hallo");
-      widget.searchableItems.add({"description": AppLocalizations.of(context)!.aktuellenOrtVerwenden});
+      showAutoComplete("aktueller Ort");
+      widget.searchableItems.add({"description": AppLocalizations.of(context)!.aktuellenOrtVerwenden, "place_id": "ownLocation"});
+      widget.searchableItems.add({"description": AppLocalizations.of(context)!.weltweit, "place_id": "worldwide"});
       addAutoCompleteItems({"description": ""});
     }
 
@@ -182,7 +187,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                 child: FocusScope(
                   child: Focus(
                     onFocusChange: (focusOn){
-                      openOwnLocationSelection(focusOn);
+                      addEmptySearchItems(focusOn);
                     },
                     child: TextField(
                         textAlignVertical: TextAlignVertical.top,
@@ -197,7 +202,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                         onChanged: (value) async {
                           if(value.isEmpty && widget.withOwnLocation){
                             widget.searchableItems = [];
-                            openOwnLocationSelection(true);
+                            addEmptySearchItems(true);
                           }else{
                             await widget._googleAutoCompleteSuche(value);
 
