@@ -33,7 +33,6 @@ import 'change_aufreise.dart';
 import 'change_besuchte_laender.dart';
 import 'change_children.dart';
 import 'change_social_media.dart';
-import 'change_trade.dart';
 import 'family_profil.dart';
 import 'privacy_security_page.dart';
 import 'feedback_page.dart';
@@ -418,10 +417,6 @@ class _ProfilSection extends StatelessWidget {
                         : userProfil["socialMediaLinks"].length.toString(),
                     "Social Media Links",
                     const ChangeSocialMediaLinks()),
-                profilThemeContainer(
-                    userProfil["tradeNotize"],
-                    AppLocalizations.of(context)!.verkaufenTauschenSchenken,
-                    ChangeTradePage(oldText: userProfil["tradeNotize"])),
               ],
             ),
           ],
