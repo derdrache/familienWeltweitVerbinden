@@ -61,17 +61,19 @@ class _MeetupPageState extends State<MeetupPage> {
 
   getAllSearchMeetups(){
     var searchedMeetups = [];
-    var searchText = meetupSearchKontroller.text;
+    var searchText = meetupSearchKontroller.text.toLowerCase();
 
     if(searchText.isEmpty) return allMeetups;
 
-    var searchTextFirstLetterBig = searchText.replaceFirst(searchText[0], searchText[0].toUpperCase());
-
     for(var meetup in allMeetups){
       bool isNotPrivat = !meetup["art"].contains("private") && !meetup["art"].contains("privat");
-      bool nameKondition = meetup["name"].contains(searchText) || meetup["name"].contains(searchTextFirstLetterBig);
-      bool countryKondition = meetup["land"].contains(searchText) || meetup["land"].contains(searchTextFirstLetterBig);
-      bool cityKondition = meetup["ort"].contains(searchText) || meetup["ort"].contains(searchTextFirstLetterBig);
+      bool nameKondition = meetup["name"].toLowerCase().contains(searchText);
+      bool countryKondition = meetup["land"].toLowerCase().contains(searchText) ||
+          LocationService()
+              .transformCountryLanguage(meetup["land"])
+              .toLowerCase()
+              .contains(searchText);
+      bool cityKondition = meetup["ort"].toLowerCase().contains(searchText);
 
       if((nameKondition || countryKondition || cityKondition) && isNotPrivat) searchedMeetups.add(meetup);
 
