@@ -96,16 +96,18 @@ class _CommunityPageState extends State<CommunityPage> {
 
   getAllSearchCommunities(){
     var searchedCommunities = [];
-    var searchText = communitySearchKontroller.text;
+    var searchText = communitySearchKontroller.text.toLowerCase();
 
     if(searchText.isEmpty) return allCommunities;
 
-    var searchTextFirstLetterBig = searchText.replaceFirst(searchText[0], searchText[0].toUpperCase());
-
     for(var community in allCommunities){
-      bool nameKondition = community["name"].contains(searchText) || community["name"].contains(searchTextFirstLetterBig);
-      bool countryKondition = community["land"].contains(searchText) || community["land"].contains(searchTextFirstLetterBig);
-      bool cityKondition = community["ort"].contains(searchText) || community["ort"].contains(searchTextFirstLetterBig);
+      bool nameKondition = community["name"].toLowerCase().contains(searchText);
+      bool countryKondition = community["land"].toLowerCase().contains(searchText) ||
+          LocationService()
+              .transformCountryLanguage(community["land"])
+              .toLowerCase()
+              .contains(searchText);
+      bool cityKondition = community["ort"].toLowerCase().contains(searchText);
 
       if(nameKondition || countryKondition || cityKondition) searchedCommunities.add(community);
 
