@@ -77,6 +77,8 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
 
   @override
   Widget build(BuildContext context) {
+    allBulletinBoardNotes =
+        Hive.box('secureBox').get("bulletinBoardNotes") ?? [];
     double width = MediaQuery.of(context).size.width;
     String onSearchText = onSearch ? AppLocalizations.of(context)!.suche : "";
 

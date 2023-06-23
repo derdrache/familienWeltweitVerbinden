@@ -84,7 +84,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
             SizedBox(height: 5,),
             Text("Location:"),
             Text(getStringSized(noteLocation)),
-            Text(getStringSized(noteCountry))
+            if(noteCountry != noteLocation) Text(getStringSized(noteCountry))
           ],
         )),
       ),

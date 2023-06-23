@@ -79,7 +79,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
 
   saveInDB(newNote) async {
     var titleTranslationData = await translation(titleKontroller.text);
-    var descriptionTranslationData = await translation(descriptionKontroller.text);
+    var descriptionTranslationData = await translation(descriptionKontroller.text, withTranslationNotice: true);
 
     newNote["titleGer"] = titleTranslationData["ger"];
     newNote["titleEng"] = titleTranslationData["eng"];

@@ -69,7 +69,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   saveLocation() {
     Map newLocation = ortAuswahlBox.getGoogleLocationData();
 
-    if(newLocation["city"] == null || newLocation["city"] == widget.note["location"]["city"]) return;
+    if (newLocation["city"] == null ||
+        newLocation["city"] == widget.note["location"]["city"]) return;
 
     widget.note["location"] = newLocation;
 
@@ -90,7 +91,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     saveDescriptionDB(newDescription);
   }
 
-  saveDescriptionDB(newDescription) async{
+  saveDescriptionDB(newDescription) async {
     var translationData = await translation(newDescription);
     String newDescriptionGer = translationData["ger"].replaceAll("'", "''");
     String newDescriptionEng = translationData["eng"].replaceAll("'", "''");
@@ -123,11 +124,10 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     setState(() {});
   }
 
-  deleteImage(image){
+  deleteImage(image) {
     DbDeleteImage(image);
 
     widget.note["bilder"].removeWhere((element) => element == image);
-
   }
 
   deleteNote() {
@@ -191,12 +191,18 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     }
 
     showLocation() {
+      String hintText = widget.note["location"]["city"];
+      if (widget.note["location"]["city"] !=
+          widget.note["location"]["countryname"]) {
+        hintText += " / " + widget.note["location"]["countryname"];
+      }
+      bool isWorldwide = widget.note["location"]["city"] ==
+          AppLocalizations.of(context)!.weltweit;
+
       ortAuswahlBox = GoogleAutoComplete(
         margin: const EdgeInsets.only(left: 10, right: 10),
         withOwnLocation: true,
-        hintText: widget.note["location"]["city"] +
-            " / " +
-            widget.note["location"]["countryname"],
+        hintText: hintText,
       );
 
       return Container(
@@ -207,17 +213,20 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                   Text("${AppLocalizations.of(context)!.ort} ",
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   InkWell(
-                    onTap: () => changePage(
-                        context,
-                        LocationInformationPage(
-                          ortName: widget.note["location"]["city"],
-                        )),
-                    child: Text(
-                      widget.note["location"]["city"] +
-                          " / " +
-                          widget.note["location"]["countryname"],
-                      style: TextStyle(decoration: TextDecoration.underline),
-                    ),
+                    onTap: isWorldwide
+                        ? null
+                        : () => changePage(
+                            context,
+                            LocationInformationPage(
+                              ortName: widget.note["location"]["city"],
+                            )),
+                    child: isWorldwide
+                        ? Text(hintText)
+                        : Text(
+                            hintText,
+                            style:
+                                TextStyle(decoration: TextDecoration.underline),
+                          ),
                   )
                 ],
               )
@@ -244,7 +253,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           margin:
               const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 10),
           child: !changeNote
-              ? Text(description)
+              ? Align(alignment: Alignment.topLeft, child: Text(description))
               : Column(
                   children: [
                     customTextInput("", descriptionKontroller,
@@ -298,8 +307,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                               child: const CircleAvatar(
                                   radius: 12.0,
                                   backgroundColor: Colors.red,
-                                  child:
-                                  Icon(Icons.close, color: Colors.white, size: 18)),
+                                  child: Icon(Icons.close,
+                                      color: Colors.white, size: 18)),
                             ),
                           )
                       ],
@@ -343,20 +352,22 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if(!isNoteOwner) IconButton(
-              onPressed: () => changePage(
-                  context,
-                  ShowProfilPage(
-                      profil: getProfilFromHive(
-                          profilId: widget.note["erstelltVon"]))),
-              icon: Icon(Icons.account_circle)),
-          if(!isNoteOwner) IconButton(
-              onPressed: () => changePage(
-                  context,
-                  ChatDetailsPage(
-                    chatPartnerId: widget.note["erstelltVon"],
-                  )),
-              icon: Icon(Icons.chat)),
+          if (!isNoteOwner)
+            IconButton(
+                onPressed: () => changePage(
+                    context,
+                    ShowProfilPage(
+                        profil: getProfilFromHive(
+                            profilId: widget.note["erstelltVon"]))),
+                icon: Icon(Icons.account_circle)),
+          if (!isNoteOwner)
+            IconButton(
+                onPressed: () => changePage(
+                    context,
+                    ChatDetailsPage(
+                      chatPartnerId: widget.note["erstelltVon"],
+                    )),
+                icon: Icon(Icons.chat)),
           if (!changeNote && isNoteOwner)
             IconButton(
                 onPressed: () => setState(() {
