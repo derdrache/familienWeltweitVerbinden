@@ -463,6 +463,7 @@
     "schwarzesBrett": "Bulletin board",
     "titelEingeben": "Enter title",
     "beschreibungEingeben": "Enter description",
-    "bulletinNoteLoeschen": "delete note"
+    "bulletinNoteLoeschen": "delete note",
+    "note": "Note"
 }
 

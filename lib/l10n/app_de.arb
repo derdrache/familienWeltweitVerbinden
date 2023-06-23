@@ -462,5 +462,6 @@
     "schwarzesBrett": "Schwarzes Brett",
     "titelEingeben": "Titel eingeben",
     "beschreibungEingeben": "Beschreibung eingeben",
-    "bulletinNoteLoeschen": "Notize löschen"
+    "bulletinNoteLoeschen": "Notize löschen",
+    "note": "Notiz"
 }

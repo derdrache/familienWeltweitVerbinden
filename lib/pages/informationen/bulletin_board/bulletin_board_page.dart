@@ -54,8 +54,7 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
 
     return Scaffold(
         appBar: CustomAppBar(
-          title:
-              "$onSearchText ${AppLocalizations.of(context)!.schwarzesBrett}",
+          title: "$onSearchText ${AppLocalizations.of(context)!.schwarzesBrett}",
           leading: IconButton(
             onPressed: () => global_functions.changePageForever(
                 context,

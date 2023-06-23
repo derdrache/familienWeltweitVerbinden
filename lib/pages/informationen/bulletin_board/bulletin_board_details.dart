@@ -34,10 +34,11 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late var ortAuswahlBox;
   late TextEditingController descriptionKontroller;
   late List noteImages;
+  late bool isNoteOwner = false;
 
   updateNote() {
-    return;
     saveTitle();
+    saveLocation();
     saveDescription();
     saveImages();
   }
@@ -57,8 +58,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   saveTitleDB(newTitle) async {
     var translationData = await translation(newTitle);
-    String newTitleGer = translationData["ger"];
-    String newTitleEng = translationData["eng"];
+    String newTitleGer = translationData["ger"].replaceAll("'", "''");
+    String newTitleEng = translationData["eng"].replaceAll("'", "''");
 
     BulletinBoardDatabase().update(
         "titleGer = '$newTitleGer', titleEng = '$newTitleEng'",
@@ -67,6 +68,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   saveLocation() {
     Map newLocation = ortAuswahlBox.getGoogleLocationData();
+
+    if(newLocation["city"] == null || newLocation["city"] == widget.note["location"]["city"]) return;
+
     widget.note["location"] = newLocation;
 
     BulletinBoardDatabase().update("location = '${json.encode(newLocation)}'",
@@ -88,8 +92,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   saveDescriptionDB(newDescription) async{
     var translationData = await translation(newDescription);
-    String newDescriptionGer = translationData["ger"];
-    String newDescriptionEng = translationData["eng"];
+    String newDescriptionGer = translationData["ger"].replaceAll("'", "''");
+    String newDescriptionEng = translationData["eng"].replaceAll("'", "''");
 
     BulletinBoardDatabase().update(
         "beschreibungGer = '$newDescriptionGer', beschreibungEng = '$newDescriptionEng'",
@@ -119,6 +123,13 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     setState(() {});
   }
 
+  deleteImage(image){
+    DbDeleteImage(image);
+
+    widget.note["bilder"].removeWhere((element) => element == image);
+
+  }
+
   deleteNote() {
     BulletinBoardDatabase().delete(widget.note["id"]);
     var allBulletinNotes = Hive.box('secureBox').get("bulletinBoardNotes");
@@ -131,6 +142,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   @override
   Widget build(BuildContext context) {
+    isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
     bool noteLanguageGerman = widget.note["beschreibungGer"]
         .contains("Dies ist eine automatische Übersetzung");
     bool userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
@@ -192,7 +204,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
         child: !changeNote
             ? Row(
                 children: [
-                  Text("Ort: ",
+                  Text("${AppLocalizations.of(context)!.ort} ",
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                   InkWell(
                     onTap: () => changePage(
@@ -274,6 +286,22 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                                   onPressed: () => uploadImage(),
                                   icon: const Icon(Icons.upload)),
                         ),
+                        if (image != null && changeNote)
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: InkWell(
+                              onTap: () {
+                                deleteImage(image);
+                                setState(() {});
+                              },
+                              child: const CircleAvatar(
+                                  radius: 12.0,
+                                  backgroundColor: Colors.red,
+                                  child:
+                                  Icon(Icons.close, color: Colors.white, size: 18)),
+                            ),
+                          )
                       ],
                     ),
                   ))
@@ -313,29 +341,29 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Note Details",
+        title: AppLocalizations.of(context)!.note,
         buttons: [
-          IconButton(
+          if(!isNoteOwner) IconButton(
               onPressed: () => changePage(
                   context,
                   ShowProfilPage(
                       profil: getProfilFromHive(
                           profilId: widget.note["erstelltVon"]))),
               icon: Icon(Icons.account_circle)),
-          IconButton(
+          if(!isNoteOwner) IconButton(
               onPressed: () => changePage(
                   context,
                   ChatDetailsPage(
                     chatPartnerId: widget.note["erstelltVon"],
                   )),
               icon: Icon(Icons.chat)),
-          if (!changeNote)
+          if (!changeNote && isNoteOwner)
             IconButton(
                 onPressed: () => setState(() {
                       changeNote = true;
                     }),
                 icon: Icon(Icons.edit)),
-          if (changeNote)
+          if (changeNote && isNoteOwner)
             IconButton(
                 onPressed: () {
                   updateNote();

@@ -194,7 +194,7 @@ class _InformationPageState extends State<InformationPage>
             const SizedBox(height: 30),
             pageCards(AppLocalizations.of(context)!.countries, "assets/icons/country_flags.png", 3),
             const SizedBox(height: 30),
-            pageCards("Schwarzes Brett","assets/icons/schedule.png", 4),
+            pageCards(AppLocalizations.of(context)!.schwarzesBrett,"assets/icons/schedule.png", 4),
             const SizedBox(height: 15),
           ],
         ),
