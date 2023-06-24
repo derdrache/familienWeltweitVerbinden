@@ -74,6 +74,7 @@ refreshHiveData() async {
   await refreshHiveStadtInfo();
   await refreshHiveStadtInfoUser();
   await refreshHiveFamilyProfils();
+  await refreshHiveBulletinBoardNotes();
 
   if(userId == null) return;
 

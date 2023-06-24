@@ -92,6 +92,7 @@ class _NewsPageState extends State<NewsPage> with WidgetsBindingObserver{
     refreshHiveMeetups();
     refreshHiveProfils();
     refreshHiveCommunities();
+    refreshHiveBulletinBoardNotes();
   }
 
   _addNewSettingProfil() {

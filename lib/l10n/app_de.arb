@@ -458,5 +458,11 @@
     "bildBearbeiten": "Bild bearbeiten",
     "hinzufuegen": "Hinzufügen",
     "verlassen": "Verlassen",
-    "aboutAppText": "Families worldwide wurde geschaffen um Menschen zu verbinden. Jeder kann hier so Anonym sein wie er möchte. Es besteht kein kommerzieller Hintergrund. Eure Daten werden weder weitergegeben noch verkauft.\nDadurch gibt es auch kein Budget für Werbung und es liegt ganz an euch, der Community, ob diese App über die Jahre verstärkt Anklang findet oder nicht.\n\nDer Code der App ist öffentlich einsehbar. Nur die php Dateien für die Datenbankverknüpfung sind aus Sicherheitsgründen unter Verschluss.\n\nFalls euch eine Funktion in der App fehlt, ihr einen Fehler gefunden habt oder ein Prozess nicht so schnell / gut abläuft wie ihr es gerne hättet, dann schreibt mir ein Feedback  oder schreibt mir direkt im Supportchat der App (beides unter Settings zu finden).\n\nÜber Spenden um die laufenden Kosten der App zu decken, freue ich mich sehr.\n\nVielen Dank für eure Unterstützung\n\nDominik Mast"
+    "aboutAppText": "Families worldwide wurde geschaffen um Menschen zu verbinden. Jeder kann hier so Anonym sein wie er möchte. Es besteht kein kommerzieller Hintergrund. Eure Daten werden weder weitergegeben noch verkauft.\nDadurch gibt es auch kein Budget für Werbung und es liegt ganz an euch, der Community, ob diese App über die Jahre verstärkt Anklang findet oder nicht.\n\nDer Code der App ist öffentlich einsehbar. Nur die php Dateien für die Datenbankverknüpfung sind aus Sicherheitsgründen unter Verschluss.\n\nFalls euch eine Funktion in der App fehlt, ihr einen Fehler gefunden habt oder ein Prozess nicht so schnell / gut abläuft wie ihr es gerne hättet, dann schreibt mir ein Feedback  oder schreibt mir direkt im Supportchat der App (beides unter Settings zu finden).\n\nÜber Spenden um die laufenden Kosten der App zu decken, freue ich mich sehr.\n\nVielen Dank für eure Unterstützung\n\nDominik Mast",
+    "schwarzesBrett": "Schwarzes Brett",
+    "titelEingeben": "Titel eingeben",
+    "beschreibungEingeben": "Beschreibung eingeben",
+    "bulletinNoteLoeschen": "Notize löschen",
+    "note": "Notiz",
+    "weltweit": "Weltweit"
 }

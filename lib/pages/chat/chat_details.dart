@@ -19,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:translator/translator.dart';
 
+import '../../services/languageService.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
 import '../informationen/meetups/meetupCard.dart';
@@ -382,9 +383,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
           "WHERE id = '${widget.groupChatData!["id"]}'");
 
-      var languageCheck = await translator.translate(messageData["message"]);
-      var languageCode = languageCheck.sourceLanguage.code;
+      var translateMessage = await translator.translate(messageData["message"]);
+      var languageCode = translateMessage.sourceLanguage.code;
+      if(languageCode == "auto") translateMessage = await translator.translate(messageData["message"], to: "de");
+
       messageData["language"] = languageCode;
+      messageData["translateMessage"] = translateMessage.text;
 
       await ChatGroupsDatabase().addNewMessageAndNotification(
           widget.groupChatData!["id"], messageData, connectedData["name"]);
@@ -948,6 +952,32 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     return messageBox.length - lastReadMessageIndex;
   }
 
+  getTranslatedMessageText(message){
+    List userLanguages = ownProfil["sprachen"];
+    String messageLanguage = message["language"] == "auto" ? "en" : message["language"];
+    bool showOriginalMessage = message["original"] ?? false;
+    bool understandMessageLanguage = false;
+
+    for(var language in userLanguages){
+      if(LanguageLocal().getDisplayLanguage(language) == messageLanguage){
+        understandMessageLanguage = true;
+      }
+    }
+
+    if(message["von"] == userId) return message["message"];
+
+    if(ownLanguage == messageLanguage
+        || message["translateMessage"].isEmpty
+        || (messageLanguage == "en" && ownLanguage != "de")
+        || showOriginalMessage
+        || understandMessageLanguage
+    ) {
+      return message["message"];
+    }else{
+      return message["translateMessage"];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Color ownMessageBoxColor =
@@ -1196,69 +1226,96 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     translationButton(Map message) {
-      return Positioned(
-          right: 5,
-          bottom: -10,
-          child: TextButton(
-              child: Text(AppLocalizations.of(context)!.uebersetzen),
-              onPressed: () async {
-                String translationMessage =
-                    message["message"].replaceAll("'", "");
+      String messageLanguage = message["language"] == "auto" ? "en" : message["language"];
+      bool showOriginalMessage = ownLanguage == messageLanguage || message["translateMessage"].isEmpty || (messageLanguage == "en" && ownLanguage != "de");
+      bool showButton = true;
 
-                var translation = await translator.translate(translationMessage,
-                    from: "auto", to: ownLanguage);
+      if(message["von"] == userId || !widget.isChatgroup || messageLanguage == ownLanguage) showButton = false;
 
-                showModalBottomSheet<void>(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Stack(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.only(
-                                top: 30, left: 30, bottom: 20, right: 15),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(AppLocalizations.of(context)!.uebersetzen,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 15),
-                                ListView(
-                                  shrinkWrap: true,
-                                  children: [
-                                    Text(
-                                      translation.toString(),
-                                      style: const TextStyle(fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 30),
-                                SizedBox(
-                                  width: double.maxFinite,
-                                  child: FloatingActionButton.extended(
-                                    onPressed: () => Navigator.pop(context),
-                                    label: Text(AppLocalizations.of(context)!
-                                        .uebersetzungSchliessen),
-                                  ),
-                                )
-                              ],
+      if (showButton){
+          return Positioned(
+              right: 5,
+              bottom: -10,
+              child: Row(
+                children: [
+                  if(!showOriginalMessage) TextButton(
+                      child: Text(message["original"] ?? false
+                          ? "Original"
+                          : "Original",
+                          style: TextStyle(decoration: message["original"] ?? false ? TextDecoration.lineThrough : TextDecoration.none)),
+                      onPressed: () async {
+                        message["original"] ??= false;
+
+                        setState(() {
+                          message["original"] = !message["original"];
+                        });
+                      }),
+                  TextButton(
+                      child: Text(AppLocalizations.of(context)!.uebersetzen) ,
+                      onPressed: () async {
+                        String translationMessage =
+                        message["message"].replaceAll("'", "");
+
+                        var translation = await translator.translate(translationMessage,
+                            from: "auto", to: ownLanguage);
+
+                        showModalBottomSheet<void>(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                          ),
-                          const Positioned(
-                              top: 0,
-                              right: 0,
-                              child: CloseButton(
-                                color: Colors.red,
-                              ))
-                        ],
-                      );
-                    });
-              }));
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Stack(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        top: 30, left: 30, bottom: 20, right: 15),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(AppLocalizations.of(context)!.uebersetzen,
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                        const SizedBox(height: 15),
+                                        ListView(
+                                          shrinkWrap: true,
+                                          children: [
+                                            Text(
+                                              translation.toString(),
+                                              style: const TextStyle(fontSize: 18),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 30),
+                                        SizedBox(
+                                          width: double.maxFinite,
+                                          child: FloatingActionButton.extended(
+                                            onPressed: () => Navigator.pop(context),
+                                            label: Text(AppLocalizations.of(context)!
+                                                .uebersetzungSchliessen),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  const Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: CloseButton(
+                                        color: Colors.red,
+                                      ))
+                                ],
+                              );
+                            });
+                      }),
+                ],
+              ));
+      }else{
+        return SizedBox.shrink();
+      }
+
     }
 
     cardMessage(
@@ -1271,6 +1328,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorProfilData["bildStandardFarbe"] ?? deletedUserColor;
       bool isMyMessage = message["von"] == userId;
+      bool hasTranslationButton = translationButton(message).runtimeType != SizedBox;
 
       if (hasForward) {
         var messageAutorId = message["forward"].split(":")[1];
@@ -1422,6 +1480,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           : Align(
                               alignment: messageBoxInformation["textAlign"],
                               child: Stack(
+                                clipBehavior: Clip.none,
                                 children: [
                                   Container(
                                       constraints: BoxConstraints(
@@ -1433,7 +1492,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                           left: 10,
                                           right: 10,
                                           top: 10,
-                                          bottom: message["showTranslationButton"] ? 25 : 10),
+                                          bottom: hasTranslationButton ? 25 : 10),
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                           color: messageBoxInformation[
@@ -1462,7 +1521,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                       )),
                                   Positioned(
                                     right: 20,
-                                    bottom: message["showTranslationButton"] ? 30 : 15,
+                                    bottom: hasTranslationButton ? 30 : 15,
                                     child: Text(
                                         messageBoxInformation["messageEdit"] +
                                             messageBoxInformation[
@@ -1470,8 +1529,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                         style:
                                             TextStyle(color: timeStampColor)),
                                   ),
-                                  if (message["showTranslationButton"])
-                                    translationButton(message)
+                                  translationButton(message)
                                 ],
                               ),
                             )
@@ -1490,6 +1548,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       String creatorName =
           creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"] ?? deletedUserColor;
+      bool hasTranslationButton = translationButton(message).runtimeType != SizedBox;
 
       for (Map lookMessage in messages.reversed.toList()) {
         if (lookMessage["id"] == message["responseId"]) {
@@ -1558,7 +1617,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     height: 50,
                     margin: EdgeInsets.only(
                         left: 5,
-                        bottom: message["showTranslationButton"] ? 25 : 10),
+                        bottom: hasTranslationButton ? 25 : 10),
                     child: GestureDetector(
                       onTap: creatorData.isEmpty
                           ? null
@@ -1577,6 +1636,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         Alignment.centerRight)
                       const Expanded(flex: 2, child: SizedBox.shrink()),
                     Stack(
+                      clipBehavior: Clip.none,
                       children: [
                         GestureDetector(
                           onTap: () => openMessageMenu(message, index),
@@ -1585,7 +1645,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   left: 10,
                                   right: 10,
                                   top: 10,
-                                  bottom: message["showTranslationButton"]
+                                  bottom: hasTranslationButton
                                       ? 25
                                       : 10),
                               decoration: BoxDecoration(
@@ -1736,7 +1796,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         ),
                         Positioned(
                           right: 20,
-                          bottom: message["showTranslationButton"] ? 30 : 15,
+                          bottom: hasTranslationButton ? 30 : 15,
                           child: GestureDetector(
                             onTap: () => openMessageMenu(message, index),
                             child: Text(
@@ -1746,8 +1806,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 style: TextStyle(color: timeStampColor)),
                           ),
                         ),
-                        if (message["showTranslationButton"])
-                          translationButton(message)
+                        translationButton(message)
                       ],
                     ),
                     if (messageBoxInformation["textAlign"] ==
@@ -1767,6 +1826,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       Map forwardProfil = getProfilFromHive(profilId: messageAutorId);
       Map creatorData = getProfilFromHive(profilId: message["von"]);
       message["index"] = index;
+      bool hasTranslationButton = translationButton(message).runtimeType != SizedBox;
 
       return Listener(
         onPointerHover: (details) => tabPosition = details.position,
@@ -1787,7 +1847,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 Container(
                     margin: EdgeInsets.only(
                         left: 5,
-                        bottom: message["showTranslationButton"] ? 25 : 10),
+                        bottom: hasTranslationButton ? 25 : 10),
                     child: GestureDetector(
                       onTap: creatorData.isEmpty
                           ? null
@@ -1799,6 +1859,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       child: ProfilImage(creatorData),
                     )),
               Stack(
+                clipBehavior: Clip.none,
                 children: [
                   Container(
                       constraints: BoxConstraints(
@@ -1807,7 +1868,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           left: 10,
                           right: 10,
                           top: 10,
-                          bottom: message["showTranslationButton"] ? 25 : 10),
+                          bottom: hasTranslationButton ? 25 : 10),
                       decoration: BoxDecoration(
                           color: messageBoxInformation["messageBoxColor"],
                           border: Border.all(),
@@ -1863,15 +1924,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       )),
                   Positioned(
                     right: 20,
-                    bottom: message["showTranslationButton"] ? 30 : 15,
+                    bottom: hasTranslationButton ? 30 : 15,
                     child: Text(
                         messageBoxInformation["messageEdit"] +
                             " " +
                             messageBoxInformation["messageTime"],
                         style: TextStyle(color: timeStampColor)),
                   ),
-                  if (message["showTranslationButton"])
-                    translationButton(message)
+                  translationButton(message)
                 ],
               ),
             ],
@@ -1886,6 +1946,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"];
       message["index"] = index;
+      String messageText = getTranslatedMessageText(message);
+      bool hasTranslationButton = translationButton(message).runtimeType != SizedBox;
 
       return Listener(
         onPointerHover: (details) {
@@ -1910,7 +1972,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     height: 50,
                     margin: EdgeInsets.only(
                         left: 5,
-                        bottom: message["showTranslationButton"] ? 25 : 10),
+                        bottom: hasTranslationButton ? 25 : 10),
                     child: GestureDetector(
                       onTap: creatorData.isEmpty
                           ? null
@@ -1924,6 +1986,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               GestureDetector(
                 onTap: () => openMessageMenu(message, index),
                 child: Stack(
+                  clipBehavior: Clip.none,
                   children: [
                     Container(
                         constraints: BoxConstraints(
@@ -1935,7 +1998,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             left: 10,
                             right: 10,
                             top: 10,
-                            bottom: message["showTranslationButton"] ? 25 : 10),
+                            bottom: hasTranslationButton ? 25 : 10),
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                             color: messageBoxInformation["messageBoxColor"],
@@ -1968,7 +2031,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               alignment: WrapAlignment.end,
                               children: [
                                 TextWithHyperlinkDetection(
-                                    text: message["message"] ?? "",
+                                    text: messageText ?? "",
                                     fontsize: 16,
                                     onTextTab: () =>
                                         openMessageMenu(message, index)),
@@ -1984,14 +2047,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         )),
                     Positioned(
                       right: 20,
-                      bottom: message["showTranslationButton"] ? 30 : 15,
+                      bottom: hasTranslationButton ? 30 : 15,
                       child: Text(
                           messageBoxInformation["messageEdit"] +
                               messageBoxInformation["messageTime"],
                           style: TextStyle(color: timeStampColor)),
                     ),
-                    if (message["showTranslationButton"])
-                      translationButton(message)
+                    translationButton(message)
                   ],
                 ),
               ),
@@ -2043,18 +2105,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
         if (message["message"] == "") continue;
 
-        var checkTextAndPersonalLanguage = ownLanguage ==
-            (message["language"] == "auto" ? "en" : message["language"]);
-
-        message["showTranslationButton"] =
-            widget.isChatgroup && !checkTextAndPersonalLanguage;
-
         message["message"] = _removeAllNewLineAtTheEnd(message["message"]);
 
         if (message["von"] == userId) {
           messageBoxInformation["textAlign"] = Alignment.centerRight;
           messageBoxInformation["messageBoxColor"] = ownMessageBoxColor;
-          message["showTranslationButton"] = false;
         }
 
         if (oldMessageDate != messageDate) {

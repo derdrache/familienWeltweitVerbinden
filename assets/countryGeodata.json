@@ -1747,12 +1747,12 @@
       "kontinentEng": "East Asia"
     },
     {
-      "nameGer": "Online",
-      "nameEng": "Online",
+      "nameGer": "Weltweit",
+      "nameEng": "worldwide",
       "latt": 30.1,
       "longt": -50.1,
-      "kontinentGer": "Online",
-      "kontinentEng": "Online"
+      "kontinentGer": "Weltweit",
+      "kontinentEng": "worldwide"
     }
   ]
 }
