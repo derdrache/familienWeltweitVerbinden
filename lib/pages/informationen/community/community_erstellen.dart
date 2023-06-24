@@ -25,7 +25,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var nameController = TextEditingController();
   var beschreibungKontroller = TextEditingController();
   var linkKontroller = TextEditingController();
-  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10),);
+  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10),withOwnLocation: true, withWorldwideLocation: true);
   var userId = Hive.box("secureBox").get("ownProfil")["id"];
   var ownCommunity = true;
   final translator = GoogleTranslator();
@@ -124,33 +124,6 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   Widget build(BuildContext context) {
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.stadtEingeben;
 
-    chooseOwnLocationBox(){
-      return Container(
-        margin: const EdgeInsets.only(left: 15, right: 15),
-        child: Row(children: [
-          Text(AppLocalizations.of(context)!.aktuellenOrtVerwenden, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          const Expanded(child: SizedBox.shrink()),
-          Switch(value: chooseCurrentLocation, onChanged: (bool){
-            if(bool){
-              var ownProfil = Hive.box('secureBox').get("ownProfil");
-              var currentLocaton = {
-                "city": ownProfil["ort"],
-                "countryname": ownProfil["land"],
-                "longt": ownProfil["longt"],
-                "latt": ownProfil["latt"],
-              };
-              ortAuswahlBox.setLocation(currentLocaton);
-            } else{
-              ortAuswahlBox.clear();
-            }
-            setState(() {
-              chooseCurrentLocation = bool;
-            });
-          })
-        ],),
-      );
-    }
-
     ownCommunityBox() {
       return Padding(
         padding: const EdgeInsets.only(left:15, right: 15),
@@ -208,7 +181,6 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
         children: [
           customTextInput(
               AppLocalizations.of(context)!.communityName, nameController),
-          chooseOwnLocationBox(),
           ortAuswahlBox,
           customTextInput(AppLocalizations.of(context)!.linkEingebenOptional,
               linkKontroller),

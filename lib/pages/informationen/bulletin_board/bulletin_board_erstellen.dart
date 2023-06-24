@@ -28,7 +28,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
   TextEditingController descriptionKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete(
       margin: const EdgeInsets.only(top: 5, bottom: 5, left: 30, right: 30),
-      withOwnLocation: true,);
+      withOwnLocation: true,withWorldwideLocation: true);
   List images = [null, null, null, null];
 
   double getRandomRange() {

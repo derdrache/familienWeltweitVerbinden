@@ -41,7 +41,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   late var sprachenAuswahlBox;
   late var meetupArtDropdown;
   late var ortTypDropdown;
-  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10));
+  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10), withOwnLocation: true);
   late var meetupIntervalDropdown;
   var ownMeetup = true;
   final translator = GoogleTranslator();
@@ -321,35 +321,6 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
             );
     }
 
-    chooseOwnLocationBox(){
-      if(ortTypDropdown.selected == "online") return const SizedBox.shrink();
-
-      return Container(
-        margin: const EdgeInsets.only(left: 15, right: 15),
-        child: Row(children: [
-          Text(AppLocalizations.of(context)!.aktuellenOrtVerwenden),
-          const Expanded(child: SizedBox.shrink()),
-          Switch(value: chooseCurrentLocation, onChanged: (bool){
-            if(bool){
-              var ownProfil = Hive.box('secureBox').get("ownProfil");
-              var currentLocaton = {
-                "city": ownProfil["ort"],
-                "countryname": ownProfil["land"],
-                "longt": ownProfil["longt"],
-                "latt": ownProfil["latt"],
-              };
-              ortAuswahlBox.setLocation(currentLocaton);
-            } else{
-              ortAuswahlBox.clear();
-            }
-            setState(() {
-              chooseCurrentLocation = bool;
-            });
-          })
-        ],),
-      );
-    }
-
     ortEingabeBox() {
       if (ortTypDropdown.selected == "online") {
         return customTextInput(
@@ -485,7 +456,6 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
               children: [meetupArtDropdown, meetupArtInformation()],
             ),
             ortTypDropdown,
-            chooseOwnLocationBox(),
             Align(child: ortEingabeBox()),
             sprachenAuswahlBox,
             meetupIntervalDropdown,

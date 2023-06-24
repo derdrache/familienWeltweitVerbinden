@@ -48,7 +48,7 @@ class _ErkundenPageState extends State<ErkundenPage>
   List aktiveProfils = [];
   List aktiveEvents = [];
   List aktiveCommunities = [];
-  late List profilsContinents,
+  List? profilsContinents,
       profilsCountries,
       profilsBetween,
       profilsCities,
@@ -670,25 +670,25 @@ class _ErkundenPageState extends State<ErkundenPage>
     var selectedComunityList = [];
 
     if (zoom > exactZoom) {
-      choosenProfils = profilsExact;
+      choosenProfils = profilsExact!;
       selectedEventList = eventsCities;
       selectedComunityList = communitiesCities;
     } else if (zoom > cityZoom) {
-      choosenProfils = profilsCities;
+      choosenProfils = profilsCities!;
       selectedEventList = eventsCities;
       selectedComunityList = communitiesCities;
     } else if (zoom > countryZoom) {
-      choosenProfils = profilsBetween;
+      choosenProfils = profilsBetween!;
       selectedEventList = eventsBetween;
       selectedComunityList = communitiesBetween;
     } else if (zoom > kontinentZoom) {
-      choosenProfils = profilsCountries;
+      choosenProfils = profilsCountries!;
       selectedEventList = eventsCountries;
       selectedComunityList = communitiesCountries;
     } else {
-      choosenProfils = profilsContinents;
+      choosenProfils = profilsContinents!;
       selectedEventList = eventsKontinente != null ? eventsKontinente! : [];
-      selectedComunityList = communitiesContinents != null ? communitiesContinents! : [];;
+      selectedComunityList = communitiesContinents != null ? communitiesContinents! : [];
     }
 
     if (mounted) {
@@ -1477,7 +1477,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       for (var community in aktiveCommunities) {
         var position = LatLng(community["latt"], community["longt"]);
 
-        allMarker.add(communityMarker(community["name"], position, () {
+        allMarker.add(communityMarker(community["name"], position,() {
           popupActive = true;
           createPopupCards(community: community);
           setState(() {});

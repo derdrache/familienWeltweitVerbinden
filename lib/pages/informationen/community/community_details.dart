@@ -22,7 +22,6 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
-import '../../start_page.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../location/location_Information.dart';
 
@@ -955,6 +954,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           ? window.locale.languageCode == "de"
           : Platform.localeName == "de_DE";
       var discription = "";
+      String locationText = widget.community["ort"];
+      if (widget.community["ort"] != widget.community["land"]) {
+        locationText += " / " + widget.community["land"];
+      }
+      bool isWorldwide = widget.community["ort"] ==
+          AppLocalizations.of(context)!.weltweit;
 
       if (isCreator) {
         discription = widget.community["beschreibung"];
@@ -992,7 +997,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: InkWell(
-            onTap: () => isCreator
+            onTap: isWorldwide ? null : () => isCreator
                 ? _changeOrtWindow()
                 : global_func.changePage(context,
                     LocationInformationPage(ortName: widget.community["ort"])),
@@ -1001,9 +1006,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 Text(AppLocalizations.of(context)!.ort,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                         decoration: isCreator ? TextDecoration.none : TextDecoration.underline)),
+                         decoration: isCreator || isWorldwide ? TextDecoration.none : TextDecoration.underline)),
                 Text(
-                  widget.community["ort"] + " / " + widget.community["land"],
+                  locationText,
                   style: TextStyle(decoration: isCreator ? TextDecoration.none : TextDecoration.underline),
                 )
               ],

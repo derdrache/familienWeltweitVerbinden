@@ -19,6 +19,7 @@ class GoogleAutoComplete extends StatefulWidget {
   Function? onConfirm;
   var margin;
   bool withOwnLocation;
+  bool withWorldwideLocation;
 
   getGoogleLocationData() {
     return googleSearchResult ??
@@ -59,7 +60,8 @@ class GoogleAutoComplete extends StatefulWidget {
     this.suche = true,
     this.onConfirm,
     this.margin = const EdgeInsets.only(top: 5, bottom:5, left:10, right:10),
-    this.withOwnLocation = false
+    this.withOwnLocation = false,
+    this.withWorldwideLocation = false
   }) : super(key: key);
 
   @override
@@ -161,11 +163,16 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
     }
 
     addEmptySearchItems(focusOn){
-      if(!focusOn || !widget.withOwnLocation) return;
+      if(!focusOn || !widget.withOwnLocation){
+        showAutoComplete("");
+        widget.searchableItems = [];
+        addAutoCompleteItems({});
+        return;
+      }
 
       showAutoComplete("aktueller Ort");
       widget.searchableItems.add({"description": AppLocalizations.of(context)!.aktuellenOrtVerwenden, "place_id": "ownLocation"});
-      widget.searchableItems.add({"description": AppLocalizations.of(context)!.weltweit, "place_id": "worldwide"});
+      if(widget.withWorldwideLocation) widget.searchableItems.add({"description": AppLocalizations.of(context)!.weltweit, "place_id": "worldwide"});
       addAutoCompleteItems({"description": ""});
     }
 
