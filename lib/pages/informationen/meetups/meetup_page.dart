@@ -84,8 +84,7 @@ class _MeetupPageState extends State<MeetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
-    myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
+    allMeetups = Hive.box('secureBox').get("events") ?? [];
     double width = MediaQuery.of(context).size.width;
 
     showMeetups() {
