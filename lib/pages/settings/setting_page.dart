@@ -26,7 +26,6 @@ import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/profil_image.dart';
-import '../../windows/upcoming_updates.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
 import 'change_aufreise.dart';
@@ -580,23 +579,10 @@ class _SupportInformation extends StatelessWidget {
                 () => PatchnotesWindow(context: context).openWindow()),
             const SizedBox(height: 20),
             settingThemeContainer(
-                AppLocalizations.of(context)!.geplanteErweiterungen,
-                Icons.update,
-                () => UmcomingUpdatesWindow(context: context).openWindow()),
-            const SizedBox(height: 20),
-            settingThemeContainer(
                 AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
                 () => Share.share(AppLocalizations.of(context)!.teilenLinkText +
                     '\nhttps://families-worldwide.com/')),
-            /*
-              SizedBox(height: 20),
-              settingThemeContainer("Über das Projekt", Icons.description,
-                  () => AboutProject(context: context).openWindow()
-              ),
-
-               */
-
             const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.spenden, Icons.card_giftcard,
