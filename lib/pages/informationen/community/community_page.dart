@@ -131,6 +131,8 @@ class _CommunityPageState extends State<CommunityPage> {
 
   @override
   Widget build(BuildContext context) {
+    allCommunities = Hive.box('secureBox').get("communities") ?? [];
+
     double width = MediaQuery.of(context).size.width;
 
     showCommunities() {
