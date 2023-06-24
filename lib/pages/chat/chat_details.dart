@@ -2797,23 +2797,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     return SelectionArea(
-      child: Scaffold(
-        appBar: textSearchIsActive
-            ? appBarTextSearch()
-            : widget.isChatgroup
-                ? appBarChatGroup()
-                : chatPartnerProfil != null
-                    ? appBarPrivatChat()
-                    : appBarDeletedUser(),
-        body: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              angehefteteNachrichten(),
-              Expanded(child: messageAnzeige()),
-              extraInputInformationBox,
-              textEingabeFeld(),
-            ],
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context);
+          return false;
+        },
+        child: Scaffold(
+          appBar: textSearchIsActive
+              ? appBarTextSearch()
+              : widget.isChatgroup
+                  ? appBarChatGroup()
+                  : chatPartnerProfil != null
+                      ? appBarPrivatChat()
+                      : appBarDeletedUser(),
+          body: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                angehefteteNachrichten(),
+                Expanded(child: messageAnzeige()),
+                extraInputInformationBox,
+                textEingabeFeld(),
+              ],
+            ),
           ),
         ),
       ),
