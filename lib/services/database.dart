@@ -292,7 +292,8 @@ class ChatDatabase {
           "von": messageData["von"],
           "zu": messageData["zu"],
           "responseId": messageData["responseId"],
-          "forward": messageData["forward"]
+          "forward": messageData["forward"],
+          "images": jsonEncode(messageData["images"])
         }));
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);

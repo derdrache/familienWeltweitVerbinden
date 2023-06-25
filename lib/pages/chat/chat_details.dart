@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
 import 'package:familien_suche/global/variablen.dart' as global_var;
@@ -333,10 +334,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  _saveNewMessage(String message) async {
+  _saveNewMessage({String? message, List? images}) async {
     String ownProfilId = FirebaseAuth.instance.currentUser!.uid;
-    String checkMessage = message.split("\n").join();
-    if (checkMessage.isEmpty) return;
+
+    if (images != null) {
+      message = "</images";
+    } else {
+      String checkMessage = message!.split("\n").join();
+      if (checkMessage.isEmpty) return;
+    }
 
     var messageData = {
       "chatId": widget.groupChatData!["id"],
@@ -346,7 +352,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "zu": widget.isChatgroup ? null : chatPartnerProfil!["id"],
       "responseId": messageExtraInformationId ??= "0",
       "forward": "",
-      "language": "auto"
+      "language": "auto",
+      "images": images ?? []
     };
 
     messages.add(messageData);
@@ -957,7 +964,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getTranslatedMessageText(message) {
-    if(!widget.isChatgroup || message["von"] == userId) return message["message"];
+    if (!widget.isChatgroup || message["von"] == userId)
+      return message["message"];
 
     List userLanguages = ownProfil["sprachen"];
     String messageLanguage =
@@ -982,13 +990,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  addImage() {
-    List image = uploadAndSaveImage(context, "");
+  addImage() async {
+    List image = await uploadAndSaveImage(context, "chat", folder: "chats/");
+    _saveNewMessage(images: image);
   }
 
-  recordVoiceMessage() {
-
-  }
+  recordVoiceMessage() {}
 
   @override
   Widget build(BuildContext context) {
@@ -997,6 +1004,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     Color chatpartnerMessageBoxColor = Colors.white;
     Color? timeStampColor = Colors.grey[600];
     Offset? tabPosition;
+
+    imageFullscreen(image) {
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              windowPadding: const EdgeInsets.all(30),
+              children: [Image.network(image)],
+            );
+          });
+    }
 
     angehefteteNachrichten() {
       if (!userJoinedChat) {
@@ -1238,7 +1256,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     translationButton(Map message) {
-      if(!widget.isChatgroup) return SizedBox.shrink();
+      if (!widget.isChatgroup) return const SizedBox.shrink();
 
       String messageLanguage =
           message["language"] == "auto" ? "en" : message["language"];
@@ -1344,7 +1362,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               ],
             ));
       } else {
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       }
     }
 
@@ -1972,6 +1990,119 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
+    imageMessage(int index, Map message, Map messageBoxInformation) {
+      Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
+      String creatorName =
+          creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
+      var creatorColor = creatorData["bildStandardFarbe"];
+      String image = message["images"][0];
+
+      return Listener(
+        onPointerHover: (details) {
+          tabPosition = details.position;
+        },
+        child: AnimatedContainer(
+          color: highlightMessages.contains(index)
+              ? Theme.of(context).colorScheme.primary
+              : Colors.white,
+          duration: const Duration(seconds: 1),
+          curve: Curves.easeIn,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment:
+                messageBoxInformation["textAlign"] == Alignment.centerLeft
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.end,
+            children: [
+              if (widget.isChatgroup && message["von"] != userId)
+                Container(
+                    width: 50,
+                    height: 50,
+                    margin: const EdgeInsets.only(left: 5, bottom: 10),
+                    child: GestureDetector(
+                      onTap: creatorData.isEmpty
+                          ? null
+                          : () => global_functions.changePage(
+                              context,
+                              ShowProfilPage(
+                                profil: creatorData,
+                              )),
+                      child: ProfilImage(creatorData),
+                    )),
+              GestureDetector(
+                onTap: () => openMessageMenu(message, index),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                        constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width *
+                                (widget.isChatgroup && message["von"] != userId
+                                    ? 0.75
+                                    : 0.85)),
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            color: messageBoxInformation["messageBoxColor"],
+                            border: Border.all(),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10))),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (widget.isChatgroup && message["von"] != userId)
+                              GestureDetector(
+                                onTap: creatorData.isEmpty
+                                    ? null
+                                    : () => global_functions.changePage(
+                                        context,
+                                        ShowProfilPage(
+                                          profil: creatorData,
+                                        )),
+                                child: Container(
+                                    margin: const EdgeInsets.only(bottom: 5),
+                                    child: Text(
+                                      creatorName,
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(creatorColor ??
+                                              deletedUserColor)),
+                                    )),
+                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                InkWell(
+                                  onTap: () => imageFullscreen(image),
+                                  child: CachedNetworkImage(
+                                      imageUrl: image,
+                                      width: 200,
+                                      placeholder: (context, url) =>
+                                          const CircularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error)),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: Text(
+                                      messageBoxInformation["messageEdit"] +
+                                          messageBoxInformation["messageTime"],
+                                      style: TextStyle(color: timeStampColor)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     normalMessage(int index, Map message, Map messageBoxInformation) {
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
       String creatorName =
@@ -2128,6 +2259,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         String messageDate = DateFormat('dd.MM.yy').format(messageDateTime);
         var forwardData = message["forward"];
+        if (message["images"].runtimeType == String)
+          message["images"] = jsonDecode(message["images"]);
 
         message["responseId"] ??= "0";
         var messageBoxInformation = {
@@ -2184,6 +2317,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         } else if (forwardData.isNotEmpty) {
           messageBox.add(forwardMessage(
               globalMessageIndex, message, messageBoxInformation));
+        } else if (message["images"].isNotEmpty) {
+          messageBox.add(
+              imageMessage(globalMessageIndex, message, messageBoxInformation));
         } else {
           messageBox.add(normalMessage(
               globalMessageIndex, message, messageBoxInformation));
@@ -2364,7 +2500,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             padding: EdgeInsets.zero,
                             onPressed: () {
                               _restartTimer();
-                              _saveNewMessage(nachrichtController.text);
+                              _saveNewMessage(
+                                  message: nachrichtController.text);
 
                               _resetExtraInputInformation();
 
@@ -2390,7 +2527,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         children: [
                           IconButton(
                               padding: EdgeInsets.zero,
-                              onPressed: () => addImage(),
+                              onPressed: () {
+                                addImage();
+                                setState(() {
+                                  nachrichtController.clear();
+                                });
+                              },
                               icon: Icon(Icons.attach_file,
                                   size: 34,
                                   color:
