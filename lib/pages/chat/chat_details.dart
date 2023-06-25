@@ -19,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:translator/translator.dart';
 
+import '../../functions/upload_and_save_image.dart';
 import '../../services/languageService.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
@@ -97,6 +98,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   int displayDataEntries = 50;
   late int globalMessageIndex;
   int lastReadMessageIndex = 0;
+  bool isWriting = false;
 
   @override
   void initState() {
@@ -283,7 +285,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       setState(() {});
     });
 
-    if(unreadMessages != 0){
+    if (unreadMessages != 0) {
       _scrollToMessage(lastReadMessageIndex);
       _resetNewMessageCounter();
     }
@@ -385,7 +387,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       var translateMessage = await translator.translate(messageData["message"]);
       var languageCode = translateMessage.sourceLanguage.code;
-      if(languageCode == "auto") translateMessage = await translator.translate(messageData["message"], to: "de");
+      if (languageCode == "auto")
+        translateMessage =
+            await translator.translate(messageData["message"], to: "de");
 
       messageData["language"] = languageCode;
       messageData["translateMessage"] = translateMessage.text;
@@ -508,7 +512,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var selectedChatId = global_functions.getChatID(selectedUserId);
     var chatGroupData =
         await ChatDatabase().getChatData("*", "WHERE id = '$selectedChatId'");
-    if(chatGroupData == false){
+    if (chatGroupData == false) {
       chatGroupData = ChatDatabase().addNewChatGroup(selectedUserId);
     }
     var forwardMessage = message["forward"].isEmpty
@@ -589,9 +593,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     String messageText;
     Map secondLastMessage = {};
 
-    if(secondLastMessageIndex < 0){
+    if (secondLastMessageIndex < 0) {
       messageText = "";
-    }else{
+    } else {
       secondLastMessage = messages[secondLastMessageIndex];
 
       if (messageId != lastMessage["id"]) return;
@@ -935,47 +939,55 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  getLastReadMessageIndex(messageBox){
+  getLastReadMessageIndex(messageBox) {
     int unreadMessagesCounter = unreadMessages as int;
     int lastReadMessageIndex = 0;
 
-    for(var message in messageBox.reversed){
+    for (var message in messageBox.reversed) {
       lastReadMessageIndex += 1;
 
-      if(message.runtimeType != Align){
+      if (message.runtimeType != Align) {
         unreadMessagesCounter -= 1;
       }
 
-      if(unreadMessagesCounter == 0) break;
+      if (unreadMessagesCounter == 0) break;
     }
 
     return messageBox.length - lastReadMessageIndex;
   }
 
-  getTranslatedMessageText(message){
+  getTranslatedMessageText(message) {
+    if(!widget.isChatgroup || message["von"] == userId) return message["message"];
+
     List userLanguages = ownProfil["sprachen"];
-    String messageLanguage = message["language"] == "auto" ? "en" : message["language"];
+    String messageLanguage =
+        message["language"] == "auto" ? "en" : message["language"];
     bool showOriginalMessage = message["original"] ?? false;
     bool understandMessageLanguage = false;
 
-    for(var language in userLanguages){
-      if(LanguageLocal().getDisplayLanguage(language) == messageLanguage){
+    for (var language in userLanguages) {
+      if (LanguageLocal().getDisplayLanguage(language) == messageLanguage) {
         understandMessageLanguage = true;
       }
     }
 
-    if(message["von"] == userId) return message["message"];
-
-    if(ownLanguage == messageLanguage
-        || message["translateMessage"].isEmpty
-        || (messageLanguage == "en" && ownLanguage != "de")
-        || showOriginalMessage
-        || understandMessageLanguage
-    ) {
+    if (ownLanguage == messageLanguage ||
+        message["translateMessage"].isEmpty ||
+        (messageLanguage == "en" && ownLanguage != "de") ||
+        showOriginalMessage ||
+        understandMessageLanguage) {
       return message["message"];
-    }else{
+    } else {
       return message["translateMessage"];
     }
+  }
+
+  addImage() {
+    List image = uploadAndSaveImage(context, "");
+  }
+
+  recordVoiceMessage() {
+
   }
 
   @override
@@ -1226,23 +1238,35 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     translationButton(Map message) {
-      String messageLanguage = message["language"] == "auto" ? "en" : message["language"];
-      bool showOriginalMessage = ownLanguage == messageLanguage || message["translateMessage"].isEmpty || (messageLanguage == "en" && ownLanguage != "de");
+      if(!widget.isChatgroup) return SizedBox.shrink();
+
+      String messageLanguage =
+          message["language"] == "auto" ? "en" : message["language"];
+      bool showOriginalMessage = ownLanguage == messageLanguage ||
+          message["translateMessage"].isEmpty ||
+          (messageLanguage == "en" && ownLanguage != "de");
       bool showButton = true;
 
-      if(message["von"] == userId || !widget.isChatgroup || messageLanguage == ownLanguage) showButton = false;
+      if (message["von"] == userId ||
+          !widget.isChatgroup ||
+          messageLanguage == ownLanguage) showButton = false;
 
-      if (showButton){
-          return Positioned(
-              right: 5,
-              bottom: -10,
-              child: Row(
-                children: [
-                  if(!showOriginalMessage) TextButton(
-                      child: Text(message["original"] ?? false
-                          ? "Original"
-                          : "Original",
-                          style: TextStyle(decoration: message["original"] ?? false ? TextDecoration.lineThrough : TextDecoration.none)),
+      if (showButton) {
+        return Positioned(
+            right: 5,
+            bottom: -10,
+            child: Row(
+              children: [
+                if (!showOriginalMessage)
+                  TextButton(
+                      child: Text(
+                          message["original"] ?? false
+                              ? "Original"
+                              : "Original",
+                          style: TextStyle(
+                              decoration: message["original"] ?? false
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none)),
                       onPressed: () async {
                         message["original"] ??= false;
 
@@ -1250,72 +1274,78 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           message["original"] = !message["original"];
                         });
                       }),
-                  TextButton(
-                      child: Text(AppLocalizations.of(context)!.uebersetzen) ,
-                      onPressed: () async {
-                        String translationMessage =
-                        message["message"].replaceAll("'", "");
+                TextButton(
+                    child: Text(AppLocalizations.of(context)!.uebersetzen),
+                    onPressed: () async {
+                      String translationMessage =
+                          message["message"].replaceAll("'", "");
 
-                        var translation = await translator.translate(translationMessage,
-                            from: "auto", to: ownLanguage);
+                      var translation = await translator.translate(
+                          translationMessage,
+                          from: "auto",
+                          to: ownLanguage);
 
-                        showModalBottomSheet<void>(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Stack(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.only(
-                                        top: 30, left: 30, bottom: 20, right: 15),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(AppLocalizations.of(context)!.uebersetzen,
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold)),
-                                        const SizedBox(height: 15),
-                                        ListView(
-                                          shrinkWrap: true,
-                                          children: [
-                                            Text(
-                                              translation.toString(),
-                                              style: const TextStyle(fontSize: 18),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 30),
-                                        SizedBox(
-                                          width: double.maxFinite,
-                                          child: FloatingActionButton.extended(
-                                            onPressed: () => Navigator.pop(context),
-                                            label: Text(AppLocalizations.of(context)!
-                                                .uebersetzungSchliessen),
+                      showModalBottomSheet<void>(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Stack(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 30, left: 30, bottom: 20, right: 15),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                          AppLocalizations.of(context)!
+                                              .uebersetzen,
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      const SizedBox(height: 15),
+                                      ListView(
+                                        shrinkWrap: true,
+                                        children: [
+                                          Text(
+                                            translation.toString(),
+                                            style:
+                                                const TextStyle(fontSize: 18),
                                           ),
-                                        )
-                                      ],
-                                    ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 30),
+                                      SizedBox(
+                                        width: double.maxFinite,
+                                        child: FloatingActionButton.extended(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          label: Text(
+                                              AppLocalizations.of(context)!
+                                                  .uebersetzungSchliessen),
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  const Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: CloseButton(
-                                        color: Colors.red,
-                                      ))
-                                ],
-                              );
-                            });
-                      }),
-                ],
-              ));
-      }else{
+                                ),
+                                const Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: CloseButton(
+                                      color: Colors.red,
+                                    ))
+                              ],
+                            );
+                          });
+                    }),
+              ],
+            ));
+      } else {
         return SizedBox.shrink();
       }
-
     }
 
     cardMessage(
@@ -1326,9 +1356,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       Map creatorProfilData = getProfilFromHive(profilId: message["von"]) ?? {};
       String creatorName = creatorProfilData["name"] ??
           AppLocalizations.of(context)!.geloeschterUser;
-      var creatorColor = creatorProfilData["bildStandardFarbe"] ?? deletedUserColor;
+      var creatorColor =
+          creatorProfilData["bildStandardFarbe"] ?? deletedUserColor;
       bool isMyMessage = message["von"] == userId;
-      bool hasTranslationButton = translationButton(message).runtimeType != SizedBox;
+      bool hasTranslationButton =
+          translationButton(message).runtimeType != SizedBox;
 
       if (hasForward) {
         var messageAutorId = message["forward"].split(":")[1];
@@ -1492,7 +1524,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                           left: 10,
                                           right: 10,
                                           top: 10,
-                                          bottom: hasTranslationButton ? 25 : 10),
+                                          bottom:
+                                              hasTranslationButton ? 25 : 10),
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                           color: messageBoxInformation[
@@ -1548,7 +1581,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       String creatorName =
           creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"] ?? deletedUserColor;
-      bool hasTranslationButton = translationButton(message).runtimeType != SizedBox;
+      bool hasTranslationButton =
+          translationButton(message).runtimeType != SizedBox;
 
       for (Map lookMessage in messages.reversed.toList()) {
         if (lookMessage["id"] == message["responseId"]) {
@@ -1560,11 +1594,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       String? replyFromId = replyMessage["von"];
       Map messageFromProfil = getProfilFromHive(profilId: replyFromId) ?? {};
-      var replyColor = messageFromProfil["bildStandardFarbe"] == deletedUserColor
-          ? Colors.greenAccent[100]
-          : messageFromProfil["bildStandardFarbe"] != null
-              ? Color(messageFromProfil["bildStandardFarbe"])
-              : Colors.black;
+      var replyColor =
+          messageFromProfil["bildStandardFarbe"] == deletedUserColor
+              ? Colors.greenAccent[100]
+              : messageFromProfil["bildStandardFarbe"] != null
+                  ? Color(messageFromProfil["bildStandardFarbe"])
+                  : Colors.black;
       bool isEvent = replyMessage.isEmpty
           ? false
           : replyMessage["message"].contains("</eventId=");
@@ -1616,8 +1651,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     width: 50,
                     height: 50,
                     margin: EdgeInsets.only(
-                        left: 5,
-                        bottom: hasTranslationButton ? 25 : 10),
+                        left: 5, bottom: hasTranslationButton ? 25 : 10),
                     child: GestureDetector(
                       onTap: creatorData.isEmpty
                           ? null
@@ -1645,9 +1679,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                   left: 10,
                                   right: 10,
                                   top: 10,
-                                  bottom: hasTranslationButton
-                                      ? 25
-                                      : 10),
+                                  bottom: hasTranslationButton ? 25 : 10),
                               decoration: BoxDecoration(
                                   color:
                                       messageBoxInformation["messageBoxColor"],
@@ -1826,7 +1858,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       Map forwardProfil = getProfilFromHive(profilId: messageAutorId);
       Map creatorData = getProfilFromHive(profilId: message["von"]);
       message["index"] = index;
-      bool hasTranslationButton = translationButton(message).runtimeType != SizedBox;
+      bool hasTranslationButton =
+          translationButton(message).runtimeType != SizedBox;
 
       return Listener(
         onPointerHover: (details) => tabPosition = details.position,
@@ -1846,8 +1879,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               if (widget.isChatgroup && message["von"] != userId)
                 Container(
                     margin: EdgeInsets.only(
-                        left: 5,
-                        bottom: hasTranslationButton ? 25 : 10),
+                        left: 5, bottom: hasTranslationButton ? 25 : 10),
                     child: GestureDetector(
                       onTap: creatorData.isEmpty
                           ? null
@@ -1947,7 +1979,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorColor = creatorData["bildStandardFarbe"];
       message["index"] = index;
       String messageText = getTranslatedMessageText(message);
-      bool hasTranslationButton = translationButton(message).runtimeType != SizedBox;
+      bool hasTranslationButton =
+          translationButton(message).runtimeType != SizedBox;
 
       return Listener(
         onPointerHover: (details) {
@@ -1971,8 +2004,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     width: 50,
                     height: 50,
                     margin: EdgeInsets.only(
-                        left: 5,
-                        bottom: hasTranslationButton ? 25 : 10),
+                        left: 5, bottom: hasTranslationButton ? 25 : 10),
                     child: GestureDetector(
                       onTap: creatorData.isEmpty
                           ? null
@@ -2024,7 +2056,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(creatorColor ?? deletedUserColor)),
+                                          color: Color(creatorColor ??
+                                              deletedUserColor)),
                                     )),
                               ),
                             Wrap(
@@ -2066,8 +2099,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     messageList(List messages) {
       List<Widget> messageBox = [];
       var changedMessageList =
-      messages.reversed.take(displayDataEntries).toList().reversed.toList();
-      String oldMessageDate = DateFormat('dd.MM.yy').format(DateTime.fromMillisecondsSinceEpoch(int.parse(changedMessageList[0]["date"]))).toString();
+          messages.reversed.take(displayDataEntries).toList().reversed.toList();
+      String oldMessageDate = DateFormat('dd.MM.yy')
+          .format(DateTime.fromMillisecondsSinceEpoch(
+              int.parse(changedMessageList[0]["date"])))
+          .toString();
       globalMessageIndex = 1;
 
       messageBox.add(Align(
@@ -2080,16 +2116,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               borderRadius: const BorderRadius.all(Radius.circular(20))),
           child: Center(
               child: Text(
-                oldMessageDate,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )),
+            oldMessageDate,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          )),
         ),
       ));
 
-      for(var checkMessage in changedMessageList){
+      for (var checkMessage in changedMessageList) {
         Map message = checkMessage;
         DateTime messageDateTime =
-        DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
+            DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         String messageDate = DateFormat('dd.MM.yy').format(messageDateTime);
         var forwardData = message["forward"];
 
@@ -2123,9 +2159,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   borderRadius: const BorderRadius.all(Radius.circular(20))),
               child: Center(
                   child: Text(
-                    messageDate,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  )),
+                messageDate,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )),
             ),
           ));
 
@@ -2134,25 +2170,33 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
 
         if (message["message"].contains("</eventId=")) {
-          messageBox.add(cardMessage(globalMessageIndex, message, messageBoxInformation, "event"));
+          messageBox.add(cardMessage(
+              globalMessageIndex, message, messageBoxInformation, "event"));
         } else if (message["message"].contains("</communityId=")) {
-          messageBox.add(cardMessage(globalMessageIndex, message, messageBoxInformation, "community"));
+          messageBox.add(cardMessage(
+              globalMessageIndex, message, messageBoxInformation, "community"));
         } else if (message["message"].contains("</cityId=")) {
-          messageBox.add(cardMessage(globalMessageIndex, message, messageBoxInformation, "location"));
+          messageBox.add(cardMessage(
+              globalMessageIndex, message, messageBoxInformation, "location"));
         } else if (int.parse(message["responseId"]) != 0) {
-          messageBox.add(responseMessage(globalMessageIndex, message, messageBoxInformation));
+          messageBox.add(responseMessage(
+              globalMessageIndex, message, messageBoxInformation));
         } else if (forwardData.isNotEmpty) {
-          messageBox.add(forwardMessage(globalMessageIndex, message, messageBoxInformation));
+          messageBox.add(forwardMessage(
+              globalMessageIndex, message, messageBoxInformation));
         } else {
-          messageBox.add(normalMessage(globalMessageIndex, message, messageBoxInformation));
+          messageBox.add(normalMessage(
+              globalMessageIndex, message, messageBoxInformation));
         }
         globalMessageIndex += 1;
       }
 
       if (unreadMessages != 0) {
         lastReadMessageIndex = getLastReadMessageIndex(messageBox);
-        messageBox.insert(lastReadMessageIndex, Center(
-            child: Text(
+        messageBox.insert(
+            lastReadMessageIndex,
+            Center(
+                child: Text(
               AppLocalizations.of(context)!.ungeleseneNachrichten,
               style: const TextStyle(fontWeight: FontWeight.bold),
             )));
@@ -2278,8 +2322,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 5,
                           blurRadius: 7,
-                          offset:
-                              const Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ]
                     : []),
@@ -2302,35 +2345,65 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       errorBorder: InputBorder.none,
                       disabledBorder: InputBorder.none,
                     ),
+                    onChanged: (text) {
+                      if (isWriting && text.isEmpty) {
+                        setState(() {
+                          isWriting = false;
+                        });
+                      } else if (!isWriting && text.isNotEmpty) {
+                        setState(() {
+                          isWriting = true;
+                        });
+                      }
+                    },
                   ),
                 ),
-                changeMessageInputModus != "edit"
-                    ? IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          _restartTimer();
-                          _saveNewMessage(nachrichtController.text);
+                isWriting
+                    ? changeMessageInputModus != "edit"
+                        ? IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              _restartTimer();
+                              _saveNewMessage(nachrichtController.text);
 
-                          _resetExtraInputInformation();
+                              _resetExtraInputInformation();
 
-                          _scrollController.jumpTo(index: 0);
+                              _scrollController.jumpTo(index: 0);
 
-                          setState(() {
-                            nachrichtController.clear();
-                          });
-                        },
-                        icon: Icon(Icons.send,
-                            size: 34,
-                            color: Theme.of(context).colorScheme.secondary))
-                    : IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          _saveEditMessage();
-                          _resetExtraInputInformation();
-                        },
-                        icon: Icon(Icons.done,
-                            size: 38,
-                            color: Theme.of(context).colorScheme.secondary))
+                              setState(() {
+                                nachrichtController.clear();
+                              });
+                            },
+                            icon: Icon(Icons.send,
+                                size: 34,
+                                color: Theme.of(context).colorScheme.secondary))
+                        : IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              _saveEditMessage();
+                              _resetExtraInputInformation();
+                            },
+                            icon: Icon(Icons.done,
+                                size: 38,
+                                color: Theme.of(context).colorScheme.secondary))
+                    : Row(
+                        children: [
+                          IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () => addImage(),
+                              icon: Icon(Icons.attach_file,
+                                  size: 34,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary)),
+                          IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () => recordVoiceMessage(),
+                              icon: Icon(Icons.mic,
+                                  size: 34,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary)),
+                        ],
+                      )
               ],
             ));
       }
