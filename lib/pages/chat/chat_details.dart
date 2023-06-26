@@ -870,15 +870,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   _getDisplayedCard(cardType, data, {smallCard = false}) {
     if (cardType == "event") {
       return MeetupCard(
-          margin:
-              const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 0),
+          margin: const EdgeInsets.all(15),
           withInteresse: true,
           meetupData: data,
           afterPageVisit: () => setState(() {}),
           smallCard: smallCard);
     } else if (cardType == "community") {
       return CommunityCard(
-        margin: const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 0),
+        margin: const EdgeInsets.all(15),
         community: data,
         afterPageVisit: () => setState(() {}),
         smallCard: smallCard,
@@ -964,7 +963,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getTranslatedMessageText(message) {
-    if (!widget.isChatgroup || message["von"] == userId)
+    if (!widget.isChatgroup || message["von"] == userId || message.isEmpty)
       return message["message"];
 
     List userLanguages = ownProfil["sprachen"];
@@ -997,6 +996,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   recordVoiceMessage() {}
 
+  getCardData(cardIdData) {
+    if (cardIdData["typ"] == "event") {
+      return getMeetupFromHive(cardIdData["id"]);
+    } else if (cardIdData["typ"] == "community") {
+      return getCommunityFromHive(cardIdData["id"]);
+    } else if (cardIdData["typ"] == "city") {
+      return getCityFromHive(cityId: cardIdData["id"]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Color ownMessageBoxColor =
@@ -1011,7 +1020,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
               windowPadding: const EdgeInsets.all(30),
-              children: [CachedNetworkImage(imageUrl: image,)],
+              children: [
+                CachedNetworkImage(
+                  imageUrl: image,
+                )
+              ],
             );
           });
     }
@@ -1366,752 +1379,29 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     }
 
-    cardMessage(
-        int index, Map message, Map messageBoxInformation, String cardType) {
-      Map cardData = {};
-      bool hasForward = message["forward"].isNotEmpty;
-      Map forwardProfil = {};
-      Map creatorProfilData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName = creatorProfilData["name"] ??
-          AppLocalizations.of(context)!.geloeschterUser;
-      var creatorColor =
-          creatorProfilData["bildStandardFarbe"] ?? deletedUserColor;
-      bool isMyMessage = message["von"] == userId;
-      bool hasTranslationButton =
-          translationButton(message).runtimeType != SizedBox;
-
-      if (hasForward) {
-        var messageAutorId = message["forward"].split(":")[1];
-        forwardProfil = getProfilFromHive(profilId: messageAutorId);
-      }
-
-      Map cardIdData = _getCardIdDataFromMessage(message["message"]);
-
-      if (cardIdData["typ"] == "event") {
-        cardData = getMeetupFromHive(cardIdData["id"]);
-      } else if (cardIdData["typ"] == "community") {
-        cardData = getCommunityFromHive(cardIdData["id"]);
-      } else if (cardIdData["typ"] == "city") {
-        cardData = getCityFromHive(cityId: cardIdData["id"]);
-      }
-
-      String replaceText = cardData["name"] ?? cardData["ort"];
-      String removeId = cardIdData["text"];
-
-      String? changedMessageText =
-          message["message"].replaceAll(removeId, replaceText).trim();
-
-      if (cardData.isEmpty) return const SizedBox.shrink();
-
-      message["index"] = index;
-
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment:
-            messageBoxInformation["textAlign"] == Alignment.centerLeft
-                ? MainAxisAlignment.start
-                : MainAxisAlignment.end,
-        children: [
-          if (widget.isChatgroup && message["von"] != userId)
-            Container(
-                width: 50,
-                height: 50,
-                margin: const EdgeInsets.only(left: 5, bottom: 10),
-                child: ProfilImage(creatorProfilData)),
-          AnimatedContainer(
-            color: highlightMessages.contains(index)
-                ? Theme.of(context).colorScheme.primary
-                : Colors.white,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeIn,
-            child: Align(
-                alignment: messageBoxInformation["textAlign"],
-                child: Column(
-                    crossAxisAlignment: messageBoxInformation["textAlign"] ==
-                            Alignment.centerLeft
-                        ? CrossAxisAlignment.start
-                        : CrossAxisAlignment.end,
-                    children: [
-                      if (widget.isChatgroup && message["von"] != userId)
-                        GestureDetector(
-                          onTap: creatorProfilData.isEmpty
-                              ? null
-                              : () => global_functions.changePage(
-                                  context,
-                                  ShowProfilPage(
-                                    profil: creatorProfilData,
-                                  )),
-                          child: Container(
-                              margin: const EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                creatorName,
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(creatorColor)),
-                              )),
-                        ),
-                      if (hasForward)
-                        Container(
-                          alignment: messageBoxInformation["textAlign"],
-                          padding:
-                              const EdgeInsets.only(top: 5, left: 10, right: 5),
-                          child: GestureDetector(
-                            onTap: forwardProfil.isEmpty
-                                ? null
-                                : () => () => global_functions.changePage(
-                                    context,
-                                    ShowProfilPage(
-                                      profil: forwardProfil,
-                                    )),
-                            child: Text(
-                              AppLocalizations.of(context)!.weitergeleitetVon +
-                                  forwardProfil["name"],
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      Container(
-                          alignment: messageBoxInformation["textAlign"],
-                          child: Stack(
-                            children: [
-                              _getDisplayedCard(cardType, cardData),
-                              if (isMyMessage || adminList.contains(userId))
-                                Positioned(
-                                  top: 2,
-                                  right: 2,
-                                  child: InkWell(
-                                    onTap: () {
-                                      _checkAndRemovePinnedMessage(message);
-                                      _deleteMessageWindow(message["id"]);
-                                    },
-                                    child: const CircleAvatar(
-                                        radius: 12.0,
-                                        backgroundColor: Colors.red,
-                                        child: Icon(Icons.close,
-                                            color: Colors.white, size: 18)),
-                                  ),
-                                ),
-                            ],
-                          )),
-                      cardIdData["hasOnlyId"]
-                          ? Row(
-                              children: [
-                                if (messageBoxInformation["textAlign"] ==
-                                    Alignment.centerLeft)
-                                  const SizedBox(width: 10),
-                                TextButton(
-                                    onPressed: () {
-                                      var replyUser = getProfilFromHive(
-                                          profilId: message["von"],
-                                          getNameOnly: true);
-
-                                      extraInputInformationBox =
-                                          inputInformationBox(Icons.reply,
-                                              replyUser, message["message"]);
-                                      _replyMessage(message);
-                                    },
-                                    child: Text(AppLocalizations.of(context)!
-                                        .antworten)),
-                                TextButton(
-                                    onPressed: () {
-                                      _forwardedMessage(message);
-                                    },
-                                    child: Text(AppLocalizations.of(context)!
-                                        .weiterleiten)),
-                                Text(messageBoxInformation["messageTime"],
-                                    style: TextStyle(color: timeStampColor)),
-                                if (messageBoxInformation["textAlign"] ==
-                                    Alignment.centerRight)
-                                  const SizedBox(width: 10),
-                              ],
-                            )
-                          : Align(
-                              alignment: messageBoxInformation["textAlign"],
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Container(
-                                      constraints: BoxConstraints(
-                                          maxWidth: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.8),
-                                      margin: EdgeInsets.only(
-                                          left: 10,
-                                          right: 10,
-                                          top: 10,
-                                          bottom:
-                                              hasTranslationButton ? 25 : 10),
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          color: messageBoxInformation[
-                                              "messageBoxColor"],
-                                          border: Border.all(),
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(10))),
-                                      child: Wrap(
-                                        alignment: WrapAlignment.end,
-                                        children: [
-                                          TextWithHyperlinkDetection(
-                                              text: changedMessageText ?? "",
-                                              fontsize: 16,
-                                              onTextTab: () => openMessageMenu(
-                                                  message, index)),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                              messageBoxInformation[
-                                                      "messageEdit"] +
-                                                  " " +
-                                                  messageBoxInformation[
-                                                      "messageTime"],
-                                              style: const TextStyle(
-                                                  color: Colors.transparent))
-                                        ],
-                                      )),
-                                  Positioned(
-                                    right: 20,
-                                    bottom: hasTranslationButton ? 30 : 15,
-                                    child: Text(
-                                        messageBoxInformation["messageEdit"] +
-                                            messageBoxInformation[
-                                                "messageTime"],
-                                        style:
-                                            TextStyle(color: timeStampColor)),
-                                  ),
-                                  translationButton(message)
-                                ],
-                              ),
-                            )
-                    ])),
-          ),
-        ],
-      );
-    }
-
-    responseMessage(int index, Map message, Map messageBoxInformation) {
-      Map replyMessage = {};
-      int replyIndex = 0;
-      Map cardData = {};
-      String textAddition = "";
-      Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName =
-          creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
-      var creatorColor = creatorData["bildStandardFarbe"] ?? deletedUserColor;
-      bool hasTranslationButton =
-          translationButton(message).runtimeType != SizedBox;
-
-      for (Map lookMessage in messages.reversed.toList()) {
-        if (lookMessage["id"] == message["responseId"]) {
-          replyMessage = lookMessage;
-          replyIndex = lookMessage["index"] ?? 0;
-          break;
-        }
-      }
-
-      String? replyFromId = replyMessage["von"];
-      Map messageFromProfil = getProfilFromHive(profilId: replyFromId) ?? {};
-      var replyColor =
-          messageFromProfil["bildStandardFarbe"] == deletedUserColor
-              ? Colors.greenAccent[100]
-              : messageFromProfil["bildStandardFarbe"] != null
-                  ? Color(messageFromProfil["bildStandardFarbe"])
-                  : Colors.black;
-      bool isEvent = replyMessage.isEmpty
-          ? false
-          : replyMessage["message"].contains("</eventId=");
-      bool isCommunity = replyMessage.isEmpty
-          ? false
-          : replyMessage["message"].contains("</communityId=");
-      bool isLocation = replyMessage.isEmpty
-          ? false
-          : replyMessage["message"].contains("</cityId=");
-      bool containsCard = isEvent || isCommunity || isLocation;
-      String cardTyp = "";
-
-      if (isEvent || isCommunity || isLocation) {
-        Map cardIdData = _getCardIdDataFromMessage(replyMessage["message"]);
-
-        if (cardIdData["typ"] == "event") {
-          cardData = getMeetupFromHive(cardIdData["id"]);
-          textAddition = "Event: ";
-          cardTyp = "event";
-        } else if (cardIdData["typ"] == "community") {
-          cardData = getCommunityFromHive(cardIdData["id"]);
-          textAddition = "Community: ";
-          cardTyp = "community";
-        } else if (cardIdData["typ"] == "city") {
-          cardData = getCityFromHive(cityId: cardIdData["id"]);
-          cardTyp = "location";
-        }
-      }
-
-      message["index"] = index;
-
-      return Listener(
-        onPointerHover: (details) => tabPosition = details.position,
-        child: AnimatedContainer(
-          color: highlightMessages.contains(index)
-              ? Theme.of(context).colorScheme.primary
-              : Colors.white,
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeIn,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment:
-                messageBoxInformation["textAlign"] == Alignment.centerLeft
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.end,
-            children: [
-              if (widget.isChatgroup && message["von"] != userId)
-                Container(
-                    width: 50,
-                    height: 50,
-                    margin: EdgeInsets.only(
-                        left: 5, bottom: hasTranslationButton ? 25 : 10),
-                    child: GestureDetector(
-                      onTap: creatorData.isEmpty
-                          ? null
-                          : () => global_functions.changePage(
-                              context,
-                              ShowProfilPage(
-                                profil: creatorData,
-                              )),
-                      child: ProfilImage(creatorData),
-                    )),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    if (messageBoxInformation["textAlign"] ==
-                        Alignment.centerRight)
-                      const Expanded(flex: 2, child: SizedBox.shrink()),
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        GestureDetector(
-                          onTap: () => openMessageMenu(message, index),
-                          child: Container(
-                              margin: EdgeInsets.only(
-                                  left: 10,
-                                  right: 10,
-                                  top: 10,
-                                  bottom: hasTranslationButton ? 25 : 10),
-                              decoration: BoxDecoration(
-                                  color:
-                                      messageBoxInformation["messageBoxColor"],
-                                  border: Border.all(),
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10))),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (widget.isChatgroup &&
-                                      message["von"] != userId)
-                                    GestureDetector(
-                                      onTap: creatorData.isEmpty
-                                          ? null
-                                          : () => global_functions.changePage(
-                                              context,
-                                              ShowProfilPage(
-                                                profil: creatorData,
-                                              )),
-                                      child: Container(
-                                          margin: const EdgeInsets.only(
-                                              left: 10, top: 10),
-                                          child: Text(
-                                            creatorName,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(creatorColor)),
-                                          )),
-                                    ),
-                                  GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () {
-                                      if (replyFromId != null) {
-                                        _scrollToMessage(replyIndex);
-                                        _highlightMessage(replyIndex);
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10, top: 5),
-                                      child: Container(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 10),
-                                          decoration: BoxDecoration(
-                                              border: Border(
-                                                  left: BorderSide(
-                                                      width: 2,
-                                                      color: replyColor!))),
-                                          child: Container(
-                                            height: replyFromId != null
-                                                ? containsCard
-                                                    ? 142
-                                                    : 39
-                                                : 18,
-                                            constraints: BoxConstraints(
-                                                maxWidth: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.70),
-                                            child: replyFromId != null
-                                                ? Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                          messageFromProfil[
-                                                                  "name"] ??
-                                                              AppLocalizations.of(
-                                                                      context)!
-                                                                  .geloeschterUser,
-                                                          style:
-                                                              TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      replyColor)),
-                                                      if (!containsCard)
-                                                        const SizedBox(
-                                                            height: 3),
-                                                      Flexible(
-                                                        child: !containsCard
-                                                            ? Text(
-                                                                cardData["name"] ==
-                                                                        null
-                                                                    ? replyMessage[
-                                                                        "message"]
-                                                                    : textAddition +
-                                                                        cardData[
-                                                                            "name"],
-                                                                maxLines: 1,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                              )
-                                                            : _getDisplayedCard(
-                                                                cardTyp,
-                                                                cardData,
-                                                                smallCard:
-                                                                    true),
-                                                      )
-                                                    ],
-                                                  )
-                                                : Text(
-                                                    AppLocalizations.of(
-                                                            context)!
-                                                        .geloeschteNachricht,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                          )),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.only(
-                                        top: 5, left: 10, bottom: 7, right: 10),
-                                    constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width *
-                                                0.745),
-                                    child: Wrap(
-                                      children: [
-                                        TextWithHyperlinkDetection(
-                                          text: message["message"] ?? "",
-                                          fontsize: 16,
-                                          onTextTab: () =>
-                                              openMessageMenu(message, index),
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Text(
-                                            messageBoxInformation[
-                                                    "messageEdit"] +
-                                                " " +
-                                                messageBoxInformation[
-                                                    "messageTime"],
-                                            style: const TextStyle(
-                                                color: Colors.transparent))
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              )),
-                        ),
-                        Positioned(
-                          right: 20,
-                          bottom: hasTranslationButton ? 30 : 15,
-                          child: GestureDetector(
-                            onTap: () => openMessageMenu(message, index),
-                            child: Text(
-                                messageBoxInformation["messageEdit"] +
-                                    " " +
-                                    messageBoxInformation["messageTime"],
-                                style: TextStyle(color: timeStampColor)),
-                          ),
-                        ),
-                        translationButton(message)
-                      ],
-                    ),
-                    if (messageBoxInformation["textAlign"] ==
-                        Alignment.centerLeft)
-                      const Expanded(flex: 2, child: SizedBox.shrink()),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    forwardMessage(int index, Map message, Map messageBoxInformation) {
-      String messageAutorId = message["forward"].split(":")[1];
-      Map forwardProfil = getProfilFromHive(profilId: messageAutorId);
-      Map creatorData = getProfilFromHive(profilId: message["von"]);
-      message["index"] = index;
-      bool hasTranslationButton =
-          translationButton(message).runtimeType != SizedBox;
-
-      return Listener(
-        onPointerHover: (details) => tabPosition = details.position,
-        child: AnimatedContainer(
-          color: highlightMessages.contains(index)
-              ? Theme.of(context).colorScheme.primary
-              : Colors.white,
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeIn,
-          child: Row(
-            mainAxisAlignment:
-                messageBoxInformation["textAlign"] == Alignment.centerLeft
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              if (widget.isChatgroup && message["von"] != userId)
-                Container(
-                    margin: EdgeInsets.only(
-                        left: 5, bottom: hasTranslationButton ? 25 : 10),
-                    child: GestureDetector(
-                      onTap: creatorData.isEmpty
-                          ? null
-                          : () => global_functions.changePage(
-                              context,
-                              ShowProfilPage(
-                                profil: creatorData,
-                              )),
-                      child: ProfilImage(creatorData),
-                    )),
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.85),
-                      margin: EdgeInsets.only(
-                          left: 10,
-                          right: 10,
-                          top: 10,
-                          bottom: hasTranslationButton ? 25 : 10),
-                      decoration: BoxDecoration(
-                          color: messageBoxInformation["messageBoxColor"],
-                          border: Border.all(),
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10))),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.only(
-                                top: 5, left: 10, right: 5),
-                            child: GestureDetector(
-                              onTap: creatorData.isEmpty
-                                  ? null
-                                  : () => global_functions.changePage(
-                                      context,
-                                      ShowProfilPage(
-                                        profil: forwardProfil,
-                                      )),
-                              child: Text(
-                                AppLocalizations.of(context)!
-                                        .weitergeleitetVon +
-                                    forwardProfil["name"],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => openMessageMenu(message, index),
-                            child: Wrap(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      top: 5, left: 10, bottom: 7, right: 10),
-                                  child: TextWithHyperlinkDetection(
-                                      text: message["message"] ?? "",
-                                      fontsize: 16,
-                                      onTextTab: () =>
-                                          openMessageMenu(message, index)),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                    messageBoxInformation["messageEdit"] +
-                                        " " +
-                                        messageBoxInformation["messageTime"],
-                                    style: const TextStyle(
-                                        color: Colors.transparent))
-                              ],
-                            ),
-                          ),
-                        ],
-                      )),
-                  Positioned(
-                    right: 20,
-                    bottom: hasTranslationButton ? 30 : 15,
-                    child: Text(
-                        messageBoxInformation["messageEdit"] +
-                            " " +
-                            messageBoxInformation["messageTime"],
-                        style: TextStyle(color: timeStampColor)),
-                  ),
-                  translationButton(message)
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    imageMessage(int index, Map message, Map messageBoxInformation) {
+    normalMessageNew(int index, Map message, Map messageBoxInformation,
+        {additionChild}) {
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
       String creatorName =
           creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
       var creatorColor = creatorData["bildStandardFarbe"];
-      String image = message["images"][0];
 
       message["index"] = index;
 
-      return Listener(
-        onPointerHover: (details) {
-          tabPosition = details.position;
-        },
-        child: AnimatedContainer(
-          color: highlightMessages.contains(index)
-              ? Theme.of(context).colorScheme.primary
-              : Colors.white,
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeIn,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment:
-                messageBoxInformation["textAlign"] == Alignment.centerLeft
-                    ? MainAxisAlignment.start
-                    : MainAxisAlignment.end,
-            children: [
-              if (widget.isChatgroup && message["von"] != userId)
-                Container(
-                    width: 50,
-                    height: 50,
-                    margin: const EdgeInsets.only(left: 5, bottom: 10),
-                    child: GestureDetector(
-                      onTap: creatorData.isEmpty
-                          ? null
-                          : () => global_functions.changePage(
-                              context,
-                              ShowProfilPage(
-                                profil: creatorData,
-                              )),
-                      child: ProfilImage(creatorData),
-                    )),
-              GestureDetector(
-                onTap: () => openMessageMenu(message, index),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                        constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width *
-                                (widget.isChatgroup && message["von"] != userId
-                                    ? 0.75
-                                    : 0.85)),
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: messageBoxInformation["messageBoxColor"],
-                            border: Border.all(),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10))),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (widget.isChatgroup && message["von"] != userId)
-                              GestureDetector(
-                                onTap: creatorData.isEmpty
-                                    ? null
-                                    : () => global_functions.changePage(
-                                        context,
-                                        ShowProfilPage(
-                                          profil: creatorData,
-                                        )),
-                                child: Container(
-                                    margin: const EdgeInsets.only(bottom: 5),
-                                    child: Text(
-                                      creatorName,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(creatorColor ??
-                                              deletedUserColor)),
-                                    )),
-                              ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                InkWell(
-                                  onTap: () => imageFullscreen(image),
-                                  child: CachedNetworkImage(
-                                      imageUrl: image,
-                                      width: 200,
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error)),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 10),
-                                  child: Text(
-                                      messageBoxInformation["messageEdit"] +
-                                          messageBoxInformation["messageTime"],
-                                      style: TextStyle(color: timeStampColor)),
-                                ),
-                              ],
-                            ),
-                          ],
-                        )),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    normalMessage(int index, Map message, Map messageBoxInformation) {
-      Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
-      String creatorName =
-          creatorData["name"] ?? AppLocalizations.of(context)!.geloeschterUser;
-      var creatorColor = creatorData["bildStandardFarbe"];
-      message["index"] = index;
       String messageText = getTranslatedMessageText(message);
+
+      if (messageText.contains("</images")) messageText = "";
+      if (messageText.contains("</eventId=") ||
+          messageText.contains("</communityId=") ||
+          messageText.contains("</cityId=")) {
+        var cardIdData = _getCardIdDataFromMessage(message["message"]);
+        Map cardData = getCardData(cardIdData);
+        String replaceText = cardData["name"] ?? cardData["ort"];
+        String removeId = cardIdData["text"];
+        messageText =
+            message["message"].replaceAll(removeId, replaceText).trim();
+      }
+
       bool hasTranslationButton =
           translationButton(message).runtimeType != SizedBox;
 
@@ -2193,6 +1483,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                               deletedUserColor)),
                                     )),
                               ),
+                            if (additionChild != null)
+                              Container(
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  child: additionChild),
                             Wrap(
                               alignment: WrapAlignment.end,
                               children: [
@@ -2229,6 +1523,143 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
+    cardMessageNew(String cardType, cardIdData, {smallCard = false}) {
+      Map cardData = getCardData(cardIdData);
+      return _getDisplayedCard(cardType, cardData, smallCard: smallCard);
+    }
+
+    responseMessageNew(responseId) {
+      Map replyMessage = {};
+      int replyIndex = 0;
+
+      for (Map lookMessage in messages.reversed.toList()) {
+        if (lookMessage["id"] == responseId) {
+          replyMessage = lookMessage;
+          replyIndex = lookMessage["index"] ?? 0;
+          break;
+        }
+      }
+
+      bool replayContainsImage = replyMessage["images"].isNotEmpty;
+      String? cardTyp;
+
+      if(replyMessage["message"].contains("</eventId=")){
+        cardTyp ="event";
+      }else if(replyMessage["message"].contains("</communityId=") ){
+        cardTyp ="community";
+      }else if(replyMessage["message"].contains("</cityId=")){
+        cardTyp = "location";
+      }
+
+
+      Map messageFromProfil =
+          getProfilFromHive(profilId: replyMessage["von"]) ?? {};
+      var replyColor =
+          messageFromProfil["bildStandardFarbe"] == deletedUserColor
+              ? Colors.greenAccent[100]
+              : messageFromProfil["bildStandardFarbe"] != null
+                  ? Color(messageFromProfil["bildStandardFarbe"])
+                  : Colors.black;
+
+      if(replyMessage["von"] == null){
+        return Text(
+          AppLocalizations.of(context)!.geloeschteNachricht,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        );
+      }else{
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            if (responseId != null) {
+              _scrollToMessage(replyIndex);
+              _highlightMessage(replyIndex);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            decoration: BoxDecoration(
+                border:
+                Border(left: BorderSide(width: 2, color: replyColor!))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    messageFromProfil["name"] ?? AppLocalizations.of(context)!.geloeschterUser,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: replyColor)),
+                const SizedBox(height: 3),
+                if(replayContainsImage) CachedNetworkImage(imageUrl: replyMessage["images"][0], width: 150, height: 150),
+                if(cardTyp != null) cardMessageNew(cardTyp, _getCardIdDataFromMessage(replyMessage["message"]),smallCard: true),
+                if(!replayContainsImage && cardTyp == null) Text(
+                  replyMessage["message"],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )
+              ],
+            ),
+          ),
+        );
+      }
+    }
+
+    forwardMessageNew(forwardedAutorId) {
+      Map forwardProfil = getProfilFromHive(profilId: forwardedAutorId);
+
+      return Text(
+        AppLocalizations.of(context)!.weitergeleitetVon + forwardProfil["name"],
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      );
+    }
+
+    imageMessageNew(image) {
+      return InkWell(
+        onTap: () => imageFullscreen(image),
+        child: CachedNetworkImage(
+            imageUrl: image,
+            width: 200,
+            placeholder: (context, url) => const CircularProgressIndicator(),
+            errorWidget: (context, url, error) => const Icon(Icons.error)),
+      );
+    }
+
+    getAdditionChild(Map message) {
+      if (message["message"].contains("</eventId=")) {
+        return cardMessageNew(
+            "event", _getCardIdDataFromMessage(message["message"]));
+      } else if (message["message"].contains("</communityId=")) {
+        return cardMessageNew(
+            "community", _getCardIdDataFromMessage(message["message"]));
+      } else if (message["message"].contains("</cityId=")) {
+        return cardMessageNew(
+            "location", _getCardIdDataFromMessage(message["message"]));
+      } else if (int.parse(message["responseId"]) != 0) {
+        return responseMessageNew(message["responseId"]);
+      } else if (message["forward"].isNotEmpty) {
+        return forwardMessageNew(message["forward"].split(":")[1]);
+      } else if (message["message"].contains("</images") &&
+          message["images"].isNotEmpty) {
+        return imageMessageNew(message["images"][0]);
+      }
+    }
+
+    dayDisplay(String date) {
+      return Align(
+        child: Container(
+          width: 80,
+          margin: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: const BorderRadius.all(Radius.circular(20))),
+          child: Center(
+              child: Text(
+            date,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          )),
+        ),
+      );
+    }
+
     messageList(List messages) {
       List<Widget> messageBox = [];
       var changedMessageList =
@@ -2239,31 +1670,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           .toString();
       globalMessageIndex = 1;
 
-      messageBox.add(Align(
-        child: Container(
-          width: 80,
-          margin: const EdgeInsets.all(10),
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: const BorderRadius.all(Radius.circular(20))),
-          child: Center(
-              child: Text(
-            oldMessageDate,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          )),
-        ),
-      ));
+      messageBox.add(dayDisplay(oldMessageDate));
 
       for (var checkMessage in changedMessageList) {
         Map message = checkMessage;
         DateTime messageDateTime =
             DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         String messageDate = DateFormat('dd.MM.yy').format(messageDateTime);
-        var forwardData = message["forward"];
         if (message["images"].runtimeType == String)
           message["images"] = jsonDecode(message["images"]);
-        bool hasImage = message["message"].contains("</images") && message["images"].isNotEmpty;
 
         message["responseId"] ??= "0";
         var messageBoxInformation = {
@@ -2285,48 +1700,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
 
         if (oldMessageDate != messageDate) {
-          messageBox.add(Align(
-            child: Container(
-              width: 80,
-              margin: const EdgeInsets.all(10),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: const BorderRadius.all(Radius.circular(20))),
-              child: Center(
-                  child: Text(
-                messageDate,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              )),
-            ),
-          ));
-
+          messageBox.add(dayDisplay(messageDate));
           globalMessageIndex += 1;
           oldMessageDate = messageDate;
         }
 
-        if (message["message"].contains("</eventId=")) {
-          messageBox.add(cardMessage(
-              globalMessageIndex, message, messageBoxInformation, "event"));
-        } else if (message["message"].contains("</communityId=")) {
-          messageBox.add(cardMessage(
-              globalMessageIndex, message, messageBoxInformation, "community"));
-        } else if (message["message"].contains("</cityId=")) {
-          messageBox.add(cardMessage(
-              globalMessageIndex, message, messageBoxInformation, "location"));
-        } else if (int.parse(message["responseId"]) != 0) {
-          messageBox.add(responseMessage(
-              globalMessageIndex, message, messageBoxInformation));
-        } else if (forwardData.isNotEmpty) {
-          messageBox.add(forwardMessage(
-              globalMessageIndex, message, messageBoxInformation));
-        } else if (hasImage) {
-          messageBox.add(
-              imageMessage(globalMessageIndex, message, messageBoxInformation));
-        } else {
-          messageBox.add(normalMessage(
-              globalMessageIndex, message, messageBoxInformation));
-        }
+        messageBox.add(normalMessageNew(
+            globalMessageIndex, message, messageBoxInformation,
+            additionChild: getAdditionChild(message)));
+
         globalMessageIndex += 1;
       }
 
