@@ -1997,6 +1997,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       var creatorColor = creatorData["bildStandardFarbe"];
       String image = message["images"][0];
 
+      message["index"] = index;
+
       return Listener(
         onPointerHover: (details) {
           tabPosition = details.position;
