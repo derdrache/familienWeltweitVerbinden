@@ -376,7 +376,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     var groupText = messageData["message"];
 
     if (messageData["message"].contains("</eventId=")) {
-      groupText = "<Event Card>";
+      groupText = "<Meetup Card>";
     }
     if (messageData["message"].contains("</communityId=")) {
       groupText = "<Community Card>";
@@ -534,9 +534,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "responseId": "0",
       "images": message["images"] ?? jsonEncode([])
     };
+    String groupText = messageData["message"].replaceAll("'", "''");
+
+    if (groupText.contains("</eventId=")) {
+      groupText = "<Meetup Card>";
+    }
+    if (groupText.contains("</communityId=")) {
+      groupText = "<Community Card>";
+    }
+    if (groupText.contains("</cityId=")) {
+      groupText = "<Location Card>";
+    }
 
     ChatDatabase().updateChatGroup(
-        "lastMessage = '${messageData["message"]}' , lastMessageDate = '${messageData["date"]}'",
+        "lastMessage = '${groupText}' , lastMessageDate = '${messageData["date"]}'",
         "WHERE id = '$selectedChatId'");
 
     var isBlocked = ownProfil["geblocktVon"].contains(userId);
