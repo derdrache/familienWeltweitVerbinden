@@ -252,7 +252,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       var isBottom =
-          itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1;
+          itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1 && itemPositionListener.itemPositions.value.last.index +1 == displayDataEntries;
       if (isBottom) {
         setState(() {
           displayDataEntries += 50;
