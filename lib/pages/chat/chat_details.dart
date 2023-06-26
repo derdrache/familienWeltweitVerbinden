@@ -531,7 +531,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       "date": DateTime.now().millisecondsSinceEpoch.toString(),
       "zu": selectedUserId,
       "forward": "userId:$forwardMessage",
-      "responseId": "0"
+      "responseId": "0",
+      "images": message["images"] ?? jsonEncode([])
     };
 
     ChatDatabase().updateChatGroup(
@@ -1485,7 +1486,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               ),
                             if (additionChild != null)
                               Container(
-                                  margin: EdgeInsets.only(bottom: 5),
+                                  margin: const EdgeInsets.only(bottom: 5),
                                   child: additionChild),
                             Wrap(
                               alignment: WrapAlignment.end,
@@ -1525,6 +1526,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     cardMessageNew(String cardType, cardIdData, {smallCard = false}) {
       Map cardData = getCardData(cardIdData);
+
       return _getDisplayedCard(cardType, cardData, smallCard: smallCard);
     }
 
@@ -1602,15 +1604,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     }
 
-    forwardMessageNew(forwardedAutorId) {
-      Map forwardProfil = getProfilFromHive(profilId: forwardedAutorId);
-
-      return Text(
-        AppLocalizations.of(context)!.weitergeleitetVon + forwardProfil["name"],
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      );
-    }
-
     imageMessageNew(image) {
       return InkWell(
         onTap: () => imageFullscreen(image),
@@ -1622,8 +1615,37 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
+    forwardMessageNew(message) {
+      Map forwardProfil = getProfilFromHive(profilId: message["forward"].split(":")[1]);
+      bool messageContainsImage = message["images"].isNotEmpty;
+      String? cardTyp;
+
+      if(message["message"].contains("</eventId=")){
+        cardTyp ="event";
+      }else if(message["message"].contains("</communityId=") ){
+        cardTyp ="community";
+      }else if(message["message"].contains("</cityId=")){
+        cardTyp = "location";
+      }
+
+      return Column(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.weitergeleitetVon + forwardProfil["name"],
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 5),
+          if(messageContainsImage) imageMessageNew(message["images"][0]),
+          if(cardTyp != null) cardMessageNew(cardTyp, _getCardIdDataFromMessage(message["message"]))
+        ],
+      );
+    }
+
     getAdditionChild(Map message) {
-      if (message["message"].contains("</eventId=")) {
+      if (message["forward"].isNotEmpty) {
+        return forwardMessageNew(message);
+      }
+      else if (message["message"].contains("</eventId=")) {
         return cardMessageNew(
             "event", _getCardIdDataFromMessage(message["message"]));
       } else if (message["message"].contains("</communityId=")) {
@@ -1634,8 +1656,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             "location", _getCardIdDataFromMessage(message["message"]));
       } else if (int.parse(message["responseId"]) != 0) {
         return responseMessageNew(message["responseId"]);
-      } else if (message["forward"].isNotEmpty) {
-        return forwardMessageNew(message["forward"].split(":")[1]);
       } else if (message["message"].contains("</images") &&
           message["images"].isNotEmpty) {
         return imageMessageNew(message["images"][0]);
