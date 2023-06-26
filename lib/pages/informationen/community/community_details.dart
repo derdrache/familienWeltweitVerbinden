@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -942,9 +943,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         child: isAssetImage
             ? Image.asset(widget.community["bild"],
                 height: screenWidth > 600 ? screenHeight / 3 : null)
-            : Image.network(widget.community["bild"],
-                height: screenHeight / 3,
-                fit: screenWidth > 600 ? null : BoxFit.fitWidth),
+            : CachedNetworkImage(imageUrl: widget.community["bild"], height: screenHeight / 3,
+            fit: screenWidth > 600 ? null : BoxFit.fitWidth)
       );
     }
 

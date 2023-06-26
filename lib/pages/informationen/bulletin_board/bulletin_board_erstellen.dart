@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_details.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -139,7 +140,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             windowPadding: const EdgeInsets.all(30),
-            children: [Image.network(image)],
+            children: [CachedNetworkImage(imageUrl: image,)],
           );
         });
   }
@@ -190,7 +191,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
                     ? IconButton(
                         onPressed: () => uploadImage(),
                         icon: const Icon(Icons.upload))
-                    : Image.network(value),
+                    : CachedNetworkImage(imageUrl: value,),
               ),
               if (value != null)
                 Positioned(

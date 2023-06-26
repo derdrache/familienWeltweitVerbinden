@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,16 +17,16 @@ class CommunityCard extends StatefulWidget {
   Function? afterFavorite;
   bool smallCard;
 
-  CommunityCard({
-    Key? key,
-    required this.community,
-    this.withFavorite = false,
-    this.afterFavorite,
-    this.margin =
-        const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
-    this.afterPageVisit,
-    this.smallCard = false
-  })  : isCreator = community["erstelltVon"] == userId,
+  CommunityCard(
+      {Key? key,
+      required this.community,
+      this.withFavorite = false,
+      this.afterFavorite,
+      this.margin =
+          const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
+      this.afterPageVisit,
+      this.smallCard = false})
+      : isCreator = community["erstelltVon"] == userId,
         super(key: key);
 
   @override
@@ -44,10 +45,11 @@ class _CommunityCardState extends State<CommunityCard> {
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
     return GestureDetector(
-     onTap: () => global_func.changePage(
-          context, 
-          CommunityDetails(community: widget.community),
-          whenComplete: widget.afterPageVisit != null ? ()=>  widget.afterPageVisit :null),
+      onTap: () => global_func.changePage(
+          context, CommunityDetails(community: widget.community),
+          whenComplete: widget.afterPageVisit != null
+              ? () => widget.afterPageVisit
+              : null),
       child: Container(
           width: (120 + ((screenHeight - 600) / 5)) * sizeRefactor,
           height: screenHeight / 3.2 * sizeRefactor,
@@ -69,24 +71,24 @@ class _CommunityCardState extends State<CommunityCard> {
                 children: [
                   Container(
                     constraints: const BoxConstraints(
-                      minHeight: 70 *0.5,
-                      maxHeight: 120
-                    ),
+                        minHeight: 70 * 0.5, maxHeight: 120),
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0),
-                      ),
-                      child: isAssetImage
-                          ? Image.asset(widget.community["bild"],
-                              height: (70 + ((screenHeight - 600) / 4)) * sizeRefactor,
-                              width: (135 + ((screenHeight - 600) / 4)),
-                              fit: BoxFit.fill)
-                          : Image.network(widget.community["bild"],
-                              height: (70 + ((screenHeight - 600) / 4)) * sizeRefactor,
-                              width: (135 + ((screenHeight - 600) / 4)),
-                              fit: BoxFit.fill),
-                    ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                        child: isAssetImage
+                            ? Image.asset(widget.community["bild"],
+                                height: (70 + ((screenHeight - 600) / 4)) *
+                                    sizeRefactor,
+                                width: (135 + ((screenHeight - 600) / 4)),
+                                fit: BoxFit.fill)
+                            : CachedNetworkImage(
+                                imageUrl: widget.community["bild"],
+                                height: (70 + ((screenHeight - 600) / 4)) *
+                                    sizeRefactor,
+                                width: (135 + ((screenHeight - 600) / 4)),
+                                fit: BoxFit.fill)),
                   ),
                   if (widget.withFavorite && !widget.isCreator)
                     Positioned(
@@ -94,7 +96,9 @@ class _CommunityCardState extends State<CommunityCard> {
                         right: 8,
                         child: InteresseButton(
                             communityData: widget.community,
-                            afterFavorite: widget.afterFavorite != null ? widget.afterFavorite! : null)),
+                            afterFavorite: widget.afterFavorite != null
+                                ? widget.afterFavorite!
+                                : null)),
                 ],
               ),
               Expanded(
@@ -146,7 +150,8 @@ class InteresseButton extends StatefulWidget {
   Map communityData;
   Function? afterFavorite;
 
-  InteresseButton({Key? key, required this.communityData, required this.afterFavorite})
+  InteresseButton(
+      {Key? key, required this.communityData, required this.afterFavorite})
       : super(key: key);
 
   @override
@@ -157,7 +162,6 @@ class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
   late bool hasIntereset;
 
-
   setInteresse() async {
     String communityId = widget.communityData["id"];
     hasIntereset = !hasIntereset;
@@ -167,21 +171,21 @@ class _InteresseButtonState extends State<InteresseButton> {
       CommunityDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
           "WHERE id ='$communityId'");
-    }else{
+    } else {
       widget.communityData["interesse"].remove(userId);
       CommunityDatabase().update(
           "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
           "WHERE id ='$communityId'");
     }
 
-    updateHiveCommunity(communityId, "interesse", widget.communityData["interesse"]);
+    updateHiveCommunity(
+        communityId, "interesse", widget.communityData["interesse"]);
     setState(() {});
 
     widget.afterFavorite!();
   }
 
-
-@override
+  @override
   void initState() {
     hasIntereset = widget.communityData["interesse"].contains(userId);
 
@@ -193,7 +197,6 @@ class _InteresseButtonState extends State<InteresseButton> {
     return GestureDetector(
         onTap: () => setInteresse(),
         child: Icon(Icons.star,
-            size: 30,
-            color: hasIntereset ? Colors.amberAccent : Colors.black));
+            size: 30, color: hasIntereset ? Colors.amberAccent : Colors.black));
   }
 }

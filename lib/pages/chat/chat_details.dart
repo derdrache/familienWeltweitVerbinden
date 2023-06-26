@@ -1011,7 +1011,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
               windowPadding: const EdgeInsets.all(30),
-              children: [Image.network(image)],
+              children: [CachedNetworkImage(imageUrl: image,)],
             );
           });
     }

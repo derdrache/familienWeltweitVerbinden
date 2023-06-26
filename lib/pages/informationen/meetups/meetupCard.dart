@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,11 +62,11 @@ class _MeetupCardState extends State<MeetupCard> {
             "WHERE id = '${widget.meetupData["id"]}'");
       }
 
-      if(widget.meetupData["absage"].contains(userId)){
+      if (widget.meetupData["absage"].contains(userId)) {
         MeetupDatabase().update(
             "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
             "WHERE id = '${widget.meetupData["id"]}'");
-      }else{
+      } else {
         MeetupDatabase().update(
             "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
             "WHERE id = '${widget.meetupData["id"]}'");
@@ -74,11 +75,11 @@ class _MeetupCardState extends State<MeetupCard> {
       widget.meetupData["zusage"].add(userId);
       widget.meetupData["absage"].remove(userId);
     } else {
-      if(widget.meetupData["zusage"].contains(userId)){
+      if (widget.meetupData["zusage"].contains(userId)) {
         MeetupDatabase().update(
             "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId'))),absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
             "WHERE id = '${widget.meetupData["id"]}'");
-      }else{
+      } else {
         MeetupDatabase().update(
             "absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
             "WHERE id = '${widget.meetupData["id"]}'");
@@ -92,15 +93,16 @@ class _MeetupCardState extends State<MeetupCard> {
   }
 
   createDatetimeText() {
-
     var datetimeText =
         widget.meetupData["wann"].split(" ")[0].split("-").reversed.join(".");
     var datetimeWann = DateTime.parse(widget.meetupData["wann"]);
 
-    if(widget.meetupData["bis"] == null || widget.meetupData["bis"] =="null") return datetimeText;
+    if (widget.meetupData["bis"] == null || widget.meetupData["bis"] == "null")
+      return datetimeText;
     var datetimeBis = DateTime.parse(widget.meetupData["bis"]);
 
-    if (DateTime.now().compareTo(datetimeWann) > 0 && datetimeBis.year.toString() == "0000") {
+    if (DateTime.now().compareTo(datetimeWann) > 0 &&
+        datetimeBis.year.toString() == "0000") {
       return DateTime.now()
           .toString()
           .split(" ")[0]
@@ -119,14 +121,19 @@ class _MeetupCardState extends State<MeetupCard> {
     int deviceZeitzone = DateTime.now().timeZoneOffset.inHours;
     var meetupStart = widget.meetupData["wann"];
 
-    meetupStart = DateTime.parse(meetupStart).add(Duration(hours: deviceZeitzone - meetupZeitzone));
+    meetupStart = DateTime.parse(meetupStart)
+        .add(Duration(hours: deviceZeitzone - meetupZeitzone));
 
     return meetupStart.toString().split(" ")[1].toString().substring(0, 5);
   }
 
   @override
   Widget build(BuildContext context) {
-    var sizeRefactor = widget.bigCard == true ? 1.4 : widget.smallCard ? 0.5 : 1.0;
+    var sizeRefactor = widget.bigCard == true
+        ? 1.4
+        : widget.smallCard
+            ? 0.5
+            : 1.0;
     double screenHeight = MediaQuery.of(context).size.height;
     var fontSize = screenHeight / 55 * sizeRefactor;
     var forTeilnahmeFreigegeben = (widget.meetupData["art"] == "public" ||
@@ -145,7 +152,8 @@ class _MeetupCardState extends State<MeetupCard> {
     }
 
     cardMenu(tapPosition) {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+      final RenderBox overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
 
       showMenu(
         context: context,
@@ -186,10 +194,13 @@ class _MeetupCardState extends State<MeetupCard> {
       onLongPressStart: widget.isCreator || forTeilnahmeFreigegeben
           ? (tapdownDetails) => cardMenu(tapdownDetails.globalPosition)
           : null,
-        onTap: () => global_func.changePage(
-            context,
-            MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
-            whenComplete: () =>  widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
+      onTap: () => global_func.changePage(
+          context,
+          MeetupDetailsPage(
+              meetupData: widget.meetupData,
+              fromMeetupPage: widget.fromMeetupPage),
+          whenComplete: () =>
+              widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
       child: Container(
           width: (120 + ((screenHeight - 600) / 5)) * sizeRefactor,
           height: screenHeight / 3.2 * sizeRefactor,
@@ -225,7 +236,8 @@ class _MeetupCardState extends State<MeetupCard> {
                               width: (135 + ((screenHeight - 600) / 4)) *
                                   sizeRefactor,
                               fit: BoxFit.fill)
-                          : Image.network(widget.meetupData["bild"],
+                          : CachedNetworkImage(
+                              imageUrl: widget.meetupData["bild"],
                               height: (70 + ((screenHeight - 600) / 4)) *
                                   sizeRefactor,
                               width: (130 + ((screenHeight - 600) / 4)) *
@@ -233,16 +245,19 @@ class _MeetupCardState extends State<MeetupCard> {
                               fit: BoxFit.fill),
                     ),
                   ),
-                  if (widget.withInteresse && !widget.isCreator && !widget.smallCard)
+                  if (widget.withInteresse &&
+                      !widget.isCreator &&
+                      !widget.smallCard)
                     Positioned(
                         top: 2,
                         right: 8,
                         child: InteresseButton(
-                          hasIntereset:
-                              widget.meetupData["interesse"].contains(userId),
-                          id: widget.meetupData["id"],
-                          afterFavorite: widget.afterFavorite != null ? widget.afterFavorite! : null
-                        )),
+                            hasIntereset:
+                                widget.meetupData["interesse"].contains(userId),
+                            id: widget.meetupData["id"],
+                            afterFavorite: widget.afterFavorite != null
+                                ? widget.afterFavorite!
+                                : null)),
                 ],
               ),
               Expanded(
@@ -300,7 +315,13 @@ class _MeetupCardState extends State<MeetupCard> {
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: fontSize)),
-                              Text(createOnlineMeetupTime() + " GMT " + DateTime.now().timeZoneOffset.inHours.toString(),
+                              Text(
+                                  createOnlineMeetupTime() +
+                                      " GMT " +
+                                      DateTime.now()
+                                          .timeZoneOffset
+                                          .inHours
+                                          .toString(),
                                   style: TextStyle(fontSize: fontSize))
                             ],
                           ),
@@ -329,7 +350,12 @@ class InteresseButton extends StatefulWidget {
   String id;
   Function? afterFavorite;
 
-  InteresseButton({Key? key, required this.hasIntereset, required this.id, this.afterFavorite}) : super(key: key);
+  InteresseButton(
+      {Key? key,
+      required this.hasIntereset,
+      required this.id,
+      this.afterFavorite})
+      : super(key: key);
 
   @override
   _InteresseButtonState createState() => _InteresseButtonState();
@@ -350,7 +376,7 @@ class _InteresseButtonState extends State<InteresseButton> {
       MeetupDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
           "WHERE id ='${widget.id}'");
-    }else{
+    } else {
       meetupData["interesse"].remove(userId);
       myInterestedMeetups.removeWhere((meetup) => meetup["id"] == widget.id);
       MeetupDatabase().update(

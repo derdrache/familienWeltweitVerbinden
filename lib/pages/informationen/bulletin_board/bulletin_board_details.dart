@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/informationen/location/location_Information.dart';
@@ -158,7 +159,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
               windowPadding: const EdgeInsets.all(30),
-              children: [Image.network(image)],
+              children: [CachedNetworkImage(imageUrl: image,)],
             );
           });
     }
@@ -290,7 +291,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                           decoration: BoxDecoration(
                               border: Border.all(), color: Colors.white),
                           child: image != null
-                              ? Image.network(image)
+                              ? CachedNetworkImage(imageUrl: image,)
                               : IconButton(
                                   onPressed: () => uploadImage(),
                                   icon: const Icon(Icons.upload)),
