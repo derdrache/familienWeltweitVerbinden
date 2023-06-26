@@ -465,6 +465,7 @@
     "beschreibungEingeben": "Enter description",
     "bulletinNoteLoeschen": "delete note",
     "note": "Note",
-    "weltweit": "worldwide"
+    "weltweit": "worldwide",
+    "bild" : "Image"
 }
 

@@ -481,7 +481,8 @@ class ChatGroupsDatabase {
           "responseId": messageData["responseId"],
           "forward": messageData["forward"],
           "language": messageData["language"],
-          "translateMessage": messageData["translateMessage"]
+          "translateMessage": messageData["translateMessage"],
+          "images": jsonEncode(messageData["images"]),
         }));
 
     _addNotificationCounterAndSendNotification(

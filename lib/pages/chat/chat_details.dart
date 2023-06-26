@@ -2261,6 +2261,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         var forwardData = message["forward"];
         if (message["images"].runtimeType == String)
           message["images"] = jsonDecode(message["images"]);
+        bool hasImage = message["message"].contains("</images") && message["images"].isNotEmpty;
 
         message["responseId"] ??= "0";
         var messageBoxInformation = {
@@ -2317,7 +2318,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         } else if (forwardData.isNotEmpty) {
           messageBox.add(forwardMessage(
               globalMessageIndex, message, messageBoxInformation));
-        } else if (message["images"].isNotEmpty) {
+        } else if (hasImage) {
           messageBox.add(
               imageMessage(globalMessageIndex, message, messageBoxInformation));
         } else {
