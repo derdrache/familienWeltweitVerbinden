@@ -256,7 +256,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
 
       var isBottom =
-          itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1;
+          itemPositionListener.itemPositions.value.last.itemTrailingEdge <= 1 &&
+              itemPositionListener.itemPositions.value.last.index + 1 ==
+                  displayDataEntries;
+
       if (isBottom) {
         setState(() {
           displayDataEntries += 50;
@@ -1556,14 +1559,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       bool replayContainsImage = replyMessage["images"].isNotEmpty;
       String? cardTyp;
 
-      if(replyMessage["message"].contains("</eventId=")){
-        cardTyp ="event";
-      }else if(replyMessage["message"].contains("</communityId=") ){
-        cardTyp ="community";
-      }else if(replyMessage["message"].contains("</cityId=")){
+      if (replyMessage["message"].contains("</eventId=")) {
+        cardTyp = "event";
+      } else if (replyMessage["message"].contains("</communityId=")) {
+        cardTyp = "community";
+      } else if (replyMessage["message"].contains("</cityId=")) {
         cardTyp = "location";
       }
-
 
       Map messageFromProfil =
           getProfilFromHive(profilId: replyMessage["von"]) ?? {};
@@ -1574,12 +1576,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   ? Color(messageFromProfil["bildStandardFarbe"])
                   : Colors.black;
 
-      if(replyMessage["von"] == null){
+      if (replyMessage["von"] == null) {
         return Text(
           AppLocalizations.of(context)!.geloeschteNachricht,
           style: const TextStyle(fontWeight: FontWeight.bold),
         );
-      }else{
+      } else {
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
@@ -1591,23 +1593,31 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           child: Container(
             padding: const EdgeInsets.only(left: 10, right: 10),
             decoration: BoxDecoration(
-                border:
-                Border(left: BorderSide(width: 2, color: replyColor!))),
+                border: Border(left: BorderSide(width: 2, color: replyColor!))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                    messageFromProfil["name"] ?? AppLocalizations.of(context)!.geloeschterUser,
+                    messageFromProfil["name"] ??
+                        AppLocalizations.of(context)!.geloeschterUser,
                     style: TextStyle(
                         fontWeight: FontWeight.bold, color: replyColor)),
                 const SizedBox(height: 3),
-                if(replayContainsImage) CachedNetworkImage(imageUrl: replyMessage["images"][0], width: 150, height: 150),
-                if(cardTyp != null) cardMessageNew(cardTyp, _getCardIdDataFromMessage(replyMessage["message"]),smallCard: true),
-                if(!replayContainsImage && cardTyp == null) Text(
-                  replyMessage["message"],
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                )
+                if (replayContainsImage)
+                  CachedNetworkImage(
+                      imageUrl: replyMessage["images"][0],
+                      width: 150,
+                      height: 150),
+                if (cardTyp != null)
+                  cardMessageNew(cardTyp,
+                      _getCardIdDataFromMessage(replyMessage["message"]),
+                      smallCard: true),
+                if (!replayContainsImage && cardTyp == null)
+                  Text(
+                    replyMessage["message"],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  )
               ],
             ),
           ),
@@ -1627,27 +1637,31 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     forwardMessageNew(message) {
-      Map forwardProfil = getProfilFromHive(profilId: message["forward"].split(":")[1]);
+      Map forwardProfil =
+          getProfilFromHive(profilId: message["forward"].split(":")[1]);
       bool messageContainsImage = message["images"].isNotEmpty;
       String? cardTyp;
 
-      if(message["message"].contains("</eventId=")){
-        cardTyp ="event";
-      }else if(message["message"].contains("</communityId=") ){
-        cardTyp ="community";
-      }else if(message["message"].contains("</cityId=")){
+      if (message["message"].contains("</eventId=")) {
+        cardTyp = "event";
+      } else if (message["message"].contains("</communityId=")) {
+        cardTyp = "community";
+      } else if (message["message"].contains("</cityId=")) {
         cardTyp = "location";
       }
 
       return Column(
         children: [
           Text(
-            AppLocalizations.of(context)!.weitergeleitetVon + forwardProfil["name"],
+            AppLocalizations.of(context)!.weitergeleitetVon +
+                forwardProfil["name"],
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 5),
-          if(messageContainsImage) imageMessageNew(message["images"][0]),
-          if(cardTyp != null) cardMessageNew(cardTyp, _getCardIdDataFromMessage(message["message"]))
+          if (messageContainsImage) imageMessageNew(message["images"][0]),
+          if (cardTyp != null)
+            cardMessageNew(
+                cardTyp, _getCardIdDataFromMessage(message["message"]))
         ],
       );
     }
@@ -1655,8 +1669,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     getAdditionChild(Map message) {
       if (message["forward"].isNotEmpty) {
         return forwardMessageNew(message);
-      }
-      else if (message["message"].contains("</eventId=")) {
+      } else if (message["message"].contains("</eventId=")) {
         return cardMessageNew(
             "event", _getCardIdDataFromMessage(message["message"]));
       } else if (message["message"].contains("</communityId=")) {
