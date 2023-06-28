@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -19,6 +20,8 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:translator/translator.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../functions/upload_and_save_image.dart';
 import '../../services/languageService.dart';
@@ -100,6 +103,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   late int globalMessageIndex;
   int lastReadMessageIndex = 0;
   bool isWriting = false;
+  final soundRecorder = FlutterSoundRecorder();
+  File? recordedAudio;
 
   @override
   void initState() {
@@ -119,6 +124,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   void dispose() {
     timer.cancel();
     messageInputNode.dispose();
+    soundRecorder.closeRecorder();
 
     _changeUserChatStatus(0);
 
@@ -550,7 +556,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     ChatDatabase().updateChatGroup(
-        "lastMessage = '${groupText}' , lastMessageDate = '${messageData["date"]}'",
+        "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
         "WHERE id = '$selectedChatId'");
 
     var isBlocked = ownProfil["geblocktVon"].contains(userId);
@@ -1009,8 +1015,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     _saveNewMessage(images: image);
   }
 
-  recordVoiceMessage() {}
-
   getCardData(cardIdData) {
     if (cardIdData["typ"] == "event") {
       return getMeetupFromHive(cardIdData["id"]);
@@ -1019,6 +1023,40 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     } else if (cardIdData["typ"] == "city") {
       return getCityFromHive(cityId: cardIdData["id"]);
     }
+  }
+
+  recordVoiceMessage() async {
+    bool getAccess = await requestVoiceRecord();
+    if (!getAccess) return;
+
+    if (!soundRecorder.isRecording && !soundRecorder.isPaused) {
+      await soundRecorder.openRecorder();
+      await soundRecorder.setSubscriptionDuration(Duration(milliseconds: 1000));
+      await soundRecorder.startRecorder(toFile: "audio");
+    } else if (soundRecorder.isRecording) {
+      await soundRecorder.pauseRecorder();
+    } else {
+      await soundRecorder.resumeRecorder();
+    }
+
+    setState(() {});
+  }
+
+  requestVoiceRecord() async {
+    final status = await Permission.microphone.request();
+
+    return status == PermissionStatus.granted;
+  }
+
+  cancelVoiceMessage() async {
+    await soundRecorder.closeRecorder();
+  }
+
+  saveVoiceMessage() async{
+    final path = await soundRecorder.stopRecorder();
+    final audioFile = File(path!);
+
+    recordedAudio = audioFile;
   }
 
   @override
@@ -1828,158 +1866,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           icon: Icon(icon, color: Colors.black, size: 30));
     }
 
-    textEingabeFeld() {
-      if (isTextSearching) {
-        return Container(
-          constraints: const BoxConstraints(
-            minHeight: 60,
-          ),
-          decoration: BoxDecoration(color: Colors.white, boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
-            ),
-          ]),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Expanded(
-                  child: Center(
-                      child: Text(messagesWithSearchText.isEmpty
-                          ? AppLocalizations.of(context)!.keineErgebnisse
-                          : "${searchTextIndex + 1} von ${messagesWithSearchText.length}"))),
-              searchIndexKontrollButton("up", Icons.keyboard_arrow_up),
-              searchIndexKontrollButton("down", Icons.keyboard_arrow_down),
-            ],
-          ),
-        );
-      } else if (!userJoinedChat) {
-        return GestureDetector(
-          onTap: () => _joinChatGroup(),
-          child: Container(
-              constraints: const BoxConstraints(
-                minHeight: 60,
-              ),
-              decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3),
-                ),
-              ]),
-              child: Center(
-                  child: Text(AppLocalizations.of(context)!.gruppeBeitreten))),
-        );
-      } else {
-        return Container(
-            constraints: const BoxConstraints(minHeight: 60, maxHeight: 200),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: extraInputInformationBox.runtimeType == SizedBox
-                    ? const Border(top: BorderSide(color: Colors.grey))
-                    : null,
-                boxShadow: extraInputInformationBox.runtimeType == SizedBox
-                    ? [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: const Offset(0, 3),
-                        ),
-                      ]
-                    : []),
-            child: Row(
-              children: [
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    maxLines: null,
-                    focusNode: messageInputNode,
-                    textInputAction: TextInputAction.newline,
-                    controller: nachrichtController,
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                      hintText: AppLocalizations.of(context)!.nachricht,
-                      hintStyle: const TextStyle(fontSize: 20),
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                    ),
-                    onChanged: (text) {
-                      if (isWriting && text.isEmpty) {
-                        setState(() {
-                          isWriting = false;
-                        });
-                      } else if (!isWriting && text.isNotEmpty) {
-                        setState(() {
-                          isWriting = true;
-                        });
-                      }
-                    },
-                  ),
-                ),
-                isWriting
-                    ? changeMessageInputModus != "edit"
-                        ? IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              _restartTimer();
-                              _saveNewMessage(
-                                  message: nachrichtController.text);
-
-                              _resetExtraInputInformation();
-
-                              _scrollController.jumpTo(index: 0);
-
-                              setState(() {
-                                nachrichtController.clear();
-                              });
-                            },
-                            icon: Icon(Icons.send,
-                                size: 34,
-                                color: Theme.of(context).colorScheme.secondary))
-                        : IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              _saveEditMessage();
-                              _resetExtraInputInformation();
-                            },
-                            icon: Icon(Icons.done,
-                                size: 38,
-                                color: Theme.of(context).colorScheme.secondary))
-                    : Row(
-                        children: [
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () {
-                                addImage();
-                                setState(() {
-                                  nachrichtController.clear();
-                                });
-                              },
-                              icon: Icon(Icons.attach_file,
-                                  size: 34,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary)),
-                          IconButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () => recordVoiceMessage(),
-                              icon: Icon(Icons.mic,
-                                  size: 34,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary)),
-                        ],
-                      )
-              ],
-            ));
-      }
-    }
-
     searchMessageDialog() {
       return SimpleDialogOption(
         child: Row(
@@ -2440,6 +2326,245 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ]);
     }
 
+    searchBottomBar() {
+      return Container(
+        constraints: const BoxConstraints(
+          minHeight: 60,
+        ),
+        decoration: BoxDecoration(color: Colors.white, boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ]),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Expanded(
+                child: Center(
+                    child: Text(messagesWithSearchText.isEmpty
+                        ? AppLocalizations.of(context)!.keineErgebnisse
+                        : "${searchTextIndex + 1} von ${messagesWithSearchText.length}"))),
+            searchIndexKontrollButton("up", Icons.keyboard_arrow_up),
+            searchIndexKontrollButton("down", Icons.keyboard_arrow_down),
+          ],
+        ),
+      );
+    }
+
+    joinChatBottomBar() {
+      return GestureDetector(
+        onTap: () => _joinChatGroup(),
+        child: Container(
+            constraints: const BoxConstraints(
+              minHeight: 60,
+            ),
+            decoration: BoxDecoration(color: Colors.white, boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3),
+              ),
+            ]),
+            child: Center(
+                child: Text(AppLocalizations.of(context)!.gruppeBeitreten))),
+      );
+    }
+
+    voiceMessageBottomBar() {
+      return Container(
+        constraints: const BoxConstraints(minHeight: 60, maxHeight: 60),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: extraInputInformationBox.runtimeType == SizedBox
+                ? const Border(top: BorderSide(color: Colors.grey))
+                : null,
+            boxShadow: extraInputInformationBox.runtimeType == SizedBox
+                ? [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : []),
+        child: Row(
+          children: [
+            const SizedBox(width: 10),
+            Icon(
+              Icons.circle,
+              color: Colors.red,
+              size: 20,
+            ),
+            const SizedBox(width: 5),
+            StreamBuilder<RecordingDisposition>(
+                stream: soundRecorder.onProgress,
+                builder: (context, snapshot) {
+                  final duration = snapshot.hasData
+                      ? snapshot.data!.duration
+                      : Duration.zero;
+
+                  final formatter = new NumberFormat('00');
+                  final minutes = formatter.format(duration.inMinutes);
+                  final seconds = formatter.format(duration.inSeconds);
+
+                  return Text(
+                    "$minutes:$seconds",
+                    style: TextStyle(fontSize: 20),
+                  );
+                }),
+            Expanded(
+              child: InkWell(
+                  onTap: () async {
+                    await cancelVoiceMessage();
+                    setState(() {});
+                  } ,
+                  child: Center(
+                      child: Text(
+                    AppLocalizations.of(context)!.abbrechen,
+                    style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontWeight: FontWeight.bold),
+                  ))),
+            ),
+            Expanded(
+              child: InkWell(
+                  onTap: () async {
+                    await saveVoiceMessage();
+                    setState(() {});
+                  },
+                  child: Center(
+                      child: Text(
+                    AppLocalizations.of(context)!.speichern,
+                    style: TextStyle(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontWeight: FontWeight.bold),
+                  ))),
+            ),
+            IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () async {
+                  await recordVoiceMessage();
+                  setState(() {});
+                },
+                icon: Icon(
+                    soundRecorder.isPaused ? Icons.play_arrow : Icons.pause,
+                    size: 34,
+                    color: Theme.of(context).colorScheme.secondary))
+          ],
+        ),
+      );
+    }
+
+    normalBottomBar() {
+      return Container(
+          constraints: const BoxConstraints(minHeight: 60, maxHeight: 200),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: extraInputInformationBox.runtimeType == SizedBox
+                  ? const Border(top: BorderSide(color: Colors.grey))
+                  : null,
+              boxShadow: extraInputInformationBox.runtimeType == SizedBox
+                  ? [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]
+                  : []),
+          child: Row(
+            children: [
+              const SizedBox(width: 10),
+              Expanded(
+                child: recordedAudio == null ? TextField(
+                  maxLines: null,
+                  focusNode: messageInputNode,
+                  textInputAction: TextInputAction.newline,
+                  controller: nachrichtController,
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
+                    hintText: AppLocalizations.of(context)!.nachricht,
+                    hintStyle: const TextStyle(fontSize: 20),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                  ),
+                  onChanged: (text) {
+                    if (isWriting && text.isEmpty) {
+                      setState(() {
+                        isWriting = false;
+                      });
+                    } else if (!isWriting && text.isNotEmpty) {
+                      setState(() {
+                        isWriting = true;
+                      });
+                    }
+                  },
+                ) : Text("Es wurde eine Voice Message aufgenommen"),
+              ),
+              isWriting
+                  ? changeMessageInputModus != "edit"
+                      ? IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            _restartTimer();
+                            _saveNewMessage(message: nachrichtController.text);
+
+                            _resetExtraInputInformation();
+
+                            _scrollController.jumpTo(index: 0);
+
+                            setState(() {
+                              nachrichtController.clear();
+                            });
+                          },
+                          icon: Icon(Icons.send,
+                              size: 34,
+                              color: Theme.of(context).colorScheme.secondary))
+                      : IconButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            _saveEditMessage();
+                            _resetExtraInputInformation();
+                          },
+                          icon: Icon(Icons.done,
+                              size: 38,
+                              color: Theme.of(context).colorScheme.secondary))
+                  : Row(
+                      children: [
+                        IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {
+                              addImage();
+                              setState(() {
+                                nachrichtController.clear();
+                              });
+                            },
+                            icon: Icon(Icons.attach_file,
+                                size: 34,
+                                color:
+                                    Theme.of(context).colorScheme.secondary)),
+                        IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () async => recordVoiceMessage(),
+                            icon: Icon(Icons.mic,
+                                size: 34,
+                                color:
+                                    Theme.of(context).colorScheme.secondary)),
+                      ],
+                    )
+            ],
+          ));
+    }
+
     return SelectionArea(
       child: WillPopScope(
         onWillPop: () async {
@@ -2461,7 +2586,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 angehefteteNachrichten(),
                 Expanded(child: messageAnzeige()),
                 extraInputInformationBox,
-                textEingabeFeld(),
+                if (isTextSearching) searchBottomBar(),
+                if (!userJoinedChat) joinChatBottomBar(),
+                if(soundRecorder.isRecording || soundRecorder.isPaused) voiceMessageBottomBar(),
+                if(!isTextSearching && userJoinedChat && soundRecorder.isStopped) normalBottomBar(),
               ],
             ),
           ),

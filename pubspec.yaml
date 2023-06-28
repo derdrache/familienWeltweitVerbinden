@@ -63,16 +63,14 @@ dependencies:
   connectivity_plus: ^4.0.1
   share_plus: ^7.0.2
   image_cropper: ^4.0.1
+  flutter_sound: ^9.2.13
+  voice_message_package: ^1.0.41
+  permission_handler: ^10.3.0
+  audio_waveforms: ^1.0.4
 
   flutter_localizations:
     sdk: flutter
   intl: ^0.18.0
-
-
-
-
-
-
 
 dev_dependencies:
   flutter_test:
