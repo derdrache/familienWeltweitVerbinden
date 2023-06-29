@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -20,9 +19,9 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:translator/translator.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:permission_handler/permission_handler.dart';
 
+
+import '../../functions/record_timer_stream.dart';
 import '../../functions/upload_and_save_image.dart';
 import '../../services/languageService.dart';
 import '../informationen/community/community_card.dart';
@@ -103,8 +102,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   late int globalMessageIndex;
   int lastReadMessageIndex = 0;
   bool isWriting = false;
-  final soundRecorder = FlutterSoundRecorder();
-  File? recordedAudio;
+  bool savedVoiceMessage = false;
+  var recordTimerStream = RecordTimerStream();
+
 
   @override
   void initState() {
@@ -124,7 +124,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   void dispose() {
     timer.cancel();
     messageInputNode.dispose();
-    soundRecorder.closeRecorder();
+    soundRecorder2.dispose();
+    recordTimerStream.dispose();
 
     _changeUserChatStatus(0);
 
@@ -1026,38 +1027,52 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   recordVoiceMessage() async {
+    /*
     bool getAccess = await requestVoiceRecord();
     if (!getAccess) return;
 
-    if (!soundRecorder.isRecording && !soundRecorder.isPaused) {
-      await soundRecorder.openRecorder();
-      await soundRecorder.setSubscriptionDuration(Duration(milliseconds: 1000));
-      await soundRecorder.startRecorder(toFile: "audio");
-    } else if (soundRecorder.isRecording) {
-      await soundRecorder.pauseRecorder();
-    } else {
-      await soundRecorder.resumeRecorder();
+    if (!soundRecorder2.isRecording) {
+      recordTimerStream.start();
+      await soundRecorder2.record();
+    } else if (soundRecorder2.isRecording) {
+      await soundRecorder2.pause();
     }
 
     setState(() {});
+
+     */
   }
 
   requestVoiceRecord() async {
+    /*
     final status = await Permission.microphone.request();
 
     return status == PermissionStatus.granted;
+
+     */
   }
 
   cancelVoiceMessage() async {
-    await soundRecorder.closeRecorder();
+    /*
+    soundRecorder2.dispose();
+
+     */
   }
 
   saveVoiceMessage() async{
-    final path = await soundRecorder.stopRecorder();
-    final audioFile = File(path!);
+    /*
+    var path = await soundRecorder2.stop();
 
-    recordedAudio = audioFile;
+    waveformData = await waveController.extractWaveformData(
+      path: path!,
+      noOfSamples: 100,
+    );
+
+    savedVoiceMessage = true;
+
+     */
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -2401,11 +2416,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               size: 20,
             ),
             const SizedBox(width: 5),
-            StreamBuilder<RecordingDisposition>(
-                stream: soundRecorder.onProgress,
+            StreamBuilder(
+                stream: recordTimerStream.stream(),
                 builder: (context, snapshot) {
                   final duration = snapshot.hasData
-                      ? snapshot.data!.duration
+                      ? snapshot.data as Duration
                       : Duration.zero;
 
                   final formatter = new NumberFormat('00');
@@ -2452,7 +2467,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   setState(() {});
                 },
                 icon: Icon(
-                    soundRecorder.isPaused ? Icons.play_arrow : Icons.pause,
+                    soundRecorder2.isRecording ? Icons.play_arrow : Icons.pause,
                     size: 34,
                     color: Theme.of(context).colorScheme.secondary))
           ],
@@ -2462,7 +2477,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     normalBottomBar() {
       return Container(
-          constraints: const BoxConstraints(minHeight: 60, maxHeight: 200),
+          constraints: BoxConstraints(minHeight: 60, maxHeight: savedVoiceMessage ? 60 : 200),
           decoration: BoxDecoration(
               color: Colors.white,
               border: extraInputInformationBox.runtimeType == SizedBox
@@ -2482,7 +2497,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             children: [
               const SizedBox(width: 10),
               Expanded(
-                child: recordedAudio == null ? TextField(
+                child: !savedVoiceMessage ? TextField(
                   maxLines: null,
                   focusNode: messageInputNode,
                   textInputAction: TextInputAction.newline,
@@ -2508,7 +2523,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       });
                     }
                   },
-                ) : Text("Es wurde eine Voice Message aufgenommen"),
+                ) : Container(
+                /*AudioFileWaveforms(
+                    size: Size(300, 60.0),
+                    playerController: waveController,
+                    enableSeekGesture: false,
+                    waveformType: WaveformType.fitWidth,
+                    waveformData: waveformData,
+                    playerWaveStyle: const PlayerWaveStyle(
+                        fixedWaveColor: Colors.black,
+                        liveWaveColor: Colors.blueAccent,
+                        spacing: 6,
+                    ),
+
+
+                 */
+                ),
               ),
               isWriting
                   ? changeMessageInputModus != "edit"
@@ -2588,8 +2618,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 extraInputInformationBox,
                 if (isTextSearching) searchBottomBar(),
                 if (!userJoinedChat) joinChatBottomBar(),
-                if(soundRecorder.isRecording || soundRecorder.isPaused) voiceMessageBottomBar(),
-                if(!isTextSearching && userJoinedChat && soundRecorder.isStopped) normalBottomBar(),
+                if(soundRecorder2.isRecording) voiceMessageBottomBar(),
+                if(!isTextSearching && userJoinedChat && !soundRecorder2.isRecording) normalBottomBar(),
               ],
             ),
           ),
@@ -2598,3 +2628,4 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     );
   }
 }
+

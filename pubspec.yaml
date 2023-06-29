@@ -67,6 +67,9 @@ dependencies:
   voice_message_package: ^1.0.41
   permission_handler: ^10.3.0
   audio_waveforms: ^1.0.4
+  just_waveform: ^0.0.5
+  path: ^1.8.3
+  path_provider: ^2.0.15
 
   flutter_localizations:
     sdk: flutter
