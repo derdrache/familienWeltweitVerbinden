@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 import '../../../functions/is_user_inactive.dart';
 import '../../../global/custom_widgets.dart';
@@ -109,7 +110,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
             icon: const Icon(Icons.link),
             onPressed: () async {
               Clipboard.setData(
-                  ClipboardData(text: "</cityId=" + location["id"].toString()));
+                  ClipboardData(text: "</cityId=${location["id"]}"));
               customSnackbar(
                   context, AppLocalizations.of(context)!.linkWurdekopiert,
                   color: Colors.green);
@@ -303,7 +304,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     double fontSize = 18;
     var anzahlFamilien = widget.location["familien"]?.length ?? 0;
 
-    _showCurrentlyThere() {
+    showCurrentlyThere() {
       var familiesOnLocation = getFamiliesThere();
 
       return InkWell(
@@ -327,7 +328,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showVisited() {
+    showVisited() {
       return InkWell(
         onTap: () => showFamilyVisitWindow(widget.location["familien"]),
         child: Container(
@@ -349,7 +350,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showInsiderCount() {
+    showInsiderCount() {
       return Container(
         margin: const EdgeInsets.all(5),
         child: Row(
@@ -359,7 +360,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               size: iconSize,
             ),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context)!.insiderInformation + ": ",
+            Text("${AppLocalizations.of(context)!.insiderInformation}: ",
                 style: TextStyle(fontSize: fontSize)),
             const SizedBox(width: 5),
             Text(widget.usersCityInformation.length.toString(),
@@ -369,7 +370,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showCost() {
+    showCost() {
       setCostIconColor(indikator) {
         if (indikator <= 1) return Colors.green[800];
         if (indikator <= 2) return Colors.green;
@@ -404,7 +405,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showInternetSpeed() {
+    showInternetSpeed() {
       String internetSpeedText = widget.location["internet"] == null
           ? "?"
           : widget.location["internet"].toString();
@@ -442,7 +443,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showWeather() {
+    showWeather() {
       return Container(
         margin: const EdgeInsets.all(5),
         child: Row(
@@ -479,12 +480,12 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _showCurrentlyThere(),
-                      _showVisited(),
-                      _showInsiderCount(),
-                      _showCost(),
-                      _showInternetSpeed(),
-                      _showWeather(),
+                      showCurrentlyThere(),
+                      showVisited(),
+                      showInsiderCount(),
+                      showCost(),
+                      showInternetSpeed(),
+                      showWeather(),
                     ]),
               ),
             ],
@@ -521,6 +522,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final translator = GoogleTranslator();
   late List usersCityInformation;
+  late List usersCityInformationOriginal = [];
 
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
@@ -530,7 +532,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-              title: AppLocalizations.of(context)!.insiderInformationHinzufuegen,
+              title:
+                  AppLocalizations.of(context)!.insiderInformationHinzufuegen,
               children: [
                 customTextInput(
                     AppLocalizations.of(context)!.titel, titleTextKontroller),
@@ -701,7 +704,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   }
 
   changeInformationDialog(information) {
-    var informationData = getInsiderInfoText(information);
+    var informationData = getInsiderInfoText(information, null);
     var titleTextKontroller =
         TextEditingController(text: informationData["title"]);
     var informationTextKontroller =
@@ -915,8 +918,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                             Navigator.pop(context);
                             ReportsDatabase().add(
                                 userId,
-                                "Melde Information id: " +
-                                    information["id"].toString(),
+                                "Melde Information id: ${information["id"]}",
                                 reportTextKontroller.text);
                           },
                           label: Text(AppLocalizations.of(context)!.senden)),
@@ -925,7 +927,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             }));
   }
 
-  getInsiderInfoText(information) {
+  getInsiderInfoText(information, index) {
     var showTitle = "";
     var showInformation = "";
     var tranlsationIn;
@@ -933,8 +935,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     var informationLanguage = information["sprache"] == "de"
         ? ["Deutsch", "german"]
         : ["Englisch", "english"];
-    bool canSpeakInformationLanguage =
-        ownlanguages.contains(informationLanguage[0]) ||
+    bool canSpeakInformationLanguage = index == null
+        ? false
+        : usersCityInformationOriginal[index] ||
+            ownlanguages.contains(informationLanguage[0]) ||
             ownlanguages.contains(informationLanguage[1]);
 
     if (information["titleGer"].isEmpty) {
@@ -973,14 +977,21 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     return {
       "title": showTitle,
       "information": showInformation,
-      "translationIn": tranlsationIn
+      "translationIn": tranlsationIn,
     };
   }
 
   @override
   void initState() {
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
+    usersCityInformation.forEach((element) {
+      usersCityInformationOriginal.add(false);
+    });
     super.initState();
+  }
+
+  showOriginalInformation(index) {
+    usersCityInformationOriginal[index] = !usersCityInformationOriginal[index];
   }
 
   @override
@@ -1021,15 +1032,16 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     insiderInfoBox(information, index) {
       information["index"] = index;
-      var informationText = getInsiderInfoText(information);
+      var informationText = getInsiderInfoText(information, index);
       var showTitle = informationText["title"];
       var showInformation = informationText["information"];
       var translationIn = informationText["translationIn"];
       var creatorProfil =
           getProfilFromHive(profilId: information["erstelltVon"]);
+      String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
 
       return Container(
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 60),
         width: double.infinity,
         decoration: BoxDecoration(
             border: Border.all(
@@ -1046,11 +1058,11 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   Padding(
                       padding: const EdgeInsets.only(left: 10, right: 10),
                       child: Text(
-                        showTitle,
+                        " #${index + 1} - $showTitle",
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.bold, fontSize: 18),
                       )),
-                  const Expanded(child: SizedBox()),
+                  const Expanded(child: SizedBox.shrink()),
                   GestureDetector(
                     onTapDown: (positionDetails) =>
                         openInformationMenu(positionDetails, information),
@@ -1060,15 +1072,19 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                 ],
               ),
             ),
-            Container(
-                margin: const EdgeInsets.only(left: 10, right: 10),
-                child: TextWithHyperlinkDetection(
-                  text: showInformation,
-                  fontsize: 16,
-                )),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Container(
+                    margin: const EdgeInsets.only(left: 10, right: 10),
+                    child: TextWithHyperlinkDetection(
+                      text: showInformation,
+                      fontsize: 16,
+                    )),
+              ),
+            ),
             if (translationIn != null)
               Padding(
-                padding: const EdgeInsets.only(right: 5, top: 2),
+                padding: const EdgeInsets.only(right: 5, top: 5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -1087,7 +1103,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   IconButton(
                       onPressed: () => setThumbUp(index),
                       icon: Icon(
-                        Icons.thumb_up,
+                        Icons.keyboard_arrow_up_outlined,
                         color: information["thumbUp"].contains(userId)
                             ? Colors.green
                             : Colors.grey,
@@ -1096,22 +1112,43 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                           information["thumbDown"].length)
                       .toString()),
                   IconButton(
-                      //padding: EdgeInsets.all(5),
                       onPressed: () => setThumbDown(index),
-                      icon: Icon(Icons.thumb_down,
+                      icon: Icon(Icons.keyboard_arrow_down_outlined,
                           color: information["thumbDown"].contains(userId)
                               ? Colors.red
                               : Colors.grey)),
-                  const Expanded(child: SizedBox()),
+                  Expanded(
+                      child: translationIn != null ||
+                              usersCityInformationOriginal[index]
+                          ? TextButton(
+                              style: TextButton.styleFrom(
+                                shape: const StadiumBorder(),
+                              ),
+                              onPressed: () {
+                                showOriginalInformation(index);
+                                setState(() {});
+                              },
+                              child: Text(
+                                "Original",
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    decoration:
+                                        usersCityInformationOriginal[index]
+                                            ? TextDecoration.lineThrough
+                                            : null),
+                              ))
+                          : const SizedBox.shrink()),
                   GestureDetector(
-                    onTap: () => global_func.changePage(
-                        context,
-                        ShowProfilPage(
-                          profil: creatorProfil,
-                        )),
+                    onTap: () => creatorProfil == null
+                        ? null
+                        : global_func.changePage(
+                            context,
+                            ShowProfilPage(
+                              profil: creatorProfil,
+                            )),
                     child: Text(
-                      creatorProfil["name"] +
-                          " " +
+                      "$creatorName " +
                           information["erstelltAm"]
                               .split("-")
                               .reversed
@@ -1148,17 +1185,15 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         ));
       }
 
-      return Container(
-        margin: const EdgeInsets.all(10),
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ListView(shrinkWrap: true, children: userCityInfo),
-            )
-          ],
-        ),
+      return CarouselSlider(
+        options: CarouselOptions(height: double.infinity),
+        items: userCityInfo.map((card) {
+          return Builder(
+            builder: (BuildContext context) {
+              return card;
+            },
+          );
+        }).toList(),
       );
     }
 
