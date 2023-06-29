@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/informationen/meetups/meetup_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
@@ -16,6 +18,7 @@ import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/image_upload_box.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import '../../start_page.dart';
@@ -527,6 +530,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
     var informationTextKontroller = TextEditingController();
+    var imageUploadBox = ImageUploadBox();
 
     showDialog(
         context: context,
@@ -542,6 +546,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     informationTextKontroller,
                     moreLines: 8, textInputAction: TextInputAction.newline),
                 const SizedBox(height: 5),
+                imageUploadBox,
+                const SizedBox(height: 5),
                 NutzerrichtlinenAnzeigen(page: "create"),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -553,7 +559,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                         ),
                         onPressed: () => saveNewInformation(
                             title: titleTextKontroller.text,
-                            inhalt: informationTextKontroller.text)),
+                            inhalt: informationTextKontroller.text, images: imageUploadBox.getImages())),
                     TextButton(
                       child: Text(
                         AppLocalizations.of(context)!.abbrechen,
@@ -568,7 +574,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         });
   }
 
-  saveNewInformation({title, inhalt}) async {
+  saveNewInformation({title, inhalt, images}) async {
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('yyyy-MM-dd');
     String nowFormatted = formatter.format(now);
@@ -597,7 +603,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       "erstelltAm": nowFormatted,
       "erstelltVon": userId,
       "thumbUp": [],
-      "thumbDown": []
+      "thumbDown": [],
+      "images": images
     };
 
     setState(() {
@@ -638,6 +645,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     newUserInformation["titleEng"] = titleEng;
     newUserInformation["informationEng"] = informationEng;
 
+
     var secureBox = Hive.box("secureBox");
     var allInformations = secureBox.get("stadtinfoUser");
     allInformations.add(newUserInformation);
@@ -652,6 +660,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         newUserInformation["titleEng"].replaceAll("'", "''");
     newUserInformation["informationEng"] =
         newUserInformation["informationEng"].replaceAll("'", "''");
+    newUserInformation["images"] = jsonEncode(newUserInformation["images"]);
 
     StadtinfoUserDatabase().addNewInformation(newUserInformation);
   }
@@ -779,11 +788,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     Navigator.pop(context);
   }
 
-  updateDatabase(
-    id,
-    newTitle,
-    newInformation,
-  ) async {
+  updateDatabase(id, newTitle, newInformation,) async {
     String titleGer, informationGer, titleEng, informationEng;
 
     var languageCheck = await translator.translate(newInformation);
