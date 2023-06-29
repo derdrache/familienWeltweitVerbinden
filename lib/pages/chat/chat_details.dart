@@ -124,8 +124,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   void dispose() {
     timer.cancel();
     messageInputNode.dispose();
-    soundRecorder2.dispose();
-    recordTimerStream.dispose();
 
     _changeUserChatStatus(0);
 
