@@ -43,8 +43,7 @@ class _LocationCardState extends State<LocationCard> {
         return AssetImage(
             "assets/bilder/flaggen/${widget.location["bild"]}.jpeg");
       }
-      return CachedNetworkImage(
-          imageUrl: widget.location["bild"]);
+      return CachedNetworkImageProvider(widget.location["bild"]);
     }
   }
 
