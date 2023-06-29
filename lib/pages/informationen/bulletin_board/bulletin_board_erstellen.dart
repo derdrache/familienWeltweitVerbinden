@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_details.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -10,11 +9,11 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../functions/translation.dart';
-import '../../../functions/upload_and_save_image.dart';
 import '../../../global/custom_widgets.dart';
-import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
+
+import '../../../widgets/image_upload_box.dart';
 
 class BulletonBoardCreate extends StatefulWidget {
   const BulletonBoardCreate({Key? key});
@@ -30,7 +29,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
   var ortAuswahlBox = GoogleAutoComplete(
       margin: const EdgeInsets.only(top: 5, bottom: 5, left: 30, right: 30),
       withOwnLocation: true,withWorldwideLocation: true);
-  List images = [null, null, null, null];
+  var imageUploadBox = ImageUploadBox();
 
   double getRandomRange() {
     Random random = new Random();
@@ -49,7 +48,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
   saveNote() {
     String userId = Hive.box("secureBox").get("ownProfil")["id"];
     bool allFilled = checkValidation();
-    List uploadedImages = images.whereType<String>().toList();
+    List uploadedImages = imageUploadBox.getImages();
 
     if (!allFilled) return;
 
@@ -110,41 +109,6 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
     return true;
   }
 
-  uploadImage() async {
-    var imageList =
-        await uploadAndSaveImage(context, "notes", folder: "notes/");
-
-    for (var i = 0; i < images.length; i++) {
-      if (images[i] == null) {
-        images[i] = imageList[0];
-        break;
-      }
-    }
-
-    setState(() {});
-  }
-
-  deleteImage(index) {
-    DbDeleteImage(images[index]);
-
-    setState(() {
-      images[index] = null;
-    });
-
-
-  }
-
-  imageFullscreen(image) {
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            windowPadding: const EdgeInsets.all(30),
-            children: [CachedNetworkImage(imageUrl: image,)],
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     ortAuswahlBox.hintText = "Ort Eingeben";
@@ -169,52 +133,6 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
               child: customTextInput(
                   "Beschreibung einfügen", descriptionKontroller,
                   moreLines: 12, maxLength: 650, textInputAction: TextInputAction.newline)));
-    }
-
-    setImages() {
-      List<Widget> imageWidgets = [];
-
-      images.asMap().forEach((index, value) {
-        imageWidgets.add(InkWell(
-          onTap: value == null
-              ? () => uploadImage()
-              : () => imageFullscreen(value),
-          child: Stack(
-            children: [
-              Container(
-                margin: const EdgeInsets.all(5),
-                width: 80,
-                height: 80,
-                decoration:
-                    BoxDecoration(border: Border.all(), color: Colors.white),
-                child: value == null
-                    ? IconButton(
-                        onPressed: () => uploadImage(),
-                        icon: const Icon(Icons.upload))
-                    : CachedNetworkImage(imageUrl: value,),
-              ),
-              if (value != null)
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: InkWell(
-                    onTap: () => deleteImage(index),
-                    child: const CircleAvatar(
-                        radius: 12.0,
-                        backgroundColor: Colors.red,
-                        child:
-                            Icon(Icons.close, color: Colors.white, size: 18)),
-                  ),
-                )
-            ],
-          ),
-        ));
-      });
-
-      return Container(
-        margin: const EdgeInsets.all(5),
-        child: Wrap(children: imageWidgets),
-      );
     }
 
     return Scaffold(
@@ -248,7 +166,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
                   setLocation(),
                   setDescription(),
                   const Expanded(child: SizedBox.shrink()),
-                  setImages()
+                  ImageUploadBox()
                 ]
         ),
       ),
