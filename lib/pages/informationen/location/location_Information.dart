@@ -527,6 +527,15 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   late List usersCityInformation;
   late List usersCityInformationOriginal = [];
 
+  @override
+  void initState() {
+    usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
+    usersCityInformation.forEach((element) {
+      usersCityInformationOriginal.add(false);
+    });
+    super.initState();
+  }
+
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
     var informationTextKontroller = TextEditingController();
@@ -559,7 +568,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                         ),
                         onPressed: () => saveNewInformation(
                             title: titleTextKontroller.text,
-                            inhalt: informationTextKontroller.text, images: imageUploadBox.getImages())),
+                            inhalt: informationTextKontroller.text,
+                            images: imageUploadBox.getImages())),
                     TextButton(
                       child: Text(
                         AppLocalizations.of(context)!.abbrechen,
@@ -645,7 +655,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     newUserInformation["titleEng"] = titleEng;
     newUserInformation["informationEng"] = informationEng;
 
-
     var secureBox = Hive.box("secureBox");
     var allInformations = secureBox.get("stadtinfoUser");
     allInformations.add(newUserInformation);
@@ -718,6 +727,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         TextEditingController(text: informationData["title"]);
     var informationTextKontroller =
         TextEditingController(text: informationData["information"]);
+    var imageUploadBox = ImageUploadBox(
+      uploadedImages: informationData["images"],
+    );
 
     Future<void>.delayed(
         const Duration(),
@@ -733,19 +745,28 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     customTextInput(AppLocalizations.of(context)!.beschreibung,
                         informationTextKontroller,
                         moreLines: 8, textInputAction: TextInputAction.newline),
+                    const SizedBox(height: 10),
+                    imageUploadBox,
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          child: Text(AppLocalizations.of(context)!.speichern),
-                          onPressed: () => changeInformation(
+                          child: Text(
+                            AppLocalizations.of(context)!.speichern,
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          onPressed: () => changeInsiderInformation(
                               id: information["id"],
                               newTitle: titleTextKontroller.text,
+                              images: imageUploadBox.getImages(),
                               newInformation: informationTextKontroller.text),
                         ),
                         TextButton(
-                          child: Text(AppLocalizations.of(context)!.abbrechen),
+                          child: Text(
+                            AppLocalizations.of(context)!.abbrechen,
+                            style: const TextStyle(fontSize: 20),
+                          ),
                           onPressed: () => Navigator.pop(context),
                         )
                       ],
@@ -755,7 +776,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             }));
   }
 
-  changeInformation({id, newTitle, newInformation}) async {
+  changeInsiderInformation({id, newTitle, newInformation, images}) async {
     newTitle = newTitle.trim();
     newInformation = newInformation.trim();
 
@@ -782,13 +803,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       }
     }
 
-    updateDatabase(id, newTitle, newInformation);
+    updateDatabase(id, newTitle, newInformation, images);
 
     setState(() {});
     Navigator.pop(context);
   }
 
-  updateDatabase(id, newTitle, newInformation,) async {
+  updateDatabase(id, newTitle, newInformation, images) async {
     String titleGer, informationGer, titleEng, informationEng;
 
     var languageCheck = await translator.translate(newInformation);
@@ -842,7 +863,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             "titleGer = '$titleGer', "
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
-            "informationEng = '$informationEng'",
+            "informationEng = '$informationEng',"
+            "images = '${jsonEncode(images)}'",
         "WHERE id ='$id'");
   }
 
@@ -866,12 +888,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.informationLoeschen,
                 height: 90,
-                children: [
-                  const SizedBox(height: 10),
-                  Center(
-                      child: Text(AppLocalizations.of(context)!
-                          .informationWirklichLoeschen))
-                ],
                 actions: [
                   TextButton(
                     child: const Text("Ok"),
@@ -894,6 +910,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     child: Text(AppLocalizations.of(context)!.abbrechen),
                     onPressed: () => Navigator.pop(context),
                   )
+                ],
+                children: [
+                  const SizedBox(height: 10),
+                  Center(
+                      child: Text(AppLocalizations.of(context)!
+                          .informationWirklichLoeschen))
                 ],
               );
             }));
@@ -984,15 +1006,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       "information": showInformation,
       "translationIn": tranlsationIn,
     };
-  }
-
-  @override
-  void initState() {
-    usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
-    usersCityInformation.forEach((element) {
-      usersCityInformationOriginal.add(false);
-    });
-    super.initState();
   }
 
   showOriginalInformation(index) {
@@ -1105,44 +1118,63 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  IconButton(
-                      onPressed: () => setThumbUp(index),
-                      icon: Icon(
+                  InkWell(
+                    onTap: () => setThumbUp(index),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 5, right: 5),
+                      child: Icon(
                         Icons.keyboard_arrow_up_outlined,
+                        size: 24,
                         color: information["thumbUp"].contains(userId)
                             ? Colors.green
                             : Colors.grey,
-                      )),
-                  Text((information["thumbUp"].length -
-                          information["thumbDown"].length)
-                      .toString()),
-                  IconButton(
-                      onPressed: () => setThumbDown(index),
-                      icon: Icon(Icons.keyboard_arrow_down_outlined,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    (information["thumbUp"].length -
+                            information["thumbDown"].length)
+                        .toString(),
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  InkWell(
+                    onTap: () => setThumbDown(index),
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                        left: 5,
+                      ),
+                      child: Icon(Icons.keyboard_arrow_down_outlined,
+                          size: 24,
                           color: information["thumbDown"].contains(userId)
                               ? Colors.red
-                              : Colors.grey)),
+                              : Colors.grey),
+                    ),
+                  ),
                   Expanded(
                       child: translationIn != null ||
                               usersCityInformationOriginal[index]
-                          ? TextButton(
-                              style: TextButton.styleFrom(
-                                shape: const StadiumBorder(),
-                              ),
-                              onPressed: () {
-                                showOriginalInformation(index);
-                                setState(() {});
-                              },
-                              child: Text(
-                                "Original",
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
-                                    decoration:
-                                        usersCityInformationOriginal[index]
-                                            ? TextDecoration.lineThrough
-                                            : null),
-                              ))
+                          ? Center(
+                              child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    shape: const StadiumBorder(),
+                                  ),
+                                  onPressed: () {
+                                    showOriginalInformation(index);
+                                    setState(() {});
+                                  },
+                                  child: Text(
+                                    "Original",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        decoration:
+                                            !usersCityInformationOriginal[index]
+                                                ? TextDecoration.lineThrough
+                                                : null),
+                                  )),
+                            )
                           : const SizedBox.shrink()),
                   GestureDetector(
                     onTap: () => creatorProfil == null
@@ -1152,13 +1184,22 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                             ShowProfilPage(
                               profil: creatorProfil,
                             )),
-                    child: Text(
-                      "$creatorName " +
-                          information["erstelltAm"]
-                              .split("-")
-                              .reversed
-                              .join("-"),
-                      style: const TextStyle(color: Colors.black),
+                    child: Column(
+                      children: [
+                        if (creatorName.isNotEmpty)
+                          Text(
+                            "$creatorName ",
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        Text(
+                            information["erstelltAm"]
+                                .split("-")
+                                .reversed
+                                .join("-"),
+                            style: const TextStyle(color: Colors.black))
+                      ],
                     ),
                   ),
                   const SizedBox(width: 5)
