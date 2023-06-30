@@ -117,6 +117,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var meetupData = {
       "id": meetupId,
       "name": meetupNameKontroller.text,
+      "nameGer": meetupNameKontroller.text,
+      "nameEng": meetupNameKontroller.text,
       "erstelltAm": DateTime.now().toString(),
       "erstelltVon": userID,
       "beschreibung": meetupBeschreibungKontroller.text,
@@ -168,10 +170,14 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
     if(descriptionIsGerman){
+      meetup["nameGer"] = meetup["name"];
+      meetup["nameEng"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungGer"] = meetup["beschreibung"];
       meetup["beschreibungEng"] = await descriptionTranslation(meetup["beschreibungGer"], "auto");
       meetup["beschreibungEng"] += "\n\nThis is an automatic translation";
     }else{
+      meetup["nameEng"] = meetup["name"];
+      meetup["nameGer"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungEng"] = meetup["beschreibung"];
       meetup["beschreibungGer"] = await descriptionTranslation(
           meetup["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
@@ -201,8 +207,6 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
 
     if (meetupNameKontroller.text.isEmpty) {
       validationFailText = AppLocalizations.of(context)!.bitteNameEingeben;
-    } else if (meetupNameKontroller.text.length > 40) {
-      validationFailText = AppLocalizations.of(context)!.usernameZuLang;
     } else if (meetupArtDropdown.getSelected().isEmpty) {
       validationFailText = AppLocalizations.of(context)!.bitteMeetupArtEingeben;
     } else if (meetupIntervalDropdown.getSelected().isEmpty) {
@@ -451,7 +455,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
         child: ListView(
           children: [
             customTextInput("Meetup Name", meetupNameKontroller,
-                validator: global_functions.checkValidatorEmpty(context)),
+                validator: global_functions.checkValidatorEmpty(context), maxLength: 40),
             Stack(
               children: [meetupArtDropdown, meetupArtInformation()],
             ),

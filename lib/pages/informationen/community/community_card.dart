@@ -39,15 +39,17 @@ class _CommunityCardState extends State<CommunityCard> {
 
 
   getCommunityTitle(){
+    String title;
+
     if(widget.isCreator){
-      return widget.community["name"];
+      title =  widget.community["name"];
     }else if(getUserSpeaksGerman()){
-      return widget.community["nameGer"];
+      title =  widget.community["nameGer"];
     }else{
-      return widget.community["nameEng"];
+      title =  widget.community["nameEng"];
     }
 
-
+    return title.isNotEmpty ? title : widget.community["name"];
   }
 
   @override

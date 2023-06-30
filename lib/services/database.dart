@@ -599,6 +599,8 @@ class MeetupDatabase {
   addNewMeetup(meetupData) async {
 
     meetupData["name"] = meetupData["name"].replaceAll("'", "''");
+    meetupData["nameGer"] = meetupData["nameGer"].replaceAll("'", "''");
+    meetupData["nameEng"] = meetupData["nameEng"].replaceAll("'", "''");
     meetupData["stadt"] = meetupData["stadt"].replaceAll("'", "''");
     meetupData["countryname"] = meetupData["land"].replaceAll("'", "''");
     meetupData["beschreibung"] = meetupData["beschreibung"].replaceAll("'", "''");

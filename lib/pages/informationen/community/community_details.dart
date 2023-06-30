@@ -995,7 +995,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             onTap: () => isCreator ? _changeNameWindow() : null,
             child: Center(
                 child: Text(
-                  title,
+                  title.isNotEmpty ? title : widget.community["name"],
               style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             )),
           ),
@@ -1067,7 +1067,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
               child: TextWithHyperlinkDetection(
-            text: discription,
+            text: discription.isNotEmpty ? discription : widget.community["beschreibung"],
             withoutActiveHyperLink: isCreator,
             onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
           )),

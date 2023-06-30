@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../../functions/user_speaks_german.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_func;
 import 'meetup_details.dart';
@@ -127,6 +128,20 @@ class _MeetupCardState extends State<MeetupCard> {
     return meetupStart.toString().split(" ")[1].toString().substring(0, 5);
   }
 
+  getMeetupTitle(){
+    String title;
+
+    if(widget.isCreator){
+      title =  widget.meetupData["name"];
+    }else if(getUserSpeaksGerman()){
+      title =  widget.meetupData["nameGer"];
+    }else{
+      title =  widget.meetupData["nameEng"];
+    }
+
+    return title.isNotEmpty ? title : widget.meetupData["name"];
+  }
+
   @override
   Widget build(BuildContext context) {
     var sizeRefactor = widget.bigCard == true
@@ -143,6 +158,7 @@ class _MeetupCardState extends State<MeetupCard> {
         widget.meetupData["bild"].substring(0, 5) == "asset" ? true : false;
     var isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
         widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
+
 
     if (widget.meetupData["zusage"].contains(userId)) {
       shadowColor = Colors.green.withOpacity(0.8);
@@ -272,7 +288,7 @@ class _MeetupCardState extends State<MeetupCard> {
                     ),
                     child: Column(
                       children: [
-                        Text(widget.meetupData["name"],
+                        Text(getMeetupTitle(),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
