@@ -786,9 +786,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
     return SelectionArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: "", leading: widget.fromMeetupPage
-            ? StartPage(selectedIndex: 2)
-            : null, buttons: [
+        appBar: CustomAppBar(title: "", buttons: [
           if (isCreator && isNotPublic)
             FutureBuilder(
                 future: MeetupDatabase().getData(
