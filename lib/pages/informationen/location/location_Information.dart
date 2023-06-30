@@ -1029,7 +1029,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       var showInformation = informationText["information"];
       var translationIn = informationText["translationIn"];
       var creatorProfil =
-          getProfilFromHive(profilId: information["erstelltVon"]);
+          getProfilFromHive(profilId: information["erstelltVon"]) ?? {};
 
       return Container(
         margin: const EdgeInsets.all(10),
@@ -1113,7 +1113,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                           profil: creatorProfil,
                         )),
                     child: Text(
-                      creatorProfil["name"] +
+                      creatorProfil["name"] ?? "" +
                           " " +
                           information["erstelltAm"]
                               .split("-")
