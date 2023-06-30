@@ -682,6 +682,8 @@ class MeetupDatabase {
 class CommunityDatabase {
   addNewCommunity(communityData) async {
     communityData["name"] = communityData["name"].replaceAll("'", "''");
+    communityData["nameGer"] = communityData["nameGer"].replaceAll("'", "''");
+    communityData["nameEng"] = communityData["nameEng"].replaceAll("'", "''");
     communityData["ort"] = communityData["ort"].replaceAll("'", "''");
     communityData["countryname"] = communityData["land"].replaceAll("'", "''");
     communityData["beschreibung"] = communityData["beschreibung"].replaceAll("'", "''");

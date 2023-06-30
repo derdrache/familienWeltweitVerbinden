@@ -41,6 +41,8 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     var communityData = {
       "id": communityId,
       "name": nameController.text,
+      "nameGer": nameController.text,
+      "nameEng": nameController.text,
       "beschreibung": beschreibungKontroller.text,
       "beschreibungGer":beschreibungKontroller.text,
       "beschreibungEng": beschreibungKontroller.text,
@@ -78,10 +80,14 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
     if(descriptionIsGerman){
+      communityData["nameGer"] = communityData["name"];
+      communityData["nameEng"] = await descriptionTranslation(communityData["name"], "auto");
       communityData["beschreibungGer"] = communityData["beschreibung"];
       communityData["beschreibungEng"] = await descriptionTranslation(communityData["beschreibungGer"], "auto");
       communityData["beschreibungEng"] += "\n\nThis is an automatic translation";
     }else{
+      communityData["nameEng"] = communityData["name"];
+      communityData["nameGer"] = await descriptionTranslation(communityData["name"], "de");
       communityData["beschreibungEng"] = communityData["beschreibung"];
       communityData["beschreibungGer"] = await descriptionTranslation(
           communityData["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
@@ -180,7 +186,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       body: ListView(
         children: [
           customTextInput(
-              AppLocalizations.of(context)!.communityName, nameController),
+              AppLocalizations.of(context)!.communityName, nameController, maxLength: 40),
           ortAuswahlBox,
           customTextInput(AppLocalizations.of(context)!.linkEingebenOptional,
               linkKontroller),

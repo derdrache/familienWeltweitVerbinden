@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
 
 import 'community_details.dart';
@@ -35,6 +36,19 @@ class CommunityCard extends StatefulWidget {
 
 class _CommunityCardState extends State<CommunityCard> {
   var shadowColor = Colors.grey.withOpacity(0.8);
+
+
+  getCommunityTitle(){
+    if(widget.isCreator){
+      return widget.community["name"];
+    }else if(getUserSpeaksGerman()){
+      return widget.community["nameGer"];
+    }else{
+      return widget.community["nameEng"];
+    }
+
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +127,7 @@ class _CommunityCardState extends State<CommunityCard> {
                     ),
                     child: Column(
                       children: [
-                        Text(widget.community["name"],
+                        Text(getCommunityTitle(),
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,

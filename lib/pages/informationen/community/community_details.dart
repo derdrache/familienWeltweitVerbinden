@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -282,7 +282,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             title: AppLocalizations.of(context)!.nameAendern,
             children: [
               customTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
-                  newNameKontroller),
+                  newNameKontroller,maxLength: 40),
               const SizedBox(height: 15),
               _windowOptions(() => _saveChangeName(newNameKontroller.text))
             ],
@@ -290,7 +290,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
-  _saveChangeName(newName) {
+  _saveChangeName(newName) async {
     if (newName.isEmpty) {
       customSnackbar(context, AppLocalizations.of(context)!.bitteNameEingeben);
       return;
@@ -302,10 +302,27 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["name"] = newName;
     });
 
+    var languageCheck = await translator.translate(newName);
+    bool textIsGerman = languageCheck.sourceLanguage.code == "de";
+    widget.community["name"] = newName;
+
+    if (textIsGerman) {
+      widget.community["nameGer"] = newName;
+      var translation = await _descriptionTranslation(newName, "auto");
+      widget.community["nameEng"] = translation;
+    } else {
+      widget.community["nameEng"] = newName;
+      var translation = await _descriptionTranslation(newName, "de");
+      widget.community["nameGer"] = translation;
+    }
+
+
     newName = newName.replaceAll("'", "''");
+    var newNameGer = widget.community["nameGer"].replaceAll("'", "''");
+    var newNameEng = widget.community["nameEng"].replaceAll("'", "''");
 
     CommunityDatabase()
-        .update("name = '$newName'", "WHERE id = '${widget.community["id"]}'");
+        .update("name = '$newName', nameGer = '$newNameGer', nameEng = '$newNameEng'", "WHERE id = '${widget.community["id"]}'");
   }
 
   _changeOrtWindow() {
@@ -950,13 +967,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     communityInformation() {
       var fremdeCommunity = widget.community["ownCommunity"] == 0;
-      String systemLanguage =
-          WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
-      var ownProfil = Hive.box("secureBox").get("ownProfil");
-      bool userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
-          ownProfil["sprachen"].contains("german") ||
-          systemLanguage == "de";
-      var discription = "";
+      bool userSpeakGerman = getUserSpeaksGerman();
+      String discription;
+      String title;
       String locationText = widget.community["ort"];
       if (widget.community["ort"] != widget.community["land"]) {
         locationText += " / " + widget.community["land"];
@@ -965,10 +978,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           AppLocalizations.of(context)!.weltweit;
 
       if (isCreator) {
+        title = widget.community["name"];
         discription = widget.community["beschreibung"];
       } else if (userSpeakGerman) {
+        title = widget.community["nameGer"];
         discription = widget.community["beschreibungGer"];
       } else {
+        title = widget.community["nameEng"];
         discription = widget.community["beschreibungEng"];
       }
 
@@ -979,8 +995,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             onTap: () => isCreator ? _changeNameWindow() : null,
             child: Center(
                 child: Text(
-              widget.community["name"],
-              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  title,
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             )),
           ),
         ),
@@ -1098,7 +1114,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     return SelectionArea(
       child: Scaffold(
           appBar: CustomAppBar(
-            title: widget.community["name"],
+            title: "",
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),
