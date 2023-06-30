@@ -950,9 +950,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     communityInformation() {
       var fremdeCommunity = widget.community["ownCommunity"] == 0;
-      var isGerman = kIsWeb
-          ? window.locale.languageCode == "de"
-          : Platform.localeName == "de_DE";
+      String systemLanguage =
+          WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+      var ownProfil = Hive.box("secureBox").get("ownProfil");
+      bool userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
+          ownProfil["sprachen"].contains("german") ||
+          systemLanguage == "de";
       var discription = "";
       String locationText = widget.community["ort"];
       if (widget.community["ort"] != widget.community["land"]) {
@@ -963,7 +966,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
       if (isCreator) {
         discription = widget.community["beschreibung"];
-      } else if (isGerman) {
+      } else if (userSpeakGerman) {
         discription = widget.community["beschreibungGer"];
       } else {
         discription = widget.community["beschreibungEng"];

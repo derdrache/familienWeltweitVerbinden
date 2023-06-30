@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:familien_suche/pages/show_profil.dart';
@@ -27,9 +26,8 @@ var isWebDesktop = kIsWeb &&
     (defaultTargetPlatform != TargetPlatform.iOS ||
         defaultTargetPlatform != TargetPlatform.android);
 double fontsize = isWebDesktop ? 12 : 16;
-var isGerman = kIsWeb
-    ? window.locale.languageCode == "de"
-    : Platform.localeName == "de_DE";
+String systemLanguage =
+    WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
 
 //ignore: must_be_immutable
 class MeetupCardDetails extends StatefulWidget {
@@ -61,9 +59,13 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   late var changeMultiDropdownInput;
   bool chooseCurrentLocation = false;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
+  late bool userSpeakGerman;
 
   @override
   void initState() {
+    userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
+        ownProfil["sprachen"].contains("german") ||
+        systemLanguage == "de";
     beschreibungInputKontroller.text = widget.meetupData["beschreibung"];
 
     addScrollListener();
@@ -330,7 +332,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     bool isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
         widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.neueStadtEingeben;
-    widget.meetupData["eventInterval"] = isGerman
+    widget.meetupData["eventInterval"] = userSpeakGerman
         ? global_func.changeEnglishToGerman(widget.meetupData["eventInterval"])
         : global_func.changeGermanToEnglish(widget.meetupData["eventInterval"]);
 
@@ -619,7 +621,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     intervalInformation() {
       changeDropdownInput = CustomDropDownButton(
-          items: isGerman
+          items: userSpeakGerman
               ? global_var.meetupInterval
               : global_var.meetupIntervalEnglisch,
           selected: widget.meetupData["eventInterval"]);
@@ -634,7 +636,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     sprachenInformation() {
-      var data = isGerman
+      var data = userSpeakGerman
           ? global_func
               .changeEnglishToGerman(widget.meetupData["sprache"])
               .join(", ")
@@ -644,7 +646,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       changeMultiDropdownInput = CustomMultiTextForm(
         selected: data.split(", "),
         hintText: "Sprachen auswählen",
-        auswahlList: isGerman
+        auswahlList: userSpeakGerman
             ? global_var.sprachenListe
             : global_var.sprachenListeEnglisch,
       );
@@ -664,7 +666,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
       if (widget.isCreator) {
         discription = widget.meetupData["beschreibung"];
-      } else if (isGerman) {
+      } else if (userSpeakGerman) {
         discription = widget.meetupData["beschreibungGer"];
       } else {
         discription = widget.meetupData["beschreibungEng"];
@@ -739,7 +741,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       List<Widget> meetupTags = [];
 
       for (var tag in widget.meetupData["tags"]) {
-        String tagText = isGerman
+        String tagText = userSpeakGerman
             ? global_func.changeEnglishToGerman(tag)
             : global_func.changeGermanToEnglish(tag);
 
@@ -778,7 +780,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     changeMeetupTagsWindow() {
-      List<String> tagItems = (isGerman
+      List<String> tagItems = (userSpeakGerman
           ? global_var.reisearten + global_var.interessenListe
           : global_var.reiseartenEnglisch + global_var.interessenListeEnglisch);
 
@@ -839,7 +841,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               borderRadius: const BorderRadius.all(Radius.circular(10.0)),
             ),
             child: Text(
-              isGerman
+              userSpeakGerman
                   ? global_func.changeEnglishToGerman(tag)
                   : global_func.changeGermanToEnglish(tag),
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),

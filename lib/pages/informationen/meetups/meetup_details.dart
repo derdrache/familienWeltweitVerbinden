@@ -42,8 +42,10 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
   var searchAutocomplete;
   late bool isNotPublic;
 
+
   @override
   void initState() {
+
     teilnahme = widget.meetupData["zusage"] == null
         ? false : widget.meetupData["zusage"].contains(userId);
     absage =widget.meetupData["absage"] == null
@@ -101,7 +103,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             title: AppLocalizations.of(context)!.newOwnerIsInitiator,
-            children: const [],
             actions: [
               TextButton(
                   onPressed: () {
@@ -118,6 +119,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   child: Text(AppLocalizations.of(context)!.nein)
               ),
             ],
+            children: const [],
           );
         });
 
@@ -244,13 +246,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.meetupLoeschen,
               height: 90,
-              children: [
-                Center(
-                    child: Text(
-                        AppLocalizations
-                            .of(context)!
-                            .meetupWirklichLoeschen))
-              ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
@@ -264,6 +259,13 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
+              ],
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations
+                            .of(context)!
+                            .meetupWirklichLoeschen))
               ],
             );
           });
@@ -769,11 +771,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                     child: InkResponse(
                         onTap: () => Navigator.pop(context),
                         child: const CircleAvatar(
+                          backgroundColor: Colors.red,
                           child: Icon(
                             Icons.close,
                             size: 16,
                           ),
-                          backgroundColor: Colors.red,
                         )),
                   ),
                 ]),
@@ -863,6 +865,10 @@ class MeetupArtButton extends StatefulWidget {
 }
 
 class _MeetupArtButtonState extends State<MeetupArtButton> {
+  String systemLanguage =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
+  late bool userSpeakGerman;
   late var meetupTypInput;
   late IconData icon;
 
@@ -971,9 +977,12 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
 
   @override
   void initState() {
+    userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
+        ownProfil["sprachen"].contains("german") ||
+        systemLanguage == "de";
     meetupTypInput = CustomDropDownButton(
-      items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
-      selected: isGerman
+      items: userSpeakGerman ? global_var.eventArt : global_var.eventArtEnglisch,
+      selected: userSpeakGerman
           ? global_func.changeEnglishToGerman(widget.meetupData["art"])
           : global_func.changeGermanToEnglish(widget.meetupData["art"]),
     );

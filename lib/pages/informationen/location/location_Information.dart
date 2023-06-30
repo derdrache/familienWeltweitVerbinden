@@ -183,8 +183,6 @@ class GeneralInformationPage extends StatefulWidget {
 
 class _GeneralInformationPageState extends State<GeneralInformationPage> {
   var userId = FirebaseAuth.instance.currentUser!.uid;
-  bool canGerman = false;
-  bool canEnglish = false;
   late bool isCity;
   final translator = GoogleTranslator();
   List familiesThere = [];
@@ -523,12 +521,19 @@ class InsiderInformationPage extends StatefulWidget {
 
 class _InsiderInformationPageState extends State<InsiderInformationPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
   final translator = GoogleTranslator();
   late List usersCityInformation;
   late List usersCityInformationOriginal = [];
+  String systemLanguage =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+  late bool userSpeakGerman;
 
   @override
   void initState() {
+    userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
+        ownProfil["sprachen"].contains("german") ||
+        systemLanguage == "de";
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
     usersCityInformation.forEach((element) {
       usersCityInformationOriginal.add(false);
@@ -684,15 +689,17 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           "thumbUp = JSON_REMOVE(thumbUp, JSON_UNQUOTE(JSON_SEARCH(thumbUp, 'one', '$userId')))",
           "WHERE id ='$infoId'");
     } else {
-      bool hasThumbDown = usersCityInformation[index]["thumbDown"].contains(userId);
+      bool hasThumbDown =
+          usersCityInformation[index]["thumbDown"].contains(userId);
       usersCityInformation[index]["thumbUp"].add(userId);
       usersCityInformation[index]["thumbDown"].remove(userId);
-      String sqlStatement = "thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')";
-      if(hasThumbDown) sqlStatement += ",thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))";
+      String sqlStatement =
+          "thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')";
+      if (hasThumbDown)
+        sqlStatement +=
+            ",thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))";
 
-      StadtinfoUserDatabase().update(
-          sqlStatement,
-          "WHERE id ='$infoId'");
+      StadtinfoUserDatabase().update(sqlStatement, "WHERE id ='$infoId'");
     }
     setState(() {});
   }
@@ -872,7 +879,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   }
 
   copyInformationDialog(information) {
-    var informationText = isGerman
+    var informationText = userSpeakGerman
         ? information["informationGer"]
         : information["informationGer"];
 
@@ -968,6 +975,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     bool canSpeakInformationLanguage = index == null
         ? false
         : usersCityInformationOriginal[index] ||
+            information["sprache"] == systemLanguage ||
             ownlanguages.contains(informationLanguage[0]) ||
             ownlanguages.contains(informationLanguage[1]);
 
@@ -1017,7 +1025,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-
     openInformationMenu(positionDetails, information) async {
       double left = positionDetails.globalPosition.dx;
       double top = positionDetails.globalPosition.dy;
