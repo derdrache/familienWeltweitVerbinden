@@ -1,3 +1,4 @@
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
@@ -15,7 +16,6 @@ import '../../../widgets/search_autocomplete.dart';
 import '../../../services/database.dart';
 import '../../../widgets/badge_icon.dart';
 import '../../show_profil.dart';
-import '../../start_page.dart';
 import 'meetup_card_details.dart';
 
 var userId = Hive.box("secureBox").get("ownProfil")["id"];
@@ -863,8 +863,6 @@ class MeetupArtButton extends StatefulWidget {
 }
 
 class _MeetupArtButtonState extends State<MeetupArtButton> {
-  String systemLanguage =
-      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   late bool userSpeakGerman;
   late var meetupTypInput;
@@ -975,9 +973,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
 
   @override
   void initState() {
-    userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
-        ownProfil["sprachen"].contains("german") ||
-        systemLanguage == "de";
+    userSpeakGerman = getUserSpeaksGerman();
     meetupTypInput = CustomDropDownButton(
       items: userSpeakGerman ? global_var.eventArt : global_var.eventArtEnglisch,
       selected: userSpeakGerman

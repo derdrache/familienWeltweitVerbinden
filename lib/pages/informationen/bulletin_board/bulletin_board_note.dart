@@ -1,3 +1,4 @@
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -28,8 +29,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
   noteLocation = widget.note["location"]["city"];
   noteCountry = widget.note["location"]["countryname"];
   noteLanguageGerman = widget.note["beschreibungGer"].contains("Dies ist eine automatische Übersetzung");
-  userSpeakGerman = ownProfil["sprachen"].contains("Deutsch")
-      || ownProfil["sprachen"].contains("german") || systemLanguage == "de";
+  userSpeakGerman = getUserSpeaksGerman();
     userSpeakEnglish = ownProfil["sprachen"].contains("Englisch")
       || ownProfil["sprachen"].contains("english") || systemLanguage == "en";
     super.initState();

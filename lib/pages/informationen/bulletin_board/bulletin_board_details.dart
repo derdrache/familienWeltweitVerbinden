@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/informationen/location/location_Information.dart';
@@ -146,9 +147,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
     bool noteLanguageGerman = widget.note["beschreibungGer"]
         .contains("Dies ist eine automatische Übersetzung");
-    bool userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
-        ownProfil["sprachen"].contains("german") ||
-        systemLanguage == "de";
+    bool userSpeakGerman = getUserSpeaksGerman();
     bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
         ownProfil["sprachen"].contains("english") ||
         systemLanguage == "en";

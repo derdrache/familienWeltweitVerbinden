@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -26,8 +27,6 @@ var isWebDesktop = kIsWeb &&
     (defaultTargetPlatform != TargetPlatform.iOS ||
         defaultTargetPlatform != TargetPlatform.android);
 double fontsize = isWebDesktop ? 12 : 16;
-String systemLanguage =
-    WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
 
 //ignore: must_be_immutable
 class MeetupCardDetails extends StatefulWidget {
@@ -63,9 +62,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
   @override
   void initState() {
-    userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
-        ownProfil["sprachen"].contains("german") ||
-        systemLanguage == "de";
+    userSpeakGerman = getUserSpeaksGerman();
     beschreibungInputKontroller.text = widget.meetupData["beschreibung"];
 
     addScrollListener();

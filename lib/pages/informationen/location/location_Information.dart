@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/informationen/meetups/meetup_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
@@ -521,7 +522,6 @@ class InsiderInformationPage extends StatefulWidget {
 
 class _InsiderInformationPageState extends State<InsiderInformationPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
-  var ownProfil = Hive.box('secureBox').get("ownProfil");
   final translator = GoogleTranslator();
   late List usersCityInformation;
   late List usersCityInformationOriginal = [];
@@ -531,9 +531,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   void initState() {
-    userSpeakGerman = ownProfil["sprachen"].contains("Deutsch") ||
-        ownProfil["sprachen"].contains("german") ||
-        systemLanguage == "de";
+    userSpeakGerman = getUserSpeaksGerman();
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
     usersCityInformation.forEach((element) {
       usersCityInformationOriginal.add(false);
