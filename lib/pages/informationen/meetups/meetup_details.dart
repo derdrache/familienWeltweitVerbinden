@@ -15,7 +15,6 @@ import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../services/database.dart';
-import '../../../widgets/badge_icon.dart';
 import '../../show_profil.dart';
 import 'meetup_card_details.dart';
 

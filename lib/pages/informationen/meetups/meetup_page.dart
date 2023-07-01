@@ -10,7 +10,6 @@ import 'dart:ui' as ui;
 import '../../../global/global_functions.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../../services/locationsService.dart';
-import '../../../widgets/badge_icon.dart';
 import '../../start_page.dart';
 import 'meetupCard.dart';
 import 'meetup_erstellen.dart';
