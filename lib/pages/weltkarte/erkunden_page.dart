@@ -77,6 +77,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       eventMarkerOn = false,
       reiseplanungOn = false,
       communityMarkerOn = false,
+      insiderInfoOn = false,
       filterOn = false;
   bool createMenuIsOpen = false;
   var spracheIstDeutsch = kIsWeb
@@ -755,7 +756,10 @@ class _ErkundenPageState extends State<ErkundenPage>
                         }
                       }
 
-                      setLookForReiseplanung(selectedDate[0], selectedDate[1]);
+                      deactivateAllButtons();
+                      reiseplanungOn = true;
+
+                      showReiseplaungMatchedProfils(selectedDate[0], selectedDate[1]);
 
                       Navigator.pop(context);
                     },
@@ -764,17 +768,6 @@ class _ErkundenPageState extends State<ErkundenPage>
             ],
           );
         });
-  }
-
-  setLookForReiseplanung(von, bis) {
-    reiseplanungOn = true;
-    eventMarkerOn = false;
-    friendMarkerOn = false;
-    communityMarkerOn = false;
-    filterOn = false;
-    filterList = [];
-
-    showReiseplaungMatchedProfils(von, bis);
   }
 
   showReiseplaungMatchedProfils(von, bis) {
@@ -905,10 +898,8 @@ class _ErkundenPageState extends State<ErkundenPage>
                     }
                     windowSetState(() {});
 
-                    friendMarkerOn = false;
-                    eventMarkerOn = false;
-                    reiseplanungOn = false;
-                    communityMarkerOn = false;
+                    deactivateAllButtons(filter: true);
+                    filterOn = true;
 
                     filterProfils();
                   }),
@@ -1118,6 +1109,17 @@ class _ErkundenPageState extends State<ErkundenPage>
     changeProfilToFamilyProfil();
   }
 
+  deactivateAllButtons({filter = false}){
+    friendMarkerOn = false;
+    eventMarkerOn = false;
+    reiseplanungOn = false;
+    communityMarkerOn = false;
+    insiderInfoOn = false;
+    filterOn = false;
+    if(!filter) filterList = [];
+    popupActive = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Marker> allMarker = [];
@@ -1295,8 +1297,8 @@ class _ErkundenPageState extends State<ErkundenPage>
               heroTag: "MapMarker" + position.toString(),
               backgroundColor: Theme.of(context).colorScheme.primary,
               mini: true,
-              child: Center(child: Text(numberText)),
-              onPressed: buttonFunction));
+              onPressed: buttonFunction,
+              child: Center(child: Text(numberText))));
     }
 
     createProfilMarker() {
@@ -1476,12 +1478,8 @@ class _ErkundenPageState extends State<ErkundenPage>
             setProfilsFromHive();
             createAndSetZoomLevels(profils, "profils");
           } else {
+            deactivateAllButtons();
             friendMarkerOn = true;
-            eventMarkerOn = false;
-            reiseplanungOn = false;
-            communityMarkerOn = false;
-            filterOn = false;
-            filterList = [];
 
             activateFriendlistProfils(ownProfil["friendlist"]);
 
@@ -1523,13 +1521,8 @@ class _ErkundenPageState extends State<ErkundenPage>
             eventMarkerOn = false;
             popupActive = false;
           } else {
+            deactivateAllButtons();
             eventMarkerOn = true;
-            friendMarkerOn = false;
-            reiseplanungOn = false;
-            communityMarkerOn = false;
-            filterOn = false;
-            filterList = [];
-            popupActive = false;
 
             if (newEvents.isNotEmpty) {
               popupActive = true;
@@ -1575,13 +1568,8 @@ class _ErkundenPageState extends State<ErkundenPage>
             communityMarkerOn = false;
             popupActive = false;
           } else {
+            deactivateAllButtons();
             communityMarkerOn = true;
-            eventMarkerOn = false;
-            friendMarkerOn = false;
-            reiseplanungOn = false;
-            filterOn = false;
-            filterList = [];
-            popupActive = false;
 
             if (newCommunity.isNotEmpty) {
               popupActive = true;
@@ -1614,6 +1602,26 @@ class _ErkundenPageState extends State<ErkundenPage>
           });
     }
 
+    insiderInfoButton(){
+      return OwnIconButton(
+        image: insiderInfoOn
+            ? "assets/icons/information.png"
+            : "assets/icons/information_colorless.png",
+        withBox: true,
+        onPressed: (){
+          if(insiderInfoOn){
+            insiderInfoOn = false;
+          }else{
+            deactivateAllButtons();
+            insiderInfoOn = true;
+          }
+
+
+          setState(() {});
+        },
+      );
+    }
+
     filterButton() {
       return OwnIconButton(
           image: filterOn
@@ -1636,19 +1644,12 @@ class _ErkundenPageState extends State<ErkundenPage>
               top: 65,
               child: Row(children: [
                 filterButton(),
+                insiderInfoButton(),
                 reiseplanungButton(),
                 communityButton(),
                 eventButton(),
                 friendButton(),
               ]))
-          /*
-          friendButton(),
-          eventButton(),
-          communityButton(),
-          reiseplanungButton(),
-          filterButton()
-
-           */
         ]),
       ),
       floatingActionButton: popupActive ? null : worldChatButton(),
