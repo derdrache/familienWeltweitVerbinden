@@ -1,5 +1,6 @@
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_page.dart';
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -115,10 +116,9 @@ class _InformationPageState extends State<InformationPage>
                   children: [
                     Container(
                         padding: const EdgeInsets.only(left: 10),
-                        child: SizedBox(
-                            width: 30,
-                            height: 30,
-                            child: Image.asset(icon))),
+                        child: OwnIconButton(
+                          image: icon,
+                        )),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Container(

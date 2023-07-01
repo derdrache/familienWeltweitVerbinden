@@ -25,16 +25,13 @@ class OwnIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onPressed != null ? () => onPressed!() : null,
-      child: Align(
-        alignment: Alignment.center,
-        child: Container(
-          width: size*1.5 + 10,
-          height: size*1.5 +10,
-          padding: EdgeInsets.all(8),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
+      child: Container(
+        margin: EdgeInsets.all(5),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Center(
+              child: Container(
                 padding: withBox ? EdgeInsets.all(5) : null,
                 decoration: withBox ? BoxDecoration(
                   border: Border.all(),
@@ -48,29 +45,29 @@ class OwnIconButton extends StatelessWidget {
                       )
                     : Icon(icon, size: size, color: color),
               ),
-              if (badgeText.isNotEmpty)
-                Positioned(
-                  top: -10,
-                  right: -10,
-                  child: Container(
-                      height: 20,
-                      width: 20,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary,
-                          shape: BoxShape.circle),
-                      child: Center(
-                        child: FittedBox(
-                          child: Text(
-                            badgeText,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
+            ),
+            if (badgeText.isNotEmpty)
+              Positioned(
+                top: -10,
+                right: -10,
+                child: Container(
+                    height: 20,
+                    width: 20,
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary,
+                        shape: BoxShape.circle),
+                    child: Center(
+                      child: FittedBox(
+                        child: Text(
+                          badgeText,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
                         ),
-                      )),
-                )
+                      ),
+                    )),
+              )
 
-            ],
-          ),
+          ],
         ),
       ),
     );
