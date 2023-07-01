@@ -2,6 +2,7 @@ import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -802,12 +803,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
                   if (data == "0") data = "";
 
-                  return IconButton(
-                      icon: BadgeIcon(
-                          icon: Icons.event_available,
-                          text: data
-                              .toString()),
-                      onPressed: () => userfreischalteWindow());
+                  return OwnIconButton(
+                    icon: Icons.event_available,
+                    badgeText: data.toString(),
+                    onPressed: () => userfreischalteWindow(),
+                  );
                 }),
           IconButton(
             icon: const Icon(Icons.link),

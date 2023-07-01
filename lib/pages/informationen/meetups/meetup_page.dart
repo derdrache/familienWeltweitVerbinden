@@ -120,12 +120,26 @@ class _MeetupPageState extends State<MeetupPage> {
                 afterFavorite: () => setState((){}),
                 afterPageVisit: () => setState((){})
             ),
-            if (isOwner && isNotPublic)
+            if (isOwner && isNotPublic && freischaltenCount > 0)
               Positioned(
                   right: 10,
-                  top: 10,
-                  child: BadgeIcon(
-                    text: freischaltenCount > 0 ? freischaltenCount.toString(): "",
+                  top: 20,
+                  child: Container(
+                      height: 20,
+                      width: 20,
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.secondary,
+                          shape: BoxShape.circle
+                      ),
+                      child: Center(
+                        child: FittedBox(
+                          child: Text(
+                            freischaltenCount.toString(),
+                            style: const TextStyle(fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                      )
                   )
               )
           ],

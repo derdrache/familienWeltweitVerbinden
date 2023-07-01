@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -342,9 +343,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
   informationenIcon(){
     var notification = _eventNotification() + _communitNotifikation();
 
-    return BadgeIcon(
-        icon: Icons.group_work,
-        text: notification > 0 ? notification.toString() : "");
+    return OwnIconButton(
+      icon: Icons.group_work,
+      size: 24,
+      margin: EdgeInsets.zero,
+      badgeText: notification > 0 ? notification.toString() : "",
+    );
   }
 
   chatIcon() {
@@ -366,9 +370,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
           newMessageCount += snapshot.data as num;
         }
 
-        return BadgeIcon(
-            icon: Icons.chat,
-            text: newMessageCount > 0 ? newMessageCount.toString() : "");
+        return OwnIconButton(
+          icon: Icons.chat,
+          size: 24,
+          margin: EdgeInsets.zero,
+          badgeText: newMessageCount > 0 ? newMessageCount.toString() : "",
+        );
       }
     );
   }

@@ -7,7 +7,7 @@ class OwnIconButton extends StatelessWidget {
   double size;
   String badgeText;
   bool withBox;
-  var padding;
+  var margin;
   Function? onPressed;
 
   OwnIconButton(
@@ -17,7 +17,7 @@ class OwnIconButton extends StatelessWidget {
       this.badgeText = "",
       this.color,
       this.size = 32,
-      this.padding = const EdgeInsets.all(8),
+      this.margin = const EdgeInsets.all(5),
       this.withBox = false, this.onPressed})
       : super(key: key);
 
@@ -26,7 +26,7 @@ class OwnIconButton extends StatelessWidget {
     return InkWell(
       onTap: onPressed != null ? () => onPressed!() : null,
       child: Container(
-        margin: EdgeInsets.all(5),
+        margin: margin,
         child: Stack(
           clipBehavior: Clip.none,
           children: [
