@@ -14,12 +14,12 @@ import 'package:hive/hive.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_var;
+import '../../widgets/layout/ownIconButton.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../widgets/flexible_date_picker.dart';
 import '../../services/database.dart';
 import '../../services/locationsService.dart';
-import '../../widgets/badge_icon.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/meetups/meetupCard.dart';
 import '../show_profil.dart';
@@ -57,9 +57,7 @@ class _ErkundenPageState extends State<ErkundenPage>
   late List eventsCountries, eventsBetween, eventsCities;
   List? eventsKontinente;
   List? communitiesContinents;
-  late List communitiesCountries,
-      communitiesBetween,
-      communitiesCities;
+  late List communitiesCountries, communitiesBetween, communitiesCities;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxZoom = 14;
   double currentMapZoom = 1.6;
@@ -124,7 +122,6 @@ class _ErkundenPageState extends State<ErkundenPage>
     refreshHiveBulletinBoardNotes();
   }
 
-
   setEvents() {
     var localDbEvents = Hive.box('secureBox').get("events") ?? [];
 
@@ -166,7 +163,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       if (condition || hasCityUserInfo) {
         newAllCities.add(city);
       }
-      if(city["isCity"] == 1) allCitiesNames.add(city["ort"]);
+      if (city["isCity"] == 1) allCitiesNames.add(city["ort"]);
     }
 
     allCities = newAllCities;
@@ -178,12 +175,9 @@ class _ErkundenPageState extends State<ErkundenPage>
     for (var profil in profils) {
       profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
       var timeDifference = Duration(
-          microseconds: (DateTime
-              .now()
-              .microsecondsSinceEpoch -
-              DateTime
-                  .parse(profil["lastLogin"].toString())
-                  .microsecondsSinceEpoch)
+          microseconds: (DateTime.now().microsecondsSinceEpoch -
+                  DateTime.parse(profil["lastLogin"].toString())
+                      .microsecondsSinceEpoch)
               .abs());
       var monthDifference = timeDifference.inDays / 30.44;
 
@@ -215,21 +209,16 @@ class _ErkundenPageState extends State<ErkundenPage>
 
       var members = familyProfil["members"];
       var membersFound = 0;
-      var familyName = (spracheIstDeutsch ? "Familie:" : "family") + " " +
+      var familyName = (spracheIstDeutsch ? "Familie:" : "family") +
+          " " +
           familyProfil["name"];
       for (var i = 0; i < profils.length; i++) {
         if (profils[i]["id"] == familyProfil["mainProfil"]) {
           membersFound += 1;
-          profils[i]["family"] = {
-            "name": familyName,
-            "status": "main"
-          };
+          profils[i]["family"] = {"name": familyName, "status": "main"};
         } else if (members.contains(profils[i]["id"])) {
           membersFound += 1;
-          profils[i]["family"] = {
-            "name": familyName,
-            "status": "member"
-          };
+          profils[i]["family"] = {"name": familyName, "status": "member"};
         }
         if (membersFound == members.length) break;
       }
@@ -255,7 +244,6 @@ class _ErkundenPageState extends State<ErkundenPage>
         profilBLand = allCountries["ger"][index];
       }
 
-
       int compareCountry = profilBLand.compareTo(profilALand) as int;
 
       if (compareCountry == 0) return a["ort"].compareTo(b["ort"]) as int;
@@ -268,13 +256,12 @@ class _ErkundenPageState extends State<ErkundenPage>
 
   setSearchAutocomplete() {
     var countryList =
-    spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
+        spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
     changeAllCitiesAndCreateCityNames();
 
     searchAutocomplete = SearchAutocomplete(
-        searchableItems:
-        allUserName.toList() + countryList + allCitiesNames,
+        searchableItems: allUserName.toList() + countryList + allCitiesNames,
         onConfirm: () {
           FocusManager.instance.primaryFocus?.unfocus();
           filterList = searchAutocomplete.getSelected();
@@ -311,7 +298,8 @@ class _ErkundenPageState extends State<ErkundenPage>
           } else {
             for (var family in familyProfils) {
               var familyName = (spracheIstDeutsch ? "Familie:" : "family") +
-                  " " + family["name"];
+                  " " +
+                  family["name"];
               if (family["mainProfil"] == profil["id"] &&
                   filterList.contains(familyName)) {
                 var familyProfil = Map.from(profil);
@@ -323,7 +311,6 @@ class _ErkundenPageState extends State<ErkundenPage>
         }
       }
     }
-
 
     setState(() {
       profils = filterProfils;
@@ -348,14 +335,14 @@ class _ErkundenPageState extends State<ErkundenPage>
 
     if (filterList.isEmpty) return true;
 
-    var spracheMatch = checkMatch(filterList, profilSprachen,
-        sprachenListeGer + sprachenListeEng);
+    var spracheMatch = checkMatch(
+        filterList, profilSprachen, sprachenListeGer + sprachenListeEng);
     var reiseartMatch = checkMatch(filterList, [profilReiseart],
         global_var.reisearten + global_var.reiseartenEnglisch);
     var interesseMatch = checkMatch(filterList, profilInteressen,
         global_var.interessenListe + global_var.interessenListeEnglisch);
     var userMatch =
-    checkMatch(filterList, [profilName], allUserName, simpleSearch: true);
+        checkMatch(filterList, [profilName], allUserName, simpleSearch: true);
     var countryMatch = checkMatch(
         filterList, [profilLand], countriesList["ger"] + countriesList["eng"]);
     var cityMatch = checkMatch(filterList, [profilOrt], allCitiesNames);
@@ -423,17 +410,18 @@ class _ErkundenPageState extends State<ErkundenPage>
       }
 
       pufferCountries =
-      await createCountriesZoomLevel(pufferCountries, mainItem);
+          await createCountriesZoomLevel(pufferCountries, mainItem);
       pufferContinents =
-      await createContinentsZoomLevel(pufferContinents, mainItem);
+          await createContinentsZoomLevel(pufferContinents, mainItem);
       pufferBetween = createBetweenZoomLevel(pufferBetween, mainItem, 1);
-
       pufferCities = createCitiesZoomLevel(pufferCities, mainItem);
       if (typ == "profils") {
         pufferExact =
             createCitiesZoomLevel(pufferExact, mainItem, exactLocation: true);
       }
     }
+
+
 
     if (typ == "profils") {
       profilsCities = pufferCities;
@@ -482,7 +470,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       double originalLongth = profil["longt"];
       double newLongth = list[i]["longt"];
       bool check = (newLatt + abstand >= originalLatt &&
-          newLatt - abstand <= originalLatt) &&
+              newLatt - abstand <= originalLatt) &&
           (newLongth + abstand >= originalLongth &&
               newLongth - abstand <= originalLongth);
 
@@ -580,9 +568,9 @@ class _ErkundenPageState extends State<ErkundenPage>
 
     for (var i = 0; i < list.length; i++) {
       var listCountryLocation =
-      LocationService().getCountryLocation(list[i]["countryname"]);
+          LocationService().getCountryLocation(list[i]["countryname"]);
       var profilCountryLocation =
-      LocationService().getCountryLocation(profil["land"]);
+          LocationService().getCountryLocation(profil["land"]);
 
       if (profilCountryLocation == null) {
         checkNewCountry = false;
@@ -632,11 +620,11 @@ class _ErkundenPageState extends State<ErkundenPage>
     kontinentGeodataProfil ??= {"kontinentEng": landGedataProfil["nameEng"]};
     for (var i = 0; i < list.length; i++) {
       var kontinentGeodataListitem =
-      LocationService().getKontinentLocation(list[i]["kontinent"]);
+          LocationService().getKontinentLocation(list[i]["kontinent"]);
       kontinentGeodataListitem ??= {"kontinentGer": list[i]["kontinent"]};
 
       if ((kontinentGeodataListitem["kontinentGer"] ==
-          kontinentGeodataProfil["kontinentGer"]) ||
+              kontinentGeodataProfil["kontinentGer"]) ||
           (list[i]["latt"] == profil["latt"] &&
               list[i]["longt"] == profil["longt"])) {
         newPoint = false;
@@ -654,7 +642,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       list.add({
         "kontinentName": landGedataProfil["kontinentGer"],
         "kontinent":
-        landGedataProfil["kontinentGer"] ?? landGedataProfil["land"],
+            landGedataProfil["kontinentGer"] ?? landGedataProfil["land"],
         "name": profil["name"] == null ? "0" : "1",
         "latt": kontinentGeodataProfil["latt"] ?? landGedataProfil["latt"],
         "longt": kontinentGeodataProfil["longt"] ?? landGedataProfil["longt"],
@@ -687,9 +675,10 @@ class _ErkundenPageState extends State<ErkundenPage>
       selectedEventList = eventsCountries;
       selectedComunityList = communitiesCountries;
     } else {
-      choosenProfils = profilsContinents!;
+      choosenProfils = profilsContinents != null ? profilsContinents! : [];
       selectedEventList = eventsKontinente != null ? eventsKontinente! : [];
-      selectedComunityList = communitiesContinents != null ? communitiesContinents! : [];
+      selectedComunityList =
+          communitiesContinents != null ? communitiesContinents! : [];
     }
 
     if (mounted) {
@@ -722,9 +711,7 @@ class _ErkundenPageState extends State<ErkundenPage>
 
   openSelectReiseplanungsDateWindow() {
     var datePicker = FlexibleDatePicker(
-      startYear: DateTime
-          .now()
-          .year,
+      startYear: DateTime.now().year,
       withMonth: true,
       multiDate: true,
       withEndDateSwitch: true,
@@ -740,9 +727,7 @@ class _ErkundenPageState extends State<ErkundenPage>
               Container(
                   margin: const EdgeInsets.all(20),
                   child: Text(
-                    AppLocalizations
-                        .of(context)!
-                        .weltkarteReiseplanungSuchen,
+                    AppLocalizations.of(context)!.weltkarteReiseplanungSuchen,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   )),
@@ -755,9 +740,8 @@ class _ErkundenPageState extends State<ErkundenPage>
                       var selectedDate = datePicker.getDate();
 
                       if (selectedDate == null) {
-                        customSnackbar(context, AppLocalizations
-                            .of(context)!
-                            .datumEingeben);
+                        customSnackbar(context,
+                            AppLocalizations.of(context)!.datumEingeben);
                         return;
                       }
 
@@ -765,9 +749,8 @@ class _ErkundenPageState extends State<ErkundenPage>
                         selectedDate = [selectedDate, null];
                       } else {
                         if (selectedDate[1].isBefore(selectedDate[0])) {
-                          customSnackbar(context, AppLocalizations
-                              .of(context)!
-                              .bisDatumFalsch);
+                          customSnackbar(context,
+                              AppLocalizations.of(context)!.bisDatumFalsch);
                           return;
                         }
                       }
@@ -776,9 +759,7 @@ class _ErkundenPageState extends State<ErkundenPage>
 
                       Navigator.pop(context);
                     },
-                    label: Text(AppLocalizations
-                        .of(context)!
-                        .anzeigen)),
+                    label: Text(AppLocalizations.of(context)!.anzeigen)),
               )
             ],
           );
@@ -793,8 +774,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     filterOn = false;
     filterList = [];
 
-    showReiseplaungMatchedProfils(
-        von, bis);
+    showReiseplaungMatchedProfils(von, bis);
   }
 
   showReiseplaungMatchedProfils(von, bis) {
@@ -810,15 +790,15 @@ class _ErkundenPageState extends State<ErkundenPage>
 
     for (var profil in profils) {
       var reiseplanung = profil["reisePlanung"];
-      bool hasFixedLocation = profil["reiseart"] == global_var.reisearten[0]
-          || profil["reiseart"] == global_var.reiseartenEnglisch[0];
+      bool hasFixedLocation = profil["reiseart"] == global_var.reisearten[0] ||
+          profil["reiseart"] == global_var.reiseartenEnglisch[0];
 
-      if(profil["id"] == userId) continue;
-      if(hasFixedLocation){
+      if (profil["id"] == userId) continue;
+      if (hasFixedLocation) {
         selectedProfils.add(profil);
         continue;
       }
-      if(reiseplanung == null) continue;
+      if (reiseplanung == null) continue;
 
       for (var planung in reiseplanung) {
         var planungVon = DateTime.parse(planung["von"]);
@@ -857,9 +837,8 @@ class _ErkundenPageState extends State<ErkundenPage>
   }
 
   openFilterWindow() async {
-    var sprachenSelection = spracheIstDeutsch
-        ? sprachenListeGer
-        : sprachenListeEng;
+    var sprachenSelection =
+        spracheIstDeutsch ? sprachenListeGer : sprachenListeEng;
     var interessenSelection = spracheIstDeutsch
         ? global_var.interessenListe
         : global_var.interessenListeEnglisch;
@@ -867,7 +846,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         ? global_var.reisearten
         : global_var.reiseartenEnglisch;
     var alterKinderSelection =
-    List<String>.generate(18, (i) => (i + 1).toString());
+        List<String>.generate(18, (i) => (i + 1).toString());
 
     await showDialog(
         context: context,
@@ -877,21 +856,13 @@ class _ErkundenPageState extends State<ErkundenPage>
               title: "",
               children: [
                 createCheckBoxen(windowSetState, reiseartSelection,
-                    AppLocalizations
-                        .of(context)!
-                        .reisearten),
+                    AppLocalizations.of(context)!.reisearten),
                 createCheckBoxen(windowSetState, alterKinderSelection,
-                    AppLocalizations
-                        .of(context)!
-                        .alterDerKinder),
+                    AppLocalizations.of(context)!.alterDerKinder),
                 createCheckBoxen(windowSetState, interessenSelection,
-                    AppLocalizations
-                        .of(context)!
-                        .interessen),
+                    AppLocalizations.of(context)!.interessen),
                 createCheckBoxen(windowSetState, sprachenSelection,
-                    AppLocalizations
-                        .of(context)!
-                        .sprachen),
+                    AppLocalizations.of(context)!.sprachen),
               ],
             );
           });
@@ -944,13 +915,13 @@ class _ErkundenPageState extends State<ErkundenPage>
             ),
             Expanded(
                 child: InkWell(
-                  onTap: () => changeCheckboxState(selection, windowSetState),
-                  child: Text(
-                    selection,
-                    style: const TextStyle(fontSize: 13),
-                    maxLines: 2,
-                  ),
-                ))
+              onTap: () => changeCheckboxState(selection, windowSetState),
+              child: Text(
+                selection,
+                style: const TextStyle(fontSize: 13),
+                maxLines: 2,
+              ),
+            ))
           ],
         ),
       ));
@@ -1024,16 +995,18 @@ class _ErkundenPageState extends State<ErkundenPage>
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         var profilData = selectUserProfils[index];
         var genauerStandortKondition = profilData["automaticLocation"] ==
-            global_var.standortbestimmung[1] ||
+                global_var.standortbestimmung[1] ||
             profilData["automaticLocation"] ==
-                global_var.standortbestimmungEnglisch[1] &&
+                    global_var.standortbestimmungEnglisch[1] &&
                 checkGenauerStandortPrivacy(profilData);
 
         return GestureDetector(
           onTap: () {
             global_functions.changePage(
                 context,
-                ShowProfilPage(profil: profilData,));
+                ShowProfilPage(
+                  profil: profilData,
+                ));
           },
           child: Container(
               padding: const EdgeInsets.all(10),
@@ -1058,12 +1031,12 @@ class _ErkundenPageState extends State<ErkundenPage>
                         const SizedBox(height: 5),
                         genauerStandortKondition
                             ? Text("📍 " +
-                            changeTextLength(profilData["ort"]) +
-                            ", " +
-                            changeTextLength(profilData["land"]))
+                                changeTextLength(profilData["ort"]) +
+                                ", " +
+                                changeTextLength(profilData["land"]))
                             : Text(changeTextLength(profilData["ort"]) +
-                            ", " +
-                            changeTextLength(profilData["land"]))
+                                ", " +
+                                changeTextLength(profilData["land"]))
                       ])
                 ],
               )),
@@ -1077,24 +1050,16 @@ class _ErkundenPageState extends State<ErkundenPage>
   selectPopupMenuText(profils, spezialActivation) {
     if (spezialActivation) {
       if (friendMarkerOn) {
-        return AppLocalizations
-          .of(context)!
-          .freundesListe;
+        return AppLocalizations.of(context)!.freundesListe;
       }
       if (filterOn) {
-        return AppLocalizations
-          .of(context)!
-          .filterErgebnisse;
+        return AppLocalizations.of(context)!.filterErgebnisse;
       }
       if (eventMarkerOn) {
-        return AppLocalizations
-          .of(context)!
-          .neueMeetups;
+        return AppLocalizations.of(context)!.neueMeetups;
       }
       if (communityMarkerOn) {
-        return AppLocalizations
-            .of(context)!
-            .neueCommunities;
+        return AppLocalizations.of(context)!.neueCommunities;
       }
     }
 
@@ -1156,15 +1121,10 @@ class _ErkundenPageState extends State<ErkundenPage>
   @override
   Widget build(BuildContext context) {
     List<Marker> allMarker = [];
-    searchAutocomplete.hintText = AppLocalizations
-        .of(context)!
-        .filterErkunden;
+    searchAutocomplete.hintText = AppLocalizations.of(context)!.filterErkunden;
 
     createPopupCards({event, community, spezialActivation = false}) {
-      double screenWidth = MediaQuery
-          .of(context)
-          .size
-          .width;
+      double screenWidth = MediaQuery.of(context).size.width;
       var crossAxisCount = screenWidth / 250;
       popupItems = [];
       popupTyp = event != null ? "events" : "community";
@@ -1187,12 +1147,13 @@ class _ErkundenPageState extends State<ErkundenPage>
             childAspectRatio: 0.75,
           ),
           delegate:
-          SliverChildBuilderDelegate((BuildContext context, int index) {
+              SliverChildBuilderDelegate((BuildContext context, int index) {
             var itemData = showItems["profils"][index];
 
             if (event != null) {
               return MeetupCard(
-                  margin: const EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 10),
+                  margin: const EdgeInsets.only(
+                      top: 10, bottom: 10, right: 20, left: 10),
                   meetupData: itemData,
                   withInteresse: true,
                   afterPageVisit: () async {
@@ -1226,13 +1187,13 @@ class _ErkundenPageState extends State<ErkundenPage>
       return popupItems;
     }
 
-    Widget worldChatButton(){
+    Widget worldChatButton() {
       return FloatingActionButton(
           heroTag: "worldchat",
           child: const Icon(Icons.message),
-          onPressed: () =>
-              global_functions.changePage(
-                  context, ChatDetailsPage(
+          onPressed: () => global_functions.changePage(
+              context,
+              ChatDetailsPage(
                 chatId: "1",
                 isChatgroup: true,
               )));
@@ -1241,51 +1202,50 @@ class _ErkundenPageState extends State<ErkundenPage>
     markerPopupContainer() {
       return Positioned.fill(
           child: ScrollConfiguration(
-            behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-              PointerDeviceKind.touch,
-              PointerDeviceKind.mouse,
-            }),
-            child: DraggableScrollableSheet(
-                initialChildSize: 0.5,
-                minChildSize: 0.27,
-                maxChildSize: 0.83,
-                builder: (context, controller) {
-                  return Stack(
-                    alignment: Alignment.topCenter,
-                    clipBehavior: Clip.none,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 130),
-                        child: ClipRRect(
-                          borderRadius:
+        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+          PointerDeviceKind.touch,
+          PointerDeviceKind.mouse,
+        }),
+        child: DraggableScrollableSheet(
+            initialChildSize: 0.5,
+            minChildSize: 0.27,
+            maxChildSize: 0.83,
+            builder: (context, controller) {
+              return Stack(
+                alignment: Alignment.topCenter,
+                clipBehavior: Clip.none,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 130),
+                    child: ClipRRect(
+                      borderRadius:
                           const BorderRadius.vertical(top: Radius.circular(20)),
-                          child: Container(
-                              color: Colors.white,
-                              child: CustomScrollView(
-                                  controller: controller, slivers: popupItems)),
-                        ),
+                      child: Container(
+                          color: Colors.white,
+                          child: CustomScrollView(
+                              controller: controller, slivers: popupItems)),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 130,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.red,
                       ),
-                      Positioned(
-                        right: 0,
-                        top: 130,
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.close,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              popupActive = false;
-                            });
-                          },
-                        ),
-                      ),
-                      Positioned(
-                          top: 60, right: 10, child: worldChatButton())
-                    ],
-                  );
-                }),
-          ));
+                      onPressed: () {
+                        setState(() {
+                          popupActive = false;
+                        });
+                      },
+                    ),
+                  ),
+                  Positioned(top: 60, right: 10, child: worldChatButton())
+                ],
+              );
+            }),
+      ));
     }
 
     createOwnMarker() {
@@ -1310,8 +1270,7 @@ class _ErkundenPageState extends State<ErkundenPage>
             point: LatLng(
                 ownProfil["latt"] + lattShift, ownProfil["longt"] + longtShift),
             // 0.07 => 0.02
-            builder: (_) =>
-                Icon(
+            builder: (_) => Icon(
                   Icons.flag,
                   color: Colors.green[900],
                   size: 30,
@@ -1332,19 +1291,12 @@ class _ErkundenPageState extends State<ErkundenPage>
           width: size,
           height: size,
           point: position,
-          builder: (ctx) =>
-              FloatingActionButton(
-                  heroTag: "MapMarker" + position.toString(),
-                  backgroundColor: Theme
-                      .of(context)
-                      .colorScheme
-                      .primary,
-                  mini: true,
-                  child: Center(child: Text(numberText)),
-                  onPressed: buttonFunction)
-
-
-      );
+          builder: (ctx) => FloatingActionButton(
+              heroTag: "MapMarker" + position.toString(),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              mini: true,
+              child: Center(child: Text(numberText)),
+              onPressed: buttonFunction));
     }
 
     createProfilMarker() {
@@ -1367,47 +1319,40 @@ class _ErkundenPageState extends State<ErkundenPage>
         width: markerSize,
         height: markerSize,
         point: position,
-        builder: (ctx) =>
-            IconButton(
-              padding: EdgeInsets.zero,
-              icon: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Icon(Icons.calendar_today,
-                      size: markerSize,
-                      color: Theme
-                          .of(context)
-                          .colorScheme
-                          .primary),
-                  Positioned(
-                      top: 9.5,
-                      left: 5.5,
-                      child: Container(
-                          padding: const EdgeInsets.only(left: 2, top: 1),
-                          width: 21.5,
-                          height: 18,
-                          color: Colors.white,
-                          child: Center(
-                              child: Text(numberText,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Colors.black))))),
-                  if (isOnline)
-                    Positioned(
-                        top: -20,
-                        left: 4,
-                        child: Icon(
-                          Icons.wifi,
-                          color: Theme
-                              .of(context)
-                              .colorScheme
-                              .primary,
-                        ))
-                ],
-              ),
-              onPressed: buttonFunction,
-            ),
+        builder: (ctx) => IconButton(
+          padding: EdgeInsets.zero,
+          icon: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Icon(Icons.calendar_today,
+                  size: markerSize,
+                  color: Theme.of(context).colorScheme.primary),
+              Positioned(
+                  top: 9.5,
+                  left: 5.5,
+                  child: Container(
+                      padding: const EdgeInsets.only(left: 2, top: 1),
+                      width: 21.5,
+                      height: 18,
+                      color: Colors.white,
+                      child: Center(
+                          child: Text(numberText,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Colors.black))))),
+              if (isOnline)
+                Positioned(
+                    top: -20,
+                    left: 4,
+                    child: Icon(
+                      Icons.wifi,
+                      color: Theme.of(context).colorScheme.primary,
+                    ))
+            ],
+          ),
+          onPressed: buttonFunction,
+        ),
       );
     }
 
@@ -1433,44 +1378,36 @@ class _ErkundenPageState extends State<ErkundenPage>
         width: markerSize,
         height: markerSize,
         point: position,
-        builder: (ctx) =>
-            IconButton(
-              padding: EdgeInsets.zero,
-              icon: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Icon(Icons.cottage_outlined,
-                      size: markerSize,
-                      color: Theme
-                          .of(context)
-                          .colorScheme
-                          .primary),
-                  Positioned(
-                      top: 8,
-                      left: 8.5,
-                      child: Container(
-                          alignment: Alignment.bottomCenter,
-                          padding: const EdgeInsets.only(left: 1),
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(9.0),
-                                  topRight: Radius.circular(9.0))),
-                          width: 15,
-                          height: 18,
-                          child: Text(numberText,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.black
-                              )
-                          )
-                      )
-                  ),
-                ],
-              ),
-              onPressed: buttonFunction,
-            ),
+        builder: (ctx) => IconButton(
+          padding: EdgeInsets.zero,
+          icon: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Icon(Icons.cottage_outlined,
+                  size: markerSize,
+                  color: Theme.of(context).colorScheme.primary),
+              Positioned(
+                  top: 8,
+                  left: 8.5,
+                  child: Container(
+                      alignment: Alignment.bottomCenter,
+                      padding: const EdgeInsets.only(left: 1),
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(9.0),
+                              topRight: Radius.circular(9.0))),
+                      width: 15,
+                      height: 18,
+                      child: Text(numberText,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.black)))),
+            ],
+          ),
+          onPressed: buttonFunction,
+        ),
       );
     }
 
@@ -1478,7 +1415,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       for (var community in aktiveCommunities) {
         var position = LatLng(community["latt"], community["longt"]);
 
-        allMarker.add(communityMarker(community["name"], position,() {
+        allMarker.add(communityMarker(community["name"], position, () {
           popupActive = true;
           createPopupCards(community: community);
           setState(() {});
@@ -1527,50 +1464,34 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
 
     friendButton() {
-      return Positioned(
-          right: 5,
-          top: 65,
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            icon: Stack(
-              children: [
-                if (!friendMarkerOn)
-                  Icon(Icons.favorite_outline,
-                      size: 32, color: Theme
-                          .of(context)
-                          .colorScheme
-                          .primary),
-                if (friendMarkerOn)
-                  Icon(Icons.favorite,
-                      size: 32, color: Theme
-                          .of(context)
-                          .colorScheme
-                          .primary)
-              ],
-            ),
-            onPressed: () {
-              if (friendMarkerOn) {
-                friendMarkerOn = false;
-                popupActive = false;
-                setProfilsFromHive();
-                createAndSetZoomLevels(profils, "profils");
-              } else {
-                friendMarkerOn = true;
-                eventMarkerOn = false;
-                reiseplanungOn = false;
-                communityMarkerOn = false;
-                filterOn = false;
-                filterList = [];
+      return OwnIconButton(
+        image: !friendMarkerOn
+            ? "assets/icons/friend_colorless.png"
+            : "assets/icons/friend.png",
+        withBox: true,
+        onPressed: () {
+          if (friendMarkerOn) {
+            friendMarkerOn = false;
+            popupActive = false;
+            setProfilsFromHive();
+            createAndSetZoomLevels(profils, "profils");
+          } else {
+            friendMarkerOn = true;
+            eventMarkerOn = false;
+            reiseplanungOn = false;
+            communityMarkerOn = false;
+            filterOn = false;
+            filterList = [];
 
-                activateFriendlistProfils(ownProfil["friendlist"]);
+            activateFriendlistProfils(ownProfil["friendlist"]);
 
-                popupActive = true;
-                createPopupProfils(profils, spezialActivation: true);
-              }
+            popupActive = true;
+            createPopupProfils(profils, spezialActivation: true);
+          }
 
-              setState(() {});
-            },
-          ));
+          setState(() {});
+        },
+      );
     }
 
     eventButton() {
@@ -1591,55 +1512,36 @@ class _ErkundenPageState extends State<ErkundenPage>
         if (isNew) newEvents.add(event);
       }
 
-      return Positioned(
-          right: 50,
-          top: 65,
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            icon: Stack(
-              children: [
-                if (!eventMarkerOn)
-                  BadgeIcon(
-                    icon: Icons.calendar_today_outlined,
-                    size: 32,
-                    color: Theme
-                        .of(context)
-                        .colorScheme
-                        .primary,
-                    text: newEvents.isEmpty ? "" : newEvents.length.toString(),
-                  ),
-                if (eventMarkerOn)
-                  Icon(Icons.event_busy,
-                      size: 36, color: Theme
-                          .of(context)
-                          .colorScheme
-                          .primary)
-              ],
-            ),
-            onPressed: () {
-              if (eventMarkerOn) {
-                eventMarkerOn = false;
-                popupActive = false;
-              } else {
-                eventMarkerOn = true;
-                friendMarkerOn = false;
-                reiseplanungOn = false;
-                communityMarkerOn = false;
-                filterOn = false;
-                filterList = [];
-                popupActive = false;
+      return OwnIconButton(
+        image: !eventMarkerOn
+            ? "assets/icons/meetup_colorless.png"
+            : "assets/icons/meetup.png",
+        withBox: true,
+        badgeText: newEvents.isEmpty ? "" : newEvents.length.toString(),
+        onPressed: () {
+          if (eventMarkerOn) {
+            eventMarkerOn = false;
+            popupActive = false;
+          } else {
+            eventMarkerOn = true;
+            friendMarkerOn = false;
+            reiseplanungOn = false;
+            communityMarkerOn = false;
+            filterOn = false;
+            filterList = [];
+            popupActive = false;
 
-                if (newEvents.isNotEmpty) {
-                  popupActive = true;
-                  createPopupCards(
-                      event: {"profils": newEvents}, spezialActivation: true);
-                  Hive.box('secureBox').put("lastLoginEvents", events);
-                }
-              }
+            if (newEvents.isNotEmpty) {
+              popupActive = true;
+              createPopupCards(
+                  event: {"profils": newEvents}, spezialActivation: true);
+              Hive.box('secureBox').put("lastLoginEvents", events);
+            }
+          }
 
-              setState(() {});
-            },
-          ));
+          setState(() {});
+        },
+      );
     }
 
     communityButton() {
@@ -1661,108 +1563,66 @@ class _ErkundenPageState extends State<ErkundenPage>
         if (isNew) newCommunity.add(community);
       }
 
-      return Positioned(
-          right: 100,
-          top: 65,
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            icon: Stack(
-              children: [
-                if (!communityMarkerOn)
-                  BadgeIcon(
-                    icon: Icons.cottage_outlined,
-                    size: 36,
-                    color: Theme
-                        .of(context)
-                        .colorScheme
-                        .primary,
-                    text: newCommunity.isEmpty
-                        ? ""
-                        : newCommunity.length.toString(),
-                  ),
-                if (communityMarkerOn)
-                  Icon(Icons.cottage,
-                      size: 36, color: Theme
-                          .of(context)
-                          .colorScheme
-                          .primary)
-              ],
-            ),
-            onPressed: () {
-              if (communityMarkerOn) {
-                communityMarkerOn = false;
-                popupActive = false;
-              } else {
-                communityMarkerOn = true;
-                eventMarkerOn = false;
-                friendMarkerOn = false;
-                reiseplanungOn = false;
-                filterOn = false;
-                filterList = [];
-                popupActive = false;
+      return OwnIconButton(
+        image: communityMarkerOn
+            ? "assets/icons/community.png"
+            : "assets/icons/community_colorless.png",
+        withBox: true,
+        badgeText:
+            newCommunity.isEmpty ? "" : newCommunity.length.toString(),
+        onPressed: () {
+          if (communityMarkerOn) {
+            communityMarkerOn = false;
+            popupActive = false;
+          } else {
+            communityMarkerOn = true;
+            eventMarkerOn = false;
+            friendMarkerOn = false;
+            reiseplanungOn = false;
+            filterOn = false;
+            filterList = [];
+            popupActive = false;
 
-                if (newCommunity.isNotEmpty) {
-                  popupActive = true;
-                  createPopupCards(
-                      community: {"profils": newCommunity},
-                      spezialActivation: true);
-                  Hive.box('secureBox').put("lastLoginCommunity", communities);
-                }
-              }
+            if (newCommunity.isNotEmpty) {
+              popupActive = true;
+              createPopupCards(
+                  community: {"profils": newCommunity},
+                  spezialActivation: true);
+              Hive.box('secureBox').put("lastLoginCommunity", communities);
+            }
+          }
 
-              setState(() {});
-            },
-          ));
+          setState(() {});
+        },
+      );
     }
 
     reiseplanungButton() {
-      return Positioned(
-          right: 150,
-          top: 65,
-          child: IconButton(
-              padding: EdgeInsets.zero,
-              icon: reiseplanungOn
-                  ? Icon(Icons.update_disabled,
-                  size: 32, color: Theme
-                      .of(context)
-                      .colorScheme
-                      .primary)
-                  : Icon(Icons.update,
-                  size: 36, color: Theme
-                      .of(context)
-                      .colorScheme
-                      .primary),
-              onPressed: () {
-                if (reiseplanungOn) {
-                  reiseplanungOn = false;
-                  setProfilsFromHive();
-                  createAndSetZoomLevels(profils, "profils");
-                } else {
-                  openSelectReiseplanungsDateWindow();
-                }
-              }));
+      return OwnIconButton(
+          image: reiseplanungOn
+              ? "assets/icons/cloack_forward.png"
+              : "assets/icons/cloack_forward_colorless.png",
+          withBox: true,
+          onPressed: () {
+            if (reiseplanungOn) {
+              reiseplanungOn = false;
+              setProfilsFromHive();
+              createAndSetZoomLevels(profils, "profils");
+            } else {
+              openSelectReiseplanungsDateWindow();
+            }
+          });
     }
 
     filterButton() {
-      return Positioned(
-          right: 195,
-          top: 65,
-          child: IconButton(
-              padding: EdgeInsets.zero,
-              icon: filterOn
-                  ? Icon(Icons.filter_list_off,
-                  size: 32, color: Theme
-                      .of(context)
-                      .colorScheme
-                      .primary)
-                  : Icon(Icons.filter_list,
-                  size: 34, color: Theme
-                      .of(context)
-                      .colorScheme
-                      .primary),
-              onPressed: () {
-                openFilterWindow();
-              }));
+      return OwnIconButton(
+          image: filterOn
+              ? "assets/icons/filter.png"
+              : "assets/icons/filter_colorless.png",
+          withBox: true,
+          onPressed: () {
+            openFilterWindow();
+          });
     }
 
     return Scaffold(
@@ -1771,11 +1631,24 @@ class _ErkundenPageState extends State<ErkundenPage>
           ownFlutterMap(),
           searchAutocomplete,
           if (popupActive) markerPopupContainer(),
+          Positioned(
+              right: 5,
+              top: 65,
+              child: Row(children: [
+                filterButton(),
+                reiseplanungButton(),
+                communityButton(),
+                eventButton(),
+                friendButton(),
+              ]))
+          /*
           friendButton(),
           eventButton(),
           communityButton(),
           reiseplanungButton(),
           filterButton()
+
+           */
         ]),
       ),
       floatingActionButton: popupActive ? null : worldChatButton(),

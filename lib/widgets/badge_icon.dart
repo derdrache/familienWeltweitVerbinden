@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 
 class BadgeIcon extends StatelessWidget {
-  var icon;
+  IconData? icon;
+  var image;
   var text;
   var color;
   double? size;
 
-  BadgeIcon({Key? key, this.icon, this.text, this.color, this.size}) : super(key: key);
+  BadgeIcon({Key? key, this.icon, this.image, this.text, this.color, this.size}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Icon(icon,
+        if(image != null) Image.asset(image, width: size, height: size,),
+        if(icon != null) Icon(icon,
           size: size,
           color: color
         ),
