@@ -13,6 +13,7 @@ import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
+import '../../../global/profil_sprachen.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
@@ -686,8 +687,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
         selected: data.split(", "),
         hintText: "Sprachen auswählen",
         auswahlList: userSpeakGerman
-            ? global_var.sprachenListe
-            : global_var.sprachenListeEnglisch,
+            ? sprachenListeGer
+            : sprachenListeEng,
       );
 
       return meetupInformationRow(

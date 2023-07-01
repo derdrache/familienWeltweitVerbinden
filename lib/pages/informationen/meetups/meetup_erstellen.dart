@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../global/profil_sprachen.dart';
 import '../../../services/database.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
@@ -51,8 +52,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
         auswahlList: isGerman
-            ? global_var.sprachenListe
-            : global_var.sprachenListeEnglisch);
+            ? sprachenListeGer
+            : sprachenListeEng);
 
     ortTypDropdown = CustomDropDownButton(
       selected: "offline",

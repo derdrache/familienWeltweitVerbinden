@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../global/profil_sprachen.dart';
 import '../../services/notification.dart' as notifications;
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -46,8 +47,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     sprachenAuswahlBox = CustomMultiTextForm(
         validator: global_functions.checkValidationMultiTextForm(context),
         auswahlList: isGerman
-            ? global_variablen.sprachenListe
-            : global_variablen.sprachenListeEnglisch);
+            ? sprachenListeGer
+            : sprachenListeEng);
 
     reiseArtenAuswahlBox = CustomDropDownButton(
       items: isGerman

@@ -12,6 +12,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
 import '../../global/global_functions.dart' as global_functions;
+import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_var;
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
@@ -348,7 +349,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     if (filterList.isEmpty) return true;
 
     var spracheMatch = checkMatch(filterList, profilSprachen,
-        global_var.sprachenListe + global_var.sprachenListeEnglisch);
+        sprachenListeGer + sprachenListeEng);
     var reiseartMatch = checkMatch(filterList, [profilReiseart],
         global_var.reisearten + global_var.reiseartenEnglisch);
     var interesseMatch = checkMatch(filterList, profilInteressen,
@@ -857,8 +858,8 @@ class _ErkundenPageState extends State<ErkundenPage>
 
   openFilterWindow() async {
     var sprachenSelection = spracheIstDeutsch
-        ? global_var.sprachenListe
-        : global_var.sprachenListeEnglisch;
+        ? sprachenListeGer
+        : sprachenListeEng;
     var interessenSelection = spracheIstDeutsch
         ? global_var.interessenListe
         : global_var.interessenListeEnglisch;
