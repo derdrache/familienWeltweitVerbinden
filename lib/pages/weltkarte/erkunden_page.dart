@@ -122,7 +122,6 @@ class _ErkundenPageState extends State<ErkundenPage>
     await refreshHiveCommunities();
   }
 
-
   setEvents() {
     var localDbEvents = Hive.box('secureBox').get("events") ?? [];
 
@@ -784,12 +783,14 @@ class _ErkundenPageState extends State<ErkundenPage>
   }
 
   setLookForReiseplanung(von, bis) {
+    filterOn = false;
+    filterList = [];
+    filterProfils();
     reiseplanungOn = true;
     eventMarkerOn = false;
     friendMarkerOn = false;
     communityMarkerOn = false;
-    filterOn = false;
-    filterList = [];
+
 
     showReiseplaungMatchedProfils(
         von, bis);
@@ -1553,12 +1554,13 @@ class _ErkundenPageState extends State<ErkundenPage>
                 setProfilsFromHive();
                 createAndSetZoomLevels(profils, "profils");
               } else {
+                filterOn = false;
+                filterList = [];
                 friendMarkerOn = true;
                 eventMarkerOn = false;
                 reiseplanungOn = false;
                 communityMarkerOn = false;
-                filterOn = false;
-                filterList = [];
+
 
                 activateFriendlistProfils(ownProfil["friendlist"]);
 
@@ -1619,12 +1621,14 @@ class _ErkundenPageState extends State<ErkundenPage>
                 eventMarkerOn = false;
                 popupActive = false;
               } else {
+                filterOn = false;
+                filterList = [];
+                filterProfils();
                 eventMarkerOn = true;
                 friendMarkerOn = false;
                 reiseplanungOn = false;
                 communityMarkerOn = false;
-                filterOn = false;
-                filterList = [];
+
                 popupActive = false;
 
                 if (newEvents.isNotEmpty) {
@@ -1691,12 +1695,13 @@ class _ErkundenPageState extends State<ErkundenPage>
                 communityMarkerOn = false;
                 popupActive = false;
               } else {
+                filterOn = false;
+                filterList = [];
+                filterProfils();
                 communityMarkerOn = true;
                 eventMarkerOn = false;
                 friendMarkerOn = false;
                 reiseplanungOn = false;
-                filterOn = false;
-                filterList = [];
                 popupActive = false;
 
                 if (newCommunity.isNotEmpty) {
