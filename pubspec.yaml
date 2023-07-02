@@ -63,16 +63,20 @@ dependencies:
   connectivity_plus: ^4.0.1
   share_plus: ^7.0.2
   image_cropper: ^4.0.1
+  carousel_slider: ^4.2.1
+
+  flutter_sound: ^9.2.13
+  voice_message_package: ^1.0.41
+  permission_handler: ^10.3.0
+  audio_waveforms: ^1.0.4
+  just_waveform: ^0.0.5
+  path: ^1.8.3
+  path_provider: ^2.0.15
+
 
   flutter_localizations:
     sdk: flutter
   intl: ^0.18.0
-
-
-
-
-
-
 
 dev_dependencies:
   flutter_test:
@@ -105,6 +109,7 @@ flutter:
    - assets/
    - assets/bilder/
    - assets/bilder/flaggen/
+   - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

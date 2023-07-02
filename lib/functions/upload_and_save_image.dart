@@ -6,17 +6,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../auth/secrets.dart';
 import '../global/global_functions.dart';
 import '../services/database.dart';
 
-uploadAndSaveImage(context, typ, {meetupCommunityData}) async{
+uploadAndSaveImage(context, typ, {folder = "",meetupCommunityData}) async{
     var ownProfil = Hive.box("secureBox").get("ownProfil");
     var imageData = await pickImage(ownProfil, meetupCommunityData);
     var imageName = imageData["name"];
     imageName = imageName.replaceAll("/", "_");
     imageName = sanitizeString(imageName);
 
-    var imageSavePath = "https://families-worldwide.com/bilder/" + imageName;
+    var imageSavePath = bilderPath + folder + imageName;
     var imageList = [imageSavePath];
 
     if(imageData == null) return;
@@ -47,7 +48,7 @@ uploadAndSaveImage(context, typ, {meetupCommunityData}) async{
     );
 
     await uploadImage(
-        croppedFile?.path, imageName, await croppedFile?.readAsBytes());
+        croppedFile?.path, imageName, await croppedFile?.readAsBytes(), folder);
 
     if (typ == "profil") {
       saveDBProfil(imageList, ownProfil);

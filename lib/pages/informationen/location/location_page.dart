@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../widgets/custom_appbar.dart';
 import '../../../global/global_functions.dart' as global_functions;
-import '../../start_page.dart';
 import 'location_card.dart';
 
 class LocationPage extends StatefulWidget {
@@ -104,16 +103,13 @@ class _LocationPageState extends State<LocationPage> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    String onSearchText = onSearch ? AppLocalizations.of(context)!.suche : "";
 
     return Scaffold(
       appBar: CustomAppBar(
         title: widget.forCity
-            ? AppLocalizations.of(context)!.cities
-            : AppLocalizations.of(context)!.countries,
-        leading: IconButton(
-          onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
-          icon: const Icon(Icons.arrow_back),
-        ),
+            ? "$onSearchText ${AppLocalizations.of(context)!.cities}"
+            : "$onSearchText ${AppLocalizations.of(context)!.countries}"
       ),
       body: SafeArea(
         child: Stack(

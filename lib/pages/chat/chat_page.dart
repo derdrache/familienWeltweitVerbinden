@@ -675,6 +675,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver{
           lastMessage = AppLocalizations.of(context)!.weitergeleitet;
         } else if (lastMessage == "</neuer Chat") {
           lastMessage = AppLocalizations.of(context)!.neuerChat;
+        } else if(lastMessage == "</images"){
+          lastMessage = AppLocalizations.of(context)!.bild;
         }
 
         chatGroupContainers.insert(

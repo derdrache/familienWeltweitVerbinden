@@ -761,26 +761,6 @@ class _UserInformationDisplay extends StatelessWidget {
       );
     }
 
-    tradeNotizeBox() {
-      return Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "${AppLocalizations.of(context)!.verkaufenTauschenSchenken}: ",
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              profil["tradeNotize"],
-              style: TextStyle(fontSize: textSize),
-            ),
-          ],
-        ),
-      );
-    }
-
     reisePlanungBox() {
       var reiseplanung = [];
       var reiseplanungPrivacy = spracheIstDeutsch
@@ -944,7 +924,6 @@ class _UserInformationDisplay extends StatelessWidget {
             if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
             if(profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
             if (profil["aboutme"].isNotEmpty) aboutmeBox(),
-            if (profil["tradeNotize"].isNotEmpty) tradeNotizeBox(),
             interessenBox(),
             SizedBox(height: columnSpacing),
           ],

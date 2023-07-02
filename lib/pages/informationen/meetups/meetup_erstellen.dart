@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
-import 'package:familien_suche/pages/start_page.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
@@ -10,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../global/profil_sprachen.dart';
 import '../../../services/database.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
@@ -42,7 +42,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   late var sprachenAuswahlBox;
   late var meetupArtDropdown;
   late var ortTypDropdown;
-  var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true);
+  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10), withOwnLocation: true);
   late var meetupIntervalDropdown;
   var ownMeetup = true;
   final translator = GoogleTranslator();
@@ -52,8 +52,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
         auswahlList: isGerman
-            ? global_var.sprachenListe
-            : global_var.sprachenListeEnglisch);
+            ? sprachenListeGer
+            : sprachenListeEng);
 
     ortTypDropdown = CustomDropDownButton(
       selected: "offline",
@@ -118,6 +118,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var meetupData = {
       "id": meetupId,
       "name": meetupNameKontroller.text,
+      "nameGer": meetupNameKontroller.text,
+      "nameEng": meetupNameKontroller.text,
       "erstelltAm": DateTime.now().toString(),
       "erstelltVon": userID,
       "beschreibung": meetupBeschreibungKontroller.text,
@@ -160,7 +162,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var meetups = Hive.box('secureBox').get("events") ?? [];
     meetups.add(meetupData);
 
-    global_functions.changePage(context, StartPage(selectedIndex: 2, informationPageIndex: 1,));
+    Navigator.pop(context);
     global_functions.changePage(context, MeetupDetailsPage(meetupData: meetupData));
   }
 
@@ -169,10 +171,14 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
     if(descriptionIsGerman){
+      meetup["nameGer"] = meetup["name"];
+      meetup["nameEng"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungGer"] = meetup["beschreibung"];
       meetup["beschreibungEng"] = await descriptionTranslation(meetup["beschreibungGer"], "auto");
       meetup["beschreibungEng"] += "\n\nThis is an automatic translation";
     }else{
+      meetup["nameEng"] = meetup["name"];
+      meetup["nameGer"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungEng"] = meetup["beschreibung"];
       meetup["beschreibungGer"] = await descriptionTranslation(
           meetup["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
@@ -202,8 +208,6 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
 
     if (meetupNameKontroller.text.isEmpty) {
       validationFailText = AppLocalizations.of(context)!.bitteNameEingeben;
-    } else if (meetupNameKontroller.text.length > 40) {
-      validationFailText = AppLocalizations.of(context)!.usernameZuLang;
     } else if (meetupArtDropdown.getSelected().isEmpty) {
       validationFailText = AppLocalizations.of(context)!.bitteMeetupArtEingeben;
     } else if (meetupIntervalDropdown.getSelected().isEmpty) {
@@ -320,35 +324,6 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                 ),
               ),
             );
-    }
-
-    chooseOwnLocationBox(){
-      if(ortTypDropdown.selected == "online") return const SizedBox.shrink();
-
-      return Container(
-        margin: const EdgeInsets.only(left: 15, right: 15),
-        child: Row(children: [
-          Text(AppLocalizations.of(context)!.aktuellenOrtVerwenden),
-          const Expanded(child: SizedBox.shrink()),
-          Switch(value: chooseCurrentLocation, onChanged: (bool){
-            if(bool){
-              var ownProfil = Hive.box('secureBox').get("ownProfil");
-              var currentLocaton = {
-                "city": ownProfil["ort"],
-                "countryname": ownProfil["land"],
-                "longt": ownProfil["longt"],
-                "latt": ownProfil["latt"],
-              };
-              ortAuswahlBox.setLocation(currentLocaton);
-            } else{
-              ortAuswahlBox.clear();
-            }
-            setState(() {
-              chooseCurrentLocation = bool;
-            });
-          })
-        ],),
-      );
     }
 
     ortEingabeBox() {
@@ -481,12 +456,11 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
         child: ListView(
           children: [
             customTextInput("Meetup Name", meetupNameKontroller,
-                validator: global_functions.checkValidatorEmpty(context)),
+                validator: global_functions.checkValidatorEmpty(context), maxLength: 40),
             Stack(
               children: [meetupArtDropdown, meetupArtInformation()],
             ),
             ortTypDropdown,
-            chooseOwnLocationBox(),
             Align(child: ortEingabeBox()),
             sprachenAuswahlBox,
             meetupIntervalDropdown,

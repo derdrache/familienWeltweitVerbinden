@@ -208,7 +208,8 @@ class DefaultProfilImage extends StatelessWidget {
             radius: 30,
             backgroundColor: Colors.black,
             child: Center(
-                child: Text("X",
+                child: Text(
+              "X",
               style: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
@@ -248,7 +249,9 @@ class OwnProfilImage extends StatelessWidget {
             return AlertDialog(
                 insetPadding: EdgeInsets.zero,
                 backgroundColor: Colors.transparent,
-                content: isUrl ? Image.network(image) : Image.asset(image));
+                content: isUrl
+                    ? CachedNetworkImage(imageUrl: image)
+                    : Image.asset(image));
           });
     }
 

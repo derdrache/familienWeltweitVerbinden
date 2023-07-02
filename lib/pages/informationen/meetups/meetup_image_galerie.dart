@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +67,8 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
 
     if (selectedImage == "") {
       selectedImage = ownPictureKontroller.text;
-      widget.child = Image.network(selectedImage, fit: BoxFit.fitWidth);
+      widget.child =
+          CachedNetworkImage(imageUrl: selectedImage, fit: BoxFit.fitWidth);
     } else {
       widget.child = Image.asset(selectedImage, fit: BoxFit.fitWidth);
     }
@@ -93,7 +95,6 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       List<Widget> allImages = [];
 
       for (var image in imagePaths) {
-
         allImages.add(InkWell(
           child: Container(
               margin: const EdgeInsets.all(5),
@@ -103,8 +104,8 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                       color: selectedImage == image
                           ? Colors.green
                           : Colors.black)),
-              child: Image.asset(image,
-                  fit: BoxFit.fill, width: 80, height: 60)),
+              child:
+                  Image.asset(image, fit: BoxFit.fill, width: 80, height: 60)),
           onTap: () {
             selectedImage = image;
             windowSetState(() {});
@@ -124,8 +125,11 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
           child: customTextInput(
               AppLocalizations.of(context)!.eigenesBildLinkEingeben,
               ownPictureKontroller, onSubmit: () {
-            allImages.add(Image.network(ownPictureKontroller.text,
-                fit: BoxFit.fill, width: 80, height: 60));
+            allImages.add(CachedNetworkImage(
+                imageUrl: ownPictureKontroller.text,
+                fit: BoxFit.fill,
+                width: 80,
+                height: 60));
 
             ownPictureKontroller.clear();
             windowSetState(() {});
@@ -186,7 +190,8 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     }
 
     _showChangeImagePopupMenu(tabPosition) async {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+      final RenderBox overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
 
       await showMenu(
         context: context,
@@ -252,8 +257,8 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                       : Container(
                           constraints:
                               BoxConstraints(maxHeight: screenHeight / 2.08),
-                          child: Image.network(
-                            widget.meetupData["bild"],
+                          child: CachedNetworkImage(
+                            imageUrl: widget.meetupData["bild"],
                           ))),
         ),
         onTapDown: !widget.isCreator

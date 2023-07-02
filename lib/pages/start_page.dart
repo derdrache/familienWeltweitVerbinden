@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -14,7 +15,6 @@ import '../global/variablen.dart';
 import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../services/network_Connectivity.dart';
-import '../widgets/badge_icon.dart';
 import 'informationen/information.dart';
 import 'login_register_page/create_profil_page.dart';
 import 'news/news_page.dart';
@@ -27,16 +27,12 @@ import 'force_update.dart';
 //ignore: must_be_immutable
 class StartPage extends StatefulWidget {
   int selectedIndex;
-  var informationPageIndex;
   int? chatPageSliderIndex;
-  bool searchOn;
 
   StartPage({
     Key? key,
     this.selectedIndex = 0,
-    this.informationPageIndex = 0,
     this.chatPageSliderIndex,
-    this.searchOn = false
   }) : super(key: key);
 
   @override
@@ -278,7 +274,7 @@ class _StartPageState extends State<StartPage> {
     pages = [
       NewsPage(),
       ErkundenPage(),
-      InformationPage(pageSelection: widget.informationPageIndex, searchOn: widget.searchOn),
+      InformationPage(),
       ChatPage(
           chatPageSliderIndex: widget.chatPageSliderIndex!
       ),
@@ -286,9 +282,6 @@ class _StartPageState extends State<StartPage> {
     ];
 
     void _onItemTapped(int index) {
-      if(index == 2){
-        widget.informationPageIndex = 0;
-      }
       setState(() {
         widget.selectedIndex = index;
       });
@@ -349,9 +342,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
   informationenIcon(){
     var notification = _eventNotification() + _communitNotifikation();
 
-    return BadgeIcon(
-        icon: Icons.group_work,
-        text: notification > 0 ? notification.toString() : "");
+    return OwnIconButton(
+      icon: Icons.group_work,
+      size: 24,
+      margin: EdgeInsets.zero,
+      badgeText: notification > 0 ? notification.toString() : "",
+    );
   }
 
   chatIcon() {
@@ -373,9 +369,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
           newMessageCount += snapshot.data as num;
         }
 
-        return BadgeIcon(
-            icon: Icons.chat,
-            text: newMessageCount > 0 ? newMessageCount.toString() : "");
+        return OwnIconButton(
+          icon: Icons.chat,
+          size: 24,
+          margin: EdgeInsets.zero,
+          badgeText: newMessageCount > 0 ? newMessageCount.toString() : "",
+        );
       }
     );
   }

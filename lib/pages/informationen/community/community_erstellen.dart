@@ -13,7 +13,6 @@ import 'package:uuid/uuid.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import 'community_details.dart';
 import '../../../widgets/google_autocomplete.dart';
-import '../../start_page.dart';
 
 class CommunityErstellen extends StatefulWidget {
   const CommunityErstellen({Key? key}) : super(key: key);
@@ -26,7 +25,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var nameController = TextEditingController();
   var beschreibungKontroller = TextEditingController();
   var linkKontroller = TextEditingController();
-  var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true,);
+  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10),withOwnLocation: true, withWorldwideLocation: true);
   var userId = Hive.box("secureBox").get("ownProfil")["id"];
   var ownCommunity = true;
   final translator = GoogleTranslator();
@@ -42,6 +41,8 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     var communityData = {
       "id": communityId,
       "name": nameController.text,
+      "nameGer": nameController.text,
+      "nameEng": nameController.text,
       "beschreibung": beschreibungKontroller.text,
       "beschreibungGer":beschreibungKontroller.text,
       "beschreibungEng": beschreibungKontroller.text,
@@ -79,14 +80,18 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
     if(descriptionIsGerman){
+      communityData["nameGer"] = communityData["name"];
+      communityData["nameEng"] = await descriptionTranslation(communityData["name"], "auto");
       communityData["beschreibungGer"] = communityData["beschreibung"];
       communityData["beschreibungEng"] = await descriptionTranslation(communityData["beschreibungGer"], "auto");
       communityData["beschreibungEng"] += "\n\nThis is an automatic translation";
     }else{
+      communityData["nameEng"] = communityData["name"];
+      communityData["nameGer"] = await descriptionTranslation(communityData["name"], "de");
       communityData["beschreibungEng"] = communityData["beschreibung"];
       communityData["beschreibungGer"] = await descriptionTranslation(
           communityData["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
-      communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nDies ist eine automatische Übersetzung";
     }
 
     await CommunityDatabase().addNewCommunity(Map.of(communityData));
@@ -124,33 +129,6 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   @override
   Widget build(BuildContext context) {
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.stadtEingeben;
-
-    chooseOwnLocationBox(){
-      return Container(
-        margin: const EdgeInsets.only(left: 15, right: 15),
-        child: Row(children: [
-          Text(AppLocalizations.of(context)!.aktuellenOrtVerwenden, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          const Expanded(child: SizedBox.shrink()),
-          Switch(value: chooseCurrentLocation, onChanged: (bool){
-            if(bool){
-              var ownProfil = Hive.box('secureBox').get("ownProfil");
-              var currentLocaton = {
-                "city": ownProfil["ort"],
-                "countryname": ownProfil["land"],
-                "longt": ownProfil["longt"],
-                "latt": ownProfil["latt"],
-              };
-              ortAuswahlBox.setLocation(currentLocaton);
-            } else{
-              ortAuswahlBox.clear();
-            }
-            setState(() {
-              chooseCurrentLocation = bool;
-            });
-          })
-        ],),
-      );
-    }
 
     ownCommunityBox() {
       return Padding(
@@ -199,8 +177,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                 onPressed: () async {
                   var communityData = await saveCommunity();
 
-                  global_func.changePageForever(
-                      context, StartPage(selectedIndex: 2, informationPageIndex: 2,));
+                  Navigator.pop(context);
                   global_func.changePage(
                       context, CommunityDetails(community: communityData));
                 },
@@ -209,8 +186,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       body: ListView(
         children: [
           customTextInput(
-              AppLocalizations.of(context)!.communityName, nameController),
-          chooseOwnLocationBox(),
+              AppLocalizations.of(context)!.communityName, nameController, maxLength: 40),
           ortAuswahlBox,
           customTextInput(AppLocalizations.of(context)!.linkEingebenOptional,
               linkKontroller),

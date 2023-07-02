@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -22,16 +23,13 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
-import '../../start_page.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../location/location_Information.dart';
 
 class CommunityDetails extends StatefulWidget {
   Map community;
-  bool fromCommunityPage;
-  bool fromCommunityPageSearch;
 
-  CommunityDetails({Key? key, required this.community, this.fromCommunityPage = false, this.fromCommunityPageSearch = false})
+  CommunityDetails({Key? key, required this.community})
       : super(key: key);
 
   @override
@@ -284,7 +282,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             title: AppLocalizations.of(context)!.nameAendern,
             children: [
               customTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
-                  newNameKontroller),
+                  newNameKontroller,maxLength: 40),
               const SizedBox(height: 15),
               _windowOptions(() => _saveChangeName(newNameKontroller.text))
             ],
@@ -292,7 +290,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
-  _saveChangeName(newName) {
+  _saveChangeName(newName) async {
     if (newName.isEmpty) {
       customSnackbar(context, AppLocalizations.of(context)!.bitteNameEingeben);
       return;
@@ -304,10 +302,27 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["name"] = newName;
     });
 
+    var languageCheck = await translator.translate(newName);
+    bool textIsGerman = languageCheck.sourceLanguage.code == "de";
+    widget.community["name"] = newName;
+
+    if (textIsGerman) {
+      widget.community["nameGer"] = newName;
+      var translation = await _descriptionTranslation(newName, "auto");
+      widget.community["nameEng"] = translation;
+    } else {
+      widget.community["nameEng"] = newName;
+      var translation = await _descriptionTranslation(newName, "de");
+      widget.community["nameGer"] = translation;
+    }
+
+
     newName = newName.replaceAll("'", "''");
+    var newNameGer = widget.community["nameGer"].replaceAll("'", "''");
+    var newNameEng = widget.community["nameEng"].replaceAll("'", "''");
 
     CommunityDatabase()
-        .update("name = '$newName'", "WHERE id = '${widget.community["id"]}'");
+        .update("name = '$newName', nameGer = '$newNameGer', nameEng = '$newNameEng'", "WHERE id = '${widget.community["id"]}'");
   }
 
   _changeOrtWindow() {
@@ -704,12 +719,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
                     DbDeleteImage(widget.community["bild"]);
 
-                    global_func.changePageForever(
-                        context,
-                        StartPage(
-                          selectedIndex: 2,
-                          informationPageIndex: 2,
-                        ));
+                    Navigator.pop(context);
                   },
                 ),
                 TextButton(
@@ -950,24 +960,31 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         child: isAssetImage
             ? Image.asset(widget.community["bild"],
                 height: screenWidth > 600 ? screenHeight / 3 : null)
-            : Image.network(widget.community["bild"],
-                height: screenHeight / 3,
-                fit: screenWidth > 600 ? null : BoxFit.fitWidth),
+            : CachedNetworkImage(imageUrl: widget.community["bild"], height: screenHeight / 3,
+            fit: screenWidth > 600 ? null : BoxFit.fitWidth)
       );
     }
 
     communityInformation() {
       var fremdeCommunity = widget.community["ownCommunity"] == 0;
-      var isGerman = kIsWeb
-          ? window.locale.languageCode == "de"
-          : Platform.localeName == "de_DE";
-      var discription = "";
+      bool userSpeakGerman = getUserSpeaksGerman();
+      String discription;
+      String title;
+      String locationText = widget.community["ort"];
+      if (widget.community["ort"] != widget.community["land"]) {
+        locationText += " / " + widget.community["land"];
+      }
+      bool isWorldwide = widget.community["ort"] ==
+          AppLocalizations.of(context)!.weltweit;
 
       if (isCreator) {
+        title = widget.community["name"];
         discription = widget.community["beschreibung"];
-      } else if (isGerman) {
+      } else if (userSpeakGerman) {
+        title = widget.community["nameGer"];
         discription = widget.community["beschreibungGer"];
       } else {
+        title = widget.community["nameEng"];
         discription = widget.community["beschreibungEng"];
       }
 
@@ -978,8 +995,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             onTap: () => isCreator ? _changeNameWindow() : null,
             child: Center(
                 child: Text(
-              widget.community["name"],
-              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                  title.isNotEmpty ? title : widget.community["name"],
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             )),
           ),
         ),
@@ -999,7 +1016,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: InkWell(
-            onTap: () => isCreator
+            onTap: isWorldwide ? null : () => isCreator
                 ? _changeOrtWindow()
                 : global_func.changePage(context,
                     LocationInformationPage(ortName: widget.community["ort"])),
@@ -1008,9 +1025,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 Text(AppLocalizations.of(context)!.ort,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                         decoration: isCreator ? TextDecoration.none : TextDecoration.underline)),
+                         decoration: isCreator || isWorldwide ? TextDecoration.none : TextDecoration.underline)),
                 Text(
-                  widget.community["ort"] + " / " + widget.community["land"],
+                  locationText,
                   style: TextStyle(decoration: isCreator ? TextDecoration.none : TextDecoration.underline),
                 )
               ],
@@ -1050,7 +1067,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
               child: TextWithHyperlinkDetection(
-            text: discription,
+            text: discription.isNotEmpty ? discription : widget.community["beschreibung"],
             withoutActiveHyperLink: isCreator,
             onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
           )),
@@ -1097,12 +1114,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     return SelectionArea(
       child: Scaffold(
           appBar: CustomAppBar(
-            title: widget.community["name"],
-            leading: widget.fromCommunityPage
-                ? StartPage(selectedIndex: 2, informationPageIndex: 2)
-                : widget.fromCommunityPageSearch
-                  ? StartPage(selectedIndex: 2, informationPageIndex: 2, searchOn: true)
-                  : null,
+            title: "",
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),

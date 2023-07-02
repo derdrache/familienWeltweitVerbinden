@@ -119,10 +119,7 @@ changeGermanToEnglish(list){
     checkList = interessenListe;
     englishList = interessenListeEnglisch;
   }
-  if(sprachenListe.contains(list[0])){
-    checkList = sprachenListe;
-    englishList = sprachenListeEnglisch;
-  }
+
   if(list.runtimeType == String && checkList.isEmpty){
     var reiseartenIndex = reisearten.indexOf(list);
     var eventIntervalIndex = meetupInterval.indexOf(list);
@@ -162,10 +159,6 @@ changeEnglishToGerman(list){
   if(interessenListeEnglisch.contains(list[0])) {
     checkList = interessenListeEnglisch;
     germanList = interessenListe;
-  }
-  if(sprachenListeEnglisch.contains(list[0])){
-    checkList = sprachenListeEnglisch;
-    germanList = sprachenListe;
   }
 
   if(list.runtimeType == String && checkList.isEmpty){

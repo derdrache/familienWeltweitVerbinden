@@ -1,6 +1,8 @@
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -13,9 +15,7 @@ import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../services/database.dart';
-import '../../../widgets/badge_icon.dart';
 import '../../show_profil.dart';
-import '../../start_page.dart';
 import 'meetup_card_details.dart';
 
 var userId = Hive.box("secureBox").get("ownProfil")["id"];
@@ -42,8 +42,10 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
   var searchAutocomplete;
   late bool isNotPublic;
 
+
   @override
   void initState() {
+
     teilnahme = widget.meetupData["zusage"] == null
         ? false : widget.meetupData["zusage"].contains(userId);
     absage =widget.meetupData["absage"] == null
@@ -101,7 +103,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             title: AppLocalizations.of(context)!.newOwnerIsInitiator,
-            children: const [],
             actions: [
               TextButton(
                   onPressed: () {
@@ -118,6 +119,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   child: Text(AppLocalizations.of(context)!.nein)
               ),
             ],
+            children: const [],
           );
         });
 
@@ -244,28 +246,26 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.meetupLoeschen,
               height: 90,
-              children: [
-                Center(
-                    child: Text(
-                        AppLocalizations
-                            .of(context)!
-                            .meetupWirklichLoeschen))
-              ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
                   onPressed: (){
                     deleteMeetup();
 
-                    global_func.changePageForever(
-                        context,
-                        StartPage(selectedIndex: 2, informationPageIndex: 1,));
+                    Navigator.pop(context);
                   },
                 ),
                 TextButton(
                   child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
+              ],
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations
+                            .of(context)!
+                            .meetupWirklichLoeschen))
               ],
             );
           });
@@ -771,11 +771,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                     child: InkResponse(
                         onTap: () => Navigator.pop(context),
                         child: const CircleAvatar(
+                          backgroundColor: Colors.red,
                           child: Icon(
                             Icons.close,
                             size: 16,
                           ),
-                          backgroundColor: Colors.red,
                         )),
                   ),
                 ]),
@@ -786,9 +786,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
     return SelectionArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: "", leading: widget.fromMeetupPage
-            ? StartPage(selectedIndex: 2, informationPageIndex: 1)
-            : null, buttons: [
+        appBar: CustomAppBar(title: "", buttons: [
           if (isCreator && isNotPublic)
             FutureBuilder(
                 future: MeetupDatabase().getData(
@@ -804,12 +802,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
                   if (data == "0") data = "";
 
-                  return IconButton(
-                      icon: BadgeIcon(
-                          icon: Icons.event_available,
-                          text: data
-                              .toString()),
-                      onPressed: () => userfreischalteWindow());
+                  return OwnIconButton(
+                    icon: Icons.event_available,
+                    badgeText: data.toString(),
+                    onPressed: () => userfreischalteWindow(),
+                  );
                 }),
           IconButton(
             icon: const Icon(Icons.link),
@@ -865,6 +862,8 @@ class MeetupArtButton extends StatefulWidget {
 }
 
 class _MeetupArtButtonState extends State<MeetupArtButton> {
+  var ownProfil = Hive.box('secureBox').get("ownProfil");
+  late bool userSpeakGerman;
   late var meetupTypInput;
   late IconData icon;
 
@@ -973,9 +972,10 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
 
   @override
   void initState() {
+    userSpeakGerman = getUserSpeaksGerman();
     meetupTypInput = CustomDropDownButton(
-      items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
-      selected: isGerman
+      items: userSpeakGerman ? global_var.eventArt : global_var.eventArtEnglisch,
+      selected: userSpeakGerman
           ? global_func.changeEnglishToGerman(widget.meetupData["art"])
           : global_func.changeGermanToEnglish(widget.meetupData["art"]),
     );

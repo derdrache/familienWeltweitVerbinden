@@ -292,7 +292,8 @@ class ChatDatabase {
           "von": messageData["von"],
           "zu": messageData["zu"],
           "responseId": messageData["responseId"],
-          "forward": messageData["forward"]
+          "forward": messageData["forward"],
+          "images": jsonEncode(messageData["images"])
         }));
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
@@ -479,7 +480,9 @@ class ChatGroupsDatabase {
           "von": messageData["von"],
           "responseId": messageData["responseId"],
           "forward": messageData["forward"],
-          "language": messageData["language"]
+          "language": messageData["language"],
+          "translateMessage": messageData["translateMessage"],
+          "images": jsonEncode(messageData["images"]),
         }));
 
     _addNotificationCounterAndSendNotification(
@@ -596,6 +599,8 @@ class MeetupDatabase {
   addNewMeetup(meetupData) async {
 
     meetupData["name"] = meetupData["name"].replaceAll("'", "''");
+    meetupData["nameGer"] = meetupData["nameGer"].replaceAll("'", "''");
+    meetupData["nameEng"] = meetupData["nameEng"].replaceAll("'", "''");
     meetupData["stadt"] = meetupData["stadt"].replaceAll("'", "''");
     meetupData["countryname"] = meetupData["land"].replaceAll("'", "''");
     meetupData["beschreibung"] = meetupData["beschreibung"].replaceAll("'", "''");
@@ -679,6 +684,8 @@ class MeetupDatabase {
 class CommunityDatabase {
   addNewCommunity(communityData) async {
     communityData["name"] = communityData["name"].replaceAll("'", "''");
+    communityData["nameGer"] = communityData["nameGer"].replaceAll("'", "''");
+    communityData["nameEng"] = communityData["nameEng"].replaceAll("'", "''");
     communityData["ort"] = communityData["ort"].replaceAll("'", "''");
     communityData["countryname"] = communityData["land"].replaceAll("'", "''");
     communityData["beschreibung"] = communityData["beschreibung"].replaceAll("'", "''");
@@ -1269,11 +1276,84 @@ class NotizDatabase{
   }
 }
 
-uploadImage(imagePath, imageName, image) async {
+class BulletinBoardDatabase {
+  addNewNote(note) async {
+    note["titleGer"] = note["titleGer"].replaceAll("'", "''");
+    note["titleEng"] = note["titleEng"].replaceAll("'", "''");
+    note["beschreibungGer"] = note["beschreibungGer"].replaceAll("'", "''");
+    note["beschreibungEng"] = note["beschreibungEng"].replaceAll("'", "''");
+    note["location"] = json.encode(note["location"]);
+    note["bilder"] = json.encode(note["bilder"]);
+
+    var url = Uri.parse(databaseUrl + databasePathNewBulletinNote);
+    var test = await http.post(url, body: json.encode(note));
+    print(test.body);
+  }
+
+  update(whatData, queryEnd) async {
+    var url = Uri.parse(databaseUrl + databasePathUpdate);
+
+    await http.post(url,
+        body: json.encode({
+          "table": "bulletin_board_notes",
+          "whatData": whatData,
+          "queryEnd": queryEnd
+        }));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    var url = Uri.parse(databaseUrl + databasePathGetData);
+
+    var res = await http.post(url,
+        body: json.encode({
+          "whatData": whatData,
+          "queryEnd": queryEnd,
+          "table": "bulletin_board_notes"
+        }));
+
+    dynamic responseBody = res.body;
+
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+
+    if (responseBody.isEmpty) return false;
+
+    for (var i = 0; i < responseBody.length; i++) {
+      if (responseBody[i].keys.toList().length == 1) {
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for (var key in responseBody[i].keys.toList()) {
+        try {
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        } catch (_) {}
+      }
+    }
+
+    if (responseBody.length == 1 && !returnList) {
+      responseBody = responseBody[0];
+      try {
+        responseBody = jsonDecode(responseBody);
+      } catch (_) {}
+    }
+
+    return responseBody;
+  }
+
+  delete(newsId) {
+    _deleteInTable("bulletin_board_notes", "id", newsId);
+  }
+}
+
+uploadImage(imagePath, imageName, image, folder) async {
   var url = Uri.parse(databasePathUploadImage);
   var data = {
     "imagePath": imagePath,
     "imageName": imageName,
+    "folder": folder,
     "image": base64Encode(image),
   };
 
@@ -1643,6 +1723,13 @@ refreshHiveFamilyProfils() async {
       await FamiliesDatabase().getData("*", "", returnList: true);
   if (familyProfils == false) familyProfils = [];
   Hive.box("secureBox").put("familyProfils", familyProfils);
+}
+
+refreshHiveBulletinBoardNotes() async {
+  var bulletinBoardNotes =
+    await BulletinBoardDatabase().getData("*", "", returnList: true);
+  if (bulletinBoardNotes == false) bulletinBoardNotes = [];
+  Hive.box("secureBox").put("bulletinBoardNotes", bulletinBoardNotes);
 }
 
 decryptProfil(profil){

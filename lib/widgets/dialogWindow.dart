@@ -9,6 +9,7 @@ class CustomAlertDialog extends StatefulWidget {
   List<Widget>? actions;
   double? height;
   var backgroundColor;
+  var windowPadding;
 
   CustomAlertDialog(
       {Key? key,
@@ -16,8 +17,9 @@ class CustomAlertDialog extends StatefulWidget {
       required this.children,
       this.actions,
       this.height,
-      this.backgroundColor = Colors.white})
-      : super(key: key);
+      this.backgroundColor = Colors.white,
+      this.windowPadding = const EdgeInsets.all(10)
+      }) : super(key: key);
 
   @override
   _CustomAlertDialogState createState() => _CustomAlertDialogState();
@@ -35,7 +37,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20.0))),
       contentPadding: EdgeInsets.zero,
-      insetPadding: const EdgeInsets.all(10),
+      insetPadding: widget.windowPadding,
       actions: widget.actions,
       content: SizedBox(
         height: widget.height,
