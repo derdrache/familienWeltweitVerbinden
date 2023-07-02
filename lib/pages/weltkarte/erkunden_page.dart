@@ -785,7 +785,6 @@ class _ErkundenPageState extends State<ErkundenPage>
   setLookForReiseplanung(von, bis) {
     filterOn = false;
     filterList = [];
-    filterProfils();
     reiseplanungOn = true;
     eventMarkerOn = false;
     friendMarkerOn = false;
@@ -822,6 +821,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       for (var planung in reiseplanung) {
         var planungVon = DateTime.parse(planung["von"]);
         var planungBis = DateTime.parse(planung["bis"]);
+        bool genauePlanung = planungVon.hour == 1;
 
         if (selectDates.contains(planungVon)) {
           var newProfil = Map.of(profil);
@@ -835,7 +835,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         }
 
         while (planungVon != planungBis) {
-          planungVon =
+          planungVon = genauePlanung ?DateTime(planungVon.year, planungVon.month, planungVon.day + 1) :
               DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
           if (selectDates.contains(planungVon)) {
             var newProfil = Map.of(profil);
