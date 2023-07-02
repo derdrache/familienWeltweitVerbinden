@@ -1109,7 +1109,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     changeProfilToFamilyProfil();
   }
 
-  deactivateAllButtons({filter = false}){
+  deactivateAllButtons({filter = false, friends = false}){
     friendMarkerOn = false;
     eventMarkerOn = false;
     reiseplanungOn = false;
@@ -1118,6 +1118,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     filterOn = false;
     if(!filter) filterList = [];
     popupActive = false;
+    if(!friends) filterProfils();
   }
 
   @override
@@ -1478,7 +1479,7 @@ class _ErkundenPageState extends State<ErkundenPage>
             setProfilsFromHive();
             createAndSetZoomLevels(profils, "profils");
           } else {
-            deactivateAllButtons();
+            deactivateAllButtons(friends: true);
             friendMarkerOn = true;
 
             activateFriendlistProfils(ownProfil["friendlist"]);
