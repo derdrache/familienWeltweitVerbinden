@@ -51,11 +51,7 @@ class _ErkundenPageState extends State<ErkundenPage>
   List aktiveEvents = [];
   List aktiveCommunities = [];
   List aktiveInsiderInfos = [];
-  List? profilsContinents,
-      profilsCountries,
-      profilsBetween,
-      profilsCities,
-      profilsExact;
+  List? profilsContinents, profilsCountries, profilsBetween, profilsCities, profilsExact;
   late List eventsCountries, eventsBetween, eventsCities;
   List? eventsKontinente;
   List? communitiesContinents;
@@ -225,12 +221,15 @@ class _ErkundenPageState extends State<ErkundenPage>
   }
 
   changeProfilToFamilyProfil() {
-    var deleteProfils = [];
+    List removeProfils = [];
 
     for (var familyProfil in familyProfils) {
-      if (familyProfil["active"] == 0 ||
-          familyProfil["name"].isEmpty ||
-          familyProfil["mainProfil"].isEmpty) continue;
+
+      bool isActive = familyProfil["active"] == 1;
+      bool hasName = familyProfil["name"].isNotEmpty;
+      bool hasMainProfil = familyProfil["mainProfil"].isNotEmpty;
+
+      if (!isActive || !hasName || !hasMainProfil) continue;
 
       var members = familyProfil["members"];
       var membersFound = 0;
@@ -240,17 +239,17 @@ class _ErkundenPageState extends State<ErkundenPage>
       for (var i = 0; i < profils.length; i++) {
         if (profils[i]["id"] == familyProfil["mainProfil"]) {
           membersFound += 1;
-          profils[i]["family"] = {"name": familyName, "status": "main"};
+          profils[i]["name"] = familyName;
         } else if (members.contains(profils[i]["id"])) {
           membersFound += 1;
-          profils[i]["family"] = {"name": familyName, "status": "member"};
+          removeProfils.add(profils[i]);
         }
         if (membersFound == members.length) break;
       }
     }
 
-    for (var profil in deleteProfils) {
-      profils.remove(profil);
+    for(var profil in removeProfils){
+      profils.removeWhere((element) => element["id"] == profil["id"]);
     }
   }
 
@@ -412,17 +411,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     var pufferContinents = [];
     var pufferExact = [];
 
-    if (typ == "profils") addCityProfils();
-
     for (var mainItem in mainList) {
-      if (mainItem["family"] != null && typ == "profils") {
-        if (mainItem["family"]["status"] == "main") {
-          mainItem["name"] = mainItem["family"]["name"];
-        } else {
-          continue;
-        }
-      }
-
       pufferCountries =
           await createCountriesZoomLevel(pufferCountries, mainItem);
       pufferContinents =
@@ -484,10 +473,10 @@ class _ErkundenPageState extends State<ErkundenPage>
     var newPoint = false;
 
     for (var i = 0; i < list.length; i++) {
-      double originalLatt = profil["latt"];
-      double newLatt = list[i]["latt"];
-      double originalLongth = profil["longt"];
-      double newLongth = list[i]["longt"];
+      num originalLatt = profil["latt"];
+      num newLatt = list[i]["latt"];
+      num originalLongth = profil["longt"];
+      num newLongth = list[i]["longt"];
       bool check = (newLatt + abstand >= originalLatt &&
               newLatt - abstand <= originalLatt) &&
           (newLongth + abstand >= originalLongth &&
@@ -523,8 +512,8 @@ class _ErkundenPageState extends State<ErkundenPage>
     if (exactLocation && !checkGenauerStandortPrivacy(profil)) return list;
 
     for (var i = 0; i < list.length; i++) {
-      double profilLongt = profil["longt"];
-      double profilLatt = profil["latt"];
+      num profilLongt = profil["longt"];
+      num profilLatt = profil["latt"];
 
       var geodataCondition =
           profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"];
@@ -1341,7 +1330,6 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
 
     Marker eventMarker(numberText, position, buttonFunction, isOnline) {
-      numberText = "12";
       int textLength = numberText.length;
       if(textLength > 2) numberText = "99";
       double markerSize = 32;

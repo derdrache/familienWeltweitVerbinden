@@ -129,7 +129,7 @@ class _MeetupCardState extends State<MeetupCard> {
   }
 
   getMeetupTitle(){
-    String title;
+    String? title;
 
     if(widget.isCreator){
       title =  widget.meetupData["name"];
@@ -139,7 +139,7 @@ class _MeetupCardState extends State<MeetupCard> {
       title =  widget.meetupData["nameEng"];
     }
 
-    return title.isNotEmpty ? title : widget.meetupData["name"];
+    return title ??widget.meetupData["name"];
   }
 
   @override

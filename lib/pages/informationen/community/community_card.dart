@@ -39,7 +39,7 @@ class _CommunityCardState extends State<CommunityCard> {
 
 
   getCommunityTitle(){
-    String title;
+    String? title;
 
     if(widget.isCreator){
       title =  widget.community["name"];
@@ -49,7 +49,7 @@ class _CommunityCardState extends State<CommunityCard> {
       title =  widget.community["nameEng"];
     }
 
-    return title.isNotEmpty ? title : widget.community["name"];
+    return title ?? widget.community["name"];
   }
 
   @override
