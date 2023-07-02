@@ -49,7 +49,7 @@ class OwnIconButton extends StatelessWidget {
             if (badgeText.isNotEmpty)
               Positioned(
                 top: -10,
-                right: -10,
+                right: image != null ? -10 : 10,
                 child: Container(
                     height: 20,
                     width: 20,
