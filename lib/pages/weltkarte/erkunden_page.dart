@@ -1352,6 +1352,9 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
 
     Marker eventMarker(numberText, position, buttonFunction, isOnline) {
+      numberText = "12";
+      int textLength = numberText.length;
+      if(textLength > 2) numberText = "99";
       double markerSize = 32;
 
       return Marker(
@@ -1361,33 +1364,14 @@ class _ErkundenPageState extends State<ErkundenPage>
         builder: (ctx) => IconButton(
           padding: EdgeInsets.zero,
           icon: Stack(
-            clipBehavior: Clip.none,
             children: [
-              Icon(Icons.calendar_today,
-                  size: markerSize,
-                  color: Theme.of(context).colorScheme.primary),
+              Image.asset("assets/icons/calendar.png", width: markerSize, height: markerSize),
               Positioned(
-                  top: 9.5,
-                  left: 5.5,
-                  child: Container(
-                      padding: const EdgeInsets.only(left: 2, top: 1),
-                      width: 21.5,
-                      height: 18,
-                      color: Colors.white,
-                      child: Center(
-                          child: Text(numberText,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.black))))),
-              if (isOnline)
-                Positioned(
-                    top: -20,
-                    left: 4,
-                    child: Icon(
-                      Icons.wifi,
-                      color: Theme.of(context).colorScheme.primary,
-                    ))
+                top: textLength == 1 ?13 : 14.5,
+                right: textLength == 1 ? 11 : 8.7,
+                child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
+                  fontSize: textLength == 1 ? 14 : 12,))
+                ,),
             ],
           ),
           onPressed: buttonFunction,
@@ -1450,13 +1434,13 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
 
     insiderInfoMarker(numberText, position, onPressed){
-      if(numberText.length > 2) numberText = "99";
       double markerSize = 32;
       int textLength = numberText.length;
+      if(textLength > 2) numberText = "99";
 
       return Marker(
-        width: 64,
-        height: 64,
+        width: markerSize * 2,
+        height: markerSize * 2,
         point: position,
         builder: (ctx) => IconButton(
           icon: Stack(
