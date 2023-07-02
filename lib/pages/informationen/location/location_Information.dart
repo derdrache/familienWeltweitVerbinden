@@ -687,17 +687,16 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           "thumbUp = JSON_REMOVE(thumbUp, JSON_UNQUOTE(JSON_SEARCH(thumbUp, 'one', '$userId')))",
           "WHERE id ='$infoId'");
     } else {
-      bool hasThumbDown =
-          usersCityInformation[index]["thumbDown"].contains(userId);
+      bool hasThumbDown = usersCityInformation[index]["thumbDown"].contains(userId);
       usersCityInformation[index]["thumbUp"].add(userId);
       usersCityInformation[index]["thumbDown"].remove(userId);
-      String sqlStatement =
-          "thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')";
-      if (hasThumbDown)
-        sqlStatement +=
-            ",thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))";
+      String sqlStatement = "thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')";
+      if(hasThumbDown) sqlStatement += ",thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))";
 
-      StadtinfoUserDatabase().update(sqlStatement, "WHERE id ='$infoId'");
+      StadtinfoUserDatabase().update(
+          sqlStatement,
+          "WHERE id ='$infoId'");
+
     }
     setState(() {});
   }
@@ -1061,8 +1060,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       var showTitle = informationText["title"];
       var showInformation = informationText["information"];
       var translationIn = informationText["translationIn"];
-      var creatorProfil =
-          getProfilFromHive(profilId: information["erstelltVon"]);
+      var creatorProfil = getProfilFromHive(profilId: information["erstelltVon"]);
       String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
 
       return Container(
