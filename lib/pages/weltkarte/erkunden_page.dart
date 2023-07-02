@@ -756,7 +756,7 @@ class _ErkundenPageState extends State<ErkundenPage>
                         }
                       }
 
-                      deactivateAllButtons();
+                      deactivateAllButtons(reiseplanung: true);
                       reiseplanungOn = true;
 
                       showReiseplaungMatchedProfils(selectedDate[0], selectedDate[1]);
@@ -796,6 +796,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       for (var planung in reiseplanung) {
         var planungVon = DateTime.parse(planung["von"]);
         var planungBis = DateTime.parse(planung["bis"]);
+        bool genauePlanung = planungVon.hour == 1;
 
         if (selectDates.contains(planungVon)) {
           var newProfil = Map.of(profil);
@@ -809,7 +810,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         }
 
         while (planungVon != planungBis) {
-          planungVon =
+          planungVon = genauePlanung ? DateTime(planungVon.year, planungVon.month , planungVon.day +1) :
               DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
           if (selectDates.contains(planungVon)) {
             var newProfil = Map.of(profil);
@@ -1109,7 +1110,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     changeProfilToFamilyProfil();
   }
 
-  deactivateAllButtons({filter = false, friends = false}){
+  deactivateAllButtons({filter = false, friends = false, reiseplanung = false}){
     friendMarkerOn = false;
     eventMarkerOn = false;
     reiseplanungOn = false;
@@ -1118,7 +1119,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     filterOn = false;
     if(!filter) filterList = [];
     popupActive = false;
-    if(!friends) filterProfils();
+    if(!friends && !reiseplanung) filterProfils();
   }
 
   @override
