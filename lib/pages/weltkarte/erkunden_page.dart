@@ -830,6 +830,7 @@ class _ErkundenPageState extends State<ErkundenPage>
           newProfil["latt"] = planung["ortData"]["latt"];
           newProfil["longt"] = planung["ortData"]["longt"];
 
+
           selectedProfils.add(newProfil);
           continue;
         }
