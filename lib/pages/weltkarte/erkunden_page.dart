@@ -40,6 +40,7 @@ class _ErkundenPageState extends State<ErkundenPage>
   var allCities = Hive.box('secureBox').get("stadtinfo") ?? [];
   var events = [];
   var communities = Hive.box('secureBox').get("communities") ?? [];
+  var insiderInfos = [];
   var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
   MapController mapController = MapController();
   Set<String> allUserName = {};
@@ -49,6 +50,7 @@ class _ErkundenPageState extends State<ErkundenPage>
   List aktiveProfils = [];
   List aktiveEvents = [];
   List aktiveCommunities = [];
+  List aktiveInsiderInfos = [];
   List? profilsContinents,
       profilsCountries,
       profilsBetween,
@@ -58,6 +60,8 @@ class _ErkundenPageState extends State<ErkundenPage>
   List? eventsKontinente;
   List? communitiesContinents;
   late List communitiesCountries, communitiesBetween, communitiesCities;
+  late List insiderInfoCountries,insiderInfoBetween,insiderInfoCities;
+  List? insiderInfoContinents;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxZoom = 14;
   double currentMapZoom = 1.6;
@@ -90,7 +94,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     profils = [for (var profil in hiveProfils) Map.of(profil)];
 
     setEvents();
-
+    setInsiderInfo();
     changeProfilToFamilyProfil();
     removeProfilsAndCreateAllUserName();
     sortProfils(profils);
@@ -98,6 +102,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     profilsBackup = profils;
     createAndSetZoomLevels(profils, "profils");
     createAndSetZoomLevels(communities, "communities");
+    createAndSetZoomLevels(insiderInfos, "insiderInfo");
 
     setSearchAutocomplete();
 
@@ -133,6 +138,25 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
 
     createAndSetZoomLevels(events, "events");
+  }
+
+  setInsiderInfo(){
+    for(var info in List.of(Hive.box('secureBox').get("stadtinfoUser"))){
+      Map insiderInfoData = getCityFromHive(cityName: info["ort"]) ?? {};
+
+      info["latt"] = insiderInfoData["latt"];
+      info["longt"] = insiderInfoData["longt"];
+      info["land"] = insiderInfoData["land"];
+
+      if(info["latt"] == null){
+        continue;
+      }else{
+        insiderInfos.add(info);
+      }
+
+
+    }
+
   }
 
   changeAllCitiesAndCreateCityNames() {
@@ -440,6 +464,11 @@ class _ErkundenPageState extends State<ErkundenPage>
       communitiesBetween = pufferBetween;
       communitiesCountries = pufferCountries;
       communitiesContinents = pufferContinents;
+    }else if(typ == "insiderInfo"){
+      insiderInfoCities = pufferCities;
+      insiderInfoBetween = pufferBetween;
+      insiderInfoCountries = pufferCountries;
+      insiderInfoContinents = pufferContinents;
     }
 
     changeProfil(currentMapZoom);
@@ -593,7 +622,6 @@ class _ErkundenPageState extends State<ErkundenPage>
     if (checkNewCountry) {
       var country = profil["land"];
       var position = LocationService().getCountryLocation(country);
-
       list.add({
         "name": profil["name"] == null ? "0" : "1",
         "countryname": country,
@@ -658,28 +686,34 @@ class _ErkundenPageState extends State<ErkundenPage>
     var choosenProfils = [];
     var selectedEventList = [];
     var selectedComunityList = [];
+    var selectedInsiderInfoList = [];
 
     if (zoom > exactZoom) {
       choosenProfils = profilsExact!;
       selectedEventList = eventsCities;
       selectedComunityList = communitiesCities;
+      selectedInsiderInfoList = insiderInfoCities;
     } else if (zoom > cityZoom) {
       choosenProfils = profilsCities!;
       selectedEventList = eventsCities;
       selectedComunityList = communitiesCities;
+      selectedInsiderInfoList = insiderInfoCities;
     } else if (zoom > countryZoom) {
       choosenProfils = profilsBetween!;
       selectedEventList = eventsBetween;
       selectedComunityList = communitiesBetween;
+      selectedInsiderInfoList = insiderInfoBetween;
     } else if (zoom > kontinentZoom) {
       choosenProfils = profilsCountries!;
       selectedEventList = eventsCountries;
       selectedComunityList = communitiesCountries;
+      selectedInsiderInfoList = insiderInfoCountries;
     } else {
       choosenProfils = profilsContinents != null ? profilsContinents! : [];
       selectedEventList = eventsKontinente != null ? eventsKontinente! : [];
       selectedComunityList =
           communitiesContinents != null ? communitiesContinents! : [];
+      selectedInsiderInfoList = insiderInfoContinents != null ? insiderInfoContinents! : [];
     }
 
     if (mounted) {
@@ -687,6 +721,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         aktiveProfils = choosenProfils;
         aktiveEvents = selectedEventList;
         aktiveCommunities = selectedComunityList;
+        aktiveInsiderInfos = selectedInsiderInfoList;
       });
     }
   }
@@ -1376,6 +1411,8 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
 
     communityMarker(numberText, position, buttonFunction) {
+      int textLength = numberText.length;
+      if(textLength > 2) numberText = "99";
       double markerSize = 32;
 
       return Marker(
@@ -1385,29 +1422,14 @@ class _ErkundenPageState extends State<ErkundenPage>
         builder: (ctx) => IconButton(
           padding: EdgeInsets.zero,
           icon: Stack(
-            clipBehavior: Clip.none,
             children: [
-              Icon(Icons.cottage_outlined,
-                  size: markerSize,
-                  color: Theme.of(context).colorScheme.primary),
+              Image.asset("assets/icons/cottage.png", width: markerSize, height: markerSize),
               Positioned(
-                  top: 8,
-                  left: 8.5,
-                  child: Container(
-                      alignment: Alignment.bottomCenter,
-                      padding: const EdgeInsets.only(left: 1),
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(9.0),
-                              topRight: Radius.circular(9.0))),
-                      width: 15,
-                      height: 18,
-                      child: Text(numberText,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: Colors.black)))),
+                top: textLength == 1 ?11 : 13,
+                right: textLength == 1 ? 11 : 8.7,
+                child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
+                  fontSize: textLength == 1 ? 14 : 12,))
+                ,),
             ],
           ),
           onPressed: buttonFunction,
@@ -1427,11 +1449,52 @@ class _ErkundenPageState extends State<ErkundenPage>
       }
     }
 
+    insiderInfoMarker(numberText, position, onPressed){
+      if(numberText.length > 2) numberText = "99";
+      double markerSize = 32;
+      int textLength = numberText.length;
+
+      return Marker(
+        width: 64,
+        height: 64,
+        point: position,
+        builder: (ctx) => IconButton(
+          icon: Stack(
+            children: [
+              Image.asset("assets/icons/bookmark.png", width: markerSize, height: markerSize),
+              Positioned(
+                top: textLength == 1 ?6 : 7,
+                right: textLength == 1 ? 11 : 8.7,
+                child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
+                  fontSize: textLength == 1 ? 14 : 12,))
+                ,),
+            ],
+          ),
+          onPressed: onPressed,
+        ),
+      );
+    }
+
+    createInsiderInfoMarker(){
+      for (var insiderInfo in aktiveInsiderInfos) {
+        var position = LatLng(insiderInfo["latt"], insiderInfo["longt"]);
+
+        allMarker.add(
+          insiderInfoMarker(insiderInfo["name"], position, () {
+            popupActive = true;
+            //createPopupCards(community: community);
+            setState(() {});
+          })
+        );
+      }
+    }
+
     createAllMarker() async {
       createOwnMarker();
-      if (!eventMarkerOn && !communityMarkerOn) createProfilMarker();
+      if (!eventMarkerOn && !communityMarkerOn && !insiderInfoOn) createProfilMarker();
       if (eventMarkerOn) createEventMarker();
       if (communityMarkerOn) createCommunityMarker();
+      if(insiderInfoOn) createInsiderInfoMarker();
     }
 
     ownFlutterMap() {
@@ -1613,6 +1676,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         onPressed: (){
           if(insiderInfoOn){
             insiderInfoOn = false;
+            popupActive = false;
           }else{
             deactivateAllButtons();
             insiderInfoOn = true;
