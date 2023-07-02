@@ -582,7 +582,7 @@ class _SupportInformation extends StatelessWidget {
                 AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
                 () => Share.share(AppLocalizations.of(context)!.teilenLinkText +
-                    '\nhttps://families-worldwide.com/')),
+                    '\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
             const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.spenden, Icons.card_giftcard,
