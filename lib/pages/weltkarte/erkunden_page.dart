@@ -289,25 +289,14 @@ class _ErkundenPageState extends State<ErkundenPage>
         searchableItems: allUserName.toList() + countryList + allCitiesNames,
         onConfirm: () {
           FocusManager.instance.primaryFocus?.unfocus();
-          filterList = searchAutocomplete.getSelected();
-          friendMarkerOn = false;
-          eventMarkerOn = false;
-          reiseplanungOn = false;
-          filterOn = false;
 
-          filterProfils();
+          filterList = searchAutocomplete.getSelected();
+          deactivateAllButtons(filter: true);
           popupActive = true;
           createPopupProfils(profils);
         },
-        onRemove: () {
-          filterList = [];
-          friendMarkerOn = false;
-          eventMarkerOn = false;
-          reiseplanungOn = false;
-          filterOn = false;
-          popupActive = false;
-          filterProfils();
-        });
+        onRemove: () => deactivateAllButtons()
+        );
   }
 
   filterProfils() {
