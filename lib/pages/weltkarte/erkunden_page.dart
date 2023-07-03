@@ -498,7 +498,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       if (check) {
         newPoint = true;
         var numberName =
-            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
+            int.parse(list[i]["name"]) + 1;
 
         list[i]["name"] = numberName.toString();
         list[i]["profils"].add(profil);
@@ -509,7 +509,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     if (!newPoint) {
       list.add({
         "ort": profil["ort"],
-        "name": profil["name"] == null ? "0" : "1",
+        "name": "1",
         "latt": profil["latt"],
         "longt": profil["longt"],
         "profils": [profil]
@@ -537,7 +537,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       if (geodataCondition || (sameCityCondition && !exactLocation)) {
         newCity = false;
         var addNumberName =
-            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
+            int.parse(list[i]["name"]) + 1;
 
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -548,7 +548,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     if (newCity) {
       list.add({
         "ort": profil["ort"],
-        "name": profil["name"] == null ? "0" : "1",
+        "name": "1",
         "latt": profil["latt"],
         "longt": profil["longt"],
         "profils": [profil]
@@ -602,7 +602,7 @@ class _ErkundenPageState extends State<ErkundenPage>
           listCountryLocation["longt"] == profilCountryLocation["longt"]) {
         checkNewCountry = false;
         var addNumberName =
-            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
+            int.parse(list[i]["name"]) + 1;
 
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -614,7 +614,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       var country = profil["land"];
       var position = LocationService().getCountryLocation(country);
       list.add({
-        "name": profil["name"] == null ? "0" : "1",
+        "name": "1",
         "countryname": country,
         "longt": position["longt"] ?? 0,
         "latt": position["latt"] ?? 0,
@@ -1151,11 +1151,12 @@ class _ErkundenPageState extends State<ErkundenPage>
     List<Marker> allMarker = [];
     searchAutocomplete.hintText = AppLocalizations.of(context)!.filterErkunden;
 
-    createPopupCards({event, community, spezialActivation = false}) {
+    createPopupCards({event, community, insiderInfo, spezialActivation = false}) {
       double screenWidth = MediaQuery.of(context).size.width;
       var crossAxisCount = screenWidth / 250;
       popupItems = [];
-      var showItems = event ?? community;
+      var showItems = event ?? community ?? insiderInfo;
+      bool speaksGerman = getUserSpeaksGerman();
 
       popupItems.add(SliverAppBar(
         toolbarHeight: 50,
@@ -1171,7 +1172,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       popupItems.add(SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount.round(),
-            childAspectRatio: 0.75,
+            childAspectRatio: insiderInfo != null ? 2.2 : 0.75,
           ),
           delegate:
               SliverChildBuilderDelegate((BuildContext context, int index) {
@@ -1201,17 +1202,42 @@ class _ErkundenPageState extends State<ErkundenPage>
                     createPopupCards(event: lastEventPopup);
                     setState(() {});
                   });
-            } else {
+            } else if(community != null){
               return CommunityCard(
                 community: itemData,
                 margin: const EdgeInsets.only(
                     top: 15, bottom: 15, left: 25, right: 25),
                 withFavorite: true,
               );
+            } else if(insiderInfo != null){
+              var infoData = insiderInfo["profils"][index];
+              String infoTitle = speaksGerman ? infoData["titleGer"] : infoData["titleEng"];
+              return GestureDetector(
+                  onTap: () {
+                    global_functions.changePage(
+                        context,
+                        LocationInformationPage(ortName: infoData["ort"],insiderInfoId: infoData["id"],));
+                  },
+                child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  margin: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(8)
+                  ),
+                  child: Column(children: [
+                    Text(infoTitle, style: TextStyle(fontWeight: FontWeight.bold),overflow: TextOverflow.ellipsis,),
+                    SizedBox(height: 5,),
+                    Text("${infoData["ort"]}",overflow: TextOverflow.ellipsis,),
+                    Text("${infoData["land"]}",overflow: TextOverflow.ellipsis,),
+                  ],),
+                ),
+              );
             }
           }, childCount: showItems["profils"].length)));
     }
 
+    /*
     createPopupInsiderInfo(infoProfils){
       popupItems = [];
       bool speaksGerman = getUserSpeaksGerman();
@@ -1243,7 +1269,16 @@ class _ErkundenPageState extends State<ErkundenPage>
                   context,
                   LocationInformationPage(ortName: infoData["ort"],insiderInfoId: infoData["id"],));
             },
-            child: Container(
+            child: Card(
+              child: Column(
+                children:[                Text(infoTitle),
+                  Text("${infoData["ort"]} / ${infoData["land"]}")]
+
+              )
+            )
+
+
+            /*Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                     border: Border(
@@ -1261,10 +1296,14 @@ class _ErkundenPageState extends State<ErkundenPage>
                         ])
                   ],
                 )),
+
+             */
           );
         }, childCount: infoProfils.length),
       ));
     }
+
+     */
 
     Widget worldChatButton() {
       return FloatingActionButton(
@@ -1416,7 +1455,7 @@ class _ErkundenPageState extends State<ErkundenPage>
               Positioned(
                 top: textTopPosition,
                 right: textRightPosition,
-                child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
+                child: Text(numberText, style: const TextStyle(                              fontWeight: FontWeight.bold,
                   fontSize: 14))
                 ,),
             ],
@@ -1466,7 +1505,7 @@ class _ErkundenPageState extends State<ErkundenPage>
               Positioned(
                 top: textTopPosition,
                 right: textRightPosition,
-                child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
+                child: Text(numberText, style: const TextStyle(                              fontWeight: FontWeight.bold,
                   fontSize: 14,))
                 ,),
             ],
@@ -1512,7 +1551,7 @@ class _ErkundenPageState extends State<ErkundenPage>
               Positioned(
                 top: textTopPosition,
                 right: textRightPosition,
-                child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
+                child: Text(numberText, style: const TextStyle(                              fontWeight: FontWeight.bold,
                   fontSize: 14))
                 ,),
             ],
@@ -1529,7 +1568,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         allMarker.add(
           insiderInfoMarker(insiderInfo["name"], position, () {
             popupActive = true;
-            createPopupInsiderInfo(insiderInfo["profils"]);
+            createPopupCards(insiderInfo: insiderInfo);
             setState(() {});
           })
         );
