@@ -33,6 +33,8 @@ class _MeetupPageState extends State<MeetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
+    myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
 
     createMeetupCards(meetups, withInteresse) {
       List<Widget> meetupCards = [];

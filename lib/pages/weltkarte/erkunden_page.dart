@@ -122,7 +122,6 @@ class _ErkundenPageState extends State<ErkundenPage>
     await refreshHiveCommunities();
   }
 
-
   setEvents() {
     var localDbEvents = Hive.box('secureBox').get("events") ?? [];
 
@@ -784,12 +783,13 @@ class _ErkundenPageState extends State<ErkundenPage>
   }
 
   setLookForReiseplanung(von, bis) {
+    filterOn = false;
+    filterList = [];
     reiseplanungOn = true;
     eventMarkerOn = false;
     friendMarkerOn = false;
     communityMarkerOn = false;
-    filterOn = false;
-    filterList = [];
+
 
     showReiseplaungMatchedProfils(
         von, bis);
@@ -821,6 +821,7 @@ class _ErkundenPageState extends State<ErkundenPage>
       for (var planung in reiseplanung) {
         var planungVon = DateTime.parse(planung["von"]);
         var planungBis = DateTime.parse(planung["bis"]);
+        bool genauePlanung = planungVon.hour == 1;
 
         if (selectDates.contains(planungVon)) {
           var newProfil = Map.of(profil);
@@ -829,12 +830,13 @@ class _ErkundenPageState extends State<ErkundenPage>
           newProfil["latt"] = planung["ortData"]["latt"];
           newProfil["longt"] = planung["ortData"]["longt"];
 
+
           selectedProfils.add(newProfil);
           continue;
         }
 
         while (planungVon != planungBis) {
-          planungVon =
+          planungVon = genauePlanung ?DateTime(planungVon.year, planungVon.month, planungVon.day + 1) :
               DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
           if (selectDates.contains(planungVon)) {
             var newProfil = Map.of(profil);
@@ -1553,12 +1555,13 @@ class _ErkundenPageState extends State<ErkundenPage>
                 setProfilsFromHive();
                 createAndSetZoomLevels(profils, "profils");
               } else {
+                filterOn = false;
+                filterList = [];
                 friendMarkerOn = true;
                 eventMarkerOn = false;
                 reiseplanungOn = false;
                 communityMarkerOn = false;
-                filterOn = false;
-                filterList = [];
+
 
                 activateFriendlistProfils(ownProfil["friendlist"]);
 
@@ -1619,12 +1622,14 @@ class _ErkundenPageState extends State<ErkundenPage>
                 eventMarkerOn = false;
                 popupActive = false;
               } else {
+                filterOn = false;
+                filterList = [];
+                filterProfils();
                 eventMarkerOn = true;
                 friendMarkerOn = false;
                 reiseplanungOn = false;
                 communityMarkerOn = false;
-                filterOn = false;
-                filterList = [];
+
                 popupActive = false;
 
                 if (newEvents.isNotEmpty) {
@@ -1691,12 +1696,13 @@ class _ErkundenPageState extends State<ErkundenPage>
                 communityMarkerOn = false;
                 popupActive = false;
               } else {
+                filterOn = false;
+                filterList = [];
+                filterProfils();
                 communityMarkerOn = true;
                 eventMarkerOn = false;
                 friendMarkerOn = false;
                 reiseplanungOn = false;
-                filterOn = false;
-                filterList = [];
                 popupActive = false;
 
                 if (newCommunity.isNotEmpty) {

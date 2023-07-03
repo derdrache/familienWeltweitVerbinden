@@ -60,13 +60,11 @@ class _LocationPageState extends State<LocationPage> {
 
   getAllSearchedLocations(){
     var allCities = Hive.box('secureBox').get("stadtinfo");
-    var searchText = citySearchKontroller.text;
+    var searchText = citySearchKontroller.text.toLowerCase();
     var searchedCities = [];
 
-    var searchTextFirstLetterBig = searchText.isEmpty ? "" :searchText.replaceFirst(searchText[0], searchText[0].toUpperCase());
-
     for (var city in allCities) {
-      var containsSearch = city["ort"].contains(searchTextFirstLetterBig)
+      var containsSearch = city["ort"].toLowerCase().contains(searchText)
           || city["ort"].contains(searchText)
           || searchText.isEmpty;
       var isCity = city["isCity"] == 1;
@@ -102,8 +100,6 @@ class _LocationPageState extends State<LocationPage> {
 
     return interestCitiyCards;
   }
-
-
 
   @override
   Widget build(BuildContext context) {

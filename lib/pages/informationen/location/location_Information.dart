@@ -666,11 +666,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
           "thumbUp = JSON_REMOVE(thumbUp, JSON_UNQUOTE(JSON_SEARCH(thumbUp, 'one', '$userId')))",
           "WHERE id ='$infoId'");
     } else {
+      bool hasThumbDown = usersCityInformation[index]["thumbDown"].contains(userId);
       usersCityInformation[index]["thumbUp"].add(userId);
       usersCityInformation[index]["thumbDown"].remove(userId);
+      String sqlStatement = "thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')";
+      if(hasThumbDown) sqlStatement += ",thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId')))";
 
       StadtinfoUserDatabase().update(
-          "thumbDown = JSON_REMOVE(thumbDown, JSON_UNQUOTE(JSON_SEARCH(thumbDown, 'one', '$userId'))), thumbUp = JSON_ARRAY_APPEND(thumbUp, '\$', '$userId')",
+          sqlStatement,
           "WHERE id ='$infoId'");
     }
     setState(() {});
@@ -988,8 +991,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    usersCityInformation = sortInformation(usersCityInformation);
-
     openInformationMenu(positionDetails, information) async {
       double left = positionDetails.globalPosition.dx;
       double top = positionDetails.globalPosition.dy;
@@ -1029,7 +1030,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       var showInformation = informationText["information"];
       var translationIn = informationText["translationIn"];
       var creatorProfil =
-          getProfilFromHive(profilId: information["erstelltVon"]);
+          getProfilFromHive(profilId: information["erstelltVon"]) ?? {};
 
       return Container(
         margin: const EdgeInsets.all(10),
@@ -1113,7 +1114,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                           profil: creatorProfil,
                         )),
                     child: Text(
-                      creatorProfil["name"] +
+                      creatorProfil["name"] ?? "" +
                           " " +
                           information["erstelltAm"]
                               .split("-")
