@@ -56,6 +56,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch1101D),
                   _patch(patch1100D),
                   _patch(patch194D),
                   _patch(patch193D),
@@ -88,6 +89,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch1101E),
                   _patch(patch1100E),
                   _patch(patch194E),
                   _patch(patch193E),
@@ -130,6 +132,26 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+var patch1101E={
+  "title" : "1.10.1 - 04.07.2023",
+  "inhalt": [
+    "World map - Show travel planning works again",
+    "Chat - Card messages with text now also have a Translate button",
+    "Chat - There was a bug that did not set the unread messages to 0 after entering a chat",
+    "Meetup/Community Search - The search is now no longer case sensitive",
+    "Settings - The 'Share with Friends' option now shares the link to the Android and iOS version in addition to the web page."
+  ]
+};
+var patch1101D={
+  "title" : "1.10.1 - 04.07.2023",
+  "inhalt": [
+    "Weltkarte - Reiseplanung anzeigen funktioniert wieder",
+    "Chat - Card Nachrichten mit Text haben jetzt auch ein Translate-Button",
+    "Chat - Es gab ein Fehler, der die ungelesenen Nachrichten nach eintritt in einem Chat nicht auf 0 gesetzt hat",
+    "Meetup/Community Suche - Die Suche ist jetzt nicht mehr case Sensitivity",
+    "Settings - Die 'Mit Freunde teilen' möglichkeit teilt jetzt neben der Webseite auch den Link zur Android und iOS Version"
   ]
 };
 
