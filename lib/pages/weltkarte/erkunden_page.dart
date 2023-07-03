@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
+import 'package:familien_suche/pages/informationen/location/location_Information.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../functions/user_speaks_german.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_var;
@@ -51,12 +53,34 @@ class _ErkundenPageState extends State<ErkundenPage>
   List aktiveEvents = [];
   List aktiveCommunities = [];
   List aktiveInsiderInfos = [];
-  List? profilsContinents, profilsCountries, profilsBetween, profilsCities, profilsExact;
-  late List eventsCountries, eventsBetween, eventsCities;
-  List? eventsKontinente;
-  List? communitiesContinents;
-  late List communitiesCountries, communitiesBetween, communitiesCities;
-  late List insiderInfoCountries,insiderInfoBetween,insiderInfoCities;
+  Map profilLevels = {
+    "continents": [],
+    "countries": [],
+    "between": [],
+    "cities": [],
+    "exact": []
+  };
+  Map meetupLevels = {
+    "continents": [],
+    "countries": [],
+    "between": [],
+    "cities": [],
+    "exact": []
+  };
+  Map communityLevels = {
+    "continents": [],
+    "countries": [],
+    "between": [],
+    "cities": [],
+    "exact": []
+  };
+  Map insiderInfoLevels = {
+    "continents": [],
+    "countries": [],
+    "between": [],
+    "cities": [],
+    "exact": []
+  };
   List? insiderInfoContinents;
   double minMapZoom = kIsWeb ? 2.0 : 1.6;
   double maxZoom = 14;
@@ -68,7 +92,6 @@ class _ErkundenPageState extends State<ErkundenPage>
   late var searchAutocomplete;
   late LatLng mapPosition;
   bool popupActive = false;
-  var popupTyp = "";
   List<Widget> popupItems = [];
   var lastEventPopup;
   var monthsUntilInactive = 3;
@@ -233,9 +256,8 @@ class _ErkundenPageState extends State<ErkundenPage>
 
       var members = familyProfil["members"];
       var membersFound = 0;
-      var familyName = (spracheIstDeutsch ? "Familie:" : "family") +
-          " " +
-          familyProfil["name"];
+      var familyName = (spracheIstDeutsch ? "Familie: " : "family: ") + familyProfil["name"];
+
       for (var i = 0; i < profils.length; i++) {
         if (profils[i]["id"] == familyProfil["mainProfil"]) {
           membersFound += 1;
@@ -412,11 +434,9 @@ class _ErkundenPageState extends State<ErkundenPage>
     var pufferExact = [];
 
     for (var mainItem in mainList) {
-      pufferCountries =
-          await createCountriesZoomLevel(pufferCountries, mainItem);
-      pufferContinents =
-          await createContinentsZoomLevel(pufferContinents, mainItem);
-      pufferBetween = createBetweenZoomLevel(pufferBetween, mainItem, 1);
+      pufferCountries = await createCountriesZoomLevel(pufferCountries, mainItem);
+      pufferContinents = await createContinentsZoomLevel(pufferContinents, mainItem);
+      pufferBetween = createBetweenZoomLevel(pufferBetween, mainItem);
       pufferCities = createCitiesZoomLevel(pufferCities, mainItem);
       if (typ == "profils") {
         pufferExact =
@@ -424,30 +444,22 @@ class _ErkundenPageState extends State<ErkundenPage>
       }
     }
 
-
-
+    late Map typLevels;
     if (typ == "profils") {
-      profilsCities = pufferCities;
-      profilsBetween = pufferBetween;
-      profilsCountries = pufferCountries;
-      profilsContinents = pufferContinents;
-      profilsExact = pufferExact;
+      typLevels = profilLevels;
     } else if (typ == "events") {
-      eventsCities = pufferCities;
-      eventsBetween = pufferBetween;
-      eventsCountries = pufferCountries;
-      eventsKontinente = pufferContinents;
+      typLevels = meetupLevels;
     } else if (typ == "communities") {
-      communitiesCities = pufferCities;
-      communitiesBetween = pufferBetween;
-      communitiesCountries = pufferCountries;
-      communitiesContinents = pufferContinents;
+      typLevels = communityLevels;
     }else if(typ == "insiderInfo"){
-      insiderInfoCities = pufferCities;
-      insiderInfoBetween = pufferBetween;
-      insiderInfoCountries = pufferCountries;
-      insiderInfoContinents = pufferContinents;
+      typLevels = insiderInfoLevels;
     }
+
+    typLevels["continents"] = pufferContinents;
+    typLevels["countries"] = pufferCountries;
+    typLevels["between"] = pufferBetween;
+    typLevels["cities"] = pufferCities;
+    typLevels["exact"] = pufferExact;
 
     changeProfil(currentMapZoom);
   }
@@ -469,7 +481,8 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
   }
 
-  createBetweenZoomLevel(list, profil, abstand) {
+  createBetweenZoomLevel(list, profil) {
+    var abstand = 1;
     var newPoint = false;
 
     for (var i = 0; i < list.length; i++) {
@@ -618,6 +631,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     var landGedataProfil = LocationService().getCountryLocation(profil["land"]);
     if (landGedataProfil == null) return list;
 
+
     landGedataProfil["kontinentGer"] ??= landGedataProfil["nameGer"];
     landGedataProfil["kontinentEng"] ??= landGedataProfil["nameEng"];
 
@@ -637,7 +651,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         newPoint = false;
 
         var addNumberName =
-            int.parse(list[i]["name"]) + (profil["name"] == null ? 0 : 1);
+            int.parse(list[i]["name"]) + 1;
 
         list[i]["name"] = addNumberName.toString();
         list[i]["profils"].add(profil);
@@ -650,7 +664,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         "kontinentName": landGedataProfil["kontinentGer"],
         "kontinent":
             landGedataProfil["kontinentGer"] ?? landGedataProfil["land"],
-        "name": profil["name"] == null ? "0" : "1",
+        "name": "1",
         "latt": kontinentGeodataProfil["latt"] ?? landGedataProfil["latt"],
         "longt": kontinentGeodataProfil["longt"] ?? landGedataProfil["longt"],
         "profils": [profil]
@@ -667,31 +681,30 @@ class _ErkundenPageState extends State<ErkundenPage>
     var selectedInsiderInfoList = [];
 
     if (zoom > exactZoom) {
-      choosenProfils = profilsExact!;
-      selectedEventList = eventsCities;
-      selectedComunityList = communitiesCities;
-      selectedInsiderInfoList = insiderInfoCities;
+      choosenProfils = profilLevels["exact"];
+      selectedEventList =meetupLevels["cities"];
+      selectedComunityList = communityLevels["cities"];
+      selectedInsiderInfoList = insiderInfoLevels["cities"];
     } else if (zoom > cityZoom) {
-      choosenProfils = profilsCities!;
-      selectedEventList = eventsCities;
-      selectedComunityList = communitiesCities;
-      selectedInsiderInfoList = insiderInfoCities;
+      choosenProfils = profilLevels["cities"];
+      selectedEventList =meetupLevels["cities"];
+      selectedComunityList = communityLevels["cities"];
+      selectedInsiderInfoList = insiderInfoLevels["cities"];
     } else if (zoom > countryZoom) {
-      choosenProfils = profilsBetween!;
-      selectedEventList = eventsBetween;
-      selectedComunityList = communitiesBetween;
-      selectedInsiderInfoList = insiderInfoBetween;
+      choosenProfils = profilLevels["between"];
+      selectedEventList =meetupLevels["between"];
+      selectedComunityList = communityLevels["between"];
+      selectedInsiderInfoList = insiderInfoLevels["between"];
     } else if (zoom > kontinentZoom) {
-      choosenProfils = profilsCountries!;
-      selectedEventList = eventsCountries;
-      selectedComunityList = communitiesCountries;
-      selectedInsiderInfoList = insiderInfoCountries;
+      choosenProfils = profilLevels["countries"];
+      selectedEventList =meetupLevels["countries"];
+      selectedComunityList = communityLevels["countries"];
+      selectedInsiderInfoList = insiderInfoLevels["countries"];
     } else {
-      choosenProfils = profilsContinents != null ? profilsContinents! : [];
-      selectedEventList = eventsKontinente != null ? eventsKontinente! : [];
-      selectedComunityList =
-          communitiesContinents != null ? communitiesContinents! : [];
-      selectedInsiderInfoList = insiderInfoContinents != null ? insiderInfoContinents! : [];
+      choosenProfils = profilLevels["continents"];
+      selectedEventList =meetupLevels["continents"];
+      selectedComunityList = communityLevels["continents"];
+      selectedInsiderInfoList = insiderInfoLevels["continents"];
     }
 
     if (mounted) {
@@ -952,8 +965,8 @@ class _ErkundenPageState extends State<ErkundenPage>
   }
 
   createPopupProfils(profils, {spezialActivation = false}) {
+    print("test");
     popupItems = [];
-    popupTyp = "profils";
     var selectUserProfils = [];
 
     for (var profil in profils) {
@@ -1000,9 +1013,9 @@ class _ErkundenPageState extends State<ErkundenPage>
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         var profilData = selectUserProfils[index];
         var genauerStandortKondition = profilData["automaticLocation"] ==
-                global_var.standortbestimmung[1] ||
+            global_var.standortbestimmung[1] ||
             profilData["automaticLocation"] ==
-                    global_var.standortbestimmungEnglisch[1] &&
+                global_var.standortbestimmungEnglisch[1] &&
                 checkGenauerStandortPrivacy(profilData);
 
         return GestureDetector(
@@ -1036,20 +1049,18 @@ class _ErkundenPageState extends State<ErkundenPage>
                         const SizedBox(height: 5),
                         genauerStandortKondition
                             ? Text("📍 " +
-                                changeTextLength(profilData["ort"]) +
-                                ", " +
-                                changeTextLength(profilData["land"]))
+                            changeTextLength(profilData["ort"]) +
+                            ", " +
+                            changeTextLength(profilData["land"]))
                             : Text(changeTextLength(profilData["ort"]) +
-                                ", " +
-                                changeTextLength(profilData["land"]))
+                            ", " +
+                            changeTextLength(profilData["land"]))
                       ])
                 ],
               )),
         );
       }, childCount: selectUserProfils.length),
     ));
-
-    return popupItems;
   }
 
   selectPopupMenuText(profils, spezialActivation) {
@@ -1144,7 +1155,6 @@ class _ErkundenPageState extends State<ErkundenPage>
       double screenWidth = MediaQuery.of(context).size.width;
       var crossAxisCount = screenWidth / 250;
       popupItems = [];
-      popupTyp = event != null ? "events" : "community";
       var showItems = event ?? community;
 
       popupItems.add(SliverAppBar(
@@ -1200,8 +1210,60 @@ class _ErkundenPageState extends State<ErkundenPage>
               );
             }
           }, childCount: showItems["profils"].length)));
+    }
 
-      return popupItems;
+    createPopupInsiderInfo(infoProfils){
+      popupItems = [];
+      bool speaksGerman = getUserSpeaksGerman();
+
+      popupItems.add(SliverAppBar(
+        toolbarHeight: kIsWeb ? 60 : 50,
+        backgroundColor: Colors.white,
+        flexibleSpace: Container(
+          alignment: Alignment.center,
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+          child: Text(selectPopupMenuText(profils, false),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        ),
+        pinned: true,
+      ));
+
+
+      popupItems.add(SliverFixedExtentList(
+        itemExtent: 90,
+        delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+          var infoData = infoProfils[index];
+          String infoTitle = speaksGerman ? infoData["titleGer"] : infoData["titleEng"];
+
+          return GestureDetector(
+            onTap: () {
+              global_functions.changePage(
+                  context,
+                  LocationInformationPage(ortName: infoData["ort"],insiderInfoId: infoData["id"],));
+            },
+            child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    border: Border(
+                        bottom: BorderSide(
+                            width: 1, color: global_var.borderColorGrey))),
+                child: Row(
+                  children: [
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            infoTitle,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ])
+                  ],
+                )),
+          );
+        }, childCount: infoProfils.length),
+      ));
     }
 
     Widget worldChatButton() {
@@ -1443,7 +1505,7 @@ class _ErkundenPageState extends State<ErkundenPage>
         allMarker.add(
           insiderInfoMarker(insiderInfo["name"], position, () {
             popupActive = true;
-            //createPopupCards(community: community);
+            createPopupInsiderInfo(insiderInfo["profils"]);
             setState(() {});
           })
         );
@@ -1452,6 +1514,7 @@ class _ErkundenPageState extends State<ErkundenPage>
 
     createAllMarker() async {
       createOwnMarker();
+
       if (!eventMarkerOn && !communityMarkerOn && !insiderInfoOn) createProfilMarker();
       if (eventMarkerOn) createEventMarker();
       if (communityMarkerOn) createCommunityMarker();
@@ -1642,7 +1705,6 @@ class _ErkundenPageState extends State<ErkundenPage>
             deactivateAllButtons();
             insiderInfoOn = true;
           }
-
 
           setState(() {});
         },

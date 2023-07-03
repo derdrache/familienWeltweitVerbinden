@@ -28,8 +28,9 @@ import 'weltkarte_mini.dart';
 class LocationInformationPage extends StatefulWidget {
   var ortName;
   var fromCityPage;
+  int? insiderInfoId;
 
-  LocationInformationPage({Key? key, this.ortName, this.fromCityPage = false})
+  LocationInformationPage({Key? key, this.ortName, this.fromCityPage = false, this.insiderInfoId})
       : super(key: key);
 
   @override
@@ -48,6 +49,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
 
   @override
   void initState() {
+    _selectNavigationIndex = widget.insiderInfoId != null ? 1 : 0;
     location = getCityFromHive(cityName: widget.ortName);
 
     location["familien"].remove(userId);
@@ -59,7 +61,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         usersCityInformation: usersCityInformation,
         fromCityPage: widget.fromCityPage,
       ),
-      InsiderInformationPage(location: location),
+      InsiderInformationPage(location: location, insiderInfoId: widget.insiderInfoId),
     ];
     addLastTab();
 
@@ -513,8 +515,9 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
 class InsiderInformationPage extends StatefulWidget {
   Map location;
+  int? insiderInfoId;
 
-  InsiderInformationPage({Key? key, required this.location}) : super(key: key);
+  InsiderInformationPage({Key? key, required this.location, this.insiderInfoId}) : super(key: key);
 
   @override
   State<InsiderInformationPage> createState() => _InsiderInformationPageState();
@@ -528,14 +531,21 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   String systemLanguage =
       WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
   late bool userSpeakGerman;
+  int initalPage = 0;
 
   @override
   void initState() {
     userSpeakGerman = getUserSpeaksGerman();
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
-    usersCityInformation.forEach((element) {
+    usersCityInformation.asMap().forEach((index, element) {
+      if(element["id"] == widget.insiderInfoId) {
+
+        initalPage = index;
+      }
       usersCityInformationOriginal.add(false);
     });
+
+
     super.initState();
   }
 
@@ -1022,6 +1032,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   Widget build(BuildContext context) {
+
     openInformationMenu(positionDetails, information) async {
       double left = positionDetails.globalPosition.dx;
       double top = positionDetails.globalPosition.dy;
@@ -1237,7 +1248,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       }
 
       return CarouselSlider(
-        options: CarouselOptions(height: double.infinity),
+        options: CarouselOptions(height: double.infinity, initialPage: initalPage),
         items: userCityInfo.map((card) {
           return Builder(
             builder: (BuildContext context) {
