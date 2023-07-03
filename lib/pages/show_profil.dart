@@ -56,16 +56,17 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
         : Platform.localeName == "de_DE";
     familyProfil = getFamilyProfil(familyMember: profil["id"]);
 
-    if (familyProfil == null
-        || familyProfil!["active"] == 0
-        || familyProfil!["mainProfil"].isEmpty
-        || familyProfil!["name"].isEmpty) {
+    if (familyProfil == null ||
+        familyProfil!["active"] == 0 ||
+        familyProfil!["mainProfil"].isEmpty ||
+        familyProfil!["name"].isEmpty) {
       familyProfil = null;
       return;
     }
 
     var familyName = familyProfil!["name"];
-    var mainMemberProfil = Map.of(getProfilFromHive(profilId: familyProfil!["mainProfil"]));
+    var mainMemberProfil =
+        Map.of(getProfilFromHive(profilId: familyProfil!["mainProfil"]));
     mainMemberProfil["name"] =
         "${spracheIstDeutsch ? "Familie" : "Family"} " + familyName;
     profil = mainMemberProfil;
@@ -73,7 +74,6 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return SelectionArea(
       child: Scaffold(
         appBar: _AppBar(profil: profil, familyProfil: familyProfil),
@@ -82,7 +82,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
             width: double.maxFinite,
             child: Scrollbar(
               child: ScrollConfiguration(
-                behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+                behavior:
+                    ScrollConfiguration.of(context).copyWith(dragDevices: {
                   PointerDeviceKind.touch,
                   PointerDeviceKind.mouse,
                 }),
@@ -104,7 +105,8 @@ class _AppBar extends StatefulWidget implements PreferredSizeWidget {
   final Map profil;
   final Map? familyProfil;
 
-  const _AppBar({Key? key, required this.profil, this.familyProfil}) : super(key: key);
+  const _AppBar({Key? key, required this.profil, this.familyProfil})
+      : super(key: key);
 
   @override
   State<_AppBar> createState() => _AppBarState();
@@ -120,9 +122,9 @@ class _AppBarState extends State<_AppBar> {
   late bool _isOwnProfil;
 
   @override
-  void initState(){
-    bool isFmailyMember = widget.familyProfil != null
-        && widget.familyProfil!["members"].contains(userId);
+  void initState() {
+    bool isFmailyMember = widget.familyProfil != null &&
+        widget.familyProfil!["members"].contains(userId);
     _isOwnProfil = widget.profil["id"] == userId || isFmailyMember;
     _userName = widget.profil["name"];
 
@@ -131,33 +133,31 @@ class _AppBarState extends State<_AppBar> {
     super.initState();
   }
 
-  createUserNotizen() async{
-    if(ownProfil["userNotizen"] != null) return;
+  createUserNotizen() async {
+    if (ownProfil["userNotizen"] != null) return;
 
-    var userNotizen = await NotizDatabase().getData("userNotizen", "WHERE id = '$userId'");
+    var userNotizen =
+        await NotizDatabase().getData("userNotizen", "WHERE id = '$userId'");
 
-    if(userNotizen == false){
+    if (userNotizen == false) {
       NotizDatabase().newNotize();
       ownProfil["userNotizen"] = {};
-    }else{
-      if(userNotizen.isNotEmpty){
+    } else {
+      if (userNotizen.isNotEmpty) {
         userNotizen = decrypt(userNotizen);
         userNotizen = json.decode(userNotizen);
       }
       ownProfil["userNotizen"] = userNotizen;
     }
-
   }
 
-  saveNotiz(notiz){
+  saveNotiz(notiz) {
     ownProfil["userNotizen"][widget.profil["id"]] = notiz;
 
     var encryptNotes = encrypt(json.encode(ownProfil["userNotizen"]));
 
-    NotizDatabase().update(
-        "userNotizen = '$encryptNotes'",
-        "WHERE id = '$userId'"
-    );
+    NotizDatabase()
+        .update("userNotizen = '$encryptNotes'", "WHERE id = '$userId'");
   }
 
   openChat(chatpartnerId, chatpartnerName) async {
@@ -168,22 +168,22 @@ class _AppBarState extends State<_AppBar> {
         ));
   }
 
-  openNoteWindow(){
+  openNoteWindow() {
     TextEditingController userNotizController = TextEditingController();
     bool changeNote = false;
 
     showDialog(
         context: context,
         builder: (BuildContext buildContext) {
-          return StatefulBuilder(
-            builder: (context, noteState) {
-              var notizen = ownProfil["userNotizen"];
-              var userNotiz = notizen[widget.profil["id"]];
+          return StatefulBuilder(builder: (context, noteState) {
+            var notizen = ownProfil["userNotizen"];
+            var userNotiz = notizen[widget.profil["id"]];
 
-              return CustomAlertDialog(
-                  title: AppLocalizations.of(context)!.notizeUeber + _userName,
-                  children: [
-                    if(userNotiz == null || changeNote) TextField(
+            return CustomAlertDialog(
+                title: AppLocalizations.of(context)!.notizeUeber + _userName,
+                children: [
+                  if (userNotiz == null || changeNote)
+                    TextField(
                       controller: userNotizController,
                       maxLines: 10,
                       decoration: InputDecoration(
@@ -191,35 +191,33 @@ class _AppBarState extends State<_AppBar> {
                         hintText: AppLocalizations.of(context)!.notizEingeben,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    if(userNotiz== null || changeNote) FloatingActionButton.extended(
-                      label: Text(AppLocalizations.of(context)!.speichern),
-                        onPressed: (){
+                  const SizedBox(height: 10),
+                  if (userNotiz == null || changeNote)
+                    FloatingActionButton.extended(
+                        label: Text(AppLocalizations.of(context)!.speichern),
+                        onPressed: () {
                           saveNotiz(userNotizController.text);
 
                           noteState(() {
                             changeNote = false;
                           });
-                        }
-                    ),
-                    if(userNotiz != null && !changeNote) InkWell(
-                      onTap: ()=> noteState((){
-                        changeNote = true;
-                        userNotizController.text = userNotiz;
-                      }),
-                      child: Text(userNotiz, maxLines: 10)
-                    ),
-                    const SizedBox(height: 5)
-                  ]);
-            }
-          );
+                        }),
+                  if (userNotiz != null && !changeNote)
+                    InkWell(
+                        onTap: () => noteState(() {
+                              changeNote = true;
+                              userNotizController.text = userNotiz;
+                            }),
+                        child: Text(userNotiz, maxLines: 10)),
+                  const SizedBox(height: 5)
+                ]);
+          });
         });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    openNoteButton(){
+    openNoteButton() {
       return IconButton(
         icon: const Icon(Icons.description),
         onPressed: () => openNoteWindow(),
@@ -470,13 +468,12 @@ class _UserNameDisplay extends StatelessWidget {
   Map profil;
   Map? familyProfil;
 
-  _UserNameDisplay({Key? key, required this.profil, this.familyProfil}) : super(key: key);
-
-
+  _UserNameDisplay({Key? key, required this.profil, this.familyProfil})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width*0.7;
+    double screenWidth = MediaQuery.of(context).size.width * 0.7;
 
     openChat(chatpartnerId, chatpartnerName) async {
       global_functions.changePage(
@@ -523,8 +520,7 @@ class _UserNameDisplay extends StatelessWidget {
                         profil["name"],
                         style: TextStyle(
                             fontSize: profil["name"].length > 20 ? 20 : 24,
-                            fontWeight: FontWeight.bold
-                        ),
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                     if (familyProfil != null) const SizedBox(height: 5),
@@ -543,7 +539,8 @@ class _UserNameDisplay extends StatelessWidget {
 class _UserInformationDisplay extends StatelessWidget {
   final Map profil;
 
-  const _UserInformationDisplay({Key? key, required this.profil}) : super(key: key);
+  const _UserInformationDisplay({Key? key, required this.profil})
+      : super(key: key);
 
   checkAccessReiseplanung() {
     var ownProfil = Hive.box("secureBox").get("ownProfil");
@@ -610,17 +607,22 @@ class _UserInformationDisplay extends StatelessWidget {
 
     locationBox() {
       return GestureDetector(
-        onTap: () => changePage(context, LocationInformationPage(ortName: profil["ort"])),
+        onTap: () => changePage(
+            context, LocationInformationPage(ortName: profil["ort"])),
         child: Row(
           children: [
             Text(
               "${AppLocalizations.of(context)!.aktuelleOrt}: ",
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold,decoration: TextDecoration.underline),
+              style: TextStyle(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline),
             ),
             Flexible(
                 child: Text(
               profil["ort"],
-              style: TextStyle(fontSize: textSize, decoration: TextDecoration.underline),
+              style: TextStyle(
+                  fontSize: textSize, decoration: TextDecoration.underline),
               maxLines: 2,
             ))
           ],
@@ -754,7 +756,7 @@ class _UserInformationDisplay extends StatelessWidget {
             const SizedBox(height: 5),
             TextWithHyperlinkDetection(
               text: profil["aboutme"],
-              fontsize: textSize-1,
+              fontsize: textSize - 1,
             )
           ],
         ),
@@ -783,18 +785,23 @@ class _UserInformationDisplay extends StatelessWidget {
         }
 
         reiseplanung.add(GestureDetector(
-          onTap: () => changePage(context, LocationInformationPage(ortName: reiseplan["ortData"]["city"])),
+          onTap: () => changePage(context,
+              LocationInformationPage(ortName: reiseplan["ortData"]["city"])),
           child: Container(
             margin: const EdgeInsets.only(bottom: 5),
             child: Row(
               children: [
-                Row(children: [
-                  Text(
-                      "${transformDateToText(reiseplan["von"])} - ${transformDateToText(reiseplan["bis"], onlyMonth: true)} in ",
-                      style: TextStyle(fontSize: textSize)),
-                  Text(ortText,
-                      style: TextStyle(fontSize: textSize, decoration: TextDecoration.underline))
-                ],),
+                Row(
+                  children: [
+                    Text(
+                        "${transformDateToText(reiseplan["von"])} - ${transformDateToText(reiseplan["bis"], onlyMonth: true)} in ",
+                        style: TextStyle(fontSize: textSize)),
+                    Text(ortText,
+                        style: TextStyle(
+                            fontSize: textSize,
+                            decoration: TextDecoration.underline))
+                  ],
+                ),
               ],
             ),
           ),
@@ -809,8 +816,8 @@ class _UserInformationDisplay extends StatelessWidget {
               style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
             ),
             if (isOwnProfil)
-              Text("${"(${AppLocalizations.of(context)!.fuer}" +
-                  reiseplanungPrivacy})")
+              Text(
+                  "${"(${AppLocalizations.of(context)!.fuer}" + reiseplanungPrivacy})")
           ],
         ),
         const SizedBox(height: 5),
@@ -825,11 +832,16 @@ class _UserInformationDisplay extends StatelessWidget {
         child: Container(
           margin: EdgeInsets.only(top: columnSpacing, bottom: columnSpacing),
           child: Row(children: [
-            Text("${AppLocalizations.of(context)!.besuchteLaender}: ",
-                style:
-                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold, decoration: TextDecoration.underline), ),
+            Text(
+              "${AppLocalizations.of(context)!.besuchteLaender}: ",
+              style: TextStyle(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline),
+            ),
             Text(profil["besuchteLaender"].length.toString(),
-                style: TextStyle(fontSize: textSize, decoration: TextDecoration.underline))
+                style: TextStyle(
+                    fontSize: textSize, decoration: TextDecoration.underline))
           ]),
         ),
       );
@@ -863,36 +875,39 @@ class _UserInformationDisplay extends StatelessWidget {
       return Text(text, style: TextStyle(color: color, fontSize: size));
     }
 
-    socialMediaItem(link){
+    socialMediaItem(link) {
+      String hyperlinkText = link;
+
+
       return Container(
         margin: const EdgeInsets.all(5),
         child: Row(
           children: [
             const Text("- "),
-            TextWithHyperlinkDetection(text: link,)
+
+            Container(width: 300,child: TextWithHyperlinkDetection(text: link, maxLines: 1,))
           ],
         ),
       );
     }
 
-    socialMediaBox(){
+    socialMediaBox() {
       List<Widget> socialMediaContent = [];
 
-      for(var socialMediaLink in profil["socialMediaLinks"]){
+      for (var socialMediaLink in profil["socialMediaLinks"]) {
         socialMediaContent.add(socialMediaItem(socialMediaLink));
       }
 
       return Container(
           margin: const EdgeInsets.only(bottom: 10),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text("Social Media: ",
                 style:
-                TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
             ...socialMediaContent
           ]));
     }
-
-
 
     return Container(
         padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
@@ -922,7 +937,7 @@ class _UserInformationDisplay extends StatelessWidget {
             kinderBox(),
             besuchteLaenderBox(),
             if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
-            if(profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
+            if (profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
             if (profil["aboutme"].isNotEmpty) aboutmeBox(),
             interessenBox(),
             SizedBox(height: columnSpacing),
@@ -930,5 +945,3 @@ class _UserInformationDisplay extends StatelessWidget {
         ));
   }
 }
-
-

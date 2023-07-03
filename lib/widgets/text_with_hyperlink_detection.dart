@@ -11,9 +11,10 @@ class TextWithHyperlinkDetection extends StatelessWidget {
   var hyperlinkColor = Colors.blue[700];
   var textColor = Colors.black;
   bool withoutActiveHyperLink;
+  int? maxLines;
 
   TextWithHyperlinkDetection(
-      {Key? key, required this.text, this.fontsize = 15, this.onTextTab, this.withoutActiveHyperLink = false})
+      {Key? key, required this.text, this.fontsize = 15, this.onTextTab, this.withoutActiveHyperLink = false, this.maxLines})
       : super(key: key);
 
   @override
@@ -74,7 +75,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       addNormalText(text);
     }
 
-    return SelectableText.rich(TextSpan(children: newTextList));
+    return SelectableText.rich(TextSpan(children: newTextList), maxLines: maxLines);
 
   }
 
