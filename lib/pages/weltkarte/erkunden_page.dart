@@ -1392,9 +1392,17 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
 
     Marker eventMarker(numberText, position, buttonFunction, isOnline) {
-      int textLength = numberText.length;
-      if(textLength > 2) numberText = "99";
       double markerSize = 32;
+      double textTopPosition = 13;
+      double textRightPosition = 11;
+
+      if(numberText.length > 2) numberText = "99";
+
+      if (numberText.length == 2) {
+        textTopPosition += 4;
+        textRightPosition -= 1;
+        markerSize += 6;
+      }
 
       return Marker(
         width: markerSize,
@@ -1406,10 +1414,10 @@ class _ErkundenPageState extends State<ErkundenPage>
             children: [
               Image.asset("assets/icons/calendar.png", width: markerSize, height: markerSize),
               Positioned(
-                top: textLength == 1 ?13 : 14.5,
-                right: textLength == 1 ? 11 : 8.7,
+                top: textTopPosition,
+                right: textRightPosition,
                 child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
-                  fontSize: textLength == 1 ? 14 : 12,))
+                  fontSize: 14))
                 ,),
             ],
           ),
@@ -1434,9 +1442,17 @@ class _ErkundenPageState extends State<ErkundenPage>
     }
 
     communityMarker(numberText, position, buttonFunction) {
-      int textLength = numberText.length;
-      if(textLength > 2) numberText = "99";
       double markerSize = 32;
+      double textTopPosition = 11;
+      double textRightPosition = 11;
+
+      if(numberText.length > 2) numberText = "99";
+
+      if (numberText.length == 2) {
+        textTopPosition += 4;
+        textRightPosition -= 1;
+        markerSize += 6;
+      }
 
       return Marker(
         width: markerSize,
@@ -1448,10 +1464,10 @@ class _ErkundenPageState extends State<ErkundenPage>
             children: [
               Image.asset("assets/icons/cottage.png", width: markerSize, height: markerSize),
               Positioned(
-                top: textLength == 1 ?11 : 13,
-                right: textLength == 1 ? 11 : 8.7,
+                top: textTopPosition,
+                right: textRightPosition,
                 child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
-                  fontSize: textLength == 1 ? 14 : 12,))
+                  fontSize: 14,))
                 ,),
             ],
           ),
@@ -1474,8 +1490,16 @@ class _ErkundenPageState extends State<ErkundenPage>
 
     insiderInfoMarker(numberText, position, onPressed){
       double markerSize = 32;
-      int textLength = numberText.length;
-      if(textLength > 2) numberText = "99";
+      double textTopPosition = 6;
+      double textRightPosition = 11;
+
+      if(numberText.length > 3) numberText = "99";
+
+      if (numberText.length == 2) {
+        textTopPosition += 4;
+        textRightPosition -= 1;
+        markerSize += 6;
+      }
 
       return Marker(
         width: markerSize * 2,
@@ -1486,10 +1510,10 @@ class _ErkundenPageState extends State<ErkundenPage>
             children: [
               Image.asset("assets/icons/bookmark.png", width: markerSize, height: markerSize),
               Positioned(
-                top: textLength == 1 ?6 : 7,
-                right: textLength == 1 ? 11 : 8.7,
+                top: textTopPosition,
+                right: textRightPosition,
                 child: Text(numberText, style: TextStyle(                              fontWeight: FontWeight.bold,
-                  fontSize: textLength == 1 ? 14 : 12,))
+                  fontSize: 14))
                 ,),
             ],
           ),
