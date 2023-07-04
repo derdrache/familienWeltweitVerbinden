@@ -22,6 +22,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../global/global_functions.dart' as global_func;
 import '../../global/global_functions.dart';
+import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
@@ -241,8 +242,8 @@ class _ProfilSection extends StatelessWidget {
         : global_func.changeGermanToEnglish(userProfil["reiseart"]);
 
     sprachenInputBox.selected = List<String>.from(spracheIstDeutsch
-        ? global_func.changeEnglishToGerman(userProfil["sprachen"])
-        : global_func.changeGermanToEnglish(userProfil["sprachen"]));
+        ? ProfilSprachen().translateLanguageList(englishList: userProfil["sprachen"])
+        : ProfilSprachen().translateLanguageList(germanList: userProfil["sprachen"]));
   }
 
   _ProfilSection({Key? key, required this.afterChange}) : super(key: key);

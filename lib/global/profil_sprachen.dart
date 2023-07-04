@@ -879,58 +879,29 @@ class ProfilSprachen{
     return _languages[isoCode];
   }
 
+  translateLanguageList({germanList, englishList}){
+    List translatedList = [];
+
+    if(germanList == null){
+      for (var element in _languages.values) {
+        if(germanList.contains(element["nameGer"])
+            || germanList.contains(element["nameEng"])){
+          translatedList.add(element["nameEng"]);
+        }
+      }
+    }else{
+      for (var element in _languages.values) {
+        if(englishList.contains(element["nameEng"])
+            || englishList.contains(element["nameGer"])){
+          translatedList.add(element["nameGer"]);
+        }
+      }
+    }
+
+    return translatedList;
+  }
 
 }
-
-/*
-final List<String> sprachenListeGer = [
-  "Deutsch",
-  "Englisch",
-  "Spanisch",
-  "Chinesisch",
-  "Französisch",
-  "Arabisch",
-  "Russisch",
-  "Italienisch",
-  "Portugiesisch",
-  "Japanisch",
-  "Türkisch",
-  "Polnisch",
-  "Niederländisch",
-  "Hindi",
-  "Bengalisch",
-  "Indonesisch",
-  "Vietnamesisch",
-  "Koreanisch",
-  "Thai",
-  "Schwedisch"
-];
-
-final List<String> sprachenListeEng = [
-  "german",
-  "english",
-  "spanish",
-  "chinese",
-  "french",
-  "arabic",
-  "russian",
-  "italian",
-  "portuguese",
-  "japanese",
-  "turkish",
-  "polish",
-  "dutch",
-  "hindi",
-  "bengali",
-  "indonesian",
-  "vietnamese",
-  "korean",
-  "thai",
-  "swedish"
-];
-
-
- */
 
 
 
