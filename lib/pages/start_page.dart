@@ -131,6 +131,8 @@ class _StartPageState extends State<StartPage> {
     var userDeviceTokenReal =
         kIsWeb ? null : await FirebaseMessaging.instance.getToken();
 
+    if(userDeviceTokenReal == null) return;
+
     if (userDeviceTokenDb != userDeviceTokenReal) {
       ProfilDatabase().updateProfil(
           "token = '$userDeviceTokenReal'", "WHERE id = '$userId'");

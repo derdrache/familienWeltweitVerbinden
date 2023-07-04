@@ -982,14 +982,6 @@ class ReportsDatabase {
           "title": title,
           "beschreibung": beschreibung,
         }));
-
-    sendEmail({
-      "title": "Eine Meldung ist eingegangen",
-      "inhalt": """
-      $title \n
-      $beschreibung
-      """
-    });
   }
 }
 

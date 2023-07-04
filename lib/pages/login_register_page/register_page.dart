@@ -4,7 +4,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
-import '../../services/notification.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../windows/nutzerrichtlinen.dart';
 import 'create_profil_page.dart';
@@ -59,13 +58,6 @@ class _RegisterPageState extends State<RegisterPage> {
         } else if (error.code == "network-request-failed") {
           customSnackbar(
               context, AppLocalizations.of(context)!.keineVerbindungInternet);
-        } else {
-          sendEmail({
-            "title": "Registrierungs Problem",
-            "inhalt": """
-             Email: ${FirebaseAuth.instance.currentUser?.email} hat Probleme mit dem Login
-             Folgendes Problem ist aufgetaucht: $error"""
-          });
         }
       }
     }

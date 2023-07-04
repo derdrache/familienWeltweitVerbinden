@@ -7,22 +7,6 @@ import '../global/global_functions.dart' as global_funcs;
 import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-sendEmail(notificationInformation, {targetEmail}) async {
-  var userId = FirebaseAuth.instance.currentUser?.uid;
-  if (userId == "appStoreViewAccount") return;
-
-  var url = Uri.parse(databaseUrl + phpSendEmail);
-  targetEmail ??= await ProfilDatabase()
-      .getData("email", "WHERE id = '${notificationInformation["zu"]}'");
-
-  http.post(url,
-      body: json.encode({
-        "to": targetEmail,
-        "title": notificationInformation["title"],
-        "inhalt": notificationInformation["inhalt"]
-      }));
-}
-
 sendNotification(notificationInformation, {isGroupNotification = false}) async {
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
@@ -91,29 +75,8 @@ prepareChatNotification({chatId, vonId, toId, inhalt, chatGroup = ""}) async {
     "typ": "chat",
   };
 
+  sendNotification(notificationInformation);
 
-  if (notificationInformation["token"] == "" ||
-      notificationInformation["token"] == null) {
-    var dbData = getProfilFromHive(profilId: toId);
-    var chatPartnerName = dbData["name"];
-    var toCanGerman = dbData["sprachen"].contains("Deutsch") || dbData["sprachen"].contains("german");
-
-    notificationInformation["title"] = title +
-        (toCanGerman
-            ? " hat dir eine Nachricht geschrieben"
-            : " has written you a message");
-
-    notificationInformation["inhalt"] = """
-      <p>Hi $chatPartnerName, </p>
-      <p> ${(toCanGerman ? "du hast in der <a href='https://families-worldwide.com/'>Families worldwide App</a> eine neue Nachricht von "
-            "$title erhalten" : "you have received a new message from "
-            "$title in the <a href='https://families-worldwide.com/'>Families worldwide App</a>")} </p>
-    """;
-
-    sendEmail(notificationInformation);
-  } else {
-    sendNotification(notificationInformation);
-  }
 }
 
 prepareChatGroupNotification({chatId, idList, inhalt, chatGroup = ""}) async {
@@ -137,33 +100,12 @@ prepareChatGroupNotification({chatId, idList, inhalt, chatGroup = ""}) async {
     var toActiveChat = toProfil["activeChat"];
     var notificationsAllowed = toProfil["notificationstatus"];
     var chatNotificationOn = toProfil["chatNotificationOn"];
-    bool targetCanGerman = toProfil["sprachen"].contains("Deutsch") || toProfil["sprachen"].contains("german");
 
     if (notificationsAllowed == 0 ||
         chatNotificationOn == 0 ||
         toActiveChat == chatId || blockList.contains(userId)) continue;
 
-    if (toProfil["token"] == "" ||
-        toProfil["token"] == null) {
-      var copyNotificationInformation = Map.of(notificationInformation);
-      var chatPartnerName = toProfil["name"];
-
-      copyNotificationInformation["title"] = title +
-          (targetCanGerman
-              ? " hat dir eine Nachricht geschrieben"
-              : " has written you a message");
-
-      copyNotificationInformation["inhalt"] = """
-      <p>Hi $chatPartnerName, </p>
-      <p> ${(targetCanGerman ? "du hast in der <a href='https://families-worldwide.com/'>Families worldwide App</a> eine neue Nachricht von "
-          "$title erhalten" : "you have received a new message from "
-          "$title in the <a href='https://families-worldwide.com/'>Families worldwide App</a>")} </p>
-    """;
-
-      sendEmail(copyNotificationInformation);
-    } else {
-      confirmNotificationList.add(toProfil["token"]);
-    }
+    confirmNotificationList.add(toProfil["token"]);
   }
 
   notificationInformation["toList"] = confirmNotificationList;
@@ -195,25 +137,7 @@ prepareMeetupNotification({meetupId, toId, meetupName, typ}) async {
     "token": dbData["token"]
   };
 
-  if (notificationInformation["token"] == "" ||
-      notificationInformation["token"] == null) {
-    var chatPartnerProfil = getProfilFromHive(profilId: toId);
-    var chatPartnerName = chatPartnerProfil["name"];
-
-    var wantNotifikations = chatPartnerProfil["eventNotificationOn"] == 1 ? true : false;
-
-    if(!wantNotifikations) return;
-
-    notificationInformation["inhalt"] = """
-      <p>Hi $chatPartnerName, </p>
-      <p>${notificationInformation["inhalt"]}</p>
-      <p><a href="https://families-worldwide.com/">Families worldwide App</a> </p>
-    """;
-
-    sendEmail(notificationInformation);
-  } else {
-    sendNotification(notificationInformation);
-  }
+  sendNotification(notificationInformation);
 }
 
 createMeetupText(typ, meetupName, sprache){
@@ -253,7 +177,6 @@ createMeetupText(typ, meetupName, sprache){
 
 prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
   var toProfil = getProfilFromHive(profilId: toId);
-  var toProfilName = toProfil["name"];
   var notificationsAllowed = toProfil["notificationstatus"];
   var newFriendNotificationOn = toProfil["newFriendNotificationOn"];
   var token = toProfil["token"];
@@ -281,22 +204,7 @@ prepareFriendNotification({newFriendId, toId, toCanGerman}) async {
     "typ": "newFriend"
   };
 
-  if (notificationInformation["token"] == "" ||
-      notificationInformation["token"] == null) {
-    var wantNotifikations = toProfil["newFriendNotificationOn"] == 1 ? true : false;
-
-    if(!wantNotifikations) return;
-
-    notificationInformation["inhalt"] = """
-      <p>Hi $toProfilName, </p>
-      ${(toCanGerman ? "<p> $ownName hat dich als Freund hinzugefügt. </p>" : "<p> $ownName added you as a friend. </p>")}
-        <p><a href="https://families-worldwide.com/">Families worldwide App</a> </p>
-    """;
-
-    sendEmail(notificationInformation);
-  } else {
-    sendNotification(notificationInformation);
-  }
+  sendNotification(notificationInformation);
 }
 
 prepareNewLocationNotification(){
