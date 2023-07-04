@@ -879,6 +879,17 @@ class ProfilSprachen{
     return _languages[isoCode];
   }
 
+  getIsoCode(language) {
+    String languageCode = "";
+
+    for (var entry in _languages.entries) {
+      if(entry.value["nameGer"] == language || entry.value["nameEng"] == language){
+        languageCode = entry.key;
+      }
+    }
+    return languageCode;
+  }
+
   translateLanguageList({germanList, englishList}){
     List translatedList = [];
 

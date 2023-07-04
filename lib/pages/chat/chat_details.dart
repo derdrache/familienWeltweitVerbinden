@@ -23,7 +23,7 @@ import 'package:translator/translator.dart';
 
 import '../../functions/record_timer_stream.dart';
 import '../../functions/upload_and_save_image.dart';
-import '../../services/languageService.dart';
+import '../../global/profil_sprachen.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
 import '../informationen/meetups/meetupCard.dart';
@@ -993,7 +993,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     bool understandMessageLanguage = false;
 
     for (var language in userLanguages) {
-      if (LanguageLocal().getDisplayLanguage(language) == messageLanguage) {
+      if (ProfilSprachen().getIsoCode(language) == messageLanguage) {
         understandMessageLanguage = true;
       }
     }
