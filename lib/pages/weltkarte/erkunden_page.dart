@@ -1594,7 +1594,7 @@ class _ErkundenPageState extends State<ErkundenPage>
           zoom: minMapZoom,
           minZoom: minMapZoom,
           maxZoom: maxZoom,
-          interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+          interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
           onPositionChanged: (position, changed) {
             mapPosition = position.center!;
             FocusScope.of(context).unfocus();
