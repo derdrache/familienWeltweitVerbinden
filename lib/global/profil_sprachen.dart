@@ -893,16 +893,17 @@ class ProfilSprachen{
   translateLanguageList({germanList, englishList}){
     List translatedList = [];
 
-    if(germanList == null){
+    if(germanList != null){
+
       for (var element in _languages.values) {
         if(germanList.contains(element["nameGer"])
-            || germanList.contains(element["nameEng"])){
-          translatedList.add(element["nameEng"]);
+            || germanList.contains(element["nameEng"]!.toLowerCase())){
+          translatedList.add(element["nameEng"]!.toLowerCase());
         }
       }
     }else{
       for (var element in _languages.values) {
-        if(englishList.contains(element["nameEng"])
+        if(englishList.contains(element["nameEng"]!.toLowerCase())
             || englishList.contains(element["nameGer"])){
           translatedList.add(element["nameGer"]);
         }

@@ -214,8 +214,7 @@ class _ProfilSection extends StatelessWidget {
   var interessenInputBox =
       CustomMultiTextForm(auswahlList: global_variablen.interessenListe);
   var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
-  var sprachenInputBox =
-      CustomMultiTextForm(auswahlList: []);
+  var sprachenInputBox = CustomMultiTextForm(auswahlList: []);
   final bool spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
@@ -254,6 +253,8 @@ class _ProfilSection extends StatelessWidget {
     List<String> besuchteLaender =
         List<String>.from(userProfil["besuchteLaender"] ?? []);
     var headLineColor = Theme.of(context).colorScheme.primary;
+
+    setData();
 
     profilThemeContainer(haupttext, beschreibung, page) {
       double screenWidth = MediaQuery.of(context).size.width;
@@ -308,7 +309,7 @@ class _ProfilSection extends StatelessWidget {
       return text;
     }
 
-    setData();
+
 
     return Container(
         width: double.maxFinite,
