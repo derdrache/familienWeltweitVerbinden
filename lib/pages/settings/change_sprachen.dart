@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../global/custom_widgets.dart';
 import '../../global/profil_sprachen.dart';
 import '../../services/database.dart';
-import '../../global/variablen.dart' as global_variablen;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../widgets/custom_appbar.dart';
@@ -19,8 +18,8 @@ class ChangeSprachenPage extends StatelessWidget {
       : sprachenInputBox = CustomMultiTextForm(
             selected: selected,
             auswahlList: isGerman
-                ? sprachenListeGer
-                : sprachenListeEng),
+                ? ProfilSprachen().getAllGermanLanguages()
+                : ProfilSprachen().getAllEnglishLanguages()),
         super(key: key);
 
   var sprachenInputBox;

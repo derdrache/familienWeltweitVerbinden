@@ -371,7 +371,7 @@ class _ErkundenPageState extends State<ErkundenPage>
     if (filterList.isEmpty) return true;
 
     var spracheMatch = checkMatch(
-        filterList, profilSprachen, sprachenListeGer + sprachenListeEng);
+        filterList, profilSprachen, ProfilSprachen().getAllGermanLanguages() + ProfilSprachen().getAllEnglishLanguages());
     var reiseartMatch = checkMatch(filterList, [profilReiseart],
         global_var.reisearten + global_var.reiseartenEnglisch);
     var interesseMatch = checkMatch(filterList, profilInteressen,
@@ -858,7 +858,7 @@ class _ErkundenPageState extends State<ErkundenPage>
 
   openFilterWindow() async {
     var sprachenSelection =
-        spracheIstDeutsch ? sprachenListeGer : sprachenListeEng;
+        spracheIstDeutsch ? ProfilSprachen().getAllGermanLanguages() : ProfilSprachen().getAllEnglishLanguages();
     var interessenSelection = spracheIstDeutsch
         ? global_var.interessenListe
         : global_var.interessenListeEnglisch;

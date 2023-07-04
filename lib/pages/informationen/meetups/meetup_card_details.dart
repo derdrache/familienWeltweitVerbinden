@@ -687,8 +687,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
         selected: data.split(", "),
         hintText: "Sprachen auswählen",
         auswahlList: userSpeakGerman
-            ? sprachenListeGer
-            : sprachenListeEng,
+            ? ProfilSprachen().getAllGermanLanguages()
+            : ProfilSprachen().getAllEnglishLanguages(),
       );
 
       return meetupInformationRow(

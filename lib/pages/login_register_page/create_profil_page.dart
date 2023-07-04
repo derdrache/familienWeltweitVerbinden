@@ -47,8 +47,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     sprachenAuswahlBox = CustomMultiTextForm(
         validator: global_functions.checkValidationMultiTextForm(context),
         auswahlList: isGerman
-            ? sprachenListeGer
-            : sprachenListeEng);
+            ? ProfilSprachen().getAllGermanLanguages()
+            : ProfilSprachen().getAllEnglishLanguages());
 
     reiseArtenAuswahlBox = CustomDropDownButton(
       items: isGerman

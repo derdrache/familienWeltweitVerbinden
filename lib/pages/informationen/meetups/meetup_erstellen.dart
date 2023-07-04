@@ -52,8 +52,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
         auswahlList: isGerman
-            ? sprachenListeGer
-            : sprachenListeEng);
+            ? ProfilSprachen().getAllGermanLanguages()
+            : ProfilSprachen().getAllEnglishLanguages());
 
     ortTypDropdown = CustomDropDownButton(
       selected: "offline",
