@@ -525,14 +525,18 @@ class _ErkundenPageState extends State<ErkundenPage>
     if (exactLocation && !checkGenauerStandortPrivacy(profil)) return list;
 
     for (var i = 0; i < list.length; i++) {
-      num profilLongt = profil["longt"];
-      num profilLatt = profil["latt"];
+      int accuracyFactor = 100;
+      num profilLongt = (profil["longt"] *accuracyFactor).round();
+      num profilLatt = (profil["latt"] * accuracyFactor).round();
+
 
       var geodataCondition =
-          profilLongt == list[i]["longt"] && profilLatt == list[i]["latt"];
+          profilLongt == (list[i]["longt"] *accuracyFactor).round() && profilLatt == (list[i]["latt"] *accuracyFactor).round();
       var sameCityCondition = list[i]["ort"] == null
           ? false
           : list[i]["ort"].contains(profil["ort"]);
+
+      if(exactLocation) print(geodataCondition);
 
       if (geodataCondition || (sameCityCondition && !exactLocation)) {
         newCity = false;
