@@ -134,6 +134,21 @@ var patchVorlage={
 
   ]
 };
+var patch1102E={
+  "title" : "1.10.2 - 16.07.2023",
+  "inhalt": [
+    "Profile interests extended: digital nomads",
+    "When changing location, it is now no longer possible to create multiple Database events with one change."
+  ]
+};
+var patch1102D={
+  "title" : "1.10.2 - 16.07.2023",
+  "inhalt": [
+    "Profil interessen erweitert: Digitale Nomaden",
+    "Beim Standortwechsel ist es nun nicht mehr möglich mehrere Datenbankevents mit einem Wechesel zu erzeugen"
+  ]
+};
+
 var patch1101E={
   "title" : "1.10.1 - 04.07.2023",
   "inhalt": [
