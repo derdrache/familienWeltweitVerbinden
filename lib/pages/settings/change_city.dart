@@ -29,11 +29,14 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
   Map locationData = {};
   var autoComplete = GoogleAutoComplete();
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
+  bool selected = false;
 
   @override
   void initState() {
     autoComplete.onConfirm = () {
+      if(selected) return;
       save();
+      Navigator.pop(context);
     };
 
     super.initState();
@@ -187,6 +190,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
       customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
       return;
     }
+    selected = true;
 
     var locationDict = {
       "city": locationData["city"],
@@ -212,7 +216,6 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
             " " +
             AppLocalizations.of(context)!.erfolgreichGeaender,
         color: Colors.green);
-    Navigator.pop(context);
   }
 
   @override
