@@ -65,13 +65,9 @@ dependencies:
   image_cropper: ^4.0.1
   carousel_slider: ^4.2.1
 
-  flutter_sound: ^9.2.13
-  voice_message_package: ^1.0.41
+  audioplayers: ^4.1.0
   permission_handler: ^10.3.0
-  audio_waveforms: ^1.0.4
-  just_waveform: ^0.0.5
-  path: ^1.8.3
-  path_provider: ^2.0.15
+  record_mp3: ^3.0.0
 
 
   flutter_localizations:

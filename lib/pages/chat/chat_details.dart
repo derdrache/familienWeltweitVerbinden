@@ -19,9 +19,11 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:translator/translator.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:record_mp3/record_mp3.dart';
 
-
-import '../../functions/record_timer_stream.dart';
 import '../../functions/upload_and_save_image.dart';
 import '../../global/profil_sprachen.dart';
 import '../informationen/community/community_card.dart';
@@ -102,8 +104,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   late int globalMessageIndex;
   int lastReadMessageIndex = 0;
   bool isWriting = false;
-  bool savedVoiceMessage = false;
-  var recordTimerStream = RecordTimerStream();
+  String? recordModus;
+  var recordTimer;
 
 
   @override
@@ -1024,51 +1026,61 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  recordVoiceMessage() async {
-    /*
-    bool getAccess = await requestVoiceRecord();
-    if (!getAccess) return;
-
-    if (!soundRecorder2.isRecording) {
-      recordTimerStream.start();
-      await soundRecorder2.record();
-    } else if (soundRecorder2.isRecording) {
-      await soundRecorder2.pause();
+  Future<bool> checkRecordPermission() async {
+    if (!await Permission.microphone.isGranted) {
+      PermissionStatus status = await Permission.microphone.request();
+      if (status != PermissionStatus.granted) {
+        return false;
+      }
     }
-
-    setState(() {});
-
-     */
+    return true;
   }
 
-  requestVoiceRecord() async {
-    /*
-    final status = await Permission.microphone.request();
+  recordVoiceMessage() async {
+      setState(() {
+        recordModus = "recording";
+      });
 
-    return status == PermissionStatus.granted;
+      bool hasPermission = await checkRecordPermission();
 
-     */
+      if (hasPermission) {
+        var recordFile = await getApplicationDocumentsDirectory();
+        var recordFilePath = recordFile.path;
+
+        RecordMp3.instance.start(recordFilePath + "/voiceMessage.mp3", (type) {
+          setState(() {});
+        });
+      } else {
+
+      }
+      setState(() {});
+
   }
 
-  cancelVoiceMessage() async {
-    /*
-    soundRecorder2.dispose();
+  stopVoiceMessage() async {
+    setState(() {
+      recordModus = null;
+    });
+    RecordMp3.instance.stop();
+  }
 
-     */
+  pauseVoiceMessage() async{
+    recordModus = "pause";
+    RecordMp3.instance.pause();
+  }
+
+  resumeVoiceMessage() async{
+    recordModus = "recording";
+    RecordMp3.instance.resume();
   }
 
   saveVoiceMessage() async{
-    /*
-    var path = await soundRecorder2.stop();
+    stopVoiceMessage();
+    await uploadVoiceMessage();
+  }
 
-    waveformData = await waveController.extractWaveformData(
-      path: path!,
-      noOfSamples: 100,
-    );
+  uploadVoiceMessage() async{
 
-    savedVoiceMessage = true;
-
-     */
   }
 
 
@@ -2414,26 +2426,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               size: 20,
             ),
             const SizedBox(width: 5),
-            StreamBuilder(
-                stream: recordTimerStream.stream(),
-                builder: (context, snapshot) {
-                  final duration = snapshot.hasData
-                      ? snapshot.data as Duration
-                      : Duration.zero;
 
-                  final formatter = new NumberFormat('00');
-                  final minutes = formatter.format(duration.inMinutes);
-                  final seconds = formatter.format(duration.inSeconds);
-
-                  return Text(
-                    "$minutes:$seconds",
-                    style: TextStyle(fontSize: 20),
-                  );
-                }),
             Expanded(
               child: InkWell(
                   onTap: () async {
-                    await cancelVoiceMessage();
+                    await stopVoiceMessage();
                     setState(() {});
                   } ,
                   child: Center(
@@ -2461,11 +2458,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () async {
-                  await recordVoiceMessage();
+                  if(recordModus == "pause") resumeVoiceMessage();
+                  else if(recordModus == "recording") pauseVoiceMessage();
                   setState(() {});
                 },
                 icon: Icon(
-                    soundRecorder2.isRecording ? Icons.play_arrow : Icons.pause,
+                    recordModus == "pause" ? Icons.play_arrow : Icons.pause,
                     size: 34,
                     color: Theme.of(context).colorScheme.secondary))
           ],
@@ -2475,7 +2473,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     normalBottomBar() {
       return Container(
-          constraints: BoxConstraints(minHeight: 60, maxHeight: savedVoiceMessage ? 60 : 200),
+          constraints: BoxConstraints(minHeight: 60, maxHeight: recordModus != null ? 60 : 200),
           decoration: BoxDecoration(
               color: Colors.white,
               border: extraInputInformationBox.runtimeType == SizedBox
@@ -2495,7 +2493,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             children: [
               const SizedBox(width: 10),
               Expanded(
-                child: !savedVoiceMessage ? TextField(
+                child: recordModus == null ? TextField(
                   maxLines: null,
                   focusNode: messageInputNode,
                   textInputAction: TextInputAction.newline,
@@ -2616,8 +2614,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 extraInputInformationBox,
                 if (isTextSearching) searchBottomBar(),
                 if (!userJoinedChat) joinChatBottomBar(),
-                if(soundRecorder2.isRecording) voiceMessageBottomBar(),
-                if(!isTextSearching && userJoinedChat && !soundRecorder2.isRecording) normalBottomBar(),
+                if(recordModus != null) voiceMessageBottomBar(),
+                if(!isTextSearching && userJoinedChat && recordModus == null) normalBottomBar(),
               ],
             ),
           ),
