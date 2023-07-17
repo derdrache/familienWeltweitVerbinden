@@ -26,6 +26,7 @@ import 'package:record_mp3/record_mp3.dart';
 
 import '../../functions/upload_and_save_image.dart';
 import '../../global/profil_sprachen.dart';
+import '../../streams/record_timer.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
 import '../informationen/meetups/meetupCard.dart';
@@ -105,7 +106,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   int lastReadMessageIndex = 0;
   bool isWriting = false;
   String? recordModus;
-  var recordTimer;
+  var recordTimer = RecordTimer();
 
 
   @override
@@ -125,6 +126,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   void dispose() {
     timer.cancel();
+    recordTimer.dispose();
     messageInputNode.dispose();
 
     _changeUserChatStatus(0);
@@ -1042,6 +1044,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       });
 
       bool hasPermission = await checkRecordPermission();
+      recordTimer.start();
 
       if (hasPermission) {
         var recordFile = await getApplicationDocumentsDirectory();
@@ -1058,6 +1061,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   stopVoiceMessage() async {
+    recordTimer.dispose();
     setState(() {
       recordModus = null;
     });
@@ -1065,11 +1069,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   pauseVoiceMessage() async{
+    recordTimer.stop();
     recordModus = "pause";
     RecordMp3.instance.pause();
   }
 
   resumeVoiceMessage() async{
+    recordTimer.start();
     recordModus = "recording";
     RecordMp3.instance.resume();
   }
@@ -2422,11 +2428,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             const SizedBox(width: 10),
             Icon(
               Icons.circle,
-              color: Colors.red,
+              color: recordModus == "recording" ? Colors.red : Colors.grey,
               size: 20,
             ),
             const SizedBox(width: 5),
+            StreamBuilder(stream: recordTimer.stream(), builder: (context, AsyncSnapshot<Duration>snapshot){
+              var timer = Duration.zero;
+              if(snapshot.hasData) timer = snapshot.data!;
 
+              return Text(timer.toString().split('.').first.padLeft(8, "0"));
+            }),
             Expanded(
               child: InkWell(
                   onTap: () async {
