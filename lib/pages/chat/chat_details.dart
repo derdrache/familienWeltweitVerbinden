@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/global/global_functions.dart'
@@ -24,6 +25,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:record_mp3/record_mp3.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 
 import '../../functions/upload_and_save_image.dart';
 import '../../global/profil_sprachen.dart';
@@ -109,6 +111,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   String? recordModus;
   var recordTimer = RecordTimer();
   String voiceMessagePath = "/voiceMessage.mp3";
+  AudioPlayer audioPlayer = AudioPlayer();
+  String playedVoiceMessage = "";
+  bool isPlaying = false;
 
   @override
   void initState() {
@@ -129,6 +134,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     timer.cancel();
     recordTimer.dispose();
     messageInputNode.dispose();
+    audioPlayer.dispose();
 
     _changeUserChatStatus(0);
 
@@ -390,11 +396,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     if (messageData["message"].contains("</eventId=")) {
       groupText = "<Meetup Card>";
-    }
-    else if (messageData["message"].contains("</communityId=")) {
+    } else if (messageData["message"].contains("</communityId=")) {
       groupText = "<Community Card>";
-    }
-    else if (messageData["message"].contains("</cityId=")) {
+    } else if (messageData["message"].contains("</cityId=")) {
       groupText = "<Location Card>";
     }
 
@@ -1087,23 +1091,44 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   uploadVoiceMessage(fileName) async {
     var appDir = await getApplicationDocumentsDirectory();
-    uploadFile("$fileName.mp3", await File(appDir.path + voiceMessagePath).readAsBytes()  ,"voice/" );
+    uploadFile("$fileName.mp3",
+        await File(appDir.path + voiceMessagePath).readAsBytes(), "voice/");
   }
 
-  downloadVoiceMessage(String audioPath){
-
-  }
-
-  playVoiceMessage(String audioPath) async{
-    AudioPlayer audioPlayer = AudioPlayer();
-    await audioPlayer.play(UrlSource("https://reckhorn.com/media/music/08/bb/8a/Doppelbass-1.mp3"));
-  }
-
-  Future<bool> fileExist(fileName)async{
+  downloadVoiceMessage(String audioPath) async {
+    var voiceDir = bilderPath + "voice/";
     var appDir = await getApplicationDocumentsDirectory();
 
-    return File(appDir.path + "/" +fileName).existsSync();
+    try {
+      final http.Response response =
+          await http.get(Uri.parse(voiceDir + audioPath));
+      final file = File(appDir.path + "/" + audioPath);
+      await file.writeAsBytes(response.bodyBytes);
+    } catch (error) {}
+  }
 
+  playVoiceMessage(String audioPath) async {
+    var appDir = await getApplicationDocumentsDirectory();
+    await audioPlayer.play(DeviceFileSource(appDir.path + "/" + audioPath));
+  }
+
+  Future<bool> fileExist(fileName) async {
+    var appDir = await getApplicationDocumentsDirectory();
+
+    return File(appDir.path + "/" + fileName).existsSync();
+  }
+
+  audioData(file, isPlaying) async {
+    if (!isPlaying) return 0;
+  }
+
+  Future<Duration>getFileDuration(fileName) async {
+    var appDir = await getApplicationDocumentsDirectory();
+    AudioPlayer durationAudioPlayer = AudioPlayer();
+    durationAudioPlayer.setSource(DeviceFileSource(appDir.path + "/" + fileName));
+    Duration? duration = await durationAudioPlayer.getDuration();
+
+    return duration!;
   }
 
   @override
@@ -1490,7 +1515,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       String messageText = getTranslatedMessageText(message);
 
-      if (messageText.contains("</images") || messageText.contains("</voiceMessage")) messageText = "";
+      if (messageText.contains("</images") ||
+          messageText.contains("</voiceMessage")) messageText = "";
       if (messageText.contains("</eventId=") ||
           messageText.contains("</communityId=") ||
           messageText.contains("</cityId=")) {
@@ -1751,31 +1777,61 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    voiceMessage(message){
-      var voiceDir = bilderPath + "voice/";
+    voiceMessage(message) {
       var voiceFileUrl = message["message"].split("=")[1];
 
-      return Row(children: [
-        FutureBuilder<bool>(
-          future: fileExist(voiceFileUrl),
-          builder: (context, snapshot) {
-            bool isDownloaded = snapshot.hasData ? snapshot.data! : false;
+      return Row(
+        children: [
+          FutureBuilder<bool>(
+              future: fileExist(voiceFileUrl),
+              builder: (context, snapshot) {
+                bool isDownloaded = snapshot.hasData ? snapshot.data! : false;
 
-            return IconButton(
-                onPressed: (){
-                  if(!isDownloaded){
+                return IconButton(
+                  padding: EdgeInsets.zero,
+                    onPressed: () async {
+                      if (!isDownloaded) {
+                        await downloadVoiceMessage(voiceFileUrl);
+                      } else if (playedVoiceMessage == voiceFileUrl && isPlaying) {
+                        isPlaying = false;
+                        audioPlayer.pause();
+                      } else {
+                        isPlaying = true;
+                        playVoiceMessage(voiceFileUrl);
+                        playedVoiceMessage = voiceFileUrl;
+                      }
+                      setState(() {});
+                    },
+                    icon: Icon(isDownloaded
+                        ? playedVoiceMessage == voiceFileUrl
+                            ? Icons.pause
+                            : Icons.play_arrow
+                        : Icons.download, size: 50,));
+              }),
+          SizedBox(width: 20,),
+          Padding(
+            padding: const EdgeInsets.only(top: 15),
+            child: FutureBuilder<Duration>(
+                future: getFileDuration(voiceFileUrl),
+                builder: (context, snapshot) {
+                  Duration maxDuration = snapshot.hasData ? snapshot.data! : Duration.zero;
 
-                  }else{
-                    playVoiceMessage(voiceDir+voiceFileUrl);
-                  }
-                  setState(() {});
-                },
-                icon: Icon(isDownloaded ? Icons.play_arrow: Icons.download)
-            );
-          }
-        ),
-        Text("Test Voice Message")
-      ],);
+                  return Container(
+                    width: 200,
+                    child: StreamBuilder<Duration>(
+                        stream: audioPlayer.onPositionChanged,
+                        builder: (context, snapshot) {
+                          return ProgressBar(
+                              progress: snapshot.hasData && playedVoiceMessage == voiceFileUrl
+                                  ? snapshot.data!
+                                  : Duration.zero,
+                              total: maxDuration);
+                        }),
+                  );
+                }),
+          )
+        ],
+      );
     }
 
     getAdditionChild(Map message) {
@@ -1795,7 +1851,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       } else if (message["message"].contains("</images") &&
           message["images"].isNotEmpty) {
         return imageMessageNew(message["images"][0]);
-      } else if(message["message"].contains("</voiceMessage")){
+      } else if (message["message"].contains("</voiceMessage")) {
         return voiceMessage(message);
       }
     }
