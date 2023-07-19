@@ -47,8 +47,7 @@ uploadAndSaveImage(context, typ, {folder = "",meetupCommunityData}) async{
       ],
     );
 
-    await uploadImage(
-        croppedFile?.path, imageName, await croppedFile?.readAsBytes(), folder);
+    await uploadFile(imageName, await croppedFile?.readAsBytes(), folder);
 
     if (typ == "profil") {
       saveDBProfil(imageList, ownProfil);
