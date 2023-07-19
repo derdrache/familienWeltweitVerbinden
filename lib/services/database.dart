@@ -1340,13 +1340,12 @@ class BulletinBoardDatabase {
   }
 }
 
-uploadImage(imagePath, imageName, image, folder) async {
+uploadFile(fileName, file, folder) async {
   var url = Uri.parse(databasePathUploadImage);
   var data = {
-    "imagePath": imagePath,
-    "imageName": imageName,
+    "imageName": fileName,
     "folder": folder,
-    "image": base64Encode(image),
+    "image": base64Encode(file),
   };
 
   try {

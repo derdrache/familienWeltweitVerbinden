@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/global/global_functions.dart'
@@ -107,7 +108,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   bool isWriting = false;
   String? recordModus;
   var recordTimer = RecordTimer();
-
+  String voiceMessagePath = "/voiceMessage.mp3";
 
   @override
   void initState() {
@@ -390,10 +391,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (messageData["message"].contains("</eventId=")) {
       groupText = "<Meetup Card>";
     }
-    if (messageData["message"].contains("</communityId=")) {
+    else if (messageData["message"].contains("</communityId=")) {
       groupText = "<Community Card>";
     }
-    if (messageData["message"].contains("</cityId=")) {
+    else if (messageData["message"].contains("</cityId=")) {
       groupText = "<Location Card>";
     }
 
@@ -1039,25 +1040,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   recordVoiceMessage() async {
-      setState(() {
-        recordModus = "recording";
+    setState(() {
+      recordModus = "recording";
+    });
+
+    bool hasPermission = await checkRecordPermission();
+    recordTimer.start();
+
+    if (hasPermission) {
+      var recordFile = await getApplicationDocumentsDirectory();
+      var recordFilePath = recordFile.path;
+
+      RecordMp3.instance.start(recordFilePath + voiceMessagePath, (type) {
+        setState(() {});
       });
-
-      bool hasPermission = await checkRecordPermission();
-      recordTimer.start();
-
-      if (hasPermission) {
-        var recordFile = await getApplicationDocumentsDirectory();
-        var recordFilePath = recordFile.path;
-
-        RecordMp3.instance.start(recordFilePath + "/voiceMessage.mp3", (type) {
-          setState(() {});
-        });
-      } else {
-
-      }
-      setState(() {});
-
+    } else {}
+    setState(() {});
   }
 
   stopVoiceMessage() async {
@@ -1068,27 +1066,45 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     RecordMp3.instance.stop();
   }
 
-  pauseVoiceMessage() async{
+  pauseVoiceMessage() async {
     recordTimer.stop();
     recordModus = "pause";
     RecordMp3.instance.pause();
   }
 
-  resumeVoiceMessage() async{
+  resumeVoiceMessage() async {
     recordTimer.start();
     recordModus = "recording";
     RecordMp3.instance.resume();
   }
 
-  saveVoiceMessage() async{
+  saveVoiceMessage() async {
+    String fileName = ownProfil["name"] + DateTime.now().toString();
     stopVoiceMessage();
-    await uploadVoiceMessage();
+    await uploadVoiceMessage(fileName);
+    _saveNewMessage(message: "</voiceMessage=$fileName");
   }
 
-  uploadVoiceMessage() async{
+  uploadVoiceMessage(fileName) async {
+    var appDir = await getApplicationDocumentsDirectory();
+    uploadFile("$fileName.mp3", await File(appDir.path + voiceMessagePath).readAsBytes()  ,"voice/" );
+  }
+
+  downloadVoiceMessage(String audioPath){
 
   }
 
+  playVoiceMessage(String audioPath) async{
+    AudioPlayer audioPlayer = AudioPlayer();
+    await audioPlayer.play(UrlSource("https://reckhorn.com/media/music/08/bb/8a/Doppelbass-1.mp3"));
+  }
+
+  Future<bool> fileExist(fileName)async{
+    var appDir = await getApplicationDocumentsDirectory();
+
+    return File(appDir.path + "/" +fileName).existsSync();
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1474,7 +1490,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       String messageText = getTranslatedMessageText(message);
 
-      if (messageText.contains("</images")) messageText = "";
+      if (messageText.contains("</images") || messageText.contains("</voiceMessage")) messageText = "";
       if (messageText.contains("</eventId=") ||
           messageText.contains("</communityId=") ||
           messageText.contains("</cityId=")) {
@@ -1735,6 +1751,33 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
+    voiceMessage(message){
+      var voiceDir = bilderPath + "voice/";
+      var voiceFileUrl = message["message"].split("=")[1];
+
+      return Row(children: [
+        FutureBuilder<bool>(
+          future: fileExist(voiceFileUrl),
+          builder: (context, snapshot) {
+            bool isDownloaded = snapshot.hasData ? snapshot.data! : false;
+
+            return IconButton(
+                onPressed: (){
+                  if(!isDownloaded){
+
+                  }else{
+                    playVoiceMessage(voiceDir+voiceFileUrl);
+                  }
+                  setState(() {});
+                },
+                icon: Icon(isDownloaded ? Icons.play_arrow: Icons.download)
+            );
+          }
+        ),
+        Text("Test Voice Message")
+      ],);
+    }
+
     getAdditionChild(Map message) {
       if (message["forward"].isNotEmpty) {
         return forwardMessageNew(message);
@@ -1752,6 +1795,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       } else if (message["message"].contains("</images") &&
           message["images"].isNotEmpty) {
         return imageMessageNew(message["images"][0]);
+      } else if(message["message"].contains("</voiceMessage")){
+        return voiceMessage(message);
       }
     }
 
@@ -2405,86 +2450,123 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    voiceMessageBottomBar() {
-      return Container(
-        constraints: const BoxConstraints(minHeight: 60, maxHeight: 60),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            border: extraInputInformationBox.runtimeType == SizedBox
-                ? const Border(top: BorderSide(color: Colors.grey))
-                : null,
-            boxShadow: extraInputInformationBox.runtimeType == SizedBox
-                ? [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3),
-                    ),
-                  ]
-                : []),
-        child: Row(
-          children: [
-            const SizedBox(width: 10),
-            Icon(
-              Icons.circle,
-              color: recordModus == "recording" ? Colors.red : Colors.grey,
-              size: 20,
-            ),
-            const SizedBox(width: 5),
-            StreamBuilder(stream: recordTimer.stream(), builder: (context, AsyncSnapshot<Duration>snapshot){
-              var timer = Duration.zero;
-              if(snapshot.hasData) timer = snapshot.data!;
+    voiceMessageRecordMenu() {
+      recordVoiceMessage();
 
-              return Text(timer.toString().split('.').first.padLeft(8, "0"));
-            }),
-            Expanded(
-              child: InkWell(
-                  onTap: () async {
-                    await stopVoiceMessage();
-                    setState(() {});
-                  } ,
-                  child: Center(
-                      child: Text(
-                    AppLocalizations.of(context)!.abbrechen,
-                    style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
-                    fontWeight: FontWeight.bold),
-                  ))),
-            ),
-            Expanded(
-              child: InkWell(
-                  onTap: () async {
-                    await saveVoiceMessage();
-                    setState(() {});
-                  },
-                  child: Center(
-                      child: Text(
-                    AppLocalizations.of(context)!.speichern,
-                    style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
-                    fontWeight: FontWeight.bold),
-                  ))),
-            ),
-            IconButton(
-                padding: EdgeInsets.zero,
-                onPressed: () async {
-                  if(recordModus == "pause") resumeVoiceMessage();
-                  else if(recordModus == "recording") pauseVoiceMessage();
-                  setState(() {});
-                },
-                icon: Icon(
-                    recordModus == "pause" ? Icons.play_arrow : Icons.pause,
-                    size: 34,
-                    color: Theme.of(context).colorScheme.secondary))
-          ],
-        ),
-      );
+      showModalBottomSheet<void>(
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          builder: (BuildContext context) {
+            return StatefulBuilder(builder: (BuildContext context, setState) {
+              return Container(
+                height: 250,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 10),
+                    Text(
+                      AppLocalizations.of(context)!.sprachnachricht,
+                      style:
+                          TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(child: SizedBox.shrink()),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          color: recordModus == "recording"
+                              ? Colors.red
+                              : Colors.grey,
+                          size: 23,
+                        ),
+                        const SizedBox(width: 5),
+                        StreamBuilder(
+                            stream: recordTimer.stream(),
+                            builder:
+                                (context, AsyncSnapshot<Duration> snapshot) {
+                              var timer = Duration.zero;
+                              if (snapshot.hasData) timer = snapshot.data!;
+
+                              return Text(
+                                timer
+                                    .toString()
+                                    .split('.')
+                                    .first
+                                    .padLeft(8, "0"),
+                                style: TextStyle(fontSize: 23),
+                              );
+                            }),
+                      ],
+                    ),
+                    SizedBox(height: 50),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (recordModus == "pause")
+                          Expanded(
+                            child: IconButton(
+                              icon: Icon(Icons.delete,
+                                  size: 40,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                stopVoiceMessage();
+                              },
+                            ),
+                          ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () async {
+                              if (recordModus == "pause")
+                                resumeVoiceMessage();
+                              else if (recordModus == "recording")
+                                pauseVoiceMessage();
+                              setState(() {});
+                            },
+                            icon: Icon(
+                                recordModus == "pause"
+                                    ? Icons.play_arrow
+                                    : Icons.pause,
+                                size: 60,
+                                color:
+                                    Theme.of(context).colorScheme.secondary)),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        if (recordModus == "pause")
+                          Expanded(
+                            child: IconButton(
+                                icon: Icon(Icons.send,
+                                    size: 40,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  saveVoiceMessage();
+                                }),
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: 25),
+                  ],
+                ),
+              );
+            });
+          });
     }
 
     normalBottomBar() {
       return Container(
-          constraints: BoxConstraints(minHeight: 60, maxHeight: recordModus != null ? 60 : 200),
+          constraints: BoxConstraints(
+              minHeight: 60, maxHeight: recordModus != null ? 60 : 200),
           decoration: BoxDecoration(
               color: Colors.white,
               border: extraInputInformationBox.runtimeType == SizedBox
@@ -2504,34 +2586,36 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             children: [
               const SizedBox(width: 10),
               Expanded(
-                child: recordModus == null ? TextField(
-                  maxLines: null,
-                  focusNode: messageInputNode,
-                  textInputAction: TextInputAction.newline,
-                  controller: nachrichtController,
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context)!.nachricht,
-                    hintStyle: const TextStyle(fontSize: 20),
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                  ),
-                  onChanged: (text) {
-                    if (isWriting && text.isEmpty) {
-                      setState(() {
-                        isWriting = false;
-                      });
-                    } else if (!isWriting && text.isNotEmpty) {
-                      setState(() {
-                        isWriting = true;
-                      });
-                    }
-                  },
-                ) : Container(
-                /*AudioFileWaveforms(
+                child: recordModus == null
+                    ? TextField(
+                        maxLines: null,
+                        focusNode: messageInputNode,
+                        textInputAction: TextInputAction.newline,
+                        controller: nachrichtController,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          hintText: AppLocalizations.of(context)!.nachricht,
+                          hintStyle: const TextStyle(fontSize: 20),
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                        ),
+                        onChanged: (text) {
+                          if (isWriting && text.isEmpty) {
+                            setState(() {
+                              isWriting = false;
+                            });
+                          } else if (!isWriting && text.isNotEmpty) {
+                            setState(() {
+                              isWriting = true;
+                            });
+                          }
+                        },
+                      )
+                    : Container(
+                        /*AudioFileWaveforms(
                     size: Size(300, 60.0),
                     playerController: waveController,
                     enableSeekGesture: false,
@@ -2545,7 +2629,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
 
                  */
-                ),
+                        ),
               ),
               isWriting
                   ? changeMessageInputModus != "edit"
@@ -2591,7 +2675,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     Theme.of(context).colorScheme.secondary)),
                         IconButton(
                             padding: EdgeInsets.zero,
-                            onPressed: () async => recordVoiceMessage(),
+                            onPressed: () async => voiceMessageRecordMenu(),
                             icon: Icon(Icons.mic,
                                 size: 34,
                                 color:
@@ -2625,8 +2709,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 extraInputInformationBox,
                 if (isTextSearching) searchBottomBar(),
                 if (!userJoinedChat) joinChatBottomBar(),
-                if(recordModus != null) voiceMessageBottomBar(),
-                if(!isTextSearching && userJoinedChat && recordModus == null) normalBottomBar(),
+                if (!isTextSearching && userJoinedChat) normalBottomBar(),
               ],
             ),
           ),
@@ -2635,4 +2718,3 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     );
   }
 }
-

@@ -64,10 +64,10 @@ dependencies:
   share_plus: ^7.0.2
   image_cropper: ^4.0.1
   carousel_slider: ^4.2.1
-
   audioplayers: ^4.1.0
   permission_handler: ^10.3.0
   record_mp3: ^3.0.0
+  path_provider: ^2.0.15
 
 
   flutter_localizations:

@@ -466,6 +466,7 @@
     "bulletinNoteLoeschen": "delete note",
     "note": "Note",
     "weltweit": "worldwide",
-    "bild" : "Image"
+    "bild" : "Image",
+    "sprachnachricht" : "Sprachnachricht"
 }
 
