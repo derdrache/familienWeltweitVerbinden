@@ -1129,7 +1129,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   Future<Duration>getFileDuration(fileName) async {
     var appDir = await getApplicationDocumentsDirectory();
     AudioPlayer durationAudioPlayer = AudioPlayer();
-    durationAudioPlayer.setSource(DeviceFileSource("${appDir.path}/$fileName"));
+    await durationAudioPlayer.setSource(DeviceFileSource("${appDir.path}/$fileName"));
     Duration? duration = await durationAudioPlayer.getDuration();
 
     return duration!;
