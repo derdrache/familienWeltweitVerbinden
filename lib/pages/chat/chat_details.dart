@@ -411,9 +411,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       var translateMessage = await translator.translate(messageData["message"]);
       var languageCode = translateMessage.sourceLanguage.code;
-      if (languageCode == "auto")
+      if (languageCode == "auto") {
         translateMessage =
             await translator.translate(messageData["message"], to: "de");
+      }
 
       messageData["language"] = languageCode;
       messageData["translateMessage"] = translateMessage.text;
@@ -992,8 +993,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   getTranslatedMessageText(message) {
-    if (!widget.isChatgroup || message["von"] == userId || message.isEmpty)
+    if (!widget.isChatgroup || message["von"] == userId || message.isEmpty) {
       return message["message"];
+    }
 
     List userLanguages = ownProfil["sprachen"];
     String messageLanguage =
@@ -1096,26 +1098,28 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   downloadVoiceMessage(String audioPath) async {
-    var voiceDir = bilderPath + "voice/";
+    var voiceDir = "${bilderPath}voice/";
     var appDir = await getApplicationDocumentsDirectory();
 
     try {
       final http.Response response =
           await http.get(Uri.parse(voiceDir + audioPath));
-      final file = File(appDir.path + "/" + audioPath);
+      final file = File("${appDir.path}/$audioPath");
       await file.writeAsBytes(response.bodyBytes);
-    } catch (error) {}
+    } catch (error) {
+
+    }
   }
 
   playVoiceMessage(String audioPath) async {
     var appDir = await getApplicationDocumentsDirectory();
-    await audioPlayer.play(DeviceFileSource(appDir.path + "/" + audioPath));
+    await audioPlayer.play(DeviceFileSource("${appDir.path}/$audioPath"));
   }
 
   Future<bool> fileExist(fileName) async {
     var appDir = await getApplicationDocumentsDirectory();
 
-    return File(appDir.path + "/" + fileName).existsSync();
+    return File("${appDir.path}/$fileName").existsSync();
   }
 
   audioData(file, isPlaying) async {
@@ -1125,7 +1129,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   Future<Duration>getFileDuration(fileName) async {
     var appDir = await getApplicationDocumentsDirectory();
     AudioPlayer durationAudioPlayer = AudioPlayer();
-    durationAudioPlayer.setSource(DeviceFileSource(appDir.path + "/" + fileName));
+    durationAudioPlayer.setSource(DeviceFileSource("${appDir.path}/$fileName"));
     Duration? duration = await durationAudioPlayer.getDuration();
 
     return duration!;
@@ -1617,7 +1621,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               alignment: WrapAlignment.end,
                               children: [
                                 TextWithHyperlinkDetection(
-                                    text: messageText ?? "",
+                                    text: messageText,
                                     fontsize: 16,
                                     onTextTab: () =>
                                         openMessageMenu(message, index)),
@@ -1803,12 +1807,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       setState(() {});
                     },
                     icon: Icon(isDownloaded
-                        ? playedVoiceMessage == voiceFileUrl
+                        ? isPlaying
                             ? Icons.pause
                             : Icons.play_arrow
                         : Icons.download, size: 50,));
               }),
-          SizedBox(width: 20,),
+          const SizedBox(width: 20,),
           Padding(
             padding: const EdgeInsets.only(top: 15),
             child: FutureBuilder<Duration>(
@@ -1816,7 +1820,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 builder: (context, snapshot) {
                   Duration maxDuration = snapshot.hasData ? snapshot.data! : Duration.zero;
 
-                  return Container(
+                  return SizedBox(
                     width: 200,
                     child: StreamBuilder<Duration>(
                         stream: audioPlayer.onPositionChanged,
@@ -1829,7 +1833,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         }),
                   );
                 }),
-          )
+          ),
         ],
       );
     }
@@ -1891,8 +1895,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         DateTime messageDateTime =
             DateTime.fromMillisecondsSinceEpoch(int.parse(message["date"]));
         String messageDate = DateFormat('dd.MM.yy').format(messageDateTime);
-        if (message["images"].runtimeType == String)
+        if (message["images"].runtimeType == String) {
           message["images"] = jsonDecode(message["images"]);
+        }
 
         message["responseId"] ??= "0";
         var messageBoxInformation = {
@@ -2516,18 +2521,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           ),
           builder: (BuildContext context) {
             return StatefulBuilder(builder: (BuildContext context, setState) {
-              return Container(
+              return SizedBox(
                 height: 250,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       AppLocalizations.of(context)!.sprachnachricht,
                       style:
-                          TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
                     ),
-                    Expanded(child: SizedBox.shrink()),
+                    const Expanded(child: SizedBox.shrink()),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -2552,12 +2557,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                     .split('.')
                                     .first
                                     .padLeft(8, "0"),
-                                style: TextStyle(fontSize: 23),
+                                style: const TextStyle(fontSize: 23),
                               );
                             }),
                       ],
                     ),
-                    SizedBox(height: 50),
+                    const SizedBox(height: 50),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -2574,16 +2579,17 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               },
                             ),
                           ),
-                        SizedBox(
+                        const SizedBox(
                           width: 10,
                         ),
                         IconButton(
                             padding: EdgeInsets.zero,
                             onPressed: () async {
-                              if (recordModus == "pause")
+                              if (recordModus == "pause") {
                                 resumeVoiceMessage();
-                              else if (recordModus == "recording")
+                              } else if (recordModus == "recording") {
                                 pauseVoiceMessage();
+                              }
                               setState(() {});
                             },
                             icon: Icon(
@@ -2593,7 +2599,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 size: 60,
                                 color:
                                     Theme.of(context).colorScheme.secondary)),
-                        SizedBox(
+                        const SizedBox(
                           width: 10,
                         ),
                         if (recordModus == "pause")
@@ -2611,7 +2617,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           ),
                       ],
                     ),
-                    SizedBox(height: 25),
+                    const SizedBox(height: 25),
                   ],
                 ),
               );
