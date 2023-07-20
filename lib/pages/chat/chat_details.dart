@@ -1097,16 +1097,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         await File(appDir.path + voiceMessagePath).readAsBytes(), "voice/");
   }
 
-  downloadVoiceMessage(String audioPath) async {
+  downloadVoiceMessage(String fileName) async {
     var voiceDir = "${bilderPath}voice/";
     var appDir = await getApplicationDocumentsDirectory();
 
     try {
       final http.Response response =
-          await http.get(Uri.parse(voiceDir + audioPath));
-      final file = File("${appDir.path}/$audioPath");
+          await http.get(Uri.parse(voiceDir + fileName));
+      final file = File("${appDir.path}/$fileName");
       await file.writeAsBytes(response.bodyBytes);
-    } catch (error) {
+    } catch (error){
 
     }
   }

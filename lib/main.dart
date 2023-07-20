@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:familien_suche/pages/informationen/community/community_details.dart';
@@ -11,6 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'firebase_options.dart';
 import 'pages/start_page.dart';
@@ -81,6 +83,24 @@ refreshHiveData() async {
   await refreshHiveProfils();
   await refreshHiveChats();
   await refreshHiveMeetups();
+}
+
+deleteOldVoiceMessages() async {
+  var appDir = await getApplicationDocumentsDirectory();
+  var allFiles = Directory(appDir.path).listSync();
+
+  for(var file in allFiles){
+    final fileStat = FileStat.statSync(file.path);
+    DateTime createdDate = fileStat.modified;
+    const oneMotninHours = 720;
+    bool tooOld =  DateTime.now().compareTo(createdDate.add(Duration(hours: oneMotninHours))) == 1;
+    String fileTyp = file.path.split(".").last;
+    bool isMP3 = fileTyp == "mp3";
+
+    if(tooOld && isMP3){
+      file.delete();
+    }
+  }
 }
 
 void main() async {
