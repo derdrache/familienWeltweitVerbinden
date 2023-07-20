@@ -536,8 +536,6 @@ class _ErkundenPageState extends State<ErkundenPage>
           ? false
           : list[i]["ort"].contains(profil["ort"]);
 
-      if(exactLocation) print(geodataCondition);
-
       if (geodataCondition || (sameCityCondition && !exactLocation)) {
         newCity = false;
         var addNumberName =
@@ -969,7 +967,6 @@ class _ErkundenPageState extends State<ErkundenPage>
   }
 
   createPopupProfils(profils, {spezialActivation = false}) {
-    print("test");
     popupItems = [];
     var selectUserProfils = [];
 
@@ -1241,73 +1238,6 @@ class _ErkundenPageState extends State<ErkundenPage>
           }, childCount: showItems["profils"].length)));
     }
 
-    /*
-    createPopupInsiderInfo(infoProfils){
-      popupItems = [];
-      bool speaksGerman = getUserSpeaksGerman();
-
-      popupItems.add(SliverAppBar(
-        toolbarHeight: kIsWeb ? 60 : 50,
-        backgroundColor: Colors.white,
-        flexibleSpace: Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-          child: Text(selectPopupMenuText(profils, false),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        ),
-        pinned: true,
-      ));
-
-
-      popupItems.add(SliverFixedExtentList(
-        itemExtent: 90,
-        delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-          var infoData = infoProfils[index];
-          String infoTitle = speaksGerman ? infoData["titleGer"] : infoData["titleEng"];
-
-          return GestureDetector(
-            onTap: () {
-              global_functions.changePage(
-                  context,
-                  LocationInformationPage(ortName: infoData["ort"],insiderInfoId: infoData["id"],));
-            },
-            child: Card(
-              child: Column(
-                children:[                Text(infoTitle),
-                  Text("${infoData["ort"]} / ${infoData["land"]}")]
-
-              )
-            )
-
-
-            /*Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            width: 1, color: global_var.borderColorGrey))),
-                child: Row(
-                  children: [
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            infoTitle,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ])
-                  ],
-                )),
-
-             */
-          );
-        }, childCount: infoProfils.length),
-      ));
-    }
-
-     */
 
     Widget worldChatButton() {
       return FloatingActionButton(
