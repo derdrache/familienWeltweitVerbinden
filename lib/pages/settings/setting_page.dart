@@ -20,6 +20,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../global/style.dart' as style;
 import '../../global/global_functions.dart' as global_func;
 import '../../global/global_functions.dart';
 import '../../global/profil_sprachen.dart';
@@ -66,10 +67,6 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
     userProfil = Hive.box("secureBox").get("ownProfil");
 
     return Scaffold(
-      appBar: _SettingsAppBar(
-        userProfil: userProfil,
-        refresh: () => setState(() {}),
-      ),
       body: SafeArea(
           child: Container(
         margin: const EdgeInsets.only(top: 10),
@@ -80,7 +77,7 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
           }),
           child:
               ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
-            _NameSection(),
+            _NameSection(refresh: () => setState(() {})),
             _ProfilSection(
               afterChange: () => setState(() {}),
             ),
@@ -93,24 +90,21 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
   }
 }
 
-class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Map userProfil;
+class _NameSection extends StatelessWidget {
   Function refresh;
+  var textColor = Colors.black;
 
-  _SettingsAppBar({Key? key, required this.userProfil, required this.refresh}) : super(key: key);
-
-  @override
-  Size get preferredSize => const Size.fromHeight(60.0);
+  _NameSection({Key? key, required this.refresh}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var textColor = Colors.black;
+    userProfil = Hive.box("secureBox").get("ownProfil");
 
     openSettingWindow() async {
       return showMenu(
-          shape: const RoundedRectangleBorder(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
-              Radius.circular(5.0),
+              Radius.circular(style.roundedCorners),
             ),
           ),
           context: context,
@@ -124,8 +118,8 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                           context,
                           MaterialPageRoute(
                               builder: (_) => ChangeNamePage(
-                                    oldName: userProfil["name"],
-                                  ))).then((_) =>refresh()
+                                oldName: userProfil["name"],
+                              ))).then((_) =>refresh()
                       );
                     },
                     child: Text(AppLocalizations.of(context)!.nameAendern,
@@ -169,21 +163,6 @@ class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
           ]);
     }
 
-    return CustomAppBar(title: "", withLeading: false, buttons: [
-      IconButton(
-          onPressed: () => openSettingWindow(),
-          icon: Icon(Icons.more_vert, color: textColor))
-    ]);
-  }
-}
-
-class _NameSection extends StatelessWidget {
-  _NameSection({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    userProfil = Hive.box("secureBox").get("ownProfil");
-
     return Container(
         width: double.maxFinite,
         padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
@@ -191,10 +170,16 @@ class _NameSection extends StatelessWidget {
             border: Border(bottom: BorderSide(width: 10, color: borderColor!))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              InkWell(onTap: ()=> openSettingWindow(), child: Icon(Icons.more_vert, color: textColor)),
+            ],
+          ),
+          Row(
             children: [
               ProfilImage(userProfil, changeable: true, fullScreenWindow: true),
               const SizedBox(width: 10),
-              Flexible(
+              Expanded(
                 child: Text(
                   userProfil["name"],
                   style: const TextStyle(fontSize: 28),
@@ -203,7 +188,7 @@ class _NameSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(userProfil["email"])
+          Text(userProfil["email"]),
         ]));
   }
 }
