@@ -27,6 +27,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:record_mp3/record_mp3.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 
+import '../../global/style.dart' as style;
 import '../../functions/upload_and_save_image.dart';
 import '../../global/profil_sprachen.dart';
 import '../../streams/record_timer.dart';
@@ -1106,9 +1107,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           await http.get(Uri.parse(voiceDir + fileName));
       final file = File("${appDir.path}/$fileName");
       await file.writeAsBytes(response.bodyBytes);
-    } catch (error){
-
-    }
+    } catch (error) {}
   }
 
   playVoiceMessage(String audioPath) async {
@@ -1126,10 +1125,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     if (!isPlaying) return 0;
   }
 
-  Future<Duration>getFileDuration(fileName) async {
+  Future<Duration> getFileDuration(fileName) async {
     var appDir = await getApplicationDocumentsDirectory();
     AudioPlayer durationAudioPlayer = AudioPlayer();
-    await durationAudioPlayer.setSource(DeviceFileSource("${appDir.path}/$fileName"));
+    await durationAudioPlayer
+        .setSource(DeviceFileSource("${appDir.path}/$fileName"));
     Duration? duration = await durationAudioPlayer.getDuration();
 
     return duration!;
@@ -1589,7 +1589,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             color: messageBoxInformation["messageBoxColor"],
                             border: Border.all(),
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(10))),
+                                BorderRadius.all(Radius.circular(style.roundedCorners))),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1792,11 +1792,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 bool isDownloaded = snapshot.hasData ? snapshot.data! : false;
 
                 return IconButton(
-                  padding: EdgeInsets.zero,
+                    padding: EdgeInsets.zero,
                     onPressed: () async {
                       if (!isDownloaded) {
                         await downloadVoiceMessage(voiceFileUrl);
-                      } else if (playedVoiceMessage == voiceFileUrl && isPlaying) {
+                      } else if (playedVoiceMessage == voiceFileUrl &&
+                          isPlaying) {
                         isPlaying = false;
                         audioPlayer.pause();
                       } else {
@@ -1806,19 +1807,25 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       }
                       setState(() {});
                     },
-                    icon: Icon(isDownloaded
-                        ? isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow
-                        : Icons.download, size: 50,));
+                    icon: Icon(
+                      isDownloaded
+                          ? isPlaying
+                              ? Icons.pause
+                              : Icons.play_arrow
+                          : Icons.download,
+                      size: 50,
+                    ));
               }),
-          const SizedBox(width: 20,),
+          const SizedBox(
+            width: 20,
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 15),
             child: FutureBuilder<Duration>(
                 future: getFileDuration(voiceFileUrl),
                 builder: (context, snapshot) {
-                  Duration maxDuration = snapshot.hasData ? snapshot.data! : Duration.zero;
+                  Duration maxDuration =
+                      snapshot.hasData ? snapshot.data! : Duration.zero;
 
                   return SizedBox(
                     width: 200,
@@ -1826,7 +1833,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         stream: audioPlayer.onPositionChanged,
                         builder: (context, snapshot) {
                           return ProgressBar(
-                              progress: snapshot.hasData && playedVoiceMessage == voiceFileUrl
+                              progress: snapshot.hasData &&
+                                      playedVoiceMessage == voiceFileUrl
                                   ? snapshot.data!
                                   : Duration.zero,
                               total: maxDuration);
@@ -2063,6 +2071,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))),
               title: Center(child: Text(connectedData["name"])),
               contentPadding: EdgeInsets.zero,
               content: SizedBox(
@@ -2517,7 +2527,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       showModalBottomSheet<void>(
           context: context,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(style.roundedCorners),
           ),
           builder: (BuildContext context) {
             return StatefulBuilder(builder: (BuildContext context, setState) {
@@ -2529,8 +2539,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     const SizedBox(height: 10),
                     Text(
                       AppLocalizations.of(context)!.sprachnachricht,
-                      style:
-                          const TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 27, fontWeight: FontWeight.bold),
                     ),
                     const Expanded(child: SizedBox.shrink()),
                     Row(
@@ -2648,51 +2658,33 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             children: [
               const SizedBox(width: 10),
               Expanded(
-                child: recordModus == null
-                    ? TextField(
-                        maxLines: null,
-                        focusNode: messageInputNode,
-                        textInputAction: TextInputAction.newline,
-                        controller: nachrichtController,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)!.nachricht,
-                          hintStyle: const TextStyle(fontSize: 20),
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                        ),
-                        onChanged: (text) {
-                          if (isWriting && text.isEmpty) {
-                            setState(() {
-                              isWriting = false;
-                            });
-                          } else if (!isWriting && text.isNotEmpty) {
-                            setState(() {
-                              isWriting = true;
-                            });
-                          }
-                        },
-                      )
-                    : Container(
-                        /*AudioFileWaveforms(
-                    size: Size(300, 60.0),
-                    playerController: waveController,
-                    enableSeekGesture: false,
-                    waveformType: WaveformType.fitWidth,
-                    waveformData: waveformData,
-                    playerWaveStyle: const PlayerWaveStyle(
-                        fixedWaveColor: Colors.black,
-                        liveWaveColor: Colors.blueAccent,
-                        spacing: 6,
-                    ),
-
-
-                 */
-                        ),
-              ),
+                  child: TextField(
+                maxLines: null,
+                focusNode: messageInputNode,
+                textInputAction: TextInputAction.newline,
+                controller: nachrichtController,
+                textAlignVertical: TextAlignVertical.center,
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.nachricht,
+                  hintStyle: const TextStyle(fontSize: 20),
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                ),
+                onChanged: (text) {
+                  if (isWriting && text.isEmpty) {
+                    setState(() {
+                      isWriting = false;
+                    });
+                  } else if (!isWriting && text.isNotEmpty) {
+                    setState(() {
+                      isWriting = true;
+                    });
+                  }
+                },
+              )),
               isWriting
                   ? changeMessageInputModus != "edit"
                       ? IconButton(

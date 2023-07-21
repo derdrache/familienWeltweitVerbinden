@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+double roundedCorners = 20;
+
 getResponsiveFontSize(context, fontType){
   double unitHeightValue = MediaQuery.of(context).size.width * 0.01;
   double size;
@@ -28,3 +30,4 @@ textButtonStyle(){
       )
   );
 }
+
