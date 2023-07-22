@@ -14,9 +14,13 @@ class ProfilImage extends StatefulWidget {
   var profil;
   var changeable;
   var fullScreenWindow;
+  double size;
 
   ProfilImage(this.profil,
-      {Key? key, this.changeable = false, this.fullScreenWindow = false})
+      {Key? key,
+      this.changeable = false,
+      this.fullScreenWindow = false,
+      this.size = 30})
       : super(key: key);
 
   @override
@@ -71,9 +75,12 @@ class _ProfilImageState extends State<ProfilImage> {
   Widget build(BuildContext context) {
     var profilImageWidget =
         widget.profil["bild"] == null || widget.profil["bild"].isEmpty
-            ? DefaultProfilImage(widget.profil)
-            : OwnProfilImage(widget.profil,
-                fullScreenWindow: widget.fullScreenWindow);
+            ? DefaultProfilImage(widget.profil, widget.size)
+            : OwnProfilImage(
+                widget.profil,
+                fullScreenWindow: widget.fullScreenWindow,
+                size: widget.size,
+              );
 
     changeImageWindow() async {
       await showDialog(
@@ -160,8 +167,9 @@ class _ProfilImageState extends State<ProfilImage> {
 
 class DefaultProfilImage extends StatelessWidget {
   var profil;
+  var size;
 
-  DefaultProfilImage(this.profil, {Key? key}) : super(key: key);
+  DefaultProfilImage(this.profil, this.size, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -204,10 +212,10 @@ class DefaultProfilImage extends StatelessWidget {
     }
 
     return profil.isEmpty
-        ? const CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.black,
-            child: Center(
+        ? ImageCircleAvatar(
+            size: size,
+            childBackgroundColor: Colors.black,
+            child: const Center(
                 child: Text(
               "X",
               style: TextStyle(
@@ -215,9 +223,9 @@ class DefaultProfilImage extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.white),
             )))
-        : CircleAvatar(
-            radius: 30,
-            backgroundColor: Color(profil["bildStandardFarbe"] ?? 4293467747),
+        : ImageCircleAvatar(
+            size: size,
+            childBackgroundColor: Color(profil["bildStandardFarbe"]),
             child: Center(
                 child: Text(
               imageText.toUpperCase(),
@@ -233,8 +241,10 @@ class DefaultProfilImage extends StatelessWidget {
 class OwnProfilImage extends StatelessWidget {
   var profil;
   var fullScreenWindow;
+  double size;
 
-  OwnProfilImage(this.profil, {Key? key, this.fullScreenWindow})
+  OwnProfilImage(this.profil,
+      {Key? key, this.fullScreenWindow, required this.size})
       : super(key: key);
 
   @override
@@ -259,19 +269,48 @@ class OwnProfilImage extends StatelessWidget {
         onTap: fullScreenWindow ? () => showBigImage() : null,
         child: Padding(
           padding: EdgeInsets.zero,
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: isUrl
-                  ? CachedNetworkImage(
-                      width: 55,
-                      height: 55,
-                      fit: BoxFit.cover,
-                      imageUrl: image,
-                      placeholder: (context, url) => Container(
-                            color: Colors.black12,
-                          ))
-                  : Image.asset(image,
-                      width: 55, height: 55, fit: BoxFit.cover)),
+          child: isUrl
+              ? CachedNetworkImage(
+                  imageUrl: image,
+                  imageBuilder: (context, imageProvider) => ImageCircleAvatar(
+                        imageProvider: imageProvider,
+                        size: size,
+                      ),
+                  placeholder: (context, url) => Container(
+                        color: Colors.black12,
+                      ))
+              : ImageCircleAvatar(
+                  imageProvider: Image.asset(image, fit: BoxFit.cover).image,
+                  size: size,
+                ),
         ));
+  }
+}
+
+class ImageCircleAvatar extends StatelessWidget {
+  var imageProvider;
+  double size;
+  var backgroundColor;
+  Widget? child;
+  var childBackgroundColor;
+
+  ImageCircleAvatar(
+      {this.imageProvider,
+      required this.size,
+      this.backgroundColor = Colors.white,
+      this.child,
+      this.childBackgroundColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: size,
+      backgroundColor: backgroundColor,
+      child: CircleAvatar(
+          radius: size - 3,
+          backgroundColor: childBackgroundColor,
+          backgroundImage: imageProvider,
+          child: child),
+    );
   }
 }
