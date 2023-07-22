@@ -337,6 +337,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  curved_text:
+    dependency: "direct main"
+    description:
+      name: curved_text
+      sha256: "65fe6c4120875306ea6cc7502c10b336b92e578503e6bc50a61f15caceebad11"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.3"
   dart_style:
     dependency: transitive
     description:
@@ -486,6 +494,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_arc_text:
+    dependency: transitive
+    description:
+      name: flutter_arc_text
+      sha256: "38e9cda592ea61af4c7f2446641416580240da4be8a5427a99bf70045533ad16"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   flutter_blurhash:
     dependency: transitive
     description:
