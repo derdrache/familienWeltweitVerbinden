@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
-import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
@@ -118,9 +117,8 @@ class _NameSection extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                               builder: (_) => ChangeNamePage(
-                                oldName: userProfil["name"],
-                              ))).then((_) =>refresh()
-                      );
+                                    oldName: userProfil["name"],
+                                  ))).then((_) => refresh());
                     },
                     child: Text(AppLocalizations.of(context)!.nameAendern,
                         style: TextStyle(color: textColor)))),
@@ -129,9 +127,10 @@ class _NameSection extends StatelessWidget {
                     onPressed: () {
                       Navigator.pop(context);
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => ChangeEmailPage())).then((_)=>refresh());
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => ChangeEmailPage()))
+                          .then((_) => refresh());
                     },
                     child: Text(AppLocalizations.of(context)!.emailAendern,
                         style: TextStyle(color: textColor)))),
@@ -141,7 +140,8 @@ class _NameSection extends StatelessWidget {
                       Navigator.pop(context);
                       global_func.changePage(context, ChangePasswortPage());
                     },
-                    child: Text(AppLocalizations.of(context)!.passwortVeraendern,
+                    child: Text(
+                        AppLocalizations.of(context)!.passwortVeraendern,
                         style: TextStyle(color: textColor)))),
             PopupMenuItem(
                 child: TextButton(
@@ -172,7 +172,9 @@ class _NameSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              InkWell(onTap: ()=> openSettingWindow(), child: Icon(Icons.more_vert, color: textColor)),
+              InkWell(
+                  onTap: () => openSettingWindow(),
+                  child: Icon(Icons.more_vert, color: textColor)),
             ],
           ),
           Row(
@@ -199,7 +201,7 @@ class _ProfilSection extends StatelessWidget {
   var interessenInputBox =
       CustomMultiTextForm(auswahlList: global_variablen.interessenListe);
   var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
-  var sprachenInputBox = CustomMultiTextForm(auswahlList: []);
+  var sprachenInputBox = CustomMultiTextForm(auswahlList: const []);
   final bool spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
@@ -226,8 +228,10 @@ class _ProfilSection extends StatelessWidget {
         : global_func.changeGermanToEnglish(userProfil["reiseart"]);
 
     sprachenInputBox.selected = List<String>.from(spracheIstDeutsch
-        ? ProfilSprachen().translateLanguageList(englishList: userProfil["sprachen"])
-        : ProfilSprachen().translateLanguageList(germanList: userProfil["sprachen"]));
+        ? ProfilSprachen()
+            .translateLanguageList(englishList: userProfil["sprachen"])
+        : ProfilSprachen()
+            .translateLanguageList(germanList: userProfil["sprachen"]));
   }
 
   _ProfilSection({Key? key, required this.afterChange}) : super(key: key);
@@ -287,14 +291,11 @@ class _ProfilSection extends StatelessWidget {
       if (bis == null) {
         text += " - offen";
       } else {
-        text += " - " +
-            bis.split(" ")[0].split("-").take(2).toList().reversed.join("-");
+        text += " - ${bis.split(" ")[0].split("-").take(2).toList().reversed.join("-")}";
       }
 
       return text;
     }
-
-
 
     return Container(
         width: double.maxFinite,
@@ -530,8 +531,8 @@ class _SupportInformation extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Row(
-                  children: [
-                    const Text("Icons: ",
+                  children: const [
+                    Text("Icons: ",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     Text("created by Freepik - Flaticon"),
                   ],
