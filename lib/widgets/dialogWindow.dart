@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'Window_topbar.dart';
+import '../global/style.dart' as Style;
 
 class CustomAlertDialog extends StatefulWidget {
   String title;
@@ -34,8 +35,8 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: widget.backgroundColor,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20.0))),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(Style.roundedCorners))),
       contentPadding: EdgeInsets.zero,
       insetPadding: widget.windowPadding,
       actions: widget.actions,
