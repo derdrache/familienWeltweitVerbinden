@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:curved_text/curved_text.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -12,12 +13,11 @@ import '../global/custom_widgets.dart';
 import '../global/encryption.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/global_functions.dart';
-import '../global/variablen.dart' as global_variablen;
 import '../global/variablen.dart';
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
 import '../services/notification.dart';
-import '../widgets/custom_appbar.dart';
+import '../widgets/colorful_background.dart';
 import '../widgets/profil_image.dart';
 import '../widgets/text_with_hyperlink_detection.dart';
 import 'informationen/location/location_Information.dart';
@@ -27,14 +27,13 @@ double columnSpacing = 15;
 double textSize = 16;
 double headlineTextSize = 18;
 
-// ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
   Map profil;
 
   ShowProfilPage({Key? key, required this.profil}) : super(key: key);
 
   @override
-  _ShowProfilPageState createState() => _ShowProfilPageState();
+  State<ShowProfilPage> createState() => _ShowProfilPageState();
 }
 
 class _ShowProfilPageState extends State<ShowProfilPage> {
@@ -74,9 +73,37 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   @override
   Widget build(BuildContext context) {
+    header() {
+      return Stack(
+        children: [
+          ClipPath(
+              clipper: MyCustomClipper(),
+              child: ColorfulBackground(
+                height: 250,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ProfilImage(profil, size: 60),
+                    SizedBox(
+                        height: 60,
+                        child: CurvedText(
+                          curvature: -0.002,
+                          text: profil["name"],
+                          textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        )),
+                  ],
+                ),
+              )),
+          Positioned(child: _AppBar(profil: profil, familyProfil: familyProfil))
+        ],
+      );
+    }
+
     return SelectionArea(
       child: Scaffold(
-        appBar: _AppBar(profil: profil, familyProfil: familyProfil),
         body: SafeArea(
           child: SizedBox(
             width: double.maxFinite,
@@ -88,8 +115,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                   PointerDeviceKind.mouse,
                 }),
                 child: ListView(children: [
-                  _UserNameDisplay(profil: profil, familyProfil: familyProfil),
-                  const SizedBox(height: 10),
+                  header(),
                   _UserInformationDisplay(profil: profil),
                 ]),
               ),
@@ -101,7 +127,28 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   }
 }
 
-class _AppBar extends StatefulWidget implements PreferredSizeWidget {
+class MyCustomClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    double width = size.width;
+    double height = size.height;
+
+    var path = Path();
+
+    path.lineTo(0, height - 30);
+    path.quadraticBezierTo(width * 0.5, height + 30, width, height - 30);
+
+    path.lineTo(width, 0);
+
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+class _AppBar extends StatefulWidget {
   final Map profil;
   final Map? familyProfil;
 
@@ -110,9 +157,6 @@ class _AppBar extends StatefulWidget implements PreferredSizeWidget {
 
   @override
   State<_AppBar> createState() => _AppBarState();
-
-  @override
-  Size get preferredSize => const Size.fromHeight(60.0);
 }
 
 class _AppBarState extends State<_AppBar> {
@@ -120,6 +164,7 @@ class _AppBarState extends State<_AppBar> {
   var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
   late String _userName;
   late bool _isOwnProfil;
+  var buttonColor = Colors.white;
 
   @override
   void initState() {
@@ -219,14 +264,20 @@ class _AppBarState extends State<_AppBar> {
   Widget build(BuildContext context) {
     openNoteButton() {
       return IconButton(
-        icon: const Icon(Icons.description),
+        icon: Icon(
+          Icons.description,
+          color: buttonColor,
+        ),
         onPressed: () => openNoteWindow(),
       );
     }
 
     openChatButton() {
       return IconButton(
-          icon: const Icon(Icons.message),
+          icon: Icon(
+            Icons.message,
+            color: buttonColor,
+          ),
           onPressed: () async {
             if (widget.familyProfil != null) {
               List<Widget> menuList = [];
@@ -298,7 +349,7 @@ class _AppBarState extends State<_AppBar> {
               snackbarText =
                   _userName + AppLocalizations.of(context)!.friendlistEntfernt;
 
-              var newsId = getNewsId("added " + widget.profil["id"]);
+              var newsId = getNewsId("added ${widget.profil["id"]}");
 
               if (newsId != null) NewsPageDatabase().delete(newsId);
             } else {
@@ -427,7 +478,10 @@ class _AppBarState extends State<_AppBar> {
 
     moreMenuButton() {
       return IconButton(
-        icon: const Icon(Icons.more_vert),
+        icon: Icon(
+          Icons.more_vert,
+          color: buttonColor,
+        ),
         onPressed: () {
           showDialog(
               context: context,
@@ -455,83 +509,17 @@ class _AppBarState extends State<_AppBar> {
       );
     }
 
-    return CustomAppBar(title: "", buttons: [
-      _isOwnProfil ? const SizedBox.shrink() : openNoteButton(),
-      _isOwnProfil ? const SizedBox.shrink() : openChatButton(),
-      _isOwnProfil ? const SizedBox.shrink() : moreMenuButton()
-    ]);
-  }
-}
-
-// ignore: must_be_immutable
-class _UserNameDisplay extends StatelessWidget {
-  Map profil;
-  Map? familyProfil;
-
-  _UserNameDisplay({Key? key, required this.profil, this.familyProfil})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width * 0.7;
-
-    openChat(chatpartnerId, chatpartnerName) async {
-      global_functions.changePage(
-          context,
-          ChatDetailsPage(
-            chatPartnerId: chatpartnerId,
-            chatPartnerName: chatpartnerName,
-          ));
-    }
-
-    getFamilyMemberNames() {
-      var familyMemberName = "";
-
-      if (familyProfil != null) {
-        var familyMember = familyProfil!["members"];
-        for (var member in familyMember) {
-          familyMemberName +=
-              getProfilFromHive(profilId: member, getNameOnly: true);
-          familyMemberName += ", ";
-        }
-      }
-
-      return familyMemberName;
-    }
-
-    return Container(
-      alignment: Alignment.center,
-      padding: const EdgeInsets.only(top: 20, bottom: 10, left: 10, right: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              ProfilImage(profil, fullScreenWindow: true),
-              const SizedBox(width: 10),
-              GestureDetector(
-                onTap: () => openChat(profil["id"], profil["name"]),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: screenWidth,
-                      child: Text(
-                        profil["name"],
-                        style: TextStyle(
-                            fontSize: profil["name"].length > 20 ? 20 : 24,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    if (familyProfil != null) const SizedBox(height: 5),
-                    if (familyProfil != null) Text(getFamilyMemberNames())
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return Row(
+      children: [
+        IconButton(
+          icon: Icon(Icons.arrow_back, color: buttonColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        const Expanded(child: SizedBox.shrink()),
+        _isOwnProfil ? const SizedBox.shrink() : openNoteButton(),
+        _isOwnProfil ? const SizedBox.shrink() : openChatButton(),
+        _isOwnProfil ? const SizedBox.shrink() : moreMenuButton()
+      ],
     );
   }
 }
@@ -587,6 +575,477 @@ class _UserInformationDisplay extends StatelessWidget {
       }
     }
 
+    createZuletztOnlineText() {
+      var text = "";
+      var color = Colors.grey;
+      var size = textSize - 2;
+      var timeDifferenceLastLogin = Duration(
+          microseconds: (DateTime.now().microsecondsSinceEpoch -
+                  DateTime.parse(profil["lastLogin"].toString())
+                      .microsecondsSinceEpoch)
+              .abs());
+      var daysOffline = timeDifferenceLastLogin.inDays;
+      var monthDifference = timeDifferenceLastLogin.inDays / 30.44;
+
+      if (monthDifference >= monthsUntilInactive) {
+        text = AppLocalizations.of(context)!.inaktiv;
+        size = headlineTextSize;
+      } else if (daysOffline > 30) {
+        text = AppLocalizations.of(context)!.langeZeitNichtGesehen;
+      } else if (daysOffline > 7) {
+        text = AppLocalizations.of(context)!.innerhalbMonatsGesehen;
+      } else if (daysOffline > 1) {
+        text = AppLocalizations.of(context)!.innerhalbWocheGesehen;
+      } else {
+        text = AppLocalizations.of(context)!.kuerzlichGesehen;
+      }
+
+      return Text(text, style: TextStyle(color: color, fontSize: size));
+    }
+
+    locationDisplay() {
+      return GestureDetector(
+        onTap: () => changePage(
+            context, LocationInformationPage(ortName: profil["ort"])),
+        child: Row(
+          children: [
+            Text(
+              "${AppLocalizations.of(context)!.aktuelleOrt}: ",
+              style: TextStyle(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.bold,
+                  decoration: TextDecoration.underline),
+            ),
+            Flexible(
+                child: Text(
+              profil["ort"],
+              style: TextStyle(
+                  fontSize: textSize, decoration: TextDecoration.underline),
+              maxLines: 2,
+            ))
+          ],
+        ),
+      );
+    }
+
+    travelTypDisplay() {
+      var themaText = "${AppLocalizations.of(context)!.artDerReise}: ";
+      var inhaltText =
+          global_functions.changeGermanToEnglish(profil["reiseart"]);
+
+      if (spracheIstDeutsch) {
+        inhaltText = global_functions.changeEnglishToGerman(profil["reiseart"]);
+      }
+
+      return Row(children: [
+        Text(themaText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: textSize))
+      ]);
+    }
+
+    openBesuchteLaenderWindow() {
+      List<Widget> besuchteLaenderList = [];
+
+      for (var land in profil["besuchteLaender"]) {
+        besuchteLaenderList.add(
+            Container(margin: const EdgeInsets.all(10), child: Text(land)));
+      }
+
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return CustomAlertDialog(
+              title: AppLocalizations.of(context)!.besuchteLaender,
+              children: besuchteLaenderList,
+            );
+          });
+    }
+
+    besuchteLaenderDisplay() {
+      return InkWell(
+        onTap: () => openBesuchteLaenderWindow(),
+        child: Row(children: [
+          Text(
+            "${AppLocalizations.of(context)!.besuchteLaender}: ",
+            style: TextStyle(
+                fontSize: textSize,
+                fontWeight: FontWeight.bold,
+                decoration: TextDecoration.underline),
+          ),
+          Text(profil["besuchteLaender"].length.toString(),
+              style: TextStyle(
+                  fontSize: textSize, decoration: TextDecoration.underline))
+        ]),
+      );
+    }
+
+    aufreiseDisplay() {
+      if (profil["aufreiseSeit"] == null) return const SizedBox.shrink();
+
+      var themenText = "${AppLocalizations.of(context)!.aufReise}: ";
+      var seitText =
+      profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+      var inhaltText = "";
+
+      if (profil["aufreiseBis"] == null) {
+        inhaltText = seitText + " - " + AppLocalizations.of(context)!.offen;
+      } else {
+        var bisText = profil["aufreiseBis"]
+            .split("-")
+            .take(2)
+            .toList()
+            .reversed
+            .join("-");
+        inhaltText = seitText + " - " + bisText;
+      }
+
+      return Row(children: [
+          Text(themenText,
+              style:
+              TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+          Text(inhaltText, style: TextStyle(fontSize: textSize))
+        ]);
+    }
+
+    reiseInfoBox() {
+      return InfoBox(
+          child: Column(
+        children: [
+          const SizedBox(height: 5),
+          locationDisplay(),
+          const SizedBox(height: 10),
+          travelTypDisplay(),
+          const SizedBox(height: 10),
+          besuchteLaenderDisplay(),
+          const SizedBox(height: 10),
+          aufreiseDisplay(),
+          const SizedBox(height: 5),
+        ],
+      ));
+    }
+
+    sprachenDisplay() {
+      var themenText = "${AppLocalizations.of(context)!.sprachen}: ";
+      var inhaltText =
+          global_functions.changeGermanToEnglish(profil["sprachen"]).join(", ");
+
+      if (spracheIstDeutsch) {
+        inhaltText = global_functions
+            .changeEnglishToGerman(profil["sprachen"])
+            .join(", ");
+      }
+
+      return Row(children: [
+        Text(themenText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: textSize))
+      ]);
+    }
+
+    kinderDisplay() {
+      var childrenProfilList = profil["kinder"];
+      childrenProfilList.sort();
+      var childrenList = [];
+      var alterZusatz = spracheIstDeutsch ? "J" : "y";
+
+      childrenProfilList.forEach((child) {
+        childrenList.add(
+            global_functions.ChangeTimeStamp(child).intoYears().toString() +
+                alterZusatz);
+      });
+
+      return Row(
+        children: [
+          Text("${AppLocalizations.of(context)!.kinder}: ",
+              style:
+                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+          Text(childrenList.reversed.join(", "),
+              style: TextStyle(fontSize: textSize))
+        ],
+      );
+    }
+
+    familyInfoBox() {
+      return InfoBox(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 5,
+            ),
+            sprachenDisplay(),
+            const SizedBox(
+              height: 10,
+            ),
+            kinderDisplay(),
+            const SizedBox(height: 5)
+          ],
+        ),
+      );
+    }
+
+    reisePlanungBox() {
+      var reiseplanung = [];
+      var reiseplanungPrivacy = spracheIstDeutsch
+          ? changeEnglishToGerman(profil["reiseplanungPrivacy"])
+          : changeGermanToEnglish(profil["reiseplanungPrivacy"]);
+
+      profil["reisePlanung"]
+          .sort((a, b) => a["von"].compareTo(b["von"]) as int);
+
+      for (var reiseplan in profil["reisePlanung"]) {
+        String ortText = reiseplan["ortData"]["city"];
+        var dateReiseplanBis = DateTime.parse(reiseplan["bis"]);
+        var dateNow = DateTime(DateTime.now().year, DateTime.now().month);
+
+        if (dateReiseplanBis.isBefore(dateNow)) continue;
+
+        if (reiseplan["ortData"]["city"] !=
+            reiseplan["ortData"]["countryname"]) {
+          ortText += " / " + reiseplan["ortData"]["countryname"];
+        }
+
+        reiseplanung.add(GestureDetector(
+          onTap: () => changePage(context,
+              LocationInformationPage(ortName: reiseplan["ortData"]["city"])),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 5),
+            child: Row(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                        "${transformDateToText(reiseplan["von"])} - ${transformDateToText(reiseplan["bis"], onlyMonth: true)} in ",
+                        style: TextStyle(fontSize: textSize)),
+                    Text(ortText,
+                        style: TextStyle(
+                            fontSize: textSize,
+                            decoration: TextDecoration.underline))
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ));
+      }
+
+      return InfoBox(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(
+            children: [
+              Text(
+                "${AppLocalizations.of(context)!.reisePlanung}: ",
+                style:
+                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+              ),
+              if (isOwnProfil)
+                Text(
+                    "${"(${AppLocalizations.of(context)!.fuer}" + reiseplanungPrivacy})")
+            ],
+          ),
+          const SizedBox(height: 5),
+          ...reiseplanung,
+          const SizedBox(height: 5)
+        ]),
+      );
+    }
+
+    socialMediaItem(link) {
+      return Container(
+        margin: const EdgeInsets.all(5),
+        child: Row(
+          children: [
+            const Text("- "),
+            SizedBox(
+                width: 300,
+                child: TextWithHyperlinkDetection(
+                  text: link,
+                  maxLines: 1,
+                ))
+          ],
+        ),
+      );
+    }
+
+    socialMediaBox() {
+      List<Widget> socialMediaContent = [];
+
+      for (var socialMediaLink in profil["socialMediaLinks"]) {
+        socialMediaContent.add(socialMediaItem(socialMediaLink));
+      }
+
+      return InfoBox(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text("Social Media: ",
+              style:
+                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+          ...socialMediaContent
+        ]),
+      );
+    }
+
+    interessenBox() {
+      var themenText = AppLocalizations.of(context)!.interessen;
+      var inhaltText =
+          global_functions.changeGermanToEnglish(profil["interessen"]);
+
+      if (spracheIstDeutsch) {
+        inhaltText =
+            global_functions.changeEnglishToGerman(profil["interessen"]);
+      }
+
+      return InfoBox(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              themenText,
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 5),
+            Wrap(
+              children: [
+                for (var item in inhaltText)
+                  Container(
+                    margin: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Text(
+                      item,
+                      style: const TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
+                    ),
+                  )
+              ],
+            )
+          ],
+        ),
+      );
+    }
+
+    aboutmeBox() {
+      return InfoBox(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.ueberMich,
+              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            TextWithHyperlinkDetection(
+              text: profil["aboutme"],
+              fontsize: textSize - 1,
+            )
+          ],
+        ),
+      );
+    }
+
+    return Container(
+        padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Text("Info",
+                  style: TextStyle(
+                      fontSize: headlineTextSize,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold)),
+              const Expanded(child: SizedBox.shrink()),
+              createZuletztOnlineText()
+            ]),
+            SizedBox(height: columnSpacing),
+            reiseInfoBox(),
+            familyInfoBox(),
+            interessenBox(),
+            if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
+            if (profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
+            if (profil["aboutme"].isNotEmpty) aboutmeBox(),
+          ],
+        ));
+  }
+}
+
+class InfoBox extends StatelessWidget {
+  const InfoBox({
+    Key? key,
+    required this.child
+  }) : super(key: key);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.only(bottom: 15),
+        width: double.infinity,
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.blueGrey),
+            borderRadius: BorderRadius.circular(20)),
+        child: child);
+  }
+}
+
+/*
+class _UserInformationDisplay extends StatelessWidget {
+  final Map profil;
+
+  const _UserInformationDisplay({Key? key, required this.profil})
+      : super(key: key);
+
+  checkAccessReiseplanung() {
+    var ownProfil = Hive.box("secureBox").get("ownProfil");
+    var hasAccess = false;
+    var reiseplanungSetting = profil["reiseplanungPrivacy"];
+    var isPrivacyLevel1 = reiseplanungSetting == privacySetting[0] ||
+        reiseplanungSetting == privacySettingEnglisch[0];
+    var isPrivacyLevel2 = reiseplanungSetting == privacySetting[1] ||
+        reiseplanungSetting == privacySettingEnglisch[1];
+    var isPrivacyLevel3 = reiseplanungSetting == privacySetting[2] ||
+        reiseplanungSetting == privacySettingEnglisch[2];
+
+    if (profil["reisePlanung"].isEmpty) return false;
+
+    if (isPrivacyLevel1) {
+      hasAccess = true;
+    } else if (isPrivacyLevel2 &&
+        (ownProfil["friendlist"].contains(profil["id"]))) {
+      hasAccess = true;
+    } else if (isPrivacyLevel3 &&
+        ownProfil["friendlist"].contains(profil["id"]) &&
+        profil["friendlist"].contains(ownProfil["id"])) {
+      hasAccess = true;
+    }
+
+    return hasAccess;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var isOwnProfil = profil["id"] == userId;
+    profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
+
+    transformDateToText(dateString, {onlyMonth = false}) {
+      DateTime date = DateTime.parse(dateString);
+
+      if ((date.month > DateTime.now().month &&
+          date.year == DateTime.now().year) ||
+          date.year > DateTime.now().year ||
+          onlyMonth) {
+        return "${date.month}.${date.year}";
+      } else {
+        return AppLocalizations.of(context)!.jetzt;
+      }
+    }
+
     openBesuchteLaenderWindow() {
       List<Widget> besuchteLaenderList = [];
 
@@ -620,11 +1079,11 @@ class _UserInformationDisplay extends StatelessWidget {
             ),
             Flexible(
                 child: Text(
-              profil["ort"],
-              style: TextStyle(
-                  fontSize: textSize, decoration: TextDecoration.underline),
-              maxLines: 2,
-            ))
+                  profil["ort"],
+                  style: TextStyle(
+                      fontSize: textSize, decoration: TextDecoration.underline),
+                  maxLines: 2,
+                ))
           ],
         ),
       );
@@ -633,7 +1092,7 @@ class _UserInformationDisplay extends StatelessWidget {
     travelTypBox() {
       var themaText = "${AppLocalizations.of(context)!.artDerReise}: ";
       var inhaltText =
-          global_functions.changeGermanToEnglish(profil["reiseart"]);
+      global_functions.changeGermanToEnglish(profil["reiseart"]);
 
       if (spracheIstDeutsch) {
         inhaltText = global_functions.changeEnglishToGerman(profil["reiseart"]);
@@ -651,7 +1110,7 @@ class _UserInformationDisplay extends StatelessWidget {
 
       var themenText = "${AppLocalizations.of(context)!.aufReise}: ";
       var seitText =
-          profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+      profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
       var inhaltText = "";
 
       if (profil["aufreiseBis"] == null) {
@@ -670,7 +1129,7 @@ class _UserInformationDisplay extends StatelessWidget {
         Row(children: [
           Text(themenText,
               style:
-                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+              TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
           Text(inhaltText, style: TextStyle(fontSize: textSize))
         ]),
         SizedBox(height: columnSpacing),
@@ -680,7 +1139,7 @@ class _UserInformationDisplay extends StatelessWidget {
     sprachenBox() {
       var themenText = "${AppLocalizations.of(context)!.sprachen}: ";
       var inhaltText =
-          global_functions.changeGermanToEnglish(profil["sprachen"]).join(", ");
+      global_functions.changeGermanToEnglish(profil["sprachen"]).join(", ");
 
       if (spracheIstDeutsch) {
         inhaltText = global_functions
@@ -711,7 +1170,7 @@ class _UserInformationDisplay extends StatelessWidget {
         children: [
           Text("${AppLocalizations.of(context)!.kinder}: ",
               style:
-                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+              TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
           Text(childrenList.reversed.join(", "),
               style: TextStyle(fontSize: textSize))
         ],
@@ -853,8 +1312,8 @@ class _UserInformationDisplay extends StatelessWidget {
       var size = textSize - 2;
       var timeDifferenceLastLogin = Duration(
           microseconds: (DateTime.now().microsecondsSinceEpoch -
-                  DateTime.parse(profil["lastLogin"].toString())
-                      .microsecondsSinceEpoch)
+              DateTime.parse(profil["lastLogin"].toString())
+                  .microsecondsSinceEpoch)
               .abs());
       var daysOffline = timeDifferenceLastLogin.inDays;
       var monthDifference = timeDifferenceLastLogin.inDays / 30.44;
@@ -901,19 +1360,16 @@ class _UserInformationDisplay extends StatelessWidget {
       return Container(
           margin: const EdgeInsets.only(bottom: 10),
           child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text("Social Media: ",
                 style:
-                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+                TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
             ...socialMediaContent
           ]));
     }
 
     return Container(
         padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
-        decoration: BoxDecoration(
-            border: Border(
-                top: BorderSide(color: global_variablen.borderColorGrey))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -945,3 +1401,5 @@ class _UserInformationDisplay extends StatelessWidget {
         ));
   }
 }
+
+ */
