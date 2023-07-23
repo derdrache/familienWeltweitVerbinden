@@ -59,10 +59,25 @@ class ColorfulBackground extends StatelessWidget {
             angle: -math.pi / 4,
             child: Container(
               height: 200,
-              width: 270,
+              width: 250,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Style.roundedCorners),
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withOpacity(0.15),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: -140,
+          child: Transform.rotate(
+            angle: -math.pi / 4,
+            child: Container(
+              height: 200,
+              width: 400,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(Style.roundedCorners),
+                color: Colors.white.withOpacity(0.15),
               ),
             ),
           ),
