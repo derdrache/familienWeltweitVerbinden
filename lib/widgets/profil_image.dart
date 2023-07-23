@@ -215,11 +215,11 @@ class DefaultProfilImage extends StatelessWidget {
         ? ImageCircleAvatar(
             size: size,
             childBackgroundColor: Colors.black,
-            child: const Center(
+            child: Center(
                 child: Text(
               "X",
               style: TextStyle(
-                  fontSize: 25,
+                  fontSize: size / 1.5,
                   fontWeight: FontWeight.bold,
                   color: Colors.white),
             )))
@@ -229,8 +229,8 @@ class DefaultProfilImage extends StatelessWidget {
             child: Center(
                 child: Text(
               imageText.toUpperCase(),
-              style: const TextStyle(
-                  fontSize: 25,
+              style: TextStyle(
+                  fontSize: size / 1.5,
                   fontWeight: FontWeight.bold,
                   color: Colors.white),
             )),
