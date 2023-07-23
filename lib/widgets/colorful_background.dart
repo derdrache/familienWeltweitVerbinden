@@ -28,7 +28,7 @@ class ColorfulBackground extends StatelessWidget {
           child: Transform.rotate(
             angle: math.pi / 4,
             child: Container(
-              height: 200,
+              height: height / 3 * 2,
               width: 300,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Style.roundedCorners),
@@ -43,7 +43,7 @@ class ColorfulBackground extends StatelessWidget {
           child: Transform.rotate(
             angle: math.pi / 4,
             child: Container(
-              height: 100,
+              height: height / 3,
               width: 150,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Style.roundedCorners),
@@ -58,7 +58,7 @@ class ColorfulBackground extends StatelessWidget {
           child: Transform.rotate(
             angle: -math.pi / 4,
             child: Container(
-              height: 200,
+              height: height / 3 * 2,
               width: 250,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Style.roundedCorners),
@@ -73,7 +73,7 @@ class ColorfulBackground extends StatelessWidget {
           child: Transform.rotate(
             angle: -math.pi / 4,
             child: Container(
-              height: 200,
+              height: height / 3 * 2,
               width: 400,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Style.roundedCorners),
