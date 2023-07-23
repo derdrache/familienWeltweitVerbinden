@@ -75,7 +75,8 @@ class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
             PointerDeviceKind.mouse,
           }),
           child:
-              ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
+              ListView(padding: EdgeInsets.zero, shrinkWrap: true, children:
+              [
             _NameSection(refresh: () => setState(() {})),
             _ProfilSection(
               afterChange: () => setState(() {}),
