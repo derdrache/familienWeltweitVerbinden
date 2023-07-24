@@ -85,6 +85,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
     newNote["titleEng"] = titleTranslationData["eng"];
     newNote["beschreibungGer"] = descriptionTranslationData["ger"];
     newNote["beschreibungEng"] = descriptionTranslationData["eng"];
+    newNote["sprache"] = descriptionTranslationData["language"];
 
     await BulletinBoardDatabase().addNewNote(Map.of(newNote));
   }
