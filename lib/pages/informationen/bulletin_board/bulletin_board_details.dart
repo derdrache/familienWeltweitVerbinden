@@ -21,7 +21,7 @@ import '../../../widgets/google_autocomplete.dart';
 class BulletinBoardDetails extends StatefulWidget {
   Map note;
 
-  BulletinBoardDetails({Key? key, required this.note});
+  BulletinBoardDetails({Key? key, required this.note}) : super(key: key);
 
   @override
   State<BulletinBoardDetails> createState() => _BulletinBoardDetailsState();
@@ -196,9 +196,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           widget.note["location"]["countryname"]) {
         hintText += " / " + widget.note["location"]["countryname"];
       }
-      bool isWorldwide = widget.note["location"]["city"] ==
-          AppLocalizations.of(context)!.weltweit;
-
+      bool isWorldwide = widget.note["location"]["city"] == "worldwide"
+          || widget.note["location"]["city"] == "Weltweit";
       ortAuswahlBox = GoogleAutoComplete(
         margin: const EdgeInsets.only(left: 10, right: 10),
         withOwnLocation: true,
