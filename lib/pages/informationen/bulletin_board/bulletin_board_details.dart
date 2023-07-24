@@ -145,8 +145,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   @override
   Widget build(BuildContext context) {
     isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
-    bool noteLanguageGerman = widget.note["beschreibungGer"]
-        .contains("Dies ist eine automatische Übersetzung");
+    bool noteLanguageGerman = widget.note["beschreibungEng"]
+        .contains("This is an automatic translation");
     bool userSpeakGerman = getUserSpeaksGerman();
     bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
         ownProfil["sprachen"].contains("english") ||
