@@ -299,7 +299,7 @@ class ImageCircleAvatar extends StatelessWidget {
       required this.size,
       this.backgroundColor = Colors.white,
       this.child,
-      this.childBackgroundColor});
+      this.childBackgroundColor = Colors.white});
 
   @override
   Widget build(BuildContext context) {
