@@ -80,6 +80,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               clipper: MyCustomClipper(),
               child: ColorfulBackground(
                 height: 250,
+                colors: [Color(0xFFBF1D53), Color(0xFFd26086)],
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -685,7 +686,7 @@ class _UserInformationDisplay extends StatelessWidget {
 
       var themenText = "${AppLocalizations.of(context)!.aufReise}: ";
       var seitText =
-      profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+          profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
       var inhaltText = "";
 
       if (profil["aufreiseBis"] == null) {
@@ -701,11 +702,10 @@ class _UserInformationDisplay extends StatelessWidget {
       }
 
       return Row(children: [
-          Text(themenText,
-              style:
-              TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-          Text(inhaltText, style: TextStyle(fontSize: textSize))
-        ]);
+        Text(themenText,
+            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: textSize))
+      ]);
     }
 
     reiseInfoBox() {
@@ -885,13 +885,26 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     interessenBox() {
+      var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
       var themenText = AppLocalizations.of(context)!.interessen;
-      var inhaltText =
+      List profilInteresets =
           global_functions.changeGermanToEnglish(profil["interessen"]);
+      List matchInterest = [];
 
       if (spracheIstDeutsch) {
-        inhaltText =
+        profilInteresets =
             global_functions.changeEnglishToGerman(profil["interessen"]);
+      }
+
+      for (var interest in profil["interessen"]) {
+        List ownInterests =
+            global_functions.changeEnglishToGerman(ownProfil["interessen"]) +
+                global_functions.changeGermanToEnglish(ownProfil["interessen"]);
+        bool match = false;
+
+        if(ownInterests.contains(interest)) match = true;
+
+        matchInterest.add(match);
       }
 
       return InfoBox(
@@ -905,20 +918,20 @@ class _UserInformationDisplay extends StatelessWidget {
             const SizedBox(height: 5),
             Wrap(
               children: [
-                for (var item in inhaltText)
-                  Container(
-                    margin: const EdgeInsets.all(5),
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold),
-                    ),
-                  )
+                for(var i = 0; i<profilInteresets.length; i++) Container(
+                  margin: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                      color: matchInterest[i] ? Theme.of(context).colorScheme.secondary : Colors.white,
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Text(
+                    profilInteresets[i],
+                    style: const TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                )
+
               ],
             )
           ],
@@ -974,10 +987,7 @@ class _UserInformationDisplay extends StatelessWidget {
 }
 
 class InfoBox extends StatelessWidget {
-  const InfoBox({
-    Key? key,
-    required this.child
-  }) : super(key: key);
+  const InfoBox({Key? key, required this.child}) : super(key: key);
 
   final Widget child;
 
