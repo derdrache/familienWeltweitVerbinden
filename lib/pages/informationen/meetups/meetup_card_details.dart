@@ -574,11 +574,15 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     openLocationChangeWindow() {
-      if (!widget.isCreator) {
+      bool isWorldwide = widget.meetupData["stadt"] == "worldwide"
+          || widget.meetupData["stadt"]== "Weltweit";
+
+      if (!widget.isCreator && !isWorldwide) {
         global_func.changePage(context,
             LocationInformationPage(ortName: widget.meetupData["stadt"]));
         return;
       }
+
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {

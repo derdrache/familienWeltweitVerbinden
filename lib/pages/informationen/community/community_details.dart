@@ -974,8 +974,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       if (widget.community["ort"] != widget.community["land"]) {
         locationText += " / " + widget.community["land"];
       }
-      bool isWorldwide = widget.community["ort"] ==
-          AppLocalizations.of(context)!.weltweit;
+      bool isWorldwide = widget.community["ort"] == "worldwide"
+          || widget.community["ort"]== "Weltweit";
 
       if (isCreator) {
         title = widget.community["name"];
