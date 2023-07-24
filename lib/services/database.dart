@@ -1278,8 +1278,7 @@ class BulletinBoardDatabase {
     note["bilder"] = json.encode(note["bilder"]);
 
     var url = Uri.parse(databaseUrl + databasePathNewBulletinNote);
-    var test = await http.post(url, body: json.encode(note));
-    print(test.body);
+    await http.post(url, body: json.encode(note));
   }
 
   update(whatData, queryEnd) async {
