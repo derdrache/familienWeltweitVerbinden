@@ -8,7 +8,7 @@ import 'bulletin_board_details.dart';
 class BulletinBoardCard extends StatefulWidget {
   final Map note;
 
-  const BulletinBoardCard({Key? key, required this.note});
+  const BulletinBoardCard({Key? key, required this.note}) : super(key: key);
 
   @override
   State<BulletinBoardCard> createState() => _BulletinBoardCardState();
