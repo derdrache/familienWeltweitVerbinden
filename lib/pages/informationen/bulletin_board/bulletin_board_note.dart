@@ -28,7 +28,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
   void initState() {
   noteLocation = widget.note["location"]["city"];
   noteCountry = widget.note["location"]["countryname"];
-  noteLanguageGerman = widget.note["beschreibungGer"].contains("Dies ist eine automatische Übersetzung");
+  noteLanguageGerman = widget.note["beschreibungEng"].contains("This is an automatic translation");
   userSpeakGerman = getUserSpeaksGerman();
     userSpeakEnglish = ownProfil["sprachen"].contains("Englisch")
       || ownProfil["sprachen"].contains("english") || systemLanguage == "en";
