@@ -14,7 +14,7 @@ class ColorfulBackground extends StatelessWidget {
   Widget? child;
   double width;
   double height;
-  List colors;
+  List<Color> colors;
 
 
   @override
@@ -95,7 +95,7 @@ class ColorfulBackground extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.orange, Colors.orangeAccent]
+                colors: colors
               )
             ),
           ),
