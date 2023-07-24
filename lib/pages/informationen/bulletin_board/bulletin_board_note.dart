@@ -71,7 +71,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
         margin: EdgeInsets.all(10),
         padding: EdgeInsets.all(5),
         width: 110,
-        height: 120,
+        height: 110,
         transform: Matrix4.rotationZ(widget.note["rotation"]),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
@@ -81,8 +81,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
         child: Center(child: Column(
           children: [
             Text(getNoteTitle(), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold),),
-            SizedBox(height: 5,),
-            Text("Location:"),
+            SizedBox(height: 10,),
             Text(getStringSized(noteLocation)),
             if(noteCountry != noteLocation) Text(getStringSized(noteCountry))
           ],
