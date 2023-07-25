@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 double roundedCorners = 20;
+double textSize = 16;
 
 getResponsiveFontSize(context, fontType){
   double unitHeightValue = MediaQuery.of(context).size.width * 0.01;

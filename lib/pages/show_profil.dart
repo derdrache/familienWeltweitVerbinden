@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../global/style.dart' as style;
 import '../global/custom_widgets.dart';
 import '../global/encryption.dart';
 import '../global/global_functions.dart' as global_functions;
@@ -22,11 +23,10 @@ import '../widgets/profil_image.dart';
 import '../widgets/text_with_hyperlink_detection.dart';
 import 'informationen/location/location_Information.dart';
 
-var userId = FirebaseAuth.instance.currentUser?.uid;
-double columnSpacing = 15;
-double textSize = 16;
+String? userId = FirebaseAuth.instance.currentUser?.uid;
 double headlineTextSize = 18;
 
+//ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
   Map profil;
 
@@ -51,7 +51,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
 
   checkIfIsFamilyMember() {
     var spracheIstDeutsch = kIsWeb
-        ? window.locale.languageCode == "de"
+        ? PlatformDispatcher.instance.locale.languageCode == "de"
         : Platform.localeName == "de_DE";
     familyProfil = getFamilyProfil(familyMember: profil["id"]);
 
@@ -66,8 +66,8 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
     var familyName = familyProfil!["name"];
     var mainMemberProfil =
         Map.of(getProfilFromHive(profilId: familyProfil!["mainProfil"]));
-    mainMemberProfil["name"] =
-        "${spracheIstDeutsch ? "Familie" : "Family"} " + familyName;
+    String familyText = spracheIstDeutsch ? "Familie" : "Family";
+    mainMemberProfil["name"] = "$familyText $familyName";
     profil = mainMemberProfil;
   }
 
@@ -77,10 +77,10 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
       return Stack(
         children: [
           ClipPath(
-              clipper: MyCustomClipper(),
+              clipper: _MyCustomClipper(),
               child: ColorfulBackground(
                 height: 250,
-                colors: [Color(0xFFBF1D53), Color(0xFFd26086)],
+                colors: const [Color(0xFFBF1D53), Color(0xFFd26086)],
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -128,7 +128,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   }
 }
 
-class MyCustomClipper extends CustomClipper<Path> {
+class _MyCustomClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     double width = size.width;
@@ -138,7 +138,6 @@ class MyCustomClipper extends CustomClipper<Path> {
 
     path.lineTo(0, height - 30);
     path.quadraticBezierTo(width * 0.5, height + 30, width, height - 30);
-
     path.lineTo(width, 0);
 
     path.close();
@@ -161,11 +160,11 @@ class _AppBar extends StatefulWidget {
 }
 
 class _AppBarState extends State<_AppBar> {
-  var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
-  var userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
+  Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
+  List userFriendlist = Hive.box('secureBox').get("ownProfil")["friendlist"];
   late String _userName;
   late bool _isOwnProfil;
-  var buttonColor = Colors.white;
+  Color buttonColor = Colors.white;
 
   @override
   void initState() {
@@ -364,7 +363,7 @@ class _AppBarState extends State<_AppBar> {
                   toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
                       widget.profil["sprachen"].contains("german"));
 
-              newsData["information"] = "added " + widget.profil["id"];
+              newsData["information"] = "added ${widget.profil["id"]}";
               NewsPageDatabase().addNewNews(newsData);
             }
 
@@ -463,7 +462,7 @@ class _AppBarState extends State<_AppBar> {
                           onPressed: () {
                             ReportsDatabase().add(
                                 userId,
-                                "Melde User id: " + widget.profil["id"],
+                                "Melde User id: ${widget.profil["id"]}",
                                 meldeTextKontroller.text);
                             Navigator.pop(context);
                             customSnackbar(context,
@@ -532,14 +531,14 @@ class _UserInformationDisplay extends StatelessWidget {
       : super(key: key);
 
   checkAccessReiseplanung() {
-    var ownProfil = Hive.box("secureBox").get("ownProfil");
-    var hasAccess = false;
-    var reiseplanungSetting = profil["reiseplanungPrivacy"];
-    var isPrivacyLevel1 = reiseplanungSetting == privacySetting[0] ||
+    Map ownProfil = Hive.box("secureBox").get("ownProfil") ?? {};
+    bool hasAccess = false;
+    String reiseplanungSetting = profil["reiseplanungPrivacy"];
+    bool isPrivacyLevel1 = reiseplanungSetting == privacySetting[0] ||
         reiseplanungSetting == privacySettingEnglisch[0];
-    var isPrivacyLevel2 = reiseplanungSetting == privacySetting[1] ||
+    bool isPrivacyLevel2 = reiseplanungSetting == privacySetting[1] ||
         reiseplanungSetting == privacySettingEnglisch[1];
-    var isPrivacyLevel3 = reiseplanungSetting == privacySetting[2] ||
+    bool isPrivacyLevel3 = reiseplanungSetting == privacySetting[2] ||
         reiseplanungSetting == privacySettingEnglisch[2];
 
     if (profil["reisePlanung"].isEmpty) return false;
@@ -560,7 +559,7 @@ class _UserInformationDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var isOwnProfil = profil["id"] == userId;
+    bool isOwnProfil = profil["id"] == userId;
     profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
 
     transformDateToText(dateString, {onlyMonth = false}) {
@@ -579,7 +578,7 @@ class _UserInformationDisplay extends StatelessWidget {
     createZuletztOnlineText() {
       var text = "";
       var color = Colors.grey;
-      var size = textSize - 2;
+      var size = style.textSize - 2;
       var timeDifferenceLastLogin = Duration(
           microseconds: (DateTime.now().microsecondsSinceEpoch -
                   DateTime.parse(profil["lastLogin"].toString())
@@ -613,7 +612,7 @@ class _UserInformationDisplay extends StatelessWidget {
             Text(
               "${AppLocalizations.of(context)!.aktuelleOrt}: ",
               style: TextStyle(
-                  fontSize: textSize,
+                  fontSize: style.textSize,
                   fontWeight: FontWeight.bold,
                   decoration: TextDecoration.underline),
             ),
@@ -621,7 +620,7 @@ class _UserInformationDisplay extends StatelessWidget {
                 child: Text(
               profil["ort"],
               style: TextStyle(
-                  fontSize: textSize, decoration: TextDecoration.underline),
+                  fontSize: style.textSize, decoration: TextDecoration.underline),
               maxLines: 2,
             ))
           ],
@@ -640,8 +639,8 @@ class _UserInformationDisplay extends StatelessWidget {
 
       return Row(children: [
         Text(themaText,
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: textSize))
+            style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
       ]);
     }
 
@@ -670,13 +669,13 @@ class _UserInformationDisplay extends StatelessWidget {
           Text(
             "${AppLocalizations.of(context)!.besuchteLaender}: ",
             style: TextStyle(
-                fontSize: textSize,
+                fontSize: style.textSize,
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.underline),
           ),
           Text(profil["besuchteLaender"].length.toString(),
               style: TextStyle(
-                  fontSize: textSize, decoration: TextDecoration.underline))
+                  fontSize: style.textSize, decoration: TextDecoration.underline))
         ]),
       );
     }
@@ -703,13 +702,13 @@ class _UserInformationDisplay extends StatelessWidget {
 
       return Row(children: [
         Text(themenText,
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: textSize))
+            style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
       ]);
     }
 
     reiseInfoBox() {
-      return InfoBox(
+      return _InfoBox(
           child: Column(
         children: [
           const SizedBox(height: 5),
@@ -738,8 +737,8 @@ class _UserInformationDisplay extends StatelessWidget {
 
       return Row(children: [
         Text(themenText,
-            style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: textSize))
+            style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
       ]);
     }
 
@@ -759,15 +758,15 @@ class _UserInformationDisplay extends StatelessWidget {
         children: [
           Text("${AppLocalizations.of(context)!.kinder}: ",
               style:
-                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+                  TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
           Text(childrenList.reversed.join(", "),
-              style: TextStyle(fontSize: textSize))
+              style: TextStyle(fontSize: style.textSize))
         ],
       );
     }
 
     familyInfoBox() {
-      return InfoBox(
+      return _InfoBox(
         child: Column(
           children: [
             const SizedBox(
@@ -802,7 +801,7 @@ class _UserInformationDisplay extends StatelessWidget {
 
         if (reiseplan["ortData"]["city"] !=
             reiseplan["ortData"]["countryname"]) {
-          ortText += " / " + reiseplan["ortData"]["countryname"];
+          ortText += " / ${reiseplan["ortData"]["countryname"]}";
         }
 
         reiseplanung.add(GestureDetector(
@@ -816,10 +815,10 @@ class _UserInformationDisplay extends StatelessWidget {
                   children: [
                     Text(
                         "${transformDateToText(reiseplan["von"])} - ${transformDateToText(reiseplan["bis"], onlyMonth: true)} in ",
-                        style: TextStyle(fontSize: textSize)),
+                        style: TextStyle(fontSize: style.textSize)),
                     Text(ortText,
                         style: TextStyle(
-                            fontSize: textSize,
+                            fontSize: style.textSize,
                             decoration: TextDecoration.underline))
                   ],
                 ),
@@ -829,18 +828,17 @@ class _UserInformationDisplay extends StatelessWidget {
         ));
       }
 
-      return InfoBox(
+      return _InfoBox(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
             children: [
               Text(
                 "${AppLocalizations.of(context)!.reisePlanung}: ",
                 style:
-                    TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+                    TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold),
               ),
               if (isOwnProfil)
-                Text(
-                    "${"(${AppLocalizations.of(context)!.fuer}" + reiseplanungPrivacy})")
+                Text("(${AppLocalizations.of(context)!.fuer} $reiseplanungPrivacy)")
             ],
           ),
           const SizedBox(height: 5),
@@ -881,7 +879,7 @@ class _UserInformationDisplay extends StatelessWidget {
           child: Image.asset("assets/icons/youtube.png", width: 20, height: 20),
         );
       }else{
-        icon = Icon(Icons.public);
+        icon = const Icon(Icons.public);
       }
 
       return Container(
@@ -889,12 +887,12 @@ class _UserInformationDisplay extends StatelessWidget {
         child: Row(
           children: [
             icon,
-            SizedBox(width: 5),
+            const SizedBox(width: 5),
             InkWell(
               onTap: () => global_functions.openURL(link),
               child: SizedBox(
                   width: 300,
-                  child: Text(displayLink, style: TextStyle(color: Colors.blue,))),
+                  child: Text(displayLink, style: const TextStyle(color: Colors.blue,))),
             )
           ],
         ),
@@ -908,11 +906,11 @@ class _UserInformationDisplay extends StatelessWidget {
         socialMediaContent.add(socialMediaItem(socialMediaLink));
       }
 
-      return InfoBox(
+      return _InfoBox(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text("Social Media: ",
               style:
-                  TextStyle(fontSize: textSize, fontWeight: FontWeight.bold)),
+                  TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
           ...socialMediaContent
         ]),
       );
@@ -941,13 +939,13 @@ class _UserInformationDisplay extends StatelessWidget {
         matchInterest.add(match);
       }
 
-      return InfoBox(
+      return _InfoBox(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               themenText,
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Wrap(
@@ -974,20 +972,20 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     aboutmeBox() {
-      return InfoBox(
+      return _InfoBox(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               AppLocalizations.of(context)!.ueberMich,
-              style: TextStyle(fontSize: textSize, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(
               height: 5,
             ),
             TextWithHyperlinkDetection(
               text: profil["aboutme"],
-              fontsize: textSize - 1,
+              fontsize: style.textSize - 1,
             )
           ],
         ),
@@ -1008,7 +1006,7 @@ class _UserInformationDisplay extends StatelessWidget {
               const Expanded(child: SizedBox.shrink()),
               createZuletztOnlineText()
             ]),
-            SizedBox(height: columnSpacing),
+            const SizedBox(height: 15),
             reiseInfoBox(),
             familyInfoBox(),
             interessenBox(),
@@ -1020,8 +1018,8 @@ class _UserInformationDisplay extends StatelessWidget {
   }
 }
 
-class InfoBox extends StatelessWidget {
-  const InfoBox({Key? key, required this.child}) : super(key: key);
+class _InfoBox extends StatelessWidget {
+  const _InfoBox({Key? key, required this.child}) : super(key: key);
 
   final Widget child;
 
@@ -1033,7 +1031,7 @@ class InfoBox extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
             border: Border.all(color: Colors.blueGrey),
-            borderRadius: BorderRadius.circular(20)),
+            borderRadius: BorderRadius.circular(style.roundedCorners)),
         child: child);
   }
 }
