@@ -1287,13 +1287,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         cardData = getCityFromHive(cityId: cardIdData["id"]);
       }
 
+      if (cardData.isEmpty) return const SizedBox.shrink();
+
       String replaceText = cardData["name"] ?? cardData["ort"];
       String removeId = cardIdData["text"];
 
       String? changedMessageText =
           message["message"].replaceAll(removeId, replaceText).trim();
-
-      if (cardData.isEmpty) return const SizedBox.shrink();
 
       message["index"] = index;
 
