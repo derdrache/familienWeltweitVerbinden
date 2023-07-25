@@ -974,7 +974,6 @@ class _UserInformationDisplay extends StatelessWidget {
     aboutmeBox() {
       return _InfoBox(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               AppLocalizations.of(context)!.ueberMich,
