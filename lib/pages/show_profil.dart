@@ -851,17 +851,51 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     socialMediaItem(link) {
+      String displayLink = link;
+      Widget icon;
+
+      if(link.contains("instagram")){
+        displayLink = link.replaceAll("https://", "");
+        displayLink = displayLink.split("/")[1];
+        displayLink = displayLink.split("?")[0];
+
+        icon = Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: Image.asset("assets/icons/instagram.png", width: 20, height: 20,),
+        );
+      }
+      else if(link.contains("facebook")){
+        displayLink = link.replaceAll("https://", "");
+        displayLink = displayLink.split("/")[1];
+
+        icon = Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: Image.asset("assets/icons/facebook.png", width: 20, height: 20),
+        );
+      }else if(link.contains("youtube")){
+        displayLink = link.replaceAll("https://", "");
+        displayLink = displayLink.split("/")[1];
+
+        icon = Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: Image.asset("assets/icons/youtube.png", width: 20, height: 20),
+        );
+      }else{
+        icon = Icon(Icons.public);
+      }
+
       return Container(
         margin: const EdgeInsets.all(5),
         child: Row(
           children: [
-            const Text("- "),
-            SizedBox(
-                width: 300,
-                child: TextWithHyperlinkDetection(
-                  text: link,
-                  maxLines: 1,
-                ))
+            icon,
+            SizedBox(width: 5),
+            InkWell(
+              onTap: () => global_functions.openURL(link),
+              child: SizedBox(
+                  width: 300,
+                  child: Text(displayLink, style: TextStyle(color: Colors.blue,))),
+            )
           ],
         ),
       );
