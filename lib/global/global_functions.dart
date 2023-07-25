@@ -194,6 +194,8 @@ changeEnglishToGerman(list){
 }
 
 openURL(url) async{
+  url = url.trim();
+
   if(url.contains("http")){
     url = Uri.parse(url);
   }else if(isPhoneNumber(url)){
@@ -204,7 +206,9 @@ openURL(url) async{
     launchUrl(tel);
     return;
   }else{
-    url = Uri.https(url);
+    String urlString = url.split("/")[0];
+    String path = url.split("/")[1];
+    url = Uri.https(urlString, path);
   }
 
   await launchUrl(
