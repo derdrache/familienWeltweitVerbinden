@@ -211,7 +211,9 @@ openURL(url) async{
     launchUrl(tel);
     return;
   }else{
-    url = Uri.https(url);
+    String urlString = url.split("/")[0];
+    String path = url.split("/")[1];
+    url = Uri.https(urlString, path);
   }
 
   await launchUrl(
