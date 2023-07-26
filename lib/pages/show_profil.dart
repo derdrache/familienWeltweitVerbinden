@@ -929,9 +929,7 @@ class _UserInformationDisplay extends StatelessWidget {
       }
 
       for (var interest in profil["interessen"]) {
-        List ownInterests =
-            global_functions.changeEnglishToGerman(ownProfil["interessen"]) +
-                global_functions.changeGermanToEnglish(ownProfil["interessen"]);
+        var ownInterests = [...global_functions.changeEnglishToGerman(ownProfil["interessen"]), ...global_functions.changeGermanToEnglish(ownProfil["interessen"])];
         bool match = false;
 
         if(ownInterests.contains(interest)) match = true;
@@ -974,6 +972,7 @@ class _UserInformationDisplay extends StatelessWidget {
     aboutmeBox() {
       return _InfoBox(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               AppLocalizations.of(context)!.ueberMich,
