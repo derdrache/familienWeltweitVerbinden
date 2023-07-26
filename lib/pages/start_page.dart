@@ -39,7 +39,7 @@ class StartPage extends StatefulWidget {
   _StartPageState createState() => _StartPageState();
 }
 
-class _StartPageState extends State<StartPage> {
+class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final String? userName = FirebaseAuth.instance.currentUser!.displayName;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
@@ -55,11 +55,28 @@ class _StartPageState extends State<StartPage> {
     noProfil = ownProfil == null || ownProfil["id"] == null;
     _networkConnectivity = NetworkConnectivity(context);
 
+    WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) => _asyncMethod());
 
     super.initState();
 
     _networkConnectivity.checkInternetStatusStream();
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      _refreshData();
+    }
+  }
+
+  _refreshData() async {
+    await refreshHiveProfils();
+    await refreshHiveNewsPage();
+    await refreshHiveChats();
+    await refreshHiveMeetups();
+    await refreshHiveCommunities();
+    await refreshHiveBulletinBoardNotes();
   }
 
   _asyncMethod() async {

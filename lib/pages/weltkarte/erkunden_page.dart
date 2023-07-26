@@ -33,8 +33,7 @@ class ErkundenPage extends StatefulWidget {
   _ErkundenPageState createState() => _ErkundenPageState();
 }
 
-class _ErkundenPageState extends State<ErkundenPage>
-    with WidgetsBindingObserver {
+class _ErkundenPageState extends State<ErkundenPage> {
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var profils = [];
   var profilsBackup = [];
@@ -125,27 +124,10 @@ class _ErkundenPageState extends State<ErkundenPage>
 
     setSearchAutocomplete();
 
-    WidgetsBinding.instance.addObserver(this);
-
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => mounted = true);
   }
 
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed && this.mounted) {
-      await _refreshData();
-      setState(() {});
-    }
-  }
-
-  _refreshData() async {
-    await refreshHiveProfils();
-    refreshHiveNewsPage();
-    refreshHiveChats();
-    await refreshHiveMeetups();
-    await refreshHiveCommunities();
-    refreshHiveBulletinBoardNotes();
-  }
 
   setEvents() {
     var localDbEvents = Hive.box('secureBox').get("events") ?? [];

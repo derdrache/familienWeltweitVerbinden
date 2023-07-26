@@ -18,8 +18,7 @@ class InformationPage extends StatefulWidget {
   State<InformationPage> createState() => _InformationPageState();
 }
 
-class _InformationPageState extends State<InformationPage>
-    with WidgetsBindingObserver {
+class _InformationPageState extends State<InformationPage>{
   var userId = FirebaseAuth.instance.currentUser!.uid;
   late List<Widget> pageList;
 
@@ -65,16 +64,7 @@ class _InformationPageState extends State<InformationPage>
       BulletinBoardPage()
     ];
 
-    WidgetsBinding.instance.addObserver(this);
     super.initState();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed && this.mounted) {
-      await _refreshData();
-      setState(() {});
-    }
   }
 
   _refreshData() async {

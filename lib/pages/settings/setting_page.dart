@@ -54,10 +54,9 @@ class SettingPage extends StatefulWidget {
   _SettingPageState createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
+class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
