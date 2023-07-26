@@ -101,25 +101,8 @@ class _ErkundenPageState extends State<ErkundenPage>
 
     setSearchAutocomplete();
 
-    WidgetsBinding.instance.addObserver(this);
-
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => mounted = true);
-  }
-
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed && this.mounted) {
-      await _refreshData();
-      setState(() {});
-    }
-  }
-
-  _refreshData() async {
-    await refreshHiveProfils();
-    refreshHiveNewsPage();
-    refreshHiveChats();
-    await refreshHiveMeetups();
-    await refreshHiveCommunities();
   }
 
   setEvents() {
