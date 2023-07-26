@@ -1352,11 +1352,12 @@ uploadFile(fileName, file, folder) async {
   } catch (_) {}
 }
 
-DbDeleteImage(imageName) async {
+DbDeleteImage(imageName, {imagePath = ""}) async {
   var url = Uri.parse(databasePathDeleteImage);
   imageName = imageName.split("/").last;
   var data = {
     "imageName": imageName,
+    "path": imagePath
   };
 
   await http.post(url, body: json.encode(data));
