@@ -67,10 +67,11 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
     setState(() {});
   }
 
-  deleteImage(image) {
-    DbDeleteImage(image);
+  deleteImage(imageIndex) {
+    var image = widget.images[imageIndex];
+    DbDeleteImage(image, imagePath: "notes/");
 
-    widget.images.removeWhere((element) => element == image);
+    widget.images[imageIndex] = null;
   }
 
   @override
@@ -103,7 +104,10 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
                   top: 0,
                   right: 0,
                   child: InkWell(
-                    onTap: () => deleteImage(index),
+                    onTap: () {
+                      deleteImage(index);
+                      setState(() {});
+                    },
                     child: const CircleAvatar(
                         radius: 12.0,
                         backgroundColor: Colors.red,
