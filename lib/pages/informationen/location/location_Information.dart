@@ -552,7 +552,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
     var informationTextKontroller = TextEditingController();
-    var imageUploadBox = ImageUploadBox();
+    var imageUploadBox = ImageUploadBox(imageKategorie: "information",);
 
     showDialog(
         context: context,
@@ -745,7 +745,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     var informationTextKontroller =
         TextEditingController(text: informationData["information"]);
     var imageUploadBox = ImageUploadBox(
-      uploadedImages: informationData["images"],
+      uploadedImages: informationData["images"], imageKategorie: "information",
     );
 
     Future<void>.delayed(

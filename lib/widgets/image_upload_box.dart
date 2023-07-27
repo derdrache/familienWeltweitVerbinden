@@ -6,12 +6,14 @@ import '../services/database.dart';
 import 'dialogWindow.dart';
 
 class ImageUploadBox extends StatefulWidget {
+  String imageKategorie;
   int numerImages;
   List? uploadedImages;
   List images = [null, null, null, null];
 
   ImageUploadBox({
     Key? key,
+    required this.imageKategorie,
     this.numerImages = 4,
     this.uploadedImages
   });
@@ -67,9 +69,22 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
     setState(() {});
   }
 
+  getPath(){
+    if(widget.imageKategorie == "note"){
+      return "notes/";
+    }else if(widget.imageKategorie == "chat"){
+      return "chats/";
+    }else if(widget.imageKategorie == "information"){
+      return "insiderInfo";
+    }
+
+    return "";
+  }
+
   deleteImage(imageIndex) {
     var image = widget.images[imageIndex];
-    DbDeleteImage(image, imagePath: "notes/");
+    String path = getPath();
+    DbDeleteImage(image, imagePath: path);
 
     widget.images[imageIndex] = null;
   }

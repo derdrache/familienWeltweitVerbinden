@@ -29,7 +29,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
   var ortAuswahlBox = GoogleAutoComplete(
       margin: const EdgeInsets.only(top: 5, bottom: 5, left: 30, right: 30),
       withOwnLocation: true,withWorldwideLocation: true);
-  var imageUploadBox = ImageUploadBox();
+  var imageUploadBox = ImageUploadBox(imageKategorie: "note",);
 
   double getRandomRange() {
     Random random = new Random();
@@ -167,7 +167,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
                   setLocation(),
                   setDescription(),
                   const Expanded(child: SizedBox.shrink()),
-                  ImageUploadBox()
+                  imageUploadBox
                 ]
         ),
       ),
