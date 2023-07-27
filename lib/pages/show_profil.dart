@@ -946,23 +946,28 @@ class _UserInformationDisplay extends StatelessWidget {
               style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            Wrap(
-              children: [
-                for(var i = 0; i<profilInteresets.length; i++) Container(
-                  margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: matchInterest[i] ? Theme.of(context).colorScheme.secondary : Colors.white,
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: Text(
-                    profilInteresets[i],
-                    style: const TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.bold),
-                  ),
-                )
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.spaceEvenly,
+                children: [
+                  for(var i = 0; i<profilInteresets.length; i++) Container(
+                    margin: const EdgeInsets.only(left:5, right: 5, top: 5, bottom: 5),
+                    padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                    decoration: BoxDecoration(
+                        color: matchInterest[i] ? Theme.of(context).colorScheme.secondary : Colors.white,
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Text(
+                      profilInteresets[i],
+                      style: const TextStyle(
+                        fontSize: 13,
+                          color: Colors.black, fontWeight: FontWeight.bold),
+                    ),
+                  )
 
-              ],
+                ],
+              ),
             )
           ],
         ),
