@@ -581,7 +581,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             backToChatPage: true));
   }
 
-  _deleteMessageWindow(messageId) {
+  _deleteMessageWindow(message) {
     Future.delayed(
         const Duration(seconds: 0),
         () => showDialog(
@@ -594,7 +594,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                   TextButton(
                     child: Text(AppLocalizations.of(context)!.loeschen),
                     onPressed: () {
-                      _deleteMessage(messageId);
+                      _checkAndRemovePinnedMessage(message);
+                      _deleteMessage(message["id"]);
+                      if(message["message"].contains("</images")){
+                        String imageName = message["images"][0];
+                        DbDeleteImage(imageName, imagePath: "chats/");
+                      }
                       setState(() {});
                       Navigator.pop(context);
                     },
@@ -1370,8 +1375,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           if (isMyMessage || adminList.contains(userId))
             PopupMenuItem(
               onTap: () {
-                _checkAndRemovePinnedMessage(message);
-                _deleteMessageWindow(message["id"]);
+                _deleteMessageWindow(message);
               },
               child: Row(
                 children: [
