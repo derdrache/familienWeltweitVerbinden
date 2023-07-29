@@ -142,6 +142,10 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     }
   }
 
+  changeNoteLanguage(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
@@ -351,6 +355,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
+          if(!isNoteOwner) IconButton(onPressed: () => changeNoteLanguage(), icon: Icon(Icons.change_circle)),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
@@ -373,6 +378,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                       changeNote = true;
                     }),
                 icon: Icon(Icons.edit)),
+          SizedBox(width: 10,),
           if (changeNote && isNoteOwner)
             IconButton(
                 onPressed: () {
