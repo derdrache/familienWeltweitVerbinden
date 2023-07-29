@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:permission_handler/permission_handler.dart';
 import 'package:familien_suche/pages/informationen/community/community_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -82,6 +83,14 @@ refreshHiveData() async {
   await refreshHiveMeetups();
 }
 
+askNotificationPermission() async{
+  await Permission.notification.isDenied.then((value) {
+    if (value) {
+      Permission.notification.request();
+    }
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -105,6 +114,8 @@ void main() async {
 
   await hiveInit();
   await setGeoData();
+
+  askNotificationPermission();
 
   refreshHiveData();
   runApp(MyApp());
