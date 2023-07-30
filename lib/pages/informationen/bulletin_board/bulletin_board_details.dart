@@ -38,6 +38,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late List noteImages;
   late bool isNoteOwner = false;
   late bool showOriginalText = false;
+  late bool showOnlyOriginal = false;
   late Map originalText = {
     "title": "",
     "description": ""
@@ -47,7 +48,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     "description": ""
   };
 
-  checkAndSetTextVariations(){
+  checkAndSetTextVariations() {
     bool noteLanguageGerman = widget.note["beschreibungEng"]
         .contains("This is an automatic translation");
     bool userSpeakGerman = getUserSpeaksGerman();
@@ -57,8 +58,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     bool bothGerman = noteLanguageGerman && userSpeakGerman;
     bool bothEnglish = !noteLanguageGerman && userSpeakEnglish;
 
-    if(bothGerman || bothEnglish){
+    if(bothGerman || bothEnglish || isNoteOwner){
       showOriginalText = true;
+      showOnlyOriginal = true;
     }
 
 
@@ -389,7 +391,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if(true) IconButton(onPressed: () => changeNoteLanguage(), icon: const Icon(Icons.change_circle)),
+          if(!isNoteOwner && !showOnlyOriginal) IconButton(onPressed: () => changeNoteLanguage(), icon: const Icon(Icons.change_circle)),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
