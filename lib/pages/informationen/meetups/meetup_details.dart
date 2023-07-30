@@ -31,7 +31,7 @@ class MeetupDetailsPage extends StatefulWidget {
   }):super(key: key);
 
   @override
-  _MeetupDetailsPageState createState() => _MeetupDetailsPageState();
+  State<MeetupDetailsPage> createState() => _MeetupDetailsPageState();
 }
 
 class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
@@ -39,7 +39,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
   late bool absage;
   late bool isCreator;
   late bool isApproved;
-  var searchAutocomplete;
+  late SearchAutocomplete searchAutocomplete;
   late bool isNotPublic;
 
 
@@ -226,7 +226,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     global_func.changePage(
       context,
       ChatDetailsPage(
-        connectedWith: "</event=" + widget.meetupData["id"],
+        connectedWith: "</event=${widget.meetupData["id"]}",
         isChatgroup: true,
       ),
     );
@@ -290,7 +290,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                         onPressed: () {
                           Navigator.pop(context);
                           ReportsDatabase().add(userId,
-                              "Melde Event id: " + widget.meetupData["id"],
+                              "Melde Event id: ${widget.meetupData["id"]}",
                               reportController.text);
                         },
                         label: Text(AppLocalizations
@@ -483,12 +483,14 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                       var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
                       myOwnMeetups.remove(widget.meetupData);
 
-                      customSnackbar(
-                          context,
-                          AppLocalizations.of(context)!.meetupUebergebenAn1 +
-                              inputKontroller.text +
-                              AppLocalizations.of(context)!.meetupUebergebenAn2,
-                          color: Colors.green);
+                      if (context.mounted){
+                        customSnackbar(
+                            context,
+                            AppLocalizations.of(context)!.meetupUebergebenAn1 +
+                                inputKontroller.text +
+                                AppLocalizations.of(context)!.meetupUebergebenAn2,
+                            color: Colors.green);
+                      }
 
                       await MeetupDatabase().update(
                           "erstelltVon = '$selectedUserId', ownEvent = '$isInitiator'",
@@ -812,7 +814,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             icon: const Icon(Icons.link),
             onPressed: () {
               Clipboard.setData(
-                  ClipboardData(text: "</eventId=" + widget.meetupData["id"]));
+                  ClipboardData(text: "</eventId=${widget.meetupData["id"]}"));
 
               customSnackbar(context, AppLocalizations
                   .of(context)!
@@ -858,13 +860,13 @@ class MeetupArtButton extends StatefulWidget {
       : super(key: key);
 
   @override
-  _MeetupArtButtonState createState() => _MeetupArtButtonState();
+  State<MeetupArtButton> createState() => _MeetupArtButtonState();
 }
 
 class _MeetupArtButtonState extends State<MeetupArtButton> {
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   late bool userSpeakGerman;
-  late var meetupTypInput;
+  late CustomDropDownButton meetupTypInput;
   late IconData icon;
 
   saveMeetupArt() {

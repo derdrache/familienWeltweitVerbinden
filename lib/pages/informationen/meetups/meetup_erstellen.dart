@@ -24,27 +24,27 @@ class MeetupErstellen extends StatefulWidget {
   const MeetupErstellen({Key? key}) : super(key: key);
 
   @override
-  _MeetupErstellenState createState() => _MeetupErstellenState();
+  State<MeetupErstellen> createState() => _MeetupErstellenState();
 }
 
 class _MeetupErstellenState extends State<MeetupErstellen> {
-  var userID = Hive.box("secureBox").get("ownProfil")["id"];
-  var isGerman = kIsWeb
-      ? window.locale.languageCode == "de"
+  String userID = Hive.box("secureBox").get("ownProfil")["id"];
+  bool isGerman = kIsWeb
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  var meetupNameKontroller = TextEditingController();
+  TextEditingController meetupNameKontroller = TextEditingController();
   DateTime? meetupWannDatum;
   DateTime? meetupBisDatum;
   TimeOfDay? meetupWannUhrzeit;
   TimeOfDay? meetupBisUhrzeit;
-  var meetupBeschreibungKontroller = TextEditingController();
-  var meetupOrtKontroller = TextEditingController();
-  late var sprachenAuswahlBox;
-  late var meetupArtDropdown;
-  late var ortTypDropdown;
-  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10), withOwnLocation: true);
-  late var meetupIntervalDropdown;
-  var ownMeetup = true;
+  TextEditingController meetupBeschreibungKontroller = TextEditingController();
+  TextEditingController meetupOrtKontroller = TextEditingController();
+  late CustomMultiTextForm sprachenAuswahlBox;
+  late CustomDropDownButton meetupArtDropdown;
+  late CustomDropDownButton ortTypDropdown;
+  GoogleAutoComplete ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10), withOwnLocation: true);
+  late CustomDropDownButton meetupIntervalDropdown;
+  bool ownMeetup = true;
   final translator = GoogleTranslator();
   bool chooseCurrentLocation = false;
 

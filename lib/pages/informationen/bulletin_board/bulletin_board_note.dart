@@ -72,8 +72,8 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
       child: Stack(
         children: [
           Container(
-            margin: EdgeInsets.all(10),
-            padding: EdgeInsets.all(5),
+            margin: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(5),
             width: 110,
             height: 110,
             transform: Matrix4.rotationZ(widget.note["rotation"]),
@@ -84,8 +84,8 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
             ),
             child: Center(child: Column(
               children: [
-                Text(getNoteTitle(), textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold),),
-                SizedBox(height: 10,),
+                Text(getNoteTitle(), textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold),),
+                const SizedBox(height: 10,),
                 Text(getStringSized(noteLocation)),
                 if(noteCountry != noteLocation) Text(getStringSized(noteCountry))
               ],
@@ -96,7 +96,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
               child: CircleAvatar(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   radius: 10,
-                  child: Icon(Icons.edit, size: 10, color: Colors.white,
+                  child: const Icon(Icons.edit, size: 10, color: Colors.white,
                   )
               )
           )

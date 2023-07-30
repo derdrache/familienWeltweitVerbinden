@@ -9,10 +9,9 @@ import 'package:hive/hive.dart';
 import '../informationen/community/community_page.dart';
 import '../informationen/meetups/meetup_page.dart';
 import 'location/location_page.dart';
-import '../../services/database.dart';
 
 class InformationPage extends StatefulWidget {
-  InformationPage({Key? key}) : super(key: key);
+  const InformationPage({Key? key}) : super(key: key);
 
   @override
   State<InformationPage> createState() => _InformationPageState();
@@ -53,30 +52,20 @@ class _InformationPageState extends State<InformationPage>{
   @override
   void initState() {
     pageList = [
-      MeetupPage(),
-      CommunityPage(),
-      LocationPage(
+      const MeetupPage(),
+      const CommunityPage(),
+      const LocationPage(
         forCity: true,
       ),
-      LocationPage(
+      const LocationPage(
         forLand: true,
       ),
-      BulletinBoardPage()
+      const BulletinBoardPage()
     ];
 
     super.initState();
   }
 
-  _refreshData() async {
-    refreshHiveStadtInfo();
-    refreshHiveStadtInfoUser();
-    refreshHiveNewsPage();
-    refreshHiveChats();
-    refreshHiveMeetups();
-    refreshHiveProfils();
-    refreshHiveCommunities();
-    refreshHiveBulletinBoardNotes();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -16,7 +16,7 @@ import 'package:familien_suche/global/global_functions.dart' as global_func;
 import '../../../widgets/image_upload_box.dart';
 
 class BulletonBoardCreate extends StatefulWidget {
-  const BulletonBoardCreate({Key? key});
+  const BulletonBoardCreate({Key? key}) : super(key: key);
 
   @override
   State<BulletonBoardCreate> createState() => _BulletonBoardCreateState();
@@ -32,7 +32,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
   var imageUploadBox = ImageUploadBox(imageKategorie: "note",);
 
   double getRandomRange() {
-    Random random = new Random();
+    Random random = Random();
     int randomNumber = random.nextInt(11);
     int changedNumber = 0;
 

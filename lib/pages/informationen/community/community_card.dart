@@ -9,6 +9,7 @@ import 'community_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser!.uid;
 
+
 class CommunityCard extends StatefulWidget {
   EdgeInsets margin;
   Map community;
@@ -31,7 +32,7 @@ class CommunityCard extends StatefulWidget {
         super(key: key);
 
   @override
-  _CommunityCardState createState() => _CommunityCardState();
+  State<CommunityCard> createState() => _CommunityCardState();
 }
 
 class _CommunityCardState extends State<CommunityCard> {
@@ -162,6 +163,8 @@ class _CommunityCardState extends State<CommunityCard> {
   }
 }
 
+
+
 class InteresseButton extends StatefulWidget {
   Map communityData;
   Function? afterFavorite;
@@ -171,7 +174,7 @@ class InteresseButton extends StatefulWidget {
       : super(key: key);
 
   @override
-  _InteresseButtonState createState() => _InteresseButtonState();
+  State<InteresseButton> createState() => _InteresseButtonState();
 }
 
 class _InteresseButtonState extends State<InteresseButton> {

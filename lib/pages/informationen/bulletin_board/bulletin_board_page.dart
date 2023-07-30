@@ -11,10 +11,10 @@ import '../../start_page.dart';
 import 'bulletin_board_note.dart';
 
 class BulletinBoardPage extends StatefulWidget {
-  bool forCity;
-  bool forLand;
+  final bool forCity;
+  final bool forLand;
 
-  BulletinBoardPage({Key? key, this.forCity = false, this.forLand = false})
+  const BulletinBoardPage({Key? key, this.forCity = false, this.forLand = false})
       : super(key: key);
 
   @override
@@ -68,8 +68,9 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
       bool cityKondition =
           note["location"]["city"].toLowerCase().contains(searchText);
 
-      if (nameKondition || countryKondition || cityKondition)
+      if (nameKondition || countryKondition || cityKondition) {
         resultNotes.add(note);
+      }
     }
 
     return resultNotes;

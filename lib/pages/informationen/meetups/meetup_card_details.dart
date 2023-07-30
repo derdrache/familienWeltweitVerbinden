@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/show_profil.dart';
@@ -48,7 +47,7 @@ class MeetupCardDetails extends StatefulWidget {
         super(key: key);
 
   @override
-  _MeetupCardDetailsState createState() => _MeetupCardDetailsState();
+  State<MeetupCardDetails> createState() => _MeetupCardDetailsState();
 }
 
 class _MeetupCardDetailsState extends State<MeetupCardDetails> {
@@ -58,9 +57,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   TextEditingController changeTextInputController = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
   var beschreibungInputKontroller = TextEditingController();
-  late var changeDropdownInput;
-  late var timeZoneDropdown;
-  late var changeMultiDropdownInput;
+  late CustomDropDownButton changeDropdownInput;
+  late CustomDropDownButton timeZoneDropdown;
+  late CustomMultiTextForm changeMultiDropdownInput;
   bool chooseCurrentLocation = false;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   late bool userSpeakGerman;
@@ -147,7 +146,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     var ownTime =
         meetupBeginn.toString().split(" ")[1].toString().substring(0, 5);
 
-    return ownDate + " " + ownTime;
+    return "$ownDate $ownTime";
   }
 
   saveTag(newValue) {
@@ -441,7 +440,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                       onPressed: () async {
                         bool saveSuccess = await saveFunction();
 
-                        if (!saveSuccess) {
+                        if (!saveSuccess && context.mounted) {
                           customSnackbar(context,
                               AppLocalizations.of(context)!.keineEingabe);
                           return;
@@ -449,7 +448,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
                         changeTextInputController = TextEditingController();
                         setState(() {});
-                        Navigator.pop(context);
+                        if (context.mounted) Navigator.pop(context);
                       }),
                 ]),
               )
@@ -457,7 +456,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           });
     }
 
-    _changeOrOpenLinkWindow() async {
+    changeOrOpenLinkWindow() async {
       final RenderBox overlay =
           Overlay.of(context).context.findRenderObject() as RenderBox;
 
@@ -565,7 +564,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
       return meetupInformationRow(
         AppLocalizations.of(context)!.zeitzone,
-        "GMT " + widget.meetupData["zeitzone"].toString(),
+        "GMT ${widget.meetupData["zeitzone"]}",
         () => openChangeWindow(
             AppLocalizations.of(context)!.meetupZeitzoneAendern,
             timeZoneDropdown,
@@ -658,7 +657,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     mapAndLinkInformation() {
       return meetupInformationRow(
           isOffline ? "Map: " : "Link: ", widget.meetupData["link"], () {
-        if (widget.isCreator) _changeOrOpenLinkWindow();
+        if (widget.isCreator) changeOrOpenLinkWindow();
         if (!widget.isCreator) global_func.openURL(widget.meetupData["link"]);
       }, bodyColor: Theme.of(context).colorScheme.secondary);
     }
@@ -992,7 +991,7 @@ class ShowDatetimeBox extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ShowDatetimeBoxState createState() => _ShowDatetimeBoxState();
+  State<ShowDatetimeBox> createState() => _ShowDatetimeBoxState();
 }
 
 class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
@@ -1011,7 +1010,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
             wannTime.hour, wannTime.minute)
         .toString()
         .substring(0, 16);
-    var newBisDate;
+    String? newBisDate;
 
     if (!isSingeDay) {
       var bisDate = bisDateInputButton.meetupDatum;
@@ -1123,9 +1122,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
       return "$wannDateText - $bisDateText \n ${wannTimeList.take(2).join(":")} - $bisTimeText";
     } else {
-      return wannDateList.reversed.join(".") +
-          " " +
-          wannTimeList.take(2).join(":");
+      return "${wannDateList.reversed.join(".")} ${wannTimeList.take(2).join(":")}";
     }
   }
 
@@ -1172,7 +1169,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
           onTap: !widget.isCreator ? null : () => openChangeWindow(),
           child: Row(
             children: [
-              Text(AppLocalizations.of(context)!.datum + " ",
+              Text("${AppLocalizations.of(context)!.datum} ",
                   style: TextStyle(
                       fontSize: fontsize, fontWeight: FontWeight.bold)),
               const Expanded(child: SizedBox.shrink()),
@@ -1196,13 +1193,13 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 class DateButton extends StatefulWidget {
   var uhrZeit;
   var meetupDatum;
-  var getDate;
+  bool getDate;
 
   DateButton({Key? key, this.meetupDatum, this.uhrZeit, this.getDate = false})
       : super(key: key);
 
   @override
-  _DateButtonState createState() => _DateButtonState();
+  State<DateButton> createState() => _DateButtonState();
 }
 
 class _DateButtonState extends State<DateButton> {
@@ -1263,7 +1260,7 @@ class InteresseButton extends StatefulWidget {
       : super(key: key);
 
   @override
-  _InteresseButtonState createState() => _InteresseButtonState();
+  State<InteresseButton> createState() => _InteresseButtonState();
 }
 
 class _InteresseButtonState extends State<InteresseButton> {
@@ -1324,9 +1321,9 @@ class _InteresseButtonState extends State<InteresseButton> {
 //ignore: must_be_immutable
 class CardFeet extends StatefulWidget {
   String organisator;
-  var meetupData;
+  Map meetupData;
   double width;
-  var meetupZusage;
+  List meetupZusage;
 
   CardFeet(
       {Key? key,
@@ -1337,7 +1334,7 @@ class CardFeet extends StatefulWidget {
       : super(key: key);
 
   @override
-  _CardFeetState createState() => _CardFeetState();
+  State<CardFeet> createState() => _CardFeetState();
 }
 
 class _CardFeetState extends State<CardFeet> {

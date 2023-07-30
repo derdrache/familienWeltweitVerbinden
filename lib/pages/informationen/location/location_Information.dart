@@ -26,11 +26,11 @@ import '../../start_page.dart';
 import 'weltkarte_mini.dart';
 
 class LocationInformationPage extends StatefulWidget {
-  var ortName;
-  var fromCityPage;
+  String ortName;
+  bool fromCityPage;
   int? insiderInfoId;
 
-  LocationInformationPage({Key? key, this.ortName, this.fromCityPage = false, this.insiderInfoId})
+  LocationInformationPage({Key? key, required this.ortName, this.fromCityPage = false, this.insiderInfoId})
       : super(key: key);
 
   @override
@@ -181,7 +181,7 @@ class GeneralInformationPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _GeneralInformationPageState createState() => _GeneralInformationPageState();
+  State<GeneralInformationPage> createState() => _GeneralInformationPageState();
 }
 
 class _GeneralInformationPageState extends State<GeneralInformationPage> {
@@ -498,12 +498,14 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
             onPressed: () async {
               await createNewChatGroup(widget.location["id"]);
 
-              global_func.changePage(
-                  context,
-                  ChatDetailsPage(
-                    isChatgroup: true,
-                    connectedWith: "</stadt=${widget.location["id"]}",
-                  ));
+              if (context.mounted) {
+                global_func.changePage(
+                    context,
+                    ChatDetailsPage(
+                      isChatgroup: true,
+                      connectedWith: "</stadt=${widget.location["id"]}",
+                    ));
+              }
             },
             child: const Icon(Icons.message),
           ),
@@ -972,9 +974,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   }
 
   getInsiderInfoText(information, index) {
-    var showTitle = "";
-    var showInformation = "";
-    var tranlsationIn;
+    String showTitle = "";
+    String showInformation = "";
+    String tranlsationIn = "";
     var ownlanguages = Hive.box("secureBox").get("ownProfil")["sprachen"];
     var informationLanguage = information["sprache"] == "de"
         ? ["Deutsch", "german"]
@@ -1274,7 +1276,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 class CountryCitiesPage extends StatefulWidget {
   final String countryName;
 
-  CountryCitiesPage({Key? key, required this.countryName}) : super(key: key);
+  const CountryCitiesPage({Key? key, required this.countryName}) : super(key: key);
 
   @override
   State<CountryCitiesPage> createState() => _CountryCitiesPageState();

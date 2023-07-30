@@ -11,7 +11,7 @@ import 'community_card.dart';
 import 'community_erstellen.dart';
 
 class CommunityPage extends StatefulWidget {
-  CommunityPage({Key? key}) : super(key: key);
+  const CommunityPage({Key? key}) : super(key: key);
 
   @override
   State<CommunityPage> createState() => _CommunityPageState();
@@ -187,18 +187,18 @@ class _CommunityPageState extends State<CommunityPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                    child: Text(AppLocalizations.of(context)!.annehmen),
                     onPressed: () => communityEinladungAnnehmen(),
                     style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.green))),
+                            MaterialStateProperty.all<Color>(Colors.green)),
+                    child: Text(AppLocalizations.of(context)!.annehmen)),
                 const SizedBox(width: 30),
                 ElevatedButton(
-                    child: Text(AppLocalizations.of(context)!.ablehnen),
                     onPressed: () => communityEinladungAblehnen(),
                     style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.red)))
+                            MaterialStateProperty.all<Color>(Colors.red)),
+                    child: Text(AppLocalizations.of(context)!.ablehnen))
               ],
             )
           ],

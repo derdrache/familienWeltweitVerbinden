@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/functions/user_speaks_german.dart';
@@ -45,12 +44,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   late Map creatorProfil;
   var ownPictureKontroller = TextEditingController();
   late double fontsize;
-  var windowSetState;
+  late var windowSetState;
   late List<String> imagePaths;
   String? selectedImage;
   List<String> allUserNames = [];
   List allUserIds = [];
-  late var searchAutocomplete;
+  late SearchAutocomplete searchAutocomplete;
   final _controller = ScrollController();
   var scrollbarOnBottom = true;
   var imageLoading = false;
@@ -643,6 +642,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     isCreator = widget.community["erstelltVon"].contains(userId);
     isMember = widget.community["members"].contains(userId);
 
+
+
     showMembersWindow() async {
       var membersID = widget.community["members"];
       var allProfils = Hive.box("secureBox").get("profils");
@@ -972,7 +973,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       String title;
       String locationText = widget.community["ort"];
       if (widget.community["ort"] != widget.community["land"]) {
-        locationText += " / " + widget.community["land"];
+        locationText += " / ${widget.community["land"]}";
       }
       bool isWorldwide = widget.community["ort"] == "worldwide"
           || widget.community["ort"]== "Weltweit";

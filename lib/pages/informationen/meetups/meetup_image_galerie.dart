@@ -12,15 +12,15 @@ import '../../../global/custom_widgets.dart';
 import '../../../services/database.dart';
 
 class MeetupImageGalerie extends StatefulWidget {
-  var isCreator;
-  var meetupData;
-  var child;
+  bool isCreator;
+  Map meetupData;
+  Widget? child;
 
-  MeetupImageGalerie({Key? key, this.child, this.isCreator, this.meetupData})
+  MeetupImageGalerie({Key? key, this.child, required this.isCreator, required this.meetupData})
       : super(key: key);
 
   @override
-  _ImageMeetupGalerieState createState() => _ImageMeetupGalerieState();
+  State<MeetupImageGalerie> createState() => _ImageMeetupGalerieState();
 }
 
 class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
@@ -32,7 +32,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
   var ownPictureKontroller = TextEditingController();
   var selectedImage = "";
   var windowSetState;
-  var imagePaths;
+  late List imagePaths;
   var imageLoading = false;
 
   @override
@@ -114,8 +114,8 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       }
 
       return Wrap(
-        children: allImages,
         alignment: WrapAlignment.center,
+        children: allImages,
       );
     }
 
@@ -189,7 +189,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
           });
     }
 
-    _showChangeImagePopupMenu(tabPosition) async {
+    showChangeImagePopupMenu(tabPosition) async {
       final RenderBox overlay =
           Overlay.of(context).context.findRenderObject() as RenderBox;
 
@@ -228,6 +228,12 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     }
 
     return GestureDetector(
+        onTapDown: !widget.isCreator
+            ? null
+            : (details) {
+                var getTabPostion = details.globalPosition;
+                showChangeImagePopupMenu(getTabPostion);
+              },
         child: Container(
           constraints: const BoxConstraints(
             minHeight: 200,
@@ -260,12 +266,6 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                           child: CachedNetworkImage(
                             imageUrl: widget.meetupData["bild"],
                           ))),
-        ),
-        onTapDown: !widget.isCreator
-            ? null
-            : (details) {
-                var getTabPostion = details.globalPosition;
-                _showChangeImagePopupMenu(getTabPostion);
-              });
+        ));
   }
 }

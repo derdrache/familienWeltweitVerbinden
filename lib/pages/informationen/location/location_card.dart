@@ -8,7 +8,7 @@ import 'location_Information.dart';
 
 class LocationCard extends StatefulWidget {
   Map location;
-  var fromCityPage;
+  bool fromCityPage;
   bool smallCard;
 
   LocationCard(

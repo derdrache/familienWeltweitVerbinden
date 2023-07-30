@@ -4,14 +4,13 @@ import 'package:hive/hive.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../widgets/custom_appbar.dart';
-import '../../../global/global_functions.dart' as global_functions;
 import 'location_card.dart';
 
 class LocationPage extends StatefulWidget {
-  bool forCity;
-  bool forLand;
+  final bool forCity;
+  final bool forLand;
 
-  LocationPage({Key? key, this.forCity = false, this.forLand = false}) : super(key: key);
+  const LocationPage({Key? key, this.forCity = false, this.forLand = false}) : super(key: key);
 
   @override
   State<LocationPage> createState() => _LocationPageState();

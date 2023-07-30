@@ -177,9 +177,11 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                 onPressed: () async {
                   var communityData = await saveCommunity();
 
-                  Navigator.pop(context);
-                  global_func.changePage(
-                      context, CommunityDetails(community: communityData));
+                  if (context.mounted){
+                    Navigator.pop(context);
+                    global_func.changePage(
+                        context, CommunityDetails(community: communityData));
+                  }
                 },
                 icon: const Icon(Icons.done, size: 30))
           ]),

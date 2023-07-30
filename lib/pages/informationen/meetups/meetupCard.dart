@@ -38,7 +38,7 @@ class MeetupCard extends StatefulWidget {
         super(key: key);
 
   @override
-  _MeetupCardState createState() => _MeetupCardState();
+  State<MeetupCard> createState() => _MeetupCardState();
 }
 
 class _MeetupCardState extends State<MeetupCard> {
@@ -98,8 +98,9 @@ class _MeetupCardState extends State<MeetupCard> {
         widget.meetupData["wann"].split(" ")[0].split("-").reversed.join(".");
     var datetimeWann = DateTime.parse(widget.meetupData["wann"]);
 
-    if (widget.meetupData["bis"] == null || widget.meetupData["bis"] == "null")
+    if (widget.meetupData["bis"] == null || widget.meetupData["bis"] == "null") {
       return datetimeText;
+    }
     var datetimeBis = DateTime.parse(widget.meetupData["bis"]);
 
     if (DateTime.now().compareTo(datetimeWann) > 0 &&
@@ -374,7 +375,7 @@ class InteresseButton extends StatefulWidget {
       : super(key: key);
 
   @override
-  _InteresseButtonState createState() => _InteresseButtonState();
+  State<InteresseButton> createState() => _InteresseButtonState();
 }
 
 class _InteresseButtonState extends State<InteresseButton> {

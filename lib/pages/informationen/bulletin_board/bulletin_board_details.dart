@@ -33,7 +33,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
   bool changeNote = false;
   late TextEditingController titleKontroller;
-  late var ortAuswahlBox;
+  late GoogleAutoComplete ortAuswahlBox;
   late TextEditingController descriptionKontroller;
   late List noteImages;
   late bool isNoteOwner = false;

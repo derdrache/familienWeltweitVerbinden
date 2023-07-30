@@ -15,7 +15,7 @@ import 'meetupCard.dart';
 import 'meetup_erstellen.dart';
 
 class MeetupPage extends StatefulWidget {
-  MeetupPage({Key? key}) : super(key: key);
+  const MeetupPage({Key? key}) : super(key: key);
 
   @override
   State<MeetupPage> createState() => _MeetupPageState();
@@ -34,7 +34,7 @@ class _MeetupPageState extends State<MeetupPage> {
   FocusNode searchFocusNode = FocusNode();
   String pageTitle = "Meetups";
   var spracheIstDeutsch = kIsWeb
-      ? ui.window.locale.languageCode == "de"
+      ? ui.PlatformDispatcher.instance.locale.languageCode == "de"
       : io.Platform.localeName == "de_DE";
 
   @override
