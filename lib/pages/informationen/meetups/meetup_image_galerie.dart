@@ -79,7 +79,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       imageLoading = false;
     });
 
-    DbDeleteImage(oldImage);
+    dbDeleteImage(oldImage);
 
     MeetupDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.meetupData["id"]}'");

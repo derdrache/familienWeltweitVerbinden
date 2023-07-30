@@ -168,7 +168,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   }
 
   deleteImage(image) {
-    DbDeleteImage(image);
+    dbDeleteImage(image);
 
     widget.note["bilder"].removeWhere((element) => element == image);
   }
@@ -179,7 +179,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     allBulletinNotes.removeWhere((note) => note["id"] == widget.note["id"]);
 
     for (var image in widget.note["bilder"]) {
-      DbDeleteImage(image);
+      dbDeleteImage(image);
     }
   }
 

@@ -84,7 +84,7 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
   deleteImage(imageIndex) {
     var image = widget.images[imageIndex];
     String path = getPath();
-    DbDeleteImage(image, imagePath: path);
+    dbDeleteImage(image, imagePath: path);
 
     widget.images[imageIndex] = null;
   }

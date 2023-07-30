@@ -202,7 +202,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
     MeetupDatabase().delete(widget.meetupData["id"]);
 
-    DbDeleteImage(widget.meetupData["bild"]);
+    dbDeleteImage(widget.meetupData["bild"]);
   }
 
   sendTakePartNotification(meetupData){

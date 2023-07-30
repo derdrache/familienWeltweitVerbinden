@@ -260,7 +260,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["bild"] = selectedImage;
     }
 
-    DbDeleteImage(oldImage);
+    dbDeleteImage(oldImage);
 
     CommunityDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.community["id"]}'");
@@ -718,7 +718,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     communities.removeWhere((community) =>
                         community["id"] == widget.community["id"]);
 
-                    DbDeleteImage(widget.community["bild"]);
+                    dbDeleteImage(widget.community["bild"]);
 
                     Navigator.pop(context);
                   },

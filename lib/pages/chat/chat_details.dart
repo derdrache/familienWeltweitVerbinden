@@ -600,7 +600,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       _deleteMessage(message["id"]);
                       if(message["message"].contains("</images")){
                         String imageName = message["images"][0];
-                        DbDeleteImage(imageName, imagePath: "chats/");
+                        dbDeleteImage(imageName, imagePath: "chats/");
                       }
                       setState(() {});
                       Navigator.pop(context);

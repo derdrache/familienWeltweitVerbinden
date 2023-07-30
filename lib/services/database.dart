@@ -4,7 +4,6 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io' as io;
-import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart' as foundation;
 
 import '../auth/secrets.dart';
@@ -14,7 +13,7 @@ import 'locationsService.dart';
 import 'notification.dart';
 
 var spracheIstDeutsch = kIsWeb
-    ? ui.window.locale.languageCode == "de"
+    ? PlatformDispatcher.instance.locale.languageCode == "de"
     : io.Platform.localeName == "de_DE";
 
 class ProfilDatabase {
@@ -330,7 +329,7 @@ class ChatDatabase {
     var url = Uri.parse(databaseUrl + databasePathNewAdminMessage);
     http.post(url, body: json.encode({"message": message, "user": user}));
 
-    url = Uri.parse(databaseUrl + "services/sendEmail.php");
+    url = Uri.parse("${databaseUrl}services/sendEmail.php");
     http.post(url,
         body: json.encode({
           "to": "dominik.mast.11@gmail.com",
@@ -1066,7 +1065,7 @@ class NewsPageDatabase {
       news.removeWhere((key, value) =>
           key == "id" || key == "erstelltAm" || key == "erstelltVon");
       var checkNewNews = Map<String, dynamic>.of(newNews);
-      var equality;
+      bool equality;
 
       try {
         checkNewNews["information"] = json.decode(checkNewNews["information"]);
@@ -1352,7 +1351,7 @@ uploadFile(fileName, file, folder) async {
   } catch (_) {}
 }
 
-DbDeleteImage(imageName, {imagePath = ""}) async {
+dbDeleteImage(imageName, {imagePath = ""}) async {
   var url = Uri.parse(databasePathDeleteImage);
   imageName = imageName.split("/").last;
   var data = {

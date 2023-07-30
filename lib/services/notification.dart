@@ -158,10 +158,10 @@ createMeetupText(typ, meetupName, sprache){
   }else if(typ == "freigegeben"){
     if(sprache == "ger"){
       meetupText["title"] = "Meetup Freigabe";
-      meetupText["inhalt"] ="Du hast jetzt Zugriff auf folgendes Meetup: " + meetupName;
+      meetupText["inhalt"] ="Du hast jetzt Zugriff auf folgendes Meetup: $meetupName";
     }else{
       meetupText["title"] = "Meetup release";
-      meetupText["inhalt"] = "You now have access to the following meetup: " + meetupName;
+      meetupText["inhalt"] = "You now have access to the following meetup: $meetupName";
     }
   } else if(typ == "takePart"){
     if(sprache == "ger"){

@@ -14,7 +14,7 @@ import '../global/global_functions.dart';
 import '../global/variablen.dart';
 import '../services/database.dart';
 import '../services/locationsService.dart';
-import '../services/network_Connectivity.dart';
+import '../services/network_connectivity.dart';
 import 'informationen/information.dart';
 import 'login_register_page/create_profil_page.dart';
 import 'news/news_page.dart';

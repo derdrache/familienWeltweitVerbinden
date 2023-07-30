@@ -5,7 +5,7 @@ class RecordTimer{
   Timer? timer;
 
   void start(){
-    timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => recordTime += 1);
+    timer = Timer.periodic(const Duration(milliseconds: 100), (Timer t) => recordTime += 1);
   }
 
   void stop(){

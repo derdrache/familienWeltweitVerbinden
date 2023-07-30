@@ -222,7 +222,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                     var deleteProfil = ownProfil;
 
                     ProfilDatabase().deleteProfil(deleteProfil["id"]);
-                    DbDeleteImage(deleteProfil["bild"]);
+                    dbDeleteImage(deleteProfil["bild"]);
 
                     setState(() {});
                     global_functions.changePageForever(context, const LoginPage());
@@ -252,7 +252,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
               String choosenProfilId = await chooseProfilIdWindow();
               ProfilDatabase().deleteProfil(choosenProfilId);
               Map deleteProfil = getProfilFromHive(profilId: choosenProfilId);
-              DbDeleteImage(deleteProfil["bild"]);
+              dbDeleteImage(deleteProfil["bild"]);
             }else{
               deleteProfilWindow();
             }

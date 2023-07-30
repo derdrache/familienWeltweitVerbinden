@@ -78,7 +78,7 @@ pickImage(profil, meetupCommunityData) async{
 }
 
 saveDBProfil(imageList, ownProfil) {
-  if (ownProfil["bild"].isNotEmpty) DbDeleteImage(ownProfil["bild"][0]);
+  if (ownProfil["bild"].isNotEmpty) dbDeleteImage(ownProfil["bild"][0]);
 
   updateHiveOwnProfil("bild", imageList);
   ProfilDatabase().updateProfil("bild = '${json.encode(imageList)}'",
@@ -87,7 +87,7 @@ saveDBProfil(imageList, ownProfil) {
 
 saveDBMeetup(imageList, meetupData) {
   var oldImage = meetupData["bild"];
-  DbDeleteImage(oldImage);
+  dbDeleteImage(oldImage);
 
   updateHiveMeetup(meetupData["id"], "bild", imageList[0]);
   MeetupDatabase().update("bild = '${imageList[0]}'",
@@ -96,7 +96,7 @@ saveDBMeetup(imageList, meetupData) {
 
 saveDBCommunity(imageList, communityData) {
   var oldImage = communityData["bild"];
-  DbDeleteImage(oldImage);
+  dbDeleteImage(oldImage);
 
   updateHiveCommunity(communityData["id"], "bild", imageList[0]);
   CommunityDatabase().update("bild = '${imageList[0]}'",
