@@ -236,7 +236,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       String hintText = widget.note["location"]["city"];
       if (widget.note["location"]["city"] !=
           widget.note["location"]["countryname"]) {
-        hintText += " / " + widget.note["location"]["countryname"];
+        hintText += " / ${widget.note["location"]["countryname"]}";
       }
       bool isWorldwide = widget.note["location"]["city"] == "worldwide"
           || widget.note["location"]["city"] == "Weltweit";
@@ -266,7 +266,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                         : Text(
                             hintText,
                             style:
-                                TextStyle(decoration: TextDecoration.underline),
+                                const TextStyle(decoration: TextDecoration.underline),
                           ),
                   )
                 ],
@@ -305,9 +305,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       noteImages = List.of(widget.note["bilder"]);
 
       if (changeNote) {
-        int NumberImages = noteImages.length;
+        int numberImages = noteImages.length;
 
-        for (var i = NumberImages; i < 4; i++) {
+        for (var i = numberImages; i < 4; i++) {
           noteImages.add(null);
         }
       }
@@ -389,7 +389,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if(true) IconButton(onPressed: () => changeNoteLanguage(), icon: Icon(Icons.change_circle)),
+          if(true) IconButton(onPressed: () => changeNoteLanguage(), icon: const Icon(Icons.change_circle)),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
@@ -397,7 +397,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     ShowProfilPage(
                         profil: getProfilFromHive(
                             profilId: widget.note["erstelltVon"]))),
-                icon: Icon(Icons.account_circle)),
+                icon: const Icon(Icons.account_circle)),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
@@ -405,14 +405,14 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     ChatDetailsPage(
                       chatPartnerId: widget.note["erstelltVon"],
                     )),
-                icon: Icon(Icons.chat)),
+                icon: const Icon(Icons.chat)),
           if (!changeNote && isNoteOwner)
             IconButton(
                 onPressed: () => setState(() {
                       changeNote = true;
                     }),
-                icon: Icon(Icons.edit)),
-          SizedBox(width: 10,),
+                icon: const Icon(Icons.edit)),
+          const SizedBox(width: 10,),
           if (changeNote && isNoteOwner)
             IconButton(
                 onPressed: () {
@@ -421,12 +421,12 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     changeNote = false;
                   });
                 },
-                icon: Icon(Icons.done)),
+                icon: const Icon(Icons.done)),
           IconButton(
               onPressed: () {
                 deleteWindow();
               },
-              icon: Icon(Icons.delete))
+              icon: const Icon(Icons.delete))
         ],
       ),
       body: Container(
