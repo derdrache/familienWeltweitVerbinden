@@ -56,6 +56,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch1103D),
                   _patch(patch1102D),
                   _patch(patch1101D),
                   _patch(patch1100D),
@@ -90,6 +91,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch1103E),
                   _patch(patch1102E),
                   _patch(patch1101E),
                   _patch(patch1100E),
@@ -136,6 +138,23 @@ var patchVorlage={
 
   ]
 };
+var patch1103E={
+  "title" : "1.10.3 - 31.07.2023",
+  "inhalt": [
+    "Notifications are working again",
+    "Chat - Deleted Meetup / Community no longer cause an error when the card is shared in chat",
+    "Hyperlinks - links without http or https can now be opened"
+  ]
+};
+var patch1103D={
+  "title" : "1.10.3 - 31.07.2023",
+  "inhalt": [
+    "Notifications funktionieren wieder",
+    "Chat - Gelöschte Meetup / Community führen nicht mehr zu einem Fehler, wenn die Karte im Chat geteilt wurde",
+    "Hyperlinks - links ohne http oder https können nun geöffnet werden"
+  ]
+};
+
 var patch1102E={
   "title" : "1.10.2 - 16.07.2023",
   "inhalt": [
