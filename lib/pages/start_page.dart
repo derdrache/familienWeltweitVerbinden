@@ -36,7 +36,7 @@ class StartPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StartPageState createState() => _StartPageState();
+  State<StartPage> createState() => _StartPageState();
 }
 
 class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
@@ -46,7 +46,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   bool hasInternet = true;
   var checkedA2HS = false;
   late List<Widget> pages;
-  var _networkConnectivity;
+  NetworkConnectivity? _networkConnectivity;
   late bool noProfil;
 
   @override
@@ -61,11 +61,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
 
     super.initState();
 
-    _networkConnectivity.checkInternetStatusStream();
+    _networkConnectivity!.checkInternetStatusStream();
   }
 
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed && this.mounted) {
+    if (state == AppLifecycleState.resumed && mounted) {
       _refreshData();
     }
   }
@@ -87,7 +88,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     }
 
     bool profileExist = await _checkProfilExist();
-    if (!profileExist) changePageForever(context, const CreateProfilPage());
+    if (!profileExist && context.mounted) changePageForever(context, const CreateProfilPage());
 
     if (userName == null || ownProfil == null) return;
 
@@ -105,8 +106,8 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var buildNumber = int.parse(packageInfo.buildNumber);
 
-    if (buildNumber < importantUpdateNumber) {
-      changePageForever(context, ForceUpdatePage());
+    if (buildNumber < importantUpdateNumber && context.mounted) {
+      changePageForever(context, const ForceUpdatePage());
       return true;
     }
     return false;
@@ -291,22 +292,22 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     pages = [
-      NewsPage(),
-      ErkundenPage(),
-      InformationPage(),
+      const NewsPage(),
+      const ErkundenPage(),
+      const InformationPage(),
       ChatPage(
           chatPageSliderIndex: widget.chatPageSliderIndex!
       ),
       const SettingPage()
     ];
 
-    void _onItemTapped(int index) {
+    void onItemTapped(int index) {
       setState(() {
         widget.selectedIndex = index;
       });
     }
 
-    if(noProfil) return Scaffold();
+    if(noProfil) return const Scaffold();
 
     return UpgradeAlert(
       upgrader: Upgrader(shouldPopScope: () => true),
@@ -315,7 +316,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
             child: pages.elementAt(widget.selectedIndex),
           ),
           bottomNavigationBar: CustomBottomNavigationBar(
-            onNavigationItemTapped: _onItemTapped,
+            onNavigationItemTapped: onItemTapped,
             selectNavigationItem: widget.selectedIndex,
           )),
     );

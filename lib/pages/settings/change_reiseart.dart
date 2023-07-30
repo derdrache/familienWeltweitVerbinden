@@ -10,7 +10,7 @@ import '../../widgets/custom_appbar.dart';
 class ChangeReiseartPage extends StatelessWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   String oldInput;
-  var reiseArtInput;
+  CustomDropDownButton reiseArtInput;
   final bool isGerman;
 
   ChangeReiseartPage({Key? key, required this.oldInput, required this.isGerman})
@@ -19,7 +19,7 @@ class ChangeReiseartPage extends StatelessWidget {
               ? global_variablen.reisearten
               : global_variablen.reiseartenEnglisch,
           selected: oldInput,
-        );
+        ), super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import '../../auth/secrets.dart';
 import '../../global/variablen.dart';
@@ -22,18 +21,18 @@ class PrivacySecurityPage extends StatefulWidget {
   const PrivacySecurityPage({Key? key}) : super(key: key);
 
   @override
-  _PrivacySecurityPageState createState() => _PrivacySecurityPageState();
+  State<PrivacySecurityPage> createState() => _PrivacySecurityPageState();
 }
 
 class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   final double fontsize = 20;
-  late var automaticLocationDropdown;
-  late var reiseplanungDropdown;
-  late var exactLocationDropdown;
+  late CustomDropDownButton automaticLocationDropdown;
+  late CustomDropDownButton reiseplanungDropdown;
+  late CustomDropDownButton exactLocationDropdown;
   final bool spracheIstDeutsch = kIsWeb
-      ? window.locale.languageCode == "de"
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
   
@@ -226,7 +225,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                     DbDeleteImage(deleteProfil["bild"]);
 
                     setState(() {});
-                    global_functions.changePageForever(context, LoginPage());
+                    global_functions.changePageForever(context, const LoginPage());
                   },
                 ),
                 TextButton(

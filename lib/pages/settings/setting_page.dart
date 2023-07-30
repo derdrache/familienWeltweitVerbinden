@@ -396,7 +396,7 @@ class _ProfilSection extends StatelessWidget {
                     besuchteLaender.length.toString(),
                     AppLocalizations.of(context)!.besuchteLaender,
                     ChangeBesuchteLaenderPage(
-                        selected: besuchteLaender,
+                        visitedCountriesList: besuchteLaender,
                         isGerman: spracheIstDeutsch)),
                 profilThemeContainer(
                     userProfil["socialMediaLinks"].isEmpty

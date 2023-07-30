@@ -26,11 +26,14 @@ class ChangeAboutmePage extends StatelessWidget {
       text = text.replaceAll("'","''");
       await ProfilDatabase().updateProfil("aboutme = '$text'", "WHERE id = '$userId'");
 
+      if (context.mounted){
+        customSnackbar(context,
+            "${AppLocalizations.of(context)!.ueberMich} ${AppLocalizations.of(context)!.erfolgreichGeaender}", color: Colors.green);
+        Navigator.pop(context);
+      }
 
-      customSnackbar(context,
-          AppLocalizations.of(context)!.ueberMich + " "+
-              AppLocalizations.of(context)!.erfolgreichGeaender, color: Colors.green);
-      Navigator.pop(context);
+
+
     }
 
     return Scaffold(

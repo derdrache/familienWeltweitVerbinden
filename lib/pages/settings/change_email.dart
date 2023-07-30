@@ -17,7 +17,7 @@ class ChangeEmailPage extends StatelessWidget {
 
   userLogin(passwort) async {
     var userEmail = FirebaseAuth.instance.currentUser!.email;
-    var loginUser;
+    UserCredential? loginUser;
     try {
       loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: userEmail ?? "", password: passwort);
@@ -50,7 +50,7 @@ class ChangeEmailPage extends StatelessWidget {
       }
 
       var loginUser = await userLogin(passwortKontroller.text);
-      if (loginUser == null) {
+      if (loginUser == null && context.mounted) {
         customSnackbar(
             context, AppLocalizations.of(context)!.emailOderPasswortFalsch);
         return false;
@@ -68,7 +68,7 @@ class ChangeEmailPage extends StatelessWidget {
       try{
         await FirebaseAuth.instance.currentUser!.updateEmail(emailKontroller.text);
       }catch(error){
-        customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
+        if(context.mounted) customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
         return;
       }
 
@@ -76,7 +76,7 @@ class ChangeEmailPage extends StatelessWidget {
       ProfilDatabase().updateProfil(
           "email = '$encryptedEmail'", "WHERE id = '$userId'");
 
-      Navigator.pop(context);
+      if(context.mounted) Navigator.pop(context);
     }
 
     return Scaffold(

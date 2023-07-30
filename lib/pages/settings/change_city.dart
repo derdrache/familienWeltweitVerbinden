@@ -18,7 +18,7 @@ class ChangeLocationPage extends StatefulWidget {
   const ChangeLocationPage({Key? key}) : super(key: key);
 
   @override
-  _ChangeLocationPageState createState() => _ChangeLocationPageState();
+  State<ChangeLocationPage> createState() => _ChangeLocationPageState();
 }
 
 class _ChangeLocationPageState extends State<ChangeLocationPage> {
@@ -41,7 +41,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
   joindAndRemoveChatGroups(locationDict, oldLocation) async {
     final Map leaveCity = getCityFromHive(cityName: oldLocation) ?? {};
-    String chatConnect = "</stadt="+leaveCity["id"].toString();
+    String chatConnect = "</stadt=${leaveCity["id"]}";
 
     ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
     ChatGroupsDatabase().leaveChat(chatConnect);
@@ -70,7 +70,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
   getVisitedCountriesLanguage(visitedCountries, allCountries) {
     final bool isGermanDeviceLanguage = kIsWeb
-        ? window.locale.languageCode == "de"
+        ? PlatformDispatcher.instance.locale.languageCode == "de"
         : Platform.localeName == "de_DE";
     String visitedCountriesLanguage = ownProfil["besuchteLaender"].isEmpty
         ? isGermanDeviceLanguage
@@ -206,13 +206,14 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     deleteOldTravelPlan(locationDict);
     addVisitedCountries(locationDict["countryname"]);
 
-    customSnackbar(
-        context,
-        AppLocalizations.of(context)!.aktuelleOrt +
-            " " +
-            AppLocalizations.of(context)!.erfolgreichGeaender,
-        color: Colors.green);
-    Navigator.pop(context);
+    if (context.mounted){
+      customSnackbar(
+          context,
+          "${AppLocalizations.of(context)!.aktuelleOrt} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
+          color: Colors.green);
+      Navigator.pop(context);
+    }
+
   }
 
   @override

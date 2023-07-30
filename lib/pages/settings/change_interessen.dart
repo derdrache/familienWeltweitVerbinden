@@ -12,7 +12,7 @@ import '../../widgets/custom_appbar.dart';
 class ChangeInteressenPage extends StatelessWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   List selected;
-  var interessenInputBox;
+  CustomMultiTextForm interessenInputBox;
   final bool isGerman;
 
   ChangeInteressenPage({Key? key, required this.selected, required this.isGerman})

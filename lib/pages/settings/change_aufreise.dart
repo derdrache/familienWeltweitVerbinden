@@ -21,12 +21,12 @@ class ChangeAufreisePage extends StatefulWidget {
     Key? key}) : super(key: key);
 
   @override
-  _ChangeAufreisePageState createState() => _ChangeAufreisePageState();
+  State<ChangeAufreisePage> createState() => _ChangeAufreisePageState();
 }
 
 class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
   late String reiseStatus;
-  late var aufreiseDropdownButton;
+  late CustomDropDownButton aufreiseDropdownButton;
   late bool noTraveling;
   late bool pastTravler;
   late bool stillTraveling;
@@ -139,8 +139,9 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
                   firstDate: DateTime(DateTime.now().year - 100),
                 );
 
-                if(text == AppLocalizations.of(context)!.seit) widget.aufreiseSeit = reiseDatum;
-                if(text == AppLocalizations.of(context)!.bis) widget.aufreiseBis = reiseDatum;
+
+                if(context.mounted && text == AppLocalizations.of(context)!.seit) widget.aufreiseSeit = reiseDatum;
+                if(context.mounted && text == AppLocalizations.of(context)!.bis) widget.aufreiseBis = reiseDatum;
 
                 setState(() {});
               },

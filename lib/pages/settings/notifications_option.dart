@@ -10,8 +10,7 @@ class NotificationsOptionsPage extends StatefulWidget {
   const NotificationsOptionsPage({Key? key}) : super(key: key);
 
   @override
-  _NotificationsOptionsPageState createState() =>
-      _NotificationsOptionsPageState();
+  State<NotificationsOptionsPage> createState() => _NotificationsOptionsPageState();
 }
 
 class _NotificationsOptionsPageState extends State<NotificationsOptionsPage> {

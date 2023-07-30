@@ -12,6 +12,8 @@ class FeedbackPage extends StatelessWidget {
   final formKey = GlobalKey<FormState>();
   final String userName = Hive.box("secureBox").get("ownProfil")["name"];
 
+  FeedbackPage({Key? key}) : super(key: key);
+
   feedbackSendenAndClose(context) async {
     String text = feedbackTextKontroller.text;
 

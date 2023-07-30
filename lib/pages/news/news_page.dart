@@ -19,7 +19,8 @@ import 'news_page_settings.dart';
 class NewsPage extends StatefulWidget {
   const NewsPage({Key? key}) : super(key: key);
 
-  _NewsPageState createState() => _NewsPageState();
+  @override
+  State<NewsPage> createState() => _NewsPageState();
 }
 
 class _NewsPageState extends State<NewsPage>{
@@ -75,15 +76,6 @@ class _NewsPageState extends State<NewsPage>{
         });
       }
     });
-  }
-
-  _refreshData() async{
-    await refreshHiveNewsPage();
-    refreshHiveChats();
-    refreshHiveMeetups();
-    refreshHiveProfils();
-    refreshHiveCommunities();
-    refreshHiveBulletinBoardNotes();
   }
 
   _addNewSettingProfil() {
@@ -196,7 +188,7 @@ class _NewsPageState extends State<NewsPage>{
   }
 
   _getCombineInformationIfSameUser(news){
-    var lastNews = newsFeed.length > 0 ?newsFeed.last["news"] : null;
+    var lastNews = newsFeed.isNotEmpty ?newsFeed.last["news"] : null;
     var newInformation = {};
 
     if(lastNews == null) return news["information"];
@@ -224,6 +216,7 @@ class _NewsPageState extends State<NewsPage>{
     return newInformation;
   }
 
+  @override
   Widget build(BuildContext context) {
     newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
     events = Hive.box('secureBox').get("events") ?? [];
@@ -330,11 +323,11 @@ class _NewsPageState extends State<NewsPage>{
       }
 
       String newsOrtInfo =
-          newsLand == newsOrt ? newsLand : newsOrt + " / " + newsLand;
+          newsLand == newsOrt ? newsLand : "$newsOrt / $newsLand";
       newsUserProfil = Map.from(newsUserProfil);
       if (familyProfil != null) {
         newsUserProfil["name"] =
-            AppLocalizations.of(context)!.familie + " " + familyProfil["name"];
+            "${AppLocalizations.of(context)!.familie} ${familyProfil["name"]}";
       }
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"] == 1) {
@@ -426,7 +419,7 @@ class _NewsPageState extends State<NewsPage>{
 
       friendProfil = Map.from(friendProfil);
       if (familyProfil != null) {
-        friendProfil["name"] = "Familie " + familyProfil["name"];
+        friendProfil["name"] = "Familie ${familyProfil["name"]}";
       }
 
       bool isSingleNews = newTravelPlan["von"].runtimeType == String;
@@ -449,8 +442,8 @@ class _NewsPageState extends State<NewsPage>{
         String textTitle = friendProfil["name"] +
             "\n" +
             AppLocalizations.of(context)!.friendNewTravelPlan;
-        String textDate = travelPlanVon.join("-") + " - " + travelPlanbis.join("-");
-        String textLocation = travelPlanCity + " / " + travelPlanCountry;
+        String textDate = "${travelPlanVon.join("-")} - ${travelPlanbis.join("-")}";
+        String textLocation = "$travelPlanCity / $travelPlanCountry";
         newsWidget = InkWell(
           onTap: () {
             global_func.changePage(context, ShowProfilPage(profil: friendProfil!));
@@ -523,8 +516,8 @@ class _NewsPageState extends State<NewsPage>{
           String travelPlanCity = newTravelPlan["ortData"][i]["city"];
           String travelPlanCountry = newTravelPlan["ortData"][i]["countryname"];
 
-          String textDate = travelPlanVon.join("-") + " - " + travelPlanbis.join("-");
-          String textLocation = travelPlanCity + " / " + travelPlanCountry;
+          String textDate = "${travelPlanVon.join("-")} - ${travelPlanbis.join("-")}";
+          String textLocation = "$travelPlanCity / $travelPlanCountry";
 
           columnItems.add(Column(children: [
             const SizedBox(height: 10),
@@ -676,7 +669,7 @@ class _NewsPageState extends State<NewsPage>{
       }
 
       bool spracheIstDeutsch = kIsWeb
-          ? window.locale.languageCode == "de"
+          ? PlatformDispatcher.instance.locale.languageCode == "de"
           : Platform.localeName == "de_DE";
       String textHeader =
           info["ort"] + AppLocalizations.of(context)!.hatNeueStadtinformation;
@@ -814,7 +807,7 @@ class _NewsPageState extends State<NewsPage>{
     }
 
     addMonthYearDivider() {
-      var latestMonthYear;
+      String? latestMonthYear;
 
       for (var news in List.of(newsFeed)) {
         if (news["newsWidget"] is SizedBox) continue;
@@ -948,10 +941,10 @@ class NoScalingAnimation extends FloatingActionButtonAnimator {
  */
 
 class NewsStamp extends StatelessWidget {
-  var date;
-  bool isNew;
+  final String date;
+  final bool isNew;
 
-  NewsStamp({this.date, required this.isNew, Key? key}) : super(key: key);
+  const NewsStamp({required this.date, required this.isNew, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

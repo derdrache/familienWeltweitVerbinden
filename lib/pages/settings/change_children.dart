@@ -37,11 +37,13 @@ class ChangeChildrenPage extends StatelessWidget {
 
         updateHiveOwnProfil("kinder", childrenBirthdatePickerBox.getDates());
 
-
-        customSnackbar(context,
-            AppLocalizations.of(context)!.anzahlUndAlterKinder +" "+
-                AppLocalizations.of(context)!.erfolgreichGeaender, color: Colors.green);
-        Navigator.pop(context);
+        if (context.mounted){
+          customSnackbar(context,
+              "${AppLocalizations.of(context)!.anzahlUndAlterKinder} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
+              color: Colors.green
+          );
+          Navigator.pop(context);
+        }
       }
     }
 

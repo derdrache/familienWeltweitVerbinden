@@ -30,7 +30,7 @@ class ErkundenPage extends StatefulWidget {
   const ErkundenPage({Key? key}) : super(key: key);
 
   @override
-  _ErkundenPageState createState() => _ErkundenPageState();
+  State<ErkundenPage> createState() => _ErkundenPageState();
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
@@ -88,13 +88,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double cityZoom = 8.5;
   double countryZoom = 5.5;
   double kontinentZoom = 3.5;
-  late var searchAutocomplete;
+  late SearchAutocomplete searchAutocomplete;
   late LatLng mapPosition;
   bool popupActive = false;
   List<Widget> popupItems = [];
-  var lastEventPopup;
+  late Map lastEventPopup;
   var monthsUntilInactive = 3;
-  var mounted = false;
+  var buildDone = false;
   bool friendMarkerOn = false,
       eventMarkerOn = false,
       reiseplanungOn = false,
@@ -103,7 +103,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       filterOn = false;
   bool createMenuIsOpen = false;
   var spracheIstDeutsch = kIsWeb
-      ? window.locale.languageCode == "de"
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
   @override
@@ -125,7 +125,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     setSearchAutocomplete();
 
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => mounted = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) => buildDone = true);
   }
 
 
@@ -314,8 +314,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             filterProfils.add(profil);
           } else {
             for (var family in familyProfils) {
-              var familyName = (spracheIstDeutsch ? "Familie:" : "family") +
-                  " " +
+              var familyName = "${spracheIstDeutsch ? "Familie:" : "family"} " +
                   family["name"];
               if (family["mainProfil"] == profil["id"] &&
                   filterList.contains(familyName)) {
@@ -691,7 +690,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       selectedInsiderInfoList = insiderInfoLevels["continents"];
     }
 
-    if (mounted) {
+    if (buildDone) {
       setState(() {
         aktiveProfils = choosenProfils;
         aktiveEvents = selectedEventList;
@@ -1031,10 +1030,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
                             childrenAgeStringToStringAge(profilData["kinder"])),
                         const SizedBox(height: 5),
                         genauerStandortKondition
-                            ? Text("📍 " +
-                            changeTextLength(profilData["ort"]) +
-                            ", " +
-                            changeTextLength(profilData["land"]))
+                            ? Text("📍 ${
+                            changeTextLength(profilData["ort"])}, ${changeTextLength(profilData["land"])}"
+                            )
                             : Text(changeTextLength(profilData["ort"]) +
                             ", " +
                             changeTextLength(profilData["land"]))
@@ -1203,20 +1201,21 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   },
                 child: Container(
                   padding: const EdgeInsets.all(8.0),
-                  margin: EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     border: Border.all(width: 2),
                     borderRadius: BorderRadius.circular(8)
                   ),
                   child: Column(children: [
-                    Text(infoTitle, style: TextStyle(fontWeight: FontWeight.bold),overflow: TextOverflow.ellipsis,),
-                    SizedBox(height: 5,),
+                    Text(infoTitle, style: const TextStyle(fontWeight: FontWeight.bold),overflow: TextOverflow.ellipsis,),
+                    const SizedBox(height: 5,),
                     Text("${infoData["ort"]}",overflow: TextOverflow.ellipsis,),
                     Text("${infoData["land"]}",overflow: TextOverflow.ellipsis,),
                   ],),
                 ),
               );
             }
+            return null;
           }, childCount: showItems["profils"].length)));
     }
 
@@ -1326,7 +1325,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           height: size,
           point: position,
           builder: (ctx) => FloatingActionButton(
-              heroTag: "MapMarker" + position.toString(),
+              heroTag: "MapMarker$position",
               backgroundColor: Theme.of(context).colorScheme.primary,
               mini: true,
               onPressed: buttonFunction,

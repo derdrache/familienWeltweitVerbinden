@@ -42,7 +42,7 @@ class ChangePasswortPage extends StatelessWidget {
 
     userLogin(passwort) async {
       var userEmail = FirebaseAuth.instance.currentUser!.email;
-      var loginUser;
+      UserCredential? loginUser;
       try {
         loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: userEmail ?? "", password: passwort);
@@ -70,17 +70,16 @@ class ChangePasswortPage extends StatelessWidget {
         await FirebaseAuth.instance.currentUser
             ?.updatePassword(newPasswort);
 
-        customSnackbar(
-            context,
-            AppLocalizations.of(context)!.passwort +
-                " " +
-                AppLocalizations.of(context)!.erfolgreichGeaender,
-            color: Colors.green);
+        if (context.mounted){
+          customSnackbar(
+              context,
+              "${AppLocalizations.of(context)!.passwort} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
+              color: Colors.green);
 
-        Navigator.pop(context);
+          Navigator.pop(context);
+        }
       } catch (error) {
-        customSnackbar(
-            context, AppLocalizations.of(context)!.neuesPasswortSchwach);
+        if (context.mounted) customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortSchwach);
       }
     }
 

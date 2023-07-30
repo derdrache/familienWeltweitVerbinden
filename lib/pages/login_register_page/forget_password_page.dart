@@ -11,7 +11,7 @@ class ForgetPasswordPage extends StatefulWidget {
   const ForgetPasswordPage({Key? key}) : super(key: key);
 
   @override
-  _ForgetPasswordPageState createState() => _ForgetPasswordPageState();
+  State<ForgetPasswordPage> createState() => _ForgetPasswordPageState();
 }
 
 class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
@@ -23,9 +23,13 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       try {
         await FirebaseAuth.instance
             .sendPasswordResetEmail(email: emailController.text);
-        customSnackbar(
+
+        if (context.mounted) {
+          customSnackbar(
             context, AppLocalizations.of(context)!.emailZuruecksetzenPasswort,
             color: Colors.green);
+        }
+
         return true;
       } on FirebaseAuthException catch (error) {
         if (error.code == "user-not-found") {
@@ -55,7 +59,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               customFloatbuttonExtended(
                   AppLocalizations.of(context)!.emailSenden, () async {
                 var wasReset = await resetPassword();
-                if (wasReset) {
+                if (wasReset && context.mounted) {
                   globa_functions.changePageForever(context, const LoginPage());
                 }
               })

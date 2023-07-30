@@ -23,7 +23,7 @@ class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -74,9 +74,9 @@ class _LoginPageState extends State<LoginPage> {
       var ownProfil = Hive.box("secureBox").get("ownProfil");
 
       if (ownProfil != false && ownProfil.isNotEmpty) {
-          global_functions.changePageForever(context, StartPage());
+        if (context.mounted) global_functions.changePageForever(context, StartPage());
         } else {
-          global_functions.changePageForever(context, const CreateProfilPage());
+        if (context.mounted) global_functions.changePageForever(context, const CreateProfilPage());
         }
 
     } on FirebaseAuthException catch (error) {
@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   bool isPhone() {
-    final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
+    final data = MediaQueryData.fromView(View.of(context));
     return data.size.shortestSide < 600 ? true : false;
   }
 
@@ -195,9 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 20),
                         Text(
-                          AppLocalizations.of(context)!.slogn1 +
-                              "\n" +
-                              AppLocalizations.of(context)!.slogn2,
+                          "${AppLocalizations.of(context)!.slogn1}\n${AppLocalizations.of(context)!.slogn2}",
                           textAlign: TextAlign.center,
                         )
                       ],
@@ -214,9 +212,7 @@ class _LoginPageState extends State<LoginPage> {
                             fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
                     Text(
-                      AppLocalizations.of(context)!.slogn1 +
-                          "\n" +
-                          AppLocalizations.of(context)!.slogn2,
+                      "${AppLocalizations.of(context)!.slogn1}\n${AppLocalizations.of(context)!.slogn2}",
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -322,10 +318,12 @@ class _LoginPageState extends State<LoginPage> {
             var ownProfil = Hive.box("secureBox").get("ownProfil");
 
             if (ownProfil != false && ownProfil.isNotEmpty) {
-              global_functions.changePageForever(context, StartPage());
+              if (context.mounted) global_functions.changePageForever(context, StartPage());
             } else {
-              global_functions.changePageForever(
+              if (context.mounted) {
+                global_functions.changePageForever(
                   context, const CreateProfilPage());
+              }
             }
           },
           child: Container(

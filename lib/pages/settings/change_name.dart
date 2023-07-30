@@ -33,7 +33,7 @@ class ChangeNamePage extends StatelessWidget {
 
       var checkUserProfilExist =
           await ProfilDatabase().getData("id", "WHERE name = '$newUserName'");
-      if (checkUserProfilExist != false) {
+      if (checkUserProfilExist != false && context.mounted) {
         customSnackbar(
             context, AppLocalizations.of(context)!.usernameInVerwendung);
         return;
@@ -42,7 +42,7 @@ class ChangeNamePage extends StatelessWidget {
       await ProfilDatabase().updateProfilName(userId, newUserName);
       updateHiveOwnProfil("name", newUserName);
 
-      Navigator.pop(context);
+      if(context.mounted) Navigator.pop(context);
     }
 
     return Scaffold(

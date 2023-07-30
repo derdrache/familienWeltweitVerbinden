@@ -25,12 +25,12 @@ class ChatPage extends StatefulWidget {
   ChatPage({Key? key, required this.chatPageSliderIndex}) : super(key: key);
 
   @override
-  _ChatPageState createState() => _ChatPageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage>{
   var userId = FirebaseAuth.instance.currentUser!.uid;
-  var searchAutocomplete;
+  late SearchAutocomplete searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
   List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
@@ -42,7 +42,7 @@ class _ChatPageState extends State<ChatPage>{
   bool firstSelectedIsMute = false;
   bool bothDelete = false;
   bool isLoaded = false;
-  var mainSlider;
+  late int mainSlider;
   bool activeChatSearch = false;
   var seachSearchInputNode = FocusNode();
   var searchTextKontroller = TextEditingController();
@@ -207,7 +207,7 @@ class _ChatPageState extends State<ChatPage>{
 
     if (messageList.length > 2) {
       message =
-          [messageList[0] ?? " " + messageList[1] ?? " "].join("\n") + " ...";
+          "${[messageList[0] ?? " " + messageList[1] ?? " "].join("\n")} ...";
     }
 
     return message;
@@ -307,6 +307,21 @@ class _ChatPageState extends State<ChatPage>{
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.chatLoeschen,
               height: countSelected == 1 && !isChatGroup ? 150 : 100,
+              actions: [
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.loeschen),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    changeBarOn = false;
+                    deleteChat();
+                    selectedChats = [];
+                  },
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
               children: [
                 Center(
                     child: Text(countSelected == 1
@@ -331,28 +346,13 @@ class _ChatPageState extends State<ChatPage>{
                     ],
                   )
               ],
-              actions: [
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.loeschen),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    changeBarOn = false;
-                    deleteChat();
-                    selectedChats = [];
-                  },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
-                )
-              ],
             );
           });
         });
   }
 
   pinChat() {
-    var selectedIsPinned;
+    bool? selectedIsPinned;
 
     for (var choosenChat in selectedChats) {
       var selectedChatId = choosenChat["id"];
@@ -375,12 +375,12 @@ class _ChatPageState extends State<ChatPage>{
     }
 
     setState(() {
-      firstSelectedIsPinned = selectedIsPinned;
+      firstSelectedIsPinned = selectedIsPinned!;
     });
   }
 
   muteChat() {
-    var selectedIsMute;
+    bool? selectedIsMute;
 
     for (var choosenChat in selectedChats) {
       var selectedChatId = choosenChat["id"];
@@ -402,7 +402,7 @@ class _ChatPageState extends State<ChatPage>{
     }
 
     setState(() {
-      firstSelectedIsMute = selectedIsMute;
+      firstSelectedIsMute = selectedIsMute!;
     });
   }
 
@@ -563,7 +563,7 @@ class _ChatPageState extends State<ChatPage>{
 
         var users = group["users"] ?? {};
         var isChatGroup = group["connected"] != null;
-        var chatData;
+        Map chatData = {};
 
         if (group["lastMessage"] is int) {
           group["lastMessage"] = group["lastMessage"].toString();
@@ -724,7 +724,7 @@ class _ChatPageState extends State<ChatPage>{
                         children: [
                           if (chatPartnerProfil != null)
                             ProfilImage(chatPartnerProfil),
-                          if (chatData != null) ProfilImage(chatData),
+                          if (chatData.isNotEmpty) ProfilImage(chatData),
                           if (selectedChats.contains(group))
                             const Positioned(
                                 bottom: 0,
@@ -865,9 +865,9 @@ class _ChatPageState extends State<ChatPage>{
               },
               backgroundColor: Colors.transparent,
               groupValue: mainSlider,
-              onValueChanged: (value) {
+              onValueChanged: (int? value) {
                 setState(() {
-                  mainSlider = value;
+                  mainSlider = value!;
                 });
               },
             ),

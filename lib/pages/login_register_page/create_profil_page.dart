@@ -27,7 +27,7 @@ class CreateProfilPage extends StatefulWidget {
   const CreateProfilPage({Key? key}) : super(key: key);
 
   @override
-  _CreateProfilPageState createState() => _CreateProfilPageState();
+  State<CreateProfilPage> createState() => _CreateProfilPageState();
 }
 
 class _CreateProfilPageState extends State<CreateProfilPage> {
@@ -36,9 +36,10 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var aboutusKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
   var isGerman = kIsWeb
-      ? window.locale.languageCode == "de"
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  late var sprachenAuswahlBox,reiseArtenAuswahlBox,interessenAuswahlBox;
+  late CustomMultiTextForm sprachenAuswahlBox,interessenAuswahlBox;
+  late CustomDropDownButton reiseArtenAuswahlBox;
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
   bool isLoading = false;
 
@@ -92,7 +93,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         await ProfilDatabase().getData("id", "WHERE name = '$userName'") !=
             false;
 
-    if (userExist) {
+    if (userExist && context.mounted) {
       customSnackbar(
           context, AppLocalizations.of(context)!.benutzerNamevergeben);
       changeLoading();
@@ -105,7 +106,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var children = childrenAgePickerBox.getDates();
       var ortMapData = ortAuswahlBox.getGoogleLocationData();
 
-      if (ortMapData["city"] == null) {
+      if (ortMapData["city"] == null && context.mounted) {
         customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
         changeLoading();
         return;
@@ -141,7 +142,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
       notifications.prepareNewLocationNotification();
 
-      global_functions.changePageForever(context, StartPage());
+      if(context.mounted) global_functions.changePageForever(context, StartPage());
 
       additionalDatabaseOperations(ortMapData, userID);
     }
@@ -182,26 +183,26 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   checkAllValidation(userExist, userName) {
     bool hasError = false;
     String errorString =
-        AppLocalizations.of(context)!.bitteEingabeKorrigieren + "\n";
+        "${AppLocalizations.of(context)!.bitteEingabeKorrigieren}\n";
 
     if (userExist) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.usernameInVerwendung + "\n";
+          "- ${AppLocalizations.of(context)!.usernameInVerwendung}\n";
     }else if (reiseArtenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.reiseartAuswaehlen + "\n";
+          "- ${AppLocalizations.of(context)!.reiseartAuswaehlen}\n";
     } else if (sprachenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.spracheAuswaehlen + "\n";
+          "- ${AppLocalizations.of(context)!.spracheAuswaehlen}\n";
     } else if (interessenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.interessenAuswaehlen + "\n";
+          "- ${AppLocalizations.of(context)!.interessenAuswaehlen}\n";
     }else if (childrenAgePickerBox.getDates().length == 0 ||
         !childrenInputValidation()) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.geburtsdatumEingeben + "\n";
+          "- ${AppLocalizations.of(context)!.geburtsdatumEingeben}\n";
     }else if (userName.length > 40) {
-      errorString += "- " + AppLocalizations.of(context)!.usernameZuLang;
+      errorString += "- ${AppLocalizations.of(context)!.usernameZuLang}";
     }
 
 
@@ -277,8 +278,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
               ),
               childrenAgePickerBox,
               customTextInput(
-                  AppLocalizations.of(context)!.aboutusHintText +
-                      " *optional*",
+                  "${AppLocalizations.of(context)!.aboutusHintText} *optional*",
                   aboutusKontroller,
                   moreLines: 4),
               Container(

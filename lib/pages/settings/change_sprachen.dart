@@ -22,7 +22,7 @@ class ChangeSprachenPage extends StatelessWidget {
                 : ProfilSprachen().getAllEnglishLanguages()),
         super(key: key);
 
-  var sprachenInputBox;
+  CustomMultiTextForm sprachenInputBox;
 
   @override
   Widget build(BuildContext context) {

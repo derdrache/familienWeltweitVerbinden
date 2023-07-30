@@ -27,11 +27,11 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   List allProfils = Hive.box('secureBox').get("profils");
   bool familyProfilIsActive = false;
-  late var searchAutocomplete;
+  late SearchAutocomplete searchAutocomplete;
   var familyProfil;
   var inviteFamilyProfil;
   TextEditingController nameFamilyKontroller = TextEditingController();
-  late var mainProfilDropdown;
+  late CustomDropDownButton mainProfilDropdown;
   bool isLoding = true;
   late Map mainProfil;
   FocusNode nameFocusNode = FocusNode();
@@ -78,7 +78,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     var nameIsUsed =
     await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
 
-    if (nameIsUsed) {
+    if (nameIsUsed && context.mounted) {
       customSnackbar(
           context, AppLocalizations.of(context)!.usernameInVerwendung);
       return;
@@ -156,8 +156,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
     var hasFamilyProfil = await checkHasFamilyProfil(memberId);
     if (hasFamilyProfil) {
-      customSnackbar(context,
-          member + " " + AppLocalizations.of(context)!.istInEinemFamilienprofil);
+      if (context.mounted)customSnackbar(context, member + " " + AppLocalizations.of(context)!.istInEinemFamilienprofil);
       return;
     }
 
@@ -165,8 +164,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       familyProfil["einladung"].add(memberId);
     });
 
-    customSnackbar(context,
-        member + " " + AppLocalizations.of(context)!.familienprofilEingeladen);
+    if (context.mounted) customSnackbar(context, member + " " + AppLocalizations.of(context)!.familienprofilEingeladen);
 
     FamiliesDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$memberId')",
@@ -349,11 +347,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.familyProfilloeschen,
               height: 110,
-              children: [
-                Center(
-                    child: Text(
-                        AppLocalizations.of(context)!.familyProfilWirklichLoeschen))
-              ],
               actions: [
                 TextButton(
                   child: const Text("Ok"),
@@ -363,7 +356,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                     var familyProfils = Hive.box('secureBox').get("familyProfils");
                     familyProfils.removeWhere((item) => item["id"] == familyProfil["id"]);
 
-                    Navigator.pop(context);
+                    if (context.mounted) Navigator.pop(context);
 
                     setState(() {
                       familyProfil = null;
@@ -376,6 +369,11 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                   child: Text(AppLocalizations.of(context)!.abbrechen),
                   onPressed: () => Navigator.pop(context),
                 )
+              ],
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context)!.familyProfilWirklichLoeschen))
               ],
             );
           });
@@ -534,18 +532,18 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
               children: [
                 ElevatedButton(
                   onPressed: () => acceptFamilyInvite(),
-                  child: Text(AppLocalizations.of(context)!.annehmen),
                   style: ButtonStyle(
                       backgroundColor:
                           MaterialStateProperty.all<Color>(Colors.green)),
+                  child: Text(AppLocalizations.of(context)!.annehmen),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                     onPressed: () => refuseFamilyInvite(),
-                    child: Text(AppLocalizations.of(context)!.ablehnen),
                     style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.red))),
+                            MaterialStateProperty.all<Color>(Colors.red)),
+                    child: Text(AppLocalizations.of(context)!.ablehnen)),
               ],
             )
           ],

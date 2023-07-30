@@ -12,7 +12,7 @@ class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -30,7 +30,8 @@ class _RegisterPageState extends State<RegisterPage> {
     var registrationComplete = await registration();
     if (registrationComplete) {
       FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
-      global_functions.changePageForever(context, const CreateProfilPage());
+
+      if (context.mounted) global_functions.changePageForever(context, const CreateProfilPage());
     }
   }
 

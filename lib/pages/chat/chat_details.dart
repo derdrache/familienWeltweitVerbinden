@@ -97,7 +97,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   int searchTextIndex = 0;
   List highlightMessages = [];
   Map connectedData = {};
-  var pageDetailsPage;
+  dynamic pageDetailsPage;
   num unreadMessages = 0;
   List adminList = [mainAdmin];
   final translator = GoogleTranslator();
@@ -573,12 +573,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     await ChatDatabase().addNewMessageAndSendNotification(
         chatGroupData["id"], messageData, isBlocked);
 
-    global_functions.changePage(
-        context,
-        ChatDetailsPage(
-            chatPartnerId: selectedUserId,
-            groupChatData: chatGroupData,
-            backToChatPage: true));
+    if (context.mounted){
+      global_functions.changePage(
+          context,
+          ChatDetailsPage(
+              chatPartnerId: selectedUserId,
+              groupChatData: chatGroupData,
+              backToChatPage: true));
+    }
   }
 
   _deleteMessageWindow(message) {
@@ -1112,7 +1114,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           await http.get(Uri.parse(voiceDir + fileName));
       final file = File("${appDir.path}/$fileName");
       await file.writeAsBytes(response.bodyBytes);
-    } catch (error) {}
+    } catch (_) {}
   }
 
   playVoiceMessage(String audioPath) async {
@@ -1449,61 +1451,64 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           from: "auto",
                           to: ownLanguage);
 
-                      showModalBottomSheet<void>(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Stack(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      top: 30, left: 30, bottom: 20, right: 15),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                          AppLocalizations.of(context)!
-                                              .uebersetzen,
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold)),
-                                      const SizedBox(height: 15),
-                                      ListView(
-                                        shrinkWrap: true,
-                                        children: [
-                                          Text(
-                                            translation.toString(),
-                                            style:
-                                                const TextStyle(fontSize: 18),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 30),
-                                      SizedBox(
-                                        width: double.maxFinite,
-                                        child: FloatingActionButton.extended(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          label: Text(
-                                              AppLocalizations.of(context)!
-                                                  .uebersetzungSchliessen),
+                      if (context.mounted){
+                        showModalBottomSheet<void>(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Stack(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        top: 30, left: 30, bottom: 20, right: 15),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                            AppLocalizations.of(context)!
+                                                .uebersetzen,
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold)),
+                                        const SizedBox(height: 15),
+                                        ListView(
+                                          shrinkWrap: true,
+                                          children: [
+                                            Text(
+                                              translation.toString(),
+                                              style:
+                                              const TextStyle(fontSize: 18),
+                                            ),
+                                          ],
                                         ),
-                                      )
-                                    ],
+                                        const SizedBox(height: 30),
+                                        SizedBox(
+                                          width: double.maxFinite,
+                                          child: FloatingActionButton.extended(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            label: Text(
+                                                AppLocalizations.of(context)!
+                                                    .uebersetzungSchliessen),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                const Positioned(
-                                    top: 0,
-                                    right: 0,
-                                    child: CloseButton(
-                                      color: Colors.red,
-                                    ))
-                              ],
-                            );
-                          });
+                                  const Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: CloseButton(
+                                        color: Colors.red,
+                                      ))
+                                ],
+                              );
+                            });
+                      }
+
                     }),
               ],
             ));

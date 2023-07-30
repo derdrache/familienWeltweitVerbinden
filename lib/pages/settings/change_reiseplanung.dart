@@ -151,7 +151,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     transformDateToText(dateString) {
       DateTime date = DateTime.parse(dateString);
 
-      return date.month.toString() + "." + date.year.toString();
+      return "${date.month}.${date.year}";
     }
 
     addNewPlanBox() {
@@ -188,7 +188,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
         String ortText = planung["ortData"]["city"];
 
         if (planung["ortData"]["city"] != planung["ortData"]["countryname"]) {
-          ortText += " / " + planung["ortData"]["countryname"];
+          ortText += " / ${planung["ortData"]["countryname"]}";
         }
 
         reiseplanungBox.add(Container(
@@ -197,11 +197,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
               children: [
                 Expanded(
                   child: Text(
-                    transformDateToText(planung["von"]) +
-                        " - " +
-                        transformDateToText(planung["bis"]) +
-                        " in " +
-                        ortText,
+                    "${transformDateToText(planung["von"])} - ${transformDateToText(planung["bis"])} in $ortText",
                     style: const TextStyle(fontSize: 18),
                     maxLines: 2,
                   ),
