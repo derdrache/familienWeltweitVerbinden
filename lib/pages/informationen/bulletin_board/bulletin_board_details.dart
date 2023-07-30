@@ -37,6 +37,45 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late TextEditingController descriptionKontroller;
   late List noteImages;
   late bool isNoteOwner = false;
+  late bool showOriginalText = false;
+  late Map originalText = {
+    "title": "",
+    "description": ""
+  };
+  late Map translatedText = {
+    "title": "",
+    "description": ""
+  };
+
+  checkAndSetTextVariations(){
+    bool noteLanguageGerman = widget.note["beschreibungEng"]
+        .contains("This is an automatic translation");
+    bool userSpeakGerman = getUserSpeaksGerman();
+    bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
+        ownProfil["sprachen"].contains("english") ||
+        systemLanguage == "en";
+    bool bothGerman = noteLanguageGerman && userSpeakGerman;
+    bool bothEnglish = !noteLanguageGerman && userSpeakEnglish;
+
+    if(bothGerman || bothEnglish){
+      showOriginalText = true;
+    }
+
+
+    if (noteLanguageGerman) {
+      originalText["title"] = widget.note["titleGer"];
+      originalText["description"] = widget.note["beschreibungGer"];
+      translatedText["title"] = widget.note["titleEng"];
+      translatedText["description"] = widget.note["beschreibungEng"];
+    }
+    else{
+      originalText["title"] = widget.note["titleEng"];
+      originalText["description"] = widget.note["beschreibungEng"];
+      translatedText["title"] = widget.note["titleGer"];
+      translatedText["description"] = widget.note["beschreibungGer"];
+    }
+
+  }
 
   updateNote() {
     saveTitle();
@@ -143,18 +182,21 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   }
 
   changeNoteLanguage(){
+    setState(() {
+      showOriginalText = !showOriginalText;
+    });
+  }
 
+  @override
+  void initState() {
+    checkAndSetTextVariations();
+
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
-    bool noteLanguageGerman = widget.note["beschreibungEng"]
-        .contains("This is an automatic translation");
-    bool userSpeakGerman = getUserSpeaksGerman();
-    bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
-        ownProfil["sprachen"].contains("english") ||
-        systemLanguage == "en";
 
     imageFullscreen(image) {
       showDialog(
@@ -170,14 +212,10 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     showTitle() {
       String title;
 
-      if (noteLanguageGerman && userSpeakGerman) {
-        title = widget.note["titleGer"];
-      } else if (!noteLanguageGerman && userSpeakEnglish) {
-        title = widget.note["titleEng"];
-      } else if (userSpeakGerman) {
-        title = widget.note["titleGer"];
+      if (showOriginalText) {
+        title = originalText["title"];
       } else {
-        title = widget.note["titleEng"];
+        title = translatedText["title"];
       }
 
       titleKontroller = TextEditingController(text: title);
@@ -240,14 +278,10 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     showDescription() {
       String description;
 
-      if (noteLanguageGerman && userSpeakGerman) {
-        description = widget.note["beschreibungGer"];
-      } else if (!noteLanguageGerman && userSpeakEnglish) {
-        description = widget.note["beschreibungEng"];
-      } else if (userSpeakGerman) {
-        description = widget.note["beschreibungGer"];
+      if (showOriginalText) {
+        description = originalText["description"];
       } else {
-        description = widget.note["beschreibungEng"];
+        description = translatedText["description"];
       }
 
       descriptionKontroller = TextEditingController(text: description);
@@ -355,7 +389,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if(!isNoteOwner) IconButton(onPressed: () => changeNoteLanguage(), icon: Icon(Icons.change_circle)),
+          if(true) IconButton(onPressed: () => changeNoteLanguage(), icon: Icon(Icons.change_circle)),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
