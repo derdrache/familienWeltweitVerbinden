@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../global/style.dart' as style;
 import '../informationen/community/community_page.dart';
 import '../informationen/meetups/meetup_page.dart';
 import 'location/location_page.dart';
@@ -139,7 +140,7 @@ class _InformationPageState extends State<InformationPage>{
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),
                     color: Theme.of(context).colorScheme.secondary,
                   ),
                   child: Center(

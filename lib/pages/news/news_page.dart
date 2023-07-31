@@ -10,6 +10,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
+import '../../../global/style.dart' as style;
 import '../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../informationen/meetups/meetupCard.dart';
@@ -258,7 +259,7 @@ class _NewsPageState extends State<NewsPage>{
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
                       color: Colors.white,
                       boxShadow: [
@@ -363,7 +364,7 @@ class _NewsPageState extends State<NewsPage>{
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
                       color: Colors.white,
                       boxShadow: [
@@ -458,7 +459,7 @@ class _NewsPageState extends State<NewsPage>{
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
                       color: Colors.white,
                       boxShadow: [
@@ -540,7 +541,7 @@ class _NewsPageState extends State<NewsPage>{
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
                       color: Colors.white,
                       boxShadow: [
@@ -693,7 +694,7 @@ class _NewsPageState extends State<NewsPage>{
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
                       color: Colors.white,
                       boxShadow: [
@@ -762,7 +763,7 @@ class _NewsPageState extends State<NewsPage>{
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
                       color: Colors.white,
                       boxShadow: [
@@ -825,7 +826,7 @@ class _NewsPageState extends State<NewsPage>{
                 margin: const EdgeInsets.only(bottom: 30),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(style.roundedCorners),
                   border: Border.all(),
                   color: Colors.white,
                   boxShadow: [
@@ -885,7 +886,6 @@ class _NewsPageState extends State<NewsPage>{
     _updateHiveUserNewsContent();
 
     return Scaffold(
-        //floatingActionButtonAnimator: NoScalingAnimation(),
         floatingActionButtonLocation: scrollbarOnBottom
             ? FloatingActionButtonLocation.endTop
             : FloatingActionButtonLocation.endDocked,
@@ -920,25 +920,6 @@ class _NewsPageState extends State<NewsPage>{
             ])));
   }
 }
-/*
-class NoScalingAnimation extends FloatingActionButtonAnimator {
-  @override
-  Offset getOffset({Offset begin, Offset end, double progress}) {
-    return end;
-  }
-
-  @override
-  Animation<double> getRotationAnimation({Animation<double> parent}) {
-    return Tween<double>(begin: 1.0, end: 1.0).animate(parent);
-  }
-
-  @override
-  Animation<double> getScaleAnimation({Animation<double> parent}) {
-    return Tween<double>(begin: 1.0, end: 1.0).animate(parent);
-  }
-}
-
- */
 
 class NewsStamp extends StatelessWidget {
   final String date;
