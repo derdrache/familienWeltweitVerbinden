@@ -476,5 +476,7 @@
     "tooltipChatPage": "Zur Übersicht vom Chatsystem",
     "tooltipWeltkarte": "Zur Weltkarte-Ansicht",
     "tooltipNewsPage": "Zur Ansicht über alle Informationen von Freunden",
-    "tooltipSettingPage": "Zur allen Profileinstellungen und App Informationen"
+    "tooltipSettingPage": "Zur allen Profileinstellungen und App Informationen",
+    "tooltipChatBenutzer": "Chat mit Benutzer öffnen",
+    "tooltipNotizBenutzerAngelegen": "Eine Notiz über den Benutzer anlegen"
 }

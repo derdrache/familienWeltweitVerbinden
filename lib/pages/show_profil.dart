@@ -268,6 +268,7 @@ class _AppBarState extends State<_AppBar> {
           Icons.description,
           color: buttonColor,
         ),
+        tooltip: AppLocalizations.of(context)!.tooltipNotizBenutzerAngelegen,
         onPressed: () => openNoteWindow(),
       );
     }
@@ -278,6 +279,7 @@ class _AppBarState extends State<_AppBar> {
             Icons.message,
             color: buttonColor,
           ),
+          tooltip: AppLocalizations.of(context)!.tooltipChatBenutzer,
           onPressed: () async {
             if (widget.familyProfil != null) {
               List<Widget> menuList = [];
