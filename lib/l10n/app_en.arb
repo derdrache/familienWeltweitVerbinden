@@ -467,6 +467,11 @@
     "note": "Note",
     "weltweit": "worldwide",
     "bild" : "Image",
-    "sprachnachricht" : "Sprachnachricht"
+    "sprachnachricht" : "Sprachnachricht",
+    "tooltipLinkKopieren": "Copy link for paste in Chat",
+    "tooltipChatErsteller": "Open chat with the creator",
+    "tooltipMehrOptionen": "Open menu with more options",
+    "tooltipMeetupDetailsVerwaltung": "Managing people who can see Meetup details",
+    "tooltipMehrInformationen": "Öffnet ein Fenster mit mehr Informationen zu diesem Thema"
 }
 

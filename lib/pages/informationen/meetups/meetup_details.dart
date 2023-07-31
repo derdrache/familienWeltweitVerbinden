@@ -806,12 +806,14 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
                   return OwnIconButton(
                     icon: Icons.event_available,
+                    tooltipText: AppLocalizations.of(context)!.tooltipMeetupDetailsVerwaltung,
                     badgeText: data.toString(),
                     onPressed: () => userfreischalteWindow(),
                   );
                 }),
-          IconButton(
-            icon: const Icon(Icons.link),
+          OwnIconButton(
+            icon: Icons.link,
+            tooltipText: AppLocalizations.of(context)!.tooltipLinkKopieren,
             onPressed: () {
               Clipboard.setData(
                   ClipboardData(text: "</eventId=${widget.meetupData["id"]}"));
@@ -821,14 +823,16 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   .linkWurdekopiert, color: Colors.green);
             },
           ),
-          IconButton(
-              icon: const Icon(Icons.message),
-              onPressed: () => openChat()
+          OwnIconButton(
+            icon: Icons.message,
+            tooltipText: AppLocalizations.of(context)!.tooltipChatErsteller,
+            onPressed: () => openChat(),
           ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
+          OwnIconButton(
+            icon:Icons.more_vert,
+            tooltipText: AppLocalizations.of(context)!.tooltipMehrOptionen,
             onPressed: () => moreMenu(),
-          ),
+          )
         ]),
         body: ListView(
           children: [
@@ -887,6 +891,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
           alignment: Alignment.centerRight,
           child: IconButton(
               icon: const Icon(Icons.help, size: 20),
+              tooltip: AppLocalizations.of(context)!.tooltipMehrInformationen,
               onPressed: () =>
                   showDialog(
                       context: context,
