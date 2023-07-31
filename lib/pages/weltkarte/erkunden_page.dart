@@ -1223,6 +1223,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     Widget worldChatButton() {
       return FloatingActionButton(
           heroTag: "worldchat",
+          tooltip: AppLocalizations.of(context)!.tooltipOeffneWeltchat,
           child: const Icon(Icons.message),
           onPressed: () => global_functions.changePage(
               context,
@@ -1538,6 +1539,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ? "assets/icons/friend_colorless.png"
             : "assets/icons/friend.png",
         withBox: true,
+        tooltipText: AppLocalizations.of(context)!.tooltipZeigFreunde,
         bigButton: true,
         margin: EdgeInsets.all(5),
         onPressed: () {
@@ -1585,6 +1587,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             : "assets/icons/meetup.png",
         withBox: true,
         bigButton: true,
+        tooltipText: AppLocalizations.of(context)!.tooltipZeigeMeetups,
         margin: EdgeInsets.all(5),
         badgeText: newEvents.isEmpty ? "" : newEvents.length.toString(),
         onPressed: () {
@@ -1633,6 +1636,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             : "assets/icons/community_colorless.png",
         withBox: true,
         bigButton: true,
+        tooltipText: AppLocalizations.of(context)!.tooltipZeigeGemeinschaften,
         margin: EdgeInsets.all(5),
         badgeText:
             newCommunity.isEmpty ? "" : newCommunity.length.toString(),
@@ -1665,6 +1669,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               : "assets/icons/cloack_forward_colorless.png",
           withBox: true,
           bigButton: true,
+          tooltipText: AppLocalizations.of(context)!.tooltipZeigeReiseplanungen,
           margin: EdgeInsets.all(5),
           onPressed: () {
             if (reiseplanungOn) {
@@ -1684,6 +1689,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             : "assets/icons/information_colorless.png",
         withBox: true,
         bigButton: true,
+        tooltipText: AppLocalizations.of(context)!.tooltipZeigeInsiderInfos,
         margin: EdgeInsets.all(5),
         onPressed: (){
           if(insiderInfoOn){
@@ -1706,6 +1712,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               : "assets/icons/filter_colorless.png",
           withBox: true,
           bigButton: true,
+          tooltipText: AppLocalizations.of(context)!.tooltipZeigeEigenenFilter,
           margin: EdgeInsets.all(5),
           onPressed: () {
             openFilterWindow();

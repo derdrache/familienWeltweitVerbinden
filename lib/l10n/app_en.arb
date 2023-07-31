@@ -479,6 +479,13 @@
     "tooltipNewsPage": "To view all information from friends",
     "tooltipSettingPage": "For all profile settings and app information",
     "tooltipChatBenutzer": "Open chat with user",
-    "tooltipNotizBenutzerAngelegen": "Create a note about the user"
+    "tooltipNotizBenutzerAngelegen": "Create a note about the user",
+    "tooltipZeigFreunde": "Show only friends",
+    "tooltipZeigeMeetups": "Show all Meetups",
+    "tooltipZeigeGemeinschaften": "Show all communities",
+    "tooltipZeigeReiseplanungen": "Show all travel plans",
+    "tooltipZeigeInsiderInfos": "Show all places / countries info",
+    "tooltipZeigeEigenenFilter": "Filter yourself what is displayed",
+    "tooltipOeffneWeltchat": "Open world chat"
 }
 
