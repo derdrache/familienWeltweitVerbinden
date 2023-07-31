@@ -1538,6 +1538,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ? "assets/icons/friend_colorless.png"
             : "assets/icons/friend.png",
         withBox: true,
+        bigButton: true,
+        margin: EdgeInsets.all(5),
         onPressed: () {
           if (friendMarkerOn) {
             friendMarkerOn = false;
@@ -1582,6 +1584,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ? "assets/icons/meetup_colorless.png"
             : "assets/icons/meetup.png",
         withBox: true,
+        bigButton: true,
+        margin: EdgeInsets.all(5),
         badgeText: newEvents.isEmpty ? "" : newEvents.length.toString(),
         onPressed: () {
           if (eventMarkerOn) {
@@ -1628,6 +1632,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ? "assets/icons/community.png"
             : "assets/icons/community_colorless.png",
         withBox: true,
+        bigButton: true,
+        margin: EdgeInsets.all(5),
         badgeText:
             newCommunity.isEmpty ? "" : newCommunity.length.toString(),
         onPressed: () {
@@ -1658,6 +1664,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ? "assets/icons/cloack_forward.png"
               : "assets/icons/cloack_forward_colorless.png",
           withBox: true,
+          bigButton: true,
+          margin: EdgeInsets.all(5),
           onPressed: () {
             if (reiseplanungOn) {
               reiseplanungOn = false;
@@ -1675,6 +1683,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
             ? "assets/icons/information.png"
             : "assets/icons/information_colorless.png",
         withBox: true,
+        bigButton: true,
+        margin: EdgeInsets.all(5),
         onPressed: (){
           if(insiderInfoOn){
             insiderInfoOn = false;
@@ -1695,6 +1705,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ? "assets/icons/filter.png"
               : "assets/icons/filter_colorless.png",
           withBox: true,
+          bigButton: true,
+          margin: EdgeInsets.all(5),
           onPressed: () {
             openFilterWindow();
           });
