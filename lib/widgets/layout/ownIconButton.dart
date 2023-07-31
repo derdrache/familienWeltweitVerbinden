@@ -9,6 +9,8 @@ class OwnIconButton extends StatelessWidget {
   bool withBox;
   var margin;
   Function? onPressed;
+  bool bigButton;
+  String tooltipText;
 
   OwnIconButton(
       {Key? key,
@@ -16,13 +18,18 @@ class OwnIconButton extends StatelessWidget {
       this.image,
       this.badgeText = "",
       this.color,
-      this.size = 32,
-      this.margin = const EdgeInsets.all(5),
-      this.withBox = false, this.onPressed})
+      this.size = 24,
+      this.margin = const EdgeInsets.all(15),
+      this.withBox = false, this.onPressed,
+      this.bigButton = false,
+      this.tooltipText = ""
+      })
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if(bigButton) size = 32;
+
     return InkWell(
       onTap: onPressed != null ? () => onPressed!() : null,
       child: Container(
@@ -37,13 +44,16 @@ class OwnIconButton extends StatelessWidget {
                   border: Border.all(),
                   borderRadius: BorderRadius.all(Radius.circular(8))
                 ): null,
-                child: image != null
-                    ? Image.asset(
-                        image,
-                        width: size,
-                        height: size,
-                      )
-                    : Icon(icon, size: size, color: color),
+                child: Tooltip(
+                  message: tooltipText,
+                  child: image != null
+                      ? Image.asset(
+                          image,
+                          width: size,
+                          height: size,
+                        )
+                      : Icon(icon, size: size, color: color),
+                ),
               ),
             ),
             if (badgeText.isNotEmpty)
