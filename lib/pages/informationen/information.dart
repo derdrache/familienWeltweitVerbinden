@@ -97,7 +97,9 @@ class _InformationPageState extends State<InformationPage>{
                     Container(
                         padding: const EdgeInsets.only(left: 10),
                         child: OwnIconButton(
+                          margin: EdgeInsets.all(5),
                           image: icon,
+                          bigButton: true,
                         )),
                     Align(
                       alignment: Alignment.centerLeft,
