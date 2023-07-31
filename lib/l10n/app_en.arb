@@ -472,6 +472,11 @@
     "tooltipChatErsteller": "Open chat with the creator",
     "tooltipMehrOptionen": "Open menu with more options",
     "tooltipMeetupDetailsVerwaltung": "Managing people who can see Meetup details",
-    "tooltipMehrInformationen": "Öffnet ein Fenster mit mehr Informationen zu diesem Thema"
+    "tooltipMehrInformationen": "Öffnet ein Fenster mit mehr Informationen zu diesem Thema",
+    "tooltipInformationPage": "From here you can get to the following pages: Meetups, Communities, Location Info, Country Info and Bulletin Board",
+    "tooltipChatPage": "To the overview of the chat system",
+    "tooltipWeltkarte": "To the world map view",
+    "tooltipNewsPage": "To view all information from friends",
+    "tooltipSettingPage": "For all profile settings and app information"
 }
 

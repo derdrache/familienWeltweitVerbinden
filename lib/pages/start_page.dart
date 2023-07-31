@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -332,6 +333,17 @@ class CustomBottomNavigationBar extends StatelessWidget {
       {Key? key, required this.onNavigationItemTapped, required this.selectNavigationItem})
       : super(key: key);
 
+  getChatNewMessageCount() async{
+    var newMessageCount = 0;
+
+    var privatChatNewMessages = await ChatDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
+        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
+    var groupChatNewMessages = await ChatGroupsDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
+        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
+
+    return newMessageCount + privatChatNewMessages + groupChatNewMessages;
+  }
+
   _eventNotification() {
     num eventNotification = 0;
     var myMeetups = Hive.box('secureBox').get("myEvents") ?? [];
@@ -359,59 +371,50 @@ class CustomBottomNavigationBar extends StatelessWidget {
     return communityNotifikation;
   }
 
-  informationenIcon(){
-    var notification = _eventNotification() + _communitNotifikation();
-
-    return OwnIconButton(
-      icon: Icons.group_work,
-      size: 24,
-      margin: EdgeInsets.zero,
-      badgeText: notification > 0 ? notification.toString() : "",
-    );
-  }
-
-  chatIcon() {
-    return FutureBuilder(
-      future: getChatNewMessageCount(),
-      builder: (context, snapshot) {
-        num newMessageCount = 0;
-
-        List myChats = Hive.box("secureBox").get("myChats") ?? [];
-        List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-
-        for (var chat in myChats + myGroupChats) {
-          if (chat["users"][userId] == null) continue;
-          newMessageCount += chat["users"][userId]["newMessages"];
-        }
-
-        if(snapshot.hasData && snapshot.data != false){
-          newMessageCount = 0;
-          newMessageCount += snapshot.data as num;
-        }
-
-        return OwnIconButton(
-          icon: Icons.chat,
-          size: 24,
-          margin: EdgeInsets.zero,
-          badgeText: newMessageCount > 0 ? newMessageCount.toString() : "",
-        );
-      }
-    );
-  }
-
-  getChatNewMessageCount() async{
-    var newMessageCount = 0;
-
-    var privatChatNewMessages = await ChatDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
-        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
-    var groupChatNewMessages = await ChatGroupsDatabase().getChatData("SUM(JSON_EXTRACT(users, '\$.$userId.newMessages'))",
-        "WHERE JSON_CONTAINS_PATH(users, 'one', '\$.$userId') > 0");
-
-    return newMessageCount + privatChatNewMessages + groupChatNewMessages;
-  }
-
   @override
   Widget build(BuildContext context) {
+
+
+    informationenIcon(){
+      var notification = _eventNotification() + _communitNotifikation();
+
+      return OwnIconButton(
+        icon: Icons.group_work,
+        size: 24,
+        margin: EdgeInsets.zero,
+        badgeText: notification > 0 ? notification.toString() : "",
+      );
+    }
+
+    chatIcon() {
+      return FutureBuilder(
+          future: getChatNewMessageCount(),
+          builder: (context, snapshot) {
+            num newMessageCount = 0;
+
+            List myChats = Hive.box("secureBox").get("myChats") ?? [];
+            List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+
+            for (var chat in myChats + myGroupChats) {
+              if (chat["users"][userId] == null) continue;
+              newMessageCount += chat["users"][userId]["newMessages"];
+            }
+
+            if(snapshot.hasData && snapshot.data != false){
+              newMessageCount = 0;
+              newMessageCount += snapshot.data as num;
+            }
+
+            return OwnIconButton(
+              icon: Icons.chat,
+              size: 24,
+              margin: EdgeInsets.zero,
+              badgeText: newMessageCount > 0 ? newMessageCount.toString() : "",
+            );
+          }
+      );
+    }
+
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       backgroundColor: Theme.of(context).colorScheme.primary,
@@ -419,24 +422,29 @@ class CustomBottomNavigationBar extends StatelessWidget {
       selectedItemColor: Colors.white,
       onTap: onNavigationItemTapped,
       items: <BottomNavigationBarItem>[
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.feed),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.feed),
+          tooltip: AppLocalizations.of(context)!.tooltipNewsPage,
           label: 'News',
         ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.map),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.map),
+          tooltip: AppLocalizations.of(context)!.tooltipWeltkarte,
           label: 'World',
         ),
         BottomNavigationBarItem(
           icon: informationenIcon(),
+          tooltip: AppLocalizations.of(context)!.tooltipInformationPage,
           label: "Information",
         ),
         BottomNavigationBarItem(
           icon: chatIcon(),
+          tooltip: AppLocalizations.of(context)!.tooltipChatPage,
           label: 'Chat',
         ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.settings),
+          tooltip: AppLocalizations.of(context)!.tooltipSettingPage,
           label: 'Settings',
         ),
       ],

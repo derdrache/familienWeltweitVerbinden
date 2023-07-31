@@ -471,5 +471,10 @@
     "tooltipChatErsteller": "Chat mit dem Ersteller öffnen",
     "tooltipMehrOptionen": "Menü mit weiteren Optionen öffnen",
     "tooltipMeetupDetailsVerwaltung": "Verwaltung von Personen, die Meetupdetails sehen können",
-    "tooltipMehrInformationen": "Öffnet ein Fenster mit mehr Informationen zu diesem Thema"
+    "tooltipMehrInformationen": "Öffnet ein Fenster mit mehr Informationen zu diesem Thema",
+    "tooltipInformationPage": "Von hier kommt man zu folgenden Seiten: Meetups, Communities,  Ortinfo, Länderinfo und Schwarzes Brett",
+    "tooltipChatPage": "Zur Übersicht vom Chatsystem",
+    "tooltipWeltkarte": "Zur Weltkarte-Ansicht",
+    "tooltipNewsPage": "Zur Ansicht über alle Informationen von Freunden",
+    "tooltipSettingPage": "Zur allen Profileinstellungen und App Informationen"
 }
