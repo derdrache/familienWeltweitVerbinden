@@ -4,11 +4,11 @@ import 'dart:io';
 
 
 class ForceUpdatePage extends StatelessWidget {
-  final bool spracheIstDeutsch = kIsWeb
+  bool spracheIstDeutsch = kIsWeb
       ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
-  const ForceUpdatePage({Key? key}) : super(key: key);
+  ForceUpdatePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -107,7 +107,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     var buildNumber = int.parse(packageInfo.buildNumber);
 
     if (buildNumber < importantUpdateNumber && context.mounted) {
-      changePageForever(context, const ForceUpdatePage());
+      changePageForever(context, ForceUpdatePage());
       return true;
     }
     return false;
