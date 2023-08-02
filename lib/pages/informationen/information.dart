@@ -72,7 +72,7 @@ class _InformationPageState extends State<InformationPage>{
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
-    pageCards(title, icon, pageIndex) {
+    pageCards(title, icon, pageIndex, tooltipText) {
       return GestureDetector(
         onTap: () {
           changePage(context, pageList[pageIndex]);
@@ -98,6 +98,7 @@ class _InformationPageState extends State<InformationPage>{
                         padding: const EdgeInsets.only(left: 10),
                         child: OwnIconButton(
                           margin: EdgeInsets.all(5),
+                          tooltipText: tooltipText,
                           image: icon,
                           bigButton: true,
                         )),
@@ -165,18 +166,20 @@ class _InformationPageState extends State<InformationPage>{
           children: [
             const SizedBox(height: 15),
             badgeCard(
-                pageCards("Meetups", "assets/icons/meetup.png", 0),
+                pageCards("Meetups", "assets/icons/meetup.png", 0,
+                    AppLocalizations.of(context)!.tooltipOpenMeetupPage
+                ),
                 getNumberEventNotification()),
             const SizedBox(height: 30),
             badgeCard(
-                pageCards("Communities", "assets/icons/community.png", 1),
+                pageCards("Communities", "assets/icons/community.png", 1, AppLocalizations.of(context)!.tooltipOpenCommunityPage),
                 getNumberCommunityNotification()),
             const SizedBox(height: 30),
-            pageCards(AppLocalizations.of(context)!.cities, "assets/icons/village.png", 2),
+            pageCards(AppLocalizations.of(context)!.cities, "assets/icons/village.png", 2, AppLocalizations.of(context)!.tooltipOpenCityPage),
             const SizedBox(height: 30),
-            pageCards(AppLocalizations.of(context)!.countries, "assets/icons/country_flags.png", 3),
+            pageCards(AppLocalizations.of(context)!.countries, "assets/icons/country_flags.png", 3, AppLocalizations.of(context)!.tooltipOpenCountryPage),
             const SizedBox(height: 30),
-            pageCards(AppLocalizations.of(context)!.schwarzesBrett,"assets/icons/schedule.png", 4),
+            pageCards(AppLocalizations.of(context)!.schwarzesBrett,"assets/icons/schedule.png", 4, AppLocalizations.of(context)!.tooltipOpenBulletinBoardPage),
             const SizedBox(height: 15),
           ],
         ),

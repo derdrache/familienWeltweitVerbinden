@@ -881,6 +881,7 @@ class _ChatPageState extends State<ChatPage>{
                   });
                   seachSearchInputNode.requestFocus();
                 },
+                tooltip: AppLocalizations.of(context)!.tooltipChatPageSuche,
                 icon: const Icon(
                   Icons.search,
                   size: 30,
@@ -958,6 +959,7 @@ class _ChatPageState extends State<ChatPage>{
       )),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
+        tooltip: AppLocalizations.of(context)!.tooltipCreateNewChat,
         child: const Icon(Icons.create),
         onPressed: () => selectChatpartnerWindow(),
       ),

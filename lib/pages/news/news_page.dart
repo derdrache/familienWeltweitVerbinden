@@ -894,6 +894,7 @@ class _NewsPageState extends State<NewsPage>{
                 margin: const EdgeInsets.only(top: 5),
                 child: FloatingActionButton(
                   child: const Icon(Icons.settings),
+                  tooltip: AppLocalizations.of(context)!.tooltipOpenNewsSettings,
                   onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(

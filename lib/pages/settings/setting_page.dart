@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
@@ -318,15 +319,15 @@ class _ProfilSection extends StatelessWidget {
                   style: const TextStyle(color: Colors.grey, fontSize: 14)),
               const Icon(Icons.arrow_downward),
               const Expanded(child: SizedBox()),
-              GestureDetector(
-                  onTap: () {
-                    global_func.changePage(
-                        context, ShowProfilPage(profil: userProfil));
-                  },
-                  child: const Icon(
-                    Icons.preview,
-                    size: 40,
-                  ))
+              OwnIconButton(
+                icon: Icons.preview,
+                bigButton: true,
+                tooltipText: AppLocalizations.of(context)!.tooltipShowOwnProfil,
+                onPressed: () {
+                  global_func.changePage(
+                      context, ShowProfilPage(profil: userProfil));
+                },
+              )
             ]),
             const SizedBox(height: 5),
             Wrap(
