@@ -486,6 +486,17 @@
     "tooltipZeigeReiseplanungen": "Show all travel plans",
     "tooltipZeigeInsiderInfos": "Show all places / countries info",
     "tooltipZeigeEigenenFilter": "Filter yourself what is displayed",
-    "tooltipOeffneWeltchat": "Open world chat"
+    "tooltipOeffneWeltchat": "Open world chat",
+    "tooltipOpenNewsSettings": "Open news pages setting",
+    "tooltipOpenMeetupPage": "To the overview of all Meetups",
+    "tooltipOpenCommunityPage": "To the overview of all communities",
+    "tooltipOpenCityPage": "To the overview of all locations",
+    "tooltipOpenCountryPage": "To the overview of all countries",
+    "tooltipOpenBulletinBoardPage": "To the overview of all bulletin board notes",
+    "tooltipChatPageSuche": "Activate chat search",
+    "tooltipCreateNewChat": "Create new chat",
+    "tooltipShowOwnProfil": "Show how others see my profile",
+    "gemeinschaftWurdeGeloescht": "Community was deleted",
+    "meetupWurdeGeloescht": "Meetup was deleted"
 }
 

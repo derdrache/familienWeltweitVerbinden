@@ -485,5 +485,17 @@
     "tooltipZeigeReiseplanungen": "Alle Reiseplanungen anzeigen",
     "tooltipZeigeInsiderInfos": "Alle Orte- / Länder info anzeigen",
     "tooltipZeigeEigenenFilter": "Selbst Filtern was angezeigt wird",
-    "tooltipOeffneWeltchat": "Weltchat öffnen"
+    "tooltipOeffneWeltchat": "Weltchat öffnen",
+    "tooltipOpenNewsSettings": "Newsseiten Einstellung öffnen",
+    "tooltipOpenMeetupPage": "Zur Übersicht von allen Meetups",
+    "tooltipOpenCommunityPage": "Zur Übersicht von allen Gemeinschaften",
+    "tooltipOpenCityPage": "Zur Übersicht von allen Orten",
+    "tooltipOpenCountryPage": "Zur Übersicht von allen Ländern",
+    "tooltipOpenBulletinBoardPage": "Zur Übersicht von allen schwarzen Brett notizen",
+    "tooltipChatPageSuche": "Chat suche aktivieren",
+    "tooltipCreateNewChat": "Neuen Chat erstellen",
+    "tooltipShowOwnProfil": "Zeige wie andere mein Profil sehen",
+    "gemeinschaftWurdeGeloescht": "Gemeinschaft wurde gelöscht",
+    "meetupWurdeGeloescht": "Meetup wurde gelöscht"
+
 }

@@ -573,7 +573,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     await ChatDatabase().addNewMessageAndSendNotification(
         chatGroupData["id"], messageData, isBlocked);
 
-    if (context.mounted){
+    if (context.mounted) {
       global_functions.changePage(
           context,
           ChatDetailsPage(
@@ -598,7 +598,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                     onPressed: () {
                       _checkAndRemovePinnedMessage(message);
                       _deleteMessage(message["id"]);
-                      if(message["message"].contains("</images")){
+                      if (message["message"].contains("</images")) {
                         String imageName = message["images"][0];
                         dbDeleteImage(imageName, imagePath: "chats/");
                       }
@@ -907,6 +907,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   _getDisplayedCard(cardType, data, {smallCard = false}) {
     if (cardType == "event") {
+      if (data.isEmpty) {
+        return Text(
+          "<${AppLocalizations.of(context)!.gemeinschaftWurdeGeloescht}>",
+          style: TextStyle(color: Colors.red),
+        );
+      }
       return MeetupCard(
           margin: const EdgeInsets.all(15),
           withInteresse: true,
@@ -914,6 +920,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           afterPageVisit: () => setState(() {}),
           smallCard: smallCard);
     } else if (cardType == "community") {
+      if (data.isEmpty) {
+        return Text(
+          "<${AppLocalizations.of(context)!.meetupWurdeGeloescht}>",
+          style: TextStyle(color: Colors.red),
+        );
+      }
+
       return CommunityCard(
         margin: const EdgeInsets.all(15),
         community: data,
@@ -1451,7 +1464,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           from: "auto",
                           to: ownLanguage);
 
-                      if (context.mounted){
+                      if (context.mounted) {
                         showModalBottomSheet<void>(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
@@ -1463,7 +1476,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.only(
-                                        top: 30, left: 30, bottom: 20, right: 15),
+                                        top: 30,
+                                        left: 30,
+                                        bottom: 20,
+                                        right: 15),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
@@ -1480,7 +1496,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                             Text(
                                               translation.toString(),
                                               style:
-                                              const TextStyle(fontSize: 18),
+                                                  const TextStyle(fontSize: 18),
                                             ),
                                           ],
                                         ),
@@ -1508,7 +1524,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               );
                             });
                       }
-
                     }),
               ],
             ));
@@ -1535,10 +1550,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           messageText.contains("</cityId=")) {
         var cardIdData = _getCardIdDataFromMessage(message["message"]);
         Map cardData = getCardData(cardIdData);
-        String replaceText = cardData["name"] ?? cardData["ort"];
+
+        String? replaceText = cardData["name"] ?? cardData["ort"];
         String removeId = cardIdData["text"];
         messageText =
-            message["message"].replaceAll(removeId, replaceText).trim();
+            message["message"].replaceAll(removeId, replaceText ?? "").trim();
       }
 
       bool hasTranslationButton =
@@ -1597,8 +1613,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         decoration: BoxDecoration(
                             color: messageBoxInformation["messageBoxColor"],
                             border: Border.all(),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(style.roundedCorners))),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(style.roundedCorners))),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1664,7 +1680,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     cardMessageNew(String cardType, cardIdData, {smallCard = false}) {
       Map cardData = getCardData(cardIdData);
-
+      if (cardData == null) return Container();
       return _getDisplayedCard(cardType, cardData, smallCard: smallCard);
     }
 
@@ -2081,7 +2097,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           builder: (BuildContext context) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))),
+                  borderRadius:
+                      BorderRadius.all(Radius.circular(style.roundedCorners))),
               title: Center(child: Text(connectedData["name"])),
               contentPadding: EdgeInsets.zero,
               content: SizedBox(
