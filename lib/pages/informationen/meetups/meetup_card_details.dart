@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/show_profil.dart';
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -765,16 +766,16 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              InkWell(
-                  child: Icon(
-                    isOnList ? Icons.do_not_disturb_on : Icons.add_circle,
-                    size: 80,
-                    color: Colors.black,
-                  ),
-                  onTap: () {
-                    askForRelease(isOnList);
-                    setState(() {});
-                  }),
+              OwnIconButton(
+                icon: isOnList ? Icons.do_not_disturb_on : Icons.add_circle,
+                size: 80,
+                color: Colors.black,
+                tooltipText: isOnList ? AppLocalizations.of(context)!.tooltipRemoveMeetupInformationRequest : AppLocalizations.of(context)!.tooltipGetMeetupInformation,
+                onPressed: () {
+                  askForRelease(isOnList);
+                  setState(() {});
+                },
+              ),
               const SizedBox(height: 40)
             ],
           ));

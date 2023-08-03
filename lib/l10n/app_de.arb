@@ -496,6 +496,12 @@
     "tooltipCreateNewChat": "Neuen Chat erstellen",
     "tooltipShowOwnProfil": "Zeige wie andere mein Profil sehen",
     "gemeinschaftWurdeGeloescht": "Gemeinschaft wurde gelöscht",
-    "meetupWurdeGeloescht": "Meetup wurde gelöscht"
+    "meetupWurdeGeloescht": "Meetup wurde gelöscht",
+    "tooltipSprachnachrichtAufnehmen": "Sprachnachricht aufnehmen",
+    "tooltipBildSenden": "Bild aussuchen und versenden",
+    "tooltipMeetupErstellen": "Meetup erstellen",
+    "tooltipMeetupSuche": "Alle Meetups anzeigen und suchen",
+    "tooltipGetMeetupInformation": "Anfrage für die Meetup-Information",
+    "tooltipRemoveMeetupInformationRequest": "Anfrage für Meetup-Information zurückziehen"
 
 }

@@ -204,6 +204,7 @@ class _MeetupPageState extends State<MeetupPage> {
         children: [
           FloatingActionButton(
               heroTag: "create meetup",
+              tooltip: AppLocalizations.of(context)!.tooltipMeetupErstellen,
               child: const Icon(Icons.create),
               onPressed: () =>
                   changePage(context, const MeetupErstellen())),
@@ -224,6 +225,7 @@ class _MeetupPageState extends State<MeetupPage> {
                 onSearch = !onSearch;
               });
             },
+            tooltip: AppLocalizations.of(context)!.tooltipMeetupSuche,
             child: Icon(onSearch ? Icons.close : Icons.search),
           ),
         ],

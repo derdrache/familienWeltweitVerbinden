@@ -497,6 +497,12 @@
     "tooltipCreateNewChat": "Create new chat",
     "tooltipShowOwnProfil": "Show how others see my profile",
     "gemeinschaftWurdeGeloescht": "Community was deleted",
-    "meetupWurdeGeloescht": "Meetup was deleted"
+    "meetupWurdeGeloescht": "Meetup was deleted",
+    "tooltipSprachnachrichtAufnehmen": "Record voice message",
+    "tooltipBildSenden": "Select and send image",
+    "tooltipMeetupErstellen": "Create Meetup",
+    "tooltipMeetupSuche": "View and search all Meetups",
+    "tooltipGetMeetupInformation": "Request for Meetup Information",
+    "tooltipRemoveMeetupInformationRequest": "Withdraw request for Meetup information"
 }
 

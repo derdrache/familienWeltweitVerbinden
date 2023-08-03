@@ -2749,13 +2749,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 nachrichtController.clear();
                               });
                             },
-                            icon: Icon(Icons.attach_file,
+                            tooltip: AppLocalizations.of(context)!.tooltipBildSenden,
+                            icon: Icon(Icons.photo_library,
                                 size: 34,
                                 color:
                                     Theme.of(context).colorScheme.secondary)),
                         IconButton(
                             padding: EdgeInsets.zero,
                             onPressed: () async => voiceMessageRecordMenu(),
+                            tooltip: AppLocalizations.of(context)!.tooltipSprachnachrichtAufnehmen,
                             icon: Icon(Icons.mic,
                                 size: 34,
                                 color:
