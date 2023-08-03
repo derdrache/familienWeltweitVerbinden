@@ -67,7 +67,6 @@ class _MeetupPageState extends State<MeetupPage> {
     for(var meetup in allMeetups){
       bool isNotPrivat = !meetup["art"].contains("private") && !meetup["art"].contains("privat");
       bool nameKondition = meetup["name"].toLowerCase().contains(searchText);
-      print(meetup["land"]);
       bool countryKondition = meetup["land"].toLowerCase().contains(searchText) ||
           LocationService()
               .transformCountryLanguage(meetup["land"])
@@ -90,7 +89,8 @@ class _MeetupPageState extends State<MeetupPage> {
     showMeetups() {
       List allEntries = onSearch
           ? getAllSearchMeetups()
-          : Hive.box('secureBox').get("interestEvents") ?? [] + Hive.box('secureBox').get("myEvents") ?? [];
+          : Hive.box('secureBox').get("interestEvents") + Hive.box('secureBox').get("myEvents");
+
       List<Widget> meetupCards = [];
       var emptyText = AppLocalizations.of(context)!.nochKeinegemeinschaftVorhanden;
       var emptySearchText = AppLocalizations.of(context)!.sucheKeineErgebnisse;
