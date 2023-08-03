@@ -295,5 +295,7 @@ class LocationService {
       if(country["nameGer"] == searchCountry) return country["nameEng"];
       if(country["nameEng"] == searchCountry) return country["nameGer"];
     }
+
+    return searchCountry;
   }
 }

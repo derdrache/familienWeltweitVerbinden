@@ -67,12 +67,13 @@ class _MeetupPageState extends State<MeetupPage> {
     for(var meetup in allMeetups){
       bool isNotPrivat = !meetup["art"].contains("private") && !meetup["art"].contains("privat");
       bool nameKondition = meetup["name"].toLowerCase().contains(searchText);
+      print(meetup["land"]);
       bool countryKondition = meetup["land"].toLowerCase().contains(searchText) ||
           LocationService()
               .transformCountryLanguage(meetup["land"])
               .toLowerCase()
               .contains(searchText);
-      bool cityKondition = meetup["ort"].toLowerCase().contains(searchText);
+      bool cityKondition = meetup["stadt"].toLowerCase().contains(searchText);
 
       if((nameKondition || countryKondition || cityKondition) && isNotPrivat) searchedMeetups.add(meetup);
 
