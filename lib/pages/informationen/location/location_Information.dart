@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/informationen/meetups/meetup_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -114,6 +113,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         buttons: [
           IconButton(
             icon: const Icon(Icons.link),
+            tooltip: AppLocalizations.of(context)!.tooltipLinkKopieren,
             onPressed: () async {
               Clipboard.setData(
                   ClipboardData(text: "</cityId=${location["id"]}"));
@@ -507,6 +507,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                     ));
               }
             },
+            tooltip: AppLocalizations.of(context)!.tooltipOrtChatOeffnen,
             child: const Icon(Icons.message),
           ),
         ),

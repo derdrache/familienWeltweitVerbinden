@@ -150,6 +150,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
                 global_func.changePage(
                     context, BulletinBoardDetails(note: newNote));
               },
+              tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
               icon: const Icon(Icons.done, size: 30))
         ],
       ),

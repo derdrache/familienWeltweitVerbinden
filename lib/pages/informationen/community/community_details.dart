@@ -1119,10 +1119,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),
+                tooltip: AppLocalizations.of(context)!.tooltipChatErsteller,
                 onPressed: () => _openGroupChat(),
               ),
               IconButton(
                 icon: const Icon(Icons.link),
+                tooltip: AppLocalizations.of(context)!.tooltipLinkKopieren,
                 onPressed: () {
                   Clipboard.setData(ClipboardData(
                       text: "</communityId=${widget.community["id"]}"));

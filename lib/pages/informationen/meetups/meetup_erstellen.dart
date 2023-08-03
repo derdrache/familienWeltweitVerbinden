@@ -450,6 +450,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
           buttons: [
             IconButton(
                 onPressed: () => saveMeetup(),
+                tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done, size: 30))
           ]),
       body: SafeArea(

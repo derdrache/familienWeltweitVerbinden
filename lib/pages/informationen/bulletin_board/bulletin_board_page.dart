@@ -143,6 +143,7 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
           children: [
             FloatingActionButton(
                 heroTag: "create note",
+                tooltip: AppLocalizations.of(context)!.tooltipNotizErstellen,
                 child: const Icon(Icons.create),
                 onPressed: () => global_functions.changePage(
                     context, const BulletonBoardCreate())),
@@ -160,6 +161,7 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
                   onSearch = !onSearch;
                 });
               },
+              tooltip: AppLocalizations.of(context)!.tooltipNotizSuche,
               child: Icon(onSearch ? Icons.close : Icons.search),
             ),
           ],

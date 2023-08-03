@@ -250,6 +250,7 @@ class _CommunityPageState extends State<CommunityPage> {
         children: [
           FloatingActionButton(
               heroTag: "create Community",
+              tooltip: AppLocalizations.of(context)!.tooltipCommunityErstellen,
               child: const Icon(Icons.create),
               onPressed: () =>
                   changePage(context, const CommunityErstellen())),
@@ -257,6 +258,7 @@ class _CommunityPageState extends State<CommunityPage> {
           FloatingActionButton(
             mini: onSearch ? true: false,
             backgroundColor: onSearch ? Colors.red : null,
+            tooltip: AppLocalizations.of(context)!.tooltipCommunitySuche,
             onPressed: () {
               if(onSearch){
                 searchFocusNode.unfocus();

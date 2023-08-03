@@ -183,6 +183,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                         context, CommunityDetails(community: communityData));
                   }
                 },
+                tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done, size: 30))
           ]),
       body: ListView(

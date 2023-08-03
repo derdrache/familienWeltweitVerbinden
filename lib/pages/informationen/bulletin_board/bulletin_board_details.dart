@@ -391,7 +391,11 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if(!isNoteOwner && !showOnlyOriginal) IconButton(onPressed: () => changeNoteLanguage(), icon: const Icon(Icons.change_circle)),
+          if(!isNoteOwner && !showOnlyOriginal) IconButton(
+              onPressed: () => changeNoteLanguage(),
+              tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
+              icon: const Icon(Icons.change_circle)
+          ),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
@@ -399,6 +403,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     ShowProfilPage(
                         profil: getProfilFromHive(
                             profilId: widget.note["erstelltVon"]))),
+                tooltip: AppLocalizations.of(context)!.tooltipZeigeProfilErsteller,
                 icon: const Icon(Icons.account_circle)),
           if (!isNoteOwner)
             IconButton(
@@ -407,12 +412,14 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     ChatDetailsPage(
                       chatPartnerId: widget.note["erstelltVon"],
                     )),
+                tooltip: AppLocalizations.of(context)!.tooltipChatErsteller,
                 icon: const Icon(Icons.chat)),
           if (!changeNote && isNoteOwner)
             IconButton(
                 onPressed: () => setState(() {
                       changeNote = true;
                     }),
+                tooltip: AppLocalizations.of(context)!.tooltipNotizBearbeiten,
                 icon: const Icon(Icons.edit)),
           const SizedBox(width: 10,),
           if (changeNote && isNoteOwner)
@@ -423,11 +430,13 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     changeNote = false;
                   });
                 },
+                tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done)),
           IconButton(
               onPressed: () {
                 deleteWindow();
               },
+              tooltip: AppLocalizations.of(context)!.tooltipNotizLoeschen,
               icon: const Icon(Icons.delete))
         ],
       ),

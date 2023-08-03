@@ -502,6 +502,16 @@
     "tooltipMeetupErstellen": "Meetup erstellen",
     "tooltipMeetupSuche": "Alle Meetups anzeigen und suchen",
     "tooltipGetMeetupInformation": "Anfrage für die Meetup-Information",
-    "tooltipRemoveMeetupInformationRequest": "Anfrage für Meetup-Information zurückziehen"
+    "tooltipRemoveMeetupInformationRequest": "Anfrage für Meetup-Information zurückziehen",
+    "tooltipEingabeBestaetigen": "Eingabe bestätigen",
+    "tooltipCommunityErstellen": "Gemeinschaft erstellen",
+    "tooltipCommunitySuche": "Alle Gemeinschaften anzeigen und suchen",
+    "tooltipOrtChatOeffnen": "Zum Ortchat",
+    "tooltipNotizErstellen": "Notiz erstellen",
+    "tooltipNotizSuche": "Alle Notizen anzeigen und suchen",
+    "tooltipSpracheWechseln": "Sprache wechseln",
+    "tooltipZeigeProfilErsteller": "Zum Ersteller-Profil",
+    "tooltipNotizBearbeiten": "Notize bearbeiten",
+    "tooltipNotizLoeschen": "Notiz loeschen"
 
 }

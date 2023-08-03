@@ -501,8 +501,18 @@
     "tooltipSprachnachrichtAufnehmen": "Record voice message",
     "tooltipBildSenden": "Select and send image",
     "tooltipMeetupErstellen": "Create Meetup",
-    "tooltipMeetupSuche": "View and search all Meetups",
+    "tooltipMeetupSuche": "Show and search all Meetups",
     "tooltipGetMeetupInformation": "Request for Meetup Information",
-    "tooltipRemoveMeetupInformationRequest": "Withdraw request for Meetup information"
+    "tooltipRemoveMeetupInformationRequest": "Withdraw request for Meetup information",
+    "tooltipEingabeBestaetigen": "Confirm entry",
+    "tooltipCommunityErstellen": "Create community",
+    "tooltipCommunitySuche": "Show and search all communities",
+    "tooltipOrtChatOeffnen": "To the place chat",
+    "tooltipNotizErstellen": "Create note",
+    "tooltipNotizSuche": "Show and search all notes",
+    "tooltipSpracheWechseln": "Switch language",
+    "tooltipZeigeProfilErsteller": "To creator profile",
+    "tooltipNotizBearbeiten": "Edit note",
+    "tooltipNotizLoeschen": "Delete note"
 }
 
