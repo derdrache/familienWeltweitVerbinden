@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'style.dart' as style;
 
 double sideSpace = 10;
 double borderRounding = 5;
@@ -230,7 +231,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
       decoration: BoxDecoration(
           border: Border.all(width: 1),
           color: Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(5))
+          borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButtonFormField<String>(

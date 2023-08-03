@@ -13,6 +13,7 @@ import 'package:translator/translator.dart';
 
 import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
+import '../../../global/style.dart' as style;
 import '../../../global/profil_sprachen.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/dialogWindow.dart';
@@ -839,8 +840,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Container(
                         width: 250,
-                        height: 50,
-                        decoration: BoxDecoration(border: Border.all()),
+                        decoration: BoxDecoration(
+                            border: Border.all(width: 1),
+                            borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))
+                        ),
                         child: DropdownButtonHideUnderline(
                             child: DropdownButton(
                                 hint: Center(
@@ -857,8 +860,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                                   saveTag(newValue);
                                   setStateMeetupTagWindow(() {});
                                   setState(() {});
-                                })),
-                      )
+                                })),)
                     ]),
                     const SizedBox(height: 20),
                     Container(
