@@ -159,7 +159,7 @@
     "eingabeKeinLink": "Input is not a link",
     "bitteBildAussuchen": "Please choose an image",
     "slogn1": "The networking app for families worldwide.",
-    "slogn2": "Find families around the world quickly and easily and organize meetings",
+    "slogn2": "Find families around the world quickly and easily",
     "linkBearbeiten": "edit link",
     "linkOeffnen": "open link",
     "teilnehmer": "Participants: ",
@@ -513,6 +513,9 @@
     "tooltipSpracheWechseln": "Switch language",
     "tooltipZeigeProfilErsteller": "To creator profile",
     "tooltipNotizBearbeiten": "Edit note",
-    "tooltipNotizLoeschen": "Delete note"
+    "tooltipNotizLoeschen": "Delete note",
+    "keinAccount": "Don't have an account ? ",
+    "oderWeiterMit": "Or continue with"
+
 }
 

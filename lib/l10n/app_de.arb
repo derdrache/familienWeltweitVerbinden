@@ -159,7 +159,7 @@
     "eingabeKeinLink": "Eingabe ist kein Link",
     "bitteBildAussuchen": "Bitte ein Bild aussuchen",
     "slogn1": "Die Vernetzungsapp für Familien weltweit.",
-    "slogn2": "Finde schnell und einfach Familien auf der ganzen Welt und organisiere treffen",
+    "slogn2": "Finde schnell und einfach Familien auf der ganzen Welt",
     "linkBearbeiten": "Link bearbeiten",
     "linkOeffnen": "Link öffnen",
     "teilnehmer": "Teilnehmer: ",
@@ -512,6 +512,9 @@
     "tooltipSpracheWechseln": "Sprache wechseln",
     "tooltipZeigeProfilErsteller": "Zum Ersteller-Profil",
     "tooltipNotizBearbeiten": "Notize bearbeiten",
-    "tooltipNotizLoeschen": "Notiz loeschen"
+    "tooltipNotizLoeschen": "Notiz loeschen",
+    "keinAccount": "Du hast kein Account ? ",
+    "oderWeiterMit": "Oder weiter mit"
+
 
 }

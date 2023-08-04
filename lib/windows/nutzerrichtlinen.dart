@@ -30,14 +30,12 @@ class NutzerrichtlinenAnzeigen extends StatelessWidget {
   Widget build(BuildContext context) {
     double fontSize = 12;
     var startText = isGerman
-        ? "Indem Sie auf " +
-            getPageClickOn() +
-            "klicken, erklären Sie sich mit den "
-        : "By clicking " + getPageClickOn() + "you agree to the ";
+        ? "Ich akzeptiere die families worldwide "
+        : "I accept the families worldwide ";
 
     var getNotifications = isGerman
-        ? " und stimmen zu, unsere Benachrichtigungen / E-Mails zu erhalten, die Sie jederzeit selbst abschalten können"
-        : " and agree to receive our notifications / emails, which you can turn off yourself at any time";
+        ? " und stimmen zu, unsere Benachrichtigungen zu erhalten, die Sie jederzeit selbst abschalten können"
+        : " and agree to receive our notifications, which you can turn off yourself at any time";
 
     termsOfUseWindow() {
       showDialog(
