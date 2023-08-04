@@ -14,11 +14,12 @@ import 'package:translator/translator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import '../../../functions/is_user_inactive.dart';
-import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/image_upload_box.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import '../../start_page.dart';

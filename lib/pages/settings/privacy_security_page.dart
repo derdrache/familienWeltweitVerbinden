@@ -10,12 +10,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import '../../global/global_functions.dart' as global_func;
 
-import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 import '../login_register_page/login_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {

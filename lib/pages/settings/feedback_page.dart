@@ -2,10 +2,11 @@ import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:hive/hive.dart';
 import '../../global/global_functions.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 
 class FeedbackPage extends StatelessWidget {
   TextEditingController feedbackTextKontroller = TextEditingController();

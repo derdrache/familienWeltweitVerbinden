@@ -17,6 +17,7 @@ import '../../../functions/upload_and_save_image.dart';
 import '../../../global/custom_widgets.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 
 class BulletinBoardDetails extends StatefulWidget {
   Map note;

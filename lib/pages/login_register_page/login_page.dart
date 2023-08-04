@@ -8,9 +8,11 @@ import 'package:hive/hive.dart';
 import 'dart:io' show Platform;
 
 import '../../auth/secrets.dart';
-import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../widgets/dialogWindow.dart';
+import '../../widgets/layout/custom_floating_action_button_extended.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 import '../../windows/nutzerrichtlinen.dart';
 import 'create_profil_page.dart';
 import '../start_page.dart';

@@ -7,11 +7,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/variablen.dart' as global_var;
 import '../../global/global_functions.dart' as global_func;

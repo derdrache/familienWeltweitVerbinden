@@ -1,11 +1,12 @@
 import 'package:familien_suche/global/encryption.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 
 class ChangeEmailPage extends StatelessWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;

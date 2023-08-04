@@ -9,11 +9,12 @@ import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../functions/translation.dart';
-import '../../../global/custom_widgets.dart';
 import '../../../widgets/google_autocomplete.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 
 import '../../../widgets/image_upload_box.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 
 class BulletonBoardCreate extends StatefulWidget {
   const BulletonBoardCreate({Key? key}) : super(key: key);

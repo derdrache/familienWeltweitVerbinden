@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../functions/upload_and_save_image.dart';
-import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
 import '../services/database.dart';
 import 'dialogWindow.dart';
+import 'layout/custom_snackbar.dart';
+import 'layout/custom_text_input.dart';
 
 class ProfilImage extends StatefulWidget {
   var profil;

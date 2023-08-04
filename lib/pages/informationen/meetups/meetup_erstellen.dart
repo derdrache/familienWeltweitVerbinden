@@ -11,13 +11,15 @@ import 'package:uuid/uuid.dart';
 
 import '../../../global/profil_sprachen.dart';
 import '../../../services/database.dart';
-import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../widgets/layout/custom_dropdownButton.dart';
+import '../../../widgets/layout/custom_multi_select.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import 'meetup_details.dart';
 

@@ -15,11 +15,12 @@ import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
 
 import '../../../functions/upload_and_save_image.dart';
-import '../../../global/custom_widgets.dart';
 import '../../../services/database.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../../global/variablen.dart' as global_var;

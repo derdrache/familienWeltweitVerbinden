@@ -10,7 +10,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
 import '../global/style.dart' as style;
-import '../global/custom_widgets.dart';
 import '../global/encryption.dart';
 import '../global/global_functions.dart' as global_functions;
 import '../global/global_functions.dart';
@@ -19,6 +18,8 @@ import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
 import '../services/notification.dart';
 import '../widgets/colorful_background.dart';
+import '../widgets/layout/custom_snackbar.dart';
+import '../widgets/layout/custom_text_input.dart';
 import '../widgets/profil_image.dart';
 import '../widgets/text_with_hyperlink_detection.dart';
 import 'informationen/location/location_Information.dart';

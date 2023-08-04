@@ -8,7 +8,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
 import 'package:familien_suche/global/variablen.dart' as global_var;
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/chat/pin_messages.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/pages/start_page.dart';
@@ -31,6 +30,7 @@ import '../../global/style.dart' as style;
 import '../../functions/upload_and_save_image.dart';
 import '../../global/profil_sprachen.dart';
 import '../../streams/record_timer.dart';
+import '../../widgets/layout/custom_snackbar.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
 import '../informationen/meetups/meetupCard.dart';
@@ -910,7 +910,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (data.isEmpty) {
         return Text(
           "<${AppLocalizations.of(context)!.gemeinschaftWurdeGeloescht}>",
-          style: TextStyle(color: Colors.red),
+          style: const TextStyle(color: Colors.red),
         );
       }
       return MeetupCard(
@@ -923,7 +923,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (data.isEmpty) {
         return Text(
           "<${AppLocalizations.of(context)!.meetupWurdeGeloescht}>",
-          style: TextStyle(color: Colors.red),
+          style: const TextStyle(color: Colors.red),
         );
       }
 

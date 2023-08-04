@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -10,6 +9,8 @@ import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import 'community_details.dart';
 import '../../../widgets/google_autocomplete.dart';

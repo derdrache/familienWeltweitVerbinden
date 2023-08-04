@@ -5,9 +5,9 @@ import 'package:intl/intl.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../global/custom_widgets.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_snackbar.dart';
 
 
 class ChangeAufreisePage extends StatefulWidget {

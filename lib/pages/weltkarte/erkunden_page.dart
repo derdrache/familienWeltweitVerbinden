@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'dart:io';
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/informationen/location/location_Information.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
@@ -16,6 +15,7 @@ import '../../functions/user_speaks_german.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_var;
+import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/ownIconButton.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
@@ -1541,7 +1541,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         withBox: true,
         tooltipText: AppLocalizations.of(context)!.tooltipZeigFreunde,
         bigButton: true,
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         onPressed: () {
           if (friendMarkerOn) {
             friendMarkerOn = false;
@@ -1588,7 +1588,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         withBox: true,
         bigButton: true,
         tooltipText: AppLocalizations.of(context)!.tooltipZeigeMeetups,
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         badgeText: newEvents.isEmpty ? "" : newEvents.length.toString(),
         onPressed: () {
           if (eventMarkerOn) {
@@ -1637,7 +1637,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         withBox: true,
         bigButton: true,
         tooltipText: AppLocalizations.of(context)!.tooltipZeigeGemeinschaften,
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         badgeText:
             newCommunity.isEmpty ? "" : newCommunity.length.toString(),
         onPressed: () {
@@ -1670,7 +1670,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           withBox: true,
           bigButton: true,
           tooltipText: AppLocalizations.of(context)!.tooltipZeigeReiseplanungen,
-          margin: EdgeInsets.all(5),
+          margin: const EdgeInsets.all(5),
           onPressed: () {
             if (reiseplanungOn) {
               reiseplanungOn = false;
@@ -1690,7 +1690,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         withBox: true,
         bigButton: true,
         tooltipText: AppLocalizations.of(context)!.tooltipZeigeInsiderInfos,
-        margin: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(5),
         onPressed: (){
           if(insiderInfoOn){
             insiderInfoOn = false;
@@ -1713,7 +1713,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           withBox: true,
           bigButton: true,
           tooltipText: AppLocalizations.of(context)!.tooltipZeigeEigenenFilter,
-          margin: EdgeInsets.all(5),
+          margin: const EdgeInsets.all(5),
           onPressed: () {
             openFilterWindow();
           });

@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_floating_action_button_extended.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 import '../../windows/nutzerrichtlinen.dart';
 import 'create_profil_page.dart';
 

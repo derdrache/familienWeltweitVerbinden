@@ -1,5 +1,4 @@
 import 'package:familien_suche/functions/user_speaks_german.dart';
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/widgets/layout/ownIconButton.dart';
@@ -14,6 +13,8 @@ import '../../../services/notification.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/layout/custom_dropdownButton.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../services/database.dart';
 import '../../show_profil.dart';

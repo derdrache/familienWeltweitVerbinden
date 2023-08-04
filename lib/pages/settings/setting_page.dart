@@ -25,9 +25,9 @@ import '../../global/global_functions.dart' as global_func;
 import '../../global/global_functions.dart';
 import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_variablen;
-import '../../global/custom_widgets.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_multi_select.dart';
 import '../../widgets/profil_image.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
@@ -158,7 +158,7 @@ class _NameSection extends StatelessWidget {
                 child: TextButton(
                     onPressed: () async {
                       await FirebaseAuth.instance.signOut();
-                      global_func.changePageForever(context, LoginPage());
+                      global_func.changePageForever(context, const LoginPage());
                     },
                     child: Text(AppLocalizations.of(context)!.abmelden,
                         style: TextStyle(color: textColor)))),
@@ -532,8 +532,8 @@ class _SupportInformation extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  children: const [
+                const Row(
+                  children: [
                     Text("Icons: ",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     Text("created by Freepik - Flaticon"),

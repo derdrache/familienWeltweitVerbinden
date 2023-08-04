@@ -8,8 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../functions/upload_and_save_image.dart';
-import '../../../global/custom_widgets.dart';
 import '../../../services/database.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 
 class MeetupImageGalerie extends StatefulWidget {
   bool isCreator;
