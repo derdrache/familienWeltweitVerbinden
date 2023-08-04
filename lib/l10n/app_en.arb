@@ -515,7 +515,9 @@
     "tooltipNotizBearbeiten": "Edit note",
     "tooltipNotizLoeschen": "Delete note",
     "keinAccount": "Don't have an account ? ",
-    "oderWeiterMit": "Or continue with"
+    "oderWeiterMit": "Or continue with",
+    "bereitsMitglied": "Already a member ? ",
+    "anmelden": "Sign in"
 
 }
 
