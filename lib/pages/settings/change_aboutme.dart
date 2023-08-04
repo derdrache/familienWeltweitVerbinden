@@ -18,22 +18,11 @@ class ChangeAboutmePage extends StatelessWidget {
   Widget build(BuildContext context) {
     textKontroller.text = oldText;
 
-    save() async{
-      String text = textKontroller.text;
-
+    save(newText){
       updateHiveOwnProfil("aboutme", textKontroller.text);
 
-      text = text.replaceAll("'","''");
-      await ProfilDatabase().updateProfil("aboutme = '$text'", "WHERE id = '$userId'");
-
-      if (context.mounted){
-        customSnackbar(context,
-            "${AppLocalizations.of(context)!.ueberMich} ${AppLocalizations.of(context)!.erfolgreichGeaender}", color: Colors.green);
-        Navigator.pop(context);
-      }
-
-
-
+      newText = newText.replaceAll("'","''");
+      ProfilDatabase().updateProfil("aboutme = '$newText'", "WHERE id = '$userId'");
     }
 
     return Scaffold(
@@ -53,7 +42,21 @@ class ChangeAboutmePage extends StatelessWidget {
           FloatingActionButton.extended(
               label: Text(AppLocalizations.of(context)!.speichern, style: const TextStyle(fontSize: 20),),
               icon: const Icon(Icons.save),
-              onPressed: () => save()
+              onPressed: (){
+                String newText = textKontroller.text;
+
+                if(newText.isEmpty){
+                  customSnackbar(context,
+                      AppLocalizations.of(context)!.keineEingabe, color: Colors.red);
+                  return;
+                }
+
+                save(newText);
+
+                customSnackbar(context,
+                    "${AppLocalizations.of(context)!.ueberMich} ${AppLocalizations.of(context)!.erfolgreichGeaender}", color: Colors.green);
+                Navigator.pop(context);
+              }
           )
         ],
 
