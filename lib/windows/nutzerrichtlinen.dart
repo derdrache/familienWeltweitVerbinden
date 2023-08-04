@@ -34,8 +34,8 @@ class NutzerrichtlinenAnzeigen extends StatelessWidget {
         : "I accept the families worldwide ";
 
     var getNotifications = isGerman
-        ? " und stimmen zu, unsere Benachrichtigungen zu erhalten, die Sie jederzeit selbst abschalten können"
-        : " and agree to receive our notifications, which you can turn off yourself at any time";
+        ? " und stimmen zu, Benachrichtigungen zu erhalten"
+        : " and agree to receive notifications";
 
     termsOfUseWindow() {
       showDialog(
@@ -130,10 +130,11 @@ All users commit themselves to exempt the Families worldwide from any liability 
     return Container(
         margin: const EdgeInsets.all(15),
         child: RichText(
+            textAlign: TextAlign.center,
             text: TextSpan(children: [
           TextSpan(
               text: startText,
-              style: TextStyle(fontSize: fontSize, color: Colors.black)),
+              style: TextStyle(fontSize: fontSize, color: Colors.black,)),
           termsOfUse(),
           if (page == "register")
             TextSpan(
