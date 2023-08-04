@@ -16,6 +16,7 @@ class CustomTextInput extends StatelessWidget {
   TextInputType? keyboardType;
   final int? maxLength;
   final bool onlyNumbers;
+  final EdgeInsetsGeometry? margin;
 
 
   CustomTextInput(
@@ -32,7 +33,8 @@ class CustomTextInput extends StatelessWidget {
         this.focusNode,
         this.keyboardType,
         this.maxLength,
-        this.onlyNumbers = false
+        this.onlyNumbers = false,
+        this.margin
   });
 
   @override
@@ -51,7 +53,7 @@ class CustomTextInput extends StatelessWidget {
             child: Container(
               constraints: BoxConstraints(maxWidth: style.webWidth),
               color: Colors.white,
-              margin: EdgeInsets.all(style.sideSpace),
+              margin: margin ?? EdgeInsets.all(style.sideSpace),
               child: TextFormField(
                   inputFormatters: inputFormater,
                   focusNode: focusNode,
@@ -69,7 +71,9 @@ class CustomTextInput extends StatelessWidget {
                     enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
                     ),
-                    border: const OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(style.roundedCorners)
+                    ),
                     alignLabelWithHint: true,
                     floatingLabelBehavior: hintText==null ? FloatingLabelBehavior.auto : FloatingLabelBehavior.always,
                     hintText: hintText,
