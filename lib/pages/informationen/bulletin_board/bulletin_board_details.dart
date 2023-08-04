@@ -232,7 +232,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 22),
                 )
-              : customTextInput("", titleKontroller, maxLength: 45));
+              : CustomTextInput("", titleKontroller, maxLength: 45));
     }
 
     showLocation() {
@@ -296,7 +296,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
               ? Align(alignment: Alignment.topLeft, child: Text(description))
               : Column(
                   children: [
-                    customTextInput("", descriptionKontroller,
+                    CustomTextInput("", descriptionKontroller,
                         moreLines: 10,
                         maxLength: 650,
                         textInputAction: TextInputAction.newline),

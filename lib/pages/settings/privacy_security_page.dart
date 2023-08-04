@@ -202,7 +202,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 ),
               ],
               children: [
-                Center(child: customTextInput("Account id eingeben", idController))
+                Center(child: CustomTextInput("Account id eingeben", idController))
               ],
             );
           });

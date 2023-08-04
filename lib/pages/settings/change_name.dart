@@ -52,7 +52,7 @@ class ChangeNamePage extends StatelessWidget {
       body: Container(
         margin: const EdgeInsets.only(top: 20),
         child: Column(children: [
-          customTextInput("Name", nameKontroller,
+          CustomTextInput("Name", nameKontroller,
               onSubmit: () => save()),
           const SizedBox(height: 10),
           FloatingActionButton.extended(

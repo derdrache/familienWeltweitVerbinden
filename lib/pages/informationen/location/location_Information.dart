@@ -565,10 +565,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               title:
                   AppLocalizations.of(context)!.insiderInformationHinzufuegen,
               children: [
-                customTextInput(
+                CustomTextInput(
                     AppLocalizations.of(context)!.titel, titleTextKontroller),
                 const SizedBox(height: 10),
-                customTextInput(AppLocalizations.of(context)!.beschreibung,
+                CustomTextInput(AppLocalizations.of(context)!.beschreibung,
                     informationTextKontroller,
                     moreLines: 8, textInputAction: TextInputAction.newline),
                 const SizedBox(height: 5),
@@ -760,10 +760,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               return CustomAlertDialog(
                   title: AppLocalizations.of(context)!.informationAendern,
                   children: [
-                    customTextInput(AppLocalizations.of(context)!.titel,
+                    CustomTextInput(AppLocalizations.of(context)!.titel,
                         titleTextKontroller),
                     const SizedBox(height: 10),
-                    customTextInput(AppLocalizations.of(context)!.beschreibung,
+                    CustomTextInput(AppLocalizations.of(context)!.beschreibung,
                         informationTextKontroller,
                         moreLines: 8, textInputAction: TextInputAction.newline),
                     const SizedBox(height: 10),
@@ -954,7 +954,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   height: 500,
                   title: AppLocalizations.of(context)!.informationMelden,
                   children: [
-                    customTextInput("", reportTextKontroller,
+                    CustomTextInput("", reportTextKontroller,
                         moreLines: 10,
                         hintText: AppLocalizations.of(context)!
                             .informationMeldenFrage),

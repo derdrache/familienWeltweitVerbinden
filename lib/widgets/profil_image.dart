@@ -90,7 +90,7 @@ class _ProfilImageState extends State<ProfilImage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.profilbildAendern,
               children: [
-                customTextInput(
+                CustomTextInput(
                     AppLocalizations.of(context)!.linkProfilbildEingeben,
                     profilImageLinkKontroller),
               ],

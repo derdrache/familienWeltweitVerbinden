@@ -55,7 +55,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               const SizedBox(height: 20),
               Center(
                   child: Text(AppLocalizations.of(context)!.passwortResetLink)),
-              customTextInput("Email", emailController,
+              CustomTextInput("Email", emailController,
                   validator: globa_functions.checkValidationEmail(context),
                   keyboardType: TextInputType.emailAddress),
               customFloatbuttonExtended(

@@ -189,12 +189,12 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
           ]),
       body: ListView(
         children: [
-          customTextInput(
+          CustomTextInput(
               AppLocalizations.of(context)!.communityName, nameController, maxLength: 40),
           ortAuswahlBox,
-          customTextInput(AppLocalizations.of(context)!.linkEingebenOptional,
+          CustomTextInput(AppLocalizations.of(context)!.linkEingebenOptional,
               linkKontroller),
-          customTextInput(AppLocalizations.of(context)!.beschreibungCommunity,
+          CustomTextInput(AppLocalizations.of(context)!.beschreibungCommunity,
               beschreibungKontroller,
               moreLines: 5, textInputAction: TextInputAction.newline),
           Center(child: secretChatQuestionBox()),

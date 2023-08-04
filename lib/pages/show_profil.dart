@@ -456,7 +456,7 @@ class _AppBarState extends State<_AppBar> {
                     height: 380,
                     title: AppLocalizations.of(context)!.benutzerMelden,
                     children: [
-                      customTextInput(
+                      CustomTextInput(
                           AppLocalizations.of(context)!.benutzerMeldenFrage,
                           meldeTextKontroller,
                           moreLines: 10),

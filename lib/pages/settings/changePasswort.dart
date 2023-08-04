@@ -91,20 +91,20 @@ class ChangePasswortPage extends StatelessWidget {
           margin: const EdgeInsets.only(top: 20),
           child: Column(
             children: [
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.neuesPasswortEingeben,
                   passwortNewKontroller,
-                  passwort: true),
+                  hideInput: true),
               const SizedBox(height: 15),
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.neuesPasswortWiederholen,
                   passwortNewCheckKontroller,
-                  passwort: true),
+                  hideInput: true),
               const SizedBox(height: 15),
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.altesPasswortEingeben,
                   passwortOldKontroller,
-                  passwort: true),
+                  hideInput: true),
               const SizedBox(height: 20),
               FloatingActionButton.extended(
                   label: Text(

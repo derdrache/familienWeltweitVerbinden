@@ -283,7 +283,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                 height: 380,
                 title: AppLocalizations.of(context)!.meetupMelden,
                 children: [
-                  customTextInput(AppLocalizations.of(context)!.meetupMeldenFrage,
+                  CustomTextInput(AppLocalizations.of(context)!.meetupMeldenFrage,
                       reportController,
                       moreLines: 10),
                   Container(

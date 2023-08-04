@@ -328,7 +328,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
 
     ortEingabeBox() {
       if (ortTypDropdown.selected == "online") {
-        return customTextInput(
+        return CustomTextInput(
             AppLocalizations.of(context)!.meetupLinkEingeben, meetupOrtKontroller,
             validator: global_functions.checkValidatorEmpty(context));
       } else if (ortTypDropdown.selected == "offline") {
@@ -456,7 +456,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       body: SafeArea(
         child: ListView(
           children: [
-            customTextInput("Meetup Name", meetupNameKontroller,
+            CustomTextInput("Meetup Name", meetupNameKontroller,
                 validator: global_functions.checkValidatorEmpty(context), maxLength: 40),
             Stack(
               children: [meetupArtDropdown, meetupArtInformation()],
@@ -468,7 +468,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
             dateTimeBox(meetupWannDatum, meetupWannUhrzeit, "wann"),
             dateTimeBox(meetupBisDatum, meetupBisUhrzeit, "bis"),
             ownMeetupBox(),
-            customTextInput(AppLocalizations.of(context)!.meetupBeschreibung,
+            CustomTextInput(AppLocalizations.of(context)!.meetupBeschreibung,
                 meetupBeschreibungKontroller,
                 moreLines: 8, textInputAction: TextInputAction.newline),
             Center(child: NutzerrichtlinenAnzeigen(page: "create")),

@@ -209,7 +209,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             children: [
               SizedBox(
                   width: 200,
-                  child: customTextInput(
+                  child: CustomTextInput(
                       AppLocalizations.of(context)!.eigenesBildLinkEingeben,
                       ownPictureKontroller)),
               const SizedBox(height: 20),
@@ -281,7 +281,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           return CustomAlertDialog(
             title: AppLocalizations.of(context)!.nameAendern,
             children: [
-              customTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
+              CustomTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
                   newNameKontroller,maxLength: 40),
               const SizedBox(height: 15),
               _windowOptions(() => _saveChangeName(newNameKontroller.text))
@@ -412,7 +412,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           return CustomAlertDialog(
             title: AppLocalizations.of(context)!.linkAendern,
             children: [
-              customTextInput(AppLocalizations.of(context)!.neuenLinkEingeben,
+              CustomTextInput(AppLocalizations.of(context)!.neuenLinkEingeben,
                   newLinkKontroller),
               const SizedBox(height: 15),
               _windowOptions(() => _saveChangeLink(newLinkKontroller.text))
@@ -453,7 +453,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             title: AppLocalizations.of(context)!.beschreibungAendern,
             height: 400,
             children: [
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.neueBeschreibungEingeben,
                   newBeschreibungKontroller,
                   moreLines: 13,
@@ -748,7 +748,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 height: 380,
                 title: AppLocalizations.of(context)!.communityMelden,
                 children: [
-                  customTextInput(
+                  CustomTextInput(
                       AppLocalizations.of(context)!.communityMeldenFrage,
                       reportController,
                       moreLines: 10),

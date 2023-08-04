@@ -87,13 +87,13 @@ class ChangeEmailPage extends StatelessWidget {
           margin: const EdgeInsets.only(top: 20),
           child: Column(
             children: [
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.neueEmail, emailKontroller, keyboardType: TextInputType.emailAddress),
 
               const SizedBox(height: 15),
-              customTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
+              CustomTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
                   passwortKontroller,
-                  passwort: true, onSubmit: () => save()),
+                  hideInput: true, onSubmit: () => save()),
               const SizedBox(height: 20),
               FloatingActionButton.extended(
                   label: Text(

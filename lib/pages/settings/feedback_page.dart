@@ -46,7 +46,7 @@ class FeedbackPage extends StatelessWidget {
                   margin: const EdgeInsets.all(30),
                   child: Text(AppLocalizations.of(context)!.feedbackText)),
             ),
-            customTextInput(
+            CustomTextInput(
                 AppLocalizations.of(context)!.feedback, feedbackTextKontroller,
                 moreLines: 10, validator: checkValidatorEmpty(context)),
             Align(

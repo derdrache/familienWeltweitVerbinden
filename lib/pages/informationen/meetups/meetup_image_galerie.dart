@@ -123,7 +123,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     ownLinkInput() {
       return SizedBox(
           width: 200,
-          child: customTextInput(
+          child: CustomTextInput(
               AppLocalizations.of(context)!.eigenesBildLinkEingeben,
               ownPictureKontroller, onSubmit: () {
             allImages.add(CachedNetworkImage(

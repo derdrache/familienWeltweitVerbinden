@@ -32,7 +32,7 @@ class ChangeAboutmePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          customTextInput(
+          CustomTextInput(
             AppLocalizations.of(context)!.ueberMich,
             textKontroller,
             moreLines: 10,

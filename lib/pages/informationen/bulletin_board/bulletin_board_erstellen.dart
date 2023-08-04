@@ -119,7 +119,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
       return Center(
           child: Container(
               margin: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-              child: customTextInput("Titel einfügen", titleKontroller,
+              child: CustomTextInput("Titel einfügen", titleKontroller,
                   maxLength: 45)));
     }
 
@@ -132,7 +132,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
           child: Container(
               width: 700,
               margin: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-              child: customTextInput(
+              child: CustomTextInput(
                   "Beschreibung einfügen", descriptionKontroller,
                   moreLines: 12, maxLength: 650, textInputAction: TextInputAction.newline)));
     }

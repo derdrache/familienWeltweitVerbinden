@@ -260,7 +260,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           }),
           child: ListView(
             children: [
-              customTextInput(AppLocalizations.of(context)!.benutzername,
+              CustomTextInput(AppLocalizations.of(context)!.benutzername,
                   userNameKontroller,
                   validator: global_functions.checkValidatorEmpty(context)),
               Align(
@@ -281,7 +281,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                     )),
               ),
               childrenAgePickerBox,
-              customTextInput(
+              CustomTextInput(
                   "${AppLocalizations.of(context)!.aboutusHintText} *optional*",
                   aboutusKontroller,
                   moreLines: 4),

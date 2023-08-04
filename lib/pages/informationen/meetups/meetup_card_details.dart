@@ -482,7 +482,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                     const Duration(seconds: 0),
                     () => openChangeWindow(
                         AppLocalizations.of(context)!.meetupMapLinkAendern,
-                        customTextInput(
+                        CustomTextInput(
                             AppLocalizations.of(context)!
                                 .neuenKartenlinkEingeben,
                             changeTextInputController),
@@ -514,7 +514,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       return InkWell(
         onTap: () => openChangeWindow(
             AppLocalizations.of(context)!.meetupNameAendern,
-            customTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
+            CustomTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
                 changeTextInputController,
                 maxLength: 40),
             checkAndSaveNewName),
@@ -738,7 +738,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                           ? () => openChangeWindow(
                               AppLocalizations.of(context)!
                                   .meetupBeschreibungAendern,
-                              customTextInput(
+                              CustomTextInput(
                                   AppLocalizations.of(context)!
                                       .neueBeschreibungEingeben,
                                   beschreibungInputKontroller,

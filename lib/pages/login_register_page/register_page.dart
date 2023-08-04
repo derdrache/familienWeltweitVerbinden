@@ -90,27 +90,27 @@ class _RegisterPageState extends State<RegisterPage> {
           key: formKey,
           child: ListView(
             children: [
-              customTextInput(
+              CustomTextInput(
                 "Email",
                 emailController,
                 validator: global_functions.checkValidationEmail(context),
                 textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.emailAddress,
               ),
-              customTextInput(AppLocalizations.of(context)!.emailBestaetigen,
+              CustomTextInput(AppLocalizations.of(context)!.emailBestaetigen,
                   checkEmailController,
                   validator: global_functions.checkValidationEmail(context,
                       emailCheck: emailController.text),
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.emailAddress),
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.passwort, passwordController,
-                  passwort: true,
+                  hideInput: true,
                   validator: global_functions.checkValidatorPassword(context),
                   textInputAction: TextInputAction.next),
-              customTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
+              CustomTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
                   checkPasswordController,
-                  passwort: true,
+                  hideInput: true,
                   validator: global_functions.checkValidatorPassword(context,
                       passwordCheck: passwordController.text),
                   textInputAction: TextInputAction.done,

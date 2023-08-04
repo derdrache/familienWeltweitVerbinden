@@ -449,7 +449,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       nameFamilyKontroller.text = familyProfil["name"];
 
       return Container(
-        child: customTextInput(AppLocalizations.of(context)!.familienprofilName,
+        child: CustomTextInput(AppLocalizations.of(context)!.familienprofilName,
             nameFamilyKontroller,
             focusNode: nameFocusNode, onSubmit: () => saveName()),
       );
