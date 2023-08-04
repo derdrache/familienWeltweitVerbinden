@@ -20,6 +20,7 @@ import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../services/database.dart';
+import '../../widgets/layout/custom_dropdownButton.dart';
 import '../start_page.dart';
 import 'login_page.dart';
 
@@ -39,7 +40,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
   late CustomMultiTextForm sprachenAuswahlBox,interessenAuswahlBox;
-  late CustomDropDownButton reiseArtenAuswahlBox;
+  late CustomDropdownButton reiseArtenAuswahlBox;
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
   bool isLoading = false;
 
@@ -51,7 +52,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             ? ProfilSprachen().getAllGermanLanguages()
             : ProfilSprachen().getAllEnglishLanguages());
 
-    reiseArtenAuswahlBox = CustomDropDownButton(
+    reiseArtenAuswahlBox = CustomDropdownButton(
       items: isGerman
           ? global_variablen.reisearten
           : global_variablen.reiseartenEnglisch,

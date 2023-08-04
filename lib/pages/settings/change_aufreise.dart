@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/custom_widgets.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_dropdownButton.dart';
 
 
 class ChangeAufreisePage extends StatefulWidget {
@@ -26,7 +27,7 @@ class ChangeAufreisePage extends StatefulWidget {
 
 class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
   late String reiseStatus;
-  late CustomDropDownButton aufreiseDropdownButton;
+  late CustomDropdownButton aufreiseDropdownButton;
   late bool noTraveling;
   late bool pastTravler;
   late bool stillTraveling;
@@ -35,7 +36,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
   void initState() {
     reiseStatus = getReiseStatus();
 
-    aufreiseDropdownButton = CustomDropDownButton(
+    aufreiseDropdownButton = CustomDropdownButton(
       items: widget.isGerman ? aufreise : aufreiseEnglisch,
       selected: reiseStatus,
       onChange: () {

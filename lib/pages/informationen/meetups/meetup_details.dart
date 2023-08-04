@@ -13,6 +13,7 @@ import '../../../global/variablen.dart' as global_var;
 import '../../../services/notification.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/layout/custom_dropdownButton.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../services/database.dart';
 import '../../show_profil.dart';
@@ -870,7 +871,7 @@ class MeetupArtButton extends StatefulWidget {
 class _MeetupArtButtonState extends State<MeetupArtButton> {
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   late bool userSpeakGerman;
-  late CustomDropDownButton meetupTypInput;
+  late CustomDropdownButton meetupTypInput;
   late IconData icon;
 
   saveMeetupArt() {
@@ -980,7 +981,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
   @override
   void initState() {
     userSpeakGerman = getUserSpeaksGerman();
-    meetupTypInput = CustomDropDownButton(
+    meetupTypInput = CustomDropdownButton(
       items: userSpeakGerman ? global_var.eventArt : global_var.eventArtEnglisch,
       selected: userSpeakGerman
           ? global_func.changeEnglishToGerman(widget.meetupData["art"])

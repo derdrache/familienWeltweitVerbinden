@@ -17,6 +17,7 @@ import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../global/variablen.dart' as global_var;
+import '../../../widgets/layout/custom_dropdownButton.dart';
 import '../../../windows/nutzerrichtlinen.dart';
 import 'meetup_details.dart';
 
@@ -40,10 +41,10 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
   TextEditingController meetupBeschreibungKontroller = TextEditingController();
   TextEditingController meetupOrtKontroller = TextEditingController();
   late CustomMultiTextForm sprachenAuswahlBox;
-  late CustomDropDownButton meetupArtDropdown;
-  late CustomDropDownButton ortTypDropdown;
+  late CustomDropdownButton meetupArtDropdown;
+  late CustomDropdownButton ortTypDropdown;
   GoogleAutoComplete ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10), withOwnLocation: true);
-  late CustomDropDownButton meetupIntervalDropdown;
+  late CustomDropdownButton meetupIntervalDropdown;
   bool ownMeetup = true;
   final translator = GoogleTranslator();
   bool chooseCurrentLocation = false;
@@ -55,21 +56,20 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
             ? ProfilSprachen().getAllGermanLanguages()
             : ProfilSprachen().getAllEnglishLanguages());
 
-    ortTypDropdown = CustomDropDownButton(
+    ortTypDropdown = CustomDropdownButton(
       selected: "offline",
       hintText: "offline / online",
-      labelText: "Meetup typ",
       items: isGerman ? global_var.meetupTyp : global_var.meetupTypEnglisch,
       onChange: () {
         setState(() {});
       },
     );
 
-    meetupArtDropdown = CustomDropDownButton(
+    meetupArtDropdown = CustomDropdownButton(
       items: isGerman ? global_var.eventArt : global_var.eventArtEnglisch,
     );
 
-    meetupIntervalDropdown = CustomDropDownButton(
+    meetupIntervalDropdown = CustomDropdownButton(
         items: isGerman
             ? global_var.meetupInterval
             : global_var.meetupIntervalEnglisch,
@@ -248,9 +248,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     double screenWidth = MediaQuery.of(context).size.width;
     sprachenAuswahlBox.hintText =
         AppLocalizations.of(context)!.spracheAuswaehlen;
-    meetupArtDropdown.labelText =  AppLocalizations.of(context)!.meetupOeffentlichkeit;
     meetupArtDropdown.hintText = AppLocalizations.of(context)!.meetupArten;
-    meetupIntervalDropdown.labelText = AppLocalizations.of(context)!.meetupWiederholung;
     meetupIntervalDropdown.hintText = isGerman
         ? global_var.meetupInterval.join(", ")
         : global_var.meetupIntervalEnglisch.join(", ");

@@ -15,6 +15,7 @@ import '../../global/global_functions.dart' as global_functions;
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
+import '../../widgets/layout/custom_dropdownButton.dart';
 import '../login_register_page/login_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
@@ -28,9 +29,9 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   final double fontsize = 20;
-  late CustomDropDownButton automaticLocationDropdown;
-  late CustomDropDownButton reiseplanungDropdown;
-  late CustomDropDownButton exactLocationDropdown;
+  late CustomDropdownButton automaticLocationDropdown;
+  late CustomDropdownButton reiseplanungDropdown;
+  late CustomDropdownButton exactLocationDropdown;
   final bool spracheIstDeutsch = kIsWeb
       ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
@@ -92,7 +93,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           ? standortbestimmung[0]
           : standortbestimmungEnglisch[0]);
 
-    automaticLocationDropdown = CustomDropDownButton(
+    automaticLocationDropdown = CustomDropdownButton(
       items: locationList,
       selected: selected,
       onChange: () => saveAutomaticLocation(),
@@ -105,7 +106,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     global_func.changeEnglishToGerman(ownProfil["genauerStandortPrivacy"]) :
     global_func.changeGermanToEnglish(ownProfil["genauerStandortPrivacy"]);
 
-    exactLocationDropdown = CustomDropDownButton(
+    exactLocationDropdown = CustomDropdownButton(
       items: items,
       selected: selected,
       onChange: () => saveExactLocation(),
@@ -118,7 +119,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     global_func.changeEnglishToGerman(ownProfil["reiseplanungPrivacy"]) :
     global_func.changeGermanToEnglish(ownProfil["reiseplanungPrivacy"]);
 
-    reiseplanungDropdown = CustomDropDownButton(
+    reiseplanungDropdown = CustomDropdownButton(
         items: items,
         selected: selected,
         onChange: () => saveReiseplanung(),

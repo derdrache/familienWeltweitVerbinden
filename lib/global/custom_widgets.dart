@@ -6,7 +6,6 @@ import 'style.dart' as style;
 double sideSpace = 10;
 double borderRounding = 5;
 double boxHeight = 50;
-double webWidth = 600;
 
 
 Widget customTextInput(text, controller, {validator, passwort = false,
@@ -25,7 +24,7 @@ Widget customTextInput(text, controller, {validator, passwort = false,
       Align(
         alignment: Alignment.center,
         child: Container(
-            constraints: BoxConstraints(maxWidth: webWidth),
+            constraints: BoxConstraints(maxWidth: style.webWidth),
             color: Colors.white,
             margin: EdgeInsets.all(sideSpace),
             child: TextFormField(
@@ -152,7 +151,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     }
 
     return Container(
-      width: webWidth,
+      width: style.webWidth,
       margin: EdgeInsets.all(sideSpace),
       decoration: BoxDecoration(
           border: Border.all(),
@@ -179,86 +178,6 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 }
 
 
-class CustomDropDownButton extends StatefulWidget {
-  List<String> items;
-  String hintText;
-  String labelText;
-  String? selected;
-  double? width;
-  var onChange;
-  var margin;
-
-  CustomDropDownButton({Key? key,
-    required this.items,
-    this.hintText = "",
-    this.selected = "",
-    this.labelText = "",
-    this.margin = const EdgeInsets.all(10),
-    this.onChange,
-    this.width
-  }) : super(key: key);
-
-
-  getSelected(){
-    return selected;
-  }
-
-  @override
-  _CustomDropDownButtonState createState() => _CustomDropDownButtonState();
-}
-
-class _CustomDropDownButtonState extends State<CustomDropDownButton> {
-
-  createDropdownItems(){
-    return widget.items.map<DropdownMenuItem<String>>((String value) {
-      return DropdownMenuItem<String>(
-        value: value,
-        child: Text(value),
-      );
-    }).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: widget.width ?? webWidth,
-      margin: widget.margin,
-      padding: const EdgeInsets.only(left: 10),
-      constraints: const BoxConstraints(
-        minHeight: 50.0,
-        maxHeight: 70.0,
-      ),
-      decoration: BoxDecoration(
-          border: Border.all(width: 1),
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          value: widget.selected == "" ? null : widget.selected,
-          hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
-          elevation: 16,
-          style: const TextStyle(color: Colors.black),
-          decoration: widget.labelText != "" ? InputDecoration(
-            labelText: widget.labelText,
-          ) :const InputDecoration() ,
-          onChanged: (newValue){
-
-            setState(() {
-              widget.selected = newValue;
-            });
-            if(widget.onChange != null) widget.onChange();
-          },
-          items: createDropdownItems(),
-        ),
-      ),
-    );
-
-
-
-  }
-}
 
 
 

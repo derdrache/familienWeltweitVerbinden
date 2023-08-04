@@ -27,6 +27,7 @@ import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../global/custom_widgets.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
+import '../../widgets/layout/custom_dropdownButton.dart';
 import '../../widgets/profil_image.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
@@ -201,7 +202,7 @@ class _ProfilSection extends StatelessWidget {
   var kinderAgeBox = ChildrenBirthdatePickerBox();
   var interessenInputBox =
       CustomMultiTextForm(auswahlList: global_variablen.interessenListe);
-  var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
+  var reiseArtInput = CustomDropdownButton(items: global_variablen.reisearten);
   var sprachenInputBox = CustomMultiTextForm(auswahlList: const []);
   final bool spracheIstDeutsch = kIsWeb
       ? window.locale.languageCode == "de"

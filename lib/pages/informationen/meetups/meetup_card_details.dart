@@ -20,6 +20,7 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../services/database.dart';
 import '../../../global/variablen.dart' as global_var;
+import '../../../widgets/layout/custom_dropdownButton.dart';
 import '../location/location_Information.dart';
 import 'meetup_image_galerie.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
@@ -59,8 +60,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   TextEditingController changeTextInputController = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
   var beschreibungInputKontroller = TextEditingController();
-  late CustomDropDownButton changeDropdownInput;
-  late CustomDropDownButton timeZoneDropdown;
+  late CustomDropdownButton changeDropdownInput;
+  late CustomDropdownButton timeZoneDropdown;
   late CustomMultiTextForm changeMultiDropdownInput;
   bool chooseCurrentLocation = false;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
@@ -560,7 +561,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     timeZoneInformation() {
-      timeZoneDropdown = CustomDropDownButton(
+      timeZoneDropdown = CustomDropdownButton(
           items: global_var.eventZeitzonen,
           selected: widget.meetupData["zeitzone"].toString());
 
@@ -665,7 +666,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     intervalInformation() {
-      changeDropdownInput = CustomDropDownButton(
+      changeDropdownInput = CustomDropdownButton(
           items: userSpeakGerman
               ? global_var.meetupInterval
               : global_var.meetupIntervalEnglisch,
