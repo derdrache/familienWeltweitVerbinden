@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
+import 'package:stacked_firebase_auth/stacked_firebase_auth.dart';
 
 import '../../auth/secrets.dart';
 import '../../global/global_functions.dart' as global_functions;
@@ -127,6 +128,20 @@ class _LoginPageState extends State<LoginPage> {
 
       return await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (_) {}
+  }
+
+  signInWithApple() async{
+    var test = FirebaseAuthenticationService();
+    final result = await test.signInWithApple(
+        appleRedirectUri: "https://praxis-cab-236720.firebaseapp.com/__/auth/handler",
+        appleClientId: 'com.example.familienSuche'
+    );
+
+    /*
+    var appleProvider = AppleAuthProvider();
+    return await FirebaseAuth.instance.signInWithProvider(appleProvider);
+
+     */
   }
 
   bool isPhone() {
@@ -336,14 +351,69 @@ class _LoginPageState extends State<LoginPage> {
                       shape: BoxShape.circle,
                     ),
                   )
-                : const CircularProgressIndicator()),
+                : Center(child: const CircularProgressIndicator())),
+      );
+    }
+
+    Widget appleLoginButton() {
+      return InkWell(
+        onTap: () async {
+          setState(() {
+            appleLoginLoading = true;
+          });
+
+          await signInWithApple();
+
+          var userId = FirebaseAuth.instance.currentUser?.uid;
+          if (userId == null) {
+            setState(() {
+              appleLoginLoading = false;
+            });
+            return;
+          }
+
+          await _refreshHiveData();
+          var ownProfil = Hive.box("secureBox").get("ownProfil");
+
+          if (ownProfil != false && ownProfil.isNotEmpty) {
+            if (context.mounted)
+              global_functions.changePageForever(context, StartPage());
+          } else {
+            if (context.mounted) {
+              global_functions.changePageForever(
+                  context, const CreateProfilPage());
+            }
+          }
+        },
+        child: Container(
+            height: 70,
+            width: 70,
+            decoration: BoxDecoration(
+                border: Border.all(),
+                borderRadius: const BorderRadius.all(Radius.circular(12))),
+            child: !appleLoginLoading
+                ? Container(
+                    height: 50.0,
+                    width: 50.0,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      image: DecorationImage(
+                          image: AssetImage('assets/appleIcon.png'),
+                          fit: BoxFit.cover),
+                      shape: BoxShape.circle,
+                    ),
+                  )
+                : Center(child: const CircularProgressIndicator())),
       );
     }
 
     Widget socialLoginButtons() {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [googleLoginButton()],
+        children: [
+          googleLoginButton(),
+          SizedBox(width: 10),
+          appleLoginButton(),]
       );
     }
 
