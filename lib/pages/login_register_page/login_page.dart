@@ -444,54 +444,57 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: SafeArea(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 50,
-              ),
-              Image.asset('assets/WeltFlugzeug.png'),
-              const SizedBox(height: 20),
-              Text(AppLocalizations.of(context)!.willkommenBeiAppName,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(
-                height: 20,
-              ),
-              CustomTextInput("Email", emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: global_functions.checkValidationEmail(context),
-                  margin:
-                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                  textInputAction: TextInputAction.next),
-              CustomTextInput(
-                  AppLocalizations.of(context)!.passwort, passwortController,
-                  validator: global_functions.checkValidatorPassword(context),
-                  margin:
-                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                  hideInput: true,
-                  textInputAction: TextInputAction.done,
-                  onSubmit: () => userLogin()),
-              if (kIsWeb) angemeldetBleibenBox(),
-              supportRow(),
-              SizedBox(
-                height: 10,
-              ),
-              loginButton(),
-              SizedBox(
-                height: 30,
-              ),
-              Text(AppLocalizations.of(context)!.oderWeiterMit),
-              SizedBox(
-                height: 20,
-              ),
-              socialLoginButtons(),
-              Expanded(
-                child: SizedBox.shrink(),
-              ),
-              noAccountBox(),
-              SizedBox(height: 20),
-              if (kIsWeb) impressumBox()
-            ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 50,
+                ),
+                Image.asset('assets/WeltFlugzeug.png'),
+                const SizedBox(height: 20),
+                Text(AppLocalizations.of(context)!.willkommenBeiAppName,
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
+                SizedBox(
+                  height: 20,
+                ),
+                CustomTextInput("Email", emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: global_functions.checkValidationEmail(context),
+                    margin:
+                        EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                    textInputAction: TextInputAction.next),
+                CustomTextInput(
+                    AppLocalizations.of(context)!.passwort, passwortController,
+                    validator: global_functions.checkValidatorPassword(context),
+                    margin:
+                        EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                    hideInput: true,
+                    textInputAction: TextInputAction.done,
+                    onSubmit: () => userLogin()),
+                if (kIsWeb) angemeldetBleibenBox(),
+                supportRow(),
+                SizedBox(
+                  height: 10,
+                ),
+                loginButton(),
+                SizedBox(
+                  height: 30,
+                ),
+                Text(AppLocalizations.of(context)!.oderWeiterMit),
+                SizedBox(
+                  height: 20,
+                ),
+                socialLoginButtons(),
+                Expanded(
+                  child: SizedBox.shrink(),
+                ),
+                noAccountBox(),
+                SizedBox(height: 20),
+                if (kIsWeb) impressumBox()
+              ],
+            ),
           ),
         ));
   }
