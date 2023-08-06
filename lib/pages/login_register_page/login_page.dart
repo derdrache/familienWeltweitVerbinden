@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -131,17 +133,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   signInWithApple() async{
-    var test = FirebaseAuthenticationService();
-    final result = await test.signInWithApple(
+    var firebaseAuthService = FirebaseAuthenticationService();
+    final result = await firebaseAuthService.signInWithApple(
         appleRedirectUri: "https://praxis-cab-236720.firebaseapp.com/__/auth/handler",
         appleClientId: 'com.example.familienSuche'
     );
-
-    /*
-    var appleProvider = AppleAuthProvider();
-    return await FirebaseAuth.instance.signInWithProvider(appleProvider);
-
-     */
   }
 
   bool isPhone() {
@@ -411,9 +407,9 @@ class _LoginPageState extends State<LoginPage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          googleLoginButton(),
+          if(!Platform.isIOS) googleLoginButton(),
           SizedBox(width: 10),
-          appleLoginButton(),]
+          if(Platform.isIOS) appleLoginButton(),]
       );
     }
 
