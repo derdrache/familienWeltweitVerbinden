@@ -52,7 +52,6 @@ class CustomTextInput extends StatelessWidget {
             alignment: Alignment.center,
             child: Container(
               constraints: BoxConstraints(maxWidth: style.webWidth),
-              color: Colors.white,
               margin: margin ?? EdgeInsets.all(style.sideSpace),
               child: TextFormField(
                   inputFormatters: inputFormater,
@@ -68,8 +67,9 @@ class CustomTextInput extends StatelessWidget {
                   controller: controller,
                   decoration: InputDecoration(
                     isDense: true,
-                    enabledBorder: const OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
+                      borderRadius: BorderRadius.circular(style.roundedCorners)
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(style.roundedCorners)
