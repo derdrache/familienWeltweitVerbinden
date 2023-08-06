@@ -11,9 +11,6 @@ import '../../widgets/layout/custom_text_input.dart';
 import '../../windows/nutzerrichtlinen.dart';
 import 'create_profil_page.dart';
 
-
-
-
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
@@ -37,7 +34,8 @@ class _RegisterPageState extends State<RegisterPage> {
     if (registrationComplete) {
       FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
 
-      if (context.mounted) global_functions.changePageForever(context, const CreateProfilPage());
+      if (context.mounted)
+        global_functions.changePageForever(context, const CreateProfilPage());
     }
   }
 
@@ -61,7 +59,8 @@ class _RegisterPageState extends State<RegisterPage> {
         } else if (error.code == "invalid-email") {
           customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
         } else if (error.code == "weak-password") {
-          customSnackbar(context, AppLocalizations.of(context)!.passwortSchwach);
+          customSnackbar(
+              context, AppLocalizations.of(context)!.passwortSchwach);
         } else if (error.code == "network-request-failed") {
           customSnackbar(
               context, AppLocalizations.of(context)!.keineVerbindungInternet);
@@ -85,67 +84,83 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      body: SafeArea(
-        child: Align(
-          child: Column(
-            children: [
-              SizedBox(height: 50,),
-              Image.asset('assets/WeltFlugzeug.png'),
-              Text("Account erstellen",
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20,),
-              CustomTextInput(
-                "Email",
-                emailController,
-                margin: EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                validator: global_functions.checkValidationEmail(context),
-                textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              CustomTextInput(AppLocalizations.of(context)!.emailBestaetigen,
-                  checkEmailController,
-                  margin: EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 10),
-                  validator: global_functions.checkValidationEmail(context,
-                      emailCheck: emailController.text),
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          child: Align(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 50,
+                ),
+                Image.asset('assets/WeltFlugzeug.png'),
+                Text("Account erstellen",
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
+                SizedBox(
+                  height: 20,
+                ),
+                CustomTextInput(
+                  "Email",
+                  emailController,
+                  margin:
+                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                  validator: global_functions.checkValidationEmail(context),
                   textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.emailAddress),
-              CustomTextInput(
-                  AppLocalizations.of(context)!.passwort, passwordController,
-                  margin: EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 5),
-                  hideInput: true,
-                  validator: global_functions.checkValidatorPassword(context),
-                  textInputAction: TextInputAction.next),
-              CustomTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
-                  checkPasswordController,
-                  margin: EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-                  hideInput: true,
-                  validator: global_functions.checkValidatorPassword(context,
-                      passwordCheck: passwordController.text),
-                  textInputAction: TextInputAction.done,
-                  onSubmit: () => registrationButton()),
-              SizedBox(height: 10),
-              isLoading
-                  ? loadingBox()
-                  : customFloatbuttonExtended(
-                  AppLocalizations.of(context)!.registrieren,
-                      () => registrationButton()),
-              NutzerrichtlinenAnzeigen(page: "register"),
-              Expanded(child: SizedBox.shrink()),
-              InkWell(
-                onTap: () => global_functions.changePageForever(context, LoginPage()),
-                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text(AppLocalizations.of(context)!.bereitsMitglied),
-                  Text(AppLocalizations.of(context)!.anmelden,style:
-                  TextStyle(color: Theme.of(context).colorScheme.secondary),)
-                ],),
-              ),
-              SizedBox(height: 20),
-            ],
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                CustomTextInput(AppLocalizations.of(context)!.emailBestaetigen,
+                    checkEmailController,
+                    margin: EdgeInsets.only(
+                        left: 20, right: 20, top: 5, bottom: 10),
+                    validator: global_functions.checkValidationEmail(context,
+                        emailCheck: emailController.text),
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.emailAddress),
+                CustomTextInput(
+                    AppLocalizations.of(context)!.passwort, passwordController,
+                    margin: EdgeInsets.only(
+                        left: 20, right: 20, top: 10, bottom: 5),
+                    hideInput: true,
+                    validator: global_functions.checkValidatorPassword(context),
+                    textInputAction: TextInputAction.next),
+                CustomTextInput(
+                    AppLocalizations.of(context)!.passwortBestaetigen,
+                    checkPasswordController,
+                    margin:
+                        EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                    hideInput: true,
+                    validator: global_functions.checkValidatorPassword(context,
+                        passwordCheck: passwordController.text),
+                    textInputAction: TextInputAction.done,
+                    onSubmit: () => registrationButton()),
+                SizedBox(height: 10),
+                isLoading
+                    ? loadingBox()
+                    : customFloatbuttonExtended(
+                        AppLocalizations.of(context)!.registrieren,
+                        () => registrationButton()),
+                NutzerrichtlinenAnzeigen(page: "register"),
+                Expanded(child: SizedBox.shrink()),
+                InkWell(
+                  onTap: () =>
+                      global_functions.changePageForever(context, LoginPage()),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(AppLocalizations.of(context)!.bereitsMitglied),
+                      Text(
+                        AppLocalizations.of(context)!.anmelden,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+              ],
+            ),
           ),
-        ),
-      )
-    );
+        ));
   }
 }

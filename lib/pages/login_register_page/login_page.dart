@@ -132,12 +132,12 @@ class _LoginPageState extends State<LoginPage> {
     } catch (_) {}
   }
 
-  signInWithApple() async{
+  signInWithApple() async {
     var firebaseAuthService = FirebaseAuthenticationService();
     final result = await firebaseAuthService.signInWithApple(
-        appleRedirectUri: "https://praxis-cab-236720.firebaseapp.com/__/auth/handler",
-        appleClientId: 'com.example.familienSuche'
-    );
+        appleRedirectUri:
+            "https://praxis-cab-236720.firebaseapp.com/__/auth/handler",
+        appleClientId: 'com.example.familienSuche');
   }
 
   bool isPhone() {
@@ -179,7 +179,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     angemeldetBleibenBox() {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -263,22 +262,22 @@ class _LoginPageState extends State<LoginPage> {
           });
     }
 
-    Widget loginButton(){
+    Widget loginButton() {
       return isLoading
           ? loadingBox()
           : kIsWeb && !isPhone()
-          ? Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          customFloatbuttonExtended("Login", () => userLogin()),
-          customFloatbuttonExtended(
-              AppLocalizations.of(context)!.registrieren, () {
-            global_functions.changePage(
-                context, const RegisterPage());
-          })
-        ],
-      )
-          : customFloatbuttonExtended("Login", () => userLogin());
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    customFloatbuttonExtended("Login", () => userLogin()),
+                    customFloatbuttonExtended(
+                        AppLocalizations.of(context)!.registrieren, () {
+                      global_functions.changePage(
+                          context, const RegisterPage());
+                    })
+                  ],
+                )
+              : customFloatbuttonExtended("Login", () => userLogin());
     }
 
     Widget supportRow() {
@@ -404,16 +403,14 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     Widget socialLoginButtons() {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if(!Platform.isIOS) googleLoginButton(),
-          SizedBox(width: 10),
-          if(Platform.isIOS) appleLoginButton(),]
-      );
+      return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        if (!Platform.isIOS) googleLoginButton(),
+        SizedBox(width: 10),
+        if (Platform.isIOS) appleLoginButton(),
+      ]);
     }
 
-    Widget noAccountBox(){
+    Widget noAccountBox() {
       return InkWell(
         onTap: () => global_functions.changePage(context, RegisterPage()),
         child: Row(
@@ -422,8 +419,7 @@ class _LoginPageState extends State<LoginPage> {
             Text(AppLocalizations.of(context)!.keinAccount),
             Text(
               AppLocalizations.of(context)!.registrieren,
-              style:
-              TextStyle(color: Theme.of(context).colorScheme.secondary),
+              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
             )
           ],
         ),
@@ -446,42 +442,57 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: SafeArea(
-      child: Column(
-        children: [
-          SizedBox(height: 50,),
-          Image.asset('assets/WeltFlugzeug.png'),
-          const SizedBox(height: 20),
-          Text(AppLocalizations.of(context)!.willkommenBeiAppName,
-              style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 20,),
-          CustomTextInput("Email", emailController,
-              keyboardType: TextInputType.emailAddress,
-              validator: global_functions.checkValidationEmail(context),
-              margin: EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-              textInputAction: TextInputAction.next),
-          CustomTextInput(
-              AppLocalizations.of(context)!.passwort, passwortController,
-              validator: global_functions.checkValidatorPassword(context),
-              margin: EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-              hideInput: true,
-              textInputAction: TextInputAction.done,
-              onSubmit: () => userLogin()),
-          if (kIsWeb) angemeldetBleibenBox(),
-          supportRow(),
-          SizedBox(height: 10,),
-          loginButton(),
-          SizedBox(height: 30,),
-          Text(AppLocalizations.of(context)!.oderWeiterMit),
-          SizedBox(height: 20,),
-          socialLoginButtons(),
-          Expanded(child: SizedBox.shrink(),),
-          noAccountBox(),
-          SizedBox(height: 20),
-          if (kIsWeb) impressumBox()
-        ],
-      ),
-    ));
+          child: Column(
+            children: [
+              SizedBox(
+                height: 50,
+              ),
+              Image.asset('assets/WeltFlugzeug.png'),
+              const SizedBox(height: 20),
+              Text(AppLocalizations.of(context)!.willkommenBeiAppName,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold)),
+              SizedBox(
+                height: 20,
+              ),
+              CustomTextInput("Email", emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: global_functions.checkValidationEmail(context),
+                  margin:
+                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                  textInputAction: TextInputAction.next),
+              CustomTextInput(
+                  AppLocalizations.of(context)!.passwort, passwortController,
+                  validator: global_functions.checkValidatorPassword(context),
+                  margin:
+                      EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                  hideInput: true,
+                  textInputAction: TextInputAction.done,
+                  onSubmit: () => userLogin()),
+              if (kIsWeb) angemeldetBleibenBox(),
+              supportRow(),
+              SizedBox(
+                height: 10,
+              ),
+              loginButton(),
+              SizedBox(
+                height: 30,
+              ),
+              Text(AppLocalizations.of(context)!.oderWeiterMit),
+              SizedBox(
+                height: 20,
+              ),
+              socialLoginButtons(),
+              Expanded(
+                child: SizedBox.shrink(),
+              ),
+              noAccountBox(),
+              SizedBox(height: 20),
+              if (kIsWeb) impressumBox()
+            ],
+          ),
+        ));
   }
 }
