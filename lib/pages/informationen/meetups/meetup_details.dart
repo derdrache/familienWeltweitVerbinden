@@ -2,6 +2,7 @@ import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/widgets/layout/ownIconButton.dart';
+import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -525,32 +526,14 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       bool isRepeating = widget.meetupData["eventInterval"] != global_var.meetupInterval[0] &&
           widget.meetupData["eventInterval"] != global_var.meetupIntervalEnglisch[0];
 
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 250,
-                  child: SimpleDialog(
-                    contentPadding: EdgeInsets.zero,
-                    insetPadding:
-                    const EdgeInsets.only(top: 40, left: 0, right: 10),
-                    children: [
-                      if (isApproved || !isNotPublic) meetupDetailsDialog(),
-                      if (isApproved || !isNotPublic)
-                        if (isRepeating) meetupOptinenDialog(),
-                      if (!isCreator) reportMeetupDialog(),
-                      if (isCreator) changeOrganisatorDialog(),
-                      if (isCreator) const SizedBox(height: 15),
-                      if (isCreator) deleteMeetupDialog(),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          });
+      CustomPopupMenu(context, children: [
+        if (isApproved || !isNotPublic) meetupDetailsDialog(),
+        if ((isApproved || !isNotPublic) && isRepeating) meetupOptinenDialog(),
+        if (!isCreator) reportMeetupDialog(),
+        if (isCreator) changeOrganisatorDialog(),
+        if (isCreator) const SizedBox(height: 15),
+        if (isCreator) deleteMeetupDialog(),
+      ]);
     }
 
     teilnahmeButtonBox() {

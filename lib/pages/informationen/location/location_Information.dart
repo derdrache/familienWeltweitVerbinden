@@ -4,6 +4,7 @@ import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1037,36 +1038,32 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   @override
   Widget build(BuildContext context) {
 
-    openInformationMenu(positionDetails, information) async {
-      double left = positionDetails.globalPosition.dx;
-      double top = positionDetails.globalPosition.dy;
+    openInformationMenu(information) async {
       bool canChange = information["erstelltVon"] == userId;
       usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
 
-      await showMenu(
-          context: context,
-          position: RelativeRect.fromLTRB(left, top, 0, 0),
-          items: [
-            if (canChange)
-              PopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.bearbeiten),
-                onTap: () => changeInformationDialog(information),
-              ),
-            PopupMenuItem(
-              child: Text(AppLocalizations.of(context)!.kopieren),
-              onTap: () => copyInformationDialog(information),
-            ),
-            PopupMenuItem(
-              child: Text(AppLocalizations.of(context)!.melden),
-              onTap: () => reportInformationDialog(information),
-            ),
-            if (canChange)
-              PopupMenuItem(
-                  child: Text(AppLocalizations.of(context)!.loeschen),
-                  onTap: () {
-                    deleteInformationDialog(information);
-                  }),
-          ]);
+      CustomPopupMenu(context, topDistance: 100.0, width: 140.0,
+          children: [
+        if (canChange)
+          SimpleDialogOption(
+            child: Text(AppLocalizations.of(context)!.bearbeiten),
+            onPressed: () => changeInformationDialog(information),
+          ),
+        SimpleDialogOption(
+          child: Text(AppLocalizations.of(context)!.kopieren),
+          onPressed: () => copyInformationDialog(information),
+        ),
+        SimpleDialogOption(
+          child: Text(AppLocalizations.of(context)!.melden),
+          onPressed: () => reportInformationDialog(information),
+        ),
+        if (canChange)
+          SimpleDialogOption(
+              child: Text(AppLocalizations.of(context)!.loeschen),
+              onPressed: () {
+                deleteInformationDialog(information);
+              }),
+      ]);
     }
 
     insiderInfoBox(information, index) {
@@ -1101,9 +1098,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                             fontWeight: FontWeight.bold, fontSize: 18),
                       )),
                   const Expanded(child: SizedBox.shrink()),
-                  GestureDetector(
-                    onTapDown: (positionDetails) =>
-                        openInformationMenu(positionDetails, information),
+                  InkWell(
+                    onTap: () => openInformationMenu(information),
                     child: const Icon(Icons.more_horiz),
                   ),
                   const SizedBox(width: 5)

@@ -5,6 +5,7 @@ import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
+import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -921,31 +922,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     }
 
     moreMenu() {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 250,
-                  child: SimpleDialog(
-                    contentPadding: EdgeInsets.zero,
-                    insetPadding:
-                        const EdgeInsets.only(top: 40, left: 0, right: 10),
-                    children: [
-                      showMemberDialog(),
-                      if (!isCreator) reportDialog(),
-                      if (isCreator) addMemberDialog(),
-                      if (isCreator) settingDialog(),
-                      if (isCreator) deleteDialog(),
-                      if (!isCreator && isMember) leaveDialog()
-                    ],
-                  ),
-                ),
-              ],
-            );
-          });
+      CustomPopupMenu(context, children: [
+        showMemberDialog(),
+        if (!isCreator) reportDialog(),
+        if (isCreator) addMemberDialog(),
+        if (isCreator) settingDialog(),
+        if (isCreator) deleteDialog(),
+        if (!isCreator && isMember) leaveDialog()
+      ]);
     }
 
     communityImage() {

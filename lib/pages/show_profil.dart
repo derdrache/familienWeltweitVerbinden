@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:curved_text/curved_text.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -486,28 +487,11 @@ class _AppBarState extends State<_AppBar> {
           color: buttonColor,
         ),
         onPressed: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 220,
-                      child: SimpleDialog(
-                        contentPadding: EdgeInsets.zero,
-                        insetPadding:
-                            const EdgeInsets.only(top: 40, left: 0, right: 10),
-                        children: [
-                          friendlistButton(),
-                          userBlockierenButton(),
-                          meldeUserButton()
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              });
+          CustomPopupMenu(context, width: 220, children: [
+            friendlistButton(),
+            userBlockierenButton(),
+            meldeUserButton()
+          ]);
         },
       );
     }
