@@ -5,6 +5,7 @@ import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:familien_suche/widgets/layout/ownIconButton.dart';
+import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
@@ -76,8 +77,7 @@ class _SettingPageState extends State<SettingPage> {
             PointerDeviceKind.mouse,
           }),
           child:
-              ListView(padding: EdgeInsets.zero, shrinkWrap: true, children:
-              [
+              ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
             _NameSection(refresh: () => setState(() {})),
             _ProfilSection(
               afterChange: () => setState(() {}),
@@ -102,67 +102,88 @@ class _NameSection extends StatelessWidget {
     userProfil = Hive.box("secureBox").get("ownProfil");
 
     openSettingWindow() async {
-      return showMenu(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(style.roundedCorners),
-            ),
+      return CustomPopupMenu(context, children: [
+        SimpleDialogOption(
+          child: Row(
+            children: [
+              const Icon(Icons.person),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.nameAendern,
+                  style: TextStyle(color: textColor)),
+            ],
           ),
-          context: context,
-          position: const RelativeRect.fromLTRB(100, 0, 0, 100),
-          items: [
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => ChangeNamePage(
-                                    oldName: userProfil["name"],
-                                  ))).then((_) => refresh());
-                    },
-                    child: Text(AppLocalizations.of(context)!.nameAendern,
-                        style: TextStyle(color: textColor)))),
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => ChangeEmailPage()))
-                          .then((_) => refresh());
-                    },
-                    child: Text(AppLocalizations.of(context)!.emailAendern,
-                        style: TextStyle(color: textColor)))),
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      global_func.changePage(context, ChangePasswortPage());
-                    },
-                    child: Text(
-                        AppLocalizations.of(context)!.passwortVeraendern,
-                        style: TextStyle(color: textColor)))),
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      global_func.changePage(
-                          context, const FamilieProfilPage());
-                    },
-                    child: Text(AppLocalizations.of(context)!.familyProfil,
-                        style: TextStyle(color: textColor)))),
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      global_func.changePageForever(context, const LoginPage());
-                    },
-                    child: Text(AppLocalizations.of(context)!.abmelden,
-                        style: TextStyle(color: textColor)))),
-          ]);
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => ChangeNamePage(
+                          oldName: userProfil["name"],
+                        ))).then((_) => refresh());
+          },
+        ),
+        SimpleDialogOption(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => ChangeEmailPage()))
+                .then((_) => refresh());
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.email),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.emailAendern,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+        ),
+        SimpleDialogOption(
+          onPressed: () {
+            Navigator.pop(context);
+            global_func.changePage(context, ChangePasswortPage());
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.password),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.passwortVeraendern,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+        ),
+        SimpleDialogOption(
+          onPressed: () {
+            Navigator.pop(context);
+            global_func.changePage(context, const FamilieProfilPage());
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.family_restroom),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.familyProfil,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+        ),
+        SimpleDialogOption(
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+            global_func.changePageForever(context, const LoginPage());
+          },
+          child: Row(
+            children: [
+              const Icon(
+                Icons.logout,
+                color: Colors.red,
+              ),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.abmelden,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+        )
+      ]);
     }
 
     return Container(
@@ -293,7 +314,8 @@ class _ProfilSection extends StatelessWidget {
       if (bis == null) {
         text += " - offen";
       } else {
-        text += " - ${bis.split(" ")[0].split("-").take(2).toList().reversed.join("-")}";
+        text +=
+            " - ${bis.split(" ")[0].split("-").take(2).toList().reversed.join("-")}";
       }
 
       return text;

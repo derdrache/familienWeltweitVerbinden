@@ -31,6 +31,7 @@ import '../../functions/upload_and_save_image.dart';
 import '../../global/profil_sprachen.dart';
 import '../../streams/record_timer.dart';
 import '../../widgets/layout/custom_snackbar.dart';
+import '../../windows/custom_popup_menu.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
 import '../informationen/meetups/meetupCard.dart';
@@ -1309,6 +1310,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       showMenu(
         context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+        ),
         position: RelativeRect.fromRect(
             (tabPosition ?? const Offset(20, 250)) & const Size(40, 40),
             Offset.zero & overlay.size),
@@ -2340,35 +2346,20 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     moreMenuWindow() {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 205,
-                  child: SimpleDialog(
-                    contentPadding: EdgeInsets.zero,
-                    insetPadding:
-                        const EdgeInsets.only(top: 40, left: 0, right: 10),
-                    children: [
-                      searchMessageDialog(),
-                      if (widget.isChatgroup) mitgliederDialog(),
-                      if (userJoinedChat) pinChatDialog(),
-                      if (userJoinedChat) muteDialog(),
-                      if (!widget.isChatgroup) deleteDialog(),
-                      if (connectedData["erstelltVon"] != userId &&
-                          userJoinedChat &&
-                          widget.isChatgroup)
-                        leaveDialog(),
-                      const SizedBox(height: 5)
-                    ],
-                  ),
-                ),
-              ],
-            );
-          });
+      CustomPopupMenu(
+        context,
+        children: [
+          searchMessageDialog(),
+          if (widget.isChatgroup) mitgliederDialog(),
+          if (userJoinedChat) pinChatDialog(),
+          if (userJoinedChat) muteDialog(),
+          if (!widget.isChatgroup) deleteDialog(),
+          if (connectedData["erstelltVon"] != userId &&
+              userJoinedChat &&
+              widget.isChatgroup)
+            leaveDialog(),
+        ]
+      );
     }
 
     appBarTextSearch() {
@@ -2749,7 +2740,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 nachrichtController.clear();
                               });
                             },
-                            tooltip: AppLocalizations.of(context)!.tooltipBildSenden,
+                            tooltip:
+                                AppLocalizations.of(context)!.tooltipBildSenden,
                             icon: Icon(Icons.photo_library,
                                 size: 34,
                                 color:
@@ -2757,7 +2749,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         IconButton(
                             padding: EdgeInsets.zero,
                             onPressed: () async => voiceMessageRecordMenu(),
-                            tooltip: AppLocalizations.of(context)!.tooltipSprachnachrichtAufnehmen,
+                            tooltip: AppLocalizations.of(context)!
+                                .tooltipSprachnachrichtAufnehmen,
                             icon: Icon(Icons.mic,
                                 size: 34,
                                 color:
