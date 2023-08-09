@@ -300,6 +300,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         },
         onRemove: () => deactivateAllButtons()
         );
+
   }
 
   filterProfils() {
@@ -858,14 +859,40 @@ class _ErkundenPageState extends State<ErkundenPage> {
             return CustomAlertDialog(
               title: "",
               children: [
-                createCheckBoxen(windowSetState, reiseartSelection,
-                    AppLocalizations.of(context)!.reisearten),
-                createCheckBoxen(windowSetState, alterKinderSelection,
-                    AppLocalizations.of(context)!.alterDerKinder),
-                createCheckBoxen(windowSetState, interessenSelection,
-                    AppLocalizations.of(context)!.interessen),
-                createCheckBoxen(windowSetState, sprachenSelection,
-                    AppLocalizations.of(context)!.sprachen),
+                Row(children: [
+                  IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back)),
+                  const Expanded(child: Center(child: Text("Filter", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),))),
+                  TextButton(onPressed: (){
+                    filterList = [];
+                    windowSetState(() {});
+                    filterProfils();
+                  }, child: const Text("Reset"))
+                ],),
+                const SizedBox(height: 10),
+                ExpansionTile(
+                  title: Text(AppLocalizations.of(context)!.reisearten),
+                  initiallyExpanded: true,
+                  children: [
+                    createCheckBoxen(windowSetState, reiseartSelection)],
+                ),
+                ExpansionTile(
+                  title: Text(AppLocalizations.of(context)!.alterDerKinder),
+                  initiallyExpanded: true,
+                  children: [
+                    createCheckBoxen(windowSetState, alterKinderSelection)],
+                ),
+                ExpansionTile(
+                  title: Text(AppLocalizations.of(context)!.interessen),
+                  initiallyExpanded: true,
+                  children: [
+                    createCheckBoxen(windowSetState, interessenSelection)],
+                ),
+                ExpansionTile(
+                  title: Text(AppLocalizations.of(context)!.sprachen),
+                  initiallyExpanded: true,
+                  children: [
+                    createCheckBoxen(windowSetState, sprachenSelection)],
+                ),
               ],
             );
           });
@@ -883,7 +910,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     setState(() {});
   }
 
-  createCheckBoxen(windowSetState, selectionList, title) {
+  createCheckBoxen(windowSetState, selectionList) {
     List<Widget> checkBoxWidget = [];
 
     for (var selection in selectionList) {
@@ -897,7 +924,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           children: [
             SizedBox(
               width: 25,
-              height: 25,
+              height: 30,
               child: Checkbox(
                   value: filterList.contains(selection),
                   onChanged: (newValue) {
@@ -930,9 +957,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     return Column(
       children: [
-        Text(title),
-        const SizedBox(height: 5),
-        Wrap(children: [...checkBoxWidget]),
+        Container(
+            margin: const EdgeInsets.only(left: 10, right: 10),
+            child: Wrap(
+                children: [...checkBoxWidget])
+        ),
         const SizedBox(height: 10)
       ],
     );
@@ -1714,9 +1743,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
           bigButton: true,
           tooltipText: AppLocalizations.of(context)!.tooltipZeigeEigenenFilter,
           margin: const EdgeInsets.all(5),
-          onPressed: () {
-            openFilterWindow();
-          });
+          onPressed: () => openFilterWindow()
+      );
     }
 
     return Scaffold(
