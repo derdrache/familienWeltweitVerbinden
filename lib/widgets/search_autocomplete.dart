@@ -107,9 +107,9 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                   contentPadding: const EdgeInsets.all(10.0),
                 ),
                 focusNode: focusNode,
-                onChanged: (value){
+                onChanged: (value) async{
                   if(value.isEmpty){
-                    widget. selected = "";
+                    widget.selected = "";
                     if(widget.onRemove != null) widget.onRemove!();
                   }
                   setState(() {
