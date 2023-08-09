@@ -2,15 +2,14 @@ import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
-import '../global/variablen.dart' as global_var;
+import '../global/style.dart' as style;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GoogleAutoComplete extends StatefulWidget {
-  List searchableItems = [];
-  List autoCompleteItems = [];
+  List<Map> searchableItems = [];
   double? width;
-  var isDense = false;
-  var searchKontroller = TextEditingController();
+  bool isDense = false;
+  TextEditingController searchKontroller = TextEditingController();
   bool isSearching = false;
   bool suche;
   String hintText;
@@ -44,25 +43,26 @@ class GoogleAutoComplete extends StatefulWidget {
     searchableItems = data["predictions"];
   }
 
-  clear(){
+  clear() {
     searchKontroller.clear();
   }
 
-  setLocation(location){
+  setLocation(location) {
     googleSearchResult = location;
-    searchKontroller.text = location["city"] +" / " + location["countryname"];
+    searchKontroller.text = location["city"] + " / " + location["countryname"];
   }
 
-  GoogleAutoComplete({
-    Key? key,
-    this.hintText = "",
-    this.width,
-    this.suche = true,
-    this.onConfirm,
-    this.margin = const EdgeInsets.only(top: 5, bottom:5, left:10, right:10),
-    this.withOwnLocation = false,
-    this.withWorldwideLocation = false
-  }) : super(key: key);
+  GoogleAutoComplete(
+      {Key? key,
+      this.hintText = "",
+      this.width,
+      this.suche = true,
+      this.onConfirm,
+      this.margin =
+          const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+      this.withOwnLocation = false,
+      this.withWorldwideLocation = false})
+      : super(key: key);
 
   @override
   _GoogleAutoCompleteState createState() => _GoogleAutoCompleteState();
@@ -71,34 +71,25 @@ class GoogleAutoComplete extends StatefulWidget {
 class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   double dropdownExtraBoxHeight = 50;
   var ownProfil = Hive.box("secureBox").get("ownProfil");
+  bool focusOn = false;
+  var myFocusNode = FocusNode();
 
-  showAutoComplete(text) {
-    if (text.length == 0) {
-      widget.isSearching = false;
-    } else {
-      widget.isSearching = true;
+  addEmptySearchItems(focusOn) {
+    widget.searchableItems.clear();
+
+    if(widget.withOwnLocation){
+      widget.searchableItems.add({
+        "description": AppLocalizations.of(context)!.aktuellenOrtVerwenden,
+        "place_id": "ownLocation"
+      });
     }
 
-    setState(() {});
-  }
-
-  addAutoCompleteItems(text) {
-    widget.autoCompleteItems = [];
-    if (text.isEmpty) return widget.autoCompleteItems;
-
-    for (var item in widget.searchableItems) {
-      if (item["description"] != widget.searchKontroller.text) {
-        widget.autoCompleteItems.add(item);
-      }
+    if (widget.withWorldwideLocation) {
+      widget.searchableItems.add({
+        "description": AppLocalizations.of(context)!.weltweit,
+        "place_id": "worldwide"
+      });
     }
-  }
-
-  resetSearchBar() {
-    widget.isSearching = false;
-    widget.autoCompleteItems = [];
-    FocusScope.of(context).unfocus();
-
-    setState(() {});
   }
 
   getGoogleSearchLocationData(placeId) async {
@@ -111,128 +102,124 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   }
 
   @override
+  void initState() {
+    myFocusNode.addListener(() {
+      focusOn = myFocusNode.hasFocus;
+
+      addEmptySearchItems(focusOn);
+
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    double dropdownItemSumHeight = widget.autoCompleteItems.length * 38.0;
-    if (widget.autoCompleteItems.length * 38 > 160) dropdownItemSumHeight = 152;
-
-    dropDownItem(item) {
-      return GestureDetector(
-        onTapDown: (details) async {
-          if(item["place_id"] == "ownLocation"){
-            widget.googleSearchResult = {
-              "city": ownProfil["ort"], "countryname": ownProfil["land"], "longt": ownProfil["longt"], "latt": ownProfil["latt"]};
-            item["description"] = "${ownProfil["ort"]}, ${ownProfil["land"]}";
-          }else if(item["place_id"] == "worldwide"){
-            widget.googleSearchResult = {
-              "city": "worldwide", "countryname": "worldwide", "longt": -50.1, "latt": 30.1};
-            item["description"] = AppLocalizations.of(context)!.weltweit;
-          }else{
-            widget.googleSearchResult =
-              await getGoogleSearchLocationData(item["place_id"]);
-          }
-
-          widget.searchKontroller.text = item["description"];
-          resetSearchBar();
-          if(widget.onConfirm != null) widget.onConfirm!();
-        },
-        child: Container(
-            padding: const EdgeInsets.all(10),
-            height: 40,
-            decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(color: global_var.borderColorGrey))),
-            child: Text(item["description"])),
-      );
-    }
-
-    autoCompleteDropdownBox(dropBoxItems) {
-      List<Widget> autoCompleteList = [];
-
-      for (var item in dropBoxItems) {
-        autoCompleteList.add(dropDownItem(item));
-      }
-
-      return Container(
-        height: dropdownItemSumHeight,
-        margin: const EdgeInsets.only(top: 0),
-        child: ListView(
-          padding: const EdgeInsets.only(top: 5),
-          children: autoCompleteList,
-        ),
-      );
-    }
-
-    addEmptySearchItems(focusOn){
-      if(!focusOn || !widget.withOwnLocation){
-        showAutoComplete("");
-        widget.searchableItems = [];
-        addAutoCompleteItems({});
-        return;
-      }
-
-      showAutoComplete("aktueller Ort");
-      widget.searchableItems.add({"description": AppLocalizations.of(context)!.aktuellenOrtVerwenden, "place_id": "ownLocation"});
-      if(widget.withWorldwideLocation) widget.searchableItems.add({"description": AppLocalizations.of(context)!.weltweit, "place_id": "worldwide"});
-      addAutoCompleteItems({"description": ""});
-    }
-
     return Container(
-      width: widget.width ?? 600,
+      margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),
           border: Border.all()),
-      height: dropdownExtraBoxHeight + dropdownItemSumHeight,
-      margin: widget.margin,
       child: Stack(
-        clipBehavior: Clip.none,
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: FocusScope(
-                  child: Focus(
-                    onFocusChange: (focusOn){
-                      addEmptySearchItems(focusOn);
-                    },
-                    child: TextField(
-                        textAlignVertical: TextAlignVertical.top,
-                        controller: widget.searchKontroller,
-                        decoration: InputDecoration(
-                            isDense: widget.isDense,
-                            border: InputBorder.none,
-                            hintText: widget.hintText,
-                            hintStyle:
-                                const TextStyle(fontSize: 15, color: Colors.grey)),
-                        style: const TextStyle(),
-                        onChanged: (value) async {
-                          if(value.isEmpty && widget.withOwnLocation){
-                            widget.searchableItems = [];
-                            addEmptySearchItems(true);
-                          }else{
-                            await widget._googleAutoCompleteSuche(value);
+          RawAutocomplete(
+            textEditingController: widget.searchKontroller,
+            focusNode: myFocusNode,
+            optionsViewBuilder: (BuildContext context,
+                void Function(Map) onSelected, Iterable<Map> options) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width - 21,
+                      height: 300,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(),
+                          borderRadius:
+                              BorderRadius.circular(style.roundedCorners)),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(10.0),
+                        itemCount: options.length,
+                        itemBuilder: (BuildContext context, int index) {
 
-                            showAutoComplete(value);
-                            addAutoCompleteItems(value);
-                          }
+                          final Map option = options.elementAt(index);
+                          return GestureDetector(
+                            onTap: () async {
+                              if (option["place_id"] == "ownLocation") {
+                                widget.googleSearchResult = {
+                                  "city": ownProfil["ort"],
+                                  "countryname": ownProfil["land"],
+                                  "longt": ownProfil["longt"],
+                                  "latt": ownProfil["latt"]
+                                };
+                                option["description"] =
+                                    "${ownProfil["ort"]}, ${ownProfil["land"]}";
+                              } else if (option["place_id"] == "worldwide") {
+                                widget.googleSearchResult = {
+                                  "city": "worldwide",
+                                  "countryname": "worldwide",
+                                  "longt": -50.1,
+                                  "latt": 30.1
+                                };
+                                option["description"] =
+                                    AppLocalizations.of(context)!.weltweit;
+                              } else {
+                                widget.googleSearchResult =
+                                    await getGoogleSearchLocationData(
+                                        option["place_id"]);
+                              }
 
-                          setState(() {});
-                        }),
+                              widget.searchKontroller.text =
+                                  option["description"];
+                              myFocusNode.unfocus();
+                              if (widget.onConfirm != null) widget.onConfirm!();
+                            },
+                            child: ListTile(
+                              title: Text(option["description"],
+                                  style: const TextStyle(color: Colors.black)),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              if (widget.isSearching) autoCompleteDropdownBox(widget.autoCompleteItems)
-            ],
+              );
+            },
+            optionsBuilder: (TextEditingValue textEditingValue) async{
+              var inputValue = textEditingValue.text;
+
+              if (inputValue.isEmpty) {
+                addEmptySearchItems(true);
+              } else if(inputValue.isNotEmpty) {
+                await widget._googleAutoCompleteSuche(inputValue);
+              }
+
+              return widget.searchableItems;
+            },
+            fieldViewBuilder: (BuildContext context,
+                TextEditingController textEditingController,
+                FocusNode focusNode,
+                VoidCallback onFieldSubmitted) {
+              return TextFormField(
+                controller: textEditingController,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: widget.hintText,
+                  contentPadding: const EdgeInsets.all(10.0),
+                ),
+                focusNode: focusNode,
+                onFieldSubmitted: (String value) {
+                  onFieldSubmitted();
+                },
+              );
+            },
           ),
-          const Positioned(
-              right: 15,
-              top: 12,
-              child: Icon(
-                Icons.search,
-                size: 25,
-                color: Colors.black,
-              )),
         ],
       ),
     );
