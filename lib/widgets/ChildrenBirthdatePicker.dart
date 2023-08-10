@@ -19,7 +19,7 @@ class CustomDatePicker extends StatefulWidget {
     Key? key,
     this.datePicker,
     this.deleteFunction,
-    this.dateIsSelected = false
+    this.dateIsSelected = false,
   }) : super(key: key);
 
   @override
@@ -40,7 +40,7 @@ class CustomDatePickerState extends State<CustomDatePicker> {
         clipBehavior: Clip.antiAliasWithSaveLayer,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(top: 5, bottom: 5),
             child: widget.datePicker,
           ),
              widget.deleteFunction == null ? const SizedBox.shrink() : Positioned(
@@ -64,7 +64,7 @@ class CustomDatePickerState extends State<CustomDatePicker> {
 
 class ChildrenBirthdatePickerBox extends StatefulWidget {
   List childrensBirthDatePickerList = [];
-  String hintText = "Year";
+  var margin;
 
   getDates({bool years = false}){
     List dates = [];
@@ -116,7 +116,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
     });
   }
 
-  ChildrenBirthdatePickerBox({Key? key, hintText}) : super(key: key);
+  ChildrenBirthdatePickerBox({Key? key, this.margin}) : super(key: key);
 
   @override
   _ChildrenBirthdatePickerBoxState createState() => _ChildrenBirthdatePickerBoxState();
@@ -159,7 +159,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
   childrenAddButton(){
     return Container(
-        margin: EdgeInsets.all(sideSpace),
+        margin: widget.margin ?? EdgeInsets.all(sideSpace),
         child: childrens < maxChildrens?
         FloatingActionButton(
           mini: true,
@@ -181,7 +181,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
     List newPicker = [];
 
     for(var i = 0;i < widget.childrensBirthDatePickerList.length; i++){
-      var hintText = dates[i] == null? widget.hintText : dates[i].toString();
+      var hintText = dates[i] == null? "Year" : dates[i].toString();
 
       if(i == 0 || i < widget.childrensBirthDatePickerList.length -1 ){
         var date = hintText.split(" ")[0].split("-");
@@ -223,7 +223,6 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
     return Align(
       alignment: Alignment.topCenter,
       child: Container(
-        padding: EdgeInsets.only(left: 2, right: 2),
         width: webWidth,
         child: Wrap(
           children: [

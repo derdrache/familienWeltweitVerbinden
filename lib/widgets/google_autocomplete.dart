@@ -58,8 +58,7 @@ class GoogleAutoComplete extends StatefulWidget {
       this.width,
       this.suche = true,
       this.onConfirm,
-      this.margin =
-          const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+      this.margin = const EdgeInsets.all(10),
       this.withOwnLocation = false,
       this.withWorldwideLocation = false})
       : super(key: key);
@@ -115,7 +114,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(10),
+      margin: widget.margin,
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),

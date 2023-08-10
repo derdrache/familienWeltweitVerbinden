@@ -8,6 +8,7 @@ class CustomMultiTextForm extends StatefulWidget {
   String hintText;
   Function? onConfirm;
   var validator;
+  var margin;
 
   getSelected(){
     return selected;
@@ -19,7 +20,8 @@ class CustomMultiTextForm extends StatefulWidget {
     this.selected,
     this.hintText = "",
     this.onConfirm,
-    this.validator
+    this.validator,
+    this.margin
   }) : super(key: key);
 
   @override
@@ -45,7 +47,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
     return Container(
       width: style.webWidth,
-      margin: EdgeInsets.all(style.sideSpace),
+      margin: widget.margin ?? EdgeInsets.all(style.sideSpace),
       decoration: BoxDecoration(
           border: Border.all(),
           borderRadius: BorderRadius.circular(style.roundedCorners)
