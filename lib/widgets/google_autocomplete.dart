@@ -70,7 +70,6 @@ class GoogleAutoComplete extends StatefulWidget {
 
 class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
   double dropdownExtraBoxHeight = 50;
-  var ownProfil = Hive.box("secureBox").get("ownProfil");
   bool focusOn = false;
   var myFocusNode = FocusNode();
 
@@ -151,6 +150,8 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                           return GestureDetector(
                             onTap: () async {
                               if (option["place_id"] == "ownLocation") {
+                                var ownProfil = Hive.box("secureBox").get("ownProfil");
+
                                 widget.googleSearchResult = {
                                   "city": ownProfil["ort"],
                                   "countryname": ownProfil["land"],
