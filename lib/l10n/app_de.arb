@@ -528,7 +528,9 @@
     "welcheThemenInteressierenEuch": "Welche Themen interessieren euch ?",
     "beschreibungEuererFamilie": "Beschreibung eurer Familie - optional",
     "informationRegisterStepTwo": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
-    "informationRegisterStepThree": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen"
-
+    "informationRegisterStepThree": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
+    "weiter": "Weiter",
+    "fertig": "Fertig",
+    "zurueck": "Zurück"
 
 }

@@ -46,6 +46,8 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
   done() async {}
 
+  skip(){}
+
   @override
   void initState() {
     pages = [sliderStepOne, sliderStepTwo, sliderStepThree];
@@ -69,6 +71,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
     }
 
     navigationButtons() {
+      bool isFirstPage = currentPage == 0;
       bool isLastPage = currentPage + 1 == pages.length;
 
       return Stack(
@@ -77,8 +80,8 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
               left: 20,
               bottom: 0,
               child: TextButton(
-                onPressed: () => back(),
-                child: const Text("Back"),
+                onPressed: () => isFirstPage ? skip() : back(),
+                child: Text(isFirstPage ? "Skip" : AppLocalizations.of(context)!.zurueck),
               )),
           Positioned.fill(
             child: Align(
@@ -90,7 +93,10 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
               bottom: 0,
               child: TextButton(
                 onPressed: () => isLastPage ? done() : next(),
-                child: Text(isLastPage ? "Done" : "Next"),
+                child: Text(isLastPage
+                    ? AppLocalizations.of(context)!.fertig
+                    : AppLocalizations.of(context)!.weiter
+                ),
               ))
         ],
       );
@@ -113,10 +119,10 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 }
 
 class StepOne extends StatelessWidget {
-  TextEditingController userNameKontroller = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController checkPasswordController = TextEditingController();
+  final TextEditingController userNameKontroller = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController checkPasswordController = TextEditingController();
 
   getName() {
     return userNameKontroller.text;
@@ -128,7 +134,7 @@ class StepOne extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        margin: EdgeInsets.only(left: 10, right: 10),
+        margin: const EdgeInsets.only(left: 10, right: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -137,61 +143,61 @@ class StepOne extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.bold)),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(AppLocalizations.of(context)!.accountErstellenInfo),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Text(
               AppLocalizations.of(context)!.benutzername,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             CustomTextInput(
-                margin: EdgeInsets.only(top: 10, bottom: 10),
+                margin: const EdgeInsets.only(top: 10, bottom: 10),
                 AppLocalizations.of(context)!.benutzername,
                 userNameKontroller,
                 validator: global_functions.checkValidatorEmpty(context)),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            Text(
+            const Text(
               "Email",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             CustomTextInput(
               "Email",
               emailController,
-              margin: EdgeInsets.only(top: 10, bottom: 10),
+              margin: const EdgeInsets.only(top: 10, bottom: 10),
               validator: global_functions.checkValidationEmail(context),
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.emailAddress,
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(
               AppLocalizations.of(context)!.passwort,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             CustomTextInput(
                 AppLocalizations.of(context)!.passwort, passwordController,
-                margin: EdgeInsets.only(top: 10, bottom: 10),
+                margin: const EdgeInsets.only(top: 10, bottom: 10),
                 hideInput: true,
                 validator: global_functions.checkValidatorPassword(context),
                 textInputAction: TextInputAction.next),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(
               AppLocalizations.of(context)!.passwortBestaetigen,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             CustomTextInput(
               AppLocalizations.of(context)!.passwortBestaetigen,
               checkPasswordController,
-              margin: EdgeInsets.only(top: 10, bottom: 10),
+              margin: const EdgeInsets.only(top: 10, bottom: 10),
               hideInput: true,
               validator: global_functions.checkValidatorPassword(context,
                   passwordCheck: passwordController.text),
@@ -215,30 +221,30 @@ class StepTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ortAuswahlBox = GoogleAutoComplete(
-      margin: EdgeInsets.only(top: 10, bottom: 10),
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
       hintText: AppLocalizations.of(context)!.aktuellenOrtEingeben,
     );
     sprachenAuswahlBox = CustomMultiTextForm(
-        margin: EdgeInsets.only(top: 10, bottom: 10),
+        margin: const EdgeInsets.only(top: 10, bottom: 10),
         validator: global_functions.checkValidationMultiTextForm(context),
         hintText: AppLocalizations.of(context)!.spracheAuswaehlen,
         auswahlList: isGerman
             ? ProfilSprachen().getAllGermanLanguages()
             : ProfilSprachen().getAllEnglishLanguages());
     reiseArtenAuswahlBox = CustomDropdownButton(
-      margin: EdgeInsets.only(top: 10, bottom: 10),
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
       hintText: AppLocalizations.of(context)!.artDerReiseAuswaehlen,
       items: isGerman
           ? global_variablen.reisearten
           : global_variablen.reiseartenEnglisch,
     );
     childrenAgePickerBox = ChildrenBirthdatePickerBox(
-      margin: EdgeInsets.only(top: 10, bottom: 10),
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
     );
 
     return SafeArea(
         child: Container(
-      margin: EdgeInsets.only(left: 10, right: 10),
+      margin: const EdgeInsets.only(left: 10, right: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -247,40 +253,40 @@ class StepTwo extends StatelessWidget {
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Text(AppLocalizations.of(context)!.informationRegisterStepTwo),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Text(
             AppLocalizations.of(context)!.woSeidIhrImMoment,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           ortAuswahlBox,
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Text(
             AppLocalizations.of(context)!.wieSeidIhrUnterwegs,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           reiseArtenAuswahlBox,
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Text(
             AppLocalizations.of(context)!.welcheSprachenSprechtIhr,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           sprachenAuswahlBox,
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Text(
             AppLocalizations.of(context)!.wieAltSindEureKinder,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           childrenAgePickerBox,
           Text(
@@ -295,13 +301,13 @@ class StepTwo extends StatelessWidget {
 class StepThree extends StatelessWidget {
   StepThree({super.key});
 
-  TextEditingController aboutusKontroller = TextEditingController();
+  final TextEditingController aboutusKontroller = TextEditingController();
   late CustomMultiTextForm interessenAuswahlBox;
 
   @override
   Widget build(BuildContext context) {
     interessenAuswahlBox = CustomMultiTextForm(
-        margin: EdgeInsets.only(top: 10, bottom: 10),
+        margin: const EdgeInsets.only(top: 10, bottom: 10),
         validator: global_functions.checkValidationMultiTextForm(context),
         hintText: AppLocalizations.of(context)!.interessenAuswaehlen,
         auswahlList: isGerman
@@ -310,36 +316,36 @@ class StepThree extends StatelessWidget {
 
     return SafeArea(
         child: Container(
-      margin: EdgeInsets.only(left: 10, right: 10),
+      margin: const EdgeInsets.only(left: 10, right: 10),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Center(
           child: Text(AppLocalizations.of(context)!.persoenlicheDaten,
               style:
                   const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Text(AppLocalizations.of(context)!.informationRegisterStepThree),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         Text(
           AppLocalizations.of(context)!.welcheThemenInteressierenEuch,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         interessenAuswahlBox,
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         Text(
           AppLocalizations.of(context)!.beschreibungEuererFamilie,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         CustomTextInput(
             "${AppLocalizations.of(context)!.aboutusHintText} *optional*",
             aboutusKontroller,
-            margin: EdgeInsets.only(top: 10, bottom: 10),
+            margin: const EdgeInsets.only(top: 10, bottom: 10),
             moreLines: 4)
       ]),
     ));
