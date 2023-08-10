@@ -43,7 +43,7 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
     return Container(
       width: widget.width ?? style.webWidth,
       margin: widget.margin,
-      padding: const EdgeInsets.only(left: 10),
+      padding: const EdgeInsets.only(left: 10, right: 10),
       constraints: const BoxConstraints(
         minHeight: 50.0,
         maxHeight: 70.0,
@@ -55,11 +55,12 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
       ),
       child: DropdownButtonFormField<String>(
         isExpanded: true,
+        icon: Icon(Icons.arrow_downward,color: Colors.black,),
         value: widget.selected == "" ? null : widget.selected,
         hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
         elevation: 16,
         style: const TextStyle(color: Colors.black),
-        decoration: const InputDecoration(enabledBorder: InputBorder.none) ,
+        decoration: const InputDecoration(enabledBorder: InputBorder.none, focusedBorder: InputBorder.none) ,
         onChanged: (newValue){
           setState(() {
             widget.selected = newValue;

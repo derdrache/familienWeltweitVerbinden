@@ -48,16 +48,17 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       margin: EdgeInsets.all(style.sideSpace),
       decoration: BoxDecoration(
           border: Border.all(),
-          borderRadius: BorderRadius.circular(5)
+          borderRadius: BorderRadius.circular(style.roundedCorners)
       ),
       child: MultiSelectDialogField(
+        decoration: BoxDecoration(),
         initialValue: widget.selected!,
         items: widget.auswahlList.map((e) => MultiSelectItem(e, e)).toList(),
         listType: MultiSelectListType.LIST,
         searchable: true,
         onConfirm: changeSelectToList,
         onSelectionChanged: changeSelectToList,
-        buttonText: Text(widget.hintText),
+        buttonText: Text(widget.hintText, style: TextStyle(color: Colors.grey),),
         chipDisplay: MultiSelectChipDisplay(
           onTap: (value){
             widget.selected!.remove(value);

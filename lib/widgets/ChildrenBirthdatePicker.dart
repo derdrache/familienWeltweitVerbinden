@@ -5,7 +5,6 @@ double sideSpace = 10;
 
 
 class CustomDatePicker extends StatefulWidget {
-  var hintText;
   var deleteFunction;
   bool dateIsSelected;
   var datePicker;
@@ -18,7 +17,6 @@ class CustomDatePicker extends StatefulWidget {
 
   CustomDatePicker({
     Key? key,
-    this.hintText,
     this.datePicker,
     this.deleteFunction,
     this.dateIsSelected = false
@@ -29,10 +27,6 @@ class CustomDatePicker extends StatefulWidget {
 }
 
 class CustomDatePickerState extends State<CustomDatePicker> {
-  double boxHeight = 50;
-  double borderRounding = 5;
-
-
   @override
   void initState() {
     super.initState();
@@ -111,7 +105,6 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 
       childrensBirthDatePickerList.add(
           CustomDatePicker(
-              hintText: birthDate.reversed.join("-"),
               datePicker: FlexibleDatePicker(
                 startYear: DateTime.now().year-18,
                 endYear: DateTime.now().year,
@@ -138,7 +131,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
   void initState() {
     if(widget.childrensBirthDatePickerList.isEmpty){
       widget.childrensBirthDatePickerList.add(
-          CustomDatePicker(hintText: widget.hintText)
+          CustomDatePicker()
       );
     }
 
@@ -158,7 +151,6 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
     if(childrenCount <=8){
       widget.childrensBirthDatePickerList.add(
           CustomDatePicker(
-              hintText: widget.hintText,
               deleteFunction: deleteFunction()
           )
       );
@@ -198,7 +190,6 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
         newPicker.add(
             CustomDatePicker(
-                hintText: hintText.split(" ")[0].split("-")[0],
                 datePicker: FlexibleDatePicker(
                   startYear: DateTime.now().year-18,
                   endYear: DateTime.now().year,
@@ -210,7 +201,6 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
       } else{
         newPicker.add(
             CustomDatePicker(
-                hintText: hintText.split(" ")[0].split("-")[0],
                 datePicker: FlexibleDatePicker(
                   startYear: DateTime.now().year-18,
                   endYear: DateTime.now().year,
@@ -232,7 +222,8 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
     return Align(
       alignment: Alignment.topCenter,
-      child: SizedBox(
+      child: Container(
+        padding: EdgeInsets.only(left: 2, right: 2),
         width: webWidth,
         child: Wrap(
           children: [

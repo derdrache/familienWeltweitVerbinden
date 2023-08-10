@@ -212,6 +212,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: widget.hintText,
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
                   contentPadding: const EdgeInsets.all(10.0),
                 ),
                 focusNode: focusNode,
