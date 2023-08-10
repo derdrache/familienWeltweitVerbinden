@@ -40,7 +40,7 @@ class CustomDatePickerState extends State<CustomDatePicker> {
         clipBehavior: Clip.antiAliasWithSaveLayer,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 5, bottom: 5),
+            padding: const EdgeInsets.only(top: 10, bottom: 10),
             child: widget.datePicker,
           ),
              widget.deleteFunction == null ? const SizedBox.shrink() : Positioned(
@@ -50,8 +50,8 @@ class CustomDatePickerState extends State<CustomDatePicker> {
                 child: InkResponse(
                   onTap: widget.deleteFunction,
                   child: const CircleAvatar(
-                    child: Icon(Icons.close, size: 10,),
                     backgroundColor: Colors.red,
+                    child: Icon(Icons.close, size: 10,),
                   ),
                 ),
               )  
