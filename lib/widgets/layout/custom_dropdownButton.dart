@@ -54,7 +54,7 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
       ),
       child: DropdownButtonFormField<String>(
         isExpanded: true,
-        icon: Icon(Icons.arrow_downward,color: Colors.black,),
+        icon: const Icon(Icons.arrow_downward,color: Colors.black,),
         value: widget.selected == "" ? null : widget.selected,
         hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
         elevation: 16,
