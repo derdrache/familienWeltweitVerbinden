@@ -116,7 +116,6 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
     return Container(
       margin: widget.margin,
       decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),
           border: Border.all()),
       child: Stack(

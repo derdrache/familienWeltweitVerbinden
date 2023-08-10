@@ -50,7 +50,6 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
       ),
       decoration: BoxDecoration(
           border: Border.all(width: 1),
-          color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))
       ),
       child: DropdownButtonFormField<String>(
