@@ -516,6 +516,19 @@
     "keinAccount": "Du hast kein Account ? ",
     "oderWeiterMit": "Oder weiter mit",
     "bereitsMitglied": "Bereits Mitglied? ",
-    "anmelden": "Anmelden"
+    "anmelden": "Anmelden",
+    "accountErstellen": "Account erstellen",
+    "accountErstellenInfo": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
+    "persoenlicheDaten": "Persönliche Daten",
+    "woSeidIhrImMoment": "Wo seid ihr im Moment ?",
+    "wieSeidIhrUnterwegs": "Wie seid ihr unterwegs ?",
+    "welcheSprachenSprechtIhr": "Welche Sprachen sprecht ihr ?",
+    "wieAltSindEureKinder": "Wie alt sind eure Kinder ?",
+    "infoZumAlterDerKinder": "Das genaue Datum deiner Kinder wird nicht öffentlich gezeigt, es dient nur zur Berechnung des angezeigten Alters",
+    "welcheThemenInteressierenEuch": "Welche Themen interessieren euch ?",
+    "beschreibungEuererFamilie": "Beschreibung eurer Familie - optional",
+    "informationRegisterStepTwo": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
+    "informationRegisterStepThree": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen"
+
 
 }

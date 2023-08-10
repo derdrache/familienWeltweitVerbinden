@@ -226,7 +226,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         AppLocalizations.of(context)!.artDerReiseAuswaehlen;
     interessenAuswahlBox.hintText =
         AppLocalizations.of(context)!.interessenAuswaehlen;
-    childrenAgePickerBox.hintText = AppLocalizations.of(context)!.geburtsdatum;
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.aktuellenOrtEingeben;
 
     return Scaffold(
