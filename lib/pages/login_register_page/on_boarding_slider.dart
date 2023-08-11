@@ -48,6 +48,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   }
 
   next() async {
+    /*
     if(currentPage == 0 && ! await sliderStepOne.allFilledAndErrorMsg(context)){
       return;
     }else if(currentPage == 1 && !sliderStepTwo.allFilledAndErrorMsg(context)){
@@ -56,6 +57,8 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
       return;
     }
 
+
+     */
     currentPage += 1;
     pageController.jumpToPage(currentPage);
   }
@@ -410,7 +413,6 @@ class StepTwo extends StatelessWidget {
     );
     _sprachenAuswahlBox = CustomMultiTextForm(
         margin: const EdgeInsets.only(top: 10, bottom: 10),
-        validator: global_functions.checkValidationMultiTextForm(context),
         hintText: AppLocalizations.of(context)!.spracheAuswaehlen,
         auswahlList: isGerman
             ? ProfilSprachen().getAllGermanLanguages()
@@ -503,7 +505,6 @@ class StepThree extends StatelessWidget {
   Widget build(BuildContext context) {
     _interessenAuswahlBox = CustomMultiTextForm(
         margin: const EdgeInsets.only(top: 10, bottom: 10),
-        validator: global_functions.checkValidationMultiTextForm(context),
         hintText: AppLocalizations.of(context)!.interessenAuswaehlen,
         auswahlList: isGerman
             ? global_variablen.interessenListe

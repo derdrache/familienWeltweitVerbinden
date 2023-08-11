@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import '../../global/style.dart' as style;
 
+
+
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
   List? selected;
   String hintText;
   Function? onConfirm;
-  var validator;
-  var margin;
+  EdgeInsets? margin;
 
   getSelected(){
     return selected;
@@ -20,12 +21,11 @@ class CustomMultiTextForm extends StatefulWidget {
     this.selected,
     this.hintText = "",
     this.onConfirm,
-    this.validator,
     this.margin
   }) : super(key: key);
 
   @override
-  _CustomMultiTextFormState createState() => _CustomMultiTextFormState();
+  State<CustomMultiTextForm> createState() => _CustomMultiTextFormState();
 }
 
 class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
@@ -43,6 +43,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
     changeSelectToList(select){
       widget.selected = select;
       if(select.isNotEmpty) widget.onConfirm!();
+      setState(() {});
     }
 
     return Container(
@@ -53,16 +54,17 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
           borderRadius: BorderRadius.circular(style.roundedCorners)
       ),
       child: MultiSelectDialogField(
-        decoration: BoxDecoration(),
+        decoration: const BoxDecoration(),
         initialValue: widget.selected!,
         items: widget.auswahlList.map((e) => MultiSelectItem(e, e)).toList(),
         listType: MultiSelectListType.LIST,
         searchable: true,
         onConfirm: changeSelectToList,
         onSelectionChanged: changeSelectToList,
-        buttonText: Text(widget.hintText, style: TextStyle(color: Colors.grey),),
+        buttonText: Text(widget.hintText, style: const TextStyle(color: Colors.grey),),
         chipDisplay: MultiSelectChipDisplay(
           onTap: (value){
+            setState(() {});
             widget.selected!.remove(value);
             if(widget.selected!.length > 1) widget.onConfirm!();
             return widget.selected;
