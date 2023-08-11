@@ -198,7 +198,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
               } else if(inputValue.isNotEmpty) {
                 await widget._googleAutoCompleteSuche(inputValue);
               }
-              print(widget.searchableItems);
+
               return widget.searchableItems;
             },
             fieldViewBuilder: (BuildContext context,
