@@ -4,9 +4,9 @@
     "passwortVergessen": "Passwort vergessen?",
     "registrieren" : "Registrieren",
     "diesesFeldAusfuellen" : "Dieses Feld bitte ausfüllen",
-    "emailEingeben": "Bitte Email eingeben",
+    "emailEingeben": "Email eingeben",
     "gueltigeEmailEingeben": "gültige Email eingeben",
-    "passwortEingeben": "Bitte Passwort eingeben",
+    "passwortEingeben": "Passwort eingeben",
     "passwortStimmtNichtUeberein" : "Passwort stimmt nicht überein",
     "ausfuellen": "Bitte auswählen",
     "registerAndEmailBestaetigen": "Registrierung erfolgreich, bitte Email bestätigen",
@@ -531,6 +531,7 @@
     "informationRegisterStepThree": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
     "weiter": "Weiter",
     "fertig": "Fertig",
-    "zurueck": "Zurück"
+    "zurueck": "Zurück",
+    "benutzernameEingeben": "Benutzername eingeben"
 
 }

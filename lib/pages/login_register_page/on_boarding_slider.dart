@@ -1,10 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:familien_suche/widgets/layout/custom_snackbar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
 
+import '../../services/notification.dart' as notifications;
+import '../../global/encryption.dart';
 import '../../global/profil_sprachen.dart';
+import '../../services/database.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../widgets/layout/custom_dropdownButton.dart';
@@ -12,6 +20,7 @@ import '../../widgets/layout/custom_multi_select.dart';
 import '../../widgets/layout/custom_text_input.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
+import '../start_page.dart';
 
 var isGerman = kIsWeb
     ? PlatformDispatcher.instance.locale.languageCode == "de"
@@ -38,15 +47,122 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
     pageController.jumpToPage(currentPage);
   }
 
-  next() {
-    //only if all is filled up
+  next() async {
+    if(currentPage == 0 && ! await sliderStepOne.allFilledAndErrorMsg(context)){
+      return;
+    }else if(currentPage == 1 && !sliderStepTwo.allFilledAndErrorMsg(context)){
+      return;
+    }else if(currentPage == 2 && !sliderStepThree.allFilledAndErrorMsg(context)){
+      return;
+    }
+
     currentPage += 1;
     pageController.jumpToPage(currentPage);
   }
 
-  done() async {}
+  done() async{
+    if(!sliderStepTwo.allFilledAndErrorMsg(context)) return;
 
-  skip(){}
+    Map accountData = sliderStepOne.getAllData();
+    Map personalData1 = sliderStepTwo.getAllData();
+    Map personalData2 = sliderStepThree.getAllData();
+    Map allData = {...accountData, ...personalData1,...personalData2};
+
+    bool createdAccount = await createAccount(allData);
+
+    if(!createdAccount) return;
+
+    Map ownProfil = await createProfil(allData);
+
+    notifications.prepareNewLocationNotification();
+    additionalDatabaseOperations(allData["location"], ownProfil["id"]);
+
+    if(context.mounted) global_functions.changePageForever(context, StartPage());
+  }
+
+  createAccount(profilData) async{
+    bool accounterSuccessfullyCreated = false;
+
+    try {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: profilData["email"], password: profilData["password"]);
+      accounterSuccessfullyCreated = true;
+    } on FirebaseAuthException catch (error) {
+      if (error.code == "email-already-in-use") {
+        customSnackbar(
+            context, AppLocalizations.of(context)!.emailInBenutzung);
+      } else if (error.code == "invalid-email") {
+        customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
+      } else if (error.code == "weak-password") {
+        customSnackbar(
+            context, AppLocalizations.of(context)!.passwortSchwach);
+      } else if (error.code == "network-request-failed") {
+        customSnackbar(
+            context, AppLocalizations.of(context)!.keineVerbindungInternet);
+      }
+      pageController.jumpToPage(0);
+    }
+
+    return accounterSuccessfullyCreated;
+  }
+
+  createProfil(profilData) async{
+    var userID = FirebaseAuth.instance.currentUser?.uid;
+
+    var profil = {
+      "id": userID,
+      "email": encrypt(profilData["email"]),
+      "name": profilData["userName"],
+      "ort": profilData["location"]["city"],
+      "interessen": profilData["interests"],
+      "kinder": profilData["children"],
+      "land": profilData["location"]["countryname"],
+      "longt": profilData["location"]["longt"],
+      "latt": profilData["location"]["latt"],
+      "reiseart": profilData["travelTyp"],
+      "sprachen": profilData["languages"],
+      "token": !kIsWeb ? await FirebaseMessaging.instance.getToken() : null,
+      "lastLogin": DateTime.now().toString(),
+      "aboutme": profilData["aboutUs"],
+      "besuchteLaender":[profilData["location"]["countryname"]]
+    };
+
+    await ProfilDatabase().addNewProfil(profil);
+
+    await refreshHiveProfils();
+
+    await NewsPageDatabase().addNewNews({
+      "typ": "ortswechsel",
+      "information": json.encode(profilData["location"]),
+    });
+    await refreshHiveNewsPage();
+
+    return profil;
+  }
+
+  additionalDatabaseOperations(ortMapData, userId) async {
+    await StadtinfoDatabase().addNewCity(ortMapData);
+    StadtinfoDatabase().update(
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
+        "WHERE ort LIKE '%${ortMapData["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+
+    await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"]);
+    await ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_MERGE_PATCH(users, '${json.encode({
+          userId: {"newMessages": 0}
+        })}')",
+        "WHERE id = '1'");
+    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
+    myGroupChats.add(getChatGroupFromHive(chatId: "1"));
+
+    await refreshHiveChats();
+    await refreshHiveMeetups();
+  }
+
+
+  skip(){
+    Navigator.pop(context);
+  }
 
   @override
   void initState() {
@@ -74,43 +190,33 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
       bool isFirstPage = currentPage == 0;
       bool isLastPage = currentPage + 1 == pages.length;
 
-      return Stack(
-        children: [
-          Positioned(
-              left: 20,
-              bottom: 0,
-              child: TextButton(
-                onPressed: () => isFirstPage ? skip() : back(),
-                child: Text(isFirstPage ? "Skip" : AppLocalizations.of(context)!.zurueck),
-              )),
-          Positioned.fill(
-            child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Wrap(children: indicators(pages.length, currentPage))),
+      return Row(mainAxisSize: MainAxisSize.min,children: [
+        TextButton(
+          onPressed: () => isFirstPage ? skip() : back(),
+          child: Text(isFirstPage ? "Skip" : AppLocalizations.of(context)!.zurueck),
+        ),
+        Expanded(child: Wrap(alignment: WrapAlignment.center, children: indicators(pages.length, currentPage))),
+        TextButton(
+          onPressed: () => isLastPage ? done() : next(),
+          child: Text(isLastPage
+              ? AppLocalizations.of(context)!.fertig
+              : AppLocalizations.of(context)!.weiter
           ),
-          Positioned(
-              right: 20,
-              bottom: 0,
-              child: TextButton(
-                onPressed: () => isLastPage ? done() : next(),
-                child: Text(isLastPage
-                    ? AppLocalizations.of(context)!.fertig
-                    : AppLocalizations.of(context)!.weiter
-                ),
-              ))
-        ],
-      );
+        )
+      ],);
     }
 
     return Scaffold(
-        body: PageView(
-          controller: pageController,
-          onPageChanged: (int page) {
-            setState(() {
-              currentPage = page;
-            });
-          },
-          children: pages,
+        body: SafeArea(
+          child: PageView(
+            controller: pageController,
+            onPageChanged: (int page) {
+              setState(() {
+                currentPage = page;
+              });
+            },
+            children: pages,
+          ),
         ),
         resizeToAvoidBottomInset: false,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -119,25 +225,51 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 }
 
 class StepOne extends StatelessWidget {
-  final TextEditingController userNameKontroller = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController checkPasswordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _userNameKontroller = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _checkPasswordController = TextEditingController();
 
-  getName() {
-    return userNameKontroller.text;
+  getAllData(){
+    return {
+      "userName": _userNameKontroller.text.replaceAll("'", "''"),
+      "email": _emailController.text.replaceAll(" ", ""),
+      "password": _passwordController.text
+    };
+  }
+
+  Future<bool> allFilledAndErrorMsg(context) async{
+    if (!_formKey.currentState!.validate()) {
+      return false;
+    }
+
+    String userName = _userNameKontroller.text;
+    userName = userName.replaceAll("'", "''");
+
+    bool userExist =
+        await ProfilDatabase().getData("id", "WHERE name = '$userName'");
+
+    if(userExist != false){
+      customSnackbar(context, AppLocalizations.of(context)!.benutzerNamevergeben);
+      return false;
+    }
+
+    return true;
   }
 
   StepOne({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        margin: const EdgeInsets.only(left: 10, right: 10),
+    return Container(
+      margin: const EdgeInsets.only(left: 10, right: 10),
+      child: Form(
+        key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 30,),
             Center(
               child: Text(AppLocalizations.of(context)!.accountErstellen,
                   style: const TextStyle(
@@ -153,11 +285,12 @@ class StepOne extends StatelessWidget {
             Text(
               AppLocalizations.of(context)!.benutzername,
               style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+                            ),
             CustomTextInput(
-                margin: const EdgeInsets.only(top: 10, bottom: 10),
                 AppLocalizations.of(context)!.benutzername,
-                userNameKontroller,
+                _userNameKontroller,
+                maxLength: 40,
+                margin: const EdgeInsets.only(top: 10, bottom: 10),
                 validator: global_functions.checkValidatorEmpty(context)),
             const SizedBox(
               height: 10,
@@ -168,7 +301,7 @@ class StepOne extends StatelessWidget {
             ),
             CustomTextInput(
               "Email",
-              emailController,
+              _emailController,
               margin: const EdgeInsets.only(top: 10, bottom: 10),
               validator: global_functions.checkValidationEmail(context),
               textInputAction: TextInputAction.next,
@@ -182,7 +315,7 @@ class StepOne extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             CustomTextInput(
-                AppLocalizations.of(context)!.passwort, passwordController,
+                AppLocalizations.of(context)!.passwort, _passwordController,
                 margin: const EdgeInsets.only(top: 10, bottom: 10),
                 hideInput: true,
                 validator: global_functions.checkValidatorPassword(context),
@@ -196,11 +329,11 @@ class StepOne extends StatelessWidget {
             ),
             CustomTextInput(
               AppLocalizations.of(context)!.passwortBestaetigen,
-              checkPasswordController,
+              _checkPasswordController,
               margin: const EdgeInsets.only(top: 10, bottom: 10),
               hideInput: true,
               validator: global_functions.checkValidatorPassword(context,
-                  passwordCheck: passwordController.text),
+                  passwordCheck: _passwordController.text),
               textInputAction: TextInputAction.done,
             ),
           ],
@@ -213,100 +346,162 @@ class StepOne extends StatelessWidget {
 class StepTwo extends StatelessWidget {
   StepTwo({super.key});
 
-  late GoogleAutoComplete ortAuswahlBox;
-  late CustomDropdownButton reiseArtenAuswahlBox;
-  late CustomMultiTextForm sprachenAuswahlBox;
-  late ChildrenBirthdatePickerBox childrenAgePickerBox;
+  late GoogleAutoComplete _ortAuswahlBox;
+  late CustomDropdownButton _reiseArtenAuswahlBox;
+  late CustomMultiTextForm _sprachenAuswahlBox;
+  late ChildrenBirthdatePickerBox _childrenAgePickerBox;
+
+  Map getAllData(){
+    return {
+      "location": _ortAuswahlBox.getGoogleLocationData(),
+      "travelTyp": _reiseArtenAuswahlBox.getSelected(),
+      "languages": _sprachenAuswahlBox.getSelected(),
+      "children": _childrenAgePickerBox.getDates()
+    };
+  }
+
+  bool allFilledAndErrorMsg(context){
+    var ortMapData = _ortAuswahlBox.getGoogleLocationData();
+    bool locationSelected = ortMapData["city"] != null;
+    bool travelTypSelected = _reiseArtenAuswahlBox.getSelected().isNotEmpty;
+    bool languageSelected = _sprachenAuswahlBox.getSelected().isNotEmpty;
+    bool childrenAgeFilled = _childrenAgePickerBox.getDates().length != 0 && _childrenInputValidation();
+
+    if(!locationSelected){
+      customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
+      return false;
+    }else if(!travelTypSelected){
+      customSnackbar(context, AppLocalizations.of(context)!.reiseartAuswaehlen);
+      return false;
+    }else if(!languageSelected){
+      customSnackbar(context, AppLocalizations.of(context)!.spracheAuswaehlen);
+      return false;
+    }else if(!childrenAgeFilled){
+      customSnackbar(context, AppLocalizations.of(context)!.geburtsdatumEingeben);
+      return false;
+    }
+
+    return true;
+  }
+
+  _childrenInputValidation() {
+    bool allFilled = true;
+
+    _childrenAgePickerBox.getDates().forEach((date) {
+      if (date == null) {
+        allFilled = false;
+      }
+    });
+    return allFilled;
+  }
 
   @override
   Widget build(BuildContext context) {
-    ortAuswahlBox = GoogleAutoComplete(
+    _ortAuswahlBox = GoogleAutoComplete(
       margin: const EdgeInsets.only(top: 10, bottom: 10),
       hintText: AppLocalizations.of(context)!.aktuellenOrtEingeben,
     );
-    sprachenAuswahlBox = CustomMultiTextForm(
-        margin: const EdgeInsets.only(top: 10, bottom: 10),
-        validator: global_functions.checkValidationMultiTextForm(context),
-        hintText: AppLocalizations.of(context)!.spracheAuswaehlen,
-        auswahlList: isGerman
-            ? ProfilSprachen().getAllGermanLanguages()
-            : ProfilSprachen().getAllEnglishLanguages());
-    reiseArtenAuswahlBox = CustomDropdownButton(
+    _reiseArtenAuswahlBox = CustomDropdownButton(
       margin: const EdgeInsets.only(top: 10, bottom: 10),
       hintText: AppLocalizations.of(context)!.artDerReiseAuswaehlen,
       items: isGerman
           ? global_variablen.reisearten
           : global_variablen.reiseartenEnglisch,
     );
-    childrenAgePickerBox = ChildrenBirthdatePickerBox(
+    _sprachenAuswahlBox = CustomMultiTextForm(
+        margin: const EdgeInsets.only(top: 10, bottom: 10),
+        validator: global_functions.checkValidationMultiTextForm(context),
+        hintText: AppLocalizations.of(context)!.spracheAuswaehlen,
+        auswahlList: isGerman
+            ? ProfilSprachen().getAllGermanLanguages()
+            : ProfilSprachen().getAllEnglishLanguages());
+    _childrenAgePickerBox = ChildrenBirthdatePickerBox(
       margin: const EdgeInsets.only(top: 10, bottom: 10),
     );
 
-    return SafeArea(
-        child: Container(
+    return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Text(AppLocalizations.of(context)!.persoenlicheDaten,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Text(AppLocalizations.of(context)!.informationRegisterStepTwo),
-          const SizedBox(
-            height: 20,
-          ),
-          Text(
-            AppLocalizations.of(context)!.woSeidIhrImMoment,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          ortAuswahlBox,
-          const SizedBox(
-            height: 10,
-          ),
-          Text(
-            AppLocalizations.of(context)!.wieSeidIhrUnterwegs,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          reiseArtenAuswahlBox,
-          const SizedBox(
-            height: 10,
-          ),
-          Text(
-            AppLocalizations.of(context)!.welcheSprachenSprechtIhr,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          sprachenAuswahlBox,
-          const SizedBox(
-            height: 10,
-          ),
-          Text(
-            AppLocalizations.of(context)!.wieAltSindEureKinder,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          childrenAgePickerBox,
-          Text(
-            AppLocalizations.of(context)!.infoZumAlterDerKinder,
-          ),
-        ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(height: 30,),
+      Center(
+        child: Text(AppLocalizations.of(context)!.persoenlicheDaten,
+            style:
+                const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       ),
-    ));
+      const SizedBox(
+        height: 10,
+      ),
+      Text(AppLocalizations.of(context)!.informationRegisterStepTwo),
+      const SizedBox(
+        height: 20,
+      ),
+      Text(
+        AppLocalizations.of(context)!.woSeidIhrImMoment,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      _ortAuswahlBox,
+      const SizedBox(
+        height: 10,
+      ),
+      Text(
+        AppLocalizations.of(context)!.wieSeidIhrUnterwegs,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      _reiseArtenAuswahlBox,
+      const SizedBox(
+        height: 10,
+      ),
+      Text(
+        AppLocalizations.of(context)!.welcheSprachenSprechtIhr,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      _sprachenAuswahlBox,
+      const SizedBox(
+        height: 10,
+      ),
+      Text(
+        AppLocalizations.of(context)!.wieAltSindEureKinder,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+      _childrenAgePickerBox,
+      Text(
+        AppLocalizations.of(context)!.infoZumAlterDerKinder,
+      ),
+    ],
+      ),
+    );
   }
 }
 
 class StepThree extends StatelessWidget {
-  StepThree({super.key});
+  final TextEditingController _aboutusKontroller = TextEditingController();
+  late CustomMultiTextForm _interessenAuswahlBox;
 
-  final TextEditingController aboutusKontroller = TextEditingController();
-  late CustomMultiTextForm interessenAuswahlBox;
+  Map getAllData(){
+    return {
+      "interests": _interessenAuswahlBox.getSelected(),
+      "aboutUs": _aboutusKontroller.text
+    };
+  }
+
+  bool allFilledAndErrorMsg(context){
+    bool interesetSelected = _interessenAuswahlBox.getSelected().isNotEmpty;
+
+    if(!interesetSelected){
+      customSnackbar(context, AppLocalizations.of(context)!.interessenAuswaehlen);
+      return false;
+    }
+
+    return true;
+  }
+
+  StepThree({super.key});
 
   @override
   Widget build(BuildContext context) {
-    interessenAuswahlBox = CustomMultiTextForm(
+    _interessenAuswahlBox = CustomMultiTextForm(
         margin: const EdgeInsets.only(top: 10, bottom: 10),
         validator: global_functions.checkValidationMultiTextForm(context),
         hintText: AppLocalizations.of(context)!.interessenAuswaehlen,
@@ -314,40 +509,40 @@ class StepThree extends StatelessWidget {
             ? global_variablen.interessenListe
             : global_variablen.interessenListeEnglisch);
 
-    return SafeArea(
-        child: Container(
+    return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Center(
-          child: Text(AppLocalizations.of(context)!.persoenlicheDaten,
-              style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Text(AppLocalizations.of(context)!.informationRegisterStepThree),
-        const SizedBox(
-          height: 20,
-        ),
-        Text(
-          AppLocalizations.of(context)!.welcheThemenInteressierenEuch,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        interessenAuswahlBox,
-        const SizedBox(
-          height: 10,
-        ),
-        Text(
-          AppLocalizations.of(context)!.beschreibungEuererFamilie,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        CustomTextInput(
-            "${AppLocalizations.of(context)!.aboutusHintText} *optional*",
-            aboutusKontroller,
-            margin: const EdgeInsets.only(top: 10, bottom: 10),
-            moreLines: 4)
+        SizedBox(height: 30,),
+    Center(
+      child: Text(AppLocalizations.of(context)!.persoenlicheDaten,
+          style:
+              const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+    ),
+    const SizedBox(
+      height: 10,
+    ),
+    Text(AppLocalizations.of(context)!.informationRegisterStepThree),
+    const SizedBox(
+      height: 20,
+    ),
+    Text(
+      AppLocalizations.of(context)!.welcheThemenInteressierenEuch,
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    ),
+    _interessenAuswahlBox,
+    const SizedBox(
+      height: 10,
+    ),
+    Text(
+      AppLocalizations.of(context)!.beschreibungEuererFamilie,
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    ),
+    CustomTextInput(
+        "${AppLocalizations.of(context)!.aboutusHintText} *optional*",
+        _aboutusKontroller,
+        margin: const EdgeInsets.only(top: 10, bottom: 10),
+        moreLines: 4)
       ]),
-    ));
+    );
   }
 }

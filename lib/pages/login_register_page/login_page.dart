@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:familien_suche/pages/login_register_page/on_boarding_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -15,15 +16,13 @@ import '../../widgets/dialogWindow.dart';
 import '../../widgets/layout/custom_floating_action_button_extended.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
-import 'create_profil_page.dart';
 import '../start_page.dart';
-import '../login_register_page/register_page.dart';
 import '../login_register_page/forget_password_page.dart';
 import '../../services/database.dart';
 import 'impressum.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key});
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -76,11 +75,13 @@ class _LoginPageState extends State<LoginPage> {
       var ownProfil = Hive.box("secureBox").get("ownProfil");
 
       if (ownProfil != false && ownProfil.isNotEmpty) {
-        if (context.mounted)
+        if (context.mounted) {
           global_functions.changePageForever(context, StartPage());
+        }
       } else {
-        if (context.mounted)
-          global_functions.changePageForever(context, const CreateProfilPage());
+        if (context.mounted) {
+          global_functions.changePageForever(context, const OnBoardingSlider());
+        }
       }
     } on FirebaseAuthException catch (error) {
       setState(() {
@@ -273,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
                     customFloatbuttonExtended(
                         AppLocalizations.of(context)!.registrieren, () {
                       global_functions.changePage(
-                          context, const RegisterPage());
+                          context, const OnBoardingSlider());
                     })
                   ],
                 )
@@ -319,12 +320,13 @@ class _LoginPageState extends State<LoginPage> {
           var ownProfil = Hive.box("secureBox").get("ownProfil");
 
           if (ownProfil != false && ownProfil.isNotEmpty) {
-            if (context.mounted)
+            if (context.mounted) {
               global_functions.changePageForever(context, StartPage());
+            }
           } else {
             if (context.mounted) {
               global_functions.changePageForever(
-                  context, const CreateProfilPage());
+                  context, const OnBoardingSlider());
             }
           }
         },
@@ -346,7 +348,7 @@ class _LoginPageState extends State<LoginPage> {
                       shape: BoxShape.circle,
                     ),
                   )
-                : Center(child: const CircularProgressIndicator())),
+                : const Center(child: CircularProgressIndicator())),
       );
     }
 
@@ -371,12 +373,13 @@ class _LoginPageState extends State<LoginPage> {
           var ownProfil = Hive.box("secureBox").get("ownProfil");
 
           if (ownProfil != false && ownProfil.isNotEmpty) {
-            if (context.mounted)
+            if (context.mounted) {
               global_functions.changePageForever(context, StartPage());
+            }
           } else {
             if (context.mounted) {
               global_functions.changePageForever(
-                  context, const CreateProfilPage());
+                  context, const OnBoardingSlider());
             }
           }
         },
@@ -398,21 +401,21 @@ class _LoginPageState extends State<LoginPage> {
                       shape: BoxShape.circle,
                     ),
                   )
-                : Center(child: const CircularProgressIndicator())),
+                : const Center(child: CircularProgressIndicator())),
       );
     }
 
     Widget socialLoginButtons() {
       return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         if (!Platform.isIOS) googleLoginButton(),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         if (Platform.isIOS) appleLoginButton(),
       ]);
     }
 
     Widget noAccountBox() {
       return InkWell(
-        onTap: () => global_functions.changePage(context, RegisterPage()),
+        onTap: () => global_functions.changePage(context, const OnBoardingSlider()),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -448,7 +451,7 @@ class _LoginPageState extends State<LoginPage> {
             key: _formKey,
             child: Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 50,
                 ),
                 Image.asset('assets/WeltFlugzeug.png'),
@@ -456,42 +459,42 @@ class _LoginPageState extends State<LoginPage> {
                 Text(AppLocalizations.of(context)!.willkommenBeiAppName,
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold)),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 CustomTextInput("Email", emailController,
                     keyboardType: TextInputType.emailAddress,
                     validator: global_functions.checkValidationEmail(context),
                     margin:
-                        EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                        const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
                     textInputAction: TextInputAction.next),
                 CustomTextInput(
                     AppLocalizations.of(context)!.passwort, passwortController,
                     validator: global_functions.checkValidatorPassword(context),
                     margin:
-                        EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                        const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
                     hideInput: true,
                     textInputAction: TextInputAction.done,
                     onSubmit: () => userLogin()),
                 if (kIsWeb) angemeldetBleibenBox(),
                 supportRow(),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 loginButton(),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 Text(AppLocalizations.of(context)!.oderWeiterMit),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 socialLoginButtons(),
-                Expanded(
+                const Expanded(
                   child: SizedBox.shrink(),
                 ),
                 noAccountBox(),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 if (kIsWeb) impressumBox()
               ],
             ),
