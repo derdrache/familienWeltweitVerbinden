@@ -39,6 +39,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   var sliderStepOne = StepOne();
   var sliderStepTwo = StepTwo();
   var sliderStepThree = StepThree();
+  bool isLoading = false;
 
   late List<Widget> pages;
 
@@ -66,6 +67,10 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   done() async{
     if(!sliderStepTwo.allFilledAndErrorMsg(context)) return;
 
+    setState(() {
+      isLoading = true;
+    });
+
     Map accountData = sliderStepOne.getAllData();
     Map personalData1 = sliderStepTwo.getAllData();
     Map personalData2 = sliderStepThree.getAllData();
@@ -73,7 +78,12 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
     bool createdAccount = await createAccount(allData);
 
-    if(!createdAccount) return;
+    if(!createdAccount) {
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
 
     Map ownProfil = await createProfil(allData);
 
@@ -199,13 +209,9 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
           child: Text(isFirstPage ? "Skip" : AppLocalizations.of(context)!.zurueck),
         ),
         Expanded(child: Wrap(alignment: WrapAlignment.center, children: indicators(pages.length, currentPage))),
-        TextButton(
-          onPressed: () => isLastPage ? done() : next(),
-          child: Text(isLastPage
-              ? AppLocalizations.of(context)!.fertig
-              : AppLocalizations.of(context)!.weiter
-          ),
-        )
+        if(isLoading) Container(width: 20, height: 20,child: CircularProgressIndicator()),
+        if(isLastPage) TextButton(onPressed: ()=> done(), child: Text(AppLocalizations.of(context)!.fertig)),
+        if(!isLastPage && !isLoading) TextButton(onPressed: ()=> next(), child: Text(AppLocalizations.of(context)!.weiter)),
       ],);
     }
 
@@ -293,11 +299,8 @@ class StepOne extends StatelessWidget {
                 AppLocalizations.of(context)!.benutzername,
                 _userNameKontroller,
                 maxLength: 40,
-                margin: const EdgeInsets.only(top: 10, bottom: 10),
+                margin: const EdgeInsets.only(top: 10),
                 validator: global_functions.checkValidatorEmpty(context)),
-            const SizedBox(
-              height: 10,
-            ),
             const Text(
               "Email",
               style: TextStyle(fontWeight: FontWeight.bold),
