@@ -40,7 +40,7 @@ class GoogleAutoComplete extends StatefulWidget {
     if (googleSuche.isEmpty) return;
 
     final Map<String, dynamic> data = Map.from(googleSuche);
-    searchableItems = data["predictions"];
+    searchableItems = List<Map>.from(data["predictions"]);
   }
 
   clear() {
@@ -198,7 +198,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
               } else if(inputValue.isNotEmpty) {
                 await widget._googleAutoCompleteSuche(inputValue);
               }
-
+              print(widget.searchableItems);
               return widget.searchableItems;
             },
             fieldViewBuilder: (BuildContext context,
