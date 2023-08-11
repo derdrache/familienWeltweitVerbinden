@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/widgets/layout/custom_like_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -47,7 +48,7 @@ class _LocationCardState extends State<LocationCard> {
     }
   }
 
-  changeIntereset() {
+  Future<bool> changeIntereset(hasInterest) async {
     if (hasInterest) {
       hasInterest = false;
 
@@ -65,6 +66,8 @@ class _LocationCardState extends State<LocationCard> {
     }
 
     setState(() {});
+
+    return hasInterest;
   }
 
   @override
@@ -154,14 +157,11 @@ class _LocationCardState extends State<LocationCard> {
             ),
             if (!widget.smallCard)
               Positioned(
-                  right: 0,
-                  child: IconButton(
-                    onPressed: () => changeIntereset(),
-                    icon: Icon(
-                      Icons.star,
-                      color:
-                          hasInterest ? Colors.yellow.shade900 : Colors.black,
-                    ),
+                  top: likeButtonAbstandTop + 5,
+                  right: likeButtonAbstandRight,
+                  child: CustomLikeButton(
+                    isLiked: hasInterest,
+                    onLikeButtonTapped: changeIntereset,
                   ))
           ],
         ),

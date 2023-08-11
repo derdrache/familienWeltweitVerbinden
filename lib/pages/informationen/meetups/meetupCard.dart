@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/widgets/layout/custom_like_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -266,8 +267,8 @@ class _MeetupCardState extends State<MeetupCard> {
                       !widget.isCreator &&
                       !widget.smallCard)
                     Positioned(
-                        top: 2,
-                        right: 8,
+                        top: likeButtonAbstandTop,
+                        right: likeButtonAbstandRight,
                         child: InteresseButton(
                             hasIntereset:
                                 widget.meetupData["interesse"].contains(userId),
@@ -381,7 +382,7 @@ class InteresseButton extends StatefulWidget {
 class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
 
-  setInteresse() async {
+  Future<bool> setInteresse(isIntereset) async {
     var myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
     var meetupData = getMeetupFromHive(widget.id);
     widget.hasIntereset = !widget.hasIntereset;
@@ -404,13 +405,16 @@ class _InteresseButtonState extends State<InteresseButton> {
     setState(() {});
 
     widget.afterFavorite!();
+
+    return !isIntereset;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: () => setInteresse(),
-        child: Icon(Icons.favorite,
-            color: widget.hasIntereset ? Colors.red : Colors.black));
+
+    return CustomLikeButton(
+        isLiked: widget.hasIntereset,
+      onLikeButtonTapped: setInteresse,
+    );
   }
 }

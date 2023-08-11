@@ -2,9 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
 
+
+import '../../../widgets/layout/custom_like_button.dart';
 import 'community_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser!.uid;
@@ -109,8 +112,8 @@ class _CommunityCardState extends State<CommunityCard> {
                   ),
                   if (widget.withFavorite && !widget.isCreator)
                     Positioned(
-                        top: 2,
-                        right: 8,
+                        top: likeButtonAbstandTop,
+                        right: likeButtonAbstandRight,
                         child: InteresseButton(
                             communityData: widget.community,
                             afterFavorite: widget.afterFavorite != null
@@ -179,13 +182,14 @@ class InteresseButton extends StatefulWidget {
 
 class _InteresseButtonState extends State<InteresseButton> {
   var color = Colors.black;
-  late bool hasIntereset;
+  late bool hasInterest;
 
-  setInteresse() async {
+  Future<bool> setInteresse(isIntereset) async {
     String communityId = widget.communityData["id"];
-    hasIntereset = !hasIntereset;
+    hasInterest = !hasInterest;
 
-    if (hasIntereset) {
+
+    if (hasInterest) {
       widget.communityData["interesse"].add(userId);
       CommunityDatabase().update(
           "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
@@ -197,25 +201,27 @@ class _InteresseButtonState extends State<InteresseButton> {
           "WHERE id ='$communityId'");
     }
 
+
     updateHiveCommunity(
         communityId, "interesse", widget.communityData["interesse"]);
-    setState(() {});
 
     widget.afterFavorite!();
+
+    return !isIntereset;
   }
 
   @override
   void initState() {
-    hasIntereset = widget.communityData["interesse"].contains(userId);
+    hasInterest = widget.communityData["interesse"].contains(userId);
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: () => setInteresse(),
-        child: Icon(Icons.star,
-            size: 30, color: hasIntereset ? Colors.amberAccent : Colors.black));
+    return CustomLikeButton(
+      isLiked: hasInterest,
+      onLikeButtonTapped: setInteresse,
+    );
   }
 }
