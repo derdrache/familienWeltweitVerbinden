@@ -271,6 +271,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
               title: "families worldwide",
               theme: ThemeData(
+                  fontFamily: "Sarabun",
                   scaffoldBackgroundColor: Colors.white,
                   colorScheme: ColorScheme.fromSwatch().copyWith(
                     primary: const Color(0xFFBF1D53),

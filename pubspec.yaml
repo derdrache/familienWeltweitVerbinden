@@ -110,6 +110,17 @@ flutter:
    - assets/bilder/flaggen/
    - assets/icons/
 
+  fonts:
+     - family: IndieFlower
+       fonts:
+         - asset: assets/fonts/IndieFlower-Regular.ttf
+     - family: Sarabun
+       fonts:
+         - asset: assets/fonts/Sarabun/Sarabun-Regular.ttf
+         - asset: assets/fonts/Sarabun/Sarabun-Bold.ttf
+           weight: 700
+
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
