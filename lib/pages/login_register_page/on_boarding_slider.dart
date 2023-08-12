@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:familien_suche/pages/login_register_page/login_page.dart';
 import 'package:familien_suche/widgets/layout/custom_snackbar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -177,9 +178,8 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
     await refreshHiveMeetups();
   }
 
-
   skip(){
-    Navigator.pop(context);
+    global_functions.changePageForever(context, const LoginPage());
   }
 
   @override
@@ -215,7 +215,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
           child: Text(isFirstPage ? "Skip" : AppLocalizations.of(context)!.zurueck),
         ),
         Expanded(child: Wrap(alignment: WrapAlignment.center, children: indicators(pages.length, currentPage))),
-        if(isLoading) Container(width: 20, height: 20,child: CircularProgressIndicator()),
+        if(isLoading) const SizedBox(width: 20, height: 20,child: CircularProgressIndicator()),
         if(isLastPage) TextButton(onPressed: ()=> done(), child: Text(AppLocalizations.of(context)!.fertig)),
         if(!isLastPage && !isLoading) TextButton(onPressed: ()=> next(), child: Text(AppLocalizations.of(context)!.weiter)),
       ],);
@@ -286,7 +286,7 @@ class SliderStepOne extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(withSocialLogin);
+
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
       child: Form(
@@ -294,7 +294,7 @@ class SliderStepOne extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 30,),
+            const SizedBox(height: 30,),
             Center(
               child: Text(AppLocalizations.of(context)!.accountErstellen,
                   style: const TextStyle(
@@ -445,7 +445,7 @@ class SliderStepTwo extends StatelessWidget {
       child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      SizedBox(height: 30,),
+      const SizedBox(height: 30,),
       Center(
         child: Text(AppLocalizations.of(context)!.persoenlicheDaten,
             style:
@@ -532,7 +532,7 @@ class SliderStepThree extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(height: 30,),
+        const SizedBox(height: 30,),
     Center(
       child: Text(AppLocalizations.of(context)!.persoenlicheDaten,
           style:
