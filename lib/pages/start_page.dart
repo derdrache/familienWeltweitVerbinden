@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/login_register_page/on_boarding_slider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -89,7 +90,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     }
 
     bool profileExist = await _checkProfilExist();
-    if (!profileExist && context.mounted) changePageForever(context, const CreateProfilPage());
+    if (!profileExist && context.mounted) changePageForever(context, OnBoardingSlider(withSocialLogin: true,));
 
     if (userName == null || ownProfil == null) return;
 

@@ -49,7 +49,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   @override
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
-        validator: global_functions.checkValidationMultiTextForm(context),
         auswahlList: isGerman
             ? ProfilSprachen().getAllGermanLanguages()
             : ProfilSprachen().getAllEnglishLanguages());
@@ -61,7 +60,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     );
 
     interessenAuswahlBox = CustomMultiTextForm(
-        validator: global_functions.checkValidationMultiTextForm(context),
         auswahlList: isGerman
             ? global_variablen.interessenListe
             : global_variablen.interessenListeEnglisch);
