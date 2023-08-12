@@ -23,6 +23,8 @@ import 'pages/login_register_page/login_page.dart';
 import 'services/database.dart';
 import 'services/local_notification.dart';
 import 'auth/secrets.dart';
+import 'themes/dark_theme.dart';
+import 'themes/light_theme.dart';
 
 refreshDataOnNotification(messageTyp) async{
   Random random = new Random();
@@ -270,14 +272,8 @@ class MyApp extends StatelessWidget {
 
           return MaterialApp(
               title: "families worldwide",
-              theme: ThemeData(
-                  fontFamily: "Sarabun",
-                  scaffoldBackgroundColor: Colors.white,
-                  colorScheme: ColorScheme.fromSwatch().copyWith(
-                    primary: const Color(0xFFBF1D53),
-                    secondary: const Color(0xFF3CB28F),
-                  ),
-                  iconTheme: const IconThemeData(color: Color(0xAA3CB28F))),
+              theme: lightTheme,
+              darkTheme: darkTheme,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: const [
                 Locale('en', ''),
