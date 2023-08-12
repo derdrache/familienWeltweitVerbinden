@@ -248,12 +248,12 @@ class SliderStepOne extends StatelessWidget {
   final TextEditingController _checkPasswordController = TextEditingController();
 
   getAllData(){
-    String userName = _userNameKontroller.text.replaceAll("'", "''");
-    String email = _emailController.text.replaceAll(" ", "");
+    String? userName = _userNameKontroller.text.replaceAll("'", "''");
+    String? email = _emailController.text.replaceAll(" ", "");
 
     if(withSocialLogin){
-      userName = "";
-      email = "";
+      userName = FirebaseAuth.instance.currentUser?.displayName!;
+      email = FirebaseAuth.instance.currentUser?.email;
     }
 
     return {
