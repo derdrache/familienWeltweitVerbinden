@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       } else {
         if (context.mounted) {
-          global_functions.changePageForever(context, const OnBoardingSlider());
+          global_functions.changePageForever(context, OnBoardingSlider());
         }
       }
     } on FirebaseAuthException catch (error) {
@@ -129,13 +129,14 @@ class _LoginPageState extends State<LoginPage> {
         idToken: googleAuth.idToken,
       );
 
+
       return await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (_) {}
   }
 
   signInWithApple() async {
     var firebaseAuthService = FirebaseAuthenticationService();
-    final result = await firebaseAuthService.signInWithApple(
+    await firebaseAuthService.signInWithApple(
         appleRedirectUri:
             "https://praxis-cab-236720.firebaseapp.com/__/auth/handler",
         appleClientId: 'com.example.familienSuche');
@@ -274,7 +275,7 @@ class _LoginPageState extends State<LoginPage> {
                     customFloatbuttonExtended(
                         AppLocalizations.of(context)!.registrieren, () {
                       global_functions.changePage(
-                          context, const OnBoardingSlider());
+                          context, OnBoardingSlider());
                     })
                   ],
                 )
@@ -325,8 +326,8 @@ class _LoginPageState extends State<LoginPage> {
             }
           } else {
             if (context.mounted) {
-              global_functions.changePageForever(
-                  context, const OnBoardingSlider());
+              global_functions.changePage(
+                  context, OnBoardingSlider(withSocialLogin: true));
             }
           }
         },
@@ -379,7 +380,7 @@ class _LoginPageState extends State<LoginPage> {
           } else {
             if (context.mounted) {
               global_functions.changePageForever(
-                  context, const OnBoardingSlider());
+                  context, OnBoardingSlider(withSocialLogin: true));
             }
           }
         },
@@ -415,7 +416,7 @@ class _LoginPageState extends State<LoginPage> {
 
     Widget noAccountBox() {
       return InkWell(
-        onTap: () => global_functions.changePage(context, const OnBoardingSlider()),
+        onTap: () => global_functions.changePage(context, OnBoardingSlider()),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

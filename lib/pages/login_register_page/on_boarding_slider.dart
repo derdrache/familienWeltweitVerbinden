@@ -27,7 +27,12 @@ var isGerman = kIsWeb
     : Platform.localeName == "de_DE";
 
 class OnBoardingSlider extends StatefulWidget {
-  const OnBoardingSlider({super.key});
+  bool withSocialLogin;
+
+  OnBoardingSlider({
+    super.key,
+    this.withSocialLogin = false
+  });
 
   @override
   State<OnBoardingSlider> createState() => _OnBoardingSliderState();
@@ -36,9 +41,9 @@ class OnBoardingSlider extends StatefulWidget {
 class _OnBoardingSliderState extends State<OnBoardingSlider> {
   int currentPage = 0;
   final PageController pageController = PageController(initialPage: 0);
-  var sliderStepOne = StepOne();
-  var sliderStepTwo = StepTwo();
-  var sliderStepThree = StepThree();
+  late var sliderStepOne;
+  var sliderStepTwo = SliderStepTwo();
+  var sliderStepThree = SliderStepThree();
   bool isLoading = false;
 
   late List<Widget> pages;
@@ -49,7 +54,6 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   }
 
   next() async {
-    /*
     if(currentPage == 0 && ! await sliderStepOne.allFilledAndErrorMsg(context)){
       return;
     }else if(currentPage == 1 && !sliderStepTwo.allFilledAndErrorMsg(context)){
@@ -58,8 +62,6 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
       return;
     }
 
-
-     */
     currentPage += 1;
     pageController.jumpToPage(currentPage);
   }
@@ -76,14 +78,17 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
     Map personalData2 = sliderStepThree.getAllData();
     Map allData = {...accountData, ...personalData1,...personalData2};
 
-    bool createdAccount = await createAccount(allData);
+    if(!widget.withSocialLogin){
+      bool createdAccount = await createAccount(allData);
 
-    if(!createdAccount) {
-      setState(() {
-        isLoading = false;
-      });
-      return;
+      if(!createdAccount) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
     }
+
 
     Map ownProfil = await createProfil(allData);
 
@@ -179,6 +184,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
   @override
   void initState() {
+    sliderStepOne = SliderStepOne(withSocialLogin: widget.withSocialLogin,);
     pages = [sliderStepOne, sliderStepTwo, sliderStepThree];
 
     super.initState();
@@ -233,7 +239,8 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   }
 }
 
-class StepOne extends StatelessWidget {
+class SliderStepOne extends StatelessWidget {
+  bool withSocialLogin;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _userNameKontroller = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -241,9 +248,17 @@ class StepOne extends StatelessWidget {
   final TextEditingController _checkPasswordController = TextEditingController();
 
   getAllData(){
+    String userName = _userNameKontroller.text.replaceAll("'", "''");
+    String email = _emailController.text.replaceAll(" ", "");
+
+    if(withSocialLogin){
+      userName = "";
+      email = "";
+    }
+
     return {
-      "userName": _userNameKontroller.text.replaceAll("'", "''"),
-      "email": _emailController.text.replaceAll(" ", ""),
+      "userName": userName,
+      "email": email,
       "password": _passwordController.text
     };
   }
@@ -267,10 +282,11 @@ class StepOne extends StatelessWidget {
     return true;
   }
 
-  StepOne({super.key});
+  SliderStepOne({super.key, this.withSocialLogin = false});
 
   @override
   Widget build(BuildContext context) {
+    print(withSocialLogin);
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
       child: Form(
@@ -301,11 +317,11 @@ class StepOne extends StatelessWidget {
                 maxLength: 40,
                 margin: const EdgeInsets.only(top: 10),
                 validator: global_functions.checkValidatorEmpty(context)),
-            const Text(
+            if(!withSocialLogin) const Text(
               "Email",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            CustomTextInput(
+            if(!withSocialLogin )CustomTextInput(
               "Email",
               _emailController,
               margin: const EdgeInsets.only(top: 10, bottom: 10),
@@ -313,27 +329,27 @@ class StepOne extends StatelessWidget {
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.emailAddress,
             ),
-            const SizedBox(
+            if(!withSocialLogin) const SizedBox(
               height: 10,
             ),
-            Text(
+            if(!withSocialLogin) Text(
               AppLocalizations.of(context)!.passwort,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            CustomTextInput(
+            if(!withSocialLogin) CustomTextInput(
                 AppLocalizations.of(context)!.passwort, _passwordController,
                 margin: const EdgeInsets.only(top: 10, bottom: 10),
                 hideInput: true,
                 validator: global_functions.checkValidatorPassword(context),
                 textInputAction: TextInputAction.next),
-            const SizedBox(
+            if(!withSocialLogin)const SizedBox(
               height: 10,
             ),
-            Text(
+            if(!withSocialLogin) Text(
               AppLocalizations.of(context)!.passwortBestaetigen,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            CustomTextInput(
+            if(!withSocialLogin) CustomTextInput(
               AppLocalizations.of(context)!.passwortBestaetigen,
               _checkPasswordController,
               margin: const EdgeInsets.only(top: 10, bottom: 10),
@@ -349,8 +365,8 @@ class StepOne extends StatelessWidget {
   }
 }
 
-class StepTwo extends StatelessWidget {
-  StepTwo({super.key});
+class SliderStepTwo extends StatelessWidget {
+  SliderStepTwo({super.key});
 
   late GoogleAutoComplete _ortAuswahlBox;
   late CustomDropdownButton _reiseArtenAuswahlBox;
@@ -480,7 +496,7 @@ class StepTwo extends StatelessWidget {
   }
 }
 
-class StepThree extends StatelessWidget {
+class SliderStepThree extends StatelessWidget {
   final TextEditingController _aboutusKontroller = TextEditingController();
   late CustomMultiTextForm _interessenAuswahlBox;
 
@@ -502,7 +518,7 @@ class StepThree extends StatelessWidget {
     return true;
   }
 
-  StepThree({super.key});
+  SliderStepThree({super.key});
 
   @override
   Widget build(BuildContext context) {
