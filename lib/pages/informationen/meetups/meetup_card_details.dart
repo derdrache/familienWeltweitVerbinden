@@ -364,7 +364,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     double screenWidth = MediaQuery.of(context).size.width;
     if (screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
-    double cardHeight = screenHeight / 1.34;
+    double cardHeight = screenHeight / 1.4;
     bool isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
         widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.neueStadtEingeben;
@@ -964,7 +964,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               ),
               if (moreContent)
                 const Positioned.fill(
-                  bottom: 35,
+                  bottom: 22,
                   child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Icon(Icons.arrow_downward)),
