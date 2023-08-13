@@ -24,7 +24,7 @@ import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
-import '../../../global/variablen.dart' as global_var;
+import '../../../global/style.dart' as style;
 import '../location/location_Information.dart';
 
 class CommunityDetails extends StatefulWidget {
@@ -542,7 +542,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
-                        width: 1, color: global_var.borderColorGrey))),
+                        width: 1, color: style.borderColorGrey))),
             child: Text(friend)),
       ));
     }

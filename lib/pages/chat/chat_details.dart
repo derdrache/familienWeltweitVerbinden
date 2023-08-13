@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
-import 'package:familien_suche/global/variablen.dart' as global_var;
+import 'package:familien_suche/global/style.dart' as style;
 import 'package:familien_suche/pages/chat/pin_messages.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/pages/start_page.dart';
@@ -2087,7 +2087,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               border: Border(
-                top: BorderSide(width: 1.0, color: global_var.borderColorGrey),
+                top: BorderSide(width: 1.0, color: style.borderColorGrey),
               ),
             ),
             child: Text(userProfil["name"]),

@@ -15,6 +15,7 @@ import '../../functions/user_speaks_german.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_var;
+import '../../global/style.dart' as style;
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/ownIconButton.dart';
 import '../../widgets/profil_image.dart';
@@ -1053,7 +1054,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               decoration: BoxDecoration(
                   border: Border(
                       bottom: BorderSide(
-                          width: 1, color: global_var.borderColorGrey))),
+                          width: 1, color: style.borderColorGrey))),
               child: Row(
                 children: [
                   ProfilImage(profilData),

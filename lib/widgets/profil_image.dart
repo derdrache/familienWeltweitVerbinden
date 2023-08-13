@@ -298,18 +298,22 @@ class ImageCircleAvatar extends StatelessWidget {
   ImageCircleAvatar(
       {this.imageProvider,
       required this.size,
-      this.backgroundColor = Colors.white,
+      this.backgroundColor,
       this.child,
-      this.childBackgroundColor = Colors.white});
+      this.childBackgroundColor});
 
   @override
   Widget build(BuildContext context) {
+    Color alternativColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey
+        : Colors.white;
+
     return CircleAvatar(
       radius: size,
-      backgroundColor: backgroundColor,
+      backgroundColor: backgroundColor ?? alternativColor,
       child: CircleAvatar(
           radius: size - 3,
-          backgroundColor: childBackgroundColor,
+          backgroundColor: childBackgroundColor ?? alternativColor,
           backgroundImage: imageProvider,
           child: child),
     );

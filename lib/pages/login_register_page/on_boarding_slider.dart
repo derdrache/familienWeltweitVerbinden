@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
 
+import '../../global/style.dart' as style;
 import '../../services/notification.dart' as notifications;
 import '../../global/encryption.dart';
 import '../../global/profil_sprachen.dart';
@@ -211,13 +212,14 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
       return Row(mainAxisSize: MainAxisSize.min,children: [
         TextButton(
+          style: style.textButtonStyle(),
           onPressed: () => isFirstPage ? skip() : back(),
           child: Text(isFirstPage ? "Skip" : AppLocalizations.of(context)!.zurueck),
         ),
         Expanded(child: Wrap(alignment: WrapAlignment.center, children: indicators(pages.length, currentPage))),
         if(isLoading) const SizedBox(width: 20, height: 20,child: CircularProgressIndicator()),
-        if(isLastPage) TextButton(onPressed: ()=> done(), child: Text(AppLocalizations.of(context)!.fertig)),
-        if(!isLastPage && !isLoading) TextButton(onPressed: ()=> next(), child: Text(AppLocalizations.of(context)!.weiter)),
+        if(isLastPage) TextButton(style: style.textButtonStyle(), onPressed: ()=> done(), child: Text(AppLocalizations.of(context)!.fertig)),
+        if(!isLastPage && !isLoading) TextButton(style: style.textButtonStyle(), onPressed: ()=> next(), child: Text(AppLocalizations.of(context)!.weiter)),
       ],);
     }
 

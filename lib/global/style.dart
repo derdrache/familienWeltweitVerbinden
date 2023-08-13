@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+Color borderColorGrey = const Color(0xFFDFDDDD);
 const double roundedCorners = 20;
 const double textSize = 16;
 const double webWidth = 600;
 const double sideSpace = 10;
 const double iconSizeNormal = 24;
-const double iconSizeBig = 32; //????
+const double iconSizeBig = 32;
 
 getResponsiveFontSize(context, fontType){
   double unitHeightValue = MediaQuery.of(context).size.width * 0.01;

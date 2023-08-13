@@ -16,7 +16,7 @@ import '../../global/style.dart';
 import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
-import '../../global/variablen.dart' as global_var;
+import '../../global/style.dart' as style;
 import '../../widgets/strike_through_icon.dart';
 import 'chat_details.dart';
 
@@ -170,7 +170,7 @@ class _ChatPageState extends State<ChatPage>{
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
-                        width: 1, color: global_var.borderColorGrey))),
+                        width: 1, color: style.borderColorGrey))),
             child: Text(friendName)),
       ));
     }
@@ -717,7 +717,7 @@ class _ChatPageState extends State<ChatPage>{
                   decoration: BoxDecoration(
                       border: Border(
                     bottom:
-                        BorderSide(width: 1, color: global_var.borderColorGrey),
+                        BorderSide(width: 1, color: style.borderColorGrey),
                   )),
                   child: Row(
                     children: [

@@ -14,7 +14,7 @@ import '../../widgets/layout/custom_dropdownButton.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
 import '../../widgets/search_autocomplete.dart';
-import '../../global/variablen.dart' as global_var;
+import '../../global/style.dart' as style;
 import '../../global/global_functions.dart' as global_func;
 
 class FamilieProfilPage extends StatefulWidget {
@@ -234,7 +234,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
               decoration: BoxDecoration(
                   border: Border(
                       bottom: BorderSide(
-                          width: 1, color: global_var.borderColorGrey))),
+                          width: 1, color: style.borderColorGrey))),
               child: Text(friend)),
         ));
       }
