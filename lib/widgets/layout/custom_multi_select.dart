@@ -50,7 +50,9 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       width: style.webWidth,
       margin: widget.margin ?? EdgeInsets.all(style.sideSpace),
       decoration: BoxDecoration(
-          border: Border.all(),
+          border: Border.all(color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black),
           borderRadius: BorderRadius.circular(style.roundedCorners)
       ),
       child: MultiSelectDialogField(

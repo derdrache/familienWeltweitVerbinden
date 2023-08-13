@@ -339,7 +339,9 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
         width: widget.multiDate ? 160 : 80,
         height: 50,
         decoration: BoxDecoration(
-            border: Border.all(),
+            border: Border.all(color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black),
             borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))),
         child: Center(
             child: Text(

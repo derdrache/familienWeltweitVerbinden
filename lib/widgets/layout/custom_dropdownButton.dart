@@ -49,7 +49,9 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
         maxHeight: 70.0,
       ),
       decoration: BoxDecoration(
-          border: Border.all(width: 1),
+          border: Border.all(width: 1, color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black),
           borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))
       ),
       child: DropdownButtonFormField<String>(

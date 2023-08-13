@@ -65,10 +65,13 @@ class CustomTextInput extends StatelessWidget {
                   maxLines: moreLines,
                   obscureText: hideInput,
                   controller: controller,
+
                   decoration: InputDecoration(
                     isDense: true,
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
+                      borderSide: BorderSide(color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black),
                       borderRadius: BorderRadius.circular(style.roundedCorners)
                     ),
                     border: OutlineInputBorder(
