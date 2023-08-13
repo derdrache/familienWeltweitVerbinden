@@ -134,13 +134,13 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
               margin: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
               child: CustomTextInput(
                   "Beschreibung einfügen", descriptionKontroller,
-                  moreLines: 12, maxLength: 650, textInputAction: TextInputAction.newline)));
+                  moreLines: 10, maxLength: 650, textInputAction: TextInputAction.newline)));
     }
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
-        title: "Notiz erstellen",
+        title: AppLocalizations.of(context)!.tooltipNotizErstellen,
         buttons: [
           IconButton(
               onPressed: () {
