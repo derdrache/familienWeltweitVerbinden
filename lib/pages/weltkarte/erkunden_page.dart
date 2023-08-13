@@ -1431,9 +1431,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 right: textRightPosition,
                 child: Text(numberText,
                     style: TextStyle(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.black
-                            : Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 14)),
               ),
@@ -1461,7 +1459,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     communityMarker(numberText, position, buttonFunction) {
       double markerSize = 32;
-      double textTopPosition = 10;
+      double textTopPosition = 9;
       double textRightPosition = 11;
 
       if (numberText.length > 2) numberText = "99";
@@ -1489,9 +1487,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.black
-                            : Colors.white)),
+                        color: Colors.black)),
               ),
             ],
           ),
@@ -1538,9 +1534,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 top: textTopPosition,
                 right: textRightPosition,
                 child: Text(numberText,
-                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black
-                        : Colors.white,
+                    style: TextStyle(color: Colors.black,
                         fontWeight: FontWeight.bold, fontSize: 14)),
               ),
             ],
