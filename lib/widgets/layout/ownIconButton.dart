@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../global/style.dart';
+
 class OwnIconButton extends StatelessWidget {
   IconData? icon;
   var image;
@@ -18,7 +20,7 @@ class OwnIconButton extends StatelessWidget {
       this.image,
       this.badgeText = "",
       this.color,
-      this.size = 24,
+      this.size = iconSizeNormal,
       this.margin = const EdgeInsets.all(15),
       this.withBox = false, this.onPressed,
       this.bigButton = false,
@@ -28,7 +30,7 @@ class OwnIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(bigButton) size = 32;
+    if(bigButton) size = iconSizeBig;
 
     return InkWell(
       onTap: onPressed != null ? () => onPressed!() : null,

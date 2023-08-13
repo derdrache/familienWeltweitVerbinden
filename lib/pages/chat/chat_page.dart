@@ -12,6 +12,7 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../../global/global_functions.dart';
+import '../../global/style.dart';
 import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
@@ -884,7 +885,7 @@ class _ChatPageState extends State<ChatPage>{
                 tooltip: AppLocalizations.of(context)!.tooltipChatPageSuche,
                 icon: const Icon(
                   Icons.search,
-                  size: 30,
+                  size: iconSizeBig,
                 )),
             const SizedBox(
               width: 10,
