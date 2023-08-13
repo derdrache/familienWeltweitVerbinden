@@ -1243,10 +1243,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     inputInformationBox(IconData icon, String? title, String bodyText) {
       return Container(
           decoration: BoxDecoration(
-              color: Colors.white,
               border: Border(
                   top: const BorderSide(color: Colors.grey),
                   bottom: BorderSide(color: Colors.grey.withOpacity(0.3))),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black
+                  : Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
@@ -1573,6 +1575,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: AnimatedContainer(
           color: highlightMessages.contains(index)
               ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).brightness == Brightness.dark
+              ? Colors.black
               : Colors.white,
           duration: const Duration(seconds: 1),
           curve: Curves.easeIn,
@@ -2495,7 +2499,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         constraints: const BoxConstraints(
           minHeight: 60,
         ),
-        decoration: BoxDecoration(color: Colors.white, boxShadow: [
+        decoration: BoxDecoration(boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 5,
@@ -2522,10 +2526,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       return GestureDetector(
         onTap: () => _joinChatGroup(),
         child: Container(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black
+                : Colors.white,
             constraints: const BoxConstraints(
               minHeight: 60,
             ),
-            decoration: BoxDecoration(color: Colors.white, boxShadow: [
+            decoration: BoxDecoration(boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 5,
@@ -2655,9 +2662,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     normalBottomBar() {
       return Container(
           constraints: BoxConstraints(
+
               minHeight: 60, maxHeight: recordModus != null ? 60 : 200),
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black
+                  : Colors.white,
               border: extraInputInformationBox.runtimeType == SizedBox
                   ? const Border(top: BorderSide(color: Colors.grey))
                   : null,

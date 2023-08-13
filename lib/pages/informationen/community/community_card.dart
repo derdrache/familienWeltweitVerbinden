@@ -76,7 +76,9 @@ class _CommunityCardState extends State<CommunityCard> {
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: Colors.white,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.black
+                  : Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: shadowColor,
@@ -129,7 +131,6 @@ class _CommunityCardState extends State<CommunityCard> {
                         bottomLeft: Radius.circular(20.0),
                         bottomRight: Radius.circular(20.0),
                       ),
-                      color: Colors.white,
                     ),
                     child: Column(
                       children: [

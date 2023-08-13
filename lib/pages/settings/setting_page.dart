@@ -442,7 +442,7 @@ class _SettingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
-    settingThemeContainer(title, icon, function, {color = Colors.black}) {
+    settingThemeContainer(title, icon, function) {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
@@ -452,7 +452,7 @@ class _SettingSection extends StatelessWidget {
             const SizedBox(width: 20),
             Text(
               title,
-              style: TextStyle(fontSize: fontSize - 4, color: color),
+              style: TextStyle(fontSize: fontSize - 4),
             )
           ],
         ),
@@ -493,7 +493,7 @@ class _SupportInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
-    settingThemeContainer(title, icon, function, {color = Colors.black}) {
+    settingThemeContainer(title, icon, function) {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
@@ -503,7 +503,7 @@ class _SupportInformation extends StatelessWidget {
             const SizedBox(width: 20),
             Text(
               title,
-              style: TextStyle(fontSize: fontSize - 4, color: color),
+              style: TextStyle(fontSize: fontSize - 4),
             )
           ],
         ),

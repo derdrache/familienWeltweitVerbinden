@@ -24,7 +24,7 @@ class NewsPage extends StatefulWidget {
   State<NewsPage> createState() => _NewsPageState();
 }
 
-class _NewsPageState extends State<NewsPage>{
+class _NewsPageState extends State<NewsPage> {
   String userId = FirebaseAuth.instance.currentUser!.uid;
   late List newsFeedData;
   int displayDataEntries = 10;
@@ -48,13 +48,13 @@ class _NewsPageState extends State<NewsPage>{
     _scrollBar();
 
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async{
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       await refreshHiveNewsPage();
       setState(() {});
     });
   }
 
-  _scrollBar(){
+  _scrollBar() {
     _controller.addListener(() {
       bool isTop = _controller.position.pixels == 0;
       bool isBottom = _controller.position.atEdge;
@@ -71,7 +71,7 @@ class _NewsPageState extends State<NewsPage>{
         }
       }
 
-      if(isBottom){
+      if (isBottom) {
         setState(() {
           displayDataEntries += 10;
         });
@@ -135,7 +135,12 @@ class _NewsPageState extends State<NewsPage>{
     double screenHeight = MediaQuery.of(context).size.height;
     var widgetList = [];
 
-    for (var item in newsFeed.reversed.toList().take(displayDataEntries).toList().reversed.toList()) {
+    for (var item in newsFeed.reversed
+        .toList()
+        .take(displayDataEntries)
+        .toList()
+        .reversed
+        .toList()) {
       widgetList.add(item["newsWidget"]);
     }
 
@@ -188,30 +193,47 @@ class _NewsPageState extends State<NewsPage>{
     return true;
   }
 
-  _getCombineInformationIfSameUser(news){
-    var lastNews = newsFeed.isNotEmpty ?newsFeed.last["news"] : null;
+  _getCombineInformationIfSameUser(news) {
+    var lastNews = newsFeed.isNotEmpty ? newsFeed.last["news"] : null;
     var newInformation = {};
 
-    if(lastNews == null) return news["information"];
+    if (lastNews == null) return news["information"];
 
     bool sameUser = lastNews["erstelltVon"] == news["erstelltVon"];
     bool sameTyp = lastNews["typ"] == news["typ"];
 
-    if(!sameUser || !sameTyp) return news["information"];
+    if (!sameUser || !sameTyp) return news["information"];
 
     newsFeed.removeLast();
 
     bool isSingleNews = lastNews["information"]["von"].runtimeType == String;
 
-    if(isSingleNews){
-      newInformation["von"] = [lastNews["information"]["von"],news["information"]["von"]];
-      newInformation["bis"] = [lastNews["information"]["bis"], news["information"]["bis"]];
-      newInformation["ortData"] = [lastNews["information"]["ortData"], news["information"]["ortData"]];
-
-    }else{
-      newInformation["von"] = [...lastNews["information"]["von"],news["information"]["von"]];
-      newInformation["bis"] = [...lastNews["information"]["bis"],news["information"]["bis"]];
-      newInformation["ortData"] = [...lastNews["information"]["ortData"], news["information"]["ortData"]];
+    if (isSingleNews) {
+      newInformation["von"] = [
+        lastNews["information"]["von"],
+        news["information"]["von"]
+      ];
+      newInformation["bis"] = [
+        lastNews["information"]["bis"],
+        news["information"]["bis"]
+      ];
+      newInformation["ortData"] = [
+        lastNews["information"]["ortData"],
+        news["information"]["ortData"]
+      ];
+    } else {
+      newInformation["von"] = [
+        ...lastNews["information"]["von"],
+        news["information"]["von"]
+      ];
+      newInformation["bis"] = [
+        ...lastNews["information"]["bis"],
+        news["information"]["bis"]
+      ];
+      newInformation["ortData"] = [
+        ...lastNews["information"]["ortData"],
+        news["information"]["ortData"]
+      ];
     }
 
     return newInformation;
@@ -221,7 +243,7 @@ class _NewsPageState extends State<NewsPage>{
   Widget build(BuildContext context) {
     newsFeedData = Hive.box('secureBox').get("newsFeed") ?? [];
     events = Hive.box('secureBox').get("events") ?? [];
-    ownSettingProfil = Hive.box('secureBox').get("ownNewsSetting") ;
+    ownSettingProfil = Hive.box('secureBox').get("ownNewsSetting");
     const double titleFontSize = 15;
 
     friendsDisplay(news) {
@@ -247,7 +269,8 @@ class _NewsPageState extends State<NewsPage>{
       newsFeed.add({
         "newsWidget": InkWell(
           onTap: () {
-            global_func.changePage(context, ShowProfilPage(profil: friendProfil));
+            global_func.changePage(
+                context, ShowProfilPage(profil: friendProfil));
           },
           child: Align(
             child: Stack(
@@ -255,20 +278,19 @@ class _NewsPageState extends State<NewsPage>{
                 Container(
                     width: 800,
                     margin:
-                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                        const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                          const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3), // changes position of shadow
                         ),
                       ],
                     ),
@@ -305,13 +327,18 @@ class _NewsPageState extends State<NewsPage>{
       String ownOrt = ownProfil["ort"];
       var locationTimeCheck = DateTime.parse(news["erstelltAm"])
           .compareTo(DateTime.parse(myLastLocationDate));
-      double distance = global_func.calculateDistance(ownProfil["latt"], ownProfil["longt"],
-          news["information"]["latt"], news["information"]["longt"]);
+      double distance = global_func.calculateDistance(
+          ownProfil["latt"],
+          ownProfil["longt"],
+          news["information"]["latt"],
+          news["information"]["longt"]);
       bool inDistance = distance <= (ownSettingProfil["distance"] ?? 50);
       bool samePlaceAndTime = (inDistance || ownOrt == newsOrt) &&
           locationTimeCheck >= 0 &&
           ownSettingProfil["showNewFamilyLocation"] == 1;
-      bool sameFamily = familyProfil != null ? familyProfil["members"].contains(userId) : false;
+      bool sameFamily = familyProfil != null
+          ? familyProfil["members"].contains(userId)
+          : false;
 
       if (newsUserProfil == null ||
           newsOrt == null ||
@@ -333,19 +360,17 @@ class _NewsPageState extends State<NewsPage>{
 
       if (isFriend && ownSettingProfil["showFriendChangedLocation"] == 1) {
         text = newsUserProfil["name"] +
-            AppLocalizations
-                .of(context)!
-                .freundOrtsWechsel +
+            AppLocalizations.of(context)!.freundOrtsWechsel +
             "\n" +
             newsOrtInfo;
-      }else if (ownOrt == newsOrt) {
+      } else if (ownOrt == newsOrt) {
         text = newsUserProfil["name"] +
             AppLocalizations.of(context)!.familieInDeinemOrt;
-      }else if(inDistance) {
+      } else if (inDistance) {
         text = newsUserProfil["name"] + AppLocalizations.of(context)!.imUmkreis;
       }
 
-        userNewsContent
+      userNewsContent
           .add({"news": news["information"], "ersteller": news["erstelltVon"]});
 
       newsFeed.add({
@@ -360,20 +385,22 @@ class _NewsPageState extends State<NewsPage>{
                 Container(
                     width: 800,
                     margin:
-                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                        const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                          const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3), // changes position of shadow
                         ),
                       ],
                     ),
@@ -403,7 +430,9 @@ class _NewsPageState extends State<NewsPage>{
       Map? friendProfil = getProfilFromHive(
           profilId:
               familyProfil != null ? familyProfil["mainProfil"] : newsUserId);
-      bool isFamilymember = familyProfil != null ? familyProfil["members"].contains(userId) : false;
+      bool isFamilymember = familyProfil != null
+          ? familyProfil["members"].contains(userId)
+          : false;
       bool isFriend = familyProfil != null
           ? ownProfil["friendlist"]
               .toSet()
@@ -411,8 +440,10 @@ class _NewsPageState extends State<NewsPage>{
               .isNotEmpty
           : ownProfil["friendlist"].contains(newsUserId);
 
-      if (!isFriend || friendProfil == null ||
-          ownSettingProfil["showFriendTravelPlan"] == 0 || isFamilymember) {
+      if (!isFriend ||
+          friendProfil == null ||
+          ownSettingProfil["showFriendTravelPlan"] == 0 ||
+          isFamilymember) {
         return null;
       }
 
@@ -426,14 +457,14 @@ class _NewsPageState extends State<NewsPage>{
       bool isSingleNews = newTravelPlan["von"].runtimeType == String;
       Widget newsWidget;
 
-      if(isSingleNews){
+      if (isSingleNews) {
         bool isExact = newTravelPlan["von"].split(" ")[1] == "01:00:00.000";
         List travelPlanVon =
-          newTravelPlan["von"].split(" ")[0].split("-").reversed.toList();
+            newTravelPlan["von"].split(" ")[0].split("-").reversed.toList();
         List travelPlanbis =
-          newTravelPlan["bis"].split(" ")[0].split("-").reversed.toList();
+            newTravelPlan["bis"].split(" ")[0].split("-").reversed.toList();
 
-        if(!isExact){
+        if (!isExact) {
           travelPlanVon.removeAt(0);
           travelPlanbis.removeAt(0);
         }
@@ -443,11 +474,13 @@ class _NewsPageState extends State<NewsPage>{
         String textTitle = friendProfil["name"] +
             "\n" +
             AppLocalizations.of(context)!.friendNewTravelPlan;
-        String textDate = "${travelPlanVon.join("-")} - ${travelPlanbis.join("-")}";
+        String textDate =
+            "${travelPlanVon.join("-")} - ${travelPlanbis.join("-")}";
         String textLocation = "$travelPlanCity / $travelPlanCountry";
         newsWidget = InkWell(
           onTap: () {
-            global_func.changePage(context, ShowProfilPage(profil: friendProfil!));
+            global_func.changePage(
+                context, ShowProfilPage(profil: friendProfil!));
           },
           child: Align(
             child: Stack(
@@ -455,20 +488,22 @@ class _NewsPageState extends State<NewsPage>{
                 Container(
                     width: 800,
                     margin:
-                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                        const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                          const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3), // changes position of shadow
                         ),
                       ],
                     ),
@@ -496,20 +531,27 @@ class _NewsPageState extends State<NewsPage>{
             ),
           ),
         );
-      }else{
+      } else {
         String textTitle = friendProfil["name"] +
             "\n" +
             AppLocalizations.of(context)!.friendNewTravelPlan;
         List<Widget> columnItems = [];
 
-        for( var i = 0 ; i < newTravelPlan["von"].length; i++){
-          bool isExact = newTravelPlan["von"][i].split(" ")[1] == "01:00:00.000";
-          List travelPlanVon =
-            newTravelPlan["von"][i].split(" ")[0].split("-").reversed.toList();
-          List travelPlanbis =
-            newTravelPlan["bis"][i].split(" ")[0].split("-").reversed.toList();
+        for (var i = 0; i < newTravelPlan["von"].length; i++) {
+          bool isExact =
+              newTravelPlan["von"][i].split(" ")[1] == "01:00:00.000";
+          List travelPlanVon = newTravelPlan["von"][i]
+              .split(" ")[0]
+              .split("-")
+              .reversed
+              .toList();
+          List travelPlanbis = newTravelPlan["bis"][i]
+              .split(" ")[0]
+              .split("-")
+              .reversed
+              .toList();
 
-          if(!isExact){
+          if (!isExact) {
             travelPlanVon.removeAt(0);
             travelPlanbis.removeAt(0);
           }
@@ -517,19 +559,23 @@ class _NewsPageState extends State<NewsPage>{
           String travelPlanCity = newTravelPlan["ortData"][i]["city"];
           String travelPlanCountry = newTravelPlan["ortData"][i]["countryname"];
 
-          String textDate = "${travelPlanVon.join("-")} - ${travelPlanbis.join("-")}";
+          String textDate =
+              "${travelPlanVon.join("-")} - ${travelPlanbis.join("-")}";
           String textLocation = "$travelPlanCity / $travelPlanCountry";
 
-          columnItems.add(Column(children: [
-            const SizedBox(height: 10),
-            Text(textDate),
-            Text(textLocation),
-          ],));
+          columnItems.add(Column(
+            children: [
+              const SizedBox(height: 10),
+              Text(textDate),
+              Text(textLocation),
+            ],
+          ));
         }
 
         newsWidget = InkWell(
           onTap: () {
-            global_func.changePage(context, ShowProfilPage(profil: friendProfil!));
+            global_func.changePage(
+                context, ShowProfilPage(profil: friendProfil!));
           },
           child: Align(
             child: Stack(
@@ -537,20 +583,22 @@ class _NewsPageState extends State<NewsPage>{
                 Container(
                     width: 800,
                     margin:
-                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                        const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                          const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3), // changes position of shadow
                         ),
                       ],
                     ),
@@ -577,7 +625,6 @@ class _NewsPageState extends State<NewsPage>{
           ),
         );
       }
-
 
       userNewsContent
           .add({"news": news["information"], "ersteller": news["erstelltVon"]});
@@ -612,10 +659,12 @@ class _NewsPageState extends State<NewsPage>{
       }
 
       if (isOnline) {
-        eventText = AppLocalizations.of(context)!.newsPageOnlineMeetupVorschlag +
-            _evenTagMatch(event["tags"]).toString();
+        eventText =
+            AppLocalizations.of(context)!.newsPageOnlineMeetupVorschlag +
+                _evenTagMatch(event["tags"]).toString();
       } else {
-        eventText = AppLocalizations.of(context)!.newsPageOfflineMeetupVorschlag;
+        eventText =
+            AppLocalizations.of(context)!.newsPageOfflineMeetupVorschlag;
       }
 
       userNewsContent.add(
@@ -640,7 +689,7 @@ class _NewsPageState extends State<NewsPage>{
                         Icons.fiber_new,
                         size: 30,
                         color: _checkIfNew(
-                            event["beschreibung"], event["erstelltVon"])
+                                event["beschreibung"], event["erstelltVon"])
                             ? null
                             : Colors.transparent,
                       ),
@@ -690,20 +739,22 @@ class _NewsPageState extends State<NewsPage>{
                 Container(
                     width: 800,
                     margin:
-                    const EdgeInsets.only(bottom: 45, left: 20, right: 20),
+                        const EdgeInsets.only(bottom: 45, left: 20, right: 20),
                     padding: const EdgeInsets.only(
                         left: 20, right: 20, top: 15, bottom: 15),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 5,
                           blurRadius: 7,
                           offset:
-                          const Offset(0, 3), // changes position of shadow
+                              const Offset(0, 3), // changes position of shadow
                         ),
                       ],
                     ),
@@ -765,7 +816,9 @@ class _NewsPageState extends State<NewsPage>{
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -828,7 +881,9 @@ class _NewsPageState extends State<NewsPage>{
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(style.roundedCorners),
                   border: Border.all(),
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.5),
@@ -894,7 +949,8 @@ class _NewsPageState extends State<NewsPage>{
                 margin: const EdgeInsets.only(top: 5),
                 child: FloatingActionButton(
                   child: const Icon(Icons.settings),
-                  tooltip: AppLocalizations.of(context)!.tooltipOpenNewsSettings,
+                  tooltip:
+                      AppLocalizations.of(context)!.tooltipOpenNewsSettings,
                   onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -926,7 +982,8 @@ class NewsStamp extends StatelessWidget {
   final String date;
   final bool isNew;
 
-  const NewsStamp({required this.date, required this.isNew, Key? key}) : super(key: key);
+  const NewsStamp({required this.date, required this.isNew, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
