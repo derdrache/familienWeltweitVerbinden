@@ -45,7 +45,9 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     return Container(
       margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black
+            : Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),
           border: Border.all()
       ),
