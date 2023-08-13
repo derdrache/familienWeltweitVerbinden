@@ -894,6 +894,22 @@ class _ChatPageState extends State<ChatPage>{
       }
     }
 
+    showChatSearchResult(){
+      List searchResults = searchListMyGroups + searchListAllChatgroups;
+
+      if(searchResults.isEmpty){
+        return Center(
+            child: Text(
+              AppLocalizations.of(context)!.keineErgebnisse,
+              style: const TextStyle(fontSize: 20),
+            ));
+      }
+
+      return ListView(
+        shrinkWrap: true,
+        children: createChatGroupContainers(searchResults));
+    }
+
     return Scaffold(
       appBar: showAppBar(),
       resizeToAvoidBottomInset: false,
@@ -909,52 +925,7 @@ class _ChatPageState extends State<ChatPage>{
           child: searchTextKontroller.text.isEmpty
               ? ListView(
                   shrinkWrap: true, children: createChatGroupContainers(null))
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                            border: Border(top: BorderSide())),
-                        padding: const EdgeInsets.all(10),
-                        child: const Text("Chats",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20))),
-                    Expanded(
-                      child: searchListMyGroups.isNotEmpty
-                          ? ListView(
-                              shrinkWrap: true,
-                              children:
-                                  createChatGroupContainers(searchListMyGroups),
-                            )
-                          : Center(
-                              child: Text(
-                              AppLocalizations.of(context)!.keineErgebnisse,
-                              style: const TextStyle(fontSize: 20),
-                            )),
-                    ),
-                    Container(
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                            border: Border(top: BorderSide())),
-                        padding: const EdgeInsets.all(10),
-                        child: Text(AppLocalizations.of(context)!.globaleSuche,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20))),
-                    Expanded(
-                      child: searchListAllChatgroups.isNotEmpty
-                          ? ListView(
-                              shrinkWrap: true,
-                              children: createChatGroupContainers(
-                                  searchListAllChatgroups),
-                            )
-                          : Center(
-                              child: Text(
-                                  AppLocalizations.of(context)!.keineErgebnisse,
-                                  style: const TextStyle(fontSize: 20))),
-                    ),
-                  ],
-                ),
+              : showChatSearchResult(),
         ),
       )),
       floatingActionButton: FloatingActionButton(
