@@ -18,7 +18,7 @@ class CustomAlertDialog extends StatefulWidget {
       required this.children,
       this.actions,
       this.height,
-      this.backgroundColor = Colors.white,
+      //this.backgroundColor = Colors.white,
       this.windowPadding = const EdgeInsets.all(10)
       }) : super(key: key);
 
@@ -34,7 +34,6 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: widget.backgroundColor,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(Style.roundedCorners))),
       contentPadding: EdgeInsets.zero,
