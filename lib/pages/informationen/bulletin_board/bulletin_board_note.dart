@@ -25,42 +25,44 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
   late bool userSpeakEnglish;
   late bool ownNote;
 
-@override
+  @override
   void initState() {
-  noteLocation = widget.note["location"]["city"];
-  noteCountry = widget.note["location"]["countryname"];
-  noteLanguageGerman = widget.note["beschreibungEng"].contains("This is an automatic translation");
-  userSpeakGerman = getUserSpeaksGerman();
-    userSpeakEnglish = ownProfil["sprachen"].contains("Englisch")
-      || ownProfil["sprachen"].contains("english") || systemLanguage == "en";
+    noteLocation = widget.note["location"]["city"];
+    noteCountry = widget.note["location"]["countryname"];
+    noteLanguageGerman = widget.note["beschreibungEng"]
+        .contains("This is an automatic translation");
+    userSpeakGerman = getUserSpeaksGerman();
+    userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
+        ownProfil["sprachen"].contains("english") ||
+        systemLanguage == "en";
     super.initState();
     ownNote = widget.note["erstelltVon"] == ownProfil["id"];
   }
 
-  getNoteTitle(){
+  getNoteTitle() {
     String title;
 
-    if(noteLanguageGerman && userSpeakGerman){
+    if (noteLanguageGerman && userSpeakGerman) {
       title = widget.note["titleGer"];
-    }else if (!noteLanguageGerman && userSpeakEnglish){
+    } else if (!noteLanguageGerman && userSpeakEnglish) {
       title = widget.note["titleEng"];
-    }else if(userSpeakGerman){
+    } else if (userSpeakGerman) {
       title = widget.note["titleGer"];
-    }else{
+    } else {
       title = widget.note["titleEng"];
     }
 
-    if(title.length > 30){
-      return "${title.substring(0,28)}...";
-    }else{
+    if (title.length > 30) {
+      return "${title.substring(0, 28)}...";
+    } else {
       return title;
     }
   }
 
-  getStringSized(str){
-    if(str.length > 14){
-      return "${str.substring(0,12)}...";
-    }else{
+  getStringSized(str) {
+    if (str.length > 14) {
+      return "${str.substring(0, 12)}...";
+    } else {
       return str;
     }
   }
@@ -82,24 +84,43 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
               color: Colors.yellow[200],
               border: Border.all(),
             ),
-            child: Center(child: Column(
+            child: Center(
+                child: Column(
               children: [
-                Text(getNoteTitle(), textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold),),
-                const SizedBox(height: 10,),
-                Text(getStringSized(noteLocation)),
-                if(noteCountry != noteLocation) Text(getStringSized(noteCountry))
+                Text(
+                  getNoteTitle(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  getStringSized(noteLocation),
+                  style: TextStyle(
+                      color: Colors.black),
+                ),
+                if (noteCountry != noteLocation)
+                  Text(getStringSized(noteCountry),
+                      style: TextStyle(
+                          color: Colors.black))
               ],
             )),
           ),
-          if(ownNote) Positioned(
-              top: 5.0 + widget.note["rotation"]*100, right: 2,
-              child: CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  radius: 10,
-                  child: const Icon(Icons.edit, size: 10, color: Colors.white,
-                  )
-              )
-          )
+          if (ownNote)
+            Positioned(
+                top: 5.0 + widget.note["rotation"] * 100,
+                right: 2,
+                child: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    radius: 10,
+                    child: const Icon(
+                      Icons.edit,
+                      size: 10,
+                      color: Colors.white,
+                    )))
         ],
       ),
     );

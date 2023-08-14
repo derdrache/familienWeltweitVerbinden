@@ -17,6 +17,8 @@ class CustomTextInput extends StatelessWidget {
   final int? maxLength;
   final bool onlyNumbers;
   final EdgeInsetsGeometry? margin;
+  Color? borderColor;
+  Color? maxLengthColor;
 
 
   CustomTextInput(
@@ -34,12 +36,17 @@ class CustomTextInput extends StatelessWidget {
         this.keyboardType,
         this.maxLength,
         this.onlyNumbers = false,
-        this.margin
+        this.margin,
+        this.borderColor,
+        this.maxLengthColor
   });
 
   @override
   Widget build(BuildContext context) {
     List<TextInputFormatter>? inputFormater;
+    borderColor ??= Theme.of(context).brightness == Brightness.dark
+          ? Colors.white
+          : Colors.black;
 
     if(onlyNumbers){
       keyboardType = TextInputType.number;
@@ -67,11 +74,10 @@ class CustomTextInput extends StatelessWidget {
                   controller: controller,
 
                   decoration: InputDecoration(
+                    counterStyle: TextStyle(color: maxLengthColor),
                     isDense: true,
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black),
+                      borderSide:  BorderSide(color: borderColor!),
                       borderRadius: BorderRadius.circular(style.roundedCorners)
                     ),
                     border: OutlineInputBorder(

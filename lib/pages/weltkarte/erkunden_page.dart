@@ -998,7 +998,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     popupItems.add(SliverAppBar(
       toolbarHeight: kIsWeb ? 60 : 50,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.black
+          : Colors.white,
       flexibleSpace: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
@@ -1052,9 +1054,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
           child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
                   border: Border(
-                      bottom: BorderSide(
-                          width: 1, color: style.borderColorGrey))),
+                      bottom:
+                          BorderSide(width: 1, color: style.borderColorGrey))),
               child: Row(
                 children: [
                   ProfilImage(profilData),
@@ -1172,6 +1177,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
   Widget build(BuildContext context) {
     List<Marker> allMarker = [];
     searchAutocomplete.hintText = AppLocalizations.of(context)!.filterErkunden;
+    var popupBackgroundColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.black
+        : Colors.white;
 
     createPopupCards(
         {event, community, insiderInfo, spezialActivation = false}) {
@@ -1183,7 +1191,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
       popupItems.add(SliverAppBar(
         toolbarHeight: 50,
-        backgroundColor: Colors.white,
         flexibleSpace: Center(
             child: Text(
                 selectPopupMenuText(showItems["profils"], spezialActivation),
@@ -1246,11 +1253,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       ));
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(5.0),
                   margin: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      border: Border.all(width: 2),
-                      borderRadius: BorderRadius.circular(8)),
+                      border: Border.all(width: 2, color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black),
+                      borderRadius: BorderRadius.circular(style.roundedCorners)),
                   child: Column(
                     children: [
                       Text(
@@ -1274,6 +1283,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 ),
               );
             }
+
             return null;
           }, childCount: showItems["profils"].length)));
     }
@@ -1313,7 +1323,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       borderRadius:
                           const BorderRadius.vertical(top: Radius.circular(20)),
                       child: Container(
-                          color: Colors.white,
+                          color: popupBackgroundColor,
                           child: CustomScrollView(
                               controller: controller, slivers: popupItems)),
                     ),
@@ -1388,7 +1398,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
               backgroundColor: Theme.of(context).colorScheme.primary,
               mini: true,
               onPressed: buttonFunction,
-              child: Center(child: Text(numberText))));
+              child: Center(
+                  child: Text(
+                numberText,
+                style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black),
+              ))));
     }
 
     createProfilMarker() {
@@ -1535,8 +1552,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 top: textTopPosition,
                 right: textRightPosition,
                 child: Text(numberText,
-                    style: TextStyle(color: Colors.black,
-                        fontWeight: FontWeight.bold, fontSize: 14)),
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14)),
               ),
             ],
           ),
@@ -1590,9 +1609,36 @@ class _ErkundenPageState extends State<ErkundenPage> {
         ),
         children: [
           TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.example.app',
-          ),
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.app',
+              tileBuilder: Theme.of(context).brightness == Brightness.dark
+                  ? (BuildContext context, Widget tileWidget, tile) {
+                      return ColorFiltered(
+                          colorFilter: const ColorFilter.matrix(<double>[
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0.2126,
+                            0.7152,
+                            0.0722,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0,
+                          ]),
+                          child: tileWidget);
+                    }
+                  : null),
           MarkerLayer(
             markers: allMarker,
           )

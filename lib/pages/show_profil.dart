@@ -82,7 +82,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               clipper: _MyCustomClipper(),
               child: ColorfulBackground(
                 height: 250,
-                colors: const [Color(0xFFBF1D53), Color(0xFFd26086)],
+                colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

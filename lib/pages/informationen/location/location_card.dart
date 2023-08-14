@@ -91,7 +91,9 @@ class _LocationCardState extends State<LocationCard> {
               child: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.withOpacity(0.7)
+                    : Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(20)),
             child: Text(
               widget.location["ort"],
@@ -108,7 +110,9 @@ class _LocationCardState extends State<LocationCard> {
           height: 200 * sizeRefactor,
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey
+                  : Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(15)),
             child: Column(
               children: [

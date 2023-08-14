@@ -19,6 +19,7 @@ class GoogleAutoComplete extends StatefulWidget {
   var margin;
   bool withOwnLocation;
   bool withWorldwideLocation;
+  Color? borderColor;
 
   getGoogleLocationData() {
     return googleSearchResult ??
@@ -60,7 +61,8 @@ class GoogleAutoComplete extends StatefulWidget {
       this.onConfirm,
       this.margin = const EdgeInsets.all(10),
       this.withOwnLocation = false,
-      this.withWorldwideLocation = false})
+      this.withWorldwideLocation = false,
+      this.borderColor})
       : super(key: key);
 
   @override
@@ -113,13 +115,15 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
 
   @override
   Widget build(BuildContext context) {
+    widget.borderColor ??= Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
     return Container(
       margin: widget.margin,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),
-          border: Border.all(color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black)),
+          border: Border.all(color: widget.borderColor!)),
       child: Stack(
         children: [
           RawAutocomplete(

@@ -107,7 +107,9 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
                 width: 80,
                 height: 80,
                 decoration:
-                BoxDecoration(border: Border.all(), color: Colors.white),
+                BoxDecoration(border: Border.all(), color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey
+                    : Colors.white),
                 child: value == null
                     ? IconButton(
                     onPressed: () => uploadImage(),

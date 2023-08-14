@@ -29,6 +29,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
   TextEditingController descriptionKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete(
       margin: const EdgeInsets.only(top: 5, bottom: 5, left: 30, right: 30),
+      borderColor: Colors.black,
       withOwnLocation: true,withWorldwideLocation: true);
   var imageUploadBox = ImageUploadBox(imageKategorie: "note",);
 
@@ -119,8 +120,9 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
       return Center(
           child: Container(
               margin: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
-              child: CustomTextInput("Titel einfügen", titleKontroller,
-                  maxLength: 45)));
+              child: CustomTextInput("Titel einfügen", titleKontroller, borderColor: Colors.black,
+                  maxLength: 45, maxLengthColor: Colors.black45
+                    )));
     }
 
     setLocation() {
@@ -134,7 +136,8 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
               margin: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
               child: CustomTextInput(
                   "Beschreibung einfügen", descriptionKontroller,
-                  moreLines: 10, maxLength: 650, textInputAction: TextInputAction.newline)));
+                  borderColor: Colors.black,
+                  moreLines: 10, maxLength: 650, maxLengthColor: Colors.black45, textInputAction: TextInputAction.newline)));
     }
 
     return Scaffold(

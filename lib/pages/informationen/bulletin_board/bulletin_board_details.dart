@@ -39,14 +39,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late bool isNoteOwner = false;
   late bool showOriginalText = false;
   late bool showOnlyOriginal = false;
-  late Map originalText = {
-    "title": "",
-    "description": ""
-  };
-  late Map translatedText = {
-    "title": "",
-    "description": ""
-  };
+  late Map originalText = {"title": "", "description": ""};
+  late Map translatedText = {"title": "", "description": ""};
 
   checkAndSetTextVariations() {
     bool noteLanguageGerman = widget.note["beschreibungEng"]
@@ -58,25 +52,22 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     bool bothGerman = noteLanguageGerman && userSpeakGerman;
     bool bothEnglish = !noteLanguageGerman && userSpeakEnglish;
 
-    if(bothGerman || bothEnglish || isNoteOwner){
+    if (bothGerman || bothEnglish || isNoteOwner) {
       showOriginalText = true;
       showOnlyOriginal = true;
     }
-
 
     if (noteLanguageGerman) {
       originalText["title"] = widget.note["titleGer"];
       originalText["description"] = widget.note["beschreibungGer"];
       translatedText["title"] = widget.note["titleEng"];
       translatedText["description"] = widget.note["beschreibungEng"];
-    }
-    else{
+    } else {
       originalText["title"] = widget.note["titleEng"];
       originalText["description"] = widget.note["beschreibungEng"];
       translatedText["title"] = widget.note["titleGer"];
       translatedText["description"] = widget.note["beschreibungGer"];
     }
-
   }
 
   updateNote() {
@@ -183,7 +174,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     }
   }
 
-  changeNoteLanguage(){
+  changeNoteLanguage() {
     setState(() {
       showOriginalText = !showOriginalText;
     });
@@ -206,7 +197,11 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
               windowPadding: const EdgeInsets.all(30),
-              children: [CachedNetworkImage(imageUrl: image,)],
+              children: [
+                CachedNetworkImage(
+                  imageUrl: image,
+                )
+              ],
             );
           });
     }
@@ -228,24 +223,26 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           child: !changeNote
               ? Text(
                   title,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 22),
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22),
                 )
               : CustomTextInput("", titleKontroller, maxLength: 45));
     }
 
     showLocation() {
-      String hintText = widget.note["location"]["city"];
+      String locationText = widget.note["location"]["city"];
       if (widget.note["location"]["city"] !=
           widget.note["location"]["countryname"]) {
-        hintText += " / ${widget.note["location"]["countryname"]}";
+        locationText += " / ${widget.note["location"]["countryname"]}";
       }
-      bool isWorldwide = widget.note["location"]["city"] == "worldwide"
-          || widget.note["location"]["city"] == "Weltweit";
+      bool isWorldwide = widget.note["location"]["city"] == "worldwide" ||
+          widget.note["location"]["city"] == "Weltweit";
       ortAuswahlBox = GoogleAutoComplete(
         margin: const EdgeInsets.only(left: 10, right: 10),
         withOwnLocation: true,
-        hintText: hintText,
+        hintText: locationText,
       );
 
       return Container(
@@ -254,7 +251,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             ? Row(
                 children: [
                   Text("${AppLocalizations.of(context)!.ort} ",
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black)),
                   InkWell(
                     onTap: isWorldwide
                         ? null
@@ -263,13 +262,13 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                             LocationInformationPage(
                               ortName: widget.note["location"]["city"],
                             )),
-                    child: isWorldwide
-                        ? Text(hintText)
-                        : Text(
-                            hintText,
-                            style:
-                                const TextStyle(decoration: TextDecoration.underline),
-                          ),
+                    child: Text(
+                      locationText,
+                      style: TextStyle(
+                          color: Colors.black,
+                          decoration:
+                              isWorldwide ? null : TextDecoration.underline),
+                    ),
                   )
                 ],
               )
@@ -292,7 +291,13 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           margin:
               const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 10),
           child: !changeNote
-              ? Align(alignment: Alignment.topLeft, child: Text(description))
+              ? Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    description,
+                    style: TextStyle(
+                        color: Colors.black),
+                  ))
               : Column(
                   children: [
                     CustomTextInput("", descriptionKontroller,
@@ -329,7 +334,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                           decoration: BoxDecoration(
                               border: Border.all(), color: Colors.white),
                           child: image != null
-                              ? CachedNetworkImage(imageUrl: image,)
+                              ? CachedNetworkImage(
+                                  imageUrl: image,
+                                )
                               : IconButton(
                                   onPressed: () => uploadImage(),
                                   icon: const Icon(Icons.upload)),
@@ -391,11 +398,11 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if(!isNoteOwner && !showOnlyOriginal) IconButton(
-              onPressed: () => changeNoteLanguage(),
-              tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
-              icon: const Icon(Icons.change_circle)
-          ),
+          if (!isNoteOwner && !showOnlyOriginal)
+            IconButton(
+                onPressed: () => changeNoteLanguage(),
+                tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
+                icon: const Icon(Icons.change_circle)),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
@@ -403,7 +410,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     ShowProfilPage(
                         profil: getProfilFromHive(
                             profilId: widget.note["erstelltVon"]))),
-                tooltip: AppLocalizations.of(context)!.tooltipZeigeProfilErsteller,
+                tooltip:
+                    AppLocalizations.of(context)!.tooltipZeigeProfilErsteller,
                 icon: const Icon(Icons.account_circle)),
           if (!isNoteOwner)
             IconButton(
@@ -421,7 +429,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     }),
                 tooltip: AppLocalizations.of(context)!.tooltipNotizBearbeiten,
                 icon: const Icon(Icons.edit)),
-          const SizedBox(width: 10,),
+          const SizedBox(
+            width: 10,
+          ),
           if (changeNote && isNoteOwner)
             IconButton(
                 onPressed: () {
@@ -430,7 +440,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     changeNote = false;
                   });
                 },
-                tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
+                tooltip:
+                    AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done)),
           IconButton(
               onPressed: () {

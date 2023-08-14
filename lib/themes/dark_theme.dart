@@ -9,7 +9,7 @@ ThemeData darkTheme = ThemeData(
       secondary: Colors.grey[800]!,
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Colors.white24
+      backgroundColor: Colors.grey
     ),
     brightness: Brightness.dark
 );

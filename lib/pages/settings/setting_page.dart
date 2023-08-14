@@ -44,7 +44,6 @@ import 'change_reiseart.dart';
 import 'change_name.dart';
 import 'change_email.dart';
 
-var borderColor = Colors.grey[200];
 double globalPadding = 30;
 double fontSize = 20;
 var userID = FirebaseAuth.instance.currentUser!.uid;
@@ -190,7 +189,9 @@ class _NameSection extends StatelessWidget {
         width: double.maxFinite,
         padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 10, color: borderColor!))),
+            border: Border(bottom: BorderSide(width: 10, color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!
+                : Colors.grey[200]!))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -326,7 +327,9 @@ class _ProfilSection extends StatelessWidget {
         padding:
             const EdgeInsets.only(top: 10, bottom: 15, left: 15, right: 15),
         decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 10, color: borderColor!))),
+            border: Border(bottom: BorderSide(width: 10, color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!
+                : Colors.grey[200]!))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
