@@ -34,8 +34,12 @@ class AllUserSelectWindow {
     return SearchAutocomplete(
       hintText: AppLocalizations.of(context)!.personSuchen,
       searchableItems: allUserNames,
-      onConfirm: () {
+      onConfirm: (){
+        var selectedUser = searchAutocomplete.getSelected()[0];
+        var userIndex = allUserNames.indexOf(selectedUser);
+        var selectedUserId = allUserIds[userIndex];
 
+        Navigator.pop(context, selectedUserId);
       },
     );
   }

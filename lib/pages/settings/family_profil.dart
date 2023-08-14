@@ -16,6 +16,7 @@ import '../../widgets/layout/custom_text_input.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/style.dart' as style;
 import '../../global/global_functions.dart' as global_func;
+import '../../windows/all_user_select.dart';
 
 class FamilieProfilPage extends StatefulWidget {
   const FamilieProfilPage({Key? key}) : super(key: key);
@@ -29,7 +30,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   List allProfils = Hive.box('secureBox').get("profils");
   bool familyProfilIsActive = false;
-  late SearchAutocomplete searchAutocomplete;
   var familyProfil;
   var inviteFamilyProfil;
   TextEditingController nameFamilyKontroller = TextEditingController();
@@ -138,27 +138,22 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     return hasFamilyProfil != false ? true : false;
   }
 
-  addMember({member}) async {
-    if (searchAutocomplete.getSelected().isEmpty && member == null) return;
-
-    member ??= searchAutocomplete.getSelected()[0];
-
-    var memberId = getProfilFromHive(profilName: member, getIdOnly: true);
-
+  addMember(memberId) async {
+    String memberName = getProfilFromHive(profilId: memberId, getNameOnly: true);
     if (familyProfil["members"].contains(memberId)) {
       customSnackbar(context,
-          member + " " + AppLocalizations.of(context)!.isImFamilienprofil);
+          memberName + " " + AppLocalizations.of(context)!.isImFamilienprofil);
       return;
     }
     if (familyProfil["einladung"].contains(memberId)) {
       customSnackbar(context,
-          member + " " + AppLocalizations.of(context)!.wurdeSchonEingeladen);
+          memberName + " " + AppLocalizations.of(context)!.wurdeSchonEingeladen);
       return;
     }
 
     var hasFamilyProfil = await checkHasFamilyProfil(memberId);
     if (hasFamilyProfil) {
-      if (context.mounted)customSnackbar(context, member + " " + AppLocalizations.of(context)!.istInEinemFamilienprofil);
+      if (context.mounted)customSnackbar(context, memberName + " " + AppLocalizations.of(context)!.istInEinemFamilienprofil);
       return;
     }
 
@@ -166,7 +161,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       familyProfil["einladung"].add(memberId);
     });
 
-    if (context.mounted) customSnackbar(context, member + " " + AppLocalizations.of(context)!.familienprofilEingeladen);
+    if (context.mounted) customSnackbar(context, memberName + " " + AppLocalizations.of(context)!.familienprofilEingeladen);
 
     FamiliesDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$memberId')",
@@ -212,83 +207,13 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
 
   @override
   Widget build(BuildContext context) {
+    addMemberWindow() async {
+      String selectedUserId = await AllUserSelectWindow(
+        context: context,
+        title: AppLocalizations.of(context)!.personSuchen,
+      ).openWindow();
 
-    List<Widget> createFriendlistBox() {
-      List userFriendlist = ownProfil["friendlist"];
-
-      for (var i = 0; i < userFriendlist.length; i++) {
-        for (var profil in allProfils) {
-          if (profil["id"] == userFriendlist[i]) {
-            userFriendlist[i] = profil["name"];
-            break;
-          }
-        }
-      }
-
-      List<Widget> friendsBoxen = [];
-      for (var friend in userFriendlist) {
-        friendsBoxen.add(GestureDetector(
-          onTap: () => addMember(member: friend),
-          child: Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                          width: 1, color: style.borderColorGrey))),
-              child: Text(friend)),
-        ));
-      }
-
-      if (userFriendlist.isEmpty) {
-        return [
-          Center(
-              heightFactor: 10,
-              child: Text(
-                  AppLocalizations.of(context)!.nochKeineFreundeVorhanden,
-                  style: const TextStyle(color: Colors.grey)))
-        ];
-      }
-
-      return friendsBoxen;
-    }
-
-    windowOptions(saveFunction) {
-      return Container(
-        margin: const EdgeInsets.only(right: 10),
-        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          TextButton(
-            child: Text(AppLocalizations.of(context)!.abbrechen,
-                style: const TextStyle()),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-              child: Text(AppLocalizations.of(context)!.speichern,
-                  style: const TextStyle()),
-              onPressed: () => saveFunction()),
-        ]),
-      );
-    }
-
-    addMemberWindow() {
-      searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context)!.personSuchen,
-        searchableItems: getAllProfilName(),
-        onConfirm: () {},
-      );
-
-      return showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-              height: 600,
-              title: AppLocalizations.of(context)!.mitgliedHinzufuegen,
-              children: [
-                Center(child: SizedBox(width: 300, child: searchAutocomplete)),
-                windowOptions(() => addMember()),
-                ...createFriendlistBox(),
-              ],
-            );
-          });
+      addMember(selectedUserId);
     }
 
     activeSwitch() {

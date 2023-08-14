@@ -18,6 +18,7 @@ import '../../widgets/profil_image.dart';
 import '../../widgets/search_autocomplete.dart';
 import '../../global/style.dart' as style;
 import '../../widgets/strike_through_icon.dart';
+import '../../windows/all_user_select.dart';
 import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget {
@@ -31,7 +32,6 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage>{
   var userId = FirebaseAuth.instance.currentUser!.uid;
-  late SearchAutocomplete searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
   List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
@@ -116,75 +116,25 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   selectChatpartnerWindow() async {
-    userFriendlist ??= [];
-    searchAutocomplete = SearchAutocomplete(
-      hintText: AppLocalizations.of(context)!.personSuchen,
-      searchableItems: allName!,
-      onConfirm: () {
-        Navigator.pop(context);
-        searchUser(searchAutocomplete.getSelected()[0]);
-      },
-    );
-
-    return showDialog(
+    String selectedUser = await AllUserSelectWindow(
         context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            height: 800,
-            title: AppLocalizations.of(context)!.neuenChatEroeffnen,
-            children: [
-              Center(child: SizedBox(width: 300, child: searchAutocomplete)),
-              ...createFriendlistBox(userFriendlist)
-            ],
-          );
-        });
-  }
+        title: AppLocalizations.of(context)!.personSuchen,
+    ).openWindow();
 
-  searchUser(chatPartnerName) async {
-    var chatPartnerId =
-        getProfilFromHive(profilName: chatPartnerName, getIdOnly: true);
+    if(selectedUser.isEmpty) return;
 
     Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => ChatDetailsPage(
-                    chatPartnerId: chatPartnerId,
-                    chatPartnerName: chatPartnerName,
-                    backToChatPage: true,
-                    chatPageSliderIndex: mainSlider)))
+        context,
+        MaterialPageRoute(
+            builder: (_) => ChatDetailsPage(
+                chatPartnerId: selectedUser,
+                backToChatPage: true,
+                chatPageSliderIndex: mainSlider)))
         .whenComplete(() => changePageForever(
-            context,
-            StartPage(
-              selectedIndex: 3,
-            )));
-  }
-
-  List<Widget> createFriendlistBox(userFriendlist) {
-    List<Widget> friendsBoxen = [];
-
-    for (var friendName in userFriendlist) {
-      friendsBoxen.add(GestureDetector(
-        onTap: () => searchUser(friendName),
-        child: Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(
-                        width: 1, color: style.borderColorGrey))),
-            child: Text(friendName)),
-      ));
-    }
-
-    if (userFriendlist.isEmpty) {
-      return [
-        Center(
-            heightFactor: 10,
-            child: Text(AppLocalizations.of(context)!.nochKeineFreundeVorhanden,
-                style: const TextStyle(color: Colors.grey)))
-      ];
-    }
-
-    return friendsBoxen;
+        context,
+        StartPage(
+          selectedIndex: 3,
+        )));
   }
 
   checkNewChatGroup(chatPartnerId) {

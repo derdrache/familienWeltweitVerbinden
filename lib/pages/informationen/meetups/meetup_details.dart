@@ -18,6 +18,7 @@ import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../services/database.dart';
+import '../../../windows/all_user_select.dart';
 import '../../show_profil.dart';
 import 'meetup_card_details.dart';
 
@@ -42,7 +43,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
   late bool absage;
   late bool isCreator;
   late bool isApproved;
-  late SearchAutocomplete searchAutocomplete;
   late bool isNotPublic;
 
 
@@ -450,58 +450,34 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           });
     }
 
-    changeOrganisatorWindow() {
-      TextEditingController inputKontroller = TextEditingController();
+    changeOrganisatorWindow() async{
+      String selectedUserId = await AllUserSelectWindow(
+        context: context,
+        title: AppLocalizations.of(context)!.personSuchen,
+      ).openWindow();
+      bool isInitiator = await isOwnerWindow();
+      String selectedUserName = getProfilFromHive(profilId: selectedUserId, getNameOnly: true);
 
-      searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context)!.benutzerEingeben,
-        searchableItems: getAllProfilNames(),
-        onConfirm: () {
-          inputKontroller.text = searchAutocomplete.getSelected()[0];
-        },
-      );
+      setState(() {
+        widget.meetupData["erstelltVon"] = selectedUserId;
+        widget.meetupData["isOwner"] = isInitiator;
+      });
 
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-                height: 250,
-                title: AppLocalizations.of(context)!.organisatorAbgeben,
-                children: [
-                  searchAutocomplete,
-                  const SizedBox(height: 40),
-                  FloatingActionButton.extended(
-                    label: Text(AppLocalizations.of(context)!.uebertragen),
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      bool isInitiator = await isOwnerWindow();
-                      String selectedUserId = getProfilFromHive(
-                          profilName: inputKontroller.text, getIdOnly: true);
+      var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
+      myOwnMeetups.remove(widget.meetupData);
 
-                      setState(() {
-                        widget.meetupData["erstelltVon"] = selectedUserId;
-                        widget.meetupData["isOwner"] = isInitiator;
-                      });
+      if (context.mounted){
+        customSnackbar(
+            context,
+            AppLocalizations.of(context)!.meetupUebergebenAn1 +
+                selectedUserName +
+                AppLocalizations.of(context)!.meetupUebergebenAn2,
+            color: Colors.green);
+      }
 
-                      var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
-                      myOwnMeetups.remove(widget.meetupData);
-
-                      if (context.mounted){
-                        customSnackbar(
-                            context,
-                            AppLocalizations.of(context)!.meetupUebergebenAn1 +
-                                inputKontroller.text +
-                                AppLocalizations.of(context)!.meetupUebergebenAn2,
-                            color: Colors.green);
-                      }
-
-                      await MeetupDatabase().update(
-                          "erstelltVon = '$selectedUserId', ownEvent = '$isInitiator'",
-                          "WHERE id = '${widget.meetupData["id"]}'");
-                    },
-                  )
-                ]);
-          });
+      await MeetupDatabase().update(
+          "erstelltVon = '$selectedUserId', ownEvent = '$isInitiator'",
+          "WHERE id = '${widget.meetupData["id"]}'");
     }
 
     changeOrganisatorDialog() {

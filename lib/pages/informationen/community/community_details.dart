@@ -25,6 +25,7 @@ import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/search_autocomplete.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../../global/style.dart' as style;
+import '../../../windows/all_user_select.dart';
 import '../location/location_Information.dart';
 
 class CommunityDetails extends StatefulWidget {
@@ -51,7 +52,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   String? selectedImage;
   List<String> allUserNames = [];
   List allUserIds = [];
-  late SearchAutocomplete searchAutocomplete;
   final _controller = ScrollController();
   var scrollbarOnBottom = true;
   var imageLoading = false;
@@ -559,20 +559,16 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     return friendsBoxen;
   }
 
-  _saveNewMember(newMember) {
-    var userIndex = allUserNames.indexOf(newMember);
-    var newMemberId = allUserIds[userIndex];
-
+  _saveNewMember(newMemberId) {
     if (widget.community["members"].contains(newMemberId)) {
       customSnackbar(context,
-          newMember + AppLocalizations.of(context)!.istSchonMitgliedCommunity);
+          AppLocalizations.of(context)!.istSchonMitgliedCommunity);
       return;
     }
     if (widget.community["einladung"].contains(newMemberId)) {
       customSnackbar(
           context,
-          newMember +
-              AppLocalizations.of(context)!.wurdeSchonEingeladenCommunity);
+           AppLocalizations.of(context)!.wurdeSchonEingeladenCommunity);
       return;
     }
 
@@ -596,7 +592,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     prepareAddMemberNotification(widget.community, newMemberId);
 
     customSnackbar(context,
-        newMember + AppLocalizations.of(context)!.wurdeEingeladenCommunity,
+        AppLocalizations.of(context)!.wurdeEingeladenCommunity,
         color: Colors.green);
   }
 
@@ -643,7 +639,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     fontsize = isWebDesktop ? 12 : 16;
     isCreator = widget.community["erstelltVon"].contains(userId);
     isMember = widget.community["members"].contains(userId);
-
 
 
     showMembersWindow() async {
@@ -801,31 +796,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
-    addMemberWindow() {
-      var newUser = "";
+    addMemberWindow() async{
+      String selectedUserId = await AllUserSelectWindow(
+        context: context,
+        title: AppLocalizations.of(context)!.personSuchen,
+      ).openWindow();
 
-      searchAutocomplete = SearchAutocomplete(
-        hintText: AppLocalizations.of(context)!.personSuchen,
-        searchableItems: allUserNames,
-        onConfirm: () {
-          newUser = searchAutocomplete.getSelected()[0];
-        },
-      );
-
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-              height: 600,
-              title: AppLocalizations.of(context)!.mitgliedHinzufuegen,
-              children: [
-                searchAutocomplete,
-                const SizedBox(height: 15),
-                _windowOptions(() => _saveNewMember(newUser)),
-                ...createFriendlistBox(),
-              ],
-            );
-          });
+      _saveNewMember(selectedUserId);
     }
 
     addMemberDialog() {

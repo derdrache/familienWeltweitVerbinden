@@ -532,10 +532,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _forwardedMessage(Map message) async {
-    var allUserSelectWindow = AllUserSelectWindow(
+    var selectedUserId = await AllUserSelectWindow(
         context: context,
-        title: AppLocalizations.of(context)!.empfaengerWaehlen);
-    var selectedUserId = await allUserSelectWindow.openWindow();
+        title: AppLocalizations.of(context)!.empfaengerWaehlen
+    ).openWindow();
     var selectedChatId = global_functions.getChatID(selectedUserId);
     var chatGroupData =
         await ChatDatabase().getChatData("*", "WHERE id = '$selectedChatId'");
