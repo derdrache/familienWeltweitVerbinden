@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/global/global_functions.dart'
     as global_functions;
-import 'package:familien_suche/global/style.dart' as style;
 import 'package:familien_suche/pages/chat/pin_messages.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/pages/start_page.dart';

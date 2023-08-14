@@ -15,7 +15,6 @@ import '../../global/global_functions.dart';
 import '../../global/style.dart';
 import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
-import '../../widgets/search_autocomplete.dart';
 import '../../global/style.dart' as style;
 import '../../widgets/strike_through_icon.dart';
 import '../../windows/all_user_select.dart';
