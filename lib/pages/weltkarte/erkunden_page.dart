@@ -1211,7 +1211,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
             if (event != null) {
               return MeetupCard(
                   margin: const EdgeInsets.only(
-                      top: 10, bottom: 10, right: 20, left: 10),
+                      top: 30, bottom: 30, right: 30, left: 30),
                   meetupData: itemData,
                   withInteresse: true,
                   afterPageVisit: () async {
@@ -1236,7 +1236,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               return CommunityCard(
                 community: itemData,
                 margin: const EdgeInsets.only(
-                    top: 15, bottom: 15, left: 25, right: 25),
+                    top: 30, bottom: 30, left: 30, right: 30),
                 withFavorite: true,
               );
             } else if (insiderInfo != null) {
