@@ -11,6 +11,7 @@ import 'package:hive/hive.dart';
 import 'package:stacked_firebase_auth/stacked_firebase_auth.dart';
 
 import '../../auth/secrets.dart';
+import '../../functions/sendAdmin.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../widgets/dialogWindow.dart';
 import '../../widgets/layout/custom_floating_action_button_extended.dart';
@@ -173,7 +174,7 @@ class _LoginPageState extends State<LoginPage> {
     var checkText = reportController.text.replaceAll(" ", "");
     if (checkText.isEmpty) return;
 
-    ChatDatabase().addAdminMessage(reportController.text, "Login/Hilfe");
+    addAdminMessage(reportController.text, "Login/Hilfe");
 
     customSnackbar(context, AppLocalizations.of(context)!.hilfeVersendetText,
         color: Colors.green);

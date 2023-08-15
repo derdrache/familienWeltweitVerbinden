@@ -1,8 +1,8 @@
-import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:hive/hive.dart';
+import '../../functions/sendAdmin.dart';
 import '../../global/global_functions.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/layout/custom_snackbar.dart';
@@ -22,7 +22,7 @@ class FeedbackPage extends StatelessWidget {
 
     text = text.replaceAll("'", "''");
 
-    ChatDatabase().addAdminMessage(text, userName);
+    addAdminMessage(text, userName);
 
     feedbackTextKontroller.clear();
 

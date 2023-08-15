@@ -325,19 +325,6 @@ class ChatDatabase {
     }
   }
 
-  addAdminMessage(message, user) {
-    var url = Uri.parse(databaseUrl + databasePathNewAdminMessage);
-    http.post(url, body: json.encode({"message": message, "user": user}));
-
-    url = Uri.parse("${databaseUrl}services/sendEmail.php");
-    http.post(url,
-        body: json.encode({
-          "to": "dominik.mast.11@gmail.com",
-          "title": "Feedback zu families worldwide",
-          "inhalt": message
-        }));
-  }
-
   deleteChat(chatId) {
     _deleteInTable("chats", "id", chatId);
   }
