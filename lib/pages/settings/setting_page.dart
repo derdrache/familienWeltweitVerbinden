@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
-import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -21,7 +20,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../global/style.dart' as style;
 import '../../global/global_functions.dart' as global_func;
 import '../../global/global_functions.dart';
 import '../../global/profil_sprachen.dart';
@@ -46,14 +44,15 @@ import 'change_email.dart';
 
 double globalPadding = 30;
 double fontSize = 20;
-var userID = FirebaseAuth.instance.currentUser!.uid;
-var userProfil;
+String userID = FirebaseAuth.instance.currentUser!.uid;
+Map userProfil = Hive.box("secureBox").get("ownProfil");
+
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
 
   @override
-  _SettingPageState createState() => _SettingPageState();
+  State<SettingPage> createState() => _SettingPageState();
 }
 
 class _SettingPageState extends State<SettingPage> {
@@ -91,10 +90,10 @@ class _SettingPageState extends State<SettingPage> {
 }
 
 class _NameSection extends StatelessWidget {
-  Function refresh;
-  var textColor = Colors.black;
+  final Function refresh;
+  final Color textColor = Colors.black;
 
-  _NameSection({Key? key, required this.refresh}) : super(key: key);
+  const _NameSection({Key? key, required this.refresh}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +167,7 @@ class _NameSection extends StatelessWidget {
         SimpleDialogOption(
           onPressed: () async {
             await FirebaseAuth.instance.signOut();
-            global_func.changePageForever(context, const LoginPage());
+            if (context.mounted) global_func.changePageForever(context, const LoginPage());
           },
           child: Row(
             children: [
@@ -227,7 +226,7 @@ class _ProfilSection extends StatelessWidget {
   var reiseArtInput = CustomDropdownButton(items: global_variablen.reisearten);
   var sprachenInputBox = CustomMultiTextForm(auswahlList: const []);
   final bool spracheIstDeutsch = kIsWeb
-      ? window.locale.languageCode == "de"
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
   final Function afterChange;
 
@@ -516,6 +515,55 @@ class _SupportInformation extends StatelessWidget {
     aboutAppWindow() async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return AboutDialog(
+              applicationName: "families worldwide",
+              applicationVersion: packageInfo.version,
+              applicationIcon: Image.asset('assets/WeltFlugzeug.png'),
+              children: [
+                InkWell(
+                  onTap: () => openURL(
+                      "https://github.com/derdrache/familienWeltweitVerbinden"),
+                  child: const Row(
+                    children: [
+                      Text("Open Source: ",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        "Github Repo",
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.blue,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Row(
+                  children: [
+                    Text("Framework:  ",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("Flutter"),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Row(
+                  children: [
+                    Text("Icons: ",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("created by Freepik - Flaticon"),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(AppLocalizations.of(context)!.aboutAppText)
+              ],
+            );
+          });
+      }
+/*
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
@@ -569,7 +617,10 @@ class _SupportInformation extends StatelessWidget {
               ],
             );
           });
+      */
+
     }
+
 
     return Container(
         padding: const EdgeInsets.all(20),
@@ -599,8 +650,7 @@ class _SupportInformation extends StatelessWidget {
             settingThemeContainer(
                 AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
-                () => Share.share(AppLocalizations.of(context)!.teilenLinkText +
-                    '\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
+                () => Share.share('${AppLocalizations.of(context)!.teilenLinkText}\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
             const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.spenden, Icons.favorite,
