@@ -163,6 +163,7 @@ class _InformationPageState extends State<InformationPage>{
         body: SafeArea(
       child: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 15),
             badgeCard(
