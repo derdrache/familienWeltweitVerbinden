@@ -89,8 +89,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       communityData["nameEng"] = communityData["name"];
       communityData["nameGer"] = await descriptionTranslation(communityData["name"], "de");
       communityData["beschreibungEng"] = communityData["beschreibung"];
-      communityData["beschreibungGer"] = await descriptionTranslation(
-          communityData["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
+      communityData["beschreibungGer"] = await descriptionTranslation(communityData["beschreibungEng"],"de");
       communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nDies ist eine automatische Übersetzung";
     }
 
