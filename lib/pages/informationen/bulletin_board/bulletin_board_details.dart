@@ -41,6 +41,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late bool showOnlyOriginal = false;
   late Map originalText = {"title": "", "description": ""};
   late Map translatedText = {"title": "", "description": ""};
+  late Map? creatorProfil;
 
   checkAndSetTextVariations() {
     bool noteLanguageGerman = widget.note["beschreibungEng"]
@@ -182,6 +183,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   @override
   void initState() {
+    creatorProfil = getProfilFromHive(
+        profilId: widget.note["erstelltVon"]);
+
     checkAndSetTextVariations();
 
     super.initState();
@@ -403,13 +407,12 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 onPressed: () => changeNoteLanguage(),
                 tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
                 icon: const Icon(Icons.change_circle)),
-          if (!isNoteOwner)
+          if (!isNoteOwner && creatorProfil != null)
             IconButton(
                 onPressed: () => changePage(
                     context,
                     ShowProfilPage(
-                        profil: getProfilFromHive(
-                            profilId: widget.note["erstelltVon"]))),
+                        profil: creatorProfil!)),
                 tooltip:
                     AppLocalizations.of(context)!.tooltipZeigeProfilErsteller,
                 icon: const Icon(Icons.account_circle)),
