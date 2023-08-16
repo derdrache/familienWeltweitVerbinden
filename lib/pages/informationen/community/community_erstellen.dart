@@ -53,7 +53,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       "latt": locationData["latt"],
       "longt": locationData["longt"],
       "erstelltAm": DateTime.now().toString(),
-      "members": json.encode(ownCommunity ? [userId] : []),
+      "members": ownCommunity ? [userId] : [],
       "erstelltVon": userId,
       "ownCommunity": ownCommunity,
       "secretChat": secretChat
@@ -61,11 +61,10 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     if (!checkValidationAndSendError(communityData)) return false;
 
-    saveDB(communityData, locationData);
+    saveDB(Map.of(communityData), locationData);
 
     communityData["bild"] = "assets/bilder/village.jpg";
     communityData["interesse"] = [];
-    communityData["members"] = [];
     communityData["einladung"] = [];
 
     var allCommunities = Hive.box('secureBox').get("communities") ?? [];
@@ -95,7 +94,9 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nDies ist eine automatische Übersetzung";
     }
 
-    await CommunityDatabase().addNewCommunity(Map.of(communityData));
+    communityData["members"] = json.encode(communityData["members"]);
+
+    await CommunityDatabase().addNewCommunity(communityData);
 
     StadtinfoDatabase().addNewCity(locationData);
     ChatGroupsDatabase().addNewChatGroup(
