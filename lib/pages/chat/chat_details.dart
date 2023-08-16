@@ -115,6 +115,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   AudioPlayer audioPlayer = AudioPlayer();
   String playedVoiceMessage = "";
   bool isPlaying = false;
+  List chatParticipantProfils = [];
 
   @override
   void initState() {
@@ -124,6 +125,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     _checkSecretChatMember();
     _changeUserChatStatus(1);
     _setScrollbarListener();
+    createChatParticipantProfils();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _asyncMethod());
     WidgetsBinding.instance.addObserver(this);
@@ -150,6 +152,16 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       _changeUserChatStatus(1);
     } else {
       _changeUserChatStatus(0);
+    }
+  }
+
+  createChatParticipantProfils(){
+    if(!widget.isChatgroup) return;
+    print(widget.groupChatData!["users"]);
+    for(var participantId in widget.groupChatData!["users"].keys.toList()){
+      Map? participanProfil = getProfilFromHive(profilId: participantId);
+
+      if(participanProfil != null) chatParticipantProfils.add(participanProfil);
     }
   }
 
@@ -2069,19 +2081,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     getMemberList() {
       List<Widget> memberList = [];
 
-      widget.groupChatData!["users"].forEach((memberUserId, data) {
-        Map userProfil = getProfilFromHive(profilId: memberUserId) ?? {};
-
-        if (userProfil.isEmpty) return;
-
+      for(var participantProfil in chatParticipantProfils){
         memberList.add(GestureDetector(
-          onTap: userProfil.isEmpty
-              ? null
-              : () => global_functions.changePage(
-                  context,
-                  ShowProfilPage(
-                    profil: userProfil,
-                  )),
+          onTap: () => global_functions.changePage(
+              context,
+              ShowProfilPage(
+                profil: participantProfil,
+              )),
           child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -2089,10 +2095,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 top: BorderSide(width: 1.0, color: style.borderColorGrey),
               ),
             ),
-            child: Text(userProfil["name"]),
+            child: Text(participantProfil["name"]),
           ),
         ));
-      });
+      }
 
       return memberList;
     }
@@ -2418,7 +2424,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               Text(title),
               const SizedBox(height: 3),
               Text(
-                widget.groupChatData!["users"].length.toString() +
+                chatParticipantProfils.length.toString() +
                     AppLocalizations.of(context)!.teilnehmerSimple,
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               )
