@@ -384,6 +384,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         size: 24,
         margin: EdgeInsets.zero,
         badgeText: notification > 0 ? notification.toString() : "",
+        badgePositionRight: 10,
       );
     }
 
@@ -411,6 +412,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
               size: 24,
               margin: EdgeInsets.zero,
               badgeText: newMessageCount > 0 ? newMessageCount.toString() : "",
+              badgePositionRight: 10,
             );
           }
       );

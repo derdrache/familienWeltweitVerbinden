@@ -13,6 +13,7 @@ class OwnIconButton extends StatelessWidget {
   Function? onPressed;
   bool bigButton;
   String tooltipText;
+  double badgePositionRight;
 
   OwnIconButton(
       {Key? key,
@@ -24,7 +25,8 @@ class OwnIconButton extends StatelessWidget {
       this.margin = const EdgeInsets.all(15),
       this.withBox = false, this.onPressed,
       this.bigButton = false,
-      this.tooltipText = ""
+      this.tooltipText = "",
+      this.badgePositionRight = -10
       })
       : super(key: key);
 
@@ -61,7 +63,7 @@ class OwnIconButton extends StatelessWidget {
             if (badgeText.isNotEmpty)
               Positioned(
                 top: -10,
-                right: image != null ? -10 : 10,
+                right: badgePositionRight,
                 child: Container(
                     height: 20,
                     width: 20,

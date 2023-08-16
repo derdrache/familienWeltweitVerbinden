@@ -10,6 +10,7 @@ import 'dart:ui' as ui;
 import '../../../global/global_functions.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../../services/locationsService.dart';
+import '../../../widgets/layout/badgeWidget.dart';
 import '../../start_page.dart';
 import 'meetupCard.dart';
 import 'meetup_erstellen.dart';
@@ -107,56 +108,37 @@ class _MeetupPageState extends State<MeetupPage> {
 
       for (var meetup in allEntries) {
         bool isOwner = meetup["erstelltVon"] == userId;
-        var freischaltenCount = meetup["freischalten"].length;
         bool isNotPublic = meetup["art"] != "public" && meetup["art"] != "öffentlich";
+        int freischaltenCount = isOwner && isNotPublic ? meetup["freischalten"].length : 0;
 
-        meetupCards.add(Stack(
-          children: [
-            MeetupCard(
+        meetupCards.add(
+          BadgeWidget(
+            child:             MeetupCard(
                 meetupData: meetup,
-                margin: const EdgeInsets.only(top: 30, bottom: 0, right: 20, left: 20),
+                margin: EdgeInsets.zero,
                 withInteresse: true,
                 fromMeetupPage: true,
                 afterFavorite: () => setState((){}),
                 afterPageVisit: () => setState((){})
             ),
-            if (isOwner && isNotPublic && freischaltenCount > 0)
-              Positioned(
-                  right: 10,
-                  top: 20,
-                  child: Container(
-                      height: 20,
-                      width: 20,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary,
-                          shape: BoxShape.circle
-                      ),
-                      child: Center(
-                        child: FittedBox(
-                          child: Text(
-                            freischaltenCount.toString(),
-                            style: const TextStyle(fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-                      )
-                  )
-              )
-          ],
-        ),
-      );
-
+            number: freischaltenCount,
+          ));
       }
 
       return SingleChildScrollView(
         child: SizedBox(
           width: double.infinity,
-          child: Wrap(
-              alignment: WrapAlignment.center,
-              children: [
-                ...meetupCards,
-                if(onSearch) const SizedBox(height: 330)
-              ]
+          child: Container(
+            margin: const EdgeInsets.only(top:20),
+            child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 15,
+                runSpacing: 30,
+                children: [
+                  ...meetupCards,
+                  if(onSearch) const SizedBox(height: 330)
+                ]
+            ),
           ),
         ),
       );
