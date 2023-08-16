@@ -845,7 +845,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                         width: 250,
                         decoration: BoxDecoration(
                             border: Border.all(width: 1),
-                            borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))
+                            borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners))
                         ),
                         child: DropdownButtonHideUnderline(
                             child: DropdownButton(
@@ -1344,13 +1344,15 @@ class CardFeet extends StatefulWidget {
 }
 
 class _CardFeetState extends State<CardFeet> {
-  late Map organisatorProfil;
+  late Map? organisatorProfil;
   var ownName = FirebaseAuth.instance.currentUser!.displayName;
   var teilnehmerAnzahl = "";
 
   @override
   Widget build(BuildContext context) {
     organisatorProfil = getProfilFromHive(profilId: widget.organisator);
+
+    organisatorProfil ??= {};
 
     showTeilnehmerWindow() {
       var zusagenIds = widget.meetupData["zusage"];
@@ -1419,7 +1421,7 @@ class _CardFeetState extends State<CardFeet> {
             ),
             const Expanded(child: SizedBox()),
             InkWell(
-              child: Text(organisatorProfil["name"] ?? "",
+              child: Text(organisatorProfil!["name"] ?? "",
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                       fontSize: fontsize)),
@@ -1427,7 +1429,7 @@ class _CardFeetState extends State<CardFeet> {
                 global_func.changePage(
                     context,
                     ShowProfilPage(
-                      profil: organisatorProfil,
+                      profil: organisatorProfil!,
                     ));
               },
             )
