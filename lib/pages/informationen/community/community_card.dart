@@ -53,7 +53,7 @@ class _CommunityCardState extends State<CommunityCard> {
       title =  widget.community["nameEng"];
     }
 
-    return title ?? widget.community["name"];
+    return title!.isNotEmpty ? title : widget.community["name"];
   }
 
   @override
