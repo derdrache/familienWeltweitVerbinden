@@ -234,6 +234,10 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     );
   }
 
+  removeUnknownUser(userId){
+    //Remove user
+  }
+
   @override
   Widget build(BuildContext context) {
     isCreator = widget.meetupData["erstelltVon"] == userId;
@@ -569,8 +573,13 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     userFreischaltenList(windowSetState) async {
       List<Widget> freizugebenListe = [];
 
-      for (var user in widget.meetupData["freischalten"]) {
-        Map profil = getProfilFromHive(profilId: user);
+      for (var userId in widget.meetupData["freischalten"]) {
+        Map? profil = getProfilFromHive(profilId: userId);
+
+        if(profil == null){
+          userFreischalten(userId, false, windowSetState);
+          continue;
+        }
 
         freizugebenListe.add(Container(
             margin: const EdgeInsets.only(left: 20),
@@ -587,10 +596,10 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                       child: Text(profil["name"])),
                 ),
                 IconButton(
-                    onPressed: () => userFreischalten(user, true, windowSetState),
+                    onPressed: () => userFreischalten(userId, true, windowSetState),
                     icon: const Icon(Icons.check_circle, size: 27)),
                 IconButton(
-                    onPressed: () => userFreischalten(user, false, windowSetState),
+                    onPressed: () => userFreischalten(userId, false, windowSetState),
                     icon: const Icon(
                       Icons.cancel,
                       size: 27,
@@ -599,7 +608,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             )));
       }
 
-      if (widget.meetupData["freischalten"].length == 0) {
+      if (freizugebenListe.isEmpty) {
         freizugebenListe.add(Padding(
           padding: const EdgeInsets.only(top: 50),
           child: Center(
@@ -620,7 +629,9 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       List<Widget> freigeschlatetList = [];
 
       for (var user in widget.meetupData["freigegeben"]) {
-        var profil = getProfilFromHive(profilId: user);
+        Map? profil = getProfilFromHive(profilId: user);
+
+        if(profil == null) continue;
 
         freigeschlatetList.add(Container(
             margin: const EdgeInsets.only(left: 20),
@@ -647,7 +658,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             )));
       }
 
-      if (widget.meetupData["freigegeben"].length == 0) {
+      if (freigeschlatetList.isEmpty) {
         freigeschlatetList.add(Padding(
           padding: const EdgeInsets.only(top: 50),
           child: Center(
