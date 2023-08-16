@@ -57,9 +57,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   final translator = GoogleTranslator();
   late bool isCreator;
   late bool isMember;
+  List allMemberProfils = [];
 
   @override
   void initState() {
+    createMemberList();
     if (widget.community["beschreibungGer"].isEmpty) {
       widget.community["beschreibungGer"] = widget.community["beschreibung"];
     }
@@ -88,6 +90,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     });
 
     super.initState();
+  }
+
+  createMemberList(){
+    List allMemberIds = widget.community["members"];
+
+    for(String memberId in allMemberIds){
+      Map? memberProfil = getProfilFromHive(profilId: memberId);
+      if(memberProfil != null) allMemberProfils.add(memberProfil);
+    }
   }
 
   _getDBDataSetAllUserNames() async {
@@ -641,21 +652,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
 
     showMembersWindow() async {
-      var membersID = widget.community["members"];
-      var allProfils = Hive.box("secureBox").get("profils");
-      var membersProfils = [];
       List<Widget> membersBoxes = [];
 
-      for (var memberId in membersID) {
-        for (var profil in allProfils) {
-          if (profil["id"] == memberId) {
-            membersProfils.add(profil);
-            break;
-          }
-        }
-      }
-
-      for (var member in membersProfils) {
+      for (var member in allMemberProfils) {
         membersBoxes.add(Row(
           children: [
             InkWell(
@@ -1047,7 +1046,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             InkWell(
               onTap: () => showMembersWindow(),
               child: Text(
-                "${widget.community["members"].length} ${AppLocalizations.of(context)!.member}",
+                "${allMemberProfils.length} ${AppLocalizations.of(context)!.member}",
                 style:
                     TextStyle(color: Theme.of(context).colorScheme.secondary),
               ),
