@@ -86,7 +86,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    ProfilImage(profil, size: 60),
+                    ProfilImage(profil, size: 60, fullScreenWindow: true,),
                     SizedBox(
                         height: 60,
                         child: CurvedText(
