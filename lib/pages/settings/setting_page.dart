@@ -28,6 +28,7 @@ import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/layout/custom_dropdownButton.dart';
 import '../../widgets/layout/custom_multi_select.dart';
 import '../../widgets/profil_image.dart';
+import '../../windows/donations.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
 import 'change_aufreise.dart';
@@ -563,62 +564,6 @@ class _SupportInformation extends StatelessWidget {
             );
           });
       }
-/*
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-              title: "families worldwide app",
-              children: [
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Text("App Version: ",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(packageInfo.version),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                InkWell(
-                  onTap: () => openURL(
-                      "https://github.com/derdrache/familienWeltweitVerbinden"),
-                  child: const Row(
-                    children: [
-                      Text("Open Source: ",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text(
-                        "Github Repo",
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.blue,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Row(
-                  children: [
-                    Text("Framework:  ",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("Flutter"),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                const Row(
-                  children: [
-                    Text("Icons: ",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("created by Freepik - Flaticon"),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Text(AppLocalizations.of(context)!.aboutAppText)
-              ],
-            );
-          });
-      */
-
     }
 
 
@@ -654,12 +599,7 @@ class _SupportInformation extends StatelessWidget {
             const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.spenden, Icons.favorite,
-                () async {
-              var url =
-                  Uri.parse("https://www.paypal.com/paypalme/DominikMast");
-
-              await launchUrl(url, mode: LaunchMode.inAppWebView);
-            }),
+                () => donationWindow(context)),
             const SizedBox(height: 20),
             settingThemeContainer(AppLocalizations.of(context)!.ueber,
                 Icons.info, () => aboutAppWindow()),
