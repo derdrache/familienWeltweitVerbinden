@@ -20,7 +20,7 @@ import '../../../widgets/layout/custom_dropdownButton.dart';
 import '../../../widgets/layout/custom_multi_select.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
-import '../../../windows/nutzerrichtlinen.dart';
+import '../../../widgets/nutzerrichtlinen.dart';
 import 'meetup_details.dart';
 
 class MeetupErstellen extends StatefulWidget {

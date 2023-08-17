@@ -11,7 +11,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
-import '../../../windows/nutzerrichtlinen.dart';
+import '../../../widgets/nutzerrichtlinen.dart';
 import 'community_details.dart';
 import '../../../widgets/google_autocomplete.dart';
 

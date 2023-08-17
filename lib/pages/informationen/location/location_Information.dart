@@ -22,7 +22,7 @@ import '../../../widgets/image_upload_box.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
-import '../../../windows/nutzerrichtlinen.dart';
+import '../../../widgets/nutzerrichtlinen.dart';
 import '../../start_page.dart';
 import 'weltkarte_mini.dart';
 

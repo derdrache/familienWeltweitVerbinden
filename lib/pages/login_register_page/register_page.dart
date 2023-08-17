@@ -8,7 +8,7 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/layout/custom_floating_action_button_extended.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
-import '../../windows/nutzerrichtlinen.dart';
+import '../../widgets/nutzerrichtlinen.dart';
 import 'create_profil_page.dart';
 
 class RegisterPage extends StatefulWidget {
