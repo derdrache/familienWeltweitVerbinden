@@ -157,7 +157,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   createChatParticipantProfils(){
     if(!widget.isChatgroup) return;
-    print(widget.groupChatData!["users"]);
+
     for(var participantId in widget.groupChatData!["users"].keys.toList()){
       Map? participanProfil = getProfilFromHive(profilId: participantId);
 
@@ -1634,7 +1634,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         decoration: BoxDecoration(
                             color: messageBoxInformation["messageBoxColor"],
                             border: Border.all(),
-                            borderRadius: BorderRadius.all(
+                            borderRadius: const BorderRadius.all(
                                 Radius.circular(style.roundedCorners))),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2078,7 +2078,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    getMemberList() {
+    getMemberWidgetList() {
       List<Widget> memberList = [];
 
       for(var participantProfil in chatParticipantProfils){
@@ -2095,7 +2095,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 top: BorderSide(width: 1.0, color: style.borderColorGrey),
               ),
             ),
-            child: Text(participantProfil["name"]),
+            child: Row(
+              children: [
+                ProfilImage(participantProfil),
+                SizedBox(width: 10,),
+                Text(participantProfil["name"]),
+              ],
+            ),
           ),
         ));
       }
@@ -2104,14 +2110,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     mitgliederWindow() {
-      List<Widget> mitgliederList = getMemberList();
+      List<Widget> mitgliederList = getMemberWidgetList();
       String detailsButtonName = "Information";
 
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.all(Radius.circular(style.roundedCorners))),
               title: Center(child: Text(connectedData["name"])),
