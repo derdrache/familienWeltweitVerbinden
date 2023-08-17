@@ -2097,7 +2097,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ),
             child: Row(
               children: [
-                ProfilImage(participantProfil),
+                ProfilImage(participantProfil, size: 20,),
                 SizedBox(width: 10,),
                 Text(participantProfil["name"]),
               ],
