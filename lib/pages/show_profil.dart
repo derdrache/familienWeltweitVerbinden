@@ -262,8 +262,64 @@ class _AppBarState extends State<_AppBar> {
         });
   }
 
+  changeFriendStatus(isFriend){
+    var snackbarText = "";
+    var newsData = {
+      "typ": "friendlist",
+      "information": "",
+    };
+
+    if (isFriend) {
+      userFriendlist.remove(widget.profil["id"]);
+      snackbarText =
+          _userName + AppLocalizations.of(context)!.friendlistEntfernt;
+
+      var newsId = getNewsId("added ${widget.profil["id"]}");
+
+      if (newsId != null) NewsPageDatabase().delete(newsId);
+    } else {
+      userFriendlist.add(widget.profil["id"]);
+      snackbarText = _userName +
+          AppLocalizations.of(context)!.friendlistHinzugefuegt;
+
+      prepareFriendNotification(
+          newFriendId: userId,
+          toId: widget.profil["id"],
+          toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
+              widget.profil["sprachen"].contains("german"));
+
+      newsData["information"] = "added ${widget.profil["id"]}";
+      NewsPageDatabase().addNewNews(newsData);
+    }
+
+    var localBox = Hive.box('secureBox');
+    var ownProfil = localBox.get("ownProfil");
+
+    ownProfil["friendlist"] = userFriendlist;
+    localBox.put("ownProfil", ownProfil);
+
+    customSnackbar(context, snackbarText, color: Colors.green);
+
+    ProfilDatabase().updateProfil(
+        "friendlist = '${jsonEncode(userFriendlist)}'",
+        "WHERE id = '$userId'");
+
+    Navigator.pop(context);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    friendButton(){
+      bool isFriend = userFriendlist.contains(widget.profil["id"]);
+
+      return IconButton(
+          onPressed: () => changeFriendStatus(isFriend),
+          icon: Icon(isFriend ? Icons.person_remove : Icons.person_add, color: buttonColor)
+      );
+    }
+
     openNoteButton() {
       return IconButton(
         icon: Icon(
@@ -325,66 +381,6 @@ class _AppBarState extends State<_AppBar> {
             } else {
               openChat(widget.profil["id"], widget.profil["name"]);
             }
-          });
-    }
-
-    friendlistButton() {
-      var onFriendlist = userFriendlist.contains(widget.profil["id"]);
-
-      return SimpleDialogOption(
-          child: Row(
-            children: [
-              Icon(onFriendlist ? Icons.person_remove : Icons.person_add),
-              const SizedBox(width: 10),
-              Text(onFriendlist
-                  ? AppLocalizations.of(context)!.freundEntfernen
-                  : AppLocalizations.of(context)!.freundHinzufuegen)
-            ],
-          ),
-          onPressed: () {
-            var snackbarText = "";
-            var newsData = {
-              "typ": "friendlist",
-              "information": "",
-            };
-
-            if (onFriendlist) {
-              userFriendlist.remove(widget.profil["id"]);
-              snackbarText =
-                  _userName + AppLocalizations.of(context)!.friendlistEntfernt;
-
-              var newsId = getNewsId("added ${widget.profil["id"]}");
-
-              if (newsId != null) NewsPageDatabase().delete(newsId);
-            } else {
-              userFriendlist.add(widget.profil["id"]);
-              snackbarText = _userName +
-                  AppLocalizations.of(context)!.friendlistHinzugefuegt;
-
-              prepareFriendNotification(
-                  newFriendId: userId,
-                  toId: widget.profil["id"],
-                  toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
-                      widget.profil["sprachen"].contains("german"));
-
-              newsData["information"] = "added ${widget.profil["id"]}";
-              NewsPageDatabase().addNewNews(newsData);
-            }
-
-            var localBox = Hive.box('secureBox');
-            var ownProfil = localBox.get("ownProfil");
-
-            ownProfil["friendlist"] = userFriendlist;
-            localBox.put("ownProfil", ownProfil);
-
-            customSnackbar(context, snackbarText, color: Colors.green);
-
-            ProfilDatabase().updateProfil(
-                "friendlist = '${jsonEncode(userFriendlist)}'",
-                "WHERE id = '$userId'");
-
-            Navigator.pop(context);
-            setState(() {});
           });
     }
 
@@ -488,7 +484,6 @@ class _AppBarState extends State<_AppBar> {
         ),
         onPressed: () {
           CustomPopupMenu(context, width: 220, children: [
-            friendlistButton(),
             userBlockierenButton(),
             meldeUserButton()
           ]);
@@ -496,17 +491,21 @@ class _AppBarState extends State<_AppBar> {
       );
     }
 
-    return Row(
-      children: [
-        IconButton(
-          icon: Icon(Icons.arrow_back, color: buttonColor),
-          onPressed: () => Navigator.pop(context),
-        ),
-        const Expanded(child: SizedBox.shrink()),
-        _isOwnProfil ? const SizedBox.shrink() : openNoteButton(),
-        _isOwnProfil ? const SizedBox.shrink() : openChatButton(),
-        _isOwnProfil ? const SizedBox.shrink() : moreMenuButton()
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back, color: buttonColor),
+            onPressed: () => Navigator.pop(context),
+          ),
+          const Expanded(child: SizedBox.shrink()),
+          _isOwnProfil ? const SizedBox.shrink() : friendButton(),
+          _isOwnProfil ? const SizedBox.shrink() : openNoteButton(),
+          _isOwnProfil ? const SizedBox.shrink() : openChatButton(),
+          _isOwnProfil ? const SizedBox.shrink() : moreMenuButton()
+        ],
+      ),
     );
   }
 }
