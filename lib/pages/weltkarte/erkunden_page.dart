@@ -49,7 +49,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var countriesList = LocationService().getAllCountryNames();
   List<String> allCitiesNames = [];
   List filterList = [];
-  List aktiveProfils = [];
+  List aktiveLocationData = [];
   List aktiveEvents = [];
   List aktiveCommunities = [];
   List aktiveInsiderInfos = [];
@@ -304,21 +304,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
     if (filterList.isEmpty) {
       filterProfils = profilsBackup;
     } else {
-      for (var profilGroup in aktiveProfils) {
-        for (var profil in profilGroup["profils"]) {
+      for (var profils in aktiveLocationData) {
+        for (var profil in profils["profils"]) {
           if (checkIfInFilter(profil)) {
             filterProfils.add(profil);
-          } else {
-            for (var family in familyProfils) {
-              var familyName = "${spracheIstDeutsch ? "Familie:" : "family"} " +
-                  family["name"];
-              if (family["mainProfil"] == profil["id"] &&
-                  filterList.contains(familyName)) {
-                var familyProfil = Map.from(profil);
-                familyProfil["name"] = familyName;
-                filterProfils.add(familyProfil);
-              }
-            }
           }
         }
       }
@@ -364,6 +353,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var kinderMatch = checkMatch(filterList, profilKinderYear,
         List.generate(18, (i) => (i + 1).toString()),
         simpleSearch: true);
+    bool singleChildCheck = checkSingleChildMatch(filterList, profilKinder);
+    bool twinsCheck = checkTwinsMatch(filterList, profilKinder);
+    bool multiChildCheck = checkMultiChildFamilyMatch(filterList, profilKinder);
+
 
     if (spracheMatch &&
         reiseartMatch &&
@@ -371,39 +364,75 @@ class _ErkundenPageState extends State<ErkundenPage> {
         userMatch &&
         countryMatch &&
         cityMatch &&
-        kinderMatch) return true;
+        kinderMatch &&
+        singleChildCheck &&
+        twinsCheck &&
+        multiChildCheck) return true;
 
     return false;
   }
 
-  checkMatch(List selected, List checkList, globalList,
+  checkMatch(List filterList, List profilList, globalVarList,
       {simpleSearch = false}) {
-    bool globalMatch = false;
-    bool match = false;
+    bool anySelected = false;
+    bool matched = false;
 
-    for (var select in selected) {
-      if (globalList.contains(select)) globalMatch = true;
+    for (var select in filterList) {
+      if (globalVarList.contains(select)) anySelected = true;
 
-      if (checkList.contains(select)) match = true;
+      if (profilList.contains(select)) matched = true;
 
       if (simpleSearch) continue;
 
-      if (globalMatch && !match) {
-        int halfListNumber = (globalList.length / 2).toInt();
-        var positionGlobal = globalList.indexOf(select);
+      if (anySelected && !matched) {
+        int halfListNumber = (globalVarList.length / 2).toInt();
+        var positionGlobal = globalVarList.indexOf(select);
         var calculatePosition = positionGlobal < halfListNumber
             ? positionGlobal + halfListNumber
             : positionGlobal - halfListNumber;
-        var otherLanguage = globalList[calculatePosition];
+        var otherLanguage = globalVarList[calculatePosition];
 
-        if (checkList.contains(otherLanguage)) match = true;
+        if (profilList.contains(otherLanguage)) matched = true;
       }
     }
 
-    if (!globalMatch) return true;
-    if (match) return true;
+    if (!anySelected) return true;
+    if (matched) return true;
 
     return false;
+  }
+
+  checkSingleChildMatch(filterList, profilChildrenList){
+    bool isSelected = filterList.contains(global_var.familienMerkmale[1]) || filterList.contains(global_var.familienMerkmaleEnglisch[1]);
+    bool hasProfilSingleChild = profilChildrenList.length == 1;
+
+    if(!isSelected) return true;
+
+
+
+    return hasProfilSingleChild;
+  }
+
+  checkTwinsMatch(filterList, profilChildrenList){
+    bool isSelected = filterList.contains(global_var.familienMerkmale[0]) || filterList.contains(global_var.familienMerkmaleEnglisch[0]);
+    bool moreThenOneChild = profilChildrenList.length > 1;
+    Set twinsCheckList = profilChildrenList.toSet();
+
+    if(!isSelected) return true;
+    if(!moreThenOneChild) return false;
+
+    return twinsCheckList.length != profilChildrenList.length;
+
+  }
+
+  checkMultiChildFamilyMatch(filterList, profilChildrenList){
+    bool isSelected = filterList.contains(global_var.familienMerkmale[2]) || filterList.contains(global_var.familienMerkmaleEnglisch[2]);
+    bool moreThenOneChild = profilChildrenList.length > 1;
+
+    if(!isSelected) return true;
+    if(!moreThenOneChild) return false;
+
+    return profilChildrenList.length > 2;
   }
 
   createAndSetZoomLevels(mainList, typ) async {
@@ -688,7 +717,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     if (buildDone) {
       setState(() {
-        aktiveProfils = choosenProfils;
+        aktiveLocationData = choosenProfils;
         aktiveEvents = selectedEventList;
         aktiveCommunities = selectedComunityList;
         aktiveInsiderInfos = selectedInsiderInfoList;
@@ -849,6 +878,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
         : global_var.reiseartenEnglisch;
     var alterKinderSelection =
         List<String>.generate(18, (i) => (i + 1).toString());
+    List familyFeatureSelection = spracheIstDeutsch
+        ? global_var.familienMerkmale
+        : global_var.familienMerkmaleEnglisch;
 
     await showDialog(
         context: context,
@@ -898,6 +930,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   initiallyExpanded: true,
                   children: [
                     createCheckBoxen(windowSetState, interessenSelection)
+                  ],
+                ),
+                ExpansionTile(
+                  title: Text(AppLocalizations.of(context)!.familienMerkmale),
+                  initiallyExpanded: true,
+                  children: [
+                    createCheckBoxen(windowSetState, familyFeatureSelection)
                   ],
                 ),
                 ExpansionTile(
@@ -1407,7 +1446,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     }
 
     createProfilMarker() {
-      for (var profil in aktiveProfils) {
+      for (var profil in aktiveLocationData) {
         if (friendMarkerOn && profil["name"] == "0") continue;
 
         var position = LatLng(profil["latt"], profil["longt"]);
