@@ -370,6 +370,15 @@ class _ProfilSection extends StatelessWidget {
                       isGerman: spracheIstDeutsch,
                     )),
                 profilThemeContainer(
+                    sprachenInputBox.getSelected() == null
+                        ? ""
+                        : sprachenInputBox.getSelected().join(", "),
+                    AppLocalizations.of(context)!.sprachen,
+                    ChangeSprachenPage(
+                      selected: sprachenInputBox.getSelected(),
+                      isGerman: spracheIstDeutsch,
+                    )),
+                profilThemeContainer(
                     kinderAgeBox.getDates(years: true) == null
                         ? ""
                         : kinderAgeBox
@@ -389,15 +398,7 @@ class _ProfilSection extends StatelessWidget {
                       selected: interessenInputBox.getSelected(),
                       isGerman: spracheIstDeutsch,
                     )),
-                profilThemeContainer(
-                    sprachenInputBox.getSelected() == null
-                        ? ""
-                        : sprachenInputBox.getSelected().join(", "),
-                    AppLocalizations.of(context)!.sprachen,
-                    ChangeSprachenPage(
-                      selected: sprachenInputBox.getSelected(),
-                      isGerman: spracheIstDeutsch,
-                    )),
+
                 profilThemeContainer(
                     userProfil["aboutme"],
                     AppLocalizations.of(context)!.ueberMich,
