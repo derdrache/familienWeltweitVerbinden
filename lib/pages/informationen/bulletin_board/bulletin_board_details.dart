@@ -432,9 +432,6 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     }),
                 tooltip: AppLocalizations.of(context)!.tooltipNotizBearbeiten,
                 icon: const Icon(Icons.edit)),
-          const SizedBox(
-            width: 10,
-          ),
           if (changeNote && isNoteOwner)
             IconButton(
                 onPressed: () {
@@ -446,7 +443,10 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 tooltip:
                     AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done)),
-          IconButton(
+          if(isNoteOwner) const SizedBox(
+            width: 10,
+          ),
+          if(isNoteOwner) IconButton(
               onPressed: () {
                 deleteWindow();
               },
