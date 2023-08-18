@@ -316,6 +316,7 @@ class _AppBarState extends State<_AppBar> {
 
       return IconButton(
           onPressed: () => changeFriendStatus(isFriend),
+          tooltip: isFriend ?AppLocalizations.of(context)!.freundEntfernen : AppLocalizations.of(context)!.freundHinzufuegen,
           icon: Icon(isFriend ? Icons.person_remove : Icons.person_add, color: buttonColor)
       );
     }
