@@ -173,9 +173,7 @@ class MyApp extends StatelessWidget {
         FlutterLocalNotificationsPlugin();
     var initializationSettings = InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-        iOS: IOSInitializationSettings(
-
-        )
+        iOS: DarwinInitializationSettings()
     );
 
     FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -185,8 +183,8 @@ class MyApp extends StatelessWidget {
     );
 
     _notificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: (payload) async {
-      final Map<String, dynamic> payLoadMap = json.decode(payload!);
+        onDidReceiveNotificationResponse: (payload) async {
+      final Map<String, dynamic> payLoadMap = json.decode(payload.payload!);
       notificationLeadPage(payLoadMap);
     });
 

@@ -42,7 +42,7 @@ dependencies:
   firebase_messaging: ^14.6.2
   http: ^0.13.5
   url_launcher: ^6.1.5
-  flutter_local_notifications: ^9.7.1
+  flutter_local_notifications: ^15.1.0+1
   package_info_plus: ^4.0.0
   uuid: ^3.0.6
   google_sign_in: ^6.1.4
