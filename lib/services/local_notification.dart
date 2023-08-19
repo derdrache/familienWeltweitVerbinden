@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 class LocalNotificationService{
   static final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  void display(RemoteMessage message, {withMeetupAction = true}) async {
+  void display(RemoteMessage message, {withMeetupAction = false}) async {
 
     try {
       var id = DateTime.now().millisecondsSinceEpoch ~/1000;
@@ -30,7 +30,6 @@ class LocalNotificationService{
       var typ = jsonEncode(json.decode(message.data.values.last)["typ"]);
       var link = jsonEncode(json.decode(message.data.values.last)["link"]);
 
-      print("show");
       await _notificationsPlugin.show(
           id,
           message.notification!.title,

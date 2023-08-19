@@ -30,21 +30,23 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await setOrientation();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await _notificationSetup();
+  await hiveInit();
+  await setOrientation();
+
+
 
   if (!kIsWeb) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
-  await hiveInit();
+
   await setGeoData();
+
+  await _notificationSetup();
 
   refreshHiveData();
   runApp(MyApp());
@@ -67,7 +69,6 @@ refreshDataOnNotification(messageTyp) async{
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("background");
   var messageData = json.decode(message.data["info"]);
   refreshDataOnNotification(messageData["typ"]);
 
@@ -159,6 +160,8 @@ _notificationSetup() async {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     String? userId = FirebaseAuth.instance.currentUser?.uid;
     var messageData = json.decode(message.data["info"]);
+    bool isMeetupReminder = messageData["typ"] == "event" && (message.notification!.title!.contains("Reminder")
+        || message.notification!.title!.contains("Erinnerung"));
 
     refreshDataOnNotification(messageData["typ"]);
     if (messageData["typ"] == "chat") {
@@ -171,7 +174,7 @@ _notificationSetup() async {
       }
     }
 
-    LocalNotificationService().display(message);
+    LocalNotificationService().display(message, withMeetupAction: isMeetupReminder);
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
@@ -195,7 +198,9 @@ onSelectNotification(NotificationResponse notificationResponse) async {
 }
 
 takePartDecision(meetupId, bool confirm) async {
-  String? userId = FirebaseAuth.instance.currentUser?.uid;
+  await hiveInit();
+
+  String? userId = Hive.box('secureBox').get("ownProfil")["id"];
   Map meetupData = getMeetupFromHive(meetupId);
 
   if (confirm) {
