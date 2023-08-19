@@ -6,18 +6,23 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 class LocalNotificationService{
   static final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  void display(RemoteMessage message) async {
+  void display(RemoteMessage message, {withMeetupAction = true}) async {
 
     try {
       var id = DateTime.now().millisecondsSinceEpoch ~/1000;
 
-      NotificationDetails notificationDetails = const NotificationDetails(
+      NotificationDetails notificationDetails = NotificationDetails(
         android: AndroidNotificationDetails(
           "notification",
           "notification channel",
           channelDescription: "this is our channel",
           importance: Importance.max,
           priority: Priority.high,
+
+          actions: !withMeetupAction ? null : <AndroidNotificationAction>[
+            AndroidNotificationAction('id_1', 'MeetupZusagen'),
+            AndroidNotificationAction('id_2', 'MeetupAbsagen'),
+          ]
         ),
         iOS: DarwinNotificationDetails()
       );
@@ -25,6 +30,7 @@ class LocalNotificationService{
       var typ = jsonEncode(json.decode(message.data.values.last)["typ"]);
       var link = jsonEncode(json.decode(message.data.values.last)["link"]);
 
+      print("show");
       await _notificationsPlugin.show(
           id,
           message.notification!.title,

@@ -26,8 +26,32 @@ import 'auth/secrets.dart';
 import 'themes/dark_theme.dart';
 import 'themes/light_theme.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await setOrientation();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await _notificationSetup();
+
+  if (!kIsWeb) {
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
+  await hiveInit();
+  await setGeoData();
+
+  refreshHiveData();
+  runApp(MyApp());
+}
+
 refreshDataOnNotification(messageTyp) async{
-  Random random = new Random();
+  Random random = Random();
   int randomNumber = random.nextInt(60);
   await Future.delayed(Duration(seconds: randomNumber), (){});
   if (messageTyp == "chat") {
@@ -43,6 +67,7 @@ refreshDataOnNotification(messageTyp) async{
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("background");
   var messageData = json.decode(message.data["info"]);
   refreshDataOnNotification(messageData["typ"]);
 
@@ -95,7 +120,7 @@ deleteOldVoiceMessages() async {
     final fileStat = FileStat.statSync(file.path);
     DateTime createdDate = fileStat.modified;
     const oneMotninHours = 720;
-    bool tooOld =  DateTime.now().compareTo(createdDate.add(Duration(hours: oneMotninHours))) == 1;
+    bool tooOld =  DateTime.now().compareTo(createdDate.add(const Duration(hours: oneMotninHours))) == 1;
     String fileTyp = file.path.split(".").last;
     bool isMP3 = fileTyp == "mp3";
 
@@ -105,11 +130,148 @@ deleteOldVoiceMessages() async {
   }
 }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+_notificationSetup() async {
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+  var initializationSettings = const InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings()
+  );
 
+  FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  _notificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: onSelectNotification,
+      onDidReceiveBackgroundNotificationResponse: onSelectNotification);
+
+  FirebaseMessaging.instance.getInitialMessage().then((value) {
+    if (value != null) {
+      var notification = json.decode(value.data.values.last);
+      notificationLeadPage(notification);
+    }
+  });
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    String? userId = FirebaseAuth.instance.currentUser?.uid;
+    var messageData = json.decode(message.data["info"]);
+
+    refreshDataOnNotification(messageData["typ"]);
+    if (messageData["typ"] == "chat") {
+      var chatId = messageData["link"];
+      var chatData = getChatFromHive(chatId);
+
+      if (chatData["users"][userId]["mute"] == true ||
+          chatData["users"][userId]["mute"] == "true") {
+        return;
+      }
+    }
+
+    LocalNotificationService().display(message);
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    var notification = json.decode(message.data.values.last);
+    notificationLeadPage(notification);
+  });
+}
+
+onSelectNotification(NotificationResponse notificationResponse) async {
+  var payloadData = jsonDecode(notificationResponse.payload!);
+  var actionId = notificationResponse.actionId;
+
+  if(actionId == "id_1"){
+    takePartDecision(payloadData["link"],true);
+  }else if(actionId == "id_2"){
+    takePartDecision(payloadData["link"],false);
+  }else{
+    notificationLeadPage(payloadData);
+  }
+
+}
+
+takePartDecision(meetupId, bool confirm) async {
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
+  Map meetupData = getMeetupFromHive(meetupId);
+
+  if (confirm) {
+    if (meetupData["absage"].contains(userId)) {
+      MeetupDatabase().update(
+          "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+          "WHERE id = '${meetupData["id"]}'");
+    } else {
+      MeetupDatabase().update(
+          "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
+          "WHERE id = '${meetupData["id"]}'");
+    }
+
+    meetupData["zusage"].add(userId);
+    meetupData["absage"].remove(userId);
+  } else {
+    if (meetupData["zusage"].contains(userId)) {
+      MeetupDatabase().update(
+          "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId'))),absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
+          "WHERE id = '${meetupData["id"]}'");
+    } else {
+      MeetupDatabase().update(
+          "absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
+          "WHERE id = '${meetupData["id"]}'");
+    }
+
+    meetupData["zusage"].remove(userId);
+    meetupData["absage"].add(userId);
+  }
+}
+
+notificationLeadPage(notification) {
+  if (notification["typ"] == "chat") {
+    _changeToChat(notification["link"]);
+  }else if (notification["typ"] == "event"){
+    _changeToEvent(notification["link"]);
+  }
+  else if (notification["typ"] == "newFriend") {
+    _changeToProfil(notification["link"]);
+  }else if(notification["typ"] == "community"){
+    _changeToCommunity(notification["link"]);
+  }
+}
+
+_changeToChat(chatId) async {
+  navigatorKey.currentState?.push(MaterialPageRoute(
+      builder: (_) => ChatDetailsPage(
+        chatId: chatId.toString(),
+      )));
+}
+
+_changeToEvent(eventId) async {
+  var eventData = getMeetupFromHive(eventId);
+
+  navigatorKey.currentState?.push(
+      MaterialPageRoute(builder: (_) => MeetupDetailsPage(meetupData: eventData)));
+}
+
+_changeToProfil(profilId) async {
+  var profilData = getProfilFromHive(profilId: profilId);
+
+  navigatorKey.currentState?.push(MaterialPageRoute(
+      builder: (_) => ShowProfilPage(
+        profil: profilData,
+      )));
+}
+
+_changeToCommunity(communityId) async{
+  var communityData = getCommunityFromHive(communityId);
+
+  navigatorKey.currentState?.push(
+      MaterialPageRoute(builder: (_) => CommunityDetails(community: communityData,)));
+}
+
+setOrientation() async {
   bool isPhone = getDeviceType() == "phone";
-
   if(isPhone){
     await SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -117,20 +279,6 @@ void main() async {
     await SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown, DeviceOrientation.landscapeLeft,DeviceOrientation.landscapeRight]);
   }
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  if (!kIsWeb) {
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  }
-
-  await hiveInit();
-  await setGeoData();
-
-  refreshHiveData();
-  runApp(MyApp());
 }
 
 String getDeviceType() {
@@ -138,11 +286,10 @@ String getDeviceType() {
   return data.size.shortestSide < 550 ? 'phone' :'tablet';
 }
 
+
 class MyApp extends StatelessWidget {
   String? userId = FirebaseAuth.instance.currentUser?.uid;
   BuildContext? pageContext;
-
-  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   _initialization() async {
     if (userId == null) {
@@ -151,106 +298,6 @@ class MyApp extends StatelessWidget {
     }
 
     if (kIsWeb) return;
-
-    _setFirebaseNotifications();
-  }
-
-  notificationLeadPage(notification) {
-    if (notification["typ"] == "chat") {
-      _changeToChat(notification["link"]);
-    }else if (notification["typ"] == "event"){
-      _changeToEvent(notification["link"]);
-    }
-    else if (notification["typ"] == "newFriend") {
-      _changeToProfil(notification["link"]);
-    }else if(notification["typ"] == "community"){
-      _changeToCommunity(notification["link"]);
-    }
-  }
-
-  _setFirebaseNotifications() {
-    final FlutterLocalNotificationsPlugin _notificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    var initializationSettings = InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-        iOS: DarwinInitializationSettings()
-    );
-
-    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    _notificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: (payload) async {
-      final Map<String, dynamic> payLoadMap = json.decode(payload.payload!);
-      notificationLeadPage(payLoadMap);
-    });
-
-    FirebaseMessaging.instance.getInitialMessage().then((value) {
-      if (value != null) {
-        var notification = json.decode(value.data.values.last);
-        notificationLeadPage(notification);
-      }
-    });
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      if (message.data.isNotEmpty) {
-        var messageData = json.decode(message.data["info"]);
-
-        refreshDataOnNotification(messageData["typ"]);
-
-        if (messageData["typ"] == "chat") {
-          var chatId = messageData["link"];
-          var chatData = getChatFromHive(chatId);
-
-          if (chatData["users"][userId]["mute"] == true ||
-              chatData["users"][userId]["mute"] == "true") {
-            return;
-          }
-        }
-
-        LocalNotificationService().display(message);
-      }
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-      var notification = json.decode(message.data.values.last);
-      if (pageContext != null) {
-        notificationLeadPage(notification);
-      }
-    });
-  }
-
-  _changeToChat(chatId) async {
-    navigatorKey.currentState?.push(MaterialPageRoute(
-        builder: (_) => ChatDetailsPage(
-            chatId: chatId.toString(),
-        )));
-  }
-
-  _changeToEvent(eventId) async {
-    var eventData = getMeetupFromHive(eventId);
-
-    navigatorKey.currentState?.push(
-        MaterialPageRoute(builder: (_) => MeetupDetailsPage(meetupData: eventData)));
-  }
-
-  _changeToProfil(profilId) async {
-    var profilData = getProfilFromHive(profilId: profilId);
-
-    navigatorKey.currentState?.push(MaterialPageRoute(
-        builder: (_) => ShowProfilPage(
-              profil: profilData,
-            )));
-  }
-
-  _changeToCommunity(communityId) async{
-    var communityData = getCommunityFromHive(communityId);
-
-    navigatorKey.currentState?.push(
-        MaterialPageRoute(builder: (_) => CommunityDetails(community: communityData,)));
   }
 
   @override
@@ -281,7 +328,9 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               home: FirebaseAuth.instance.currentUser != null
                   ? StartPage()
-                  : LoginPage());
+                  : const LoginPage());
         });
   }
 }
+
+
