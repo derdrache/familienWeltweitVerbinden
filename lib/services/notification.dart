@@ -8,7 +8,9 @@ import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 sendNotification(notificationInformation, {isGroupNotification = false}) async {
-  return;
+  notificationInformation["token"] = "eaiNn_maT4GX4E_0AWDjCJ:APA91bFq47BwG02iucLBrB1hYi2n9AqMZiocrR-TDmSiSb0ygk9Dsjvz1I925ZeDw3tSt7J1jjkpq1bFv-VsGTJEjQ3uaxRIPp6TUK8r4kjTu1nXYmrdsq_Tf-4F4InaeVaqrhkcY3RR";
+  notificationInformation["toList"] = ["eaiNn_maT4GX4E_0AWDjCJ:APA91bFq47BwG02iucLBrB1hYi2n9AqMZiocrR-TDmSiSb0ygk9Dsjvz1I925ZeDw3tSt7J1jjkpq1bFv-VsGTJEjQ3uaxRIPp6TUK8r4kjTu1nXYmrdsq_Tf-4F4InaeVaqrhkcY3RR"];
+
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
 
