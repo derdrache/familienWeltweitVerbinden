@@ -324,7 +324,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       }
 
       return Container(
-        margin: const EdgeInsets.all(5),
+        margin: const EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 10),
         child: Wrap(
           children: noteImages
               .map<Widget>((image) => InkWell(
@@ -455,18 +455,18 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
         ],
       ),
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(20),
         decoration: BoxDecoration(
             color: Colors.yellow[200],
             border: Border.all(),
             borderRadius: BorderRadius.circular(4)),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             showTitle(),
             showLocation(),
-            Expanded(child: showDescription()),
+            showDescription(),
+            SizedBox(height: 30),
             showImages()
           ],
         ),
