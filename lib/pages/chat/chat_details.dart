@@ -305,7 +305,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       isLoading = false;
     });
 
-    _delayForPinnedMessages();
+    _delayForSpezialFunctions();
 
     timer = Timer.periodic(const Duration(seconds: 30), (Timer t) async {
       messages = await _getAllDbMessages();
@@ -313,13 +313,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     });
   }
 
-  _delayForPinnedMessages() async {
-    await Future.delayed(const Duration(milliseconds: 500), () {
+  _delayForSpezialFunctions() async {
+    await Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {});
     });
 
     if (unreadMessages != 0) {
       _scrollToMessage(lastReadMessageIndex);
+      _highlightMessage(lastReadMessageIndex);
       _resetNewMessageCounter();
     }
   }
@@ -855,7 +856,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   }
 
   _scrollToMessage(int messageIndex) {
-    int scrollToIndex = globalMessageIndex - 1 - messageIndex;
+    int scrollToIndex = globalMessageIndex - 2 - messageIndex;
+    if(scrollToIndex < 0 ) scrollToIndex = globalMessageIndex - 1 - messageIndex;
 
     if (scrollToIndex < 0) scrollToIndex = 0;
 
