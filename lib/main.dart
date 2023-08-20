@@ -37,16 +37,15 @@ void main() async {
   await hiveInit();
   await setOrientation();
 
-
-
   if (!kIsWeb) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }
 
+  await _notificationSetup();
 
   await setGeoData();
 
-  await _notificationSetup();
+
 
   refreshHiveData();
   runApp(MyApp());
@@ -134,9 +133,19 @@ deleteOldVoiceMessages() async {
 _notificationSetup() async {
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
   FlutterLocalNotificationsPlugin();
-  var initializationSettings = const InitializationSettings(
+  var initializationSettings = InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-      iOS: DarwinInitializationSettings()
+      iOS: DarwinInitializationSettings(
+        notificationCategories: [
+          DarwinNotificationCategory(
+            "meetupParticipate",
+            actions: <DarwinNotificationAction>[
+              DarwinNotificationAction.plain('id_1', 'Action 1'),
+              DarwinNotificationAction.plain('id_2', 'Action 2'),
+            ]
+          )
+        ]
+      )
   );
 
   FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -183,6 +192,7 @@ _notificationSetup() async {
   });
 }
 
+@pragma('vm:entry-point')
 onSelectNotification(NotificationResponse notificationResponse) async {
   var payloadData = jsonDecode(notificationResponse.payload!);
   var actionId = notificationResponse.actionId;
