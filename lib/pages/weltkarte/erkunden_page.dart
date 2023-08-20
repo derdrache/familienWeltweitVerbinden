@@ -1568,7 +1568,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     insiderInfoMarker(numberText, position, onPressed) {
       double markerSize = 32;
       double textTopPosition = 4;
-      double textRightPosition = 11;
+      double textRightPosition = 12;
 
       if (numberText.length > 3) numberText = "99";
 
