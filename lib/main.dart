@@ -119,8 +119,8 @@ deleteOldVoiceMessages() async {
   for(var file in allFiles){
     final fileStat = FileStat.statSync(file.path);
     DateTime createdDate = fileStat.modified;
-    const oneMotninHours = 720;
-    bool tooOld =  DateTime.now().compareTo(createdDate.add(const Duration(hours: oneMotninHours))) == 1;
+    const oneMonthInHours = 720;
+    bool tooOld =  DateTime.now().compareTo(createdDate.add(const Duration(hours: oneMonthInHours))) == 1;
     String fileTyp = file.path.split(".").last;
     bool isMP3 = fileTyp == "mp3";
 
@@ -307,6 +307,8 @@ class MyApp extends StatelessWidget {
   BuildContext? pageContext;
 
   _initialization() async {
+    deleteOldVoiceMessages();
+
     if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
       userId = FirebaseAuth.instance.currentUser?.uid;

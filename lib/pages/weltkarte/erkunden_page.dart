@@ -402,35 +402,35 @@ class _ErkundenPageState extends State<ErkundenPage> {
     return false;
   }
 
-  checkSingleChildMatch(filterList, profilChildrenList){
-    bool isSelected = filterList.contains(global_var.familienMerkmale[1]) || filterList.contains(global_var.familienMerkmaleEnglisch[1]);
+  checkSingleChildMatch(filterList, profilChildrenList) {
+    bool isSelected = filterList.contains(global_var.familienMerkmale[1]) ||
+        filterList.contains(global_var.familienMerkmaleEnglisch[1]);
     bool hasProfilSingleChild = profilChildrenList.length == 1;
 
-    if(!isSelected) return true;
-
-
+    if (!isSelected) return true;
 
     return hasProfilSingleChild;
   }
 
-  checkTwinsMatch(filterList, profilChildrenList){
-    bool isSelected = filterList.contains(global_var.familienMerkmale[0]) || filterList.contains(global_var.familienMerkmaleEnglisch[0]);
+  checkTwinsMatch(filterList, profilChildrenList) {
+    bool isSelected = filterList.contains(global_var.familienMerkmale[0]) ||
+        filterList.contains(global_var.familienMerkmaleEnglisch[0]);
     bool moreThenOneChild = profilChildrenList.length > 1;
     Set twinsCheckList = profilChildrenList.toSet();
 
-    if(!isSelected) return true;
-    if(!moreThenOneChild) return false;
+    if (!isSelected) return true;
+    if (!moreThenOneChild) return false;
 
     return twinsCheckList.length != profilChildrenList.length;
-
   }
 
-  checkMultiChildFamilyMatch(filterList, profilChildrenList){
-    bool isSelected = filterList.contains(global_var.familienMerkmale[2]) || filterList.contains(global_var.familienMerkmaleEnglisch[2]);
+  checkMultiChildFamilyMatch(filterList, profilChildrenList) {
+    bool isSelected = filterList.contains(global_var.familienMerkmale[2]) ||
+        filterList.contains(global_var.familienMerkmaleEnglisch[2]);
     bool moreThenOneChild = profilChildrenList.length > 1;
 
-    if(!isSelected) return true;
-    if(!moreThenOneChild) return false;
+    if (!isSelected) return true;
+    if (!moreThenOneChild) return false;
 
     return profilChildrenList.length > 2;
   }
@@ -1295,10 +1295,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   padding: const EdgeInsets.all(5.0),
                   margin: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      border: Border.all(width: 2, color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : Colors.black),
-                      borderRadius: BorderRadius.circular(style.roundedCorners)),
+                      border: Border.all(
+                          width: 2,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black),
+                      borderRadius:
+                          BorderRadius.circular(style.roundedCorners)),
                   child: Column(
                     children: [
                       Text(
@@ -1440,8 +1443,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               child: Center(
                   child: Text(
                 numberText,
-                style: TextStyle(
-                    color: Colors.white),
+                style: TextStyle(color: Colors.white),
               ))));
     }
 
@@ -1629,7 +1631,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       return FlutterMap(
         mapController: mapController,
         options: MapOptions(
-          center: LatLng(25, 0),
+          center: const LatLng(25, 0),
           zoom: minMapZoom,
           minZoom: minMapZoom,
           maxZoom: maxZoom,
@@ -1648,6 +1650,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           TileLayer(
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.example.app',
+              backgroundColor: Colors.transparent,
               tileBuilder: Theme.of(context).brightness == Brightness.dark
                   ? (BuildContext context, Widget tileWidget, tile) {
                       return ColorFiltered(
