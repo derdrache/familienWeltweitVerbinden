@@ -1248,7 +1248,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       }
 
       return CarouselSlider(
-        options: CarouselOptions(height: double.infinity, initialPage: initalPage),
+        options: CarouselOptions(height: double.infinity, initialPage: initalPage, enableInfiniteScroll: false),
         items: userCityInfo.map((card) {
           return Builder(
             builder: (BuildContext context) {
