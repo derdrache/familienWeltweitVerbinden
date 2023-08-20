@@ -4,7 +4,7 @@ List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
   "Auto/Unterkünfte", "Wohnmobile/Camping", "Boot"];
 List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
   "Montessori", "Waldorf", "Gemeinsame Aktivitäten", "Weltreise", "Langsam reisen", "Gemeinsam reisen",
-  "Gemeinsam wohnen", "Gemeinsame Kinderbetreuung", "Dauerhaft reisen", "Kaffeetreff", "Online kennenlernen",
+  "Gemeinsam wohnen", "Digitale Nomaden", "Gemeinsame Kinderbetreuung", "Dauerhaft reisen", "Kaffeetreff", "Online kennenlernen",
   "Minimalismus","Frugalismus", "Vegan", "Zuckerfrei","Glutenfrei", "Gewaltfreie Kommunikation", "Bitcoin", "Alleinerziehend"];
 List<String> meetupInterval = ["einmalig", "täglich", "mehrtägig", "wöchentlich", "alle 2 Wochen", "monatlich"];
 List<String> meetupTyp = ["offline", "online"];
@@ -17,7 +17,7 @@ List<String> familienMerkmale = ["Zwillinge", "Einzelkind", "Mehrkindfamilie"];
 List<String> reiseartenEnglisch = ["fixed location", "airplane/housing",
   "car/housing","mobile home/camping", "boat"];
 List<String> interessenListeEnglisch = ["homeschooling", "unschooling", "worldschooling","montessori", "waldorf",
-  "joint activities", "world Travel", "travel slowly", "travel together", "co-living", "shared child care",
+  "joint activities", "world Travel", "travel slowly", "travel together", "co-living", "digital nomads", "shared child care",
   "open end travel", "coffee meeting", "meet online","minimalism","frugalism", "vegan","sugar free","gluten free",
   "nonviolent communication", "bitcoin", "single parent"];
 List<String> meetupIntervalEnglisch = ["once", "daily", "several days", "weekly","every 2 weeks","monthly"];

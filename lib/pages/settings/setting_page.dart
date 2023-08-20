@@ -242,7 +242,7 @@ class _ProfilSection extends StatelessWidget {
     });
 
     kinderAgeBox.setSelected(childrenAgeTimestamp);
-
+    print(userProfil["interessen"]);
     interessenInputBox.selected = List<String>.from(spracheIstDeutsch
         ? global_func.changeEnglishToGerman(userProfil["interessen"])
         : global_func.changeGermanToEnglish(userProfil["interessen"]));
