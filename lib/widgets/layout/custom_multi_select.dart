@@ -69,6 +69,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
             setState(() {});
             widget.selected!.remove(value);
             if(widget.selected!.length > 1) widget.onConfirm!();
+            widget.onConfirm!();
             return widget.selected;
           },
         ),
