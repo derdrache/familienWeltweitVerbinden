@@ -528,6 +528,7 @@ class _UserInformationDisplay extends StatelessWidget {
     bool isPrivacyLevel3 = reiseplanungSetting == privacySetting[2] ||
         reiseplanungSetting == privacySettingEnglisch[2];
 
+    print(profil["reisePlanung"]);
     if (profil["reisePlanung"].isEmpty) return false;
 
     if (isPrivacyLevel1) {
@@ -814,6 +815,8 @@ class _UserInformationDisplay extends StatelessWidget {
           ),
         ));
       }
+
+      if(reiseplanung.isEmpty) return SizedBox.shrink();
 
       return _InfoBox(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
