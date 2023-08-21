@@ -544,10 +544,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
     usersCityInformation.asMap().forEach((index, element) {
       if(element["id"] == widget.insiderInfoId) {
-
         initalPage = index;
       }
-      usersCityInformationOriginal.add(false);
+      usersCityInformationOriginal.add(null);
     });
 
 
@@ -979,55 +978,48 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   getInsiderInfoText(information, index) {
     String showTitle = "";
     String showInformation = "";
-    String tranlsationIn = "";
     var ownlanguages = Hive.box("secureBox").get("ownProfil")["sprachen"];
     var informationLanguage = information["sprache"] == "de"
         ? ["Deutsch", "german"]
         : ["Englisch", "english"];
-    bool canSpeakInformationLanguage = index == null
-        ? false
-        : usersCityInformationOriginal[index] ||
-            information["sprache"] == systemLanguage ||
+
+    bool canSpeakInformationLanguage = information["sprache"] == systemLanguage ||
             ownlanguages.contains(informationLanguage[0]) ||
             ownlanguages.contains(informationLanguage[1]);
+    if(usersCityInformationOriginal[index] == null) canSpeakInformationLanguage ? usersCityInformationOriginal[index] = true : usersCityInformationOriginal[index] = false;
 
     if (information["titleGer"].isEmpty) {
       return {
         "title": information["titleEng"],
-        "information": information["informationEng"]
+        "information": information["informationEng"],
+        "translated": false,
       };
     }
     if (information["titleEng"].isEmpty) {
       return {
         "title": information["titleGer"],
-        "information": information["informationGer"]
+        "information": information["informationGer"],
+        "translated": false,
       };
     }
 
-    if (canSpeakInformationLanguage) {
-      if (information["sprache"] == "de") {
-        showTitle = information["titleGer"];
-        showInformation = information["informationGer"];
-      } else {
-        showTitle = information["titleEng"];
-        showInformation = information["informationEng"];
-      }
-    } else {
-      if (information["sprache"] == "de") {
-        tranlsationIn = "englisch";
-        showTitle = information["titleEng"];
-        showInformation = information["informationEng"];
-      } else {
-        tranlsationIn = "deutsch";
-        showTitle = information["titleGer"];
-        showInformation = information["informationGer"];
-      }
+    String originalTitle = informationLanguage[0] == "Deutsch" ? information["titleGer"] : information["titleEng"];
+    String originalInformation = informationLanguage[0] == "Deutsch" ? information["informationGer"] : information["informationEng"];
+    String translationTitle = informationLanguage[0] == "Deutsch" ? information["titleEng"] : information["titleGer"];
+    String translationInformation = informationLanguage[0] == "Deutsch" ? information["informationEng"] : information["informationGer"];
+
+    if(usersCityInformationOriginal[index]){
+      showTitle = originalTitle;
+      showInformation = originalInformation;
+    }else{
+      showTitle = translationTitle;
+      showInformation = translationInformation;
     }
 
     return {
       "title": showTitle,
       "information": showInformation,
-      "translationIn": tranlsationIn,
+      "translated": !usersCityInformationOriginal[index],
     };
   }
 
@@ -1071,7 +1063,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       var informationText = getInsiderInfoText(information, index);
       var showTitle = informationText["title"];
       var showInformation = informationText["information"];
-      var translationIn = informationText["translationIn"];
+      var translated = informationText["translated"];
       var creatorProfil = getProfilFromHive(profilId: information["erstelltVon"]);
       String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
 
@@ -1116,7 +1108,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     )),
               ),
             ),
-            if (translationIn != null)
+            if (translated)
               Padding(
                 padding: const EdgeInsets.only(right: 5, top: 5),
                 child: Row(
@@ -1167,9 +1159,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ),
                   ),
                   Expanded(
-                      child: translationIn != null ||
-                              usersCityInformationOriginal[index]
-                          ? Center(
+                      child: Center(
                               child: TextButton(
                                   style: TextButton.styleFrom(
                                     shape: const StadiumBorder(),
@@ -1186,12 +1176,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                                             .colorScheme
                                             .secondary,
                                         decoration:
-                                            !usersCityInformationOriginal[index]
+                                            translated
                                                 ? TextDecoration.lineThrough
                                                 : null),
                                   )),
                             )
-                          : const SizedBox.shrink()),
+                          ),
                   GestureDetector(
                     onTap: () => creatorProfil == null
                         ? null
