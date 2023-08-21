@@ -113,6 +113,8 @@ refreshHiveData() async {
 }
 
 deleteOldVoiceMessages() async {
+  if (kIsWeb) return;
+
   var appDir = await getApplicationDocumentsDirectory();
   var allFiles = Directory(appDir.path).listSync();
 
