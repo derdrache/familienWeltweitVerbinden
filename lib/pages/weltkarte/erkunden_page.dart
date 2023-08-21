@@ -1579,10 +1579,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
 
       return Marker(
-        width: markerSize * 2,
-        height: markerSize * 2,
+        width: markerSize,
+        height: markerSize,
         point: position,
         builder: (ctx) => IconButton(
+          padding: EdgeInsets.zero,
+          color: Colors.red,
           icon: Stack(
             children: [
               Image.asset("assets/icons/bookmark.png",
