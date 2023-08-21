@@ -408,10 +408,12 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     Widget socialLoginButtons() {
+      if(kIsWeb) return SizedBox.shrink();
+
       return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        if (!Platform.isIOS) googleLoginButton(),
+        if (kIsWeb|| !Platform.isIOS) googleLoginButton(),
         const SizedBox(width: 10),
-        if (Platform.isIOS) appleLoginButton(),
+        if (!kIsWeb || Platform.isIOS) appleLoginButton(),
       ]);
     }
 
