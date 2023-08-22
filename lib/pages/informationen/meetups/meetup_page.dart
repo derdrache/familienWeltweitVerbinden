@@ -113,15 +113,14 @@ class _MeetupPageState extends State<MeetupPage> {
 
         meetupCards.add(
           BadgeWidget(
-            child:             MeetupCard(
+            number: freischaltenCount,
+            child: MeetupCard(
                 meetupData: meetup,
-                margin: EdgeInsets.zero,
                 withInteresse: true,
                 fromMeetupPage: true,
                 afterFavorite: () => setState((){}),
                 afterPageVisit: () => setState((){})
             ),
-            number: freischaltenCount,
           ));
       }
 
@@ -131,9 +130,7 @@ class _MeetupPageState extends State<MeetupPage> {
           child: Container(
             margin: const EdgeInsets.only(top:20),
             child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 15,
-                runSpacing: 30,
+                alignment: WrapAlignment.spaceEvenly,
                 children: [
                   ...meetupCards,
                   if(onSearch) const SizedBox(height: 330)
