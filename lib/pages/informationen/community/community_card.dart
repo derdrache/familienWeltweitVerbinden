@@ -190,7 +190,7 @@ class _InteresseButtonState extends State<InteresseButton> {
     updateHiveCommunity(
         communityId, "interesse", widget.communityData["interesse"]);
 
-    widget.afterFavorite!();
+    if(widget.afterFavorite != null) widget.afterFavorite!();
 
     return !isIntereset;
   }

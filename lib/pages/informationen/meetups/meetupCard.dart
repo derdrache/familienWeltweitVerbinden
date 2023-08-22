@@ -382,7 +382,7 @@ class _InteresseButtonState extends State<InteresseButton> {
 
     setState(() {});
 
-    widget.afterFavorite!();
+    if(widget.afterFavorite != null) widget.afterFavorite!();
 
     return !isIntereset;
   }
