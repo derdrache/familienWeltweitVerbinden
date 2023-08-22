@@ -35,15 +35,15 @@ class ErkundenPage extends StatefulWidget {
 }
 
 class _ErkundenPageState extends State<ErkundenPage> {
-  var userId = FirebaseAuth.instance.currentUser?.uid;
-  var profils = [];
-  var profilsBackup = [];
-  var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
-  var allCities = Hive.box('secureBox').get("stadtinfo") ?? [];
-  var events = [];
-  var communities = Hive.box('secureBox').get("communities") ?? [];
-  var insiderInfos = [];
-  var familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
+  List profils = [];
+  List profilsBackup = [];
+  var ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
+  List allCities = Hive.box('secureBox').get("stadtinfo") ?? [];
+  List events = [];
+  List communities = Hive.box('secureBox').get("communities") ?? [];
+  List insiderInfos = [];
+  List familyProfils = Hive.box('secureBox').get("familyProfils") ?? [];
   MapController mapController = MapController();
   Set<String> allUserName = {};
   var countriesList = LocationService().getAllCountryNames();
@@ -1125,15 +1125,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if(profils != null) content = showItems.map<Widget>((profil) => profilBottomSheetLayout(profil)).toList();
       if(event != null) {
         content = showItems["profils"].map<Widget>((meetup) => MeetupCard(
-          margin: const EdgeInsets.all(10),
           withInteresse: true,
+          margin: const EdgeInsets.all(20),
           meetupData: meetup,
         )).toList();
       }
       if(community != null) {
         content = showItems["profils"].map<Widget>((communityData) => CommunityCard(
-          margin: const EdgeInsets.all(10),
           withFavorite: true,
+          margin: const EdgeInsets.all(20),
           community: communityData,
         )).toList();
       }
@@ -1160,7 +1160,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       children: [
                         SizedBox(
                           height: 50,
-                          child: Expanded(child: Center(child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),))),
+                          child: Center(child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)),
                         ),
                         const Positioned(top: -5, right: -5, child: CloseButton(color: Colors.red,))
                       ],
