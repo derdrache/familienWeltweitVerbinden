@@ -37,50 +37,40 @@ class OwnIconButton extends StatelessWidget {
     return InkWell(
       onTap: onPressed != null ? () => onPressed!() : null,
       child: Container(
+        padding: withBox ? const EdgeInsets.all(5) : null,
         margin: margin,
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Center(
-              child: Container(
-                padding: withBox ? EdgeInsets.all(5) : null,
-                decoration: withBox ? BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.all(Radius.circular(8))
-                ): null,
-                child: Tooltip(
-                  message: tooltipText,
-                  child: image != null
-                      ? Image.asset(
-                          image,
-                          width: size,
-                          height: size,
-                        )
-                      : Icon(icon, size: size, color: color),
-                ),
-              ),
-            ),
-            if (badgeText.isNotEmpty)
-              Positioned(
-                top: -10,
-                right: badgePositionRight,
-                child: Container(
-                    height: 20,
-                    width: 20,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondary,
-                        shape: BoxShape.circle),
-                    child: Center(
-                      child: FittedBox(
-                        child: Text(
-                          badgeText,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                      ),
-                    )),
+            Tooltip(
+              message: tooltipText,
+              child: image != null
+                  ? Image.asset(
+                image,
+                width: size,
+                height: size,
               )
-
+                  : Icon(icon, size: size, color: color),
+            ),
+            if (badgeText.isNotEmpty) Positioned(
+              top: -10,
+              right: -15,
+              child: Container(
+                  height: 20,
+                  width: 20,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.secondary,
+                      shape: BoxShape.circle),
+                  child: Center(
+                    child: FittedBox(
+                      child: Text(
+                        badgeText,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                    ),
+                  )),
+            )
           ],
         ),
       ),
