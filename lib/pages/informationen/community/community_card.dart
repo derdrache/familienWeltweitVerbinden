@@ -28,7 +28,7 @@ class CommunityCard extends StatefulWidget {
       this.withFavorite = false,
       this.afterFavorite,
       this.margin =
-          const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
+          const EdgeInsets.all(10),
       this.afterPageVisit,
       this.smallCard = false})
       : isCreator = community["erstelltVon"] == userId,
@@ -58,9 +58,8 @@ class _CommunityCardState extends State<CommunityCard> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
     double sizeRefactor = widget.smallCard ? 0.5 : 1;
-    var fontSize = screenHeight / 55 * sizeRefactor;
+    var fontSize = 14 * sizeRefactor;
     var isAssetImage =
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
@@ -71,8 +70,8 @@ class _CommunityCardState extends State<CommunityCard> {
               ? () => widget.afterPageVisit
               : null),
       child: Container(
-          width: (120 + ((screenHeight - 600) / 5)) * sizeRefactor,
-          height: screenHeight / 3.2 * sizeRefactor,
+          width: 150 * sizeRefactor,
+          height: 225 * sizeRefactor,
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -91,27 +90,14 @@ class _CommunityCardState extends State<CommunityCard> {
             children: [
               Stack(
                 children: [
-                  Container(
-                    constraints: const BoxConstraints(
-                        minHeight: 70 * 0.5, maxHeight: 120),
-                    child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0),
-                        ),
-                        child: isAssetImage
-                            ? Image.asset(widget.community["bild"],
-                                height: (70 + ((screenHeight - 600) / 4)) *
-                                    sizeRefactor,
-                                width: (135 + ((screenHeight - 600) / 4)),
-                                fit: BoxFit.fill)
-                            : CachedNetworkImage(
-                                imageUrl: widget.community["bild"],
-                                height: (70 + ((screenHeight - 600) / 4)) *
-                                    sizeRefactor,
-                                width: (135 + ((screenHeight - 600) / 4)),
-                                fit: BoxFit.fill)),
-                  ),
+                  ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
+                      ),
+                      child: isAssetImage
+                          ? Image.asset(widget.community["bild"])
+                          : CachedNetworkImage(imageUrl: widget.community["bild"])),
                   if (widget.withFavorite && !widget.isCreator)
                     Positioned(
                         top: likeButtonAbstandTop,
@@ -123,44 +109,42 @@ class _CommunityCardState extends State<CommunityCard> {
                                 : null)),
                 ],
               ),
-              Expanded(
-                child: Container(
-                    padding: const EdgeInsets.only(top: 10, left: 5),
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20.0),
-                        bottomRight: Radius.circular(20.0),
-                      ),
+              Container(
+                  padding: const EdgeInsets.only(top: 10, left: 5),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
                     ),
-                    child: Column(
-                      children: [
-                        Text(getCommunityTitle(),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: fontSize + 1)),
-                        const SizedBox(height: 10),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(getCommunityTitle(),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: fontSize + 1)),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(widget.community["ort"],
+                              style: TextStyle(fontSize: fontSize))
+                        ],
+                      ),
+                      const SizedBox(height: 2.5),
+                      if (widget.community["ort"] != widget.community["land"])
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(widget.community["ort"],
+                            Text(widget.community["land"],
                                 style: TextStyle(fontSize: fontSize))
                           ],
                         ),
-                        const SizedBox(height: 2.5),
-                        if (widget.community["ort"] != widget.community["land"])
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(widget.community["land"],
-                                  style: TextStyle(fontSize: fontSize))
-                            ],
-                          ),
-                      ],
-                    )),
-              )
+                    ],
+                  ))
             ],
           )),
     );

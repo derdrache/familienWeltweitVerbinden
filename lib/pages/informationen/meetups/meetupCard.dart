@@ -28,8 +28,7 @@ class MeetupCard extends StatefulWidget {
     Key? key,
     required this.meetupData,
     this.withInteresse = false,
-    this.margin =
-        const EdgeInsets.only(top: 10, bottom: 0, right: 10, left: 10),
+    this.margin = const EdgeInsets.all(10),
     this.afterPageVisit,
     this.bigCard = false,
     this.fromMeetupPage = false,
@@ -151,8 +150,8 @@ class _MeetupCardState extends State<MeetupCard> {
         : widget.smallCard
             ? 0.5
             : 1.0;
-    double screenHeight = MediaQuery.of(context).size.height;
-    var fontSize = screenHeight / 55 * sizeRefactor;
+    var fontSize = 14 * sizeRefactor;
+
     var forTeilnahmeFreigegeben = (widget.meetupData["art"] == "public" ||
             widget.meetupData["art"] == "öffentlich") ||
         widget.meetupData["freigegeben"].contains(userId);
@@ -214,14 +213,11 @@ class _MeetupCardState extends State<MeetupCard> {
           : null,
       onTap: () => global_func.changePage(
           context,
-          MeetupDetailsPage(
-              meetupData: widget.meetupData,
-              fromMeetupPage: widget.fromMeetupPage),
-          whenComplete: () =>
-              widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
+          MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
+          whenComplete: () =>  widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
       child: Container(
-          width: (120 + ((screenHeight - 600) / 5)) * sizeRefactor,
-          height: screenHeight / 3.2 * sizeRefactor,
+          width: 150 * sizeRefactor,
+          height: 225 * sizeRefactor,
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -236,130 +232,111 @@ class _MeetupCardState extends State<MeetupCard> {
                   offset: const Offset(0, 3), // changes position of shadow
                 ),
               ]),
-          child: Column(
+        child: Column(children: [
+          Stack(
             children: [
-              Stack(
-                children: [
-                  Container(
-                    constraints: BoxConstraints(
-                      minHeight: 70 * sizeRefactor,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0),
-                      ),
-                      child: isAssetImage
-                          ? Image.asset(widget.meetupData["bild"],
-                              height: (70 + ((screenHeight - 600) / 4)) *
-                                  sizeRefactor,
-                              width: (135 + ((screenHeight - 600) / 4)) *
-                                  sizeRefactor,
-                              fit: BoxFit.fill)
-                          : CachedNetworkImage(
-                              imageUrl: widget.meetupData["bild"],
-                              height: (70 + ((screenHeight - 600) / 4)) *
-                                  sizeRefactor,
-                              width: (130 + ((screenHeight - 600) / 4)) *
-                                  sizeRefactor,
-                              fit: BoxFit.fill),
-                    ),
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
                   ),
-                  if (widget.withInteresse &&
-                      !widget.isCreator &&
-                      !widget.smallCard)
-                    Positioned(
-                        top: likeButtonAbstandTop,
-                        right: likeButtonAbstandRight,
-                        child: InteresseButton(
-                            hasIntereset:
-                                widget.meetupData["interesse"].contains(userId),
-                            id: widget.meetupData["id"],
-                            afterFavorite: widget.afterFavorite != null
-                                ? widget.afterFavorite!
-                                : null)),
-                ],
+                  child: isAssetImage
+                      ? Image.asset(widget.meetupData["bild"])
+                      : CachedNetworkImage(imageUrl: widget.meetupData["bild"]),
+                ),
+              if (widget.withInteresse &&
+                  !widget.isCreator &&
+                  !widget.smallCard)
+                Positioned(
+                    top: likeButtonAbstandTop,
+                    right: likeButtonAbstandRight,
+                    child: InteresseButton(
+                        hasIntereset:
+                        widget.meetupData["interesse"].contains(userId),
+                        id: widget.meetupData["id"],
+                        afterFavorite: widget.afterFavorite != null
+                            ? widget.afterFavorite!
+                            : null)),
+            ],
+          ),
+          Container(
+              padding: const EdgeInsets.only(top: 10, left: 5),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20.0),
+                  bottomRight: Radius.circular(20.0),
+                ),
               ),
-              Expanded(
-                child: Container(
-                    padding: const EdgeInsets.only(top: 10, left: 5),
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20.0),
-                        bottomRight: Radius.circular(20.0),
-                      ),
-                    ),
-                    child: Column(
+              child: Column(
+                children: [
+                  Text(getMeetupTitle(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: fontSize + 1)),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(AppLocalizations.of(context)!.datum,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: fontSize)),
+                      Text(createDatetimeText(),
+                          style: TextStyle(fontSize: fontSize))
+                    ],
+                  ),
+                  const SizedBox(height: 2.5),
+                  if (isOffline)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(getMeetupTitle(),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
+                        Text(widget.meetupData["stadt"],
+                            style: TextStyle(fontSize: fontSize))
+                      ],
+                    ),
+                  if (isOffline) const SizedBox(height: 2.5),
+                  if (isOffline)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(widget.meetupData["land"],
+                            style: TextStyle(fontSize: fontSize))
+                      ],
+                    ),
+                  if (!isOffline)
+                    Row(
+                      children: [
+                        Text(AppLocalizations.of(context)!.uhrzeit,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: fontSize + 1)),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Text(AppLocalizations.of(context)!.datum,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: fontSize)),
-                            Text(createDatetimeText(),
-                                style: TextStyle(fontSize: fontSize))
-                          ],
-                        ),
-                        const SizedBox(height: 2.5),
-                        if (isOffline)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(widget.meetupData["stadt"],
-                                  style: TextStyle(fontSize: fontSize))
-                            ],
-                          ),
-                        if (isOffline) const SizedBox(height: 2.5),
-                        if (isOffline)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(widget.meetupData["land"],
-                                  style: TextStyle(fontSize: fontSize))
-                            ],
-                          ),
-                        if (!isOffline)
-                          Row(
-                            children: [
-                              Text(AppLocalizations.of(context)!.uhrzeit,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: fontSize)),
-                              Text(
-                                  createOnlineMeetupTime() +
-                                      " GMT " +
-                                      DateTime.now()
-                                          .timeZoneOffset
-                                          .inHours
-                                          .toString(),
-                                  style: TextStyle(fontSize: fontSize))
-                            ],
-                          ),
-                        if (!isOffline)
-                          Row(
-                            children: [
-                              Text("Typ: ",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: fontSize)),
-                              Text(widget.meetupData["typ"],
-                                  style: TextStyle(fontSize: fontSize))
-                            ],
-                          )
+                                fontSize: fontSize)),
+                        Text(
+                            createOnlineMeetupTime() +
+                                " GMT " +
+                                DateTime.now()
+                                    .timeZoneOffset
+                                    .inHours
+                                    .toString(),
+                            style: TextStyle(fontSize: fontSize))
                       ],
-                    )),
-              )
-            ],
-          )),
+                    ),
+                  if (!isOffline)
+                    Row(
+                      children: [
+                        Text("Typ: ",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: fontSize)),
+                        Text(widget.meetupData["typ"],
+                            style: TextStyle(fontSize: fontSize))
+                      ],
+                    )
+                ],
+              ))
+        ],),
+      ),
     );
   }
 }
