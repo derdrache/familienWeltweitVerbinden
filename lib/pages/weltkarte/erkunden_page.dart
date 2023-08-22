@@ -89,7 +89,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
   double cityZoom = 8.5;
   double countryZoom = 5.5;
   double kontinentZoom = 3.5;
-  SearchAutocomplete searchAutocomplete = SearchAutocomplete(searchableItems: const [],);
+  SearchAutocomplete searchAutocomplete = SearchAutocomplete(
+    searchableItems: const [],
+  );
   late LatLng mapPosition;
   List<Widget> popupItems = [];
   var monthsUntilInactive = 3;
@@ -332,7 +334,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
     bool singleChildCheck = checkSingleChildMatch(filterList, profilKinder);
     bool twinsCheck = checkTwinsMatch(filterList, profilKinder);
     bool multiChildCheck = checkMultiChildFamilyMatch(filterList, profilKinder);
-
 
     if (spracheMatch &&
         reiseartMatch &&
@@ -1014,12 +1015,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
   Widget build(BuildContext context) {
     List<Marker> allMarker = [];
 
-    profilBottomSheetLayout(profilData){
-      var genauerStandortKondition = profilData["automaticLocation"] ==
-          global_var.standortbestimmung[1] ||
-          profilData["automaticLocation"] ==
-              global_var.standortbestimmungEnglisch[1] &&
-              checkGenauerStandortPrivacy(profilData);
+    profilBottomSheetLayout(profilData) {
+      var genauerStandortKondition =
+          profilData["automaticLocation"] == global_var.standortbestimmung[1] ||
+              profilData["automaticLocation"] ==
+                      global_var.standortbestimmungEnglisch[1] &&
+                  checkGenauerStandortPrivacy(profilData);
 
       return GestureDetector(
         onTap: () {
@@ -1037,38 +1038,34 @@ class _ErkundenPageState extends State<ErkundenPage> {
                     : Colors.white,
                 border: Border(
                     bottom:
-                    BorderSide(width: 1, color: style.borderColorGrey))),
+                        BorderSide(width: 1, color: style.borderColorGrey))),
             child: Row(
               children: [
                 ProfilImage(profilData),
                 const SizedBox(width: 10),
-                Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        profilData["name"],
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                          childrenAgeStringToStringAge(profilData["kinder"])),
-                      const SizedBox(height: 5),
-                      genauerStandortKondition
-                          ? Text(
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(
+                    profilData["name"],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(childrenAgeStringToStringAge(profilData["kinder"])),
+                  const SizedBox(height: 5),
+                  genauerStandortKondition
+                      ? Text(
                           "📍 ${changeTextLength(profilData["ort"])}, ${changeTextLength(profilData["land"])}")
-                          : Text(changeTextLength(profilData["ort"]) +
+                      : Text(changeTextLength(profilData["ort"]) +
                           ", " +
                           changeTextLength(profilData["land"]))
-                    ])
+                ])
               ],
             )),
       );
     }
 
-    insiderInfoBottomSheetLayout(infoData){
-      String infoTitle = getUserSpeaksGerman()
-          ? infoData["titleGer"]
-          : infoData["titleEng"];
+    insiderInfoBottomSheetLayout(infoData) {
+      String infoTitle =
+          getUserSpeaksGerman() ? infoData["titleGer"] : infoData["titleEng"];
 
       return GestureDetector(
         onTap: () {
@@ -1089,8 +1086,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
                       : Colors.black),
-              borderRadius:
-              BorderRadius.circular(style.roundedCorners)),
+              borderRadius: BorderRadius.circular(style.roundedCorners)),
           child: Column(
             children: [
               Text(
@@ -1115,43 +1111,55 @@ class _ErkundenPageState extends State<ErkundenPage> {
       );
     }
 
-    bottomSheet({event, community, insiderInfo, profils, spezialActivation = false}){
+    bottomSheet(
+        {event, community, insiderInfo, profils, spezialActivation = false}) {
       var showItems = profils ?? event ?? community ?? insiderInfo;
       String title = profils != null
           ? selectPopupMenuText(profils, spezialActivation)
           : selectPopupMenuText(showItems["profils"], spezialActivation);
       List content = [];
 
-      if(profils != null) content = showItems.map<Widget>((profil) => profilBottomSheetLayout(profil)).toList();
-      if(event != null) {
-        content = showItems["profils"].map<Widget>((meetup) => MeetupCard(
-          withInteresse: true,
-          margin: const EdgeInsets.all(20),
-          meetupData: meetup,
-        )).toList();
+      if (profils != null)
+        content = showItems
+            .map<Widget>((profil) => profilBottomSheetLayout(profil))
+            .toList();
+      if (event != null) {
+        content = showItems["profils"]
+            .map<Widget>((meetup) => MeetupCard(
+                  withInteresse: true,
+                  margin: const EdgeInsets.all(20),
+                  meetupData: meetup,
+                ))
+            .toList();
       }
-      if(community != null) {
-        content = showItems["profils"].map<Widget>((communityData) => CommunityCard(
-          withFavorite: true,
-          margin: const EdgeInsets.all(20),
-          community: communityData,
-        )).toList();
+      if (community != null) {
+        content = showItems["profils"]
+            .map<Widget>((communityData) => CommunityCard(
+                  withFavorite: true,
+                  margin: const EdgeInsets.all(20),
+                  community: communityData,
+                ))
+            .toList();
       }
-      if(insiderInfo != null) content = showItems["profils"].map<Widget>((infoData) => insiderInfoBottomSheetLayout(infoData)).toList();
+      if (insiderInfo != null)
+        content = showItems["profils"]
+            .map<Widget>((infoData) => insiderInfoBottomSheetLayout(infoData))
+            .toList();
 
       return showModalBottomSheet(
           backgroundColor: Colors.transparent,
           context: context,
           isScrollControlled: true,
-          builder: (context){
+          builder: (context) {
             return Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.black
-                    : Colors.white,
-                border: Border.all(),
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(style.roundedCorners))
-              ),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
+                  border: Border.all(),
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(style.roundedCorners))),
               child: FractionallySizedBox(
                 heightFactor: 0.7,
                 child: Column(
@@ -1160,9 +1168,19 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       children: [
                         SizedBox(
                           height: 50,
-                          child: Center(child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),)),
+                          child: Center(
+                              child: Text(
+                            title,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          )),
                         ),
-                        const Positioned(top: -5, right: -5, child: CloseButton(color: Colors.red,))
+                        const Positioned(
+                            top: -5,
+                            right: -5,
+                            child: CloseButton(
+                              color: Colors.red,
+                            ))
                       ],
                     ),
                     Expanded(
@@ -1546,7 +1564,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
             eventMarkerOn = true;
 
             if (newEvents.isNotEmpty) {
-              bottomSheet(event: {"profils": newEvents}, spezialActivation: true);
+              bottomSheet(
+                  event: {"profils": newEvents}, spezialActivation: true);
               Hive.box('secureBox').put("lastLoginEvents", events);
             }
           }
@@ -1592,7 +1611,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
             communityMarkerOn = true;
 
             if (newCommunity.isNotEmpty) {
-              bottomSheet(community: {"profils": newCommunity},
+              bottomSheet(
+                  community: {"profils": newCommunity},
                   spezialActivation: true);
               Hive.box('secureBox').put("lastLoginCommunity", communities);
             }
@@ -1656,7 +1676,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           ? global_var.reisearten
           : global_var.reiseartenEnglisch;
       var alterKinderSelection =
-      List<String>.generate(18, (i) => (i + 1).toString());
+          List<String>.generate(18, (i) => (i + 1).toString());
       List familyFeatureSelection = spracheIstDeutsch
           ? global_var.familienMerkmale
           : global_var.familienMerkmaleEnglisch;
@@ -1676,10 +1696,10 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       const Expanded(
                           child: Center(
                               child: Text(
-                                "Filter",
-                                style:
-                                TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                              ))),
+                        "Filter",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ))),
                       TextButton(
                           onPressed: () {
                             filterList = [];
@@ -1754,7 +1774,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     setSearchAutocomplete() {
       var countryList =
-      spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
+          spracheIstDeutsch ? countriesList["ger"] : countriesList["eng"];
 
       changeAllCitiesAndCreateCityNames();
 
@@ -1770,8 +1790,6 @@ class _ErkundenPageState extends State<ErkundenPage> {
           },
           onRemove: () => deactivateAllButtons());
     }
-
-
 
     setSearchAutocomplete();
 
