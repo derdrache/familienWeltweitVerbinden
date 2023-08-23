@@ -27,7 +27,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       newTextList.add(TextSpan(
           text: text,
           recognizer: TapGestureRecognizer()..onTap = onTextTab == null ? null :() => onTextTab!(),
-          style: TextStyle(fontSize: fontsize, color: Colors.black,)
+          style: TextStyle(fontSize: fontsize)
       ));
     }
 
