@@ -528,7 +528,7 @@ class _UserInformationDisplay extends StatelessWidget {
     bool isPrivacyLevel3 = reiseplanungSetting == privacySetting[2] ||
         reiseplanungSetting == privacySettingEnglisch[2];
 
-    print(profil["reisePlanung"]);
+
     if (profil["reisePlanung"].isEmpty) return false;
 
     if (isPrivacyLevel1) {
@@ -922,7 +922,7 @@ class _UserInformationDisplay extends StatelessWidget {
         var ownInterests = [...global_functions.changeEnglishToGerman(ownProfil["interessen"]), ...global_functions.changeGermanToEnglish(ownProfil["interessen"])];
         bool match = false;
 
-        if(ownInterests.contains(interest)) match = true;
+        if(ownInterests.contains(interest) && !isOwnProfil) match = true;
 
         matchInterest.add(match);
       }
