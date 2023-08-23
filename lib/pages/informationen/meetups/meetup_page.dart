@@ -59,24 +59,26 @@ class _MeetupPageState extends State<MeetupPage> {
     setState(() {});
   }
 
-  getAllSearchMeetups(){
+  getAllSearchMeetups() {
     var searchedMeetups = [];
     var searchText = meetupSearchKontroller.text.toLowerCase();
 
-    if(searchText.isEmpty) return allMeetups;
+    if (searchText.isEmpty) return allMeetups;
 
-    for(var meetup in allMeetups){
-      bool isNotPrivat = !meetup["art"].contains("private") && !meetup["art"].contains("privat");
+    for (var meetup in allMeetups) {
+      bool isNotPrivat = !meetup["art"].contains("private") &&
+          !meetup["art"].contains("privat");
       bool nameKondition = meetup["name"].toLowerCase().contains(searchText);
-      bool countryKondition = meetup["land"].toLowerCase().contains(searchText) ||
-          LocationService()
-              .transformCountryLanguage(meetup["land"])
-              .toLowerCase()
-              .contains(searchText);
+      bool countryKondition =
+          meetup["land"].toLowerCase().contains(searchText) ||
+              LocationService()
+                  .transformCountryLanguage(meetup["land"])
+                  .toLowerCase()
+                  .contains(searchText);
       bool cityKondition = meetup["stadt"].toLowerCase().contains(searchText);
 
-      if((nameKondition || countryKondition || cityKondition) && isNotPrivat) searchedMeetups.add(meetup);
-
+      if ((nameKondition || countryKondition || cityKondition) && isNotPrivat)
+        searchedMeetups.add(meetup);
     }
 
     return searchedMeetups;
@@ -90,54 +92,48 @@ class _MeetupPageState extends State<MeetupPage> {
     showMeetups() {
       List allEntries = onSearch
           ? getAllSearchMeetups()
-          : Hive.box('secureBox').get("interestEvents") + Hive.box('secureBox').get("myEvents");
+          : Hive.box('secureBox').get("interestEvents") +
+              Hive.box('secureBox').get("myEvents");
 
       List<Widget> meetupCards = [];
-      var emptyText = AppLocalizations.of(context)!.nochKeinegemeinschaftVorhanden;
+      var emptyText =
+          AppLocalizations.of(context)!.nochKeinegemeinschaftVorhanden;
       var emptySearchText = AppLocalizations.of(context)!.sucheKeineErgebnisse;
 
       if (allEntries.isEmpty) {
         meetupCards.add(SizedBox(
           height: 300,
           child: Center(
-              child: Text(onSearch ? emptySearchText : emptyText,
-                style: const TextStyle(fontSize: 20),
-              )),
+              child: Text(
+            onSearch ? emptySearchText : emptyText,
+            style: const TextStyle(fontSize: 20),
+          )),
         ));
       }
 
       for (var meetup in allEntries) {
         bool isOwner = meetup["erstelltVon"] == userId;
-        bool isNotPublic = meetup["art"] != "public" && meetup["art"] != "öffentlich";
-        int freischaltenCount = isOwner && isNotPublic ? meetup["freischalten"].length : 0;
+        bool isNotPublic =
+            meetup["art"] != "public" && meetup["art"] != "öffentlich";
+        int freischaltenCount =
+            isOwner && isNotPublic ? meetup["freischalten"].length : 0;
 
-        meetupCards.add(
-          BadgeWidget(
-            number: freischaltenCount,
-            child: MeetupCard(
-                meetupData: meetup,
-                withInteresse: true,
-                fromMeetupPage: true,
-                afterFavorite: () => setState((){}),
-                afterPageVisit: () => setState((){})
-            ),
-          ));
+        meetupCards.add(BadgeWidget(
+          number: freischaltenCount,
+          child: MeetupCard(
+              meetupData: meetup,
+              withInteresse: true,
+              fromMeetupPage: true,
+              afterFavorite: () => setState(() {}),
+              afterPageVisit: () => setState(() {})),
+        ));
       }
 
       return SingleChildScrollView(
-        child: SizedBox(
-          width: double.infinity,
-          child: Container(
-            margin: const EdgeInsets.only(top:20),
-            child: Wrap(
-                alignment: WrapAlignment.spaceEvenly,
-                children: [
-                  ...meetupCards,
-                  if(onSearch) const SizedBox(height: 330)
-                ]
-            ),
-          ),
-        ),
+        child: Wrap(alignment: WrapAlignment.spaceEvenly, children: [
+          ...meetupCards,
+          if (onSearch) const SizedBox(height: 330)
+        ]),
       );
     }
 
@@ -145,37 +141,43 @@ class _MeetupPageState extends State<MeetupPage> {
       appBar: CustomAppBar(
           title: pageTitle,
           leading: IconButton(
-            onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
+            onPressed: () => global_functions.changePageForever(
+                context,
+                StartPage(
+                  selectedIndex: 2,
+                )),
             icon: const Icon(Icons.arrow_back),
-          )
-      ),
+          )),
       body: SafeArea(
         child: Stack(
           children: [
-            showMeetups(),
-            if(onSearch) Positioned(
-                bottom: 15,
-                right: 15,
-                child: Container(
-                  width: width*0.9,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      border: Border.all(),
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(Radius.circular(20))
-                  ),
-                  child: TextField(
-                    controller: meetupSearchKontroller,
-                    focusNode: searchFocusNode,
-                    decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.suche,
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(10)
+            Container(
+                margin: const EdgeInsets.only(top: 10),
+                height: double.infinity,
+                width: double.infinity,
+                child: showMeetups()),
+            if (onSearch)
+              Positioned(
+                  bottom: 15,
+                  right: 15,
+                  child: Container(
+                    width: width * 0.9,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        color: Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20))),
+                    child: TextField(
+                      controller: meetupSearchKontroller,
+                      focusNode: searchFocusNode,
+                      decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.suche,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(10)),
+                      onChanged: (_) => setState(() {}),
                     ),
-                    onChanged: (_) => setState((){}),
-                  ),
-                )
-            )
+                  ))
           ],
         ),
       ),
@@ -186,18 +188,17 @@ class _MeetupPageState extends State<MeetupPage> {
               heroTag: "create meetup",
               tooltip: AppLocalizations.of(context)!.tooltipMeetupErstellen,
               child: const Icon(Icons.create),
-              onPressed: () =>
-                  changePage(context, const MeetupErstellen())),
+              onPressed: () => changePage(context, const MeetupErstellen())),
           const SizedBox(height: 10),
           FloatingActionButton(
-            mini: onSearch ? true: false,
+            mini: onSearch ? true : false,
             backgroundColor: onSearch ? Colors.red : null,
             onPressed: () {
-              if(onSearch){
+              if (onSearch) {
                 pageTitle = "Meetups";
                 searchFocusNode.unfocus();
                 meetupSearchKontroller.clear();
-              }else{
+              } else {
                 pageTitle = "${AppLocalizations.of(context)!.suche} Meetups";
               }
 
