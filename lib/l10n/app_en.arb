@@ -535,7 +535,12 @@
     "zurueck": "Back",
     "benutzernameEingeben": "Benutzername eingeben",
     "familienMerkmale": "Family features",
-    "jahre": "Years"
+    "jahre": "Years",
+    "chatNotificationHinweis": "Turning off will no longer display notifications triggered by chat",
+    "meetupNotificationHinweis": "Turning off will no longer display notifications triggered by the Meetup",
+    "newFriendNotificationHinweis": "By turning it off, there is no more notification when someone adds you as a friend",
+    "travelPlanNotificationHinweis": "By switching off, you will no longer be shown notifications from friends",
+    "familieAroundNotificationHinweis": "By switching off, you will no longer receive a notification when a family comes near you"
 
 }
 

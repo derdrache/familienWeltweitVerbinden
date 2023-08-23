@@ -534,5 +534,9 @@
     "zurueck": "Zurück",
     "benutzernameEingeben": "Benutzername eingeben",
     "familienMerkmale": "Familienmerkmal",
-    "jahre": "Jahre"
+    "chatNotificationHinweis": "Durch Abschalten werden keine vom Chat ausgelösten Notifikation mehr angezeigt",
+    "meetupNotificationHinweis": "Durch Abschalten werden keine vom Meetup ausgelösten Notifikation mehr angezeigt",
+    "newFriendNotificationHinweis": "Durch Abschalten gibt es keine Notifikation mehr, wenn dich jemand als Freund hinzufügt",
+    "travelPlanNotificationHinweis": "Durch Abschalten werden dir keine Notifikation von Freunden mehr angezeigt",
+    "familieAroundNotificationHinweis": "Durch Abschalten bekommst du keine Notifikation mehr, wenn eine Familie in deine nähe kommt"
 }
