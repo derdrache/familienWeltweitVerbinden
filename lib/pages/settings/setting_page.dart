@@ -450,15 +450,18 @@ class _SettingSection extends StatelessWidget {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
-        child: Row(
-          children: [
-            Icon(icon),
-            const SizedBox(width: 20),
-            Text(
-              title,
-              style: TextStyle(fontSize: fontSize - 4),
-            )
-          ],
+        child: Container(
+          margin: EdgeInsets.only(top: 10, bottom: 10),
+          child: Row(
+            children: [
+              Icon(icon),
+              const SizedBox(width: 20),
+              Text(
+                title,
+                style: TextStyle(fontSize: fontSize - 4),
+              )
+            ],
+          ),
         ),
       );
     }
@@ -473,13 +476,12 @@ class _SettingSection extends StatelessWidget {
                     color: headLineColor,
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
+            SizedBox(height: 10,),
             settingThemeContainer(
                 AppLocalizations.of(context)!.privatsphaereSicherheit,
                 Icons.lock,
                 () => global_func.changePage(
                     context, const PrivacySecurityPage())),
-            const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.benachrichtigungen,
                 Icons.notifications,
@@ -501,15 +503,18 @@ class _SupportInformation extends StatelessWidget {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
-        child: Row(
-          children: [
-            Icon(icon),
-            const SizedBox(width: 20),
-            Text(
-              title,
-              style: TextStyle(fontSize: fontSize - 4),
-            )
-          ],
+        child: Container(
+          margin: EdgeInsets.only(top: 10, bottom: 10),
+          child: Row(
+            children: [
+              Icon(icon),
+              const SizedBox(width: 20),
+              Text(
+                title,
+                style: TextStyle(fontSize: fontSize - 4),
+              )
+            ],
+          ),
         ),
       );
     }
@@ -578,10 +583,9 @@ class _SupportInformation extends StatelessWidget {
                     color: headLineColor,
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             settingThemeContainer("Feedback", Icons.feedback,
                 () => global_func.changePage(context, FeedbackPage())),
-            const SizedBox(height: 20),
             settingThemeContainer(
                 "Support Chat",
                 Icons.chat,
@@ -589,19 +593,15 @@ class _SupportInformation extends StatelessWidget {
                     context,
                     ChatDetailsPage(
                         isChatgroup: true, connectedWith: "</support=1"))),
-            const SizedBox(height: 20),
             settingThemeContainer("Patch Notes", Icons.format_list_bulleted,
                 () => PatchnotesWindow(context: context).openWindow()),
-            const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
                 () => Share.share('${AppLocalizations.of(context)!.teilenLinkText}\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
-            const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.spenden, Icons.favorite,
                 () => donationWindow(context)),
-            const SizedBox(height: 20),
             settingThemeContainer(AppLocalizations.of(context)!.ueber,
                 Icons.info, () => aboutAppWindow()),
           ],
