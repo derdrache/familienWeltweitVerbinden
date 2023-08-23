@@ -60,7 +60,6 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
         value: widget.selected == "" ? null : widget.selected,
         hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
         elevation: 16,
-        style: const TextStyle(color: Colors.black),
         decoration: const InputDecoration(enabledBorder: InputBorder.none, focusedBorder: InputBorder.none) ,
         onChanged: (newValue){
           setState(() {
