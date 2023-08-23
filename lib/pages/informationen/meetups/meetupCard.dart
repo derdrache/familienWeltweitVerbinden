@@ -217,7 +217,7 @@ class _MeetupCardState extends State<MeetupCard> {
           whenComplete: () =>  widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
       child: Container(
           width: 150 * sizeRefactor,
-          height: 225 * sizeRefactor,
+          height: 250 * sizeRefactor,
           margin: widget.margin,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
