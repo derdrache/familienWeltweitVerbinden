@@ -677,15 +677,21 @@ class _UserInformationDisplay extends StatelessWidget {
       var inhaltText = "";
 
       if (profil["aufreiseBis"] == null) {
-        inhaltText = seitText + " - " + AppLocalizations.of(context)!.offen;
+        DateTime aufreiseSeit = DateTime.parse(profil["aufreiseSeit"]);
+        String yearsOnTravel = (DateTime.now().difference(aufreiseSeit).inDays / 365).toStringAsFixed(1);
+
+        inhaltText =  "$yearsOnTravel ${AppLocalizations.of(context)!.jahre} / $seitText - ${AppLocalizations.of(context)!.offen}";
       } else {
+        DateTime aufreiseSeit = DateTime.parse(profil["aufreiseSeit"]);
+        DateTime aufreiseBis = DateTime.parse(profil["aufreiseBis"]);
+        String yearsOnTravel = (aufreiseBis.difference(aufreiseSeit).inDays / 365).toStringAsFixed(1);
         var bisText = profil["aufreiseBis"]
             .split("-")
             .take(2)
             .toList()
             .reversed
             .join("-");
-        inhaltText = seitText + " - " + bisText;
+        inhaltText = "$yearsOnTravel ${AppLocalizations.of(context)!.jahre} - $seitText - $bisText";
       }
 
       return Row(children: [
