@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../functions/upload_and_save_image.dart';
 import '../global/global_functions.dart';
+import '../global/style.dart' as style;
 import '../services/database.dart';
 import 'dialogWindow.dart';
 import 'layout/custom_snackbar.dart';
@@ -260,9 +261,12 @@ class OwnProfilImage extends StatelessWidget {
             return AlertDialog(
                 insetPadding: EdgeInsets.zero,
                 backgroundColor: Colors.transparent,
-                content: isUrl
-                    ? CachedNetworkImage(imageUrl: image)
-                    : Image.asset(image));
+                content: ClipRRect(
+                  borderRadius: BorderRadius.circular(style.roundedCorners),
+                  child: isUrl
+                      ? CachedNetworkImage(imageUrl: image)
+                      : Image.asset(image),
+                ));
           });
     }
 
