@@ -27,9 +27,6 @@ class CustomAlertDialog extends StatefulWidget {
 }
 
 class _CustomAlertDialogState extends State<CustomAlertDialog> {
-  _closeWindow() {
-    Navigator.pop(context);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +69,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
               right: -13,
               top: -7,
               child: InkResponse(
-                  onTap: () => _closeWindow(),
+                  onTap: () => Navigator.pop(context),
                   child: const CircleAvatar(
                     child: Icon(
                       Icons.close,
