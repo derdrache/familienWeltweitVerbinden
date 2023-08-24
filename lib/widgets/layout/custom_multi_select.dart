@@ -58,6 +58,9 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       child: MultiSelectDialogField(
         decoration: const BoxDecoration(),
         initialValue: widget.selected!,
+        buttonIcon: Icon(Icons.arrow_downward, color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.black),
         items: widget.auswahlList.map((e) => MultiSelectItem(e, e)).toList(),
         listType: MultiSelectListType.LIST,
         searchable: true,
