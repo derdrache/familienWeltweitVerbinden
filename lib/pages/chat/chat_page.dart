@@ -753,7 +753,13 @@ class _ChatPageState extends State<ChatPage>{
                   suffixIcon: CloseButton(
                     color: Colors.white,
                     onPressed: () {
-                      searchTextKontroller.clear();
+                      if(searchTextKontroller.text.isNotEmpty){
+                        searchTextKontroller.clear();
+                      }else{
+                        setState(() {
+                          activeChatSearch = false;
+                        });
+                      }
                     },
                   )),
               onChanged: (value) => searchChats(value),
