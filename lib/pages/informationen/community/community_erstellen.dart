@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../global/style.dart' as style;
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/nutzerrichtlinen.dart';
@@ -133,20 +134,23 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     ownCommunityBox() {
       return Padding(
-        padding: const EdgeInsets.only(left:15, right: 15),
-        child: Row(
-          children: [
-            Expanded(
-                child: Text(AppLocalizations.of(context)!.frageTeilGemeinschaft,
-                    maxLines: 2, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-            Checkbox(
-                value: ownCommunity,
-                onChanged: (value) {
-                  setState(() {
-                    ownCommunity = value!;
-                  });
-                }),
-          ],
+        padding: const EdgeInsets.only(left:20, right: 20),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: style.webWidth),
+          child: Row(
+            children: [
+              Expanded(
+                  child: Text(AppLocalizations.of(context)!.frageTeilGemeinschaft,
+                      maxLines: 2, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+              Checkbox(
+                  value: ownCommunity,
+                  onChanged: (value) {
+                    setState(() {
+                      ownCommunity = value!;
+                    });
+                  }),
+            ],
+          ),
         ),
       );
     }
@@ -154,18 +158,21 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     secretChatQuestionBox(){
       return Padding(
         padding: const EdgeInsets.only(left: 15, right: 15),
-        child: Row(
-          children: [
-            Expanded(child: Text(AppLocalizations.of(context)!.geheimerChat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-            Switch(
-                value: secretChat,
-                onChanged: (newValue){
-                  setState(() {
-                    secretChat = newValue;
-                  });
-                }
-            ),
-          ],
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: style.webWidth),
+          child: Row(
+            children: [
+              Expanded(child: Text(AppLocalizations.of(context)!.geheimerChat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+              Switch(
+                  value: secretChat,
+                  onChanged: (newValue){
+                    setState(() {
+                      secretChat = newValue;
+                    });
+                  }
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -187,7 +194,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                 tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done, size: 30))
           ]),
-      body: ListView(
+      body: Column(
         children: [
           CustomTextInput(
               AppLocalizations.of(context)!.communityName, nameController, maxLength: 40),

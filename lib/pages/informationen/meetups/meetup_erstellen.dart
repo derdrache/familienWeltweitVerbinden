@@ -16,6 +16,7 @@ import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../global/variablen.dart' as global_var;
+import '../../../global/style.dart' as style;
 import '../../../widgets/layout/custom_dropdownButton.dart';
 import '../../../widgets/layout/custom_multi_select.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
@@ -420,26 +421,26 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     }
 
     ownMeetupBox() {
-      return Container(
-        margin: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Container(
-                padding: const EdgeInsets.only(left:10),
-                width: screenWidth * 0.75,
+      return Padding(
+        padding: const EdgeInsets.only(left:30, right: 20),
+        child: Container(
+          constraints: BoxConstraints(maxWidth: style.webWidth),
+          margin: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Expanded(
                 child: Text(AppLocalizations.of(context)!.frageErstellerMeetup,
-                    maxLines: 2, style: const TextStyle(fontSize: 18),)),
-            const Expanded(
-              child: SizedBox.shrink(),
-            ),
-            Checkbox(
-                value: ownMeetup,
-                onChanged: (value) {
-                  setState(() {
-                    ownMeetup = value!;
-                  });
-                }),
-          ],
+                    maxLines: 2, style: const TextStyle(fontSize: 18),),
+              ),
+              Checkbox(
+                  value: ownMeetup,
+                  onChanged: (value) {
+                    setState(() {
+                      ownMeetup = value!;
+                    });
+                  }),
+            ],
+          ),
         ),
       );
     }
@@ -459,15 +460,15 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
             CustomTextInput("Meetup Name", meetupNameKontroller,
                 validator: global_functions.checkValidatorEmpty(context), maxLength: 40),
             Stack(
-              children: [meetupArtDropdown, meetupArtInformation()],
+              children: [Align(child: meetupArtDropdown), meetupArtInformation()],
             ),
-            ortTypDropdown,
+            Align( child: ortTypDropdown),
             Align(child: ortEingabeBox()),
-            sprachenAuswahlBox,
-            meetupIntervalDropdown,
+            Align(child: sprachenAuswahlBox),
+            Align(child: meetupIntervalDropdown),
             dateTimeBox(meetupWannDatum, meetupWannUhrzeit, "wann"),
             dateTimeBox(meetupBisDatum, meetupBisUhrzeit, "bis"),
-            ownMeetupBox(),
+            Align(child: ownMeetupBox()),
             CustomTextInput(AppLocalizations.of(context)!.meetupBeschreibung,
                 meetupBeschreibungKontroller,
                 moreLines: 8, textInputAction: TextInputAction.newline),
