@@ -121,8 +121,9 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
 
     return Container(
       margin: widget.margin,
+      constraints: const BoxConstraints(maxWidth: style.webWidth),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),
+          borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners)),
           border: Border.all(color: widget.borderColor!)),
       child: Stack(
         children: [
@@ -216,7 +217,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: widget.hintText,
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
                   contentPadding: const EdgeInsets.all(10.0),
                 ),
                 focusNode: focusNode,
