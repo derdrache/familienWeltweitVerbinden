@@ -2,16 +2,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
 
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
-
 
 import '../../../widgets/layout/custom_like_button.dart';
 import 'community_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser!.uid;
-
 
 class CommunityCard extends StatefulWidget {
   EdgeInsets margin;
@@ -27,8 +26,7 @@ class CommunityCard extends StatefulWidget {
       required this.community,
       this.withFavorite = false,
       this.afterFavorite,
-      this.margin =
-          const EdgeInsets.all(10),
+      this.margin = const EdgeInsets.all(10),
       this.afterPageVisit,
       this.smallCard = false})
       : isCreator = community["erstelltVon"] == userId,
@@ -41,16 +39,15 @@ class CommunityCard extends StatefulWidget {
 class _CommunityCardState extends State<CommunityCard> {
   var shadowColor = Colors.grey.withOpacity(0.8);
 
-
-  getCommunityTitle(){
+  getCommunityTitle() {
     String? title;
 
-    if(widget.isCreator){
-      title =  widget.community["name"];
-    }else if(getUserSpeaksGerman()){
-      title =  widget.community["nameGer"];
-    }else{
-      title =  widget.community["nameEng"];
+    if (widget.isCreator) {
+      title = widget.community["name"];
+    } else if (getUserSpeaksGerman()) {
+      title = widget.community["nameGer"];
+    } else {
+      title = widget.community["nameEng"];
     }
 
     return title!.isNotEmpty ? title : widget.community["name"];
@@ -90,14 +87,22 @@ class _CommunityCardState extends State<CommunityCard> {
             children: [
               Stack(
                 children: [
-                  ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0),
-                      ),
-                      child: isAssetImage
-                          ? Image.asset(widget.community["bild"])
-                          : CachedNetworkImage(imageUrl: widget.community["bild"])),
+                  Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(maxHeight: 100),
+                    child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                        child: isAssetImage
+                            ? Image.asset(widget.community["bild"],
+                                fit: BoxFit.fill)
+                            : CachedNetworkImage(
+                                imageUrl: widget.community["bild"],
+                                fit: BoxFit.fill,
+                              )),
+                  ),
                   if (widget.withFavorite && !widget.isCreator)
                     Positioned(
                         top: likeButtonAbstandTop,
@@ -151,8 +156,6 @@ class _CommunityCardState extends State<CommunityCard> {
   }
 }
 
-
-
 class InteresseButton extends StatefulWidget {
   Map communityData;
   Function? afterFavorite;
@@ -173,7 +176,6 @@ class _InteresseButtonState extends State<InteresseButton> {
     String communityId = widget.communityData["id"];
     hasInterest = !hasInterest;
 
-
     if (hasInterest) {
       widget.communityData["interesse"].add(userId);
       CommunityDatabase().update(
@@ -186,11 +188,10 @@ class _InteresseButtonState extends State<InteresseButton> {
           "WHERE id ='$communityId'");
     }
 
-
     updateHiveCommunity(
         communityId, "interesse", widget.communityData["interesse"]);
 
-    if(widget.afterFavorite != null) widget.afterFavorite!();
+    if (widget.afterFavorite != null) widget.afterFavorite!();
 
     return !isIntereset;
   }

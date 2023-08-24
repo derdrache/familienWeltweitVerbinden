@@ -216,7 +216,7 @@ class _MeetupCardState extends State<MeetupCard> {
           MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
           whenComplete: () =>  widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
       child: Container(
-          width: 150 * sizeRefactor,
+          width: 175 * sizeRefactor,
           height: 250 * sizeRefactor,
           margin: widget.margin,
           decoration: BoxDecoration(
@@ -235,14 +235,18 @@ class _MeetupCardState extends State<MeetupCard> {
         child: Column(children: [
           Stack(
             children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0),
+                Container(
+                  width: double.infinity,
+                  constraints: const BoxConstraints(maxHeight: 115),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                    ),
+                    child: isAssetImage
+                        ? Image.asset(widget.meetupData["bild"],fit: BoxFit.fill)
+                        : CachedNetworkImage(imageUrl: widget.meetupData["bild"],fit: BoxFit.fill),
                   ),
-                  child: isAssetImage
-                      ? Image.asset(widget.meetupData["bild"])
-                      : CachedNetworkImage(imageUrl: widget.meetupData["bild"]),
                 ),
               if (widget.withInteresse &&
                   !widget.isCreator &&
