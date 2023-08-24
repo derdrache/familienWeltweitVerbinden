@@ -271,16 +271,18 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
           ? const SizedBox.shrink()
           : Align(
               child: Container(
-                width: 600,
-                margin: const EdgeInsets.only(left: 20, right: 10),
+                constraints: const BoxConstraints(maxWidth: style.webWidth),
+                margin: const EdgeInsets.only(left: 15, right: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      dateTimeTyp == "wann"
-                          ? "Meetup start: "
-                          : AppLocalizations.of(context)!.meetupEnde,
-                      style: const TextStyle(fontSize: 18),
+                    Expanded(
+                      child: Text(
+                        dateTimeTyp == "wann"
+                            ? "Meetup start: "
+                            : AppLocalizations.of(context)!.meetupEnde,
+                        style: const TextStyle(fontSize: 18),
+                      ),
                     ),
                     const SizedBox(width: 20),
                     ElevatedButton(
@@ -320,7 +322,8 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
 
                         setState(() {});
                       },
-                    )
+                    ),
+                    const SizedBox(width: 10,)
                   ],
                 ),
               ),
@@ -421,26 +424,23 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     }
 
     ownMeetupBox() {
-      return Padding(
-        padding: const EdgeInsets.only(left:30, right: 20),
-        child: Container(
-          constraints: BoxConstraints(maxWidth: style.webWidth),
-          margin: const EdgeInsets.all(10),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(AppLocalizations.of(context)!.frageErstellerMeetup,
-                    maxLines: 2, style: const TextStyle(fontSize: 18),),
-              ),
-              Checkbox(
-                  value: ownMeetup,
-                  onChanged: (value) {
-                    setState(() {
-                      ownMeetup = value!;
-                    });
-                  }),
-            ],
-          ),
+      return Container(
+        constraints: const BoxConstraints(maxWidth: style.webWidth),
+        margin: const EdgeInsets.only(left: 15),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(AppLocalizations.of(context)!.frageErstellerMeetup,
+                  maxLines: 2, style: const TextStyle(fontSize: 18),),
+            ),
+            Checkbox(
+                value: ownMeetup,
+                onChanged: (value) {
+                  setState(() {
+                    ownMeetup = value!;
+                  });
+                }),
+          ],
         ),
       );
     }
@@ -462,7 +462,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
             Stack(
               children: [Align(child: meetupArtDropdown), meetupArtInformation()],
             ),
-            Align( child: ortTypDropdown),
+            Align(child: ortTypDropdown),
             Align(child: ortEingabeBox()),
             Align(child: sprachenAuswahlBox),
             Align(child: meetupIntervalDropdown),
