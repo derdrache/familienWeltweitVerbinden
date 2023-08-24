@@ -41,7 +41,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
   @override
   Widget build(BuildContext context) {
-
+    print(widget._textEditingController.text);
     return Container(
       margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -107,6 +107,10 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                   border: InputBorder.none,
                   hintText: widget.hintText,
                   contentPadding: const EdgeInsets.all(10.0),
+                  suffixIcon: IconButton(
+                    onPressed: textEditingController.clear,
+                    icon: Icon(Icons.clear, color: Colors.red,),
+                  ),
                 ),
                 focusNode: focusNode,
                 onChanged: (value) async{
@@ -124,16 +128,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
               );
             },
           ),
-          if(widget._textEditingController.text.isNotEmpty) Positioned(
-              right: 0, top: 0,
-              child: CloseButton(
-                color: Colors.red,
-                onPressed: (){
-                  widget.clearInput();
-                  if(widget.onRemove != null) widget.onRemove!();
-                  setState(() {});
-                },
-              ))
+
         ],
       ),
     );
