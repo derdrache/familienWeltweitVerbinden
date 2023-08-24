@@ -41,7 +41,6 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget._textEditingController.text);
     return Container(
       margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
