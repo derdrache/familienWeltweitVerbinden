@@ -342,7 +342,7 @@ class _ProfilSection extends StatelessWidget {
               const Expanded(child: SizedBox.shrink()),
               const Icon(Icons.arrow_downward),
               Text(AppLocalizations.of(context)!.antippenZumAendern,
-                  style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                  style: TextStyle(color: Colors.grey[800], fontSize: 14)),
               const Icon(Icons.arrow_downward),
               const Expanded(child: SizedBox()),
               OwnIconButton(
