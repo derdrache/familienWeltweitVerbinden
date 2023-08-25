@@ -77,20 +77,6 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     await refreshHiveBulletinBoardNotes();
   }
 
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed && this.mounted) {
-      await _refreshData();
-    }
-  }
-
-  _refreshData() async {
-    await refreshHiveProfils();
-    await refreshHiveNewsPage();
-    await refreshHiveChats();
-    await refreshHiveMeetups();
-    await refreshHiveCommunities();
-  }
-
   _asyncMethod() async {
     await refreshHiveAllgemein();
     if (!kIsWeb) {

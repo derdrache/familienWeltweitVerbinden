@@ -95,7 +95,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   late LatLng mapPosition;
   List<Widget> popupItems = [];
   var monthsUntilInactive = 3;
-  var buildDone = false;
+  bool buildDone = false;
   bool friendMarkerOn = false,
       eventMarkerOn = false,
       reiseplanungOn = false,
@@ -125,7 +125,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomLevels(insiderInfos, "insiderInfo");
 
     
-    WidgetsBinding.instance.addPostFrameCallback((_) => mounted = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) => buildDone = true);
   }
 
   setEvents() {
