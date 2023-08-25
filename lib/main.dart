@@ -34,119 +34,32 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  if (!kIsWeb) await _notificationSetup();
+
   await hiveInit();
+  await setGeoData();
   await setOrientation();
 
-  if (!kIsWeb) {
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  }
-
-  await _notificationSetup();
-
-  await setGeoData();
-
-
-
   refreshHiveData();
+
   runApp(MyApp());
 }
 
-refreshDataOnNotification(messageTyp) async{
-  Random random = Random();
-  int randomNumber = random.nextInt(60);
-  await Future.delayed(Duration(seconds: randomNumber), (){});
-  if (messageTyp == "chat") {
-    refreshHiveChats();
-  }else if (messageTyp == "event"){
-    refreshHiveMeetups();
-  }
-  else if (messageTyp == "newFriend") {
-    refreshHiveProfils();
-  }else if(messageTyp == "community"){
-    refreshHiveCommunities();
-  }
-}
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  var messageData = json.decode(message.data["info"]);
-  refreshDataOnNotification(messageData["typ"]);
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-}
-
-hiveInit() async {
-  await Hive.initFlutter();
-
-  await Hive.openBox("secureBox",
-      encryptionCipher: HiveAesCipher(boxEncrpytionKey), crashRecovery: false);
-}
-
-setGeoData() async{
-  var countryJsonText =
-  await rootBundle.loadString('assets/countryGeodata.json');
-  var geodata = json.decode(countryJsonText)["data"];
-  Hive.box('secureBox').put("countryGeodata", geodata);
-
-  var continentsJsonText =
-  await rootBundle.loadString('assets/continentsGeodata.json');
-  var continentsGeodata = json.decode(continentsJsonText)["data"];
-  Hive.box('secureBox').put("kontinentGeodata", continentsGeodata);
-}
-
-refreshHiveData() async {
-  String? userId = FirebaseAuth.instance.currentUser?.uid;
-
-  await refreshHiveNewsPage();
-  await refreshHiveCommunities();
-  await refreshHiveStadtInfo();
-  await refreshHiveStadtInfoUser();
-  await refreshHiveFamilyProfils();
-  await refreshHiveBulletinBoardNotes();
-
-  if(userId == null) return;
-
-  await refreshHiveProfils();
-  await refreshHiveChats();
-  await refreshHiveMeetups();
-}
-
-deleteOldVoiceMessages() async {
-  if (kIsWeb) return;
-
-  var appDir = await getApplicationDocumentsDirectory();
-  var allFiles = Directory(appDir.path).listSync();
-
-  for(var file in allFiles){
-    final fileStat = FileStat.statSync(file.path);
-    DateTime createdDate = fileStat.modified;
-    const oneMonthInHours = 720;
-    bool tooOld =  DateTime.now().compareTo(createdDate.add(const Duration(hours: oneMonthInHours))) == 1;
-    String fileTyp = file.path.split(".").last;
-    bool isMP3 = fileTyp == "mp3";
-
-    if(tooOld && isMP3){
-      file.delete();
-    }
-  }
-}
-
 _notificationSetup() async {
-  final FlutterLocalNotificationsPlugin _notificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin notificationsPlugin =
+    FlutterLocalNotificationsPlugin();
   var initializationSettings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
       iOS: DarwinInitializationSettings(
-        notificationCategories: [
-          DarwinNotificationCategory(
-            "meetupParticipate",
-            actions: <DarwinNotificationAction>[
-              DarwinNotificationAction.plain('id_1', 'Action 1'),
-              DarwinNotificationAction.plain('id_2', 'Action 2'),
-            ]
-          )
-        ]
+          notificationCategories: [
+            DarwinNotificationCategory(
+                "meetupParticipate",
+                actions: <DarwinNotificationAction>[
+                  DarwinNotificationAction.plain('id_1', 'Action 1'),
+                  DarwinNotificationAction.plain('id_2', 'Action 2'),
+                ]
+            )
+          ]
       )
   );
 
@@ -156,10 +69,15 @@ _notificationSetup() async {
     sound: true,
   );
 
-  _notificationsPlugin.initialize(
+  notificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: onSelectNotification,
       onDidReceiveBackgroundNotificationResponse: onSelectNotification);
+
+  FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
+    var messageData = json.decode(message.data["info"]);
+    refreshDataOnNotification(messageData["typ"]);
+  });
 
   FirebaseMessaging.instance.getInitialMessage().then((value) {
     if (value != null) {
@@ -175,6 +93,7 @@ _notificationSetup() async {
         || message.notification!.title!.contains("Erinnerung"));
 
     refreshDataOnNotification(messageData["typ"]);
+
     if (messageData["typ"] == "chat") {
       var chatId = messageData["link"];
       var chatData = getChatFromHive(chatId);
@@ -192,6 +111,22 @@ _notificationSetup() async {
     var notification = json.decode(message.data.values.last);
     notificationLeadPage(notification);
   });
+}
+
+refreshDataOnNotification(messageTyp) async{
+  Random random = Random();
+  int randomNumber = random.nextInt(60);
+  await Future.delayed(Duration(seconds: randomNumber), (){});
+  if (messageTyp == "chat") {
+    refreshHiveChats();
+  }else if (messageTyp == "event"){
+    refreshHiveMeetups();
+  }
+  else if (messageTyp == "newFriend") {
+    refreshHiveProfils();
+  }else if(messageTyp == "community"){
+    refreshHiveCommunities();
+  }
 }
 
 @pragma('vm:entry-point')
@@ -287,8 +222,30 @@ _changeToCommunity(communityId) async{
       MaterialPageRoute(builder: (_) => CommunityDetails(community: communityData,)));
 }
 
+hiveInit() async {
+  await Hive.initFlutter();
+
+  await Hive.openBox("secureBox",
+      encryptionCipher: HiveAesCipher(boxEncrpytionKey), crashRecovery: false);
+}
+
+setGeoData() async{
+  var countryJsonText =
+  await rootBundle.loadString('assets/countryGeodata.json');
+  var geodata = json.decode(countryJsonText)["data"];
+  Hive.box('secureBox').put("countryGeodata", geodata);
+
+  var continentsJsonText =
+  await rootBundle.loadString('assets/continentsGeodata.json');
+  var continentsGeodata = json.decode(continentsJsonText)["data"];
+  Hive.box('secureBox').put("kontinentGeodata", continentsGeodata);
+}
+
 setOrientation() async {
-  bool isPhone = getDeviceType() == "phone";
+  final firstView = WidgetsBinding.instance.platformDispatcher.views.first;
+  final logicalShortestSide = firstView.physicalSize.shortestSide / firstView.devicePixelRatio;
+  bool isPhone = logicalShortestSide < 600 ? true : false;
+
   if(isPhone){
     await SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -298,37 +255,67 @@ setOrientation() async {
   }
 }
 
-String getDeviceType() {
-  final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
-  return data.size.shortestSide < 550 ? 'phone' :'tablet';
+refreshHiveData() async {
+  String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+  await refreshHiveNewsPage();
+  await refreshHiveCommunities();
+  await refreshHiveStadtInfo();
+  await refreshHiveStadtInfoUser();
+  await refreshHiveFamilyProfils();
+  await refreshHiveBulletinBoardNotes();
+
+  if(userId == null) return;
+
+  await refreshHiveProfils();
+  await refreshHiveChats();
+  await refreshHiveMeetups();
 }
 
 
+//ignore: must_be_immutable
 class MyApp extends StatelessWidget {
   String? userId = FirebaseAuth.instance.currentUser?.uid;
-  BuildContext? pageContext;
 
-  _initialization() async {
+  MyApp({super.key});
+
+  initialization() async {
     deleteOldVoiceMessages();
 
     if (userId == null) {
       await FirebaseAuth.instance.authStateChanges().first;
       userId = FirebaseAuth.instance.currentUser?.uid;
     }
+  }
 
+  deleteOldVoiceMessages() async {
     if (kIsWeb) return;
+
+    var appDir = await getApplicationDocumentsDirectory();
+    var allFiles = Directory(appDir.path).listSync();
+
+    for(var file in allFiles){
+      final fileStat = FileStat.statSync(file.path);
+      DateTime createdDate = fileStat.modified;
+      const oneMonthInHours = 720;
+      bool tooOld =  DateTime.now().compareTo(createdDate.add(const Duration(hours: oneMonthInHours))) == 1;
+      String fileTyp = file.path.split(".").last;
+      bool isMP3 = fileTyp == "mp3";
+
+      if(tooOld && isMP3){
+        file.delete();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    pageContext = context;
-
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,
     ));
 
     return FutureBuilder(
-        future: _initialization(),
+        future: initialization(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

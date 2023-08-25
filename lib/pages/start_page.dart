@@ -18,7 +18,6 @@ import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../services/network_connectivity.dart';
 import 'informationen/information.dart';
-import 'login_register_page/create_profil_page.dart';
 import 'news/news_page.dart';
 import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';
@@ -44,26 +43,21 @@ class StartPage extends StatefulWidget {
 class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final String? userName = FirebaseAuth.instance.currentUser!.displayName;
-  Map ownProfil = Hive.box("secureBox").get("ownProfil");
-  bool hasInternet = true;
-  var checkedA2HS = false;
+  Map? ownProfil = Hive.box("secureBox").get("ownProfil");
   late List<Widget> pages;
-  NetworkConnectivity? _networkConnectivity;
   late bool noProfil;
 
   @override
   void initState() {
-    widget.chatPageSliderIndex ??= 0;
-    noProfil = ownProfil == null || ownProfil["id"] == null;
-    _networkConnectivity = NetworkConnectivity(context);
-
-    WidgetsBinding.instance.addObserver(this);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => _asyncMethod());
-
     super.initState();
 
-    _networkConnectivity!.checkInternetStatusStream();
+    widget.chatPageSliderIndex ??= 0;
+    noProfil = ownProfil == null || ownProfil!["id"] == null;
+
+    NetworkConnectivity(context).checkInternetStatusStream();
+
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _asyncMethod());
   }
 
   @override
@@ -94,7 +88,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
 
     if (userName == null || ownProfil == null) return;
 
-    _oldUserAutomaticJoinChats(ownProfil["ort"]);
+    _oldUserAutomaticJoinChats(ownProfil!["ort"]);
     _setOwnLocation();
     _updateOwnEmail();
     _updateOwnToken();
@@ -122,49 +116,28 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     return profilExist != false;
   }
 
-  _updateOwnLastLogin() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    var buildNumber = int.parse(packageInfo.buildNumber);
-    Hive.box('secureBox').put("version", buildNumber);
+  _oldUserAutomaticJoinChats(ort) async {
+    var savedVersion = Hive.box('secureBox').get("version");
+    var lastLoginBeforeUpdate = savedVersion == null && DateTime.parse(ownProfil!["lastLogin"])
+        .isBefore(DateTime.parse("2022-12-16"));
+    var versionBiggerThenChatGroupUpdate = savedVersion != null && savedVersion >= 34;
 
-    ProfilDatabase().updateProfil(
-        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
+    if (!lastLoginBeforeUpdate || versionBiggerThenChatGroupUpdate) return;
 
-    ownProfil["lastLogin"] = DateTime.now().toString();
-
-
-  }
-
-  _updateOwnEmail() async {
-    final String? userAuthEmail = FirebaseAuth.instance.currentUser!.email;
-    String enryptEmail = encrypt(userAuthEmail!);
-    var userDBEmail = ownProfil["email"];
-
-    if (userAuthEmail != userDBEmail) {
-      ProfilDatabase()
-          .updateProfil("email = '$enryptEmail'", "WHERE id = '$userId'");
-    }
-  }
-
-  _updateOwnToken() async {
-    var userDeviceTokenDb = ownProfil["token"];
-    var userDeviceTokenReal =
-        kIsWeb ? null : await FirebaseMessaging.instance.getToken();
-
-    if(userDeviceTokenReal == null) return;
-
-    if (userDeviceTokenDb != userDeviceTokenReal) {
-      ProfilDatabase().updateProfil(
-          "token = '$userDeviceTokenReal'", "WHERE id = '$userId'");
-    }
+    await ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_MERGE_PATCH(users, '${json.encode({
+          userId: {"newMessages": 0}
+        })}')",
+        "WHERE id = '1'");
+    await ChatGroupsDatabase().joinAndCreateCityChat(ort);
   }
 
   _setOwnLocation(){
-    var automaticLocation = ownProfil["automaticLocation"];
+    var automaticLocation = ownProfil!["automaticLocation"];
     bool automaticLocationOff = automaticLocation == standortbestimmung[0] ||
         automaticLocation == standortbestimmungEnglisch[0];
     var dateDifference =
-    DateTime.now().difference(DateTime.parse(ownProfil["lastLogin"]));
+    DateTime.now().difference(DateTime.parse(ownProfil!["lastLogin"]));
     var firstTimeOnDay = dateDifference.inDays > 0;
 
     if(automaticLocation == null || automaticLocationOff || !firstTimeOnDay){
@@ -188,7 +161,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
         automaticLocationStatus == standortbestimmungEnglisch[3];
     var currentPosition = await LocationService().getCurrentUserLocation();
     var nearstLocationData =
-        await LocationService().getNearstLocationData(currentPosition);
+    await LocationService().getNearstLocationData(currentPosition);
     nearstLocationData =
         LocationService().transformNearstLocation(nearstLocationData);
 
@@ -203,7 +176,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
         "latt": currentPosition.latitude,
       };
 
-      if (ownProfil["ort"] == locationData["city"]) return;
+      if (ownProfil!["ort"] == locationData["city"]) return;
 
       _databaseOperations(locationData,
           exactLocation: true, nearstLocationData: nearstLocationData);
@@ -215,7 +188,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
       newLocation = nearstLocationData["region"];
     }
 
-    if (newLocation == ownProfil["ort"]) return;
+    if (newLocation == ownProfil!["ort"]) return;
 
     var geoData = await LocationService().getLocationGeoData(newLocation);
     var locationData = await LocationService()
@@ -226,7 +199,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
 
   _databaseOperations(locationData,
       {exactLocation = false, nearstLocationData}) async {
-    var oldLocation = ownProfil["ort"];
+    String oldLocation = ownProfil!["ort"];
 
     _updateOwnLocation(locationData);
     _updateNewsPage(locationData);
@@ -237,7 +210,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
   _updateOwnLocation(locationData) {
     ProfilDatabase().updateProfilLocation(userId, locationData);
 
-    var ownProfil = Hive.box("secureBox").get("ownProfil");
+    Map ownProfil = Hive.box("secureBox").get("ownProfil");
     ownProfil["ort"] = locationData["city"];
     ownProfil["longt"] = locationData["longt"];
     ownProfil["latt"] = locationData["latt"];
@@ -275,21 +248,43 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
   }
 
-  _oldUserAutomaticJoinChats(ort) async {
-    var savedVersion = Hive.box('secureBox').get("version");
-    var lastLoginBeforeUpdate = savedVersion == null && DateTime.parse(ownProfil["lastLogin"])
-        .isBefore(DateTime.parse("2022-12-16"));
-    var versionBiggerThenChatGroupUpdate = savedVersion != null && savedVersion >= 34;
+  _updateOwnEmail() async {
+    final String? userAuthEmail = FirebaseAuth.instance.currentUser!.email;
+    String enryptEmail = encrypt(userAuthEmail!);
+    var userDBEmail = ownProfil!["email"];
 
-    if (!lastLoginBeforeUpdate || versionBiggerThenChatGroupUpdate) return;
-
-    await ChatGroupsDatabase().updateChatGroup(
-        "users = JSON_MERGE_PATCH(users, '${json.encode({
-              userId: {"newMessages": 0}
-            })}')",
-        "WHERE id = '1'");
-    await ChatGroupsDatabase().joinAndCreateCityChat(ort);
+    if (userAuthEmail != userDBEmail) {
+      ProfilDatabase()
+          .updateProfil("email = '$enryptEmail'", "WHERE id = '$userId'");
+    }
   }
+
+  _updateOwnToken() async {
+    var userDeviceTokenDb = ownProfil!["token"];
+    var userDeviceTokenReal =
+    kIsWeb ? null : await FirebaseMessaging.instance.getToken();
+
+    if(userDeviceTokenReal == null) return;
+
+    if (userDeviceTokenDb != userDeviceTokenReal) {
+      ProfilDatabase().updateProfil(
+          "token = '$userDeviceTokenReal'", "WHERE id = '$userId'");
+    }
+  }
+
+  _updateOwnLastLogin() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var buildNumber = int.parse(packageInfo.buildNumber);
+    Hive.box('secureBox').put("version", buildNumber);
+
+    ProfilDatabase().updateProfil(
+        "lastLogin = '${DateTime.now().toString()}'", "WHERE id = '$userId'");
+
+    ownProfil!["lastLogin"] = DateTime.now().toString();
+
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -297,9 +292,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
       const NewsPage(),
       const ErkundenPage(),
       const InformationPage(),
-      ChatPage(
-          chatPageSliderIndex: widget.chatPageSliderIndex!
-      ),
+      ChatPage(chatPageSliderIndex: widget.chatPageSliderIndex!),
       const SettingPage()
     ];
 
@@ -375,9 +368,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-
-    informationenIcon(){
-      var notification = _eventNotification() + _communitNotifikation();
+    Widget informationenIcon(){
+      int notification = _eventNotification() + _communitNotifikation();
 
       return OwnIconButton(
         icon: Icons.group_work,
@@ -388,7 +380,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
       );
     }
 
-    chatIcon() {
+    Widget chatIcon() {
       return FutureBuilder(
           future: getChatNewMessageCount(),
           builder: (context, snapshot) {

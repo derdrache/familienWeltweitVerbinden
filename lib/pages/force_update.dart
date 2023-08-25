@@ -4,7 +4,7 @@ import 'dart:io';
 
 
 class ForceUpdatePage extends StatelessWidget {
-  bool spracheIstDeutsch = kIsWeb
+  final bool spracheIstDeutsch = kIsWeb
       ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 

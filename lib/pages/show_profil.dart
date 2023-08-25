@@ -28,11 +28,10 @@ import 'informationen/location/location_Information.dart';
 String? userId = FirebaseAuth.instance.currentUser?.uid;
 double headlineTextSize = 18;
 
-//ignore: must_be_immutable
 class ShowProfilPage extends StatefulWidget {
-  Map profil;
+  final Map profil;
 
-  ShowProfilPage({Key? key, required this.profil}) : super(key: key);
+  const ShowProfilPage({Key? key, required this.profil}) : super(key: key);
 
   @override
   State<ShowProfilPage> createState() => _ShowProfilPageState();
@@ -52,7 +51,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
   }
 
   checkIfIsFamilyMember() {
-    var spracheIstDeutsch = kIsWeb
+    bool spracheIstDeutsch = kIsWeb
         ? PlatformDispatcher.instance.locale.languageCode == "de"
         : Platform.localeName == "de_DE";
     familyProfil = getFamilyProfil(familyMember: profil["id"]);
@@ -82,11 +81,18 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
               clipper: _MyCustomClipper(),
               child: ColorfulBackground(
                 height: 250,
-                colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.secondary
+                ],
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    ProfilImage(profil, size: 60, fullScreenWindow: true,),
+                    ProfilImage(
+                      profil,
+                      size: 60,
+                      fullScreenWindow: true,
+                    ),
                     SizedBox(
                         height: 60,
                         child: CurvedText(
@@ -207,7 +213,7 @@ class _AppBarState extends State<_AppBar> {
         .update("userNotizen = '$encryptNotes'", "WHERE id = '$userId'");
   }
 
-  openChat(chatpartnerId, chatpartnerName) async {
+  openChat(chatpartnerId) async {
     global_functions.changePage(
         context,
         ChatDetailsPage(
@@ -262,7 +268,7 @@ class _AppBarState extends State<_AppBar> {
         });
   }
 
-  changeFriendStatus(isFriend){
+  changeFriendStatus(isFriend) {
     var snackbarText = "";
     var newsData = {
       "typ": "friendlist",
@@ -279,8 +285,8 @@ class _AppBarState extends State<_AppBar> {
       if (newsId != null) NewsPageDatabase().delete(newsId);
     } else {
       userFriendlist.add(widget.profil["id"]);
-      snackbarText = _userName +
-          AppLocalizations.of(context)!.friendlistHinzugefuegt;
+      snackbarText =
+          _userName + AppLocalizations.of(context)!.friendlistHinzugefuegt;
 
       prepareFriendNotification(
           newFriendId: userId,
@@ -293,7 +299,7 @@ class _AppBarState extends State<_AppBar> {
     }
 
     var localBox = Hive.box('secureBox');
-    var ownProfil = localBox.get("ownProfil");
+    Map ownProfil = localBox.get("ownProfil");
 
     ownProfil["friendlist"] = userFriendlist;
     localBox.put("ownProfil", ownProfil);
@@ -301,24 +307,55 @@ class _AppBarState extends State<_AppBar> {
     customSnackbar(context, snackbarText, color: Colors.green);
 
     ProfilDatabase().updateProfil(
-        "friendlist = '${jsonEncode(userFriendlist)}'",
-        "WHERE id = '$userId'");
+        "friendlist = '${jsonEncode(userFriendlist)}'", "WHERE id = '$userId'");
 
     Navigator.pop(context);
     setState(() {});
   }
 
+  userBlockieren(ownId, onBlockList) {
+    String snackbarText = "";
+    List allProfils = Hive.box('secureBox').get("profils");
+    String databaseQuery = "";
+
+    if (onBlockList) {
+      widget.profil["geblocktVon"].remove(ownId);
+      databaseQuery =
+          "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
+      snackbarText = AppLocalizations.of(context)!.benutzerFreigegeben;
+    } else {
+      widget.profil["geblocktVon"].add(ownId);
+      databaseQuery =
+          "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
+      snackbarText = AppLocalizations.of(context)!.benutzerBlockieren;
+    }
+
+    for (var profil in allProfils) {
+      if (profil["id"] == profil["id"]) {
+        profil["blockiertVon"] = profil["geblocktVon"];
+      }
+    }
+
+    Hive.box('secureBox').put("profils", allProfils);
+
+    customSnackbar(context, snackbarText, color: Colors.green);
+
+    ProfilDatabase()
+        .updateProfil(databaseQuery, "WHERE id = '${widget.profil["id"]}'");
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    friendButton(){
+    friendButton() {
       bool isFriend = userFriendlist.contains(widget.profil["id"]);
 
       return IconButton(
           onPressed: () => changeFriendStatus(isFriend),
-          tooltip: isFriend ?AppLocalizations.of(context)!.freundEntfernen : AppLocalizations.of(context)!.freundHinzufuegen,
-          icon: Icon(isFriend ? Icons.person_remove : Icons.person_add, color: buttonColor)
-      );
+          tooltip: isFriend
+              ? AppLocalizations.of(context)!.freundEntfernen
+              : AppLocalizations.of(context)!.freundHinzufuegen,
+          icon: Icon(isFriend ? Icons.person_remove : Icons.person_add,
+              color: buttonColor));
     }
 
     openNoteButton() {
@@ -332,6 +369,45 @@ class _AppBarState extends State<_AppBar> {
       );
     }
 
+    selectChatMemberWindow() {
+      List<Widget> menuList = [];
+
+      widget.familyProfil!["members"].remove(userId);
+
+      for (var memberId in widget.familyProfil!["members"]) {
+        var memberName =
+            getProfilFromHive(profilId: memberId, getNameOnly: true);
+
+        menuList.add(SimpleDialogOption(
+          child: Row(
+            children: [
+              Text(memberName),
+            ],
+          ),
+          onPressed: () => openChat(memberId),
+        ));
+      }
+
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 200,
+                  child: SimpleDialog(
+                    contentPadding: EdgeInsets.zero,
+                    insetPadding:
+                        const EdgeInsets.only(top: 40, left: 0, right: 10),
+                    children: menuList,
+                  ),
+                ),
+              ],
+            );
+          });
+    }
+
     openChatButton() {
       return IconButton(
           icon: Icon(
@@ -341,53 +417,16 @@ class _AppBarState extends State<_AppBar> {
           tooltip: AppLocalizations.of(context)!.tooltipChatBenutzer,
           onPressed: () async {
             if (widget.familyProfil != null) {
-              List<Widget> menuList = [];
-
-              widget.familyProfil!["members"].remove(userId);
-
-              for (var memberId in widget.familyProfil!["members"]) {
-                var memberName =
-                    getProfilFromHive(profilId: memberId, getNameOnly: true);
-
-                menuList.add(SimpleDialogOption(
-                  child: Row(
-                    children: [
-                      Text(memberName),
-                    ],
-                  ),
-                  onPressed: () {
-                    openChat(memberId, memberName);
-                  },
-                ));
-              }
-
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          width: 200,
-                          child: SimpleDialog(
-                            contentPadding: EdgeInsets.zero,
-                            insetPadding: const EdgeInsets.only(
-                                top: 40, left: 0, right: 10),
-                            children: menuList,
-                          ),
-                        ),
-                      ],
-                    );
-                  });
+              selectChatMemberWindow();
             } else {
-              openChat(widget.profil["id"], widget.profil["name"]);
+              openChat(widget.profil["id"]);
             }
           });
     }
 
     userBlockierenButton() {
-      var ownId = FirebaseAuth.instance.currentUser?.uid;
-      var onBlockList = widget.profil["geblocktVon"].contains(ownId);
+      String? ownId = FirebaseAuth.instance.currentUser?.uid;
+      bool onBlockList = widget.profil["geblocktVon"].contains(ownId);
 
       return SimpleDialogOption(
           child: Row(
@@ -400,34 +439,7 @@ class _AppBarState extends State<_AppBar> {
             ],
           ),
           onPressed: () {
-            String snackbarText = "";
-            var allProfils = Hive.box('secureBox').get("profils");
-            String databaseQuery = "";
-
-            if (onBlockList) {
-              widget.profil["geblocktVon"].remove(ownId);
-              databaseQuery =
-                  "geblocktVon = JSON_REMOVE(geblocktVon, JSON_UNQUOTE(JSON_SEARCH(geblocktVon, 'one', '$ownId')))";
-              snackbarText = AppLocalizations.of(context)!.benutzerFreigegeben;
-            } else {
-              widget.profil["geblocktVon"].add(ownId);
-              databaseQuery =
-                  "geblocktVon = JSON_ARRAY_APPEND(geblocktVon, '\$', '$ownId')";
-              snackbarText = AppLocalizations.of(context)!.benutzerBlockieren;
-            }
-
-            for (var profil in allProfils) {
-              if (profil["id"] == profil["id"]) {
-                profil["blockiertVon"] = profil["geblocktVon"];
-              }
-            }
-
-            Hive.box('secureBox').put("profils", allProfils);
-
-            customSnackbar(context, snackbarText, color: Colors.green);
-
-            ProfilDatabase().updateProfil(
-                databaseQuery, "WHERE id = '${widget.profil["id"]}'");
+            userBlockieren(ownId, onBlockList);
 
             Navigator.pop(context);
             setState(() {});
@@ -444,7 +456,7 @@ class _AppBarState extends State<_AppBar> {
             ],
           ),
           onPressed: () {
-            var meldeTextKontroller = TextEditingController();
+            TextEditingController meldeTextKontroller = TextEditingController();
             Navigator.pop(context);
 
             showDialog(
@@ -484,10 +496,9 @@ class _AppBarState extends State<_AppBar> {
           color: buttonColor,
         ),
         onPressed: () {
-          CustomPopupMenu(context, width: 220, children: [
-            userBlockierenButton(),
-            meldeUserButton()
-          ]);
+          CustomPopupMenu(context,
+              width: 220,
+              children: [userBlockierenButton(), meldeUserButton()]);
         },
       );
     }
@@ -501,10 +512,10 @@ class _AppBarState extends State<_AppBar> {
             onPressed: () => Navigator.pop(context),
           ),
           const Expanded(child: SizedBox.shrink()),
-          _isOwnProfil ? const SizedBox.shrink() : friendButton(),
-          _isOwnProfil ? const SizedBox.shrink() : openNoteButton(),
-          _isOwnProfil ? const SizedBox.shrink() : openChatButton(),
-          _isOwnProfil ? const SizedBox.shrink() : moreMenuButton()
+          if (!_isOwnProfil) friendButton(),
+          if (!_isOwnProfil) openNoteButton(),
+          if (!_isOwnProfil) openChatButton(),
+          if (!_isOwnProfil) moreMenuButton(),
         ],
       ),
     );
@@ -528,7 +539,6 @@ class _UserInformationDisplay extends StatelessWidget {
     bool isPrivacyLevel3 = reiseplanungSetting == privacySetting[2] ||
         reiseplanungSetting == privacySettingEnglisch[2];
 
-
     if (profil["reisePlanung"].isEmpty) return false;
 
     if (isPrivacyLevel1) {
@@ -548,15 +558,15 @@ class _UserInformationDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isOwnProfil = profil["id"] == userId;
-    profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
+    profil["lastLogin"] ??= DateTime.parse("2022-02-13");
 
     transformDateToText(dateString, {onlyMonth = false}) {
       DateTime date = DateTime.parse(dateString);
+      bool laterSameYear =
+          date.month > DateTime.now().month && date.year == DateTime.now().year;
+      bool laterOnlyYears = date.year > DateTime.now().year;
 
-      if ((date.month > DateTime.now().month &&
-              date.year == DateTime.now().year) ||
-          date.year > DateTime.now().year ||
-          onlyMonth) {
+      if (laterSameYear || laterOnlyYears || onlyMonth) {
         return "${date.month}.${date.year}";
       } else {
         return AppLocalizations.of(context)!.jetzt;
@@ -599,7 +609,7 @@ class _UserInformationDisplay extends StatelessWidget {
           children: [
             Text(
               "${AppLocalizations.of(context)!.aktuelleOrt}: ",
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: style.textSize,
                   fontWeight: FontWeight.bold,
                   decoration: TextDecoration.underline),
@@ -607,8 +617,9 @@ class _UserInformationDisplay extends StatelessWidget {
             Flexible(
                 child: Text(
               profil["ort"],
-              style: TextStyle(
-                  fontSize: style.textSize, decoration: TextDecoration.underline),
+              style: const TextStyle(
+                  fontSize: style.textSize,
+                  decoration: TextDecoration.underline),
               maxLines: 2,
             ))
           ],
@@ -617,8 +628,8 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     travelTypDisplay() {
-      var themaText = "${AppLocalizations.of(context)!.artDerReise}: ";
-      var inhaltText =
+      String themaText = "${AppLocalizations.of(context)!.artDerReise}: ";
+      String inhaltText =
           global_functions.changeGermanToEnglish(profil["reiseart"]);
 
       if (spracheIstDeutsch) {
@@ -627,8 +638,9 @@ class _UserInformationDisplay extends StatelessWidget {
 
       return Row(children: [
         Text(themaText,
-            style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
+            style: const TextStyle(
+                fontSize: style.textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: const TextStyle(fontSize: style.textSize))
       ]);
     }
 
@@ -656,14 +668,15 @@ class _UserInformationDisplay extends StatelessWidget {
         child: Row(children: [
           Text(
             "${AppLocalizations.of(context)!.besuchteLaender}: ",
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: style.textSize,
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.underline),
           ),
           Text(profil["besuchteLaender"].length.toString(),
-              style: TextStyle(
-                  fontSize: style.textSize, decoration: TextDecoration.underline))
+              style: const TextStyle(
+                  fontSize: style.textSize,
+                  decoration: TextDecoration.underline))
         ]),
       );
     }
@@ -671,33 +684,40 @@ class _UserInformationDisplay extends StatelessWidget {
     aufreiseDisplay() {
       if (profil["aufreiseSeit"] == null) return const SizedBox.shrink();
 
-      var themenText = "${AppLocalizations.of(context)!.aufReise}: ";
-      var seitText =
+      String themenText = "${AppLocalizations.of(context)!.aufReise}: ";
+      String seitText =
           profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
-      var inhaltText = "";
+      String inhaltText = "";
 
       if (profil["aufreiseBis"] == null) {
         DateTime aufreiseSeit = DateTime.parse(profil["aufreiseSeit"]);
-        String yearsOnTravel = (DateTime.now().difference(aufreiseSeit).inDays / 365).toStringAsFixed(1);
+        String yearsOnTravel =
+            (DateTime.now().difference(aufreiseSeit).inDays / 365)
+                .toStringAsFixed(1);
 
-        inhaltText =  "$yearsOnTravel ${AppLocalizations.of(context)!.jahre} / $seitText - ${AppLocalizations.of(context)!.offen}";
+        inhaltText =
+            "$yearsOnTravel ${AppLocalizations.of(context)!.jahre} / $seitText - ${AppLocalizations.of(context)!.offen}";
       } else {
         DateTime aufreiseSeit = DateTime.parse(profil["aufreiseSeit"]);
         DateTime aufreiseBis = DateTime.parse(profil["aufreiseBis"]);
-        String yearsOnTravel = (aufreiseBis.difference(aufreiseSeit).inDays / 365).toStringAsFixed(1);
+        String yearsOnTravel =
+            (aufreiseBis.difference(aufreiseSeit).inDays / 365)
+                .toStringAsFixed(1);
         var bisText = profil["aufreiseBis"]
             .split("-")
             .take(2)
             .toList()
             .reversed
             .join("-");
-        inhaltText = "$yearsOnTravel ${AppLocalizations.of(context)!.jahre} - $seitText - $bisText";
+        inhaltText =
+            "$yearsOnTravel ${AppLocalizations.of(context)!.jahre} - $seitText - $bisText";
       }
 
       return Row(children: [
         Text(themenText,
-            style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
+            style: const TextStyle(
+                fontSize: style.textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: const TextStyle(fontSize: style.textSize))
       ]);
     }
 
@@ -719,8 +739,8 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     sprachenDisplay() {
-      var themenText = "${AppLocalizations.of(context)!.sprachen}: ";
-      var inhaltText =
+      String themenText = "${AppLocalizations.of(context)!.sprachen}: ";
+      String inhaltText =
           global_functions.changeGermanToEnglish(profil["sprachen"]).join(", ");
 
       if (spracheIstDeutsch) {
@@ -731,30 +751,31 @@ class _UserInformationDisplay extends StatelessWidget {
 
       return Row(children: [
         Text(themenText,
-            style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
+            style: const TextStyle(
+                fontSize: style.textSize, fontWeight: FontWeight.bold)),
+        Text(inhaltText, style: const TextStyle(fontSize: style.textSize))
       ]);
     }
 
     kinderDisplay() {
-      var childrenProfilList = profil["kinder"];
+      List childrenProfilList = profil["kinder"];
       childrenProfilList.sort();
-      var childrenList = [];
-      var alterZusatz = spracheIstDeutsch ? "J" : "y";
+      List childrenList = [];
+      String alterZusatz = spracheIstDeutsch ? "J" : "y";
 
-      childrenProfilList.forEach((child) {
+      for (var child in childrenProfilList) {
         childrenList.add(
             global_functions.ChangeTimeStamp(child).intoYears().toString() +
                 alterZusatz);
-      });
+      }
 
       return Row(
         children: [
           Text("${AppLocalizations.of(context)!.kinder}: ",
-              style:
-                  TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
+              style: const TextStyle(
+                  fontSize: style.textSize, fontWeight: FontWeight.bold)),
           Text(childrenList.reversed.join(", "),
-              style: TextStyle(fontSize: style.textSize))
+              style: const TextStyle(fontSize: style.textSize))
         ],
       );
     }
@@ -788,8 +809,8 @@ class _UserInformationDisplay extends StatelessWidget {
 
       for (var reiseplan in profil["reisePlanung"]) {
         String ortText = reiseplan["ortData"]["city"];
-        var dateReiseplanBis = DateTime.parse(reiseplan["bis"]);
-        var dateNow = DateTime(DateTime.now().year, DateTime.now().month);
+        DateTime dateReiseplanBis = DateTime.parse(reiseplan["bis"]);
+        DateTime dateNow = DateTime(DateTime.now().year, DateTime.now().month);
 
         if (dateReiseplanBis.isBefore(dateNow)) continue;
 
@@ -809,9 +830,9 @@ class _UserInformationDisplay extends StatelessWidget {
                   children: [
                     Text(
                         "${transformDateToText(reiseplan["von"])} - ${transformDateToText(reiseplan["bis"], onlyMonth: true)} in ",
-                        style: TextStyle(fontSize: style.textSize)),
+                        style: const TextStyle(fontSize: style.textSize)),
                     Text(ortText,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: style.textSize,
                             decoration: TextDecoration.underline))
                   ],
@@ -822,7 +843,7 @@ class _UserInformationDisplay extends StatelessWidget {
         ));
       }
 
-      if(reiseplanung.isEmpty) return SizedBox.shrink();
+      if (reiseplanung.isEmpty) return const SizedBox.shrink();
 
       return _InfoBox(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -830,11 +851,12 @@ class _UserInformationDisplay extends StatelessWidget {
             children: [
               Text(
                 "${AppLocalizations.of(context)!.reisePlanung}: ",
-                style:
-                    TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: style.textSize, fontWeight: FontWeight.bold),
               ),
               if (isOwnProfil)
-                Text("(${AppLocalizations.of(context)!.fuer} $reiseplanungPrivacy)")
+                Text(
+                    "(${AppLocalizations.of(context)!.fuer} $reiseplanungPrivacy)")
             ],
           ),
           const SizedBox(height: 5),
@@ -848,25 +870,29 @@ class _UserInformationDisplay extends StatelessWidget {
       String displayLink = link;
       Widget icon;
 
-      if(link.contains("instagram")){
+      if (link.contains("instagram")) {
         displayLink = link.replaceAll("https://", "");
         displayLink = displayLink.split("/")[1];
         displayLink = displayLink.split("?")[0];
 
         icon = Padding(
           padding: const EdgeInsets.all(2.0),
-          child: Image.asset("assets/icons/instagram.png", width: 20, height: 20,),
+          child: Image.asset(
+            "assets/icons/instagram.png",
+            width: 20,
+            height: 20,
+          ),
         );
-      }
-      else if(link.contains("facebook")){
+      } else if (link.contains("facebook")) {
         displayLink = link.replaceAll("https://", "");
         displayLink = displayLink.split("/")[1];
 
         icon = Padding(
           padding: const EdgeInsets.all(2.0),
-          child: Image.asset("assets/icons/facebook.png", width: 20, height: 20),
+          child:
+              Image.asset("assets/icons/facebook.png", width: 20, height: 20),
         );
-      }else if(link.contains("youtube")){
+      } else if (link.contains("youtube")) {
         displayLink = link.replaceAll("https://", "");
         displayLink = displayLink.split("/")[1];
 
@@ -874,7 +900,7 @@ class _UserInformationDisplay extends StatelessWidget {
           padding: const EdgeInsets.all(2.0),
           child: Image.asset("assets/icons/youtube.png", width: 20, height: 20),
         );
-      }else{
+      } else {
         icon = const Icon(Icons.public);
       }
 
@@ -888,7 +914,10 @@ class _UserInformationDisplay extends StatelessWidget {
               onTap: () => global_functions.openURL(link),
               child: SizedBox(
                   width: 300,
-                  child: Text(displayLink, style: const TextStyle(color: Colors.blue,))),
+                  child: Text(displayLink,
+                      style: const TextStyle(
+                        color: Colors.blue,
+                      ))),
             )
           ],
         ),
@@ -904,17 +933,17 @@ class _UserInformationDisplay extends StatelessWidget {
 
       return _InfoBox(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text("Social Media: ",
-              style:
-                  TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold)),
+          const Text("Social Media: ",
+              style: TextStyle(
+                  fontSize: style.textSize, fontWeight: FontWeight.bold)),
           ...socialMediaContent
         ]),
       );
     }
 
     interessenBox() {
-      var ownProfil = Hive.box('secureBox').get("ownProfil") ?? [];
-      var themenText = AppLocalizations.of(context)!.interessen;
+      Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
+      String themenText = AppLocalizations.of(context)!.interessen;
       List profilInteresets =
           global_functions.changeGermanToEnglish(profil["interessen"]);
       List matchInterest = [];
@@ -925,10 +954,13 @@ class _UserInformationDisplay extends StatelessWidget {
       }
 
       for (var interest in profil["interessen"]) {
-        var ownInterests = [...global_functions.changeEnglishToGerman(ownProfil["interessen"]), ...global_functions.changeGermanToEnglish(ownProfil["interessen"])];
+        List ownInterests = [
+          ...global_functions.changeEnglishToGerman(ownProfil["interessen"]),
+          ...global_functions.changeGermanToEnglish(ownProfil["interessen"])
+        ];
         bool match = false;
 
-        if(ownInterests.contains(interest) && !isOwnProfil) match = true;
+        if (ownInterests.contains(interest) && !isOwnProfil) match = true;
 
         matchInterest.add(match);
       }
@@ -939,7 +971,8 @@ class _UserInformationDisplay extends StatelessWidget {
           children: [
             Text(
               themenText,
-              style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: style.textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             SizedBox(
@@ -947,21 +980,26 @@ class _UserInformationDisplay extends StatelessWidget {
               child: Wrap(
                 alignment: WrapAlignment.spaceEvenly,
                 children: [
-                  for(var i = 0; i<profilInteresets.length; i++) Container(
-                    margin: const EdgeInsets.only(left:5, right: 5, top: 5, bottom: 5),
-                    padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-                    decoration: BoxDecoration(
-                        color: matchInterest[i] ? Theme.of(context).colorScheme.secondary : Colors.white,
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Text(
-                      profilInteresets[i],
-                      style: const TextStyle(
-                        fontSize: 13,
-                          color: Colors.black, fontWeight: FontWeight.bold),
-                    ),
-                  )
-
+                  for (var i = 0; i < profilInteresets.length; i++)
+                    Container(
+                      margin: const EdgeInsets.only(
+                          left: 5, right: 5, top: 5, bottom: 5),
+                      padding: const EdgeInsets.only(
+                          left: 10, right: 10, top: 5, bottom: 5),
+                      decoration: BoxDecoration(
+                          color: matchInterest[i]
+                              ? Theme.of(context).colorScheme.secondary
+                              : Colors.white,
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Text(
+                        profilInteresets[i],
+                        style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
                 ],
               ),
             )
@@ -977,7 +1015,8 @@ class _UserInformationDisplay extends StatelessWidget {
           children: [
             Text(
               AppLocalizations.of(context)!.ueberMich,
-              style: TextStyle(fontSize: style.textSize, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: style.textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(
               height: 5,
