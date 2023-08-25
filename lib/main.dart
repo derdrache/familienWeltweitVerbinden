@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:permission_handler/permission_handler.dart';
 import 'package:familien_suche/pages/informationen/community/community_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -46,6 +47,7 @@ void main() async {
 }
 
 _notificationSetup() async {
+    askNotificationPermission();
   final FlutterLocalNotificationsPlugin notificationsPlugin =
     FlutterLocalNotificationsPlugin();
   var initializationSettings = InitializationSettings(
@@ -272,6 +274,15 @@ refreshHiveData() async {
   await refreshHiveMeetups();
 }
 
+
+
+askNotificationPermission() async{
+  await Permission.notification.isDenied.then((value) {
+    if (value) {
+      Permission.notification.request();
+    }
+  });
+}
 
 //ignore: must_be_immutable
 class MyApp extends StatelessWidget {

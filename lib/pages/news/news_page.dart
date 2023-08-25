@@ -24,6 +24,7 @@ class NewsPage extends StatefulWidget {
   State<NewsPage> createState() => _NewsPageState();
 }
 
+
 class _NewsPageState extends State<NewsPage> {
   String userId = FirebaseAuth.instance.currentUser!.uid;
   late List newsFeedData;

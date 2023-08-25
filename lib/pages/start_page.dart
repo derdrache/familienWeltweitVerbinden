@@ -57,6 +57,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     NetworkConnectivity(context).checkInternetStatusStream();
 
     WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) => _asyncMethod());
   }
 
@@ -74,6 +75,20 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     await refreshHiveMeetups();
     await refreshHiveCommunities();
     await refreshHiveBulletinBoardNotes();
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed && this.mounted) {
+      await _refreshData();
+    }
+  }
+
+  _refreshData() async {
+    await refreshHiveProfils();
+    await refreshHiveNewsPage();
+    await refreshHiveChats();
+    await refreshHiveMeetups();
+    await refreshHiveCommunities();
   }
 
   _asyncMethod() async {

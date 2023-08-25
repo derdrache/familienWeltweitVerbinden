@@ -56,6 +56,9 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch1103D),
+                  _patch(patch1102D),
+                  _patch(patch1101D),
                   _patch(patch1100D),
                   _patch(patch194D),
                   _patch(patch193D),
@@ -88,6 +91,9 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch1103E),
+                  _patch(patch1102E),
+                  _patch(patch1101E),
                   _patch(patch1100E),
                   _patch(patch194E),
                   _patch(patch193E),
@@ -130,6 +136,58 @@ var patchVorlage={
   "title" : "",
   "inhalt": [
 
+  ]
+};
+var patch1103E={
+  "title" : "1.10.3 - 31.07.2023",
+  "inhalt": [
+    "Notifications are working again",
+    "Chat - Deleted Meetup / Community no longer cause an error when the card is shared in chat",
+    "Hyperlinks - links without http or https can now be opened"
+  ]
+};
+var patch1103D={
+  "title" : "1.10.3 - 31.07.2023",
+  "inhalt": [
+    "Notifications funktionieren wieder",
+    "Chat - Gelöschte Meetup / Community führen nicht mehr zu einem Fehler, wenn die Karte im Chat geteilt wurde",
+    "Hyperlinks - links ohne http oder https können nun geöffnet werden"
+  ]
+};
+
+var patch1102E={
+  "title" : "1.10.2 - 16.07.2023",
+  "inhalt": [
+    "Profile interests extended: digital nomads",
+    "When changing location, it is now no longer possible to create multiple Database events with one change."
+  ]
+};
+var patch1102D={
+  "title" : "1.10.2 - 16.07.2023",
+  "inhalt": [
+    "Profil interessen erweitert: Digitale Nomaden",
+    "Beim Standortwechsel ist es nun nicht mehr möglich mehrere Datenbankevents mit einem Wechesel zu erzeugen"
+  ]
+};
+
+var patch1101E={
+  "title" : "1.10.1 - 04.07.2023",
+  "inhalt": [
+    "World map - Show travel planning works again",
+    "Chat - Card messages with text now also have a Translate button",
+    "Chat - There was a bug that did not set the unread messages to 0 after entering a chat",
+    "Meetup/Community Search - The search is now no longer case sensitive",
+    "Settings - The 'Share with Friends' option now shares the link to the Android and iOS version in addition to the web page."
+  ]
+};
+var patch1101D={
+  "title" : "1.10.1 - 04.07.2023",
+  "inhalt": [
+    "Weltkarte - Reiseplanung anzeigen funktioniert wieder",
+    "Chat - Card Nachrichten mit Text haben jetzt auch ein Translate-Button",
+    "Chat - Es gab ein Fehler, der die ungelesenen Nachrichten nach eintritt in einem Chat nicht auf 0 gesetzt hat",
+    "Meetup/Community Suche - Die Suche ist jetzt nicht mehr case Sensitivity",
+    "Settings - Die 'Mit Freunde teilen' möglichkeit teilt jetzt neben der Webseite auch den Link zur Android und iOS Version"
   ]
 };
 

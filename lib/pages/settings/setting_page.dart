@@ -56,7 +56,9 @@ class SettingPage extends StatefulWidget {
   State<SettingPage> createState() => _SettingPageState();
 }
 
+
 class _SettingPageState extends State<SettingPage> {
+  
   @override
   void initState() {
     super.initState();
@@ -598,7 +600,8 @@ class _SupportInformation extends StatelessWidget {
             settingThemeContainer(
                 AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
-                () => Share.share('${AppLocalizations.of(context)!.teilenLinkText}\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
+                () => Share.share(AppLocalizations.of(context)!.teilenLinkText +
+                    '\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
             settingThemeContainer(
                 AppLocalizations.of(context)!.spenden, Icons.favorite,
                 () => donationWindow(context)),

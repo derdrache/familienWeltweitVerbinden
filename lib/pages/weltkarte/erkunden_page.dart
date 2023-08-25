@@ -108,6 +108,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   @override
   void initState() {
+    super.initState();
+    
     var hiveProfils = List.of(Hive.box('secureBox').get("profils") ?? []);
     profils = [for (var profil in hiveProfils) Map.of(profil)];
 
@@ -122,8 +124,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
     createAndSetZoomLevels(communities, "communities");
     createAndSetZoomLevels(insiderInfos, "insiderInfo");
 
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => buildDone = true);
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) => mounted = true);
   }
 
   setEvents() {
@@ -817,14 +819,17 @@ class _ErkundenPageState extends State<ErkundenPage> {
           newProfil["latt"] = planung["ortData"]["latt"];
           newProfil["longt"] = planung["ortData"]["longt"];
 
+
           selectedProfils.add(newProfil);
           continue;
         }
 
         while (planungVon != planungBis) {
+
           planungVon = genauePlanung
               ? DateTime(planungVon.year, planungVon.month, planungVon.day + 1)
               : DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
+          
           if (selectDates.contains(planungVon)) {
             var newProfil = Map.of(profil);
             newProfil["ort"] = planung["ortData"]["city"];

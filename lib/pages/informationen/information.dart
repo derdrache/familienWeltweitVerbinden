@@ -68,7 +68,7 @@ class _InformationPageState extends State<InformationPage>{
     super.initState();
   }
 
-
+  
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
