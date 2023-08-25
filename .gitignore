@@ -53,3 +53,4 @@ app.*.map.json
 /lib/test.apns
 /lib/auth/
 /lib/page_test.dart
+/lib/functions/record_timer_stream.dart

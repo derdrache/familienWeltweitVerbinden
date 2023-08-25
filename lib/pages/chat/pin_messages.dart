@@ -7,11 +7,10 @@ import 'package:intl/intl.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
 
 class PinMessagesPage extends StatelessWidget {
-  List pinMessages;
-  MaterialAccentColor ownMessageBoxColor = Colors.greenAccent;
-  Color chatpartnerMessageBoxColor = Colors.white;
-  String userId = FirebaseAuth.instance.currentUser!.uid;
-
+  final List pinMessages;
+  final MaterialAccentColor ownMessageBoxColor = Colors.greenAccent;
+  final Color chatpartnerMessageBoxColor = Colors.white;
+  final String userId = FirebaseAuth.instance.currentUser!.uid;
 
   PinMessagesPage({required this.pinMessages, Key? key}) : super(key: key);
 

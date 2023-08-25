@@ -1,7 +1,10 @@
+import 'dart:convert';
+
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/informationen/meetups/meetup_card_details.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,22 +12,26 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:translator/translator.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 import '../../../functions/is_user_inactive.dart';
-import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/image_upload_box.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
-import '../../../windows/nutzerrichtlinen.dart';
+import '../../../widgets/nutzerrichtlinen.dart';
 import '../../start_page.dart';
 import 'weltkarte_mini.dart';
 
 class LocationInformationPage extends StatefulWidget {
-  var ortName;
-  var fromCityPage;
+  String ortName;
+  bool fromCityPage;
+  int? insiderInfoId;
 
-  LocationInformationPage({Key? key, this.ortName, this.fromCityPage = false})
+  LocationInformationPage({Key? key, required this.ortName, this.fromCityPage = false, this.insiderInfoId})
       : super(key: key);
 
   @override
@@ -43,6 +50,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
 
   @override
   void initState() {
+    _selectNavigationIndex = widget.insiderInfoId != null ? 1 : 0;
     location = getCityFromHive(cityName: widget.ortName);
 
     location["familien"].remove(userId);
@@ -54,7 +62,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         usersCityInformation: usersCityInformation,
         fromCityPage: widget.fromCityPage,
       ),
-      InsiderInformationPage(location: location),
+      InsiderInformationPage(location: location, insiderInfoId: widget.insiderInfoId),
     ];
     addLastTab();
 
@@ -104,15 +112,13 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
         title: widget.ortName,
-        leading: widget.fromCityPage
-            ? StartPage(selectedIndex: 2, informationPageIndex: isCity ? 3 : 4)
-            : null,
         buttons: [
           IconButton(
             icon: const Icon(Icons.link),
+            tooltip: AppLocalizations.of(context)!.tooltipLinkKopieren,
             onPressed: () async {
               Clipboard.setData(
-                  ClipboardData(text: "</cityId=" + location["id"].toString()));
+                  ClipboardData(text: "</cityId=${location["id"]}"));
               customSnackbar(
                   context, AppLocalizations.of(context)!.linkWurdekopiert,
                   color: Colors.green);
@@ -177,13 +183,11 @@ class GeneralInformationPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _GeneralInformationPageState createState() => _GeneralInformationPageState();
+  State<GeneralInformationPage> createState() => _GeneralInformationPageState();
 }
 
 class _GeneralInformationPageState extends State<GeneralInformationPage> {
   var userId = FirebaseAuth.instance.currentUser!.uid;
-  bool canGerman = false;
-  bool canEnglish = false;
   late bool isCity;
   final translator = GoogleTranslator();
   List familiesThere = [];
@@ -306,7 +310,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     double fontSize = 18;
     var anzahlFamilien = widget.location["familien"]?.length ?? 0;
 
-    _showCurrentlyThere() {
+    showCurrentlyThere() {
       var familiesOnLocation = getFamiliesThere();
 
       return InkWell(
@@ -330,7 +334,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showVisited() {
+    showVisited() {
       return InkWell(
         onTap: () => showFamilyVisitWindow(widget.location["familien"]),
         child: Container(
@@ -352,7 +356,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showInsiderCount() {
+    showInsiderCount() {
       return Container(
         margin: const EdgeInsets.all(5),
         child: Row(
@@ -362,7 +366,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               size: iconSize,
             ),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context)!.insiderInformation + ": ",
+            Text("${AppLocalizations.of(context)!.insiderInformation}: ",
                 style: TextStyle(fontSize: fontSize)),
             const SizedBox(width: 5),
             Text(widget.usersCityInformation.length.toString(),
@@ -372,7 +376,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showCost() {
+    showCost() {
       setCostIconColor(indikator) {
         if (indikator <= 1) return Colors.green[800];
         if (indikator <= 2) return Colors.green;
@@ -407,7 +411,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showInternetSpeed() {
+    showInternetSpeed() {
       String internetSpeedText = widget.location["internet"] == null
           ? "?"
           : widget.location["internet"].toString();
@@ -445,7 +449,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       );
     }
 
-    _showWeather() {
+    showWeather() {
       return Container(
         margin: const EdgeInsets.all(5),
         child: Row(
@@ -482,12 +486,12 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _showCurrentlyThere(),
-                      _showVisited(),
-                      _showInsiderCount(),
-                      _showCost(),
-                      _showInternetSpeed(),
-                      _showWeather(),
+                      showCurrentlyThere(),
+                      showVisited(),
+                      showInsiderCount(),
+                      showCost(),
+                      showInternetSpeed(),
+                      showWeather(),
                     ]),
               ),
             ],
@@ -496,13 +500,16 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
             onPressed: () async {
               await createNewChatGroup(widget.location["id"]);
 
-              global_func.changePage(
-                  context,
-                  ChatDetailsPage(
-                    isChatgroup: true,
-                    connectedWith: "</stadt=${widget.location["id"]}",
-                  ));
+              if (context.mounted) {
+                global_func.changePage(
+                    context,
+                    ChatDetailsPage(
+                      isChatgroup: true,
+                      connectedWith: "</stadt=${widget.location["id"]}",
+                    ));
+              }
             },
+            tooltip: AppLocalizations.of(context)!.tooltipOrtChatOeffnen,
             child: const Icon(Icons.message),
           ),
         ),
@@ -513,8 +520,9 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
 class InsiderInformationPage extends StatefulWidget {
   Map location;
+  int? insiderInfoId;
 
-  InsiderInformationPage({Key? key, required this.location}) : super(key: key);
+  InsiderInformationPage({Key? key, required this.location, this.insiderInfoId}) : super(key: key);
 
   @override
   State<InsiderInformationPage> createState() => _InsiderInformationPageState();
@@ -524,23 +532,47 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final translator = GoogleTranslator();
   late List usersCityInformation;
+  late List usersCityInformationOriginal = [];
+  String systemLanguage =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+  late bool userSpeakGerman;
+  int initalPage = 0;
+
+  @override
+  void initState() {
+    userSpeakGerman = getUserSpeaksGerman();
+    usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
+    usersCityInformation.asMap().forEach((index, element) {
+      if(element["id"] == widget.insiderInfoId) {
+        initalPage = index;
+      }
+      usersCityInformationOriginal.add(null);
+    });
+
+
+    super.initState();
+  }
 
   addInformationWindow() {
     var titleTextKontroller = TextEditingController();
     var informationTextKontroller = TextEditingController();
+    var imageUploadBox = ImageUploadBox(imageKategorie: "information",);
 
     showDialog(
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-              title: AppLocalizations.of(context)!.insiderInformationHinzufuegen,
+              title:
+                  AppLocalizations.of(context)!.insiderInformationHinzufuegen,
               children: [
-                customTextInput(
+                CustomTextInput(
                     AppLocalizations.of(context)!.titel, titleTextKontroller),
                 const SizedBox(height: 10),
-                customTextInput(AppLocalizations.of(context)!.beschreibung,
+                CustomTextInput(AppLocalizations.of(context)!.beschreibung,
                     informationTextKontroller,
                     moreLines: 8, textInputAction: TextInputAction.newline),
+                const SizedBox(height: 5),
+                imageUploadBox,
                 const SizedBox(height: 5),
                 NutzerrichtlinenAnzeigen(page: "create"),
                 Row(
@@ -553,7 +585,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                         ),
                         onPressed: () => saveNewInformation(
                             title: titleTextKontroller.text,
-                            inhalt: informationTextKontroller.text)),
+                            inhalt: informationTextKontroller.text,
+                            images: imageUploadBox.getImages())),
                     TextButton(
                       child: Text(
                         AppLocalizations.of(context)!.abbrechen,
@@ -568,7 +601,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         });
   }
 
-  saveNewInformation({title, inhalt}) async {
+  saveNewInformation({title, inhalt, images}) async {
     DateTime now = DateTime.now();
     DateFormat formatter = DateFormat('yyyy-MM-dd');
     String nowFormatted = formatter.format(now);
@@ -597,7 +630,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       "erstelltAm": nowFormatted,
       "erstelltVon": userId,
       "thumbUp": [],
-      "thumbDown": []
+      "thumbDown": [],
+      "images": images
     };
 
     setState(() {
@@ -652,6 +686,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         newUserInformation["titleEng"].replaceAll("'", "''");
     newUserInformation["informationEng"] =
         newUserInformation["informationEng"].replaceAll("'", "''");
+    newUserInformation["images"] = jsonEncode(newUserInformation["images"]);
 
     StadtinfoUserDatabase().addNewInformation(newUserInformation);
   }
@@ -675,6 +710,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       StadtinfoUserDatabase().update(
           sqlStatement,
           "WHERE id ='$infoId'");
+
     }
     setState(() {});
   }
@@ -707,11 +743,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
   }
 
   changeInformationDialog(information) {
-    var informationData = getInsiderInfoText(information);
+    var informationData = getInsiderInfoText(information, null);
     var titleTextKontroller =
         TextEditingController(text: informationData["title"]);
     var informationTextKontroller =
         TextEditingController(text: informationData["information"]);
+    var imageUploadBox = ImageUploadBox(
+      uploadedImages: informationData["images"], imageKategorie: "information",
+    );
 
     Future<void>.delayed(
         const Duration(),
@@ -721,25 +760,34 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               return CustomAlertDialog(
                   title: AppLocalizations.of(context)!.informationAendern,
                   children: [
-                    customTextInput(AppLocalizations.of(context)!.titel,
+                    CustomTextInput(AppLocalizations.of(context)!.titel,
                         titleTextKontroller),
                     const SizedBox(height: 10),
-                    customTextInput(AppLocalizations.of(context)!.beschreibung,
+                    CustomTextInput(AppLocalizations.of(context)!.beschreibung,
                         informationTextKontroller,
                         moreLines: 8, textInputAction: TextInputAction.newline),
+                    const SizedBox(height: 10),
+                    imageUploadBox,
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          child: Text(AppLocalizations.of(context)!.speichern),
-                          onPressed: () => changeInformation(
+                          child: Text(
+                            AppLocalizations.of(context)!.speichern,
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          onPressed: () => changeInsiderInformation(
                               id: information["id"],
                               newTitle: titleTextKontroller.text,
+                              images: imageUploadBox.getImages(),
                               newInformation: informationTextKontroller.text),
                         ),
                         TextButton(
-                          child: Text(AppLocalizations.of(context)!.abbrechen),
+                          child: Text(
+                            AppLocalizations.of(context)!.abbrechen,
+                            style: const TextStyle(fontSize: 20),
+                          ),
                           onPressed: () => Navigator.pop(context),
                         )
                       ],
@@ -749,7 +797,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             }));
   }
 
-  changeInformation({id, newTitle, newInformation}) async {
+  changeInsiderInformation({id, newTitle, newInformation, images}) async {
     newTitle = newTitle.trim();
     newInformation = newInformation.trim();
 
@@ -776,17 +824,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       }
     }
 
-    updateDatabase(id, newTitle, newInformation);
+    updateDatabase(id, newTitle, newInformation, images);
 
     setState(() {});
     Navigator.pop(context);
   }
 
-  updateDatabase(
-    id,
-    newTitle,
-    newInformation,
-  ) async {
+  updateDatabase(id, newTitle, newInformation, images) async {
     String titleGer, informationGer, titleEng, informationEng;
 
     var languageCheck = await translator.translate(newInformation);
@@ -840,12 +884,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             "titleGer = '$titleGer', "
             "informationGer = '$informationGer',"
             "titleEng = '$titleEng',"
-            "informationEng = '$informationEng'",
+            "informationEng = '$informationEng',"
+            "images = '${jsonEncode(images)}'",
         "WHERE id ='$id'");
   }
 
   copyInformationDialog(information) {
-    var informationText = isGerman
+    var informationText = userSpeakGerman
         ? information["informationGer"]
         : information["informationGer"];
 
@@ -864,12 +909,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.informationLoeschen,
                 height: 90,
-                children: [
-                  const SizedBox(height: 10),
-                  Center(
-                      child: Text(AppLocalizations.of(context)!
-                          .informationWirklichLoeschen))
-                ],
                 actions: [
                   TextButton(
                     child: const Text("Ok"),
@@ -893,6 +932,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     onPressed: () => Navigator.pop(context),
                   )
                 ],
+                children: [
+                  const SizedBox(height: 10),
+                  Center(
+                      child: Text(AppLocalizations.of(context)!
+                          .informationWirklichLoeschen))
+                ],
               );
             }));
   }
@@ -909,7 +954,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   height: 500,
                   title: AppLocalizations.of(context)!.informationMelden,
                   children: [
-                    customTextInput("", reportTextKontroller,
+                    CustomTextInput("", reportTextKontroller,
                         moreLines: 10,
                         hintText: AppLocalizations.of(context)!
                             .informationMeldenFrage),
@@ -921,8 +966,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                             Navigator.pop(context);
                             ReportsDatabase().add(
                                 userId,
-                                "Melde Information id: " +
-                                    information["id"].toString(),
+                                "Melde Information id: ${information["id"]}",
                                 reportTextKontroller.text);
                           },
                           label: Text(AppLocalizations.of(context)!.senden)),
@@ -931,109 +975,100 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             }));
   }
 
-  getInsiderInfoText(information) {
-    var showTitle = "";
-    var showInformation = "";
-    var tranlsationIn;
+  getInsiderInfoText(information, index) {
+    String showTitle = "";
+    String showInformation = "";
     var ownlanguages = Hive.box("secureBox").get("ownProfil")["sprachen"];
     var informationLanguage = information["sprache"] == "de"
         ? ["Deutsch", "german"]
         : ["Englisch", "english"];
-    bool canSpeakInformationLanguage =
-        ownlanguages.contains(informationLanguage[0]) ||
+
+    bool canSpeakInformationLanguage = information["sprache"] == systemLanguage ||
+            ownlanguages.contains(informationLanguage[0]) ||
             ownlanguages.contains(informationLanguage[1]);
+    if(usersCityInformationOriginal[index] == null) canSpeakInformationLanguage ? usersCityInformationOriginal[index] = true : usersCityInformationOriginal[index] = false;
 
     if (information["titleGer"].isEmpty) {
       return {
         "title": information["titleEng"],
-        "information": information["informationEng"]
+        "information": information["informationEng"],
+        "translated": false,
       };
     }
     if (information["titleEng"].isEmpty) {
       return {
         "title": information["titleGer"],
-        "information": information["informationGer"]
+        "information": information["informationGer"],
+        "translated": false,
       };
     }
 
-    if (canSpeakInformationLanguage) {
-      if (information["sprache"] == "de") {
-        showTitle = information["titleGer"];
-        showInformation = information["informationGer"];
-      } else {
-        showTitle = information["titleEng"];
-        showInformation = information["informationEng"];
-      }
-    } else {
-      if (information["sprache"] == "de") {
-        tranlsationIn = "englisch";
-        showTitle = information["titleEng"];
-        showInformation = information["informationEng"];
-      } else {
-        tranlsationIn = "deutsch";
-        showTitle = information["titleGer"];
-        showInformation = information["informationGer"];
-      }
+    String originalTitle = informationLanguage[0] == "Deutsch" ? information["titleGer"] : information["titleEng"];
+    String originalInformation = informationLanguage[0] == "Deutsch" ? information["informationGer"] : information["informationEng"];
+    String translationTitle = informationLanguage[0] == "Deutsch" ? information["titleEng"] : information["titleGer"];
+    String translationInformation = informationLanguage[0] == "Deutsch" ? information["informationEng"] : information["informationGer"];
+
+    if(usersCityInformationOriginal[index]){
+      showTitle = originalTitle;
+      showInformation = originalInformation;
+    }else{
+      showTitle = translationTitle;
+      showInformation = translationInformation;
     }
 
     return {
       "title": showTitle,
       "information": showInformation,
-      "translationIn": tranlsationIn
+      "translated": !usersCityInformationOriginal[index],
     };
   }
 
-  @override
-  void initState() {
-    usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
-    super.initState();
+  showOriginalInformation(index) {
+    usersCityInformationOriginal[index] = !usersCityInformationOriginal[index];
   }
 
   @override
   Widget build(BuildContext context) {
-    openInformationMenu(positionDetails, information) async {
-      double left = positionDetails.globalPosition.dx;
-      double top = positionDetails.globalPosition.dy;
+
+    openInformationMenu(information) async {
       bool canChange = information["erstelltVon"] == userId;
       usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
 
-      await showMenu(
-          context: context,
-          position: RelativeRect.fromLTRB(left, top, 0, 0),
-          items: [
-            if (canChange)
-              PopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.bearbeiten),
-                onTap: () => changeInformationDialog(information),
-              ),
-            PopupMenuItem(
-              child: Text(AppLocalizations.of(context)!.kopieren),
-              onTap: () => copyInformationDialog(information),
-            ),
-            PopupMenuItem(
-              child: Text(AppLocalizations.of(context)!.melden),
-              onTap: () => reportInformationDialog(information),
-            ),
-            if (canChange)
-              PopupMenuItem(
-                  child: Text(AppLocalizations.of(context)!.loeschen),
-                  onTap: () {
-                    deleteInformationDialog(information);
-                  }),
-          ]);
+      CustomPopupMenu(context, topDistance: 100.0, width: 140.0,
+          children: [
+        if (canChange)
+          SimpleDialogOption(
+            child: Text(AppLocalizations.of(context)!.bearbeiten),
+            onPressed: () => changeInformationDialog(information),
+          ),
+        SimpleDialogOption(
+          child: Text(AppLocalizations.of(context)!.kopieren),
+          onPressed: () => copyInformationDialog(information),
+        ),
+        SimpleDialogOption(
+          child: Text(AppLocalizations.of(context)!.melden),
+          onPressed: () => reportInformationDialog(information),
+        ),
+        if (canChange)
+          SimpleDialogOption(
+              child: Text(AppLocalizations.of(context)!.loeschen),
+              onPressed: () {
+                deleteInformationDialog(information);
+              }),
+      ]);
     }
 
     insiderInfoBox(information, index) {
       information["index"] = index;
-      var informationText = getInsiderInfoText(information);
+      var informationText = getInsiderInfoText(information, index);
       var showTitle = informationText["title"];
       var showInformation = informationText["information"];
-      var translationIn = informationText["translationIn"];
-      var creatorProfil =
-          getProfilFromHive(profilId: information["erstelltVon"]) ?? {};
+      var translated = informationText["translated"];
+      var creatorProfil = getProfilFromHive(profilId: information["erstelltVon"]);
+      String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
 
       return Container(
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 60),
         width: double.infinity,
         decoration: BoxDecoration(
             border: Border.all(
@@ -1050,29 +1085,32 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   Padding(
                       padding: const EdgeInsets.only(left: 10, right: 10),
                       child: Text(
-                        showTitle,
+                        " #${index + 1} - $showTitle",
                         style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                            fontWeight: FontWeight.bold, fontSize: 18),
                       )),
-                  const Expanded(child: SizedBox()),
-                  GestureDetector(
-                    onTapDown: (positionDetails) =>
-                        openInformationMenu(positionDetails, information),
+                  const Expanded(child: SizedBox.shrink()),
+                  InkWell(
+                    onTap: () => openInformationMenu(information),
                     child: const Icon(Icons.more_horiz),
                   ),
                   const SizedBox(width: 5)
                 ],
               ),
             ),
-            Container(
-                margin: const EdgeInsets.only(left: 10, right: 10),
-                child: TextWithHyperlinkDetection(
-                  text: showInformation,
-                  fontsize: 16,
-                )),
-            if (translationIn != null)
+            Expanded(
+              child: SingleChildScrollView(
+                child: Container(
+                    margin: const EdgeInsets.only(left: 10, right: 10),
+                    child: TextWithHyperlinkDetection(
+                      text: showInformation,
+                      fontsize: 16,
+                    )),
+              ),
+            ),
+            if (translated)
               Padding(
-                padding: const EdgeInsets.only(right: 5, top: 2),
+                padding: const EdgeInsets.only(right: 5, top: 5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -1088,39 +1126,86 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  IconButton(
-                      onPressed: () => setThumbUp(index),
-                      icon: Icon(
-                        Icons.thumb_up,
+                  InkWell(
+                    onTap: () => setThumbUp(index),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 5, right: 5),
+                      child: Icon(
+                        Icons.keyboard_arrow_up_outlined,
+                        size: 24,
                         color: information["thumbUp"].contains(userId)
                             ? Colors.green
                             : Colors.grey,
-                      )),
-                  Text((information["thumbUp"].length -
-                          information["thumbDown"].length)
-                      .toString()),
-                  IconButton(
-                      //padding: EdgeInsets.all(5),
-                      onPressed: () => setThumbDown(index),
-                      icon: Icon(Icons.thumb_down,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    (information["thumbUp"].length -
+                            information["thumbDown"].length)
+                        .toString(),
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  InkWell(
+                    onTap: () => setThumbDown(index),
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                        left: 5,
+                      ),
+                      child: Icon(Icons.keyboard_arrow_down_outlined,
+                          size: 24,
                           color: information["thumbDown"].contains(userId)
                               ? Colors.red
-                              : Colors.grey)),
-                  const Expanded(child: SizedBox()),
+                              : Colors.grey),
+                    ),
+                  ),
+                  Expanded(
+                      child: Center(
+                              child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    shape: const StadiumBorder(),
+                                  ),
+                                  onPressed: () {
+                                    showOriginalInformation(index);
+                                    setState(() {});
+                                  },
+                                  child: Text(
+                                    "Original",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        decoration:
+                                            translated
+                                                ? TextDecoration.lineThrough
+                                                : null),
+                                  )),
+                            )
+                          ),
                   GestureDetector(
-                    onTap: () => global_func.changePage(
-                        context,
-                        ShowProfilPage(
-                          profil: creatorProfil,
-                        )),
-                    child: Text(
-                      creatorProfil["name"] ?? "" +
-                          " " +
-                          information["erstelltAm"]
-                              .split("-")
-                              .reversed
-                              .join("-"),
-                      style: const TextStyle(color: Colors.black),
+                    onTap: () => creatorProfil == null
+                        ? null
+                        : global_func.changePage(
+                            context,
+                            ShowProfilPage(
+                              profil: creatorProfil,
+                            )),
+                    child: Column(
+                      children: [
+                        if (creatorName.isNotEmpty)
+                          Text(
+                            "$creatorName ",
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        Text(
+                            information["erstelltAm"]
+                                .split("-")
+                                .reversed
+                                .join("-"),
+                            style: const TextStyle(color: Colors.black))
+                      ],
                     ),
                   ),
                   const SizedBox(width: 5)
@@ -1152,17 +1237,15 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         ));
       }
 
-      return Container(
-        margin: const EdgeInsets.all(10),
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ListView(shrinkWrap: true, children: userCityInfo),
-            )
-          ],
-        ),
+      return CarouselSlider(
+        options: CarouselOptions(height: double.infinity, initialPage: initalPage, enableInfiniteScroll: false),
+        items: userCityInfo.map((card) {
+          return Builder(
+            builder: (BuildContext context) {
+              return card;
+            },
+          );
+        }).toList(),
       );
     }
 
@@ -1181,7 +1264,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 class CountryCitiesPage extends StatefulWidget {
   final String countryName;
 
-  CountryCitiesPage({Key? key, required this.countryName}) : super(key: key);
+  const CountryCitiesPage({Key? key, required this.countryName}) : super(key: key);
 
   @override
   State<CountryCitiesPage> createState() => _CountryCitiesPageState();

@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:ui';
 
+import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/show_profil.dart';
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +11,18 @@ import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:translator/translator.dart';
 
-import '../../../global/custom_widgets.dart';
 import '../../../global/global_functions.dart' as global_func;
+import '../../../global/style.dart' as style;
+import '../../../global/profil_sprachen.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../services/database.dart';
 import '../../../global/variablen.dart' as global_var;
+import '../../../widgets/layout/custom_dropdownButton.dart';
+import '../../../widgets/layout/custom_multi_select.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 import '../location/location_Information.dart';
 import 'meetup_image_galerie.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
@@ -27,9 +32,6 @@ var isWebDesktop = kIsWeb &&
     (defaultTargetPlatform != TargetPlatform.iOS ||
         defaultTargetPlatform != TargetPlatform.android);
 double fontsize = isWebDesktop ? 12 : 16;
-var isGerman = kIsWeb
-    ? window.locale.languageCode == "de"
-    : Platform.localeName == "de_DE";
 
 //ignore: must_be_immutable
 class MeetupCardDetails extends StatefulWidget {
@@ -40,13 +42,17 @@ class MeetupCardDetails extends StatefulWidget {
   bool isPublic;
 
   MeetupCardDetails(
-      {Key? key, required this.meetupData, this.offlineMeetup = true, this.isApproved = false})
+      {Key? key,
+      required this.meetupData,
+      this.offlineMeetup = true,
+      this.isApproved = false})
       : isCreator = meetupData["erstelltVon"] == userId,
-        isPublic = meetupData["art"] == "öffentlich" || meetupData["art"] == "public",
+        isPublic =
+            meetupData["art"] == "öffentlich" || meetupData["art"] == "public",
         super(key: key);
 
   @override
-  _MeetupCardDetailsState createState() => _MeetupCardDetailsState();
+  State<MeetupCardDetails> createState() => _MeetupCardDetailsState();
 }
 
 class _MeetupCardDetailsState extends State<MeetupCardDetails> {
@@ -56,14 +62,16 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   TextEditingController changeTextInputController = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
   var beschreibungInputKontroller = TextEditingController();
-  late var changeDropdownInput;
-  late var timeZoneDropdown;
-  late var changeMultiDropdownInput;
+  late CustomDropdownButton changeDropdownInput;
+  late CustomDropdownButton timeZoneDropdown;
+  late CustomMultiTextForm changeMultiDropdownInput;
   bool chooseCurrentLocation = false;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
+  late bool userSpeakGerman;
 
   @override
   void initState() {
+    userSpeakGerman = getUserSpeaksGerman();
     beschreibungInputKontroller.text = widget.meetupData["beschreibung"];
 
     addScrollListener();
@@ -122,13 +130,12 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       prepareMeetupNotification(
           meetupId: widget.meetupData["id"],
           toId: widget.meetupData["erstelltVon"],
-          meetupName : widget.meetupData["name"],
-          typ: "freigeben"
-      );
+          meetupName: widget.meetupData["name"],
+          typ: "freigeben");
     }
 
-    updateHiveMeetup(
-        widget.meetupData["id"], "freischalten", widget.meetupData["freischalten"]);
+    updateHiveMeetup(widget.meetupData["id"], "freischalten",
+        widget.meetupData["freischalten"]);
   }
 
   convertMeetupDateIntoMyDate() {
@@ -144,7 +151,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     var ownTime =
         meetupBeginn.toString().split(" ")[1].toString().substring(0, 5);
 
-    return ownDate + " " + ownTime;
+    return "$ownDate $ownTime";
   }
 
   saveTag(newValue) {
@@ -155,7 +162,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     widget.meetupData["tags"].add(newValue);
 
-    updateHiveMeetup(widget.meetupData["id"], "tags", widget.meetupData["tags"]);
+    updateHiveMeetup(
+        widget.meetupData["id"], "tags", widget.meetupData["tags"]);
 
     MeetupDatabase().update("tags = JSON_ARRAY_APPEND(tags, '\$', '$newValue')",
         "WHERE id = '${widget.meetupData["id"]}'");
@@ -164,7 +172,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   removeTag(tag) {
     widget.meetupData["tags"].remove(tag);
 
-    updateHiveMeetup(widget.meetupData["id"], "tags", widget.meetupData["tags"]);
+    updateHiveMeetup(
+        widget.meetupData["id"], "tags", widget.meetupData["tags"]);
 
     MeetupDatabase().update(
         "tags = JSON_REMOVE(tags, JSON_UNQUOTE(JSON_SEARCH(tags, 'one', '$tag')))",
@@ -185,19 +194,42 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     if (newName.isEmpty) return false;
 
-    if (newName.length > 40) {
-      customSnackbar(context, AppLocalizations.of(context)!.usernameZuLang);
-    }
+    var meetupId = widget.meetupData["id"];
+    var meetupData = getMeetupFromHive(meetupId);
 
-    widget.meetupData["name"] = newName;
-    updateHiveMeetup(widget.meetupData["id"], "name", newName);
+    meetupData["name"] = newName;
+    meetupData["nameGer"] = newName;
+    meetupData["nameEng"] = newName;
 
-    newName = newName.replaceAll("'", "''");
-
-    MeetupDatabase()
-        .update("name = '$newName'", "WHERE id = '${widget.meetupData["id"]}'");
+    translateAndSaveTitle(Map.of(meetupData));
 
     return true;
+  }
+
+  translateAndSaveTitle(meetupData) async {
+    String newTitle = meetupData["name"];
+    var languageCheck = await translator.translate(newTitle);
+    bool titleIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if (titleIsGerman) {
+      meetupData["nameGer"] = newTitle;
+      var translation = await descriptionTranslation(newTitle, "auto");
+      meetupData["beschreibungEng"] =
+          translation + "\n\nThis is an automatic translation";
+    } else {
+      meetupData["nameEng"] = newTitle;
+      var translation = await descriptionTranslation(newTitle, "de");
+      meetupData["nameGer"] = translation +
+          "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+    }
+
+    String name = meetupData["name"].replaceAll("'", "''");
+    String nameGer = meetupData["nameGer"].replaceAll("'", "''");
+    String nameEng = meetupData["nameEng"].replaceAll("'", "''");
+
+    MeetupDatabase().update(
+        "name = '$name', nameGer = '$nameGer', nameEng = '$nameEng'",
+        "WHERE id = '${widget.meetupData["id"]}'");
   }
 
   checkAndSaveNewBeschreibung() async {
@@ -209,15 +241,15 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     var meetupData = getMeetupFromHive(meetupId);
 
     meetupData["beschreibung"] = newBeschreibung;
-    meetupData["beschreibungGer"]= newBeschreibung;
-    meetupData["beschreibungEng"]= newBeschreibung;
+    meetupData["beschreibungGer"] = newBeschreibung;
+    meetupData["beschreibungEng"] = newBeschreibung;
 
-    translateAndSaveBeschreibung(meetupData);
+    translateAndSaveBeschreibung(Map.of(meetupData));
 
     return true;
   }
 
-  translateAndSaveBeschreibung(meetupData) async{
+  translateAndSaveBeschreibung(meetupData) async {
     var newBeschreibung = meetupData["beschreibung"];
     var languageCheck = await translator.translate(newBeschreibung);
     bool descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
@@ -235,8 +267,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     String beschreibung = meetupData["beschreibung"].replaceAll("'", "''");
-    String beschreibungGer = meetupData["beschreibungGer"].replaceAll("'", "''");
-    String beschreibungEng = meetupData["beschreibungEng"].replaceAll("'", "''");
+    String beschreibungGer =
+        meetupData["beschreibungGer"].replaceAll("'", "''");
+    String beschreibungEng =
+        meetupData["beschreibungEng"].replaceAll("'", "''");
 
     await MeetupDatabase().update(
         "beschreibung = '$beschreibung', beschreibungGer = '$beschreibungGer',beschreibungEng = '$beschreibungEng'",
@@ -262,13 +296,15 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (newLocation["city"].isEmpty) return false;
 
     updateHiveMeetup(widget.meetupData["id"], "stadt", newLocation["city"]);
-    updateHiveMeetup(widget.meetupData["id"], "land", newLocation["countryname"]);
+    updateHiveMeetup(
+        widget.meetupData["id"], "land", newLocation["countryname"]);
     updateHiveMeetup(widget.meetupData["id"], "latt", newLocation["latt"]);
     updateHiveMeetup(widget.meetupData["id"], "longt", newLocation["longt"]);
     StadtinfoDatabase().addNewCity(newLocation);
 
     newLocation["city"] = newLocation["city"].replaceAll("'", "''");
-    newLocation["countryname"] = newLocation["countryname"].replaceAll("'", "''");
+    newLocation["countryname"] =
+        newLocation["countryname"].replaceAll("'", "''");
     MeetupDatabase().updateLocation(widget.meetupData["id"], newLocation);
 
     return true;
@@ -298,11 +334,13 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (newInterval.isEmpty) return false;
 
     widget.meetupData["eventInterval"] = newInterval;
-    widget.meetupData["bis"] = DateTime.parse(widget.meetupData["wann"]).add(const Duration(days: 1)).toString();
+    widget.meetupData["bis"] = DateTime.parse(widget.meetupData["wann"])
+        .add(const Duration(days: 1))
+        .toString();
     MeetupDatabase().update(
-        "eventInterval = '$newInterval'", "bis = '${widget.meetupData["bis"]}'"
-        "WHERE id = '${widget.meetupData["id"]}'"
-    );
+        "eventInterval = '$newInterval'",
+        "bis = '${widget.meetupData["bis"]}'"
+            "WHERE id = '${widget.meetupData["id"]}'");
 
     return true;
   }
@@ -326,11 +364,11 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     double screenWidth = MediaQuery.of(context).size.width;
     if (screenWidth > 500) screenWidth = kIsWeb ? 350 : 500;
     double cardWidth = screenWidth / 1.12;
-    double cardHeight = screenHeight / 1.34;
+    double cardHeight = screenHeight / 1.4;
     bool isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
         widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.neueStadtEingeben;
-    widget.meetupData["eventInterval"] = isGerman
+    widget.meetupData["eventInterval"] = userSpeakGerman
         ? global_func.changeEnglishToGerman(widget.meetupData["eventInterval"])
         : global_func.changeGermanToEnglish(widget.meetupData["eventInterval"]);
 
@@ -384,7 +422,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     openChangeWindow(title, inputWidget, saveFunction, {double height = 180}) {
-      if(!widget.isCreator) return;
+      if (!widget.isCreator) return;
 
       showDialog(
           context: context,
@@ -407,7 +445,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                       onPressed: () async {
                         bool saveSuccess = await saveFunction();
 
-                        if (!saveSuccess) {
+                        if (!saveSuccess && context.mounted) {
                           customSnackbar(context,
                               AppLocalizations.of(context)!.keineEingabe);
                           return;
@@ -415,7 +453,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
                         changeTextInputController = TextEditingController();
                         setState(() {});
-                        Navigator.pop(context);
+                        if (context.mounted) Navigator.pop(context);
                       }),
                 ]),
               )
@@ -423,28 +461,32 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           });
     }
 
-    _changeOrOpenLinkWindow() async {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    changeOrOpenLinkWindow() async {
+      final RenderBox overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
 
       await showMenu(
         context: context,
         position: RelativeRect.fromRect(
-            Offset(MediaQuery.of(context).size.width - 60,MediaQuery.of(context).size.height / 1.6) & const Size(40, 40), // smaller rect, the touch area
+            Offset(MediaQuery.of(context).size.width - 60,
+                    MediaQuery.of(context).size.height / 1.6) &
+                const Size(40, 40),
+            // smaller rect, the touch area
             Offset.zero & overlay.size // Bigger rect, the entire screen
-        ),
+            ),
         items: [
           PopupMenuItem(
               child: Text(AppLocalizations.of(context)!.linkBearbeiten),
               onTap: () {
                 Future.delayed(
-                    const Duration(seconds: 0), () => openChangeWindow(
-                      AppLocalizations.of(context)!.meetupMapLinkAendern,
-                      customTextInput(
-                          AppLocalizations.of(context)!.neuenKartenlinkEingeben,
-                          changeTextInputController),
-                      checkAndSaveNewMapAndLink
-                    )
-                );
+                    const Duration(seconds: 0),
+                    () => openChangeWindow(
+                        AppLocalizations.of(context)!.meetupMapLinkAendern,
+                        CustomTextInput(
+                            AppLocalizations.of(context)!
+                                .neuenKartenlinkEingeben,
+                            changeTextInputController),
+                        checkAndSaveNewMapAndLink));
               }),
           PopupMenuItem(
             child: Text(AppLocalizations.of(context)!.linkOeffnen),
@@ -459,13 +501,24 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     nameInformation() {
+      String title;
+
+      if (widget.isCreator) {
+        title = widget.meetupData["name"];
+      } else if (userSpeakGerman) {
+        title = widget.meetupData["nameGer"];
+      } else {
+        title = widget.meetupData["nameEng"];
+      }
+
       return InkWell(
         onTap: () => openChangeWindow(
             AppLocalizations.of(context)!.meetupNameAendern,
-            customTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
-                changeTextInputController),
+            CustomTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
+                changeTextInputController,
+                maxLength: 40),
             checkAndSaveNewName),
-        child: Text(widget.meetupData["name"],
+        child: Text(title.isNotEmpty ? title : widget.meetupData["name"],
             style:
                 TextStyle(fontSize: fontsize + 8, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center),
@@ -473,7 +526,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     bildAndTitleBox() {
-
       return Stack(
         clipBehavior: Clip.none,
         children: [
@@ -482,7 +534,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               MeetupImageGalerie(
                 isCreator: widget.isCreator,
                 meetupData: widget.meetupData,
-
               ),
             ],
           ),
@@ -512,14 +563,13 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     timeZoneInformation() {
-      timeZoneDropdown = CustomDropDownButton(
+      timeZoneDropdown = CustomDropdownButton(
           items: global_var.eventZeitzonen,
-          selected: widget.meetupData["zeitzone"].toString()
-      );
+          selected: widget.meetupData["zeitzone"].toString());
 
       return meetupInformationRow(
         AppLocalizations.of(context)!.zeitzone,
-        "GMT " + widget.meetupData["zeitzone"].toString(),
+        "GMT ${widget.meetupData["zeitzone"]}",
         () => openChangeWindow(
             AppLocalizations.of(context)!.meetupZeitzoneAendern,
             timeZoneDropdown,
@@ -528,12 +578,15 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     openLocationChangeWindow() {
-      if(!widget.isCreator) {
-        global_func.changePage(
-          context,
-          LocationInformationPage(ortName: widget.meetupData["stadt"]));
+      bool isWorldwide = widget.meetupData["stadt"] == "worldwide"
+          || widget.meetupData["stadt"]== "Weltweit";
+
+      if (!widget.isCreator && !isWorldwide) {
+        global_func.changePage(context,
+            LocationInformationPage(ortName: widget.meetupData["stadt"]));
         return;
       }
+
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
@@ -608,18 +661,15 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     mapAndLinkInformation() {
       return meetupInformationRow(
-          isOffline ? "Map: " : "Link: ",
-          widget.meetupData["link"],
-          (){
-            if (widget.isCreator) _changeOrOpenLinkWindow();
-            if (!widget.isCreator) global_func.openURL(widget.meetupData["link"]);
-          },
-          bodyColor: Theme.of(context).colorScheme.secondary);
+          isOffline ? "Map: " : "Link: ", widget.meetupData["link"], () {
+        if (widget.isCreator) changeOrOpenLinkWindow();
+        if (!widget.isCreator) global_func.openURL(widget.meetupData["link"]);
+      }, bodyColor: Theme.of(context).colorScheme.secondary);
     }
 
     intervalInformation() {
-      changeDropdownInput = CustomDropDownButton(
-          items: isGerman
+      changeDropdownInput = CustomDropdownButton(
+          items: userSpeakGerman
               ? global_var.meetupInterval
               : global_var.meetupIntervalEnglisch,
           selected: widget.meetupData["eventInterval"]);
@@ -634,7 +684,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     sprachenInformation() {
-      var data = isGerman
+      var data = userSpeakGerman
           ? global_func
               .changeEnglishToGerman(widget.meetupData["sprache"])
               .join(", ")
@@ -644,9 +694,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       changeMultiDropdownInput = CustomMultiTextForm(
         selected: data.split(", "),
         hintText: "Sprachen auswählen",
-        auswahlList: isGerman
-            ? global_var.sprachenListe
-            : global_var.sprachenListeEnglisch,
+        auswahlList: userSpeakGerman
+            ? ProfilSprachen().getAllGermanLanguages()
+            : ProfilSprachen().getAllEnglishLanguages(),
       );
 
       return meetupInformationRow(
@@ -664,12 +714,11 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
       if (widget.isCreator) {
         discription = widget.meetupData["beschreibung"];
-      } else if (isGerman) {
+      } else if (userSpeakGerman) {
         discription = widget.meetupData["beschreibungGer"];
       } else {
         discription = widget.meetupData["beschreibungEng"];
       }
-
 
       return Container(
           margin:
@@ -681,13 +730,15 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                     minHeight: 50.0,
                   ),
                   child: TextWithHyperlinkDetection(
-                      text: discription.isNotEmpty ? discription : widget.meetupData["beschreibung"],
+                      text: discription.isNotEmpty
+                          ? discription
+                          : widget.meetupData["beschreibung"],
                       withoutActiveHyperLink: widget.isCreator,
                       onTextTab: widget.isCreator
                           ? () => openChangeWindow(
                               AppLocalizations.of(context)!
                                   .meetupBeschreibungAendern,
-                              customTextInput(
+                              CustomTextInput(
                                   AppLocalizations.of(context)!
                                       .neueBeschreibungEingeben,
                                   beschreibungInputKontroller,
@@ -695,8 +746,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                                   textInputAction: TextInputAction.newline),
                               checkAndSaveNewBeschreibung,
                               height: 400)
-                          : null)
-              )));
+                          : null))));
     }
 
     cardShadowColor() {
@@ -720,16 +770,16 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              InkWell(
-                  child: Icon(
-                    isOnList ? Icons.do_not_disturb_on : Icons.add_circle,
-                    size: 80,
-                    color: Colors.black,
-                  ),
-                  onTap: () {
-                    askForRelease(isOnList);
-                    setState(() {});
-                  }),
+              OwnIconButton(
+                icon: isOnList ? Icons.do_not_disturb_on : Icons.add_circle,
+                size: 80,
+                color: Colors.black,
+                tooltipText: isOnList ? AppLocalizations.of(context)!.tooltipRemoveMeetupInformationRequest : AppLocalizations.of(context)!.tooltipGetMeetupInformation,
+                onPressed: () {
+                  askForRelease(isOnList);
+                  setState(() {});
+                },
+              ),
               const SizedBox(height: 40)
             ],
           ));
@@ -739,7 +789,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       List<Widget> meetupTags = [];
 
       for (var tag in widget.meetupData["tags"]) {
-        String tagText = isGerman
+        String tagText = userSpeakGerman
             ? global_func.changeEnglishToGerman(tag)
             : global_func.changeGermanToEnglish(tag);
 
@@ -778,7 +828,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     changeMeetupTagsWindow() {
-      List<String> tagItems = (isGerman
+      List<String> tagItems = (userSpeakGerman
           ? global_var.reisearten + global_var.interessenListe
           : global_var.reiseartenEnglisch + global_var.interessenListeEnglisch);
 
@@ -793,8 +843,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Container(
                         width: 250,
-                        height: 50,
-                        decoration: BoxDecoration(border: Border.all()),
+                        decoration: BoxDecoration(
+                            border: Border.all(width: 1),
+                            borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners))
+                        ),
                         child: DropdownButtonHideUnderline(
                             child: DropdownButton(
                                 hint: Center(
@@ -811,15 +863,14 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                                   saveTag(newValue);
                                   setStateMeetupTagWindow(() {});
                                   setState(() {});
-                                })),
-                      )
+                                })),)
                     ]),
                     const SizedBox(height: 20),
                     Container(
                         margin: const EdgeInsets.all(5),
                         child: Wrap(
-                          children:
-                              createChangeableMeetupTags(setStateMeetupTagWindow),
+                          children: createChangeableMeetupTags(
+                              setStateMeetupTagWindow),
                         ))
                   ]);
             });
@@ -839,7 +890,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               borderRadius: const BorderRadius.all(Radius.circular(10.0)),
             ),
             child: Text(
-              isGerman
+              userSpeakGerman
                   ? global_func.changeEnglishToGerman(tag)
                   : global_func.changeGermanToEnglish(tag),
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
@@ -891,7 +942,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                     creatorChangeHintBox(),
                     fremdesMeetupBox(),
                     ShowDatetimeBox(
-                        meetupData: widget.meetupData, isCreator: widget.isCreator),
+                        meetupData: widget.meetupData,
+                        isCreator: widget.isCreator),
                     timeZoneInformation(),
                     if (isOffline) locationInformation(),
                     if (!isOffline && !widget.isCreator)
@@ -912,7 +964,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               ),
               if (moreContent)
                 const Positioned.fill(
-                  bottom: 35,
+                  bottom: 22,
                   child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Icon(Icons.arrow_downward)),
@@ -941,10 +993,11 @@ class ShowDatetimeBox extends StatefulWidget {
   Map meetupData;
   bool isCreator;
 
-  ShowDatetimeBox({Key? key, required this.meetupData, required this.isCreator}) : super(key: key);
+  ShowDatetimeBox({Key? key, required this.meetupData, required this.isCreator})
+      : super(key: key);
 
   @override
-  _ShowDatetimeBoxState createState() => _ShowDatetimeBoxState();
+  State<ShowDatetimeBox> createState() => _ShowDatetimeBoxState();
 }
 
 class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
@@ -955,15 +1008,15 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
   DateButton bisTimeInputButton = DateButton();
 
   saveChanges() async {
-    var wannDate =
-        wannDateInputButton.meetupDatum ?? DateTime.parse(widget.meetupData["wann"]);
-    var wannTime =
-        wannTimeInputButton.uhrZeit ?? DateTime.parse(widget.meetupData["wann"]);
+    var wannDate = wannDateInputButton.meetupDatum ??
+        DateTime.parse(widget.meetupData["wann"]);
+    var wannTime = wannTimeInputButton.uhrZeit ??
+        DateTime.parse(widget.meetupData["wann"]);
     var newWannDate = DateTime(wannDate.year, wannDate.month, wannDate.day,
             wannTime.hour, wannTime.minute)
         .toString()
         .substring(0, 16);
-    var newBisDate;
+    String? newBisDate;
 
     if (!isSingeDay) {
       var bisDate = bisDateInputButton.meetupDatum;
@@ -1075,9 +1128,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
       return "$wannDateText - $bisDateText \n ${wannTimeList.take(2).join(":")} - $bisTimeText";
     } else {
-      return wannDateList.reversed.join(".") +
-          " " +
-          wannTimeList.take(2).join(":");
+      return "${wannDateList.reversed.join(".")} ${wannTimeList.take(2).join(":")}";
     }
   }
 
@@ -1089,9 +1140,10 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     );
     wannTimeInputButton = DateButton(
         uhrZeit: TimeOfDay(
-            hour: int.parse(widget.meetupData["wann"].split(" ")[1].split(":")[0]),
-            minute:
-                int.parse(widget.meetupData["wann"].split(" ")[1].split(":")[1])));
+            hour: int.parse(
+                widget.meetupData["wann"].split(" ")[1].split(":")[0]),
+            minute: int.parse(
+                widget.meetupData["wann"].split(" ")[1].split(":")[1])));
     bisDateInputButton = DateButton(
       getDate: true,
       meetupDatum: widget.meetupData["bis"] != null
@@ -1101,10 +1153,10 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
     bisTimeInputButton = DateButton(
         uhrZeit: widget.meetupData["bis"] != null
             ? TimeOfDay(
-                hour:
-                    int.parse(widget.meetupData["bis"].split(" ")[1].split(":")[0]),
-                minute:
-                    int.parse(widget.meetupData["bis"].split(" ")[1].split(":")[1]))
+                hour: int.parse(
+                    widget.meetupData["bis"].split(" ")[1].split(":")[0]),
+                minute: int.parse(
+                    widget.meetupData["bis"].split(" ")[1].split(":")[1]))
             : null);
 
     super.initState();
@@ -1112,8 +1164,10 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 
   @override
   Widget build(BuildContext context) {
-    isSingeDay = widget.meetupData["eventInterval"] != global_var.meetupInterval[2] &&
-        widget.meetupData["eventInterval"] != global_var.meetupIntervalEnglisch[2];
+    isSingeDay =
+        widget.meetupData["eventInterval"] != global_var.meetupInterval[2] &&
+            widget.meetupData["eventInterval"] !=
+                global_var.meetupIntervalEnglisch[2];
 
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
@@ -1121,7 +1175,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
           onTap: !widget.isCreator ? null : () => openChangeWindow(),
           child: Row(
             children: [
-              Text(AppLocalizations.of(context)!.datum + " ",
+              Text("${AppLocalizations.of(context)!.datum} ",
                   style: TextStyle(
                       fontSize: fontsize, fontWeight: FontWeight.bold)),
               const Expanded(child: SizedBox.shrink()),
@@ -1145,13 +1199,13 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
 class DateButton extends StatefulWidget {
   var uhrZeit;
   var meetupDatum;
-  var getDate;
+  bool getDate;
 
   DateButton({Key? key, this.meetupDatum, this.uhrZeit, this.getDate = false})
       : super(key: key);
 
   @override
-  _DateButtonState createState() => _DateButtonState();
+  State<DateButton> createState() => _DateButtonState();
 }
 
 class _DateButtonState extends State<DateButton> {
@@ -1208,10 +1262,11 @@ class InteresseButton extends StatefulWidget {
   bool hasIntereset;
   final String id;
 
-  InteresseButton({Key? key, required this.hasIntereset, required this.id}) : super(key: key);
+  InteresseButton({Key? key, required this.hasIntereset, required this.id})
+      : super(key: key);
 
   @override
-  _InteresseButtonState createState() => _InteresseButtonState();
+  State<InteresseButton> createState() => _InteresseButtonState();
 }
 
 class _InteresseButtonState extends State<InteresseButton> {
@@ -1272,26 +1327,32 @@ class _InteresseButtonState extends State<InteresseButton> {
 //ignore: must_be_immutable
 class CardFeet extends StatefulWidget {
   String organisator;
-  var meetupData;
+  Map meetupData;
   double width;
-  var meetupZusage;
+  List meetupZusage;
 
   CardFeet(
-      {Key? key, required this.organisator, required this.width, required this.meetupData, required this.meetupZusage})
+      {Key? key,
+      required this.organisator,
+      required this.width,
+      required this.meetupData,
+      required this.meetupZusage})
       : super(key: key);
 
   @override
-  _CardFeetState createState() => _CardFeetState();
+  State<CardFeet> createState() => _CardFeetState();
 }
 
 class _CardFeetState extends State<CardFeet> {
-  late Map organisatorProfil;
+  late Map? organisatorProfil;
   var ownName = FirebaseAuth.instance.currentUser!.displayName;
   var teilnehmerAnzahl = "";
 
   @override
   Widget build(BuildContext context) {
     organisatorProfil = getProfilFromHive(profilId: widget.organisator);
+
+    organisatorProfil ??= {};
 
     showTeilnehmerWindow() {
       var zusagenIds = widget.meetupData["zusage"];
@@ -1360,7 +1421,7 @@ class _CardFeetState extends State<CardFeet> {
             ),
             const Expanded(child: SizedBox()),
             InkWell(
-              child: Text(organisatorProfil["name"] ?? "",
+              child: Text(organisatorProfil!["name"] ?? "",
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.secondary,
                       fontSize: fontsize)),
@@ -1368,7 +1429,7 @@ class _CardFeetState extends State<CardFeet> {
                 global_func.changePage(
                     context,
                     ShowProfilPage(
-                      profil: organisatorProfil,
+                      profil: organisatorProfil!,
                     ));
               },
             )

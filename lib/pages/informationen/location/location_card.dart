@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/widgets/layout/custom_like_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +9,7 @@ import 'location_Information.dart';
 
 class LocationCard extends StatefulWidget {
   Map location;
-  var fromCityPage;
+  bool fromCityPage;
   bool smallCard;
 
   LocationCard(
@@ -42,11 +44,11 @@ class _LocationCardState extends State<LocationCard> {
         return AssetImage(
             "assets/bilder/flaggen/${widget.location["bild"]}.jpeg");
       }
-      return NetworkImage(widget.location["bild"]);
+      return CachedNetworkImageProvider(widget.location["bild"]);
     }
   }
 
-  changeIntereset() {
+  Future<bool> changeIntereset(hasInterest) async {
     if (hasInterest) {
       hasInterest = false;
 
@@ -64,6 +66,8 @@ class _LocationCardState extends State<LocationCard> {
     }
 
     setState(() {});
+
+    return hasInterest;
   }
 
   @override
@@ -87,7 +91,9 @@ class _LocationCardState extends State<LocationCard> {
               child: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.withOpacity(0.7)
+                    : Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(20)),
             child: Text(
               widget.location["ort"],
@@ -104,7 +110,9 @@ class _LocationCardState extends State<LocationCard> {
           height: 200 * sizeRefactor,
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey
+                  : Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(15)),
             child: Column(
               children: [
@@ -153,14 +161,11 @@ class _LocationCardState extends State<LocationCard> {
             ),
             if (!widget.smallCard)
               Positioned(
-                  right: 0,
-                  child: IconButton(
-                    onPressed: () => changeIntereset(),
-                    icon: Icon(
-                      Icons.star,
-                      color:
-                          hasInterest ? Colors.yellow.shade900 : Colors.black,
-                    ),
+                  top: likeButtonAbstandTop + 5,
+                  right: likeButtonAbstandRight,
+                  child: CustomLikeButton(
+                    isLiked: hasInterest,
+                    onLikeButtonTapped: changeIntereset,
                   ))
           ],
         ),

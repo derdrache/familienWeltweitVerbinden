@@ -5,8 +5,9 @@ import 'package:intl/intl.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../global/custom_widgets.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_snackbar.dart';
 
 
 class ChangeAufreisePage extends StatefulWidget {
@@ -21,12 +22,12 @@ class ChangeAufreisePage extends StatefulWidget {
     Key? key}) : super(key: key);
 
   @override
-  _ChangeAufreisePageState createState() => _ChangeAufreisePageState();
+  State<ChangeAufreisePage> createState() => _ChangeAufreisePageState();
 }
 
 class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
   late String reiseStatus;
-  late var aufreiseDropdownButton;
+  late CustomDropdownButton aufreiseDropdownButton;
   late bool noTraveling;
   late bool pastTravler;
   late bool stillTraveling;
@@ -35,7 +36,7 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
   void initState() {
     reiseStatus = getReiseStatus();
 
-    aufreiseDropdownButton = CustomDropDownButton(
+    aufreiseDropdownButton = CustomDropdownButton(
       items: widget.isGerman ? aufreise : aufreiseEnglisch,
       selected: reiseStatus,
       onChange: () {
@@ -139,8 +140,9 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
                   firstDate: DateTime(DateTime.now().year - 100),
                 );
 
-                if(text == AppLocalizations.of(context)!.seit) widget.aufreiseSeit = reiseDatum;
-                if(text == AppLocalizations.of(context)!.bis) widget.aufreiseBis = reiseDatum;
+
+                if(context.mounted && text == AppLocalizations.of(context)!.seit) widget.aufreiseSeit = reiseDatum;
+                if(context.mounted && text == AppLocalizations.of(context)!.bis) widget.aufreiseBis = reiseDatum;
 
                 setState(() {});
               },

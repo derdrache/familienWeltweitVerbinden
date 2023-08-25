@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'Window_topbar.dart';
+import '../global/style.dart' as Style;
 
 class CustomAlertDialog extends StatefulWidget {
   String title;
@@ -9,6 +10,7 @@ class CustomAlertDialog extends StatefulWidget {
   List<Widget>? actions;
   double? height;
   var backgroundColor;
+  var windowPadding;
 
   CustomAlertDialog(
       {Key? key,
@@ -16,26 +18,23 @@ class CustomAlertDialog extends StatefulWidget {
       required this.children,
       this.actions,
       this.height,
-      this.backgroundColor = Colors.white})
-      : super(key: key);
+      //this.backgroundColor = Colors.white,
+      this.windowPadding = const EdgeInsets.all(10)
+      }) : super(key: key);
 
   @override
   _CustomAlertDialogState createState() => _CustomAlertDialogState();
 }
 
 class _CustomAlertDialogState extends State<CustomAlertDialog> {
-  _closeWindow() {
-    Navigator.pop(context);
-  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: widget.backgroundColor,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20.0))),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(Style.roundedCorners))),
       contentPadding: EdgeInsets.zero,
-      insetPadding: const EdgeInsets.all(10),
+      insetPadding: widget.windowPadding,
       actions: widget.actions,
       content: SizedBox(
         height: widget.height,
@@ -70,7 +69,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
               right: -13,
               top: -7,
               child: InkResponse(
-                  onTap: () => _closeWindow(),
+                  onTap: () => Navigator.pop(context),
                   child: const CircleAvatar(
                     child: Icon(
                       Icons.close,

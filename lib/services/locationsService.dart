@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'dart:ui';
 import 'package:geolocator/geolocator.dart';
 
 import '../auth/secrets.dart';
@@ -65,7 +64,7 @@ class LocationService {
 
   getGoogleAutocompleteItems(input, sessionToken) async {
     var deviceLanguage =
-        kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+        kIsWeb ? PlatformDispatcher.instance.locale.languageCode : Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
     input = input.replaceAll(" ", "_");
     input = Uri.encodeComponent(input);
@@ -93,7 +92,7 @@ class LocationService {
 
   getLocationdataFromGoogleID(id, sessionToken) async {
     var deviceLanguage =
-    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    kIsWeb ? PlatformDispatcher.instance.locale.languageCode : Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
 
     try {
@@ -133,7 +132,7 @@ class LocationService {
 
   getNearstLocationData(position) async {
     var deviceLanguage =
-    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    kIsWeb ? PlatformDispatcher.instance.locale.languageCode : Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
 
     try {
@@ -188,7 +187,7 @@ class LocationService {
 
   getLocationGeoData(location) async {
     var deviceLanguage =
-    kIsWeb ? window.locale.languageCode : Platform.localeName.split("_")[0];
+    kIsWeb ? PlatformDispatcher.instance.locale.languageCode : Platform.localeName.split("_")[0];
     var sprache = deviceLanguage == "de" ? "de" : "en";
     location = location.replaceAll(" ", "_");
     location = Uri.encodeComponent(location);
@@ -215,10 +214,6 @@ class LocationService {
 
   bool isNumeric(String str) {
     bool hasNumber = false;
-
-    if (str == null) {
-      return false;
-    }
 
     str.split("").forEach((letter) {
       if(double.tryParse(letter) != null) hasNumber = true;
@@ -300,5 +295,7 @@ class LocationService {
       if(country["nameGer"] == searchCountry) return country["nameEng"];
       if(country["nameEng"] == searchCountry) return country["nameGer"];
     }
+
+    return searchCountry;
   }
 }

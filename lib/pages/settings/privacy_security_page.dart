@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import '../../auth/secrets.dart';
 import '../../global/variablen.dart';
@@ -11,29 +10,31 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
 import '../../global/global_functions.dart' as global_func;
 
-import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/dialogWindow.dart';
+import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 import '../login_register_page/login_page.dart';
 
 class PrivacySecurityPage extends StatefulWidget {
   const PrivacySecurityPage({Key? key}) : super(key: key);
 
   @override
-  _PrivacySecurityPageState createState() => _PrivacySecurityPageState();
+  State<PrivacySecurityPage> createState() => _PrivacySecurityPageState();
 }
 
 class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   Map ownProfil = Hive.box("secureBox").get("ownProfil");
   final double fontsize = 20;
-  late var automaticLocationDropdown;
-  late var reiseplanungDropdown;
-  late var exactLocationDropdown;
+  late CustomDropdownButton automaticLocationDropdown;
+  late CustomDropdownButton reiseplanungDropdown;
+  late CustomDropdownButton exactLocationDropdown;
   final bool spracheIstDeutsch = kIsWeb
-      ? window.locale.languageCode == "de"
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
   
@@ -93,7 +94,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           ? standortbestimmung[0]
           : standortbestimmungEnglisch[0]);
 
-    automaticLocationDropdown = CustomDropDownButton(
+    automaticLocationDropdown = CustomDropdownButton(
       items: locationList,
       selected: selected,
       onChange: () => saveAutomaticLocation(),
@@ -106,7 +107,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     global_func.changeEnglishToGerman(ownProfil["genauerStandortPrivacy"]) :
     global_func.changeGermanToEnglish(ownProfil["genauerStandortPrivacy"]);
 
-    exactLocationDropdown = CustomDropDownButton(
+    exactLocationDropdown = CustomDropdownButton(
       items: items,
       selected: selected,
       onChange: () => saveExactLocation(),
@@ -119,7 +120,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
     global_func.changeEnglishToGerman(ownProfil["reiseplanungPrivacy"]) :
     global_func.changeGermanToEnglish(ownProfil["reiseplanungPrivacy"]);
 
-    reiseplanungDropdown = CustomDropDownButton(
+    reiseplanungDropdown = CustomDropdownButton(
         items: items,
         selected: selected,
         onChange: () => saveReiseplanung(),
@@ -201,7 +202,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                 ),
               ],
               children: [
-                Center(child: customTextInput("Account id eingeben", idController))
+                Center(child: CustomTextInput("Account id eingeben", idController))
               ],
             );
           });
@@ -223,10 +224,10 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                     var deleteProfil = ownProfil;
 
                     ProfilDatabase().deleteProfil(deleteProfil["id"]);
-                    DbDeleteImage(deleteProfil["bild"]);
+                    dbDeleteImage(deleteProfil["bild"]);
 
                     setState(() {});
-                    global_functions.changePageForever(context, LoginPage());
+                    global_functions.changePageForever(context, const LoginPage());
                   },
                 ),
                 TextButton(
@@ -253,7 +254,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
               String choosenProfilId = await chooseProfilIdWindow();
               ProfilDatabase().deleteProfil(choosenProfilId);
               Map deleteProfil = getProfilFromHive(profilId: choosenProfilId);
-              DbDeleteImage(deleteProfil["bild"]);
+              dbDeleteImage(deleteProfil["bild"]);
             }else{
               deleteProfilWindow();
             }

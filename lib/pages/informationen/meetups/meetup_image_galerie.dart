@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,19 +8,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../functions/upload_and_save_image.dart';
-import '../../../global/custom_widgets.dart';
 import '../../../services/database.dart';
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
 
 class MeetupImageGalerie extends StatefulWidget {
-  var isCreator;
-  var meetupData;
-  var child;
+  bool isCreator;
+  Map meetupData;
+  Widget? child;
 
-  MeetupImageGalerie({Key? key, this.child, this.isCreator, this.meetupData})
+  MeetupImageGalerie({Key? key, this.child, required this.isCreator, required this.meetupData})
       : super(key: key);
 
   @override
-  _ImageMeetupGalerieState createState() => _ImageMeetupGalerieState();
+  State<MeetupImageGalerie> createState() => _ImageMeetupGalerieState();
 }
 
 class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
@@ -31,7 +33,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
   var ownPictureKontroller = TextEditingController();
   var selectedImage = "";
   var windowSetState;
-  var imagePaths;
+  late List imagePaths;
   var imageLoading = false;
 
   @override
@@ -66,7 +68,8 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
 
     if (selectedImage == "") {
       selectedImage = ownPictureKontroller.text;
-      widget.child = Image.network(selectedImage, fit: BoxFit.fitWidth);
+      widget.child =
+          CachedNetworkImage(imageUrl: selectedImage, fit: BoxFit.fitWidth);
     } else {
       widget.child = Image.asset(selectedImage, fit: BoxFit.fitWidth);
     }
@@ -77,7 +80,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       imageLoading = false;
     });
 
-    DbDeleteImage(oldImage);
+    dbDeleteImage(oldImage);
 
     MeetupDatabase().update(
         "bild = '$selectedImage'", "WHERE id = '${widget.meetupData["id"]}'");
@@ -93,7 +96,6 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       List<Widget> allImages = [];
 
       for (var image in imagePaths) {
-
         allImages.add(InkWell(
           child: Container(
               margin: const EdgeInsets.all(5),
@@ -103,8 +105,8 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                       color: selectedImage == image
                           ? Colors.green
                           : Colors.black)),
-              child: Image.asset(image,
-                  fit: BoxFit.fill, width: 80, height: 60)),
+              child:
+                  Image.asset(image, fit: BoxFit.fill, width: 80, height: 60)),
           onTap: () {
             selectedImage = image;
             windowSetState(() {});
@@ -113,19 +115,22 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
       }
 
       return Wrap(
-        children: allImages,
         alignment: WrapAlignment.center,
+        children: allImages,
       );
     }
 
     ownLinkInput() {
       return SizedBox(
           width: 200,
-          child: customTextInput(
+          child: CustomTextInput(
               AppLocalizations.of(context)!.eigenesBildLinkEingeben,
               ownPictureKontroller, onSubmit: () {
-            allImages.add(Image.network(ownPictureKontroller.text,
-                fit: BoxFit.fill, width: 80, height: 60));
+            allImages.add(CachedNetworkImage(
+                imageUrl: ownPictureKontroller.text,
+                fit: BoxFit.fill,
+                width: 80,
+                height: 60));
 
             ownPictureKontroller.clear();
             windowSetState(() {});
@@ -185,8 +190,9 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
           });
     }
 
-    _showChangeImagePopupMenu(tabPosition) async {
-      final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    showChangeImagePopupMenu(tabPosition) async {
+      final RenderBox overlay =
+          Overlay.of(context).context.findRenderObject() as RenderBox;
 
       await showMenu(
         context: context,
@@ -223,6 +229,12 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     }
 
     return GestureDetector(
+        onTapDown: !widget.isCreator
+            ? null
+            : (details) {
+                var getTabPostion = details.globalPosition;
+                showChangeImagePopupMenu(getTabPostion);
+              },
         child: Container(
           constraints: const BoxConstraints(
             minHeight: 200,
@@ -252,15 +264,9 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                       : Container(
                           constraints:
                               BoxConstraints(maxHeight: screenHeight / 2.08),
-                          child: Image.network(
-                            widget.meetupData["bild"],
+                          child: CachedNetworkImage(
+                            imageUrl: widget.meetupData["bild"],
                           ))),
-        ),
-        onTapDown: !widget.isCreator
-            ? null
-            : (details) {
-                var getTabPostion = details.globalPosition;
-                _showChangeImagePopupMenu(getTabPostion);
-              });
+        ));
   }
 }

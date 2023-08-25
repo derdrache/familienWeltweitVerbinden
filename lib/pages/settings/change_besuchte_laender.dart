@@ -2,20 +2,20 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../services/locationsService.dart';
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_multi_select.dart';
 
 class ChangeBesuchteLaenderPage extends StatefulWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
-  var selected;
+  List visitedCountriesList;
   bool isGerman;
 
   ChangeBesuchteLaenderPage(
-      {Key? key, this.selected, required this.isGerman})
+      {Key? key, required this.visitedCountriesList, required this.isGerman})
       : super(key: key);
 
   @override
@@ -24,15 +24,15 @@ class ChangeBesuchteLaenderPage extends StatefulWidget {
 }
 
 class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
-  late var besuchteLaenderDropdown;
+  late CustomMultiTextForm besuchteLaenderDropdown;
 
   @override
   void initState() {
     Map allCountries = LocationService().getAllCountryNames();
     List allCountriesLanguage;
-    bool unselectedAndGerman = widget.selected.isEmpty && widget.isGerman;
-    bool selectedIsGerman = widget.selected.isNotEmpty
-        && allCountries["ger"].contains(widget.selected[0]);
+    bool unselectedAndGerman = widget.visitedCountriesList.isEmpty && widget.isGerman;
+    bool selectedIsGerman = widget.visitedCountriesList.isNotEmpty
+        && allCountries["ger"].contains(widget.visitedCountriesList[0]);
 
     if(unselectedAndGerman || selectedIsGerman){
       allCountriesLanguage = allCountries["ger"];
@@ -42,7 +42,7 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
 
     besuchteLaenderDropdown = CustomMultiTextForm(
         auswahlList: allCountriesLanguage,
-        selected: widget.selected,
+        selected: widget.visitedCountriesList,
         onConfirm: (){
           saveInDB();
         },

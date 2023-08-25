@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:collection/collection.dart';
@@ -11,6 +10,7 @@ import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../widgets/flexible_date_picker.dart';
 import '../../services/notification.dart';
+import '../../widgets/layout/custom_snackbar.dart';
 
 class ChangeReiseplanungPage extends StatefulWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -151,7 +151,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     transformDateToText(dateString) {
       DateTime date = DateTime.parse(dateString);
 
-      return date.month.toString() + "." + date.year.toString();
+      return "${date.month}.${date.year}";
     }
 
     addNewPlanBox() {
@@ -188,7 +188,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
         String ortText = planung["ortData"]["city"];
 
         if (planung["ortData"]["city"] != planung["ortData"]["countryname"]) {
-          ortText += " / " + planung["ortData"]["countryname"];
+          ortText += " / ${planung["ortData"]["countryname"]}";
         }
 
         reiseplanungBox.add(Container(
@@ -197,11 +197,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
               children: [
                 Expanded(
                   child: Text(
-                    transformDateToText(planung["von"]) +
-                        " - " +
-                        transformDateToText(planung["bis"]) +
-                        " in " +
-                        ortText,
+                    "${transformDateToText(planung["von"])} - ${transformDateToText(planung["bis"])} in $ortText",
                     style: const TextStyle(fontSize: 18),
                     maxLines: 2,
                   ),

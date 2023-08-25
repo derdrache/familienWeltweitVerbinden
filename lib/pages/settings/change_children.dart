@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_snackbar.dart';
 
 class ChangeChildrenPage extends StatelessWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -37,11 +37,13 @@ class ChangeChildrenPage extends StatelessWidget {
 
         updateHiveOwnProfil("kinder", childrenBirthdatePickerBox.getDates());
 
-
-        customSnackbar(context,
-            AppLocalizations.of(context)!.anzahlUndAlterKinder +" "+
-                AppLocalizations.of(context)!.erfolgreichGeaender, color: Colors.green);
-        Navigator.pop(context);
+        if (context.mounted){
+          customSnackbar(context,
+              "${AppLocalizations.of(context)!.anzahlUndAlterKinder} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
+              color: Colors.green
+          );
+          Navigator.pop(context);
+        }
       }
     }
 

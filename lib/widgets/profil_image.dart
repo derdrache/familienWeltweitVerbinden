@@ -5,18 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../functions/upload_and_save_image.dart';
-import '../global/custom_widgets.dart';
 import '../global/global_functions.dart';
+import '../global/style.dart' as style;
 import '../services/database.dart';
 import 'dialogWindow.dart';
+import 'layout/custom_snackbar.dart';
+import 'layout/custom_text_input.dart';
 
 class ProfilImage extends StatefulWidget {
   var profil;
   var changeable;
   var fullScreenWindow;
+  double size;
 
   ProfilImage(this.profil,
-      {Key? key, this.changeable = false, this.fullScreenWindow = false})
+      {Key? key,
+      this.changeable = false,
+      this.fullScreenWindow = false,
+      this.size = 30})
       : super(key: key);
 
   @override
@@ -53,7 +59,7 @@ class _ProfilImageState extends State<ProfilImage> {
   }
 
   deleteOldImage(oldLink) {
-    DbDeleteImage(oldLink);
+    dbDeleteImage(oldLink);
   }
 
   deleteProfilImage() async {
@@ -71,9 +77,12 @@ class _ProfilImageState extends State<ProfilImage> {
   Widget build(BuildContext context) {
     var profilImageWidget =
         widget.profil["bild"] == null || widget.profil["bild"].isEmpty
-            ? DefaultProfilImage(widget.profil)
-            : OwnProfilImage(widget.profil,
-                fullScreenWindow: widget.fullScreenWindow);
+            ? DefaultProfilImage(widget.profil, widget.size)
+            : OwnProfilImage(
+                widget.profil,
+                fullScreenWindow: widget.fullScreenWindow,
+                size: widget.size,
+              );
 
     changeImageWindow() async {
       await showDialog(
@@ -82,7 +91,7 @@ class _ProfilImageState extends State<ProfilImage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.profilbildAendern,
               children: [
-                customTextInput(
+                CustomTextInput(
                     AppLocalizations.of(context)!.linkProfilbildEingeben,
                     profilImageLinkKontroller),
               ],
@@ -160,8 +169,9 @@ class _ProfilImageState extends State<ProfilImage> {
 
 class DefaultProfilImage extends StatelessWidget {
   var profil;
+  var size;
 
-  DefaultProfilImage(this.profil, {Key? key}) : super(key: key);
+  DefaultProfilImage(this.profil, this.size, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -204,24 +214,25 @@ class DefaultProfilImage extends StatelessWidget {
     }
 
     return profil.isEmpty
-        ? const CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.black,
+        ? ImageCircleAvatar(
+            size: size,
+            childBackgroundColor: Colors.black,
             child: Center(
-                child: Text("X",
+                child: Text(
+              "X",
               style: TextStyle(
-                  fontSize: 25,
+                  fontSize: size / 1.5,
                   fontWeight: FontWeight.bold,
                   color: Colors.white),
             )))
-        : CircleAvatar(
-            radius: 30,
-            backgroundColor: Color(profil["bildStandardFarbe"] ?? 4293467747),
+        : ImageCircleAvatar(
+            size: size,
+            childBackgroundColor: Color(profil["bildStandardFarbe"]),
             child: Center(
                 child: Text(
               imageText.toUpperCase(),
-              style: const TextStyle(
-                  fontSize: 25,
+              style: TextStyle(
+                  fontSize: size / 1.5,
                   fontWeight: FontWeight.bold,
                   color: Colors.white),
             )),
@@ -232,15 +243,16 @@ class DefaultProfilImage extends StatelessWidget {
 class OwnProfilImage extends StatelessWidget {
   var profil;
   var fullScreenWindow;
+  double size;
 
-  OwnProfilImage(this.profil, {Key? key, this.fullScreenWindow})
+  OwnProfilImage(this.profil,
+      {Key? key, this.fullScreenWindow, required this.size})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var image = profil["bild"] is String ? profil["bild"] : profil["bild"][0];
     bool isUrl = image.contains("http");
-
     showBigImage() {
       showDialog(
           context: context,
@@ -248,7 +260,31 @@ class OwnProfilImage extends StatelessWidget {
             return AlertDialog(
                 insetPadding: EdgeInsets.zero,
                 backgroundColor: Colors.transparent,
-                content: isUrl ? Image.network(image) : Image.asset(image));
+                content: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(style.roundedCorners),
+                      child: isUrl
+                          ? CachedNetworkImage(imageUrl: image)
+                          : Image.asset(image),
+                    ),
+                    Positioned(
+                      height: 30,
+                      right: -13,
+                      top: -7,
+                      child: InkResponse(
+                          onTap: () => Navigator.pop(context),
+                          child: const CircleAvatar(
+                            child: Icon(
+                              Icons.close,
+                              size: 16,
+                            ),
+                            backgroundColor: Colors.red,
+                          )),
+                    )
+                  ],
+                ));
           });
     }
 
@@ -256,19 +292,52 @@ class OwnProfilImage extends StatelessWidget {
         onTap: fullScreenWindow ? () => showBigImage() : null,
         child: Padding(
           padding: EdgeInsets.zero,
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: isUrl
-                  ? CachedNetworkImage(
-                      width: 55,
-                      height: 55,
-                      fit: BoxFit.cover,
-                      imageUrl: image,
-                      placeholder: (context, url) => Container(
-                            color: Colors.black12,
-                          ))
-                  : Image.asset(image,
-                      width: 55, height: 55, fit: BoxFit.cover)),
+          child: isUrl
+              ? CachedNetworkImage(
+                  imageUrl: image,
+                  imageBuilder: (context, imageProvider) => ImageCircleAvatar(
+                        imageProvider: imageProvider,
+                        size: size,
+                      ),
+                  placeholder: (context, url) => Container(
+                        color: Colors.black12,
+                      ))
+              : ImageCircleAvatar(
+                  imageProvider: Image.asset(image, fit: BoxFit.cover).image,
+                  size: size,
+                ),
         ));
+  }
+}
+
+class ImageCircleAvatar extends StatelessWidget {
+  var imageProvider;
+  double size;
+  var backgroundColor;
+  Widget? child;
+  var childBackgroundColor;
+
+  ImageCircleAvatar(
+      {this.imageProvider,
+      required this.size,
+      this.backgroundColor,
+      this.child,
+      this.childBackgroundColor});
+
+  @override
+  Widget build(BuildContext context) {
+    Color alternativColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey
+        : Colors.white;
+
+    return CircleAvatar(
+      radius: size,
+      backgroundColor: backgroundColor ?? alternativColor,
+      child: CircleAvatar(
+          radius: size - 3,
+          backgroundColor: childBackgroundColor ?? alternativColor,
+          backgroundImage: imageProvider,
+          child: child),
+    );
   }
 }

@@ -112,7 +112,7 @@ class _ChangeSocialMediaLinksState extends State<ChangeSocialMediaLinks> {
             margin: const EdgeInsets.all(10),
             child: Row(children: [
               Text(socialMediaLink),
-              Expanded(child: SizedBox.shrink()),
+              const Expanded(child: SizedBox.shrink()),
               CloseButton(
                 onPressed: (){
                   deleteLink(socialMediaLink);

@@ -1,11 +1,12 @@
 import 'package:familien_suche/global/encryption.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 
 class ChangeEmailPage extends StatelessWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -17,7 +18,7 @@ class ChangeEmailPage extends StatelessWidget {
 
   userLogin(passwort) async {
     var userEmail = FirebaseAuth.instance.currentUser!.email;
-    var loginUser;
+    UserCredential? loginUser;
     try {
       loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: userEmail ?? "", password: passwort);
@@ -50,7 +51,7 @@ class ChangeEmailPage extends StatelessWidget {
       }
 
       var loginUser = await userLogin(passwortKontroller.text);
-      if (loginUser == null) {
+      if (loginUser == null && context.mounted) {
         customSnackbar(
             context, AppLocalizations.of(context)!.emailOderPasswortFalsch);
         return false;
@@ -68,7 +69,7 @@ class ChangeEmailPage extends StatelessWidget {
       try{
         await FirebaseAuth.instance.currentUser!.updateEmail(emailKontroller.text);
       }catch(error){
-        customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
+        if(context.mounted) customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
         return;
       }
 
@@ -76,7 +77,7 @@ class ChangeEmailPage extends StatelessWidget {
       ProfilDatabase().updateProfil(
           "email = '$encryptedEmail'", "WHERE id = '$userId'");
 
-      Navigator.pop(context);
+      if(context.mounted) Navigator.pop(context);
     }
 
     return Scaffold(
@@ -86,13 +87,13 @@ class ChangeEmailPage extends StatelessWidget {
           margin: const EdgeInsets.only(top: 20),
           child: Column(
             children: [
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.neueEmail, emailKontroller, keyboardType: TextInputType.emailAddress),
 
               const SizedBox(height: 15),
-              customTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
+              CustomTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
                   passwortKontroller,
-                  passwort: true, onSubmit: () => save()),
+                  hideInput: true, onSubmit: () => save()),
               const SizedBox(height: 20),
               FloatingActionButton.extended(
                   label: Text(

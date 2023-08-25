@@ -1,12 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'dart:ui';
 
 
 class ForceUpdatePage extends StatelessWidget {
-  bool spracheIstDeutsch = kIsWeb
-      ? window.locale.languageCode == "de"
+  final bool spracheIstDeutsch = kIsWeb
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
   ForceUpdatePage({Key? key}) : super(key: key);

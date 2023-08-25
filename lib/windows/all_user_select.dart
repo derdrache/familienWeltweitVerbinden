@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/dialogWindow.dart';
 import '../widgets/search_autocomplete.dart';
-import '../../global/variablen.dart' as global_var;
+import '../../global/style.dart' as style;
 
 
 class AllUserSelectWindow {
@@ -34,8 +34,12 @@ class AllUserSelectWindow {
     return SearchAutocomplete(
       hintText: AppLocalizations.of(context)!.personSuchen,
       searchableItems: allUserNames,
-      onConfirm: () {
+      onConfirm: (){
+        var selectedUser = searchAutocomplete.getSelected()[0];
+        var userIndex = allUserNames.indexOf(selectedUser);
+        var selectedUserId = allUserIds[userIndex];
 
+        Navigator.pop(context, selectedUserId);
       },
     );
   }
@@ -94,7 +98,7 @@ class AllUserSelectWindow {
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
-                        width: 1, color: global_var.borderColorGrey))),
+                        width: 1, color: style.borderColorGrey))),
             child: Text(friend)),
       ));
     }

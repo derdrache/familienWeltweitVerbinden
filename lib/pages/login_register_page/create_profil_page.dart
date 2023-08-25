@@ -11,14 +11,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../global/profil_sprachen.dart';
 import '../../services/notification.dart' as notifications;
-import '../../global/custom_widgets.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/global_functions.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../services/database.dart';
+import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_multi_select.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 import '../start_page.dart';
 import 'login_page.dart';
 
@@ -26,7 +30,7 @@ class CreateProfilPage extends StatefulWidget {
   const CreateProfilPage({Key? key}) : super(key: key);
 
   @override
-  _CreateProfilPageState createState() => _CreateProfilPageState();
+  State<CreateProfilPage> createState() => _CreateProfilPageState();
 }
 
 class _CreateProfilPageState extends State<CreateProfilPage> {
@@ -35,28 +39,27 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   var aboutusKontroller = TextEditingController();
   var ortAuswahlBox = GoogleAutoComplete();
   var isGerman = kIsWeb
-      ? window.locale.languageCode == "de"
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
-  late var sprachenAuswahlBox,reiseArtenAuswahlBox,interessenAuswahlBox;
+  late CustomMultiTextForm sprachenAuswahlBox,interessenAuswahlBox;
+  late CustomDropdownButton reiseArtenAuswahlBox;
   var childrenAgePickerBox = ChildrenBirthdatePickerBox();
   bool isLoading = false;
 
   @override
   void initState() {
     sprachenAuswahlBox = CustomMultiTextForm(
-        validator: global_functions.checkValidationMultiTextForm(context),
         auswahlList: isGerman
-            ? global_variablen.sprachenListe
-            : global_variablen.sprachenListeEnglisch);
+            ? ProfilSprachen().getAllGermanLanguages()
+            : ProfilSprachen().getAllEnglishLanguages());
 
-    reiseArtenAuswahlBox = CustomDropDownButton(
+    reiseArtenAuswahlBox = CustomDropdownButton(
       items: isGerman
           ? global_variablen.reisearten
           : global_variablen.reiseartenEnglisch,
     );
 
     interessenAuswahlBox = CustomMultiTextForm(
-        validator: global_functions.checkValidationMultiTextForm(context),
         auswahlList: isGerman
             ? global_variablen.interessenListe
             : global_variablen.interessenListeEnglisch);
@@ -91,7 +94,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         await ProfilDatabase().getData("id", "WHERE name = '$userName'") !=
             false;
 
-    if (userExist) {
+    if (userExist && context.mounted) {
       customSnackbar(
           context, AppLocalizations.of(context)!.benutzerNamevergeben);
       changeLoading();
@@ -104,7 +107,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var children = childrenAgePickerBox.getDates();
       var ortMapData = ortAuswahlBox.getGoogleLocationData();
 
-      if (ortMapData["city"] == null) {
+      if (ortMapData["city"] == null && context.mounted) {
         customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
         changeLoading();
         return;
@@ -140,7 +143,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
 
       notifications.prepareNewLocationNotification();
 
-      global_functions.changePageForever(context, StartPage());
+      if(context.mounted) global_functions.changePageForever(context, StartPage());
 
       additionalDatabaseOperations(ortMapData, userID);
     }
@@ -181,26 +184,26 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   checkAllValidation(userExist, userName) {
     bool hasError = false;
     String errorString =
-        AppLocalizations.of(context)!.bitteEingabeKorrigieren + "\n";
+        "${AppLocalizations.of(context)!.bitteEingabeKorrigieren}\n";
 
     if (userExist) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.usernameInVerwendung + "\n";
+          "- ${AppLocalizations.of(context)!.usernameInVerwendung}\n";
     }else if (reiseArtenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.reiseartAuswaehlen + "\n";
+          "- ${AppLocalizations.of(context)!.reiseartAuswaehlen}\n";
     } else if (sprachenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.spracheAuswaehlen + "\n";
+          "- ${AppLocalizations.of(context)!.spracheAuswaehlen}\n";
     } else if (interessenAuswahlBox.getSelected().isEmpty) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.interessenAuswaehlen + "\n";
+          "- ${AppLocalizations.of(context)!.interessenAuswaehlen}\n";
     }else if (childrenAgePickerBox.getDates().length == 0 ||
         !childrenInputValidation()) {
       errorString +=
-          "- " + AppLocalizations.of(context)!.geburtsdatumEingeben + "\n";
+          "- ${AppLocalizations.of(context)!.geburtsdatumEingeben}\n";
     }else if (userName.length > 40) {
-      errorString += "- " + AppLocalizations.of(context)!.usernameZuLang;
+      errorString += "- ${AppLocalizations.of(context)!.usernameZuLang}";
     }
 
 
@@ -221,7 +224,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
         AppLocalizations.of(context)!.artDerReiseAuswaehlen;
     interessenAuswahlBox.hintText =
         AppLocalizations.of(context)!.interessenAuswaehlen;
-    childrenAgePickerBox.hintText = AppLocalizations.of(context)!.geburtsdatum;
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.aktuellenOrtEingeben;
 
     return Scaffold(
@@ -238,6 +240,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
               ? const CircularProgressIndicator()
               : IconButton(
                   onPressed: () => saveFunction(),
+                  tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                   icon: const Icon(
                     Icons.done,
                     size: 30,
@@ -254,7 +257,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
           }),
           child: ListView(
             children: [
-              customTextInput(AppLocalizations.of(context)!.benutzername,
+              CustomTextInput(AppLocalizations.of(context)!.benutzername,
                   userNameKontroller,
                   validator: global_functions.checkValidatorEmpty(context)),
               Align(
@@ -275,9 +278,8 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
                     )),
               ),
               childrenAgePickerBox,
-              customTextInput(
-                  AppLocalizations.of(context)!.aboutusHintText +
-                      " *optional*",
+              CustomTextInput(
+                  "${AppLocalizations.of(context)!.aboutusHintText} *optional*",
                   aboutusKontroller,
                   moreLines: 4),
               Container(

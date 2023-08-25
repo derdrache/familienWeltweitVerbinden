@@ -4,15 +4,13 @@ import 'package:hive/hive.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../widgets/custom_appbar.dart';
-import '../../../global/global_functions.dart' as global_functions;
-import '../../start_page.dart';
 import 'location_card.dart';
 
 class LocationPage extends StatefulWidget {
-  bool forCity;
-  bool forLand;
+  final bool forCity;
+  final bool forLand;
 
-  LocationPage({Key? key, this.forCity = false, this.forLand = false}) : super(key: key);
+  const LocationPage({Key? key, this.forCity = false, this.forLand = false}) : super(key: key);
 
   @override
   State<LocationPage> createState() => _LocationPageState();
@@ -104,16 +102,13 @@ class _LocationPageState extends State<LocationPage> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
+    String onSearchText = onSearch ? AppLocalizations.of(context)!.suche : "";
 
     return Scaffold(
       appBar: CustomAppBar(
         title: widget.forCity
-            ? AppLocalizations.of(context)!.cities
-            : AppLocalizations.of(context)!.countries,
-        leading: IconButton(
-          onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
-          icon: const Icon(Icons.arrow_back),
-        ),
+            ? "$onSearchText ${AppLocalizations.of(context)!.cities}"
+            : "$onSearchText ${AppLocalizations.of(context)!.countries}"
       ),
       body: SafeArea(
         child: Stack(

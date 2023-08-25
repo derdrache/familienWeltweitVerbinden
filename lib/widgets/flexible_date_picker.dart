@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
+import '../global/style.dart' as style;
+
 class FlexibleDatePicker extends StatefulWidget {
   final int? startYear;
   final int? endYear;
@@ -337,14 +339,17 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
         width: widget.multiDate ? 160 : 80,
         height: 50,
         decoration: BoxDecoration(
-            border: Border.all(),
-            borderRadius: const BorderRadius.all(Radius.circular(5))),
+            border: Border.all(color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black),
+            borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))),
         child: Center(
             child: Text(
           createDateText(),
           textAlign: TextAlign.center,
           style: TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: widget.selectedDate == null? null :FontWeight.bold,
+              fontSize: 14,
               color: widget.selectedDate == null ? Colors.grey : Colors.black),
         )),
       ),

@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../global/custom_widgets.dart';
 import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 
 class ChangeNamePage extends StatelessWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -33,7 +34,7 @@ class ChangeNamePage extends StatelessWidget {
 
       var checkUserProfilExist =
           await ProfilDatabase().getData("id", "WHERE name = '$newUserName'");
-      if (checkUserProfilExist != false) {
+      if (checkUserProfilExist != false && context.mounted) {
         customSnackbar(
             context, AppLocalizations.of(context)!.usernameInVerwendung);
         return;
@@ -42,7 +43,7 @@ class ChangeNamePage extends StatelessWidget {
       await ProfilDatabase().updateProfilName(userId, newUserName);
       updateHiveOwnProfil("name", newUserName);
 
-      Navigator.pop(context);
+      if(context.mounted) Navigator.pop(context);
     }
 
     return Scaffold(
@@ -51,7 +52,7 @@ class ChangeNamePage extends StatelessWidget {
       body: Container(
         margin: const EdgeInsets.only(top: 20),
         child: Column(children: [
-          customTextInput("Name", nameKontroller,
+          CustomTextInput("Name", nameKontroller,
               onSubmit: () => save()),
           const SizedBox(height: 10),
           FloatingActionButton.extended(

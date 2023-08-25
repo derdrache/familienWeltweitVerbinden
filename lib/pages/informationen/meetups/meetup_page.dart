@@ -4,12 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'dart:io' as io;
+import 'dart:ui' as ui;
 
-import '../../../global/variablen.dart' as global_var;
+import '../../../global/global_functions.dart';
 import '../../../global/global_functions.dart' as global_functions;
-import '../../../widgets/badge_icon.dart';
+import '../../../services/locationsService.dart';
+import '../../../widgets/layout/badgeWidget.dart';
 import '../../start_page.dart';
-import 'meetup_suchen.dart';
 import 'meetupCard.dart';
 import 'meetup_erstellen.dart';
 
@@ -17,175 +19,198 @@ class MeetupPage extends StatefulWidget {
   const MeetupPage({Key? key}) : super(key: key);
 
   @override
-  _MeetupPageState createState() => _MeetupPageState();
+  State<MeetupPage> createState() => _MeetupPageState();
 }
 
 class _MeetupPageState extends State<MeetupPage> {
   var userId = FirebaseAuth.instance.currentUser!.uid;
-  double textSizeHeadline = 20.0;
-  var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
-  var myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
+  var allMeetups = Hive.box('secureBox').get("events") ?? [];
+  var isLoading = true;
+  bool filterOn = false;
+  var filterList = [];
+  var allMeetupCities = [];
+  var allMeetupCountries = [];
+  bool onSearch = false;
+  TextEditingController meetupSearchKontroller = TextEditingController();
+  FocusNode searchFocusNode = FocusNode();
+  String pageTitle = "Meetups";
+  var spracheIstDeutsch = kIsWeb
+      ? ui.PlatformDispatcher.instance.locale.languageCode == "de"
+      : io.Platform.localeName == "de_DE";
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => initialize());
+
     super.initState();
+  }
+
+  initialize() async {
+    for (var meetup in allMeetups) {
+      allMeetupCities.add(meetup["ort"]);
+
+      var countryData = LocationService().getCountryLocation(meetup["land"]);
+      allMeetupCountries.add(
+          spracheIstDeutsch ? countryData["nameGer"] : countryData["nameEng"]);
+    }
+
+    isLoading = false;
+
+    setState(() {});
+  }
+
+  getAllSearchMeetups() {
+    var searchedMeetups = [];
+    var searchText = meetupSearchKontroller.text.toLowerCase();
+
+    if (searchText.isEmpty) return allMeetups;
+
+    for (var meetup in allMeetups) {
+      bool isNotPrivat = !meetup["art"].contains("private") &&
+          !meetup["art"].contains("privat");
+      bool nameKondition = meetup["name"].toLowerCase().contains(searchText);
+      bool countryKondition =
+          meetup["land"].toLowerCase().contains(searchText) ||
+              LocationService()
+                  .transformCountryLanguage(meetup["land"])
+                  .toLowerCase()
+                  .contains(searchText);
+      bool cityKondition = meetup["stadt"].toLowerCase().contains(searchText);
+
+      if ((nameKondition || countryKondition || cityKondition) && isNotPrivat)
+        searchedMeetups.add(meetup);
+    }
+
+    return searchedMeetups;
   }
 
   @override
   Widget build(BuildContext context) {
-    myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
-    myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
+    allMeetups = Hive.box('secureBox').get("events") ?? [];
+    double width = MediaQuery.of(context).size.width;
 
-    createMeetupCards(meetups, withInteresse) {
+    showMeetups() {
+      List allEntries = onSearch
+          ? getAllSearchMeetups()
+          : Hive.box('secureBox').get("interestEvents") +
+              Hive.box('secureBox').get("myEvents");
+
       List<Widget> meetupCards = [];
+      var emptyText =
+          AppLocalizations.of(context)!.nochKeinegemeinschaftVorhanden;
+      var emptySearchText = AppLocalizations.of(context)!.sucheKeineErgebnisse;
 
-      for (var meetup in meetups) {
-        bool isOwner = meetup["erstelltVon"] == userId;
-        var freischaltenCount = meetup["freischalten"].length;
-        bool isNotPublic = meetup["art"] != "public" && meetup["art"] != "öffentlich";
-
-        meetupCards.add(Stack(
-          children: [
-            MeetupCard(
-                meetupData: meetup,
-                margin: const EdgeInsets.only(top: 10, bottom: 0, right: 20, left: 10),
-                withInteresse: withInteresse,
-                fromMeetupPage: true,
-                afterFavorite: () => setState((){}),
-                afterPageVisit: () => setState((){})),
-            if (isOwner && isNotPublic)
-              Positioned(
-                right: 10,
-                top: 10,
-                child: BadgeIcon(
-                  text: freischaltenCount > 0 ? freischaltenCount.toString(): "",
-                )
-              )
-          ],
+      if (allEntries.isEmpty) {
+        meetupCards.add(SizedBox(
+          height: 300,
+          child: Center(
+              child: Text(
+            onSearch ? emptySearchText : emptyText,
+            style: const TextStyle(fontSize: 20),
+          )),
         ));
       }
 
-      return meetupCards;
-    }
+      for (var meetup in allEntries) {
+        bool isOwner = meetup["erstelltVon"] == userId;
+        bool isNotPublic =
+            meetup["art"] != "public" && meetup["art"] != "öffentlich";
+        int freischaltenCount =
+            isOwner && isNotPublic ? meetup["freischalten"].length : 0;
 
-    meineInteressiertenMeetupsBox() {
-      return Container(
-          padding: const EdgeInsets.only(top: 10),
-          width: double.infinity,
-          decoration: BoxDecoration(
-              border: Border(
-                  bottom:
-                      BorderSide(width: 1, color: global_var.borderColorGrey))),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                  margin: const EdgeInsets.only(left: 10),
-                  child: Text(
-                    AppLocalizations.of(context)!.favoritenMeetups,
-                    style: TextStyle(fontSize: textSizeHeadline),
-                  )),
-              FutureBuilder(
-                  future: null,
-                  builder: (context, snapshot) {
-                    if (myInterestedMeetups != null && myInterestedMeetups.isNotEmpty) {
-                      return Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Wrap(
-                              direction: Axis.vertical,
-                              children: createMeetupCards(myInterestedMeetups, true)),
-                        ),
-                      );
-                    }
+        meetupCards.add(BadgeWidget(
+          number: freischaltenCount,
+          child: MeetupCard(
+              meetupData: meetup,
+              withInteresse: true,
+              fromMeetupPage: true,
+              afterFavorite: () => setState(() {}),
+              afterPageVisit: () => setState(() {})),
+        ));
+      }
 
-                    return Center(
-                        heightFactor: 5,
-                        child: Text(
-                          AppLocalizations.of(context)!
-                              .nochKeineMeetupsAusgewaehlt,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: textSizeHeadline, color: Colors.grey),
-                        ));
-                  }),
-            ],
-          ));
-    }
-
-    meineErstellenMeetupsBox() {
-      return Container(
-          padding: const EdgeInsets.only(top: 10),
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                  margin: const EdgeInsets.only(left: 10),
-                  child: Text(
-                    AppLocalizations.of(context)!.meineMeetups,
-                    style: TextStyle(fontSize: textSizeHeadline),
-                  )),
-              FutureBuilder(
-                  future: null,
-                  builder: (context, snapshot) {
-                    if (myOwnMeetups != null && myOwnMeetups.isNotEmpty) {
-                      return Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Wrap(
-                              direction: Axis.vertical,
-                              children: createMeetupCards(myOwnMeetups, false)),
-                        ),
-                      );
-                    }
-
-                    return Center(
-                        heightFactor: 5,
-                        child: Text(
-                          AppLocalizations.of(context)!.nochKeineMeetupsErstellt,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: textSizeHeadline, color: Colors.grey),
-                        ));
-                  }),
-            ],
-          ));
+      return SingleChildScrollView(
+        child: Wrap(alignment: WrapAlignment.spaceEvenly, children: [
+          ...meetupCards,
+          if (onSearch) const SizedBox(height: 330)
+        ]),
+      );
     }
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Meetups",
-        leading: IconButton(
-          onPressed: () => global_functions.changePageForever(context, StartPage(selectedIndex: 2,)),
-          icon: const Icon(Icons.arrow_back),
+          title: pageTitle,
+          leading: IconButton(
+            onPressed: () => global_functions.changePageForever(
+                context,
+                StartPage(
+                  selectedIndex: 2,
+                )),
+            icon: const Icon(Icons.arrow_back),
+          )),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Container(
+                margin: const EdgeInsets.only(top: 10),
+                height: double.infinity,
+                width: double.infinity,
+                child: showMeetups()),
+            if (onSearch)
+              Positioned(
+                  bottom: 15,
+                  right: 15,
+                  child: Container(
+                    width: width * 0.9,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        color: Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20))),
+                    child: TextField(
+                      controller: meetupSearchKontroller,
+                      focusNode: searchFocusNode,
+                      decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.suche,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(10)),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ))
+          ],
         ),
-        buttons: [
-          IconButton(
-              onPressed: ()=> Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) => const MeetupSuchenPage()))
-                  .whenComplete(() => setState(() {})),
-              icon: const Icon(
-                Icons.search,
-                size: 30,
-              ))
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+              heroTag: "create meetup",
+              tooltip: AppLocalizations.of(context)!.tooltipMeetupErstellen,
+              child: const Icon(Icons.create),
+              onPressed: () => changePage(context, const MeetupErstellen())),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            mini: onSearch ? true : false,
+            backgroundColor: onSearch ? Colors.red : null,
+            onPressed: () {
+              if (onSearch) {
+                pageTitle = "Meetups";
+                searchFocusNode.unfocus();
+                meetupSearchKontroller.clear();
+              } else {
+                pageTitle = "${AppLocalizations.of(context)!.suche} Meetups";
+              }
+
+              setState(() {
+                onSearch = !onSearch;
+              });
+            },
+            tooltip: AppLocalizations.of(context)!.tooltipMeetupSuche,
+            child: Icon(onSearch ? Icons.close : Icons.search),
+          ),
         ],
       ),
-      body: SafeArea(
-        child: Container(
-            padding: const EdgeInsets.only(top: kIsWeb ? 0 : 24),
-            child: Column(children: [
-              Expanded(child: meineInteressiertenMeetupsBox()),
-              Expanded(child: meineErstellenMeetupsBox()),
-            ])),
-      ),
-      floatingActionButton: FloatingActionButton(
-          heroTag: "meetup hinzufügen",
-          child: const Icon(Icons.create),
-          onPressed: () =>
-              global_functions.changePage(context, const MeetupErstellen())),
     );
   }
 }

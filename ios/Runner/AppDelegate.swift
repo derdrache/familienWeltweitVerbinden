@@ -8,6 +8,11 @@ import FirebaseMessaging
   override func application(_ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+
+    FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
+      GeneratedPluginRegistrant.register(with: registry)
+    }
+
     FirebaseApp.configure()
     GeneratedPluginRegistrant.register(with: self)
 

@@ -5,7 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../global/custom_widgets.dart';
+import '../widgets/layout/custom_snackbar.dart';
 
 class NetworkConnectivity {
   final _networkConnectivity = Connectivity();

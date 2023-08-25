@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:familien_suche/global/custom_widgets.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -10,10 +9,12 @@ import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../windows/nutzerrichtlinen.dart';
+import '../../../global/style.dart' as style;
+import '../../../widgets/layout/custom_snackbar.dart';
+import '../../../widgets/layout/custom_text_input.dart';
+import '../../../widgets/nutzerrichtlinen.dart';
 import 'community_details.dart';
 import '../../../widgets/google_autocomplete.dart';
-import '../../start_page.dart';
 
 class CommunityErstellen extends StatefulWidget {
   const CommunityErstellen({Key? key}) : super(key: key);
@@ -26,7 +27,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   var nameController = TextEditingController();
   var beschreibungKontroller = TextEditingController();
   var linkKontroller = TextEditingController();
-  var ortAuswahlBox = GoogleAutoComplete(withoutTopMargin: true,);
+  var ortAuswahlBox = GoogleAutoComplete(margin: const EdgeInsets.only(top: 0, bottom:5, left:10, right:10),withOwnLocation: true, withWorldwideLocation: true);
   var userId = Hive.box("secureBox").get("ownProfil")["id"];
   var ownCommunity = true;
   final translator = GoogleTranslator();
@@ -42,6 +43,8 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     var communityData = {
       "id": communityId,
       "name": nameController.text,
+      "nameGer": nameController.text,
+      "nameEng": nameController.text,
       "beschreibung": beschreibungKontroller.text,
       "beschreibungGer":beschreibungKontroller.text,
       "beschreibungEng": beschreibungKontroller.text,
@@ -51,7 +54,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       "latt": locationData["latt"],
       "longt": locationData["longt"],
       "erstelltAm": DateTime.now().toString(),
-      "members": json.encode(ownCommunity ? [userId] : []),
+      "members": ownCommunity ? [userId] : [],
       "erstelltVon": userId,
       "ownCommunity": ownCommunity,
       "secretChat": secretChat
@@ -59,11 +62,10 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
     if (!checkValidationAndSendError(communityData)) return false;
 
-    saveDB(communityData, locationData);
+    saveDB(Map.of(communityData), locationData);
 
     communityData["bild"] = "assets/bilder/village.jpg";
     communityData["interesse"] = [];
-    communityData["members"] = [];
     communityData["einladung"] = [];
 
     var allCommunities = Hive.box('secureBox').get("communities") ?? [];
@@ -79,17 +81,22 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     descriptionIsGerman = languageCheck.sourceLanguage.code == "de";
 
     if(descriptionIsGerman){
+      communityData["nameGer"] = communityData["name"];
+      communityData["nameEng"] = await descriptionTranslation(communityData["name"], "auto");
       communityData["beschreibungGer"] = communityData["beschreibung"];
       communityData["beschreibungEng"] = await descriptionTranslation(communityData["beschreibungGer"], "auto");
       communityData["beschreibungEng"] += "\n\nThis is an automatic translation";
     }else{
+      communityData["nameEng"] = communityData["name"];
+      communityData["nameGer"] = await descriptionTranslation(communityData["name"], "de");
       communityData["beschreibungEng"] = communityData["beschreibung"];
-      communityData["beschreibungGer"] = await descriptionTranslation(
-          communityData["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
-      communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      communityData["beschreibungGer"] = await descriptionTranslation(communityData["beschreibungEng"],"de");
+      communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nDies ist eine automatische Übersetzung";
     }
 
-    await CommunityDatabase().addNewCommunity(Map.of(communityData));
+    communityData["members"] = json.encode(communityData["members"]);
+
+    await CommunityDatabase().addNewCommunity(communityData);
 
     StadtinfoDatabase().addNewCity(locationData);
     ChatGroupsDatabase().addNewChatGroup(
@@ -125,49 +132,25 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
   Widget build(BuildContext context) {
     ortAuswahlBox.hintText = AppLocalizations.of(context)!.stadtEingeben;
 
-    chooseOwnLocationBox(){
-      return Container(
-        margin: const EdgeInsets.only(left: 15, right: 15),
-        child: Row(children: [
-          Text(AppLocalizations.of(context)!.aktuellenOrtVerwenden, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          const Expanded(child: SizedBox.shrink()),
-          Switch(value: chooseCurrentLocation, onChanged: (bool){
-            if(bool){
-              var ownProfil = Hive.box('secureBox').get("ownProfil");
-              var currentLocaton = {
-                "city": ownProfil["ort"],
-                "countryname": ownProfil["land"],
-                "longt": ownProfil["longt"],
-                "latt": ownProfil["latt"],
-              };
-              ortAuswahlBox.setLocation(currentLocaton);
-            } else{
-              ortAuswahlBox.clear();
-            }
-            setState(() {
-              chooseCurrentLocation = bool;
-            });
-          })
-        ],),
-      );
-    }
-
     ownCommunityBox() {
       return Padding(
         padding: const EdgeInsets.only(left:15, right: 15),
-        child: Row(
-          children: [
-            Expanded(
-                child: Text(AppLocalizations.of(context)!.frageTeilGemeinschaft,
-                    maxLines: 2, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-            Checkbox(
-                value: ownCommunity,
-                onChanged: (value) {
-                  setState(() {
-                    ownCommunity = value!;
-                  });
-                }),
-          ],
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: style.webWidth),
+          child: Row(
+            children: [
+              Expanded(
+                  child: Text(AppLocalizations.of(context)!.frageTeilGemeinschaft,
+                      maxLines: 2, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+              Checkbox(
+                  value: ownCommunity,
+                  onChanged: (value) {
+                    setState(() {
+                      ownCommunity = value!;
+                    });
+                  }),
+            ],
+          ),
         ),
       );
     }
@@ -175,18 +158,21 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     secretChatQuestionBox(){
       return Padding(
         padding: const EdgeInsets.only(left: 15, right: 15),
-        child: Row(
-          children: [
-            Expanded(child: Text(AppLocalizations.of(context)!.geheimerChat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-            Switch(
-                value: secretChat,
-                onChanged: (newValue){
-                  setState(() {
-                    secretChat = newValue;
-                  });
-                }
-            ),
-          ],
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: style.webWidth),
+          child: Row(
+            children: [
+              Expanded(child: Text(AppLocalizations.of(context)!.geheimerChat, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
+              Switch(
+                  value: secretChat,
+                  onChanged: (newValue){
+                    setState(() {
+                      secretChat = newValue;
+                    });
+                  }
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -199,22 +185,23 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                 onPressed: () async {
                   var communityData = await saveCommunity();
 
-                  global_func.changePageForever(
-                      context, StartPage(selectedIndex: 2, informationPageIndex: 2,));
-                  global_func.changePage(
-                      context, CommunityDetails(community: communityData));
+                  if (context.mounted){
+                    Navigator.pop(context);
+                    global_func.changePage(
+                        context, CommunityDetails(community: communityData));
+                  }
                 },
+                tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done, size: 30))
           ]),
-      body: ListView(
+      body: Column(
         children: [
-          customTextInput(
-              AppLocalizations.of(context)!.communityName, nameController),
-          chooseOwnLocationBox(),
+          CustomTextInput(
+              AppLocalizations.of(context)!.communityName, nameController, maxLength: 40),
           ortAuswahlBox,
-          customTextInput(AppLocalizations.of(context)!.linkEingebenOptional,
+          CustomTextInput(AppLocalizations.of(context)!.linkEingebenOptional,
               linkKontroller),
-          customTextInput(AppLocalizations.of(context)!.beschreibungCommunity,
+          CustomTextInput(AppLocalizations.of(context)!.beschreibungCommunity,
               beschreibungKontroller,
               moreLines: 5, textInputAction: TextInputAction.newline),
           Center(child: secretChatQuestionBox()),

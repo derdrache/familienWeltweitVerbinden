@@ -12,11 +12,12 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 import '../../global/global_functions.dart';
+import '../../global/style.dart';
 import '../../services/database.dart';
 import '../../widgets/profil_image.dart';
-import '../../widgets/search_autocomplete.dart';
-import '../../global/variablen.dart' as global_var;
+import '../../global/style.dart' as style;
 import '../../widgets/strike_through_icon.dart';
+import '../../windows/all_user_select.dart';
 import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget {
@@ -25,12 +26,11 @@ class ChatPage extends StatefulWidget {
   ChatPage({Key? key, required this.chatPageSliderIndex}) : super(key: key);
 
   @override
-  _ChatPageState createState() => _ChatPageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage>{
   var userId = FirebaseAuth.instance.currentUser!.uid;
-  var searchAutocomplete;
   List dbProfilData = Hive.box("secureBox").get("profils") ?? [];
   List myChats = Hive.box("secureBox").get("myChats") ?? [];
   List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
@@ -42,7 +42,7 @@ class _ChatPageState extends State<ChatPage>{
   bool firstSelectedIsMute = false;
   bool bothDelete = false;
   bool isLoaded = false;
-  var mainSlider;
+  late int mainSlider;
   bool activeChatSearch = false;
   var seachSearchInputNode = FocusNode();
   var searchTextKontroller = TextEditingController();
@@ -115,75 +115,25 @@ class _ChatPageState extends State<ChatPage>{
   }
 
   selectChatpartnerWindow() async {
-    userFriendlist ??= [];
-    searchAutocomplete = SearchAutocomplete(
-      hintText: AppLocalizations.of(context)!.personSuchen,
-      searchableItems: allName!,
-      onConfirm: () {
-        Navigator.pop(context);
-        searchUser(searchAutocomplete.getSelected()[0]);
-      },
-    );
-
-    return showDialog(
+    String selectedUser = await AllUserSelectWindow(
         context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            height: 800,
-            title: AppLocalizations.of(context)!.neuenChatEroeffnen,
-            children: [
-              Center(child: SizedBox(width: 300, child: searchAutocomplete)),
-              ...createFriendlistBox(userFriendlist)
-            ],
-          );
-        });
-  }
+        title: AppLocalizations.of(context)!.personSuchen,
+    ).openWindow();
 
-  searchUser(chatPartnerName) async {
-    var chatPartnerId =
-        getProfilFromHive(profilName: chatPartnerName, getIdOnly: true);
+    if(selectedUser.isEmpty) return;
 
     Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => ChatDetailsPage(
-                    chatPartnerId: chatPartnerId,
-                    chatPartnerName: chatPartnerName,
-                    backToChatPage: true,
-                    chatPageSliderIndex: mainSlider)))
+        context,
+        MaterialPageRoute(
+            builder: (_) => ChatDetailsPage(
+                chatPartnerId: selectedUser,
+                backToChatPage: true,
+                chatPageSliderIndex: mainSlider)))
         .whenComplete(() => changePageForever(
-            context,
-            StartPage(
-              selectedIndex: 3,
-            )));
-  }
-
-  List<Widget> createFriendlistBox(userFriendlist) {
-    List<Widget> friendsBoxen = [];
-
-    for (var friendName in userFriendlist) {
-      friendsBoxen.add(GestureDetector(
-        onTap: () => searchUser(friendName),
-        child: Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(
-                        width: 1, color: global_var.borderColorGrey))),
-            child: Text(friendName)),
-      ));
-    }
-
-    if (userFriendlist.isEmpty) {
-      return [
-        Center(
-            heightFactor: 10,
-            child: Text(AppLocalizations.of(context)!.nochKeineFreundeVorhanden,
-                style: const TextStyle(color: Colors.grey)))
-      ];
-    }
-
-    return friendsBoxen;
+        context,
+        StartPage(
+          selectedIndex: 3,
+        )));
   }
 
   checkNewChatGroup(chatPartnerId) {
@@ -207,7 +157,7 @@ class _ChatPageState extends State<ChatPage>{
 
     if (messageList.length > 2) {
       message =
-          [messageList[0] ?? " " + messageList[1] ?? " "].join("\n") + " ...";
+          "${[messageList[0] ?? " " + messageList[1] ?? " "].join("\n")} ...";
     }
 
     return message;
@@ -307,6 +257,21 @@ class _ChatPageState extends State<ChatPage>{
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.chatLoeschen,
               height: countSelected == 1 && !isChatGroup ? 150 : 100,
+              actions: [
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.loeschen),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    changeBarOn = false;
+                    deleteChat();
+                    selectedChats = [];
+                  },
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
               children: [
                 Center(
                     child: Text(countSelected == 1
@@ -331,28 +296,13 @@ class _ChatPageState extends State<ChatPage>{
                     ],
                   )
               ],
-              actions: [
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.loeschen),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    changeBarOn = false;
-                    deleteChat();
-                    selectedChats = [];
-                  },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
-                )
-              ],
             );
           });
         });
   }
 
   pinChat() {
-    var selectedIsPinned;
+    bool? selectedIsPinned;
 
     for (var choosenChat in selectedChats) {
       var selectedChatId = choosenChat["id"];
@@ -375,12 +325,12 @@ class _ChatPageState extends State<ChatPage>{
     }
 
     setState(() {
-      firstSelectedIsPinned = selectedIsPinned;
+      firstSelectedIsPinned = selectedIsPinned!;
     });
   }
 
   muteChat() {
-    var selectedIsMute;
+    bool? selectedIsMute;
 
     for (var choosenChat in selectedChats) {
       var selectedChatId = choosenChat["id"];
@@ -402,7 +352,7 @@ class _ChatPageState extends State<ChatPage>{
     }
 
     setState(() {
-      firstSelectedIsMute = selectedIsMute;
+      firstSelectedIsMute = selectedIsMute!;
     });
   }
 
@@ -563,7 +513,7 @@ class _ChatPageState extends State<ChatPage>{
 
         var users = group["users"] ?? {};
         var isChatGroup = group["connected"] != null;
-        var chatData;
+        Map chatData = {};
 
         if (group["lastMessage"] is int) {
           group["lastMessage"] = group["lastMessage"].toString();
@@ -659,6 +609,8 @@ class _ChatPageState extends State<ChatPage>{
           lastMessage = AppLocalizations.of(context)!.weitergeleitet;
         } else if (lastMessage == "</neuer Chat") {
           lastMessage = AppLocalizations.of(context)!.neuerChat;
+        } else if(lastMessage == "</images"){
+          lastMessage = AppLocalizations.of(context)!.bild;
         }
 
         chatGroupContainers.insert(
@@ -714,7 +666,7 @@ class _ChatPageState extends State<ChatPage>{
                   decoration: BoxDecoration(
                       border: Border(
                     bottom:
-                        BorderSide(width: 1, color: global_var.borderColorGrey),
+                        BorderSide(width: 1, color: style.borderColorGrey),
                   )),
                   child: Row(
                     children: [
@@ -722,7 +674,7 @@ class _ChatPageState extends State<ChatPage>{
                         children: [
                           if (chatPartnerProfil != null)
                             ProfilImage(chatPartnerProfil),
-                          if (chatData != null) ProfilImage(chatData),
+                          if (chatData.isNotEmpty) ProfilImage(chatData),
                           if (selectedChats.contains(group))
                             const Positioned(
                                 bottom: 0,
@@ -801,7 +753,13 @@ class _ChatPageState extends State<ChatPage>{
                   suffixIcon: CloseButton(
                     color: Colors.white,
                     onPressed: () {
-                      searchTextKontroller.clear();
+                      if(searchTextKontroller.text.isNotEmpty){
+                        searchTextKontroller.clear();
+                      }else{
+                        setState(() {
+                          activeChatSearch = false;
+                        });
+                      }
                     },
                   )),
               onChanged: (value) => searchChats(value),
@@ -863,9 +821,9 @@ class _ChatPageState extends State<ChatPage>{
               },
               backgroundColor: Colors.transparent,
               groupValue: mainSlider,
-              onValueChanged: (value) {
+              onValueChanged: (int? value) {
                 setState(() {
-                  mainSlider = value;
+                  mainSlider = value!;
                 });
               },
             ),
@@ -879,9 +837,10 @@ class _ChatPageState extends State<ChatPage>{
                   });
                   seachSearchInputNode.requestFocus();
                 },
+                tooltip: AppLocalizations.of(context)!.tooltipChatPageSuche,
                 icon: const Icon(
                   Icons.search,
-                  size: 30,
+                  size: iconSizeBig,
                 )),
             const SizedBox(
               width: 10,
@@ -889,6 +848,22 @@ class _ChatPageState extends State<ChatPage>{
           ],
         );
       }
+    }
+
+    showChatSearchResult(){
+      List searchResults = searchListMyGroups + searchListAllChatgroups;
+
+      if(searchResults.isEmpty){
+        return Center(
+            child: Text(
+              AppLocalizations.of(context)!.keineErgebnisse,
+              style: const TextStyle(fontSize: 20),
+            ));
+      }
+
+      return ListView(
+        shrinkWrap: true,
+        children: createChatGroupContainers(searchResults));
     }
 
     return Scaffold(
@@ -906,56 +881,12 @@ class _ChatPageState extends State<ChatPage>{
           child: searchTextKontroller.text.isEmpty
               ? ListView(
                   shrinkWrap: true, children: createChatGroupContainers(null))
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                            border: Border(top: BorderSide())),
-                        padding: const EdgeInsets.all(10),
-                        child: const Text("Chats",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20))),
-                    Expanded(
-                      child: searchListMyGroups.isNotEmpty
-                          ? ListView(
-                              shrinkWrap: true,
-                              children:
-                                  createChatGroupContainers(searchListMyGroups),
-                            )
-                          : Center(
-                              child: Text(
-                              AppLocalizations.of(context)!.keineErgebnisse,
-                              style: const TextStyle(fontSize: 20),
-                            )),
-                    ),
-                    Container(
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                            border: Border(top: BorderSide())),
-                        padding: const EdgeInsets.all(10),
-                        child: Text(AppLocalizations.of(context)!.globaleSuche,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20))),
-                    Expanded(
-                      child: searchListAllChatgroups.isNotEmpty
-                          ? ListView(
-                              shrinkWrap: true,
-                              children: createChatGroupContainers(
-                                  searchListAllChatgroups),
-                            )
-                          : Center(
-                              child: Text(
-                                  AppLocalizations.of(context)!.keineErgebnisse,
-                                  style: const TextStyle(fontSize: 20))),
-                    ),
-                  ],
-                ),
+              : showChatSearchResult(),
         ),
       )),
       floatingActionButton: FloatingActionButton(
         heroTag: "newChat",
+        tooltip: AppLocalizations.of(context)!.tooltipCreateNewChat,
         child: const Icon(Icons.create),
         onPressed: () => selectChatpartnerWindow(),
       ),

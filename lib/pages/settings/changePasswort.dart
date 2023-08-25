@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../global/custom_widgets.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../widgets/custom_appbar.dart';
+import '../../widgets/layout/custom_snackbar.dart';
+import '../../widgets/layout/custom_text_input.dart';
 
 class ChangePasswortPage extends StatelessWidget {
   TextEditingController passwortOldKontroller = TextEditingController();
@@ -42,7 +43,7 @@ class ChangePasswortPage extends StatelessWidget {
 
     userLogin(passwort) async {
       var userEmail = FirebaseAuth.instance.currentUser!.email;
-      var loginUser;
+      UserCredential? loginUser;
       try {
         loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: userEmail ?? "", password: passwort);
@@ -70,17 +71,16 @@ class ChangePasswortPage extends StatelessWidget {
         await FirebaseAuth.instance.currentUser
             ?.updatePassword(newPasswort);
 
-        customSnackbar(
-            context,
-            AppLocalizations.of(context)!.passwort +
-                " " +
-                AppLocalizations.of(context)!.erfolgreichGeaender,
-            color: Colors.green);
+        if (context.mounted){
+          customSnackbar(
+              context,
+              "${AppLocalizations.of(context)!.passwort} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
+              color: Colors.green);
 
-        Navigator.pop(context);
+          Navigator.pop(context);
+        }
       } catch (error) {
-        customSnackbar(
-            context, AppLocalizations.of(context)!.neuesPasswortSchwach);
+        if (context.mounted) customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortSchwach);
       }
     }
 
@@ -91,20 +91,20 @@ class ChangePasswortPage extends StatelessWidget {
           margin: const EdgeInsets.only(top: 20),
           child: Column(
             children: [
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.neuesPasswortEingeben,
                   passwortNewKontroller,
-                  passwort: true),
+                  hideInput: true),
               const SizedBox(height: 15),
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.neuesPasswortWiederholen,
                   passwortNewCheckKontroller,
-                  passwort: true),
+                  hideInput: true),
               const SizedBox(height: 15),
-              customTextInput(
+              CustomTextInput(
                   AppLocalizations.of(context)!.altesPasswortEingeben,
                   passwortOldKontroller,
-                  passwort: true),
+                  hideInput: true),
               const SizedBox(height: 20),
               FloatingActionButton.extended(
                   label: Text(

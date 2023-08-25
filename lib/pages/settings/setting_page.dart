@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
-import 'package:familien_suche/widgets/custom_appbar.dart';
-import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:familien_suche/widgets/layout/ownIconButton.dart';
+import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:familien_suche/pages/settings/changePasswort.dart';
 import 'package:familien_suche/pages/settings/change_aboutme.dart';
@@ -22,17 +22,19 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../global/global_functions.dart' as global_func;
 import '../../global/global_functions.dart';
+import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_variablen;
-import '../../global/custom_widgets.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
+import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_multi_select.dart';
 import '../../widgets/profil_image.dart';
+import '../../windows/donations.dart';
 import '../../windows/patchnotes.dart';
 import '../login_register_page/login_page.dart';
 import 'change_aufreise.dart';
 import 'change_besuchte_laender.dart';
 import 'change_children.dart';
 import 'change_social_media.dart';
-import 'change_trade.dart';
 import 'family_profil.dart';
 import 'privacy_security_page.dart';
 import 'feedback_page.dart';
@@ -41,20 +43,22 @@ import 'change_reiseart.dart';
 import 'change_name.dart';
 import 'change_email.dart';
 
-var borderColor = Colors.grey[200];
 double globalPadding = 30;
 double fontSize = 20;
-var userID = FirebaseAuth.instance.currentUser!.uid;
-var userProfil;
+String userID = FirebaseAuth.instance.currentUser!.uid;
+Map userProfil = Hive.box("secureBox").get("ownProfil");
+
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
 
   @override
-  _SettingPageState createState() => _SettingPageState();
+  State<SettingPage> createState() => _SettingPageState();
 }
 
-class _SettingPageState extends State<SettingPage>{
+
+class _SettingPageState extends State<SettingPage> {
+  
   @override
   void initState() {
     super.initState();
@@ -65,10 +69,6 @@ class _SettingPageState extends State<SettingPage>{
     userProfil = Hive.box("secureBox").get("ownProfil");
 
     return Scaffold(
-      appBar: _SettingsAppBar(
-        userProfil: userProfil,
-        refresh: () => setState(() {}),
-      ),
       body: SafeArea(
           child: Container(
         margin: const EdgeInsets.only(top: 10),
@@ -79,7 +79,7 @@ class _SettingPageState extends State<SettingPage>{
           }),
           child:
               ListView(padding: EdgeInsets.zero, shrinkWrap: true, children: [
-            _NameSection(),
+            _NameSection(refresh: () => setState(() {})),
             _ProfilSection(
               afterChange: () => setState(() {}),
             ),
@@ -92,108 +92,122 @@ class _SettingPageState extends State<SettingPage>{
   }
 }
 
-class _SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Map userProfil;
-  Function refresh;
-
-  _SettingsAppBar({Key? key, required this.userProfil, required this.refresh}) : super(key: key);
-
-  @override
-  Size get preferredSize => const Size.fromHeight(60.0);
-
-  @override
-  Widget build(BuildContext context) {
-    var textColor = Colors.black;
-
-    openSettingWindow() async {
-      return showMenu(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(5.0),
-            ),
-          ),
-          context: context,
-          position: const RelativeRect.fromLTRB(100, 0, 0, 100),
-          items: [
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => ChangeNamePage(
-                                    oldName: userProfil["name"],
-                                  ))).then((_) =>refresh()
-                      );
-                    },
-                    child: Text(AppLocalizations.of(context)!.nameAendern,
-                        style: TextStyle(color: textColor)))),
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => ChangeEmailPage())).then((_)=>refresh());
-                    },
-                    child: Text(AppLocalizations.of(context)!.emailAendern,
-                        style: TextStyle(color: textColor)))),
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      global_func.changePage(context, ChangePasswortPage());
-                    },
-                    child: Text(AppLocalizations.of(context)!.passwortVeraendern,
-                        style: TextStyle(color: textColor)))),
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      global_func.changePage(
-                          context, const FamilieProfilPage());
-                    },
-                    child: Text(AppLocalizations.of(context)!.familyProfil,
-                        style: TextStyle(color: textColor)))),
-            PopupMenuItem(
-                child: TextButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      global_func.changePageForever(context, LoginPage());
-                    },
-                    child: Text(AppLocalizations.of(context)!.abmelden,
-                        style: TextStyle(color: textColor)))),
-          ]);
-    }
-
-    return CustomAppBar(title: "", withLeading: false, buttons: [
-      IconButton(
-          onPressed: () => openSettingWindow(),
-          icon: Icon(Icons.more_vert, color: textColor))
-    ]);
-  }
-}
-
 class _NameSection extends StatelessWidget {
-  _NameSection({Key? key}) : super(key: key);
+  final Function refresh;
+  final Color textColor = Colors.black;
+
+  const _NameSection({Key? key, required this.refresh}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     userProfil = Hive.box("secureBox").get("ownProfil");
 
+    openSettingWindow() async {
+      return CustomPopupMenu(context, children: [
+        SimpleDialogOption(
+          child: Row(
+            children: [
+              const Icon(Icons.person),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.nameAendern,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => ChangeNamePage(
+                          oldName: userProfil["name"],
+                        ))).then((_) => refresh());
+          },
+        ),
+        SimpleDialogOption(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => ChangeEmailPage()))
+                .then((_) => refresh());
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.email),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.emailAendern,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+        ),
+        SimpleDialogOption(
+          onPressed: () {
+            Navigator.pop(context);
+            global_func.changePage(context, ChangePasswortPage());
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.password),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.passwortVeraendern,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+        ),
+        SimpleDialogOption(
+          onPressed: () {
+            Navigator.pop(context);
+            global_func.changePage(context, const FamilieProfilPage());
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.family_restroom),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.familyProfil,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+        ),
+        SimpleDialogOption(
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+            if (context.mounted) global_func.changePageForever(context, const LoginPage());
+          },
+          child: Row(
+            children: [
+              const Icon(
+                Icons.logout,
+                color: Colors.red,
+              ),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.abmelden,
+                  style: TextStyle(color: textColor)),
+            ],
+          ),
+        )
+      ]);
+    }
+
     return Container(
         width: double.maxFinite,
         padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 10, color: borderColor!))),
+            border: Border(bottom: BorderSide(width: 10, color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!
+                : Colors.grey[200]!))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              InkWell(
+                  onTap: () => openSettingWindow(),
+                  child: Icon(Icons.more_vert, color: textColor)),
+            ],
+          ),
           Row(
             children: [
               ProfilImage(userProfil, changeable: true, fullScreenWindow: true),
               const SizedBox(width: 10),
-              Flexible(
+              Expanded(
                 child: Text(
                   userProfil["name"],
                   style: const TextStyle(fontSize: 28),
@@ -202,7 +216,7 @@ class _NameSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(userProfil["email"])
+          Text(userProfil["email"]),
         ]));
   }
 }
@@ -212,11 +226,10 @@ class _ProfilSection extends StatelessWidget {
   var kinderAgeBox = ChildrenBirthdatePickerBox();
   var interessenInputBox =
       CustomMultiTextForm(auswahlList: global_variablen.interessenListe);
-  var reiseArtInput = CustomDropDownButton(items: global_variablen.reisearten);
-  var sprachenInputBox =
-      CustomMultiTextForm(auswahlList: global_variablen.sprachenListe);
+  var reiseArtInput = CustomDropdownButton(items: global_variablen.reisearten);
+  var sprachenInputBox = CustomMultiTextForm(auswahlList: const []);
   final bool spracheIstDeutsch = kIsWeb
-      ? window.locale.languageCode == "de"
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
   final Function afterChange;
 
@@ -241,8 +254,10 @@ class _ProfilSection extends StatelessWidget {
         : global_func.changeGermanToEnglish(userProfil["reiseart"]);
 
     sprachenInputBox.selected = List<String>.from(spracheIstDeutsch
-        ? global_func.changeEnglishToGerman(userProfil["sprachen"])
-        : global_func.changeGermanToEnglish(userProfil["sprachen"]));
+        ? ProfilSprachen()
+            .translateLanguageList(englishList: userProfil["sprachen"])
+        : ProfilSprachen()
+            .translateLanguageList(germanList: userProfil["sprachen"]));
   }
 
   _ProfilSection({Key? key, required this.afterChange}) : super(key: key);
@@ -253,6 +268,8 @@ class _ProfilSection extends StatelessWidget {
     List<String> besuchteLaender =
         List<String>.from(userProfil["besuchteLaender"] ?? []);
     var headLineColor = Theme.of(context).colorScheme.primary;
+
+    setData();
 
     profilThemeContainer(haupttext, beschreibung, page) {
       double screenWidth = MediaQuery.of(context).size.width;
@@ -300,21 +317,21 @@ class _ProfilSection extends StatelessWidget {
       if (bis == null) {
         text += " - offen";
       } else {
-        text += " - " +
-            bis.split(" ")[0].split("-").take(2).toList().reversed.join("-");
+        text +=
+            " - ${bis.split(" ")[0].split("-").take(2).toList().reversed.join("-")}";
       }
 
       return text;
     }
-
-    setData();
 
     return Container(
         width: double.maxFinite,
         padding:
             const EdgeInsets.only(top: 10, bottom: 15, left: 15, right: 15),
         decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(width: 10, color: borderColor!))),
+            border: Border(bottom: BorderSide(width: 10, color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[800]!
+                : Colors.grey[200]!))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -327,18 +344,18 @@ class _ProfilSection extends StatelessWidget {
               const Expanded(child: SizedBox.shrink()),
               const Icon(Icons.arrow_downward),
               Text(AppLocalizations.of(context)!.antippenZumAendern,
-                  style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                  style: TextStyle(color: Colors.grey[800], fontSize: 14)),
               const Icon(Icons.arrow_downward),
               const Expanded(child: SizedBox()),
-              GestureDetector(
-                  onTap: () {
-                    global_func.changePage(
-                        context, ShowProfilPage(profil: userProfil));
-                  },
-                  child: const Icon(
-                    Icons.preview,
-                    size: 40,
-                  ))
+              OwnIconButton(
+                icon: Icons.preview,
+                bigButton: true,
+                tooltipText: AppLocalizations.of(context)!.tooltipShowOwnProfil,
+                onPressed: () {
+                  global_func.changePage(
+                      context, ShowProfilPage(profil: userProfil));
+                },
+              )
             ]),
             const SizedBox(height: 5),
             Wrap(
@@ -352,6 +369,15 @@ class _ProfilSection extends StatelessWidget {
                     AppLocalizations.of(context)!.artDerReise,
                     ChangeReiseartPage(
                       oldInput: reiseArtInput.getSelected(),
+                      isGerman: spracheIstDeutsch,
+                    )),
+                profilThemeContainer(
+                    sprachenInputBox.getSelected() == null
+                        ? ""
+                        : sprachenInputBox.getSelected().join(", "),
+                    AppLocalizations.of(context)!.sprachen,
+                    ChangeSprachenPage(
+                      selected: sprachenInputBox.getSelected(),
                       isGerman: spracheIstDeutsch,
                     )),
                 profilThemeContainer(
@@ -374,15 +400,7 @@ class _ProfilSection extends StatelessWidget {
                       selected: interessenInputBox.getSelected(),
                       isGerman: spracheIstDeutsch,
                     )),
-                profilThemeContainer(
-                    sprachenInputBox.getSelected() == null
-                        ? ""
-                        : sprachenInputBox.getSelected().join(", "),
-                    AppLocalizations.of(context)!.sprachen,
-                    ChangeSprachenPage(
-                      selected: sprachenInputBox.getSelected(),
-                      isGerman: spracheIstDeutsch,
-                    )),
+
                 profilThemeContainer(
                     userProfil["aboutme"],
                     AppLocalizations.of(context)!.ueberMich,
@@ -408,7 +426,7 @@ class _ProfilSection extends StatelessWidget {
                     besuchteLaender.length.toString(),
                     AppLocalizations.of(context)!.besuchteLaender,
                     ChangeBesuchteLaenderPage(
-                        selected: besuchteLaender,
+                        visitedCountriesList: besuchteLaender,
                         isGerman: spracheIstDeutsch)),
                 profilThemeContainer(
                     userProfil["socialMediaLinks"].isEmpty
@@ -416,10 +434,6 @@ class _ProfilSection extends StatelessWidget {
                         : userProfil["socialMediaLinks"].length.toString(),
                     "Social Media Links",
                     const ChangeSocialMediaLinks()),
-                profilThemeContainer(
-                    userProfil["tradeNotize"],
-                    AppLocalizations.of(context)!.verkaufenTauschenSchenken,
-                    ChangeTradePage(oldText: userProfil["tradeNotize"])),
               ],
             ),
           ],
@@ -434,19 +448,22 @@ class _SettingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
-    settingThemeContainer(title, icon, function, {color = Colors.black}) {
+    settingThemeContainer(title, icon, function) {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
-        child: Row(
-          children: [
-            Icon(icon),
-            const SizedBox(width: 20),
-            Text(
-              title,
-              style: TextStyle(fontSize: fontSize - 4, color: color),
-            )
-          ],
+        child: Container(
+          margin: EdgeInsets.only(top: 10, bottom: 10),
+          child: Row(
+            children: [
+              Icon(icon),
+              const SizedBox(width: 20),
+              Text(
+                title,
+                style: TextStyle(fontSize: fontSize - 4),
+              )
+            ],
+          ),
         ),
       );
     }
@@ -461,13 +478,12 @@ class _SettingSection extends StatelessWidget {
                     color: headLineColor,
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
+            SizedBox(height: 10,),
             settingThemeContainer(
                 AppLocalizations.of(context)!.privatsphaereSicherheit,
                 Icons.lock,
                 () => global_func.changePage(
                     context, const PrivacySecurityPage())),
-            const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.benachrichtigungen,
                 Icons.notifications,
@@ -485,19 +501,22 @@ class _SupportInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     var headLineColor = Theme.of(context).colorScheme.primary;
 
-    settingThemeContainer(title, icon, function, {color = Colors.black}) {
+    settingThemeContainer(title, icon, function) {
       return GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: function,
-        child: Row(
-          children: [
-            Icon(icon),
-            const SizedBox(width: 20),
-            Text(
-              title,
-              style: TextStyle(fontSize: fontSize - 4, color: color),
-            )
-          ],
+        child: Container(
+          margin: EdgeInsets.only(top: 10, bottom: 10),
+          child: Row(
+            children: [
+              Icon(icon),
+              const SizedBox(width: 20),
+              Text(
+                title,
+                style: TextStyle(fontSize: fontSize - 4),
+              )
+            ],
+          ),
         ),
       );
     }
@@ -505,21 +524,15 @@ class _SupportInformation extends StatelessWidget {
     aboutAppWindow() async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-      showDialog(
+      if (context.mounted) {
+        showDialog(
           context: context,
           builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-              title: "families worldwide app",
+            return AboutDialog(
+              applicationName: "families worldwide",
+              applicationVersion: packageInfo.version,
+              applicationIcon: Image.asset('assets/WeltFlugzeug.png'),
               children: [
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Text("App Version: ",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(packageInfo.version),
-                  ],
-                ),
-                const SizedBox(height: 10),
                 InkWell(
                   onTap: () => openURL(
                       "https://github.com/derdrache/familienWeltweitVerbinden"),
@@ -545,12 +558,22 @@ class _SupportInformation extends StatelessWidget {
                     Text("Flutter"),
                   ],
                 ),
+                const SizedBox(height: 10),
+                const Row(
+                  children: [
+                    Text("Icons: ",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("created by Freepik - Flaticon"),
+                  ],
+                ),
                 const SizedBox(height: 20),
                 Text(AppLocalizations.of(context)!.aboutAppText)
               ],
             );
           });
+      }
     }
+
 
     return Container(
         padding: const EdgeInsets.all(20),
@@ -562,10 +585,9 @@ class _SupportInformation extends StatelessWidget {
                     color: headLineColor,
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             settingThemeContainer("Feedback", Icons.feedback,
                 () => global_func.changePage(context, FeedbackPage())),
-            const SizedBox(height: 20),
             settingThemeContainer(
                 "Support Chat",
                 Icons.chat,
@@ -573,25 +595,16 @@ class _SupportInformation extends StatelessWidget {
                     context,
                     ChatDetailsPage(
                         isChatgroup: true, connectedWith: "</support=1"))),
-            const SizedBox(height: 20),
             settingThemeContainer("Patch Notes", Icons.format_list_bulleted,
                 () => PatchnotesWindow(context: context).openWindow()),
-            const SizedBox(height: 20),
             settingThemeContainer(
                 AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
                 () => Share.share(AppLocalizations.of(context)!.teilenLinkText +
                     '\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
-            const SizedBox(height: 20),
             settingThemeContainer(
-                AppLocalizations.of(context)!.spenden, Icons.card_giftcard,
-                () async {
-              var url =
-                  Uri.parse("https://www.paypal.com/paypalme/DominikMast");
-
-              await launchUrl(url, mode: LaunchMode.inAppWebView);
-            }),
-            const SizedBox(height: 20),
+                AppLocalizations.of(context)!.spenden, Icons.favorite,
+                () => donationWindow(context)),
             settingThemeContainer(AppLocalizations.of(context)!.ueber,
                 Icons.info, () => aboutAppWindow()),
           ],
