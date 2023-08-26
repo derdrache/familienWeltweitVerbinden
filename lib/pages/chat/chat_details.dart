@@ -1671,6 +1671,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 TextWithHyperlinkDetection(
                                     text: messageText,
                                     fontsize: 16,
+                                    textColor: Colors.black,
                                     onTextTab: () =>
                                         openMessageMenu(message, index)),
                                 const SizedBox(width: 5),
