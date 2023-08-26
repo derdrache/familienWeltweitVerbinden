@@ -9,12 +9,12 @@ class TextWithHyperlinkDetection extends StatelessWidget {
   List<InlineSpan> textSpanList = [];
   Function? onTextTab;
   var hyperlinkColor = Colors.blue[700];
-  var textColor = Colors.black;
+  Color textColor;
   bool withoutActiveHyperLink;
   int? maxLines;
 
   TextWithHyperlinkDetection(
-      {Key? key, required this.text, this.fontsize = 15, this.onTextTab, this.withoutActiveHyperLink = false, this.maxLines})
+      {Key? key, required this.text, this.fontsize = 15, this.textColor = Colors.black,  this.onTextTab, this.withoutActiveHyperLink = false, this.maxLines})
       : super(key: key);
 
   @override
@@ -27,7 +27,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
       newTextList.add(TextSpan(
           text: text,
           recognizer: TapGestureRecognizer()..onTap = onTextTab == null ? null :() => onTextTab!(),
-          style: TextStyle(fontSize: fontsize)
+          style: TextStyle(fontSize: fontsize, color: textColor)
       ));
     }
 
