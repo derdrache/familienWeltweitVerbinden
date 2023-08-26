@@ -1181,8 +1181,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
                           )),
                         ),
                         const Positioned(
-                            top: -5,
-                            right: -5,
+                            top: 0,
+                            right: 0,
                             child: CloseButton(
                               color: Colors.red,
                             ))
