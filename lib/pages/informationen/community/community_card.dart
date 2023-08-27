@@ -67,7 +67,7 @@ class _CommunityCardState extends State<CommunityCard> {
               ? () => widget.afterPageVisit
               : null),
       child: Container(
-          width: 150 * sizeRefactor,
+          width: 160 * sizeRefactor,
           height: 225 * sizeRefactor,
           margin: widget.margin,
           decoration: BoxDecoration(
@@ -115,7 +115,7 @@ class _CommunityCardState extends State<CommunityCard> {
                 ],
               ),
               Container(
-                  padding: const EdgeInsets.only(top: 10, left: 5),
+                  padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(20.0),
@@ -131,7 +131,7 @@ class _CommunityCardState extends State<CommunityCard> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: fontSize + 1)),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10 * sizeRefactor),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

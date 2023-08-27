@@ -216,7 +216,7 @@ class _MeetupCardState extends State<MeetupCard> {
           MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
           whenComplete: () =>  widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
       child: Container(
-          width: 175 * sizeRefactor,
+          width: 160 * sizeRefactor,
           height: 250 * sizeRefactor,
           margin: widget.margin,
           decoration: BoxDecoration(
@@ -264,7 +264,7 @@ class _MeetupCardState extends State<MeetupCard> {
             ],
           ),
           Container(
-              padding: const EdgeInsets.only(top: 10, left: 5),
+              padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5),
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(20.0),
@@ -280,7 +280,7 @@ class _MeetupCardState extends State<MeetupCard> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: fontSize + 1)),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10 * sizeRefactor),
                   Row(
                     children: [
                       Text(AppLocalizations.of(context)!.datum,
