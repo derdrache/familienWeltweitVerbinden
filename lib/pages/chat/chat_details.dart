@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -2770,7 +2771,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 size: 34,
                                 color:
                                     Theme.of(context).colorScheme.secondary)),
-                        IconButton(
+                        if(!kIsWeb) IconButton(
                             padding: EdgeInsets.zero,
                             onPressed: () async => voiceMessageRecordMenu(),
                             tooltip: AppLocalizations.of(context)!
@@ -2779,6 +2780,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 size: 34,
                                 color:
                                     Theme.of(context).colorScheme.secondary)),
+                        SizedBox(width: 5)
                       ],
                     )
             ],
