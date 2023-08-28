@@ -1704,7 +1704,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
 
     cardMessageNew(String cardType, cardIdData, {smallCard = false}) {
-      Map cardData = getCardData(cardIdData);
+      Map? cardData = getCardData(cardIdData);
       if (cardData == null) return Container();
       return _getDisplayedCard(cardType, cardData, smallCard: smallCard);
     }
@@ -2102,7 +2102,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             child: Row(
               children: [
                 ProfilImage(participantProfil, size: 20,),
-                SizedBox(width: 10,),
+                const SizedBox(width: 10,),
                 Text(participantProfil["name"]),
               ],
             ),
@@ -2541,13 +2541,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       return GestureDetector(
         onTap: () => _joinChatGroup(),
         child: Container(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.black
-                : Colors.white,
             constraints: const BoxConstraints(
               minHeight: 60,
             ),
-            decoration: BoxDecoration(boxShadow: [
+            decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.green
+                    : Colors.green,boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 5,
@@ -2780,7 +2780,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 size: 34,
                                 color:
                                     Theme.of(context).colorScheme.secondary)),
-                        SizedBox(width: 5)
+                        const SizedBox(width: 5)
                       ],
                     )
             ],
