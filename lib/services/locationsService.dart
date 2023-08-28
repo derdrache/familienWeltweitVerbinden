@@ -222,7 +222,7 @@ class LocationService {
     return hasNumber;
   }
 
-  getCountryLocation(input) {
+  getCountryLocationData(input) {
     for (var i = 0; i < countryGeodata.length; i++) {
       var nameGer = countryGeodata[i]["nameGer"];
       var nameEng = countryGeodata[i]["nameEng"];
