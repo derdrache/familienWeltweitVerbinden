@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../services/locationsService.dart';
 import '../../../widgets/custom_appbar.dart';
 import 'location_card.dart';
 
@@ -18,19 +19,19 @@ class LocationPage extends StatefulWidget {
 
 class _LocationPageState extends State<LocationPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
-  var onSearch = false;
-  TextEditingController citySearchKontroller = TextEditingController();
+  bool onSearch = false;
+  TextEditingController searchKontroller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
   final _scrollController = ScrollController();
   int displayDataEntries = 20;
 
   @override
   void initState() {
-    _scrollBar();
+    scrollBarListener();
     super.initState();
   }
 
-  _scrollBar(){
+  scrollBarListener(){
     _scrollController.addListener(() {
       bool isBottom = _scrollController.position.atEdge;
 
@@ -57,13 +58,14 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   getAllSearchedLocations(){
-    var allCities = Hive.box('secureBox').get("stadtinfo");
-    var searchText = citySearchKontroller.text.toLowerCase();
-    var searchedCities = [];
+    List allCities = Hive.box('secureBox').get("stadtinfo");
+    String searchText = searchKontroller.text.toLowerCase();
+    List searchedCities = [];
 
     for (var city in allCities) {
       var containsSearch = city["ort"].toLowerCase().contains(searchText)
-          || city["ort"].contains(searchText)
+          || city["land"].toLowerCase().contains(searchText)
+          || LocationService().transformCountryLanguage(city["land"]).toLowerCase().contains(searchText)
           || searchText.isEmpty;
       var isCity = city["isCity"] == 1;
 
@@ -137,7 +139,7 @@ class _LocationPageState extends State<LocationPage> {
                     borderRadius: const BorderRadius.all(Radius.circular(20))
                   ),
                   child: TextField(
-                    controller: citySearchKontroller,
+                    controller: searchKontroller,
                     focusNode: searchFocusNode,
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.suche,
@@ -157,7 +159,7 @@ class _LocationPageState extends State<LocationPage> {
             onPressed: () {
               if(onSearch){
                 searchFocusNode.unfocus();
-                citySearchKontroller.clear();
+                searchKontroller.clear();
               }
 
               setState(() {
