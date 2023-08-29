@@ -579,9 +579,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     for (var i = 0; i < list.length; i++) {
       var listCountryLocation =
-          LocationService().getCountryLocation(list[i]["countryname"]);
+          LocationService().getCountryLocationData(list[i]["countryname"]);
       var profilCountryLocation =
-          LocationService().getCountryLocation(profil["land"]);
+          LocationService().getCountryLocationData(profil["land"]);
 
       if (profilCountryLocation == null) {
         checkNewCountry = false;
@@ -601,7 +601,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     if (checkNewCountry) {
       var country = profil["land"];
-      var position = LocationService().getCountryLocation(country);
+      var position = LocationService().getCountryLocationData(country);
       list.add({
         "name": "1",
         "countryname": country,
@@ -617,7 +617,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   createContinentsZoomLevel(list, profil) {
     var newPoint = true;
 
-    var landGedataProfil = LocationService().getCountryLocation(profil["land"]);
+    var landGedataProfil = LocationService().getCountryLocationData(profil["land"]);
     if (landGedataProfil == null) return list;
 
     landGedataProfil["kontinentGer"] ??= landGedataProfil["nameGer"];
@@ -943,7 +943,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     Set<String> titleList = {};
 
     if (filter == "kontinente") {
-      var locationData = LocationService().getCountryLocation(list[0]["land"]);
+      var locationData = LocationService().getCountryLocationData(list[0]["land"]);
       if (locationData["kontinentGer"] == locationData["kontinentEng"]) {
         return locationData["kontinentEng"];
       }

@@ -15,7 +15,6 @@ import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
@@ -453,7 +452,7 @@ class _SettingSection extends StatelessWidget {
         behavior: HitTestBehavior.translucent,
         onTap: function,
         child: Container(
-          margin: EdgeInsets.only(top: 10, bottom: 10),
+          margin: const EdgeInsets.only(top: 10, bottom: 10),
           child: Row(
             children: [
               Icon(icon),
@@ -478,7 +477,7 @@ class _SettingSection extends StatelessWidget {
                     color: headLineColor,
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold)),
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             settingThemeContainer(
                 AppLocalizations.of(context)!.privatsphaereSicherheit,
                 Icons.lock,
@@ -506,7 +505,7 @@ class _SupportInformation extends StatelessWidget {
         behavior: HitTestBehavior.translucent,
         onTap: function,
         child: Container(
-          margin: EdgeInsets.only(top: 10, bottom: 10),
+          margin: const EdgeInsets.only(top: 10, bottom: 10),
           child: Row(
             children: [
               Icon(icon),
@@ -573,7 +572,6 @@ class _SupportInformation extends StatelessWidget {
           });
       }
     }
-
 
     return Container(
         padding: const EdgeInsets.all(20),

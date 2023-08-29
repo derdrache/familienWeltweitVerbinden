@@ -49,7 +49,7 @@ class _MeetupPageState extends State<MeetupPage> {
     for (var meetup in allMeetups) {
       allMeetupCities.add(meetup["ort"]);
 
-      var countryData = LocationService().getCountryLocation(meetup["land"]);
+      var countryData = LocationService().getCountryLocationData(meetup["land"]);
       allMeetupCountries.add(
           spracheIstDeutsch ? countryData["nameGer"] : countryData["nameEng"]);
     }

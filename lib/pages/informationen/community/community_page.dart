@@ -41,7 +41,7 @@ class _CommunityPageState extends State<CommunityPage> {
     for (var community in allCommunities) {
       allCommunitiesCities.add(community["ort"]);
 
-      var countryData = LocationService().getCountryLocation(community["land"]);
+      var countryData = LocationService().getCountryLocationData(community["land"]);
       allCommunitiesCountries.add(
           spracheIstDeutsch ? countryData["nameGer"] : countryData["nameEng"]);
     }
