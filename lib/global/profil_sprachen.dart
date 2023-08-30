@@ -879,15 +879,14 @@ class ProfilSprachen{
     return _languages[isoCode];
   }
 
-  getIsoCode(language) {
-    String languageCode = "";
-
+  getIsoCode(String language) {
     for (var entry in _languages.entries) {
-      if(entry.value["nameGer"] == language || entry.value["nameEng"] == language){
-        languageCode = entry.key;
+
+      if(entry.value["nameGer"]?.toLowerCase() == language
+          || entry.value["nameEng"]?.toLowerCase() == language){
+         return entry.key;
       }
     }
-    return languageCode;
   }
 
   translateLanguageList({germanList, englishList}){
