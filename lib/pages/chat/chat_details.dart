@@ -102,8 +102,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   num unreadMessages = 0;
   List adminList = [mainAdmin];
   final translator = GoogleTranslator();
-  String ownLanguage =
-      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+  late List ownLanguages;
   int deletedUserColor = 4293467747;
   bool userJoinedChat = false;
   int displayDataEntries = 50;
@@ -120,6 +119,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   @override
   void initState() {
+    ownLanguages = [WidgetsBinding.instance.platformDispatcher.locales[0].languageCode];
+    List userLanguages = ownProfil["sprachen"];
+
+    for (var language in userLanguages) {
+      ownLanguages.add(ProfilSprachen().getIsoCode(language));
+    }
+
     _getAndSetChatData();
     widget.chatId ??= widget.groupChatData!["id"].toString();
     _setConnectionData();
@@ -1033,21 +1039,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       return message["message"];
     }
 
-    List userLanguages = ownProfil["sprachen"];
     String messageLanguage =
         message["language"] == "auto" ? "en" : message["language"];
     bool showOriginalMessage = message["original"] ?? false;
     bool understandMessageLanguage = false;
 
-    for (var language in userLanguages) {
-      if (ProfilSprachen().getIsoCode(language) == messageLanguage) {
-        understandMessageLanguage = true;
-      }
-    }
-
-    if (ownLanguage == messageLanguage ||
+    if (ownLanguages.contains(messageLanguage) ||
         message["translateMessage"].isEmpty ||
-        (messageLanguage == "en" && ownLanguage != "de") ||
         showOriginalMessage ||
         understandMessageLanguage) {
       return message["message"];
@@ -1443,14 +1441,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       String messageLanguage =
           message["language"] == "auto" ? "en" : message["language"];
-      bool showOriginalMessage = ownLanguage == messageLanguage ||
-          message["translateMessage"].isEmpty ||
-          (messageLanguage == "en" && ownLanguage != "de");
+      bool showOriginalMessage = ownLanguages.contains(messageLanguage) ||
+          message["translateMessage"].isEmpty ;
       bool showButton = true;
 
       if (message["von"] == userId ||
           !widget.isChatgroup ||
-          messageLanguage == ownLanguage) showButton = false;
+           ownLanguages.contains(messageLanguage)) showButton = false;
 
       if (showButton) {
         return Positioned(
@@ -1475,7 +1472,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           message["original"] = !message["original"];
                         });
                       }),
-                TextButton(
+                if(ownLanguages[0] != "en") TextButton(
                     child: Text(AppLocalizations.of(context)!.uebersetzen),
                     onPressed: () async {
                       String translationMessage =
@@ -1484,7 +1481,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       var translation = await translator.translate(
                           translationMessage,
                           from: "auto",
-                          to: ownLanguage);
+                          to: ownLanguages[0]);
 
                       if (context.mounted) {
                         showModalBottomSheet<void>(
