@@ -16,23 +16,26 @@ class ForceUpdatePage extends StatelessWidget {
       home: Scaffold(
         body: Container(
           margin: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(10),
           child: Center(
               child:
               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Image.asset('assets/WeltFlugzeug.png'),
-                const SizedBox(height: 50),
+                SizedBox(height: 150, width: 150, child: Image.asset('assets/launch_image.png')),
+                const SizedBox(height: 100),
                 Text(
                   spracheIstDeutsch
-                      ? "Families worldwide hat wichtige Updates bekommen"
-                      : "Families worldwide received important updates",
-                  style: const TextStyle(fontSize: 20),
+                      ? "Bitte aktualisiere\nfamilies worldwide"
+                      : "Please Update\n families worldwide",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 35),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 40),
                 Text(
                   spracheIstDeutsch
-                      ? "Damit die alten Fehler für alle sichtbar behoben sind, ist es nötig, die App auf den neusten Stand zu bringen\n\nBitte lade dir dafür die neuste Version im App Store runter."
-                      : "In order to fix the old bugs for everyone to see, it is necessary to update the app to the latest version\n\nPlease download the latest version from the App Store for this.",
-                  style: const TextStyle(fontSize: 16),
+                      ? "Diese Version der App wird nicht mehr unterstützt. Installieren Sie die neueste Version, um wieder auf alle Ihre Unterhaltungen zugreifen zu können."
+                      : "This version of the app is no longer supported. To get back to all your conversations, install latest version.",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 25),
                 ),
               ])),
         ),
