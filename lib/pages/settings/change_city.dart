@@ -153,7 +153,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     }
 
     StadtinfoDatabase().update(sql,
-        "WHERE (ort LIKE '%${locationDict["city"].replaceAll("'", "''")}%' OR ort LIKE '%${locationDict["city"].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
+        "WHERE (ort LIKE '%${locationDict["city"].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
 
     if(!cityInfo["familien"].contains(ownProfil["id"])){
       cityInfo["familien"].add(ownProfil["id"]);
