@@ -979,7 +979,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: InkWell(
-            onTap: isWorldwide ? null : () => isCreator
+            onTap: isWorldwide && !isCreator ? null : () => isCreator
                 ? _changeOrtWindow()
                 : global_func.changePage(context,
                     LocationInformationPage(ortName: widget.community["ort"])),
