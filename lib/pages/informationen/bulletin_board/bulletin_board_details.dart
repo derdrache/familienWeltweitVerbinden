@@ -149,12 +149,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     var imageList =
         await uploadAndSaveImage(context, "notes", folder: "notes/");
 
-    for (var i = 0; i < widget.note["images"].length; i++) {
-      if (widget.note["images"][i] == null) {
-        widget.note["images"][i] = imageList[0];
-        break;
-      }
-    }
+    widget.note["bilder"].add(imageList[0]);
 
     setState(() {});
   }
