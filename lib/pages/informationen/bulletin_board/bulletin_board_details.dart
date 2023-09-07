@@ -222,7 +222,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           child: !changeNote
               ? Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 22),
@@ -241,6 +241,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       ortAuswahlBox = GoogleAutoComplete(
         margin: const EdgeInsets.only(left: 10, right: 10),
         withOwnLocation: true,
+        withWorldwideLocation: true,
         hintText: locationText,
       );
 
@@ -250,7 +251,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             ? Row(
                 children: [
                   Text("${AppLocalizations.of(context)!.ort} ",
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black)),
                   InkWell(
@@ -294,7 +295,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                   alignment: Alignment.topLeft,
                   child: Text(
                     description,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.black),
                   ))
               : Column(
@@ -461,7 +462,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             showTitle(),
             showLocation(),
             showDescription(),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             showImages()
           ],
         ),

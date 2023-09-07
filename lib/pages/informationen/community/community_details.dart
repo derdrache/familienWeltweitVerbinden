@@ -339,6 +339,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   _changeOrtWindow() {
     var ortAuswahlBox = GoogleAutoComplete(
       hintText: AppLocalizations.of(context)!.ortEingeben,
+      withWorldwideLocation: true,
+      withOwnLocation: true,
     );
 
     showDialog(
