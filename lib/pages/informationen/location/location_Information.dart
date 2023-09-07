@@ -29,7 +29,7 @@ import 'weltkarte_mini.dart';
 class LocationInformationPage extends StatefulWidget {
   String ortName;
   bool fromCityPage;
-  int? insiderInfoId;
+  int? insiderInfoId = 0;
 
   LocationInformationPage({Key? key, required this.ortName, this.fromCityPage = false, this.insiderInfoId})
       : super(key: key);
@@ -537,6 +537,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
   late bool userSpeakGerman;
   int initalPage = 0;
+  CarouselController carouselController = CarouselController();
 
   @override
   void initState() {
@@ -621,6 +622,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     }
 
     var newUserInformation = {
+      "id": -1,
       "ort": widget.location["ort"],
       "sprache": "auto",
       "titleGer": title,
@@ -636,7 +638,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     setState(() {
       usersCityInformation.add(newUserInformation);
+      initalPage = usersCityInformation.length -1;
     });
+
+    carouselController.jumpToPage(usersCityInformation.length -1);
 
     Navigator.pop(context);
 
@@ -1029,6 +1034,10 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   Widget build(BuildContext context) {
+    usersCityInformationOriginal = [];
+    usersCityInformation.asMap().forEach((index, element) {
+      usersCityInformationOriginal.add(null);
+    });
 
     openInformationMenu(information) async {
       bool canChange = information["erstelltVon"] == userId;
@@ -1238,6 +1247,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       }
 
       return CarouselSlider(
+        carouselController: carouselController,
         options: CarouselOptions(height: double.infinity, initialPage: initalPage, enableInfiniteScroll: false),
         items: userCityInfo.map((card) {
           return Builder(
