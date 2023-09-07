@@ -395,6 +395,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
