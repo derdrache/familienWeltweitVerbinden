@@ -147,6 +147,9 @@ class _CommunityPageState extends State<CommunityPage> {
             margin: const EdgeInsets.all(15),
             community: community,
             withFavorite: true,
+            afterPageVisit: () {
+              setState(() {});
+            },
             afterFavorite: (){
               setState(() {});
             })

@@ -63,9 +63,7 @@ class _CommunityCardState extends State<CommunityCard> {
     return GestureDetector(
       onTap: () => global_func.changePage(
           context, CommunityDetails(community: widget.community),
-          whenComplete: widget.afterPageVisit != null
-              ? () => widget.afterPageVisit
-              : null),
+          whenComplete: widget.afterPageVisit),
       child: Container(
           width: 160 * sizeRefactor,
           height: 225 * sizeRefactor,
