@@ -93,18 +93,17 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
           child: Stack(
             children: [
               Container(
-                margin: const EdgeInsets.all(5),
                 width: 80,
                 height: 80,
-                decoration:
-                BoxDecoration(border: Border.all(), color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey
-                    : Colors.white),
-                child: value == null
-                    ? IconButton(
-                    onPressed: () => uploadImage(),
-                    icon: const Icon(Icons.upload))
-                    : CachedNetworkImage(imageUrl: value,),
+                margin: EdgeInsets.all(5),
+                child: Card(
+                  elevation: 12,
+                  child: value == null
+                      ? IconButton(
+                      onPressed: () => uploadImage(),
+                      icon: const Icon(Icons.upload))
+                      : CachedNetworkImage(imageUrl: value,),
+                ),
               ),
               if (value != null)
                 Positioned(
