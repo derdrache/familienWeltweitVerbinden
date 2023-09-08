@@ -315,18 +315,20 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     child: Stack(
                       children: [
                         Container(
-                          margin: const EdgeInsets.all(5),
                           width: 80,
                           height: 80,
-                          decoration: BoxDecoration(
-                              border: Border.all(), color: Colors.white),
-                          child: image != null
-                              ? CachedNetworkImage(
-                                  imageUrl: image,
-                                )
-                              : IconButton(
-                                  onPressed: () => uploadImage(),
-                                  icon: const Icon(Icons.upload)),
+                          margin: const EdgeInsets.all(5),
+                          child: Card(
+                            elevation: 12,
+                            child: image != null
+                                ? CachedNetworkImage(
+                              imageUrl: image,
+                            )
+                                : IconButton(
+                              onPressed: () => uploadImage(),
+                              icon: const Icon(Icons.upload)
+                            ),
+                          ),
                         ),
                         if (image != null && changeNote)
                           Positioned(
