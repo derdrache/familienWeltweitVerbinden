@@ -18,7 +18,6 @@ class CustomAlertDialog extends StatefulWidget {
       required this.children,
       this.actions,
       this.height,
-      //this.backgroundColor = Colors.white,
       this.windowPadding = const EdgeInsets.all(10)
       }) : super(key: key);
 
@@ -73,6 +72,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
                   child: const CircleAvatar(
                     child: Icon(
                       Icons.close,
+                      color: Colors.white,
                       size: 16,
                     ),
                     backgroundColor: Colors.red,

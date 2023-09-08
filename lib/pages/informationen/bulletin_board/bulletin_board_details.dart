@@ -17,6 +17,7 @@ import '../../../functions/upload_and_save_image.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/layout/custom_text_input.dart';
+import '../../../windows/image_fullscreen.dart';
 
 class BulletinBoardDetails extends StatefulWidget {
   Map note;
@@ -190,21 +191,6 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   Widget build(BuildContext context) {
     isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
 
-    imageFullscreen(image) {
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-              windowPadding: const EdgeInsets.all(30),
-              children: [
-                CachedNetworkImage(
-                  imageUrl: image,
-                )
-              ],
-            );
-          });
-    }
-
     showTitle() {
       String title;
 
@@ -324,7 +310,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
         child: Wrap(
           children: noteImages
               .map<Widget>((image) => InkWell(
-                    onTap: () => imageFullscreen(image),
+                    onTap: () => ImageFullscreen(context, image),
                     child: Stack(
                       children: [
                         Container(

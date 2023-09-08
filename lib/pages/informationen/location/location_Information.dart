@@ -23,7 +23,7 @@ import '../../../widgets/image_upload_box.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
-import '../../../widgets/nutzerrichtlinen.dart';
+import '../../../windows/image_fullscreen.dart';
 import '../../start_page.dart';
 import 'weltkarte_mini.dart';
 
@@ -1074,17 +1074,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       ]);
     }
 
-    imageFullscreen(image) {
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-              windowPadding: const EdgeInsets.all(30),
-              children: [CachedNetworkImage(imageUrl: image,)],
-            );
-          });
-    }
-
     insiderInfoBox(information, index) {
       information["index"] = index;
       Map informationText = getInsiderInfoText(information, index);
@@ -1153,7 +1142,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               margin: const EdgeInsets.all(10),
               child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 20, runSpacing: 10, children: [
                 for ( var image in informationImages ) InkWell(
-                  onTap: () => imageFullscreen(image),
+                  onTap: () => ImageFullscreen(context, image),
                   child: Card(
                     elevation: 12,
                     child: CachedNetworkImage(imageUrl:  image, width: 110,height: 100,),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../functions/upload_and_save_image.dart';
 import '../services/database.dart';
+import '../windows/image_fullscreen.dart';
 import 'dialogWindow.dart';
 
 class ImageUploadBox extends StatefulWidget {
@@ -42,17 +43,6 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
     for (var i = widget.images.length; i < widget.numerImages; i++) {
       widget.images.add(null);
     }
-  }
-
-  imageFullscreen(image) {
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return CustomAlertDialog(
-            windowPadding: const EdgeInsets.all(30),
-            children: [CachedNetworkImage(imageUrl: image,)],
-          );
-        });
   }
 
   uploadImage() async {
@@ -99,7 +89,7 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
         imageWidgets.add(InkWell(
           onTap: value == null
               ? () => uploadImage()
-              : () => imageFullscreen(value),
+              : () => ImageFullscreen(context, value),
           child: Stack(
             children: [
               Container(

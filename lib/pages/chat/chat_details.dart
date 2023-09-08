@@ -32,6 +32,7 @@ import '../../global/profil_sprachen.dart';
 import '../../streams/record_timer.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../windows/custom_popup_menu.dart';
+import '../../windows/image_fullscreen.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
 import '../informationen/meetups/meetupCard.dart';
@@ -1176,21 +1177,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     Color? timeStampColor = Colors.grey[600];
     Offset? tabPosition;
 
-    imageFullscreen(image) {
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-              windowPadding: const EdgeInsets.all(30),
-              children: [
-                CachedNetworkImage(
-                  imageUrl: image,
-                )
-              ],
-            );
-          });
-    }
-
     angehefteteNachrichten() {
       if (!userJoinedChat) {
         return const SizedBox.shrink();
@@ -1789,7 +1775,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     imageMessageNew(image) {
       return InkWell(
-        onTap: () => imageFullscreen(image),
+        onTap: () => ImageFullscreen(context, image),
         child: CachedNetworkImage(
             imageUrl: image,
             width: 200,
