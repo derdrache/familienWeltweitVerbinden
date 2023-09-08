@@ -160,18 +160,19 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
       ),
       body: Container(
         width: double.infinity,
-        height: double.infinity,
         margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.only(top: 10, bottom: 10),
         decoration: BoxDecoration(
             color: Colors.yellow[200],
             border: Border.all(),
             borderRadius: BorderRadius.circular(4)),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
                   setTitle(),
                   setLocation(),
                   setDescription(),
-                  const Expanded(child: SizedBox.shrink()),
+                  //const Expanded(child: SizedBox.shrink()),
                   imageUploadBox
                 ]
         ),
