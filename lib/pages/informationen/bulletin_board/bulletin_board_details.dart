@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
+import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_page.dart';
 import 'package:familien_suche/pages/informationen/location/location_Information.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
@@ -363,7 +364,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                   child: const Text("Ok"),
                   onPressed: () async {
                     deleteNote();
-                    Navigator.pop(context);
+                    changePage(context, const BulletinBoardPage());
                   },
                 ),
                 TextButton(
