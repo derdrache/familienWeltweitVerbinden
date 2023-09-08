@@ -70,11 +70,11 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
       "rotation": getRandomRange()
     };
 
-    saveInDB(newNote);
-
     var allBulletinBoardNotes =
         Hive.box('secureBox').get("bulletinBoardNotes") ?? [];
     allBulletinBoardNotes.add(newNote);
+
+    saveInDB(newNote);
 
     return newNote;
   }
