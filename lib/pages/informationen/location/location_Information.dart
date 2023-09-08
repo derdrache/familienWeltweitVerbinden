@@ -1069,12 +1069,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     insiderInfoBox(information, index) {
       information["index"] = index;
-      var informationText = getInsiderInfoText(information, index);
-      var showTitle = informationText["title"];
-      var showInformation = informationText["information"];
-      var translated = informationText["translated"];
+      Map informationText = getInsiderInfoText(information, index);
+      String showTitle = informationText["title"];
+      String showInformation = informationText["information"];
+      bool translated = informationText["translated"];
       var creatorProfil = getProfilFromHive(profilId: information["erstelltVon"]);
       String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
+      List informationImages = information["images"];
 
       return Container(
         margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 60),
@@ -1107,15 +1108,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                 ],
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                    margin: const EdgeInsets.only(left: 10, right: 10),
-                    child: TextWithHyperlinkDetection(
-                      text: showInformation,
-                      fontsize: 16,
-                    )),
-              ),
+            SingleChildScrollView(
+              child: Container(
+                  margin: const EdgeInsets.only(left: 10, right: 10),
+                  child: TextWithHyperlinkDetection(
+                    text: showInformation,
+                    fontsize: 16,
+                  )),
             ),
             if (translated)
               Padding(
@@ -1130,6 +1129,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   ],
                 ),
               ),
+            const Expanded(child: SizedBox.shrink()),
+            if(informationImages.isNotEmpty) Container(
+              alignment: Alignment.center,
+              margin: const EdgeInsets.all(10),
+              child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 20, runSpacing: 10, children: [
+                for ( var image in informationImages ) Card(elevation: 12, child: Image.network(image, width: 110,height: 100,),)
+              ],),
+            ),
             Padding(
               padding: const EdgeInsets.all(0),
               child: Row(
