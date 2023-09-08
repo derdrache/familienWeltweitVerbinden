@@ -755,7 +755,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     var informationTextKontroller =
         TextEditingController(text: informationData["information"]);
     var imageUploadBox = ImageUploadBox(
-      uploadedImages: informationData["images"], imageKategorie: "information",
+      uploadedImages: information["images"], imageKategorie: "information",
     );
 
     Future<void>.delayed(
@@ -826,6 +826,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         usersCityInformation[i]["informationGer"] = newInformation;
         usersCityInformation[i]["titleEng"] = newTitle;
         usersCityInformation[i]["informationEng"] = newInformation;
+        usersCityInformation[i]["images"] = images;
         break;
       }
     }
@@ -875,6 +876,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         allInformations[i]["informationGer"] = informationGer;
         allInformations[i]["titleEng"] = titleEng;
         allInformations[i]["informationEng"] = informationEng;
+        allInformations[i]["images"] = images;
         break;
       }
     }
