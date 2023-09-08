@@ -1206,22 +1206,26 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                             ShowProfilPage(
                               profil: creatorProfil,
                             )),
-                    child: Column(
-                      children: [
-                        if (creatorName.isNotEmpty)
+                    child: SizedBox(
+                      width: 100,
+                      child: Column(
+                        children: [
+                          if (creatorName.isNotEmpty)
+                            Text(
+                              "$creatorName ",
+                              maxLines: 1,
+                              style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
                           Text(
-                            "$creatorName ",
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        Text(
-                            information["erstelltAm"]
-                                .split("-")
-                                .reversed
-                                .join("-"),
-                            style: const TextStyle(color: Colors.black))
-                      ],
+                              information["erstelltAm"]
+                                  .split("-")
+                                  .reversed
+                                  .join("-"),
+                              style: const TextStyle(color: Colors.black))
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 5)
