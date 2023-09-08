@@ -747,8 +747,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     return data;
   }
 
-  changeInformationDialog(information) {
-    var informationData = getInsiderInfoText(information, null);
+  changeInformationDialog(information, index) {
+    var informationData = getInsiderInfoText(information, index);
     var titleTextKontroller =
         TextEditingController(text: informationData["title"]);
     var informationTextKontroller =
@@ -991,6 +991,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     bool canSpeakInformationLanguage = information["sprache"] == systemLanguage ||
             ownlanguages.contains(informationLanguage[0]) ||
             ownlanguages.contains(informationLanguage[1]);
+
     if(usersCityInformationOriginal[index] == null) canSpeakInformationLanguage ? usersCityInformationOriginal[index] = true : usersCityInformationOriginal[index] = false;
 
     if (information["titleGer"].isEmpty) {
@@ -1039,7 +1040,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       usersCityInformationOriginal.add(null);
     });
 
-    openInformationMenu(information) async {
+    openInformationMenu(information, index) async {
       bool canChange = information["erstelltVon"] == userId;
       usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
 
@@ -1048,7 +1049,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         if (canChange)
           SimpleDialogOption(
             child: Text(AppLocalizations.of(context)!.bearbeiten),
-            onPressed: () => changeInformationDialog(information),
+            onPressed: () => changeInformationDialog(information, index),
           ),
         SimpleDialogOption(
           child: Text(AppLocalizations.of(context)!.kopieren),
@@ -1101,7 +1102,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                       )),
                   const Expanded(child: SizedBox.shrink()),
                   InkWell(
-                    onTap: () => openInformationMenu(information),
+                    onTap: () => openInformationMenu(information, index),
                     child: const Icon(Icons.more_horiz),
                   ),
                   const SizedBox(width: 5)
