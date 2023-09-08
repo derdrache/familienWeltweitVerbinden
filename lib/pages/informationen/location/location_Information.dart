@@ -913,7 +913,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             builder: (BuildContext context) {
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.informationLoeschen,
-                height: 90,
+                height: 100,
                 actions: [
                   TextButton(
                     child: const Text("Ok"),
@@ -1049,20 +1049,30 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         if (canChange)
           SimpleDialogOption(
             child: Text(AppLocalizations.of(context)!.bearbeiten),
-            onPressed: () => changeInformationDialog(information, index),
+            onPressed: () {
+              Navigator.pop(context);
+              changeInformationDialog(information, index);
+            }
           ),
         SimpleDialogOption(
           child: Text(AppLocalizations.of(context)!.kopieren),
-          onPressed: () => copyInformationDialog(information),
+          onPressed: () {
+            Navigator.pop(context);
+            copyInformationDialog(information);
+          }
         ),
         SimpleDialogOption(
           child: Text(AppLocalizations.of(context)!.melden),
-          onPressed: () => reportInformationDialog(information),
+          onPressed: () {
+            Navigator.pop(context);
+            reportInformationDialog(information);
+          }
         ),
         if (canChange)
           SimpleDialogOption(
               child: Text(AppLocalizations.of(context)!.loeschen),
               onPressed: () {
+                Navigator.pop(context);
                 deleteInformationDialog(information);
               }),
       ]);
@@ -1076,6 +1086,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       bool translated = informationText["translated"];
       var creatorProfil = getProfilFromHive(profilId: information["erstelltVon"]);
       String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
+      print(information["images"]);
       List informationImages = information["images"];
 
       return Container(
