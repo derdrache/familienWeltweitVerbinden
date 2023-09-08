@@ -11,11 +11,7 @@ import '../../start_page.dart';
 import 'bulletin_board_note.dart';
 
 class BulletinBoardPage extends StatefulWidget {
-  final bool forCity;
-  final bool forLand;
-
-  const BulletinBoardPage({Key? key, this.forCity = false, this.forLand = false})
-      : super(key: key);
+  const BulletinBoardPage({Key? key}) : super(key: key);
 
   @override
   State<BulletinBoardPage> createState() => _BulletinBoardPageState();
@@ -106,10 +102,13 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
                     child: SizedBox(
                       width: double.infinity,
                       child: Wrap(alignment: WrapAlignment.center, children: [
-                        for (var note in onSearch
-                            ? getAllSearchBulletinNotes()
-                            : allBulletinBoardNotes)
-                          BulletinBoardCard(note: note)
+                        for (var note in getAllSearchBulletinNotes())
+                          BulletinBoardCard(
+                            note: note,
+                            afterPageVisit: () {
+                              setState(() {});
+                            },
+                          )
                       ]),
                     )),
               ),
