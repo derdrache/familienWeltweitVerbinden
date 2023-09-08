@@ -639,6 +639,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     setState(() {
       usersCityInformation.add(newUserInformation);
       initalPage = usersCityInformation.length -1;
+      usersCityInformationOriginal.add(null);
     });
 
     carouselController.jumpToPage(usersCityInformation.length -1);
@@ -1035,11 +1036,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    usersCityInformationOriginal = [];
-    usersCityInformation.asMap().forEach((index, element) {
-      usersCityInformationOriginal.add(null);
-    });
-
     openInformationMenu(information, index) async {
       bool canChange = information["erstelltVon"] == userId;
       usersCityInformation = getCityUserInfoFromHive(widget.location["ort"]);
@@ -1086,7 +1082,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       bool translated = informationText["translated"];
       var creatorProfil = getProfilFromHive(profilId: information["erstelltVon"]);
       String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
-      print(information["images"]);
       List informationImages = information["images"];
 
       return Container(
