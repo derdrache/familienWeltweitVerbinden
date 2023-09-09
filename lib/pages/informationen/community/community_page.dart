@@ -223,7 +223,7 @@ class _CommunityPageState extends State<CommunityPage> {
               ],
             ),
             if(onSearch) Positioned(
-                bottom: 15,
+                bottom: getInvite ? 125 : 15,
                 right: 15,
                 child: Container(
                   width: width*0.9,
