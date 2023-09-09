@@ -611,7 +611,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   }
 
   _openGroupChat() {
-    bool hasSecretChat = widget.community["secretChat"]?.isOdd ?? false;
+    bool hasSecretChat = widget.community["secretChat"] == true || widget.community["secretChat"] == 1;
     bool hasAccess = !hasSecretChat || isMember || isCreator;
 
     if (!hasAccess) {
