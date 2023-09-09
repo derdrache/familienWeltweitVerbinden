@@ -41,7 +41,8 @@ class _CommunityPageState extends State<CommunityPage> {
     for (var community in allCommunities) {
       allCommunitiesCities.add(community["ort"]);
 
-      var countryData = LocationService().getCountryLocationData(community["land"]);
+      var countryData =
+          LocationService().getCountryLocationData(community["land"]);
       allCommunitiesCountries.add(
           spracheIstDeutsch ? countryData["nameGer"] : countryData["nameEng"]);
     }
@@ -85,36 +86,37 @@ class _CommunityPageState extends State<CommunityPage> {
         "WHERE id = '${allCommunities[invitedCommunityIndex]["id"]}'");
   }
 
-  getAllSearchCommunities(){
+  getAllSearchCommunities() {
     var searchedCommunities = [];
     var searchText = communitySearchKontroller.text.toLowerCase();
 
-    if(searchText.isEmpty) return allCommunities;
+    if (searchText.isEmpty) return allCommunities;
 
-    for(var community in allCommunities){
+    for (var community in allCommunities) {
       bool nameKondition = community["name"].toLowerCase().contains(searchText);
-      bool countryKondition = community["land"].toLowerCase().contains(searchText) ||
-          LocationService()
-              .transformCountryLanguage(community["land"])
-              .toLowerCase()
-              .contains(searchText);
+      bool countryKondition =
+          community["land"].toLowerCase().contains(searchText) ||
+              LocationService()
+                  .transformCountryLanguage(community["land"])
+                  .toLowerCase()
+                  .contains(searchText);
       bool cityKondition = community["ort"].toLowerCase().contains(searchText);
 
-      if(nameKondition || countryKondition || cityKondition) searchedCommunities.add(community);
-
+      if (nameKondition || countryKondition || cityKondition)
+        searchedCommunities.add(community);
     }
 
     return searchedCommunities;
   }
 
-  getAllFavoritesCommunities(){
+  getAllFavoritesCommunities() {
     var favoritesCommunities = [];
 
-    for(var community in allCommunities){
+    for (var community in allCommunities) {
       var myCommunity = community["erstelltVon"].contains(userId);
       var isFavorite = community["interesse"].contains(userId);
 
-      if(myCommunity || isFavorite) favoritesCommunities.add(community);
+      if (myCommunity || isFavorite) favoritesCommunities.add(community);
     }
 
     return favoritesCommunities;
@@ -128,18 +130,21 @@ class _CommunityPageState extends State<CommunityPage> {
     String onSearchText = onSearch ? AppLocalizations.of(context)!.suche : "";
 
     showCommunities() {
-      List shownCommunities = onSearch ? getAllSearchCommunities() : getAllFavoritesCommunities();
+      List shownCommunities =
+          onSearch ? getAllSearchCommunities() : getAllFavoritesCommunities();
       List<Widget> communities = [];
-      var emptyText = AppLocalizations.of(context)!.nochKeinegemeinschaftVorhanden;
+      var emptyText =
+          AppLocalizations.of(context)!.nochKeinegemeinschaftVorhanden;
       var emptySearchText = AppLocalizations.of(context)!.sucheKeineErgebnisse;
 
       if (shownCommunities.isEmpty) {
         communities.add(SizedBox(
           height: 300,
           child: Center(
-              child: Text(onSearch ? emptySearchText : emptyText,
-                style: const TextStyle(fontSize: 20),
-              )),
+              child: Text(
+            onSearch ? emptySearchText : emptyText,
+            style: const TextStyle(fontSize: 20),
+          )),
         ));
       }
 
@@ -151,22 +156,18 @@ class _CommunityPageState extends State<CommunityPage> {
             afterPageVisit: () {
               setState(() {});
             },
-            afterFavorite: (){
+            afterFavorite: () {
               setState(() {});
-            })
-        );
+            }));
       }
 
       return SingleChildScrollView(
         child: SizedBox(
           width: double.infinity,
-          child: Wrap(
-              alignment: WrapAlignment.center,
-              children: [
-                ...communities,
-                if(onSearch) const SizedBox(height: 330)
-              ]
-          ),
+          child: Wrap(alignment: WrapAlignment.center, children: [
+            ...communities,
+            if (onSearch) const SizedBox(height: 330)
+          ]),
         ),
       );
     }
@@ -213,6 +214,17 @@ class _CommunityPageState extends State<CommunityPage> {
     return Scaffold(
       appBar: CustomAppBar(
         title: "$onSearchText Communities",
+        leading: onSearch
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  setState(() {
+                    onSearch = false;
+                  });
+                },
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+              )
+            : null,
       ),
       body: SafeArea(
         child: Stack(
@@ -223,29 +235,28 @@ class _CommunityPageState extends State<CommunityPage> {
                 if (getInvite) showInvite(),
               ],
             ),
-            if(onSearch) Positioned(
-                bottom: getInvite ? 125 : 15,
-                right: 15,
-                child: Container(
-                  width: width*0.9,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      border: Border.all(),
-                      color: Colors.white,
-                      borderRadius: const BorderRadius.all(Radius.circular(20))
-                  ),
-                  child: TextField(
-                    controller: communitySearchKontroller,
-                    focusNode: searchFocusNode,
-                    decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.suche,
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.all(10)
+            if (onSearch)
+              Positioned(
+                  bottom: getInvite ? 125 : 15,
+                  right: 15,
+                  child: Container(
+                    width: width * 0.9,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        color: Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20))),
+                    child: TextField(
+                      controller: communitySearchKontroller,
+                      focusNode: searchFocusNode,
+                      decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.suche,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(10)),
+                      onChanged: (_) => setState(() {}),
                     ),
-                    onChanged: (_) => setState((){}),
-                  ),
-                )
-            )
+                  ))
           ],
         ),
       ),
@@ -256,15 +267,14 @@ class _CommunityPageState extends State<CommunityPage> {
               heroTag: "create Community",
               tooltip: AppLocalizations.of(context)!.tooltipCommunityErstellen,
               child: const Icon(Icons.create),
-              onPressed: () =>
-                  changePage(context, const CommunityErstellen())),
+              onPressed: () => changePage(context, const CommunityErstellen())),
           const SizedBox(height: 10),
           FloatingActionButton(
-            mini: onSearch ? true: false,
+            mini: onSearch ? true : false,
             backgroundColor: onSearch ? Colors.red : null,
             tooltip: AppLocalizations.of(context)!.tooltipCommunitySuche,
             onPressed: () {
-              if(onSearch){
+              if (onSearch) {
                 searchFocusNode.unfocus();
                 communitySearchKontroller.clear();
               }
@@ -275,7 +285,7 @@ class _CommunityPageState extends State<CommunityPage> {
             },
             child: Icon(onSearch ? Icons.close : Icons.search),
           ),
-          if(getInvite) const SizedBox(height: 110),
+          if (getInvite) const SizedBox(height: 110),
         ],
       ),
     );
