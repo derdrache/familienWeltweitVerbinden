@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
+import 'package:familien_suche/pages/informationen/community/community_page.dart';
 import 'package:familien_suche/pages/show_profil.dart';
+import 'package:familien_suche/pages/start_page.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -717,7 +719,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
                     dbDeleteImage(widget.community["bild"]);
 
-                    Navigator.pop(context);
+                    global_func.changePage(context, StartPage(selectedIndex: 2,));
+                    global_func.changePage(context, CommunityPage());
                   },
                 ),
                 TextButton(
@@ -747,7 +750,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   CustomTextInput(
                       AppLocalizations.of(context)!.communityMeldenFrage,
                       reportController,
-                      moreLines: 10),
+                      moreLines: 8),
                   Container(
                     margin: const EdgeInsets.only(left: 30, top: 10, right: 30),
                     child: FloatingActionButton.extended(
