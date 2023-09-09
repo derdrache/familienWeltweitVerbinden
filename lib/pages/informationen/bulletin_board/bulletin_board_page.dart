@@ -83,14 +83,18 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
         appBar: CustomAppBar(
           title:
               "$onSearchText ${AppLocalizations.of(context)!.schwarzesBrett}",
-          leading: IconButton(
-            onPressed: () => global_functions.changePageForever(
-                context,
-                StartPage(
-                  selectedIndex: 2,
-                )),
-            icon: const Icon(Icons.arrow_back),
-          ),
+          leading: onSearch
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      onSearch = false;
+                    });
+                  },
+                  tooltip:
+                      MaterialLocalizations.of(context).openAppDrawerTooltip,
+                )
+              : null,
         ),
         body: SafeArea(
           child: Stack(

@@ -49,7 +49,8 @@ class _MeetupPageState extends State<MeetupPage> {
     for (var meetup in allMeetups) {
       allMeetupCities.add(meetup["ort"]);
 
-      var countryData = LocationService().getCountryLocationData(meetup["land"]);
+      var countryData =
+          LocationService().getCountryLocationData(meetup["land"]);
       allMeetupCountries.add(
           spracheIstDeutsch ? countryData["nameGer"] : countryData["nameEng"]);
     }
@@ -140,14 +141,18 @@ class _MeetupPageState extends State<MeetupPage> {
     return Scaffold(
       appBar: CustomAppBar(
           title: pageTitle,
-          leading: IconButton(
-            onPressed: () => global_functions.changePageForever(
-                context,
-                StartPage(
-                  selectedIndex: 2,
-                )),
-            icon: const Icon(Icons.arrow_back),
-          )),
+          leading: onSearch
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      onSearch = false;
+                    });
+                  },
+                  tooltip:
+                      MaterialLocalizations.of(context).openAppDrawerTooltip,
+                )
+              : null),
       body: SafeArea(
         child: Stack(
           children: [
