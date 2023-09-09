@@ -11,12 +11,14 @@ class LocationCard extends StatefulWidget {
   Map location;
   bool fromCityPage;
   bool smallCard;
+  Function? afterLike;
 
   LocationCard(
       {Key? key,
       required this.location,
       this.fromCityPage = false,
-      this.smallCard = false})
+      this.smallCard = false,
+      this.afterLike})
       : super(key: key);
 
   @override
@@ -27,6 +29,7 @@ class _LocationCardState extends State<LocationCard> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   late bool hasInterest;
   late bool isCity;
+
 
   @override
   void initState() {
@@ -66,6 +69,7 @@ class _LocationCardState extends State<LocationCard> {
     }
 
     setState(() {});
+    if (widget.afterLike != null) widget.afterLike!();
 
     return hasInterest;
   }

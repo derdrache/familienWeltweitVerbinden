@@ -105,6 +105,11 @@ class _LocationPageState extends State<LocationPage> {
       interestCitiyCards.add(LocationCard(
         location: city,
         fromCityPage: true,
+        afterLike: (){
+          setState(() {
+
+          });
+        },
       ));
     }
 
