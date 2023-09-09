@@ -33,7 +33,6 @@ class _MeetupPageState extends State<MeetupPage> {
   bool onSearch = false;
   TextEditingController meetupSearchKontroller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
-  String pageTitle = "Meetups";
   var spracheIstDeutsch = kIsWeb
       ? ui.PlatformDispatcher.instance.locale.languageCode == "de"
       : io.Platform.localeName == "de_DE";
@@ -140,7 +139,9 @@ class _MeetupPageState extends State<MeetupPage> {
 
     return Scaffold(
       appBar: CustomAppBar(
-          title: pageTitle,
+          title: onSearch
+              ? "${AppLocalizations.of(context)!.suche} Meetups"
+              : "Meetups",
           leading: onSearch
               ? IconButton(
                   icon: const Icon(Icons.arrow_back),
@@ -200,11 +201,8 @@ class _MeetupPageState extends State<MeetupPage> {
             backgroundColor: onSearch ? Colors.red : null,
             onPressed: () {
               if (onSearch) {
-                pageTitle = "Meetups";
                 searchFocusNode.unfocus();
                 meetupSearchKontroller.clear();
-              } else {
-                pageTitle = "${AppLocalizations.of(context)!.suche} Meetups";
               }
 
               setState(() {
