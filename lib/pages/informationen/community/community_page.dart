@@ -173,7 +173,7 @@ class _CommunityPageState extends State<CommunityPage> {
     showInvite() {
       return Container(
         padding: const EdgeInsets.all(10),
-        height: 112,
+        height: 120,
         decoration: BoxDecoration(
           border: Border.all(),
         ),
