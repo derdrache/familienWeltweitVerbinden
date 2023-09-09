@@ -1,6 +1,7 @@
 import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/global_functions.dart' as global_func;
 import 'package:familien_suche/pages/chat/chat_details.dart';
+import 'package:familien_suche/pages/informationen/meetups/meetup_page.dart';
 import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import '../../../widgets/layout/custom_text_input.dart';
 import '../../../services/database.dart';
 import '../../../windows/all_user_select.dart';
 import '../../show_profil.dart';
+import '../../start_page.dart';
 import 'meetup_card_details.dart';
 
 var userId = Hive.box("secureBox").get("ownProfil")["id"];
@@ -200,11 +202,12 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
   }
 
   deleteMeetup(){
-
-
     MeetupDatabase().delete(widget.meetupData["id"]);
 
     dbDeleteImage(widget.meetupData["bild"]);
+
+    global_func.changePage(context, StartPage(selectedIndex: 2,));
+    global_func.changePage(context, const MeetupPage());
   }
 
   sendTakePartNotification(meetupData){

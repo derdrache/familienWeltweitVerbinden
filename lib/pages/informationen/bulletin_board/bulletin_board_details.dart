@@ -19,6 +19,7 @@ import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../windows/image_fullscreen.dart';
+import '../../start_page.dart';
 
 class BulletinBoardDetails extends StatefulWidget {
   Map note;
@@ -366,6 +367,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                   child: const Text("Ok"),
                   onPressed: () async {
                     deleteNote();
+                    changePage(context, StartPage(selectedIndex: 2,));
                     changePage(context, const BulletinBoardPage());
                   },
                 ),
