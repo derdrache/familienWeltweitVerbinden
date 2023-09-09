@@ -178,6 +178,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
     }
 
     return Scaffold(
+        resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
           title: AppLocalizations.of(context)!.communityErstellen,
           buttons: [
