@@ -64,12 +64,13 @@ class _CommunityPageState extends State<CommunityPage> {
   communityEinladungAnnehmen() {
     setState(() {
       allCommunities[invitedCommunityIndex]["members"].add(userId);
+      allCommunities[invitedCommunityIndex]["interesse"].add(userId);
       allCommunities[invitedCommunityIndex]["einladung"].remove(userId);
       getInvite = false;
     });
 
     CommunityDatabase().update(
-        "einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId'))), members = JSON_ARRAY_APPEND(members, '\$', '$userId')",
+        "einladung = JSON_REMOVE(einladung, JSON_UNQUOTE(JSON_SEARCH(einladung, 'one', '$userId'))), members = JSON_ARRAY_APPEND(members, '\$', '$userId') , interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
         "WHERE id = '${allCommunities[invitedCommunityIndex]["id"]}'");
   }
 
