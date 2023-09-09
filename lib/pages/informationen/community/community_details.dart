@@ -720,7 +720,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     dbDeleteImage(widget.community["bild"]);
 
                     global_func.changePage(context, StartPage(selectedIndex: 2,));
-                    global_func.changePage(context, CommunityPage());
+                    global_func.changePage(context, const CommunityPage());
                   },
                 ),
                 TextButton(
@@ -895,8 +895,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           ],
         ),
         onPressed: () {
-          Navigator.pop(context);
           _removeMember(userId);
+
+          widget.community["interesse"].remove(userId);
+          updateHiveCommunity(widget.community["id"], "interesse", widget.community["interesse"]);
+
+          global_func.changePage(context, StartPage(selectedIndex: 2,));
+          global_func.changePage(context, const CommunityPage());
         },
       );
     }
