@@ -172,7 +172,6 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
                   setTitle(),
                   setLocation(),
                   setDescription(),
-                  //const Expanded(child: SizedBox.shrink()),
                   imageUploadBox
                 ]
         ),
