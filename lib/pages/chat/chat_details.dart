@@ -1704,25 +1704,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
-      bool replayContainsImage = replyMessage["images"].isNotEmpty;
-      String? cardTyp;
 
-      if (replyMessage["message"].contains("</eventId=")) {
-        cardTyp = "event";
-      } else if (replyMessage["message"].contains("</communityId=")) {
-        cardTyp = "community";
-      } else if (replyMessage["message"].contains("</cityId=")) {
-        cardTyp = "location";
-      }
-
-      Map messageFromProfil =
-          getProfilFromHive(profilId: replyMessage["von"]) ?? {};
-      var replyColor =
-          messageFromProfil["bildStandardFarbe"] == deletedUserColor
-              ? Colors.greenAccent[100]
-              : messageFromProfil["bildStandardFarbe"] != null
-                  ? Color(messageFromProfil["bildStandardFarbe"])
-                  : Colors.black;
 
       if (replyMessage["von"] == null) {
         return Text(
@@ -1730,6 +1712,27 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           style: const TextStyle(fontWeight: FontWeight.bold),
         );
       } else {
+        bool replayContainsImage = replyMessage["images"].isNotEmpty;
+        String? cardTyp;
+
+        if (replyMessage["message"].contains("</eventId=")) {
+          cardTyp = "event";
+        } else if (replyMessage["message"].contains("</communityId=")) {
+          cardTyp = "community";
+        } else if (replyMessage["message"].contains("</cityId=")) {
+          cardTyp = "location";
+        }
+
+        Map messageFromProfil =
+            getProfilFromHive(profilId: replyMessage["von"]) ?? {};
+        var replyColor =
+        messageFromProfil["bildStandardFarbe"] == deletedUserColor
+            ? Colors.greenAccent[100]
+            : messageFromProfil["bildStandardFarbe"] != null
+            ? Color(messageFromProfil["bildStandardFarbe"])
+            : Colors.black;
+
+
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
