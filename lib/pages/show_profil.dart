@@ -304,7 +304,7 @@ class _AppBarState extends State<_AppBar> {
     ownProfil["friendlist"] = userFriendlist;
     localBox.put("ownProfil", ownProfil);
 
-    customSnackbar(context, snackbarText, color: Colors.green);
+    customSnackBar(context, snackbarText, color: Colors.green);
 
     ProfilDatabase().updateProfil(
         "friendlist = '${jsonEncode(userFriendlist)}'", "WHERE id = '$userId'");
@@ -338,7 +338,7 @@ class _AppBarState extends State<_AppBar> {
 
     Hive.box('secureBox').put("profils", allProfils);
 
-    customSnackbar(context, snackbarText, color: Colors.green);
+    customSnackBar(context, snackbarText, color: Colors.green);
 
     ProfilDatabase()
         .updateProfil(databaseQuery, "WHERE id = '${widget.profil["id"]}'");
@@ -478,7 +478,7 @@ class _AppBarState extends State<_AppBar> {
                                 "Melde User id: ${widget.profil["id"]}",
                                 meldeTextKontroller.text);
                             Navigator.pop(context);
-                            customSnackbar(context,
+                            customSnackBar(context,
                                 AppLocalizations.of(context)!.benutzerGemeldet,
                                 color: Colors.green);
                           },

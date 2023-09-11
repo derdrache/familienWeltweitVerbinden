@@ -62,7 +62,7 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
     var oldImage = widget.meetupData["bild"];
 
     if (selectedImage == "" && ownPictureKontroller.text == "") {
-      customSnackbar(context, AppLocalizations.of(context)!.bitteBildAussuchen);
+      customSnackBar(context, AppLocalizations.of(context)!.bitteBildAussuchen);
       return;
     }
 

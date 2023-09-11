@@ -109,15 +109,15 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
       accounterSuccessfullyCreated = true;
     } on FirebaseAuthException catch (error) {
       if (error.code == "email-already-in-use") {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.emailInBenutzung);
       } else if (error.code == "invalid-email") {
-        customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
+        customSnackBar(context, AppLocalizations.of(context)!.emailUngueltig);
       } else if (error.code == "weak-password") {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.passwortSchwach);
       } else if (error.code == "network-request-failed") {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.keineVerbindungInternet);
       }
       pageController.jumpToPage(0);
@@ -277,7 +277,7 @@ class SliderStepOne extends StatelessWidget {
         await ProfilDatabase().getData("id", "WHERE name = '$userName'");
 
     if(userExist != false){
-      customSnackbar(context, AppLocalizations.of(context)!.benutzerNamevergeben);
+      customSnackBar(context, AppLocalizations.of(context)!.benutzerNamevergeben);
       return false;
     }
 
@@ -392,16 +392,16 @@ class SliderStepTwo extends StatelessWidget {
     bool childrenAgeFilled = _childrenAgePickerBox.getDates().length != 0 && _childrenInputValidation();
 
     if(!locationSelected){
-      customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.ortEingeben);
       return false;
     }else if(!travelTypSelected){
-      customSnackbar(context, AppLocalizations.of(context)!.reiseartAuswaehlen);
+      customSnackBar(context, AppLocalizations.of(context)!.reiseartAuswaehlen);
       return false;
     }else if(!languageSelected){
-      customSnackbar(context, AppLocalizations.of(context)!.spracheAuswaehlen);
+      customSnackBar(context, AppLocalizations.of(context)!.spracheAuswaehlen);
       return false;
     }else if(!childrenAgeFilled){
-      customSnackbar(context, AppLocalizations.of(context)!.geburtsdatumEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.geburtsdatumEingeben);
       return false;
     }
 
@@ -513,7 +513,7 @@ class SliderStepThree extends StatelessWidget {
     bool interesetSelected = _interessenAuswahlBox.getSelected().isNotEmpty;
 
     if(!interesetSelected){
-      customSnackbar(context, AppLocalizations.of(context)!.interessenAuswaehlen);
+      customSnackBar(context, AppLocalizations.of(context)!.interessenAuswaehlen);
       return false;
     }
 

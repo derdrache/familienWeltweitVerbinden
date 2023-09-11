@@ -40,7 +40,7 @@ class _ProfilImageState extends State<ProfilImage> {
       return;
     } else if (newLink.substring(0, 4) != "http" &&
         newLink.substring(0, 3) != "www") {
-      customSnackbar(context, AppLocalizations.of(context)!.ungueltigerLink);
+      customSnackBar(context, AppLocalizations.of(context)!.ungueltigerLink);
       return;
     } else {
       newLink = [newLink];

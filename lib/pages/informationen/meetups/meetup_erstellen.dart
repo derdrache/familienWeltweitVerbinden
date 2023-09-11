@@ -99,7 +99,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     FocusManager.instance.primaryFocus?.unfocus();
 
     if (!allValid) {
-      customSnackbar(context, allValid);
+      customSnackBar(context, allValid);
       return;
     }
     var wannDate = DateTime(meetupWannDatum!.year, meetupWannDatum!.month,
@@ -242,7 +242,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
 
     if (validationFailText.isEmpty) return true;
 
-    customSnackbar(context, validationFailText);
+    customSnackBar(context, validationFailText);
     return false;
   }
 

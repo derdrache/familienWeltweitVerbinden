@@ -47,14 +47,14 @@ class ChangeAboutmePage extends StatelessWidget {
                 String newText = textKontroller.text;
 
                 if(newText.isEmpty){
-                  customSnackbar(context,
+                  customSnackBar(context,
                       AppLocalizations.of(context)!.keineEingabe, color: Colors.red);
                   return;
                 }
 
                 save(newText);
 
-                customSnackbar(context,
+                customSnackBar(context,
                     "${AppLocalizations.of(context)!.ueberMich} ${AppLocalizations.of(context)!.erfolgreichGeaender}", color: Colors.green);
                 Navigator.pop(context);
               }

@@ -27,7 +27,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
             .sendPasswordResetEmail(email: emailController.text);
 
         if (context.mounted) {
-          customSnackbar(
+          customSnackBar(
             context, AppLocalizations.of(context)!.emailZuruecksetzenPasswort,
             color: Colors.green);
         }
@@ -35,7 +35,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
         return true;
       } on FirebaseAuthException catch (error) {
         if (error.code == "user-not-found") {
-          customSnackbar(
+          customSnackBar(
               context, AppLocalizations.of(context)!.userEmailNichtGefunden);
         }
         return false;

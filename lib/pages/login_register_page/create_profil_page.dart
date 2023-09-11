@@ -95,7 +95,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
             false;
 
     if (userExist && context.mounted) {
-      customSnackbar(
+      customSnackBar(
           context, AppLocalizations.of(context)!.benutzerNamevergeben);
       changeLoading();
       return;
@@ -108,7 +108,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
       var ortMapData = ortAuswahlBox.getGoogleLocationData();
 
       if (ortMapData["city"] == null && context.mounted) {
-        customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
+        customSnackBar(context, AppLocalizations.of(context)!.ortEingeben);
         changeLoading();
         return;
       }
@@ -210,7 +210,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     if (errorString.length > 29) {
       hasError = true;
 
-      customSnackbar(context, errorString);
+      customSnackBar(context, errorString);
     }
 
     return !hasError;

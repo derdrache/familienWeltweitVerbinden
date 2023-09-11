@@ -40,7 +40,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
   
   saveAutomaticLocation() async {
     if(ownProfil["reiseart"] == "fixed location" || ownProfil["reiseart"] == "Fester Standort"){
-      customSnackbar(context, AppLocalizations.of(context)!.automatischerStandortNichtMoeglich);
+      customSnackBar(context, AppLocalizations.of(context)!.automatischerStandortNichtMoeglich);
       return;
     }
 

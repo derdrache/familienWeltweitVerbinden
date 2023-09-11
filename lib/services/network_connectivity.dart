@@ -37,11 +37,11 @@ class NetworkConnectivity {
       _internetStatus = newInternetStatus;
 
       if(connectionText.contains("Offline")){
-        customSnackbar(context, AppLocalizations.of(context)!.keineVerbindungInternet,
+        customSnackBar(context, AppLocalizations.of(context)!.keineVerbindungInternet,
             duration: const Duration(days: 365));
       } else {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        customSnackbar(context, "Online", color: Colors.green,
+        customSnackBar(context, "Online", color: Colors.green,
             duration: const Duration(seconds: 2));
       }
     });

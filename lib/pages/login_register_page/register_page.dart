@@ -54,15 +54,15 @@ class _RegisterPageState extends State<RegisterPage> {
         success = true;
       } on FirebaseAuthException catch (error) {
         if (error.code == "email-already-in-use") {
-          customSnackbar(
+          customSnackBar(
               context, AppLocalizations.of(context)!.emailInBenutzung);
         } else if (error.code == "invalid-email") {
-          customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
+          customSnackBar(context, AppLocalizations.of(context)!.emailUngueltig);
         } else if (error.code == "weak-password") {
-          customSnackbar(
+          customSnackBar(
               context, AppLocalizations.of(context)!.passwortSchwach);
         } else if (error.code == "network-request-failed") {
-          customSnackbar(
+          customSnackBar(
               context, AppLocalizations.of(context)!.keineVerbindungInternet);
         }
       }

@@ -79,7 +79,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
     await FamiliesDatabase().getData("id", "WHERE name = '$newName'");
 
     if (nameIsUsed && context.mounted) {
-      customSnackbar(
+      customSnackBar(
           context, AppLocalizations.of(context)!.usernameInVerwendung);
       return;
     }
@@ -139,19 +139,19 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
   addMember(memberId) async {
     String memberName = getProfilFromHive(profilId: memberId, getNameOnly: true);
     if (familyProfil["members"].contains(memberId)) {
-      customSnackbar(context,
+      customSnackBar(context,
           "$memberName ${AppLocalizations.of(context)!.isImFamilienprofil}");
       return;
     }
     if (familyProfil["einladung"].contains(memberId)) {
-      customSnackbar(context,
+      customSnackBar(context,
           "$memberName ${AppLocalizations.of(context)!.wurdeSchonEingeladen}");
       return;
     }
 
     var hasFamilyProfil = await checkHasFamilyProfil(memberId);
     if (hasFamilyProfil) {
-      if (context.mounted)customSnackbar(context, "$memberName ${AppLocalizations.of(context)!.istInEinemFamilienprofil}");
+      if (context.mounted)customSnackBar(context, "$memberName ${AppLocalizations.of(context)!.istInEinemFamilienprofil}");
       return;
     }
 
@@ -159,7 +159,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
       familyProfil["einladung"].add(memberId);
     });
 
-    if (context.mounted) customSnackbar(context, "$memberName ${AppLocalizations.of(context)!.familienprofilEingeladen}");
+    if (context.mounted) customSnackBar(context, "$memberName ${AppLocalizations.of(context)!.familienprofilEingeladen}");
 
     FamiliesDatabase().update(
         "einladung = JSON_ARRAY_APPEND(einladung, '\$', '$memberId')",

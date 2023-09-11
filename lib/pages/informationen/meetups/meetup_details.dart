@@ -224,7 +224,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     bool hasAccsess = widget.meetupData["erstelltAm"] == userId || widget.meetupData["freigegeben"].contains(userId);
 
     if(isPrivat && !hasAccsess){
-      customSnackbar(context, AppLocalizations.of(context)!.geheimerChatMeldung);
+      customSnackBar(context, AppLocalizations.of(context)!.geheimerChatMeldung);
       return;
     }
 
@@ -473,7 +473,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       myOwnMeetups.remove(widget.meetupData);
 
       if (context.mounted){
-        customSnackbar(
+        customSnackBar(
             context,
             AppLocalizations.of(context)!.meetupUebergebenAn1 +
                 selectedUserName +
@@ -797,7 +797,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
               Clipboard.setData(
                   ClipboardData(text: "</eventId=${widget.meetupData["id"]}"));
 
-              customSnackbar(context, AppLocalizations
+              customSnackBar(context, AppLocalizations
                   .of(context)!
                   .linkWurdekopiert, color: Colors.green);
             },

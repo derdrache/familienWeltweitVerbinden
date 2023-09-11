@@ -89,12 +89,12 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = false;
       });
       if (error.code == "user-not-found") {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.benutzerNichtGefunden);
       } else if (error.code == "wrong-password") {
-        customSnackbar(context, AppLocalizations.of(context)!.passwortFalsch);
+        customSnackBar(context, AppLocalizations.of(context)!.passwortFalsch);
       } else if (error.code == "network-request-failed") {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.keineVerbindungInternet);
       }
     }
@@ -176,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
 
     addAdminMessage(reportController.text, "Login/Hilfe");
 
-    customSnackbar(context, AppLocalizations.of(context)!.hilfeVersendetText,
+    customSnackBar(context, AppLocalizations.of(context)!.hilfeVersendetText,
         color: Colors.green);
   }
 

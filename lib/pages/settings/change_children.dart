@@ -29,7 +29,7 @@ class ChangeChildrenPage extends StatelessWidget {
       }
 
       if(!allFilled || childrenBirthdatePickerBox.getDates().isEmpty){
-        customSnackbar(context, AppLocalizations.of(context)!.geburtsdatumEingeben);
+        customSnackBar(context, AppLocalizations.of(context)!.geburtsdatumEingeben);
       } else{
         await ProfilDatabase().updateProfil(
             "kinder = '${jsonEncode(childrenBirthdatePickerBox.getDates())}'",
@@ -38,7 +38,7 @@ class ChangeChildrenPage extends StatelessWidget {
         updateHiveOwnProfil("kinder", childrenBirthdatePickerBox.getDates());
 
         if (context.mounted){
-          customSnackbar(context,
+          customSnackBar(context,
               "${AppLocalizations.of(context)!.anzahlUndAlterKinder} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
               color: Colors.green
           );

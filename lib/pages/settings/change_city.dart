@@ -188,7 +188,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     var locationData = autoComplete.getGoogleLocationData();
 
     if (locationData["city"] == null) {
-      customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.ortEingeben);
       return;
     }
     selected = true;
@@ -213,7 +213,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
 
     if (context.mounted){
-      customSnackbar(
+      customSnackBar(
           context,
           "${AppLocalizations.of(context)!.aktuelleOrt} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
           color: Colors.green);

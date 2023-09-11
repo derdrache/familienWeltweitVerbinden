@@ -256,14 +256,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     var oldImage = widget.community["bild"];
 
     if (selectedImage == "" && (image == null || image.isEmpty)) {
-      customSnackbar(context, AppLocalizations.of(context)!.bitteBildAussuchen);
+      customSnackBar(context, AppLocalizations.of(context)!.bitteBildAussuchen);
       return;
     }
 
     if (image != null &&
         image.substring(0, 4) != "http" &&
         image.substring(0, 3) != "www") {
-      customSnackbar(context, AppLocalizations.of(context)!.ungueltigerLink);
+      customSnackBar(context, AppLocalizations.of(context)!.ungueltigerLink);
       return;
     }
 
@@ -305,7 +305,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   _saveChangeName(newName) async {
     if (newName.isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context)!.bitteNameEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.bitteNameEingeben);
       return;
     }
 
@@ -356,7 +356,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               _windowOptions(() {
                 var newLocation = ortAuswahlBox.getGoogleLocationData();
                 if (newLocation["city"].isEmpty) {
-                  customSnackbar(
+                  customSnackBar(
                       context, AppLocalizations.of(context)!.ortEingeben);
                   return;
                 }
@@ -438,12 +438,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   _saveChangeLink(newLink) {
     if (newLink.isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context)!.neuenLinkEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.neuenLinkEingeben);
       return;
     }
 
     if (!newLink.contains("http") && !newLink.contains("www")) {
-      customSnackbar(context, AppLocalizations.of(context)!.eingabeKeinLink);
+      customSnackBar(context, AppLocalizations.of(context)!.eingabeKeinLink);
       return;
     }
 
@@ -476,7 +476,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               _windowOptions(() {
                 String newBeschreibung = newBeschreibungKontroller.text;
                 if (newBeschreibung.isEmpty) {
-                  customSnackbar(
+                  customSnackBar(
                       context,
                       AppLocalizations.of(context)!
                           .bitteCommunityBeschreibungEingeben);
@@ -575,12 +575,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
   _saveNewMember(newMemberId) {
     if (widget.community["members"].contains(newMemberId)) {
-      customSnackbar(context,
+      customSnackBar(context,
           AppLocalizations.of(context)!.istSchonMitgliedCommunity);
       return;
     }
     if (widget.community["einladung"].contains(newMemberId)) {
-      customSnackbar(
+      customSnackBar(
           context,
            AppLocalizations.of(context)!.wurdeSchonEingeladenCommunity);
       return;
@@ -605,7 +605,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     prepareAddMemberNotification(widget.community, newMemberId);
 
-    customSnackbar(context,
+    customSnackBar(context,
         AppLocalizations.of(context)!.wurdeEingeladenCommunity,
         color: Colors.green);
   }
@@ -615,7 +615,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     bool hasAccess = !hasSecretChat || isMember || isCreator;
 
     if (!hasAccess) {
-      customSnackbar(context, AppLocalizations.of(context)!.geheimerChatMeldung);
+      customSnackBar(context, AppLocalizations.of(context)!.geheimerChatMeldung);
       return;
     }
 
@@ -1099,7 +1099,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   Clipboard.setData(ClipboardData(
                       text: "</communityId=${widget.community["id"]}"));
 
-                  customSnackbar(
+                  customSnackBar(
                       context, AppLocalizations.of(context)?.linkWurdekopiert,
                       color: Colors.green);
                 },

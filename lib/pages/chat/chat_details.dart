@@ -546,7 +546,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
   _copyMessage(String messageText) {
     Clipboard.setData(ClipboardData(text: messageText));
-    customSnackbar(
+    customSnackBar(
         context, AppLocalizations.of(context)!.nachrichtZwischenAblage,
         color: Colors.green, duration: const Duration(seconds: 1));
   }
@@ -700,7 +700,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         "Message ${message["id"]} in $reportTitle gemeldet",
         message["message"]);
 
-    customSnackbar(context, AppLocalizations.of(context)!.nachrichtGemeldet,
+    customSnackBar(context, AppLocalizations.of(context)!.nachrichtGemeldet,
         color: Colors.green, duration: const Duration(seconds: 2));
   }
 

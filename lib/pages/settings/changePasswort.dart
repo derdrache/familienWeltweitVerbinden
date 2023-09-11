@@ -18,22 +18,22 @@ class ChangePasswortPage extends StatelessWidget {
 
     validationAndError(newPasswort, newPasswortCheck, oldPasswort){
       if (newPasswort == "" || newPasswort == oldPasswort) {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.neuesPasswortEingeben);
         return false;
       }
       if (newPasswortCheck == "") {
-        customSnackbar(context,
+        customSnackBar(context,
             AppLocalizations.of(context)!.neuesPasswortWiederholen);
         return false;
       }
       if (oldPasswort == "") {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.altesPasswortEingeben);
         return false;
       }
       if (newPasswort != newPasswortCheck) {
-        customSnackbar(context,
+        customSnackBar(context,
             AppLocalizations.of(context)!.passwortStimmtNichtMitNeuem);
         return false;
       }
@@ -48,7 +48,7 @@ class ChangePasswortPage extends StatelessWidget {
         loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: userEmail ?? "", password: passwort);
       } on FirebaseAuthException catch (_) {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.altesPasswortFalsch);
         loginUser = null;
       }
@@ -72,7 +72,7 @@ class ChangePasswortPage extends StatelessWidget {
             ?.updatePassword(newPasswort);
 
         if (context.mounted){
-          customSnackbar(
+          customSnackBar(
               context,
               "${AppLocalizations.of(context)!.passwort} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
               color: Colors.green);
@@ -80,7 +80,7 @@ class ChangePasswortPage extends StatelessWidget {
           Navigator.pop(context);
         }
       } catch (error) {
-        if (context.mounted) customSnackbar(context, AppLocalizations.of(context)!.neuesPasswortSchwach);
+        if (context.mounted) customSnackBar(context, AppLocalizations.of(context)!.neuesPasswortSchwach);
       }
     }
 

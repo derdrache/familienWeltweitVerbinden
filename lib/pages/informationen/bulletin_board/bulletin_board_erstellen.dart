@@ -98,13 +98,13 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
     bool beschreibung = descriptionKontroller.text.isEmpty;
 
     if (checkTitle) {
-      customSnackbar(context, AppLocalizations.of(context)!.titelEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.titelEingeben);
       return false;
     } else if (checkLocation) {
-      customSnackbar(context, AppLocalizations.of(context)!.ortEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.ortEingeben);
       return false;
     } else if (beschreibung) {
-      customSnackbar(
+      customSnackBar(
           context, AppLocalizations.of(context)!.beschreibungEingeben);
       return false;
     }

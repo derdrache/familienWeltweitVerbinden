@@ -754,7 +754,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                       var selectedDate = datePicker.getDate();
 
                       if (selectedDate == null) {
-                        customSnackbar(context,
+                        customSnackBar(context,
                             AppLocalizations.of(context)!.datumEingeben);
                         return;
                       }
@@ -763,7 +763,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                         selectedDate = [selectedDate, null];
                       } else {
                         if (selectedDate[1].isBefore(selectedDate[0])) {
-                          customSnackbar(context,
+                          customSnackBar(context,
                               AppLocalizations.of(context)!.bisDatumFalsch);
                           return;
                         }

@@ -45,7 +45,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
   saveInDatabase(newReiseplan){
     if(checkDuplicateEntry()){
       widget.reiseplanung.removeLast();
-      customSnackbar(context, "Doppelter Eintrag");
+      customSnackBar(context, "Doppelter Eintrag");
       return;
     }
 
@@ -93,12 +93,12 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     var ortData = ortInput.getGoogleLocationData();
 
     if(datePicker.getDate() == null){
-      customSnackbar(context,
+      customSnackBar(context,
           AppLocalizations.of(context)!.datumEingeben);
       return;
     }
     if(ortData["city"] == null){
-      customSnackbar(context,
+      customSnackBar(context,
           AppLocalizations.of(context)!.ortEingeben);
       return;
     }
@@ -107,7 +107,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     var endDate = datePicker.getDate()[1];
 
     if (endDate.isBefore(startDate)) {
-      customSnackbar(context, AppLocalizations.of(context)!.vonKleinerAlsBis);
+      customSnackBar(context, AppLocalizations.of(context)!.vonKleinerAlsBis);
       return;
     }
 
@@ -118,7 +118,7 @@ class _ChangeReiseplanungPageState extends State<ChangeReiseplanungPage> {
     };
 
     if (checkOverlappingPeriods(newReiseplan)) {
-      customSnackbar(
+      customSnackBar(
           context, AppLocalizations.of(context)!.zeitraumUeberschneidetSich);
       return;
     }

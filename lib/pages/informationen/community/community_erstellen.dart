@@ -115,12 +115,12 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
 
   checkValidationAndSendError(communityData) {
     if (communityData["name"].isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context)!.bitteNameEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.bitteNameEingeben);
     } else if (communityData["beschreibung"].isEmpty) {
-      customSnackbar(context,
+      customSnackBar(context,
           AppLocalizations.of(context)!.bitteCommunityBeschreibungEingeben);
     } else if (communityData["ort"] == null || communityData["ort"].isEmpty) {
-      customSnackbar(context, AppLocalizations.of(context)!.bitteStadtEingeben);
+      customSnackBar(context, AppLocalizations.of(context)!.bitteStadtEingeben);
     } else {
       return true;
     }

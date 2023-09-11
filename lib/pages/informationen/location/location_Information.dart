@@ -120,7 +120,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
             onPressed: () async {
               Clipboard.setData(
                   ClipboardData(text: "</cityId=${location["id"]}"));
-              customSnackbar(
+              customSnackBar(
                   context, AppLocalizations.of(context)!.linkWurdekopiert,
                   color: Colors.green);
               global_func.changePageForever(
@@ -608,14 +608,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     String titleGer, informationGer, titleEng, informationEng;
 
     if (title.isEmpty) {
-      customSnackbar(
+      customSnackBar(
           context, AppLocalizations.of(context)!.titelStadtinformationEingeben);
       return;
     } else if (title.length > 100) {
-      customSnackbar(context, AppLocalizations.of(context)!.titleZuLang);
+      customSnackBar(context, AppLocalizations.of(context)!.titleZuLang);
       return;
     } else if (title.isEmpty) {
-      customSnackbar(context,
+      customSnackBar(context,
           AppLocalizations.of(context)!.beschreibungStadtinformationEingeben);
       return;
     }
@@ -806,14 +806,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     newInformation = newInformation.trim();
 
     if (newTitle.isEmpty) {
-      customSnackbar(
+      customSnackBar(
           context, AppLocalizations.of(context)!.titelStadtinformationEingeben);
       return;
     } else if (newTitle.length > 100) {
-      customSnackbar(context, AppLocalizations.of(context)!.titleZuLang);
+      customSnackBar(context, AppLocalizations.of(context)!.titleZuLang);
       return;
     } else if (newInformation.isEmpty) {
-      customSnackbar(context,
+      customSnackBar(context,
           AppLocalizations.of(context)!.beschreibungStadtinformationEingeben);
       return;
     }
@@ -902,7 +902,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     Clipboard.setData(ClipboardData(text: informationText));
 
-    customSnackbar(context, AppLocalizations.of(context)!.informationKopiert,
+    customSnackBar(context, AppLocalizations.of(context)!.informationKopiert,
         color: Colors.green);
   }
 

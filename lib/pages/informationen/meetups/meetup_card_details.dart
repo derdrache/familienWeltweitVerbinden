@@ -105,7 +105,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
   askForRelease(isOnList) async {
     if (isOnList) {
-      customSnackbar(
+      customSnackBar(
           context, AppLocalizations.of(context)!.meetupInteresseZurueckgenommen,
           color: Colors.green);
 
@@ -116,7 +116,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
           "WHERE id ='${widget.meetupData["id"]}'");
     } else {
-      customSnackbar(
+      customSnackBar(
           context, AppLocalizations.of(context)!.meetupInteresseMitgeteilt,
           color: Colors.green);
 
@@ -316,7 +316,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (newLink.isEmpty) return false;
 
     if (!global_func.isLink(newLink)) {
-      customSnackbar(context, AppLocalizations.of(context)!.eingabeKeinLink);
+      customSnackBar(context, AppLocalizations.of(context)!.eingabeKeinLink);
       return;
     }
 
@@ -446,7 +446,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                         bool saveSuccess = await saveFunction();
 
                         if (!saveSuccess && context.mounted) {
-                          customSnackbar(context,
+                          customSnackBar(context,
                               AppLocalizations.of(context)!.keineEingabe);
                           return;
                         }
@@ -1023,12 +1023,12 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
       var bisTime = bisTimeInputButton.uhrZeit;
 
       if (bisDate == null) {
-        return customSnackbar(
+        return customSnackBar(
             context, AppLocalizations.of(context)!.eingebenBisTagMeetup);
       }
 
       if (bisTime == null) {
-        return customSnackbar(
+        return customSnackBar(
             context, AppLocalizations.of(context)!.eingebenBisUhrzeitMeetup);
       }
 

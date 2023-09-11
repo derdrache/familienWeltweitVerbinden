@@ -26,7 +26,7 @@ class FeedbackPage extends StatelessWidget {
 
     feedbackTextKontroller.clear();
 
-    customSnackbar(context, AppLocalizations.of(context)!.feedbackDanke,
+    customSnackBar(context, AppLocalizations.of(context)!.feedbackDanke,
         color: Colors.green);
 
     Navigator.pop(context);

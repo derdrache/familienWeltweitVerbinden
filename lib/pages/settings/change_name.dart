@@ -20,7 +20,7 @@ class ChangeNamePage extends StatelessWidget {
 
     save() async {
       if (nameKontroller.text.isEmpty) {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.neuenNamenEingeben);
         return;
       }
@@ -28,14 +28,14 @@ class ChangeNamePage extends StatelessWidget {
       var newUserName = nameKontroller.text.replaceAll("'", "''");
 
       if (newUserName.length > 40) {
-        customSnackbar(context, AppLocalizations.of(context)!.usernameZuLang);
+        customSnackBar(context, AppLocalizations.of(context)!.usernameZuLang);
         return;
       }
 
       var checkUserProfilExist =
           await ProfilDatabase().getData("id", "WHERE name = '$newUserName'");
       if (checkUserProfilExist != false && context.mounted) {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.usernameInVerwendung);
         return;
       }

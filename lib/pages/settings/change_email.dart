@@ -34,11 +34,11 @@ class ChangeEmailPage extends StatelessWidget {
 
     checkValidationAndError() async {
       if (emailKontroller.text.isEmpty) {
-        customSnackbar(context, AppLocalizations.of(context)!.emailEingeben);
+        customSnackBar(context, AppLocalizations.of(context)!.emailEingeben);
         return false;
       }
       if (passwortKontroller.text.isEmpty) {
-        customSnackbar(context, AppLocalizations.of(context)!.passwortEingeben);
+        customSnackBar(context, AppLocalizations.of(context)!.passwortEingeben);
         return false;
       }
 
@@ -46,13 +46,13 @@ class ChangeEmailPage extends StatelessWidget {
           r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(emailKontroller.text);
       if (!emailIsValid) {
-        customSnackbar(context, AppLocalizations.of(context)!.emailUngueltig);
+        customSnackBar(context, AppLocalizations.of(context)!.emailUngueltig);
         return false;
       }
 
       var loginUser = await userLogin(passwortKontroller.text);
       if (loginUser == null && context.mounted) {
-        customSnackbar(
+        customSnackBar(
             context, AppLocalizations.of(context)!.emailOderPasswortFalsch);
         return false;
       }
@@ -69,7 +69,7 @@ class ChangeEmailPage extends StatelessWidget {
       try{
         await FirebaseAuth.instance.currentUser!.updateEmail(emailKontroller.text);
       }catch(error){
-        if(context.mounted) customSnackbar(context, AppLocalizations.of(context)!.emailInBenutzung);
+        if(context.mounted) customSnackBar(context, AppLocalizations.of(context)!.emailInBenutzung);
         return;
       }
 

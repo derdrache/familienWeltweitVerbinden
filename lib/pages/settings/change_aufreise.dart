@@ -63,12 +63,12 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
     if(noTraveling) return true;
 
     if(widget.aufreiseSeit == null) {
-      customSnackbar(context, AppLocalizations.of(context)!.eingebenSeitWannReise);
+      customSnackBar(context, AppLocalizations.of(context)!.eingebenSeitWannReise);
       return false;
     }
 
     if(widget.aufreiseBis == null && pastTravler){
-      customSnackbar(context, AppLocalizations.of(context)!.eingebenBisWannReise);
+      customSnackBar(context, AppLocalizations.of(context)!.eingebenBisWannReise);
       return false;
     }
 
