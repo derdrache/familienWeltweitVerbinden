@@ -17,6 +17,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 
 import '../../../functions/is_user_inactive.dart';
 import '../../../global/global_functions.dart' as global_func;
+import '../../../global/style.dart' as style;
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/dialogWindow.dart';
 import '../../../widgets/image_upload_box.dart';
@@ -1087,165 +1088,174 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       return Container(
         margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 60),
         width: double.infinity,
+        /*
         decoration: BoxDecoration(
             border: Border.all(
                 width: 2, color: Theme.of(context).colorScheme.primary),
             borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 5, bottom: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 10),
-                      child: Text(
-                        " #${index + 1} - $showTitle",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
-                      )),
-                  const Expanded(child: SizedBox.shrink()),
-                  InkWell(
-                    onTap: () => openInformationMenu(information, index),
-                    child: const Icon(Icons.more_horiz),
-                  ),
-                  const SizedBox(width: 5)
-                ],
-              ),
-            ),
-            SingleChildScrollView(
-              child: Container(
-                  margin: const EdgeInsets.only(left: 10, right: 10),
-                  child: TextWithHyperlinkDetection(
-                    text: showInformation,
-                    fontsize: 16,
-                  )),
-            ),
-            if (translated)
-              Padding(
-                padding: const EdgeInsets.only(right: 5, top: 5),
+
+         */
+        child: Card(
+          elevation: 15,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(style.roundedCorners),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 5, bottom: 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.automatischeUebersetzung,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    )
+                    Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        child: Text(
+                          " #${index + 1} - $showTitle",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        )),
+                    const Expanded(child: SizedBox.shrink()),
+                    InkWell(
+                      onTap: () => openInformationMenu(information, index),
+                      child: const Icon(Icons.more_horiz),
+                    ),
+                    const SizedBox(width: 5)
                   ],
                 ),
               ),
-            const Expanded(child: SizedBox.shrink()),
-            if(informationImages.isNotEmpty) Container(
-              alignment: Alignment.center,
-              margin: const EdgeInsets.all(10),
-              child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 20, runSpacing: 10, children: [
-                for ( var image in informationImages ) InkWell(
-                  onTap: () => ImageFullscreen(context, image),
-                  child: Card(
-                    elevation: 12,
-                    child: CachedNetworkImage(imageUrl:  image, width: 110,height: 100,),
-                  ),
-                )
-              ],),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  InkWell(
-                    onTap: () => setThumbUp(index),
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 5, right: 5),
-                      child: Icon(
-                        Icons.keyboard_arrow_up_outlined,
-                        size: 24,
-                        color: information["thumbUp"].contains(userId)
-                            ? Colors.green
-                            : Colors.grey,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    (information["thumbUp"].length -
-                            information["thumbDown"].length)
-                        .toString(),
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  InkWell(
-                    onTap: () => setThumbDown(index),
-                    child: Container(
-                      margin: const EdgeInsets.only(
-                        left: 5,
-                      ),
-                      child: Icon(Icons.keyboard_arrow_down_outlined,
-                          size: 24,
-                          color: information["thumbDown"].contains(userId)
-                              ? Colors.red
-                              : Colors.grey),
-                    ),
-                  ),
-                  Expanded(
-                      child: Center(
-                              child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    shape: const StadiumBorder(),
-                                  ),
-                                  onPressed: () {
-                                    showOriginalInformation(index);
-                                    setState(() {});
-                                  },
-                                  child: Text(
-                                    "Original",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                        decoration:
-                                            translated
-                                                ? TextDecoration.lineThrough
-                                                : null),
-                                  )),
-                            )
-                          ),
-                  GestureDetector(
-                    onTap: () => creatorProfil == null
-                        ? null
-                        : global_func.changePage(
-                            context,
-                            ShowProfilPage(
-                              profil: creatorProfil,
-                            )),
-                    child: SizedBox(
-                      width: 100,
-                      child: Column(
-                        children: [
-                          if (creatorName.isNotEmpty)
-                            Text(
-                              "$creatorName ",
-                              maxLines: 1,
-                              style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          Text(
-                              information["erstelltAm"]
-                                  .split("-")
-                                  .reversed
-                                  .join("-"),
-                              style: const TextStyle(color: Colors.black))
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 5)
-                ],
+              SingleChildScrollView(
+                child: Container(
+                    margin: const EdgeInsets.only(left: 10, right: 10),
+                    child: TextWithHyperlinkDetection(
+                      text: showInformation,
+                      fontsize: 16,
+                    )),
               ),
-            )
-          ],
+              if (translated)
+                Padding(
+                  padding: const EdgeInsets.only(right: 5, top: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.automatischeUebersetzung,
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      )
+                    ],
+                  ),
+                ),
+              const Expanded(child: SizedBox.shrink()),
+              if(informationImages.isNotEmpty) Container(
+                alignment: Alignment.center,
+                margin: const EdgeInsets.all(10),
+                child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 20, runSpacing: 10, children: [
+                  for ( var image in informationImages ) InkWell(
+                    onTap: () => ImageFullscreen(context, image),
+                    child: Card(
+                      elevation: 12,
+                      child: CachedNetworkImage(imageUrl:  image, width: 110,height: 100,),
+                    ),
+                  )
+                ],),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () => setThumbUp(index),
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 5, right: 5),
+                        child: Icon(
+                          Icons.keyboard_arrow_up_outlined,
+                          size: 24,
+                          color: information["thumbUp"].contains(userId)
+                              ? Colors.green
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      (information["thumbUp"].length -
+                              information["thumbDown"].length)
+                          .toString(),
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    InkWell(
+                      onTap: () => setThumbDown(index),
+                      child: Container(
+                        margin: const EdgeInsets.only(
+                          left: 5,
+                        ),
+                        child: Icon(Icons.keyboard_arrow_down_outlined,
+                            size: 24,
+                            color: information["thumbDown"].contains(userId)
+                                ? Colors.red
+                                : Colors.grey),
+                      ),
+                    ),
+                    Expanded(
+                        child: Center(
+                                child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      shape: const StadiumBorder(),
+                                    ),
+                                    onPressed: () {
+                                      showOriginalInformation(index);
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      "Original",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                          decoration:
+                                              translated
+                                                  ? TextDecoration.lineThrough
+                                                  : null),
+                                    )),
+                              )
+                            ),
+                    GestureDetector(
+                      onTap: () => creatorProfil == null
+                          ? null
+                          : global_func.changePage(
+                              context,
+                              ShowProfilPage(
+                                profil: creatorProfil,
+                              )),
+                      child: SizedBox(
+                        width: 100,
+                        child: Column(
+                          children: [
+                            if (creatorName.isNotEmpty)
+                              Text(
+                                "$creatorName ",
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            Text(
+                                information["erstelltAm"]
+                                    .split("-")
+                                    .reversed
+                                    .join("-"),
+                                style: const TextStyle(color: Colors.black))
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 5)
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       );
     }
