@@ -4,7 +4,6 @@ import '../../global/style.dart' as style;
 customSnackbar(context, text, {color = Colors.red, duration = const Duration(seconds: 3)}){
   var snackbar = SnackBar(
       duration: duration,
-      behavior: SnackBarBehavior.floating,
       elevation: 0,
       backgroundColor: Colors.transparent,
       content: Container(
