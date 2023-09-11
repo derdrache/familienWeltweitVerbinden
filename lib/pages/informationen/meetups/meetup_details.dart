@@ -974,7 +974,7 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
 
     return Positioned(
       top: -5,
-      left: -10,
+      left: -5,
       child: IconButton(
           icon: Icon(icon, color: Theme
               .of(context)
