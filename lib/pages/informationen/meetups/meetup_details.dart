@@ -351,7 +351,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       int meetupAbsagen = widget.meetupData["absage"].length;
       int meetupInteressierte = widget.meetupData["interesse"].length;
       int meetupFreigegebene = widget.meetupData["freigegeben"].length;
-      int meetupUnsure = meetupInteressierte - meetupZusagen - meetupAbsagen;
+      List interestedCleaned = widget.meetupData["interesse"];
+
+      for(var user in widget.meetupData["zusage"] + widget.meetupData["absage"]){
+        interestedCleaned.remove(user);
+      }
 
       return SimpleDialogOption(
           child: const Row(
@@ -389,7 +393,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                       const SizedBox(height: 10),
                       Text(
                           AppLocalizations.of(context)!.unsicher
-                              + meetupUnsure.toString(),
+                              + interestedCleaned.length.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       if (isNotPublic)
