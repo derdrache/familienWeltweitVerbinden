@@ -742,10 +742,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                                   AppLocalizations.of(context)!
                                       .neueBeschreibungEingeben,
                                   beschreibungInputKontroller,
-                                  moreLines: 13,
+                                  moreLines: 8,
                                   textInputAction: TextInputAction.newline),
                               checkAndSaveNewBeschreibung,
-                              height: 400)
+                              height: 350)
                           : null))));
     }
 
