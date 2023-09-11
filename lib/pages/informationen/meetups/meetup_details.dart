@@ -786,6 +786,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   );
                 }),
           OwnIconButton(
+            icon: Icons.message,
+            tooltipText: AppLocalizations.of(context)!.tooltipChatErsteller,
+            onPressed: () => openChat(),
+          ),
+          OwnIconButton(
             icon: Icons.link,
             tooltipText: AppLocalizations.of(context)!.tooltipLinkKopieren,
             onPressed: () {
@@ -796,11 +801,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                   .of(context)!
                   .linkWurdekopiert, color: Colors.green);
             },
-          ),
-          OwnIconButton(
-            icon: Icons.message,
-            tooltipText: AppLocalizations.of(context)!.tooltipChatErsteller,
-            onPressed: () => openChat(),
           ),
           OwnIconButton(
             icon:Icons.more_vert,
