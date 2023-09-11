@@ -786,42 +786,14 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     createChangeableMeetupTags(changeState) {
-      List<Widget> meetupTags = [];
+      List meetupTags = [];
 
       for (var tag in widget.meetupData["tags"]) {
         String tagText = userSpeakGerman
             ? global_func.changeEnglishToGerman(tag)
             : global_func.changeGermanToEnglish(tag);
 
-        meetupTags.add(InkWell(
-          onTap: () async {
-            removeTag(tag);
-            changeState(() {});
-            setState(() {});
-          },
-          child: Stack(
-            children: [
-              Container(
-                  margin: const EdgeInsets.only(right: 5, top: 10),
-                  padding: const EdgeInsets.only(
-                      left: 5, top: 5, bottom: 5, right: 22),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Theme.of(context).colorScheme.primary, width: 2),
-                    borderRadius: const BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  child: Text(
-                    tagText,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  )),
-              const Positioned(
-                  top: 20,
-                  right: 14,
-                  child: Icon(Icons.cancel, color: Colors.red, size: 15))
-            ],
-          ),
-        ));
+        meetupTags.add(tagText);
       }
 
       return meetupTags;
@@ -831,14 +803,39 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       List<String> tagItems = (userSpeakGerman
           ? global_var.reisearten + global_var.interessenListe
           : global_var.reiseartenEnglisch + global_var.interessenListeEnglisch);
+      CustomMultiTextForm tagSelection = CustomMultiTextForm(
+        auswahlList: tagItems,
+        selected: createChangeableMeetupTags(null),
+      );
+
 
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
             return StatefulBuilder(builder: (context, setStateMeetupTagWindow) {
+              tagSelection.onConfirm = (){
+                List selectedTags = tagSelection.getSelected();
+
+                widget.meetupData["tags"] = selectedTags;
+
+                updateHiveMeetup(
+                    widget.meetupData["id"], "tags", selectedTags);
+
+                MeetupDatabase().update("tags = '${jsonEncode(selectedTags)}'", "WHERE id = '${widget.meetupData["id"]}'");
+
+                setStateMeetupTagWindow(() {});
+                setState(() {});
+
+              };
+
               return CustomAlertDialog(
                   title: AppLocalizations.of(context)!.tagsChange,
                   children: [
+                    tagSelection
+
+
+
+                    /*
                     const SizedBox(height: 20),
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Container(
@@ -872,6 +869,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                           children: createChangeableMeetupTags(
                               setStateMeetupTagWindow),
                         ))
+
+                     */
                   ]);
             });
           });
