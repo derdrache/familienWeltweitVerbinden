@@ -1704,34 +1704,27 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
+      bool replayContainsImage = (replyMessage["images"] ?? []).isNotEmpty;
+      String? cardTyp;
 
+      if(replyMessage["message"] == null){
 
-      if (replyMessage["von"] == null) {
-        return Text(
-          AppLocalizations.of(context)!.geloeschteNachricht,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        );
-      } else {
-        bool replayContainsImage = replyMessage["images"].isNotEmpty;
-        String? cardTyp;
+      } else if (replyMessage["message"].contains("</eventId=")) {
+        cardTyp = "event";
+      } else if (replyMessage["message"].contains("</communityId=")) {
+        cardTyp = "community";
+      } else if (replyMessage["message"].contains("</cityId=")) {
+        cardTyp = "location";
+      }
 
-        if (replyMessage["message"].contains("</eventId=")) {
-          cardTyp = "event";
-        } else if (replyMessage["message"].contains("</communityId=")) {
-          cardTyp = "community";
-        } else if (replyMessage["message"].contains("</cityId=")) {
-          cardTyp = "location";
-        }
-
-        Map messageFromProfil =
-            getProfilFromHive(profilId: replyMessage["von"]) ?? {};
-        var replyColor =
-        messageFromProfil["bildStandardFarbe"] == deletedUserColor
-            ? Colors.greenAccent[100]
-            : messageFromProfil["bildStandardFarbe"] != null
-            ? Color(messageFromProfil["bildStandardFarbe"])
-            : Colors.black;
-
+      Map messageFromProfil =
+          getProfilFromHive(profilId: replyMessage["von"]) ?? {};
+      var replyColor =
+      messageFromProfil["bildStandardFarbe"] == deletedUserColor
+          ? Colors.greenAccent[100]
+          : messageFromProfil["bildStandardFarbe"] != null
+          ? Color(messageFromProfil["bildStandardFarbe"])
+          : Colors.black;
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -1765,7 +1758,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       smallCard: true),
                 if (!replayContainsImage && cardTyp == null)
                   Text(
-                    replyMessage["message"],
+                    replyMessage["message"] ?? AppLocalizations.of(context)!.geloeschteNachricht,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   )
@@ -1773,7 +1766,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             ),
           ),
         );
-      }
     }
 
     imageMessageNew(image) {
