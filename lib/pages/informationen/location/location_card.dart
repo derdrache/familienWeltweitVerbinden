@@ -109,9 +109,11 @@ class _LocationCardState extends State<LocationCard> {
     countryLayout() {
       return Column(
         children: [
-          SizedBox(
+          Container(
             width: 150 * sizeRefactor,
-            height: 87 * sizeRefactor,
+            constraints: BoxConstraints(
+              maxHeight: 80 * sizeRefactor
+            ),
             child: ClipRRect(
                 borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(15),
@@ -123,11 +125,14 @@ class _LocationCardState extends State<LocationCard> {
           ),
           Expanded(
             child: Center(
-              child: Text(
-                widget.location["ort"],
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 22 * sizeRefactor, fontWeight: FontWeight.bold),
+              child: Container(
+                padding: const EdgeInsets.only(right: 2, left: 2),
+                child: Text(
+                  widget.location["ort"],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 20 * sizeRefactor, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ),

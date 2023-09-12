@@ -28,7 +28,7 @@ class CustomCard extends StatelessWidget {
       onLongPressStart: onLongPressStart,
       onTap: onTap,
       child: Container(
-        margin: margin ?? const EdgeInsets.all(10),
+        margin: margin ?? const EdgeInsets.all(0),
         child: Card(
             elevation: 16,
             shape: RoundedRectangleBorder(
