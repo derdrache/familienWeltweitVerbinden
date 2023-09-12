@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
+import '../../../widgets/custom_card.dart';
 import 'location_Information.dart';
 
 class LocationCard extends StatefulWidget {
@@ -29,7 +30,6 @@ class _LocationCardState extends State<LocationCard> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   late bool hasInterest;
   late bool isCity;
-
 
   @override
   void initState() {
@@ -81,8 +81,6 @@ class _LocationCardState extends State<LocationCard> {
 
     cityLayout() {
       return Container(
-          width: 150 * sizeRefactor,
-          height: 200 * sizeRefactor,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
@@ -109,71 +107,49 @@ class _LocationCardState extends State<LocationCard> {
     }
 
     countryLayout() {
-      return SizedBox(
-          width: 150 * sizeRefactor,
-          height: 200 * sizeRefactor,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey
-                  : Colors.white.withOpacity(0.7),
-                borderRadius: BorderRadius.circular(15)),
-            child: Column(
-              children: [
-                SizedBox(
-                  width: 150 * sizeRefactor,
-                  height: 87 * sizeRefactor,
-                  child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(15),
-                          topLeft: Radius.circular(15)),
-                      child: Image(image: getLocationImageWidget(), fit: BoxFit.fitWidth,)),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      widget.location["ort"],
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 22 * sizeRefactor,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ],
+      return Column(
+        children: [
+          SizedBox(
+            width: 150 * sizeRefactor,
+            height: 87 * sizeRefactor,
+            child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(15),
+                    topLeft: Radius.circular(15)),
+                child: Image(
+                  image: getLocationImageWidget(),
+                  fit: BoxFit.fitWidth,
+                )),
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                widget.location["ort"],
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 22 * sizeRefactor, fontWeight: FontWeight.bold),
+              ),
             ),
-          ));
+          ),
+        ],
+      );
     }
 
-    return GestureDetector(
+    return CustomCard(
+      sizeRefactor: sizeRefactor,
+      width: 150,
+      height: 200,
+      margin: const EdgeInsets.all(15),
+      likeButton: CustomLikeButton(
+        isLiked: hasInterest,
+        onLikeButtonTapped: changeIntereset,
+      ),
       onTap: () => changePage(
           context,
           LocationInformationPage(
               ortName: widget.location["ort"],
               fromCityPage: widget.fromCityPage)),
-      child: Container(
-        margin: const EdgeInsets.all(15),
-        child: Stack(
-          children: [
-            Card(
-              elevation: 5,
-              shadowColor: Colors.black,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              child: isCity ? cityLayout() : countryLayout(),
-            ),
-            if (!widget.smallCard)
-              Positioned(
-                  top: likeButtonAbstandTop + 5,
-                  right: likeButtonAbstandRight,
-                  child: CustomLikeButton(
-                    isLiked: hasInterest,
-                    onLikeButtonTapped: changeIntereset,
-                  ))
-          ],
-        ),
-      ),
+      child: isCity ? cityLayout() : countryLayout(),
     );
   }
 }

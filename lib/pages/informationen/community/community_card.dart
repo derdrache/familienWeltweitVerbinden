@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/services/database.dart';
+import 'package:familien_suche/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hive/hive.dart';
 
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
@@ -60,97 +60,75 @@ class _CommunityCardState extends State<CommunityCard> {
     var isAssetImage =
         widget.community["bild"].substring(0, 5) == "asset" ? true : false;
 
-    return GestureDetector(
-      onTap: () => global_func.changePage(
-          context, CommunityDetails(community: widget.community),
-          whenComplete: widget.afterPageVisit),
-      child: Container(
-          width: 160 * sizeRefactor,
-          height: 225 * sizeRefactor,
-          margin: widget.margin,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black
-                  : Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: shadowColor,
-                  spreadRadius: 8,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
+    return CustomCard(
+        sizeRefactor: sizeRefactor,
+        width: 160,
+        height: 225,
+        margin: widget.margin,
+        likeButton: widget.withFavorite && !widget.isCreator
+            ? InteresseButton(
+                communityData: widget.community,
+                afterFavorite:
+                    widget.afterFavorite != null ? widget.afterFavorite! : null)
+            : null,
+        onTap: () => global_func.changePage(
+            context, CommunityDetails(community: widget.community),
+            whenComplete: widget.afterPageVisit),
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxHeight: 100),
+              child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
+                  ),
+                  child: isAssetImage
+                      ? Image.asset(widget.community["bild"], fit: BoxFit.fill)
+                      : CachedNetworkImage(
+                          imageUrl: widget.community["bild"],
+                          fit: BoxFit.fill,
+                        )),
+            ),
+            Container(
+                padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.0),
+                    bottomRight: Radius.circular(20.0),
+                  ),
                 ),
-              ]),
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    constraints: const BoxConstraints(maxHeight: 100),
-                    child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0),
-                        ),
-                        child: isAssetImage
-                            ? Image.asset(widget.community["bild"],
-                                fit: BoxFit.fill)
-                            : CachedNetworkImage(
-                                imageUrl: widget.community["bild"],
-                                fit: BoxFit.fill,
-                              )),
-                  ),
-                  if (widget.withFavorite && !widget.isCreator)
-                    Positioned(
-                        top: likeButtonAbstandTop,
-                        right: likeButtonAbstandRight,
-                        child: InteresseButton(
-                            communityData: widget.community,
-                            afterFavorite: widget.afterFavorite != null
-                                ? widget.afterFavorite!
-                                : null)),
-                ],
-              ),
-              Container(
-                  padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5),
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20.0),
-                      bottomRight: Radius.circular(20.0),
+                child: Column(
+                  children: [
+                    Text(getCommunityTitle(),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: fontSize + 1)),
+                    SizedBox(height: 10 * sizeRefactor),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(widget.community["ort"],
+                            style: TextStyle(fontSize: fontSize))
+                      ],
                     ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(getCommunityTitle(),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: fontSize + 1)),
-                      SizedBox(height: 10 * sizeRefactor),
+                    const SizedBox(height: 2.5),
+                    if (widget.community["ort"] != widget.community["land"])
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(widget.community["ort"],
+                          Text(widget.community["land"],
                               style: TextStyle(fontSize: fontSize))
                         ],
                       ),
-                      const SizedBox(height: 2.5),
-                      if (widget.community["ort"] != widget.community["land"])
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(widget.community["land"],
-                                style: TextStyle(fontSize: fontSize))
-                          ],
-                        ),
-                    ],
-                  ))
-            ],
-          )),
-    );
+                  ],
+                ))
+          ],
+        ));
   }
 }
 

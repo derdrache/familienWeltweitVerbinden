@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_func;
+import '../../../widgets/custom_card.dart';
 import 'meetup_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser!.uid;
@@ -98,7 +99,8 @@ class _MeetupCardState extends State<MeetupCard> {
         widget.meetupData["wann"].split(" ")[0].split("-").reversed.join(".");
     var datetimeWann = DateTime.parse(widget.meetupData["wann"]);
 
-    if (widget.meetupData["bis"] == null || widget.meetupData["bis"] == "null") {
+    if (widget.meetupData["bis"] == null ||
+        widget.meetupData["bis"] == "null") {
       return datetimeText;
     }
     var datetimeBis = DateTime.parse(widget.meetupData["bis"]);
@@ -129,15 +131,15 @@ class _MeetupCardState extends State<MeetupCard> {
     return meetupStart.toString().split(" ")[1].toString().substring(0, 5);
   }
 
-  getMeetupTitle(){
+  getMeetupTitle() {
     String title;
 
-    if(widget.isCreator){
-      title =  widget.meetupData["name"];
-    }else if(getUserSpeaksGerman()){
-      title =  widget.meetupData["nameGer"];
-    }else{
-      title =  widget.meetupData["nameEng"];
+    if (widget.isCreator) {
+      title = widget.meetupData["name"];
+    } else if (getUserSpeaksGerman()) {
+      title = widget.meetupData["nameGer"];
+    } else {
+      title = widget.meetupData["nameEng"];
     }
 
     return title.isEmpty ? widget.meetupData["name"] : title;
@@ -159,7 +161,6 @@ class _MeetupCardState extends State<MeetupCard> {
         widget.meetupData["bild"].substring(0, 5) == "asset" ? true : false;
     var isOffline = widget.meetupData["typ"] == global_var.meetupTyp[0] ||
         widget.meetupData["typ"] == global_var.meetupTypEnglisch[0];
-
 
     if (widget.meetupData["zusage"].contains(userId)) {
       shadowColor = Colors.green.withOpacity(0.8);
@@ -207,60 +208,46 @@ class _MeetupCardState extends State<MeetupCard> {
       );
     }
 
-    return GestureDetector(
+    return CustomCard(
+      width: 160,
+      height: 250,
+      margin: widget.margin,
+      likeButton: widget.withInteresse && !widget.isCreator && !widget.smallCard
+          ? InteresseButton(
+              hasIntereset: widget.meetupData["interesse"].contains(userId),
+              id: widget.meetupData["id"],
+              afterFavorite:
+                  widget.afterFavorite != null ? widget.afterFavorite! : null)
+          : null,
       onLongPressStart: widget.isCreator || forTeilnahmeFreigegeben
           ? (tapdownDetails) => cardMenu(tapdownDetails.globalPosition)
           : null,
       onTap: () => global_func.changePage(
           context,
-          MeetupDetailsPage(meetupData: widget.meetupData, fromMeetupPage: widget.fromMeetupPage),
-          whenComplete: () =>  widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
-      child: Container(
-          width: 160 * sizeRefactor,
-          height: 250 * sizeRefactor,
-          margin: widget.margin,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black
-                  : Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: shadowColor,
-                  spreadRadius: 8,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ]),
-        child: Column(children: [
+          MeetupDetailsPage(
+              meetupData: widget.meetupData,
+              fromMeetupPage: widget.fromMeetupPage),
+          whenComplete: () =>
+              widget.afterPageVisit != null ? widget.afterPageVisit!() : null),
+      child: Column(
+        children: [
           Stack(
             children: [
-                Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(maxHeight: 115),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0),
-                    ),
-                    child: isAssetImage
-                        ? Image.asset(widget.meetupData["bild"],fit: BoxFit.fill)
-                        : CachedNetworkImage(imageUrl: widget.meetupData["bild"],fit: BoxFit.fill),
+              Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxHeight: 115),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
                   ),
+                  child: isAssetImage
+                      ? Image.asset(widget.meetupData["bild"], fit: BoxFit.fill)
+                      : CachedNetworkImage(
+                          imageUrl: widget.meetupData["bild"],
+                          fit: BoxFit.fill),
                 ),
-              if (widget.withInteresse &&
-                  !widget.isCreator &&
-                  !widget.smallCard)
-                Positioned(
-                    top: likeButtonAbstandTop,
-                    right: likeButtonAbstandRight,
-                    child: InteresseButton(
-                        hasIntereset:
-                        widget.meetupData["interesse"].contains(userId),
-                        id: widget.meetupData["id"],
-                        afterFavorite: widget.afterFavorite != null
-                            ? widget.afterFavorite!
-                            : null)),
+              ),
             ],
           ),
           Container(
@@ -278,15 +265,13 @@ class _MeetupCardState extends State<MeetupCard> {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: fontSize + 1)),
+                          fontWeight: FontWeight.bold, fontSize: fontSize + 1)),
                   SizedBox(height: 10 * sizeRefactor),
                   Row(
                     children: [
                       Text(AppLocalizations.of(context)!.datum,
                           style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: fontSize)),
+                              fontWeight: FontWeight.bold, fontSize: fontSize)),
                       Text(createDatetimeText(),
                           style: TextStyle(fontSize: fontSize))
                     ],
@@ -339,7 +324,7 @@ class _MeetupCardState extends State<MeetupCard> {
                     )
                 ],
               ))
-        ],),
+        ],
       ),
     );
   }
@@ -386,16 +371,15 @@ class _InteresseButtonState extends State<InteresseButton> {
 
     setState(() {});
 
-    if(widget.afterFavorite != null) widget.afterFavorite!();
+    if (widget.afterFavorite != null) widget.afterFavorite!();
 
     return !isIntereset;
   }
 
   @override
   Widget build(BuildContext context) {
-
     return CustomLikeButton(
-        isLiked: widget.hasIntereset,
+      isLiked: widget.hasIntereset,
       onLikeButtonTapped: setInteresse,
     );
   }
