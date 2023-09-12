@@ -7,8 +7,9 @@ import 'bulletin_board_details.dart';
 
 class BulletinBoardCard extends StatefulWidget {
   final Map note;
+  final Function? afterPageVisit;
 
-  const BulletinBoardCard({Key? key, required this.note}) : super(key: key);
+  const BulletinBoardCard({Key? key, required this.note, this.afterPageVisit}) : super(key: key);
 
   @override
   State<BulletinBoardCard> createState() => _BulletinBoardCardState();
@@ -70,7 +71,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => changePage(context, BulletinBoardDetails(note: widget.note)),
+      onTap: () => changePage(context, BulletinBoardDetails(note: widget.note), whenComplete: widget.afterPageVisit),
       child: Stack(
         children: [
           Container(

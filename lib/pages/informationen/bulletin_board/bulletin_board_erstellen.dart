@@ -137,7 +137,7 @@ class _BulletonBoardCreateState extends State<BulletonBoardCreate> {
               child: CustomTextInput(
                   "Beschreibung einfügen", descriptionKontroller,
                   borderColor: Colors.black,
-                  moreLines: 10, maxLength: 650, maxLengthColor: Colors.black45, textInputAction: TextInputAction.newline)));
+                  moreLines: 9, maxLength: 650, maxLengthColor: Colors.black45, textInputAction: TextInputAction.newline)));
     }
 
     return Scaffold(
