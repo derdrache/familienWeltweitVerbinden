@@ -1459,7 +1459,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         });
                       }),
                 if(ownLanguages[0] != "en") TextButton(
-                    child: Text(AppLocalizations.of(context)!.uebersetzen),
+                    child: const Icon(Icons.translate_outlined),
                     onPressed: () async {
                       String translationMessage =
                           message["message"].replaceAll("'", "");
