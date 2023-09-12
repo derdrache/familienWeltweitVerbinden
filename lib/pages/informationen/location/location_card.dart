@@ -126,7 +126,7 @@ class _LocationCardState extends State<LocationCard> {
           Expanded(
             child: Center(
               child: Container(
-                padding: const EdgeInsets.only(right: 2, left: 2),
+                padding: const EdgeInsets.only(right: 5, left: 5),
                 child: Text(
                   widget.location["ort"],
                   textAlign: TextAlign.center,

@@ -92,7 +92,7 @@ class _CommunityCardState extends State<CommunityCard> {
                         )),
             ),
             Container(
-                padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5),
+                padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5, right: 5),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20.0),

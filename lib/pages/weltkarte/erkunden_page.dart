@@ -1125,15 +1125,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
           : selectPopupMenuText(showItems["profils"], spezialActivation);
       List content = [];
 
-      if (profils != null)
+      if (profils != null) {
         content = showItems
             .map<Widget>((profil) => profilBottomSheetLayout(profil))
             .toList();
+      }
       if (event != null) {
         content = showItems["profils"]
             .map<Widget>((meetup) => MeetupCard(
                   withInteresse: true,
-                  margin: const EdgeInsets.all(20),
                   meetupData: meetup,
                 ))
             .toList();
@@ -1142,15 +1142,15 @@ class _ErkundenPageState extends State<ErkundenPage> {
         content = showItems["profils"]
             .map<Widget>((communityData) => CommunityCard(
                   withFavorite: true,
-                  margin: const EdgeInsets.all(20),
                   community: communityData,
                 ))
             .toList();
       }
-      if (insiderInfo != null)
+      if (insiderInfo != null) {
         content = showItems["profils"]
             .map<Widget>((infoData) => insiderInfoBottomSheetLayout(infoData))
             .toList();
+      }
 
       return showModalBottomSheet(
           backgroundColor: Colors.transparent,
