@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 import '../../../global/style.dart' as style;
 import '../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
-import '../informationen/meetups/meetupCard.dart';
+import '../informationen/meetups/meetup_card.dart';
 import '../informationen/location/location_Information.dart';
 import 'news_page_settings.dart';
 

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
 
-double likeButtonAbstandTop = 2;
-double likeButtonAbstandRight = 8;
-
 class CustomLikeButton extends StatelessWidget {
   bool isLiked;
   Future<bool?> Function(bool)? onLikeButtonTapped;

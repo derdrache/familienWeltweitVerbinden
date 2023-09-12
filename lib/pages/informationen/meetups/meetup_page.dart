@@ -12,7 +12,7 @@ import '../../../global/global_functions.dart' as global_functions;
 import '../../../services/locationsService.dart';
 import '../../../widgets/layout/badgeWidget.dart';
 import '../../start_page.dart';
-import 'meetupCard.dart';
+import 'meetup_card.dart';
 import 'meetup_erstellen.dart';
 
 class MeetupPage extends StatefulWidget {

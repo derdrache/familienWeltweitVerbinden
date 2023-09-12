@@ -24,7 +24,7 @@ import '../../widgets/flexible_date_picker.dart';
 import '../../services/database.dart';
 import '../../services/locationsService.dart';
 import '../informationen/community/community_card.dart';
-import '../informationen/meetups/meetupCard.dart';
+import '../informationen/meetups/meetup_card.dart';
 import '../show_profil.dart';
 
 class ErkundenPage extends StatefulWidget {
@@ -1085,6 +1085,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           padding: const EdgeInsets.all(5.0),
           margin: const EdgeInsets.all(10),
           width: 180,
+
           decoration: BoxDecoration(
               border: Border.all(
                   width: 2,

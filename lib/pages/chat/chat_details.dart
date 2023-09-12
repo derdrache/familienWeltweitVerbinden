@@ -35,7 +35,7 @@ import '../../windows/custom_popup_menu.dart';
 import '../../windows/image_fullscreen.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
-import '../informationen/meetups/meetupCard.dart';
+import '../informationen/meetups/meetup_card.dart';
 import '../informationen/meetups/meetup_details.dart';
 import '../../auth/secrets.dart';
 import '../../widgets/custom_appbar.dart';
