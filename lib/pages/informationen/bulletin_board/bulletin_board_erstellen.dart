@@ -1,20 +1,19 @@
 import 'dart:math';
 
-import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_details.dart';
-import 'package:familien_suche/services/database.dart';
-import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../functions/translation.dart';
+import '../../../services/database.dart';
+import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/google_autocomplete.dart';
-import 'package:familien_suche/global/global_functions.dart' as global_func;
-
+import '../../../global/global_functions.dart' as global_func;
 import '../../../widgets/image_upload_box.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
+import 'bulletin_board_details.dart';
 
 class BulletonBoardCreate extends StatefulWidget {
   const BulletonBoardCreate({Key? key}) : super(key: key);

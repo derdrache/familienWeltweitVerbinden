@@ -1,14 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
 import '../global/global_functions.dart' as global_func;
 
 class TextWithHyperlinkDetection extends StatelessWidget {
   String text;
   double fontsize;
-  var hasLink = false;
+  bool hasLink = false;
   List<InlineSpan> textSpanList = [];
   Function? onTextTab;
-  var hyperlinkColor = Colors.blue[700];
+  Color? hyperlinkColor = Colors.blue[700];
   Color textColor;
   bool withoutActiveHyperLink;
   int? maxLines;
@@ -49,7 +50,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
         var wordArray = word.split("\n");
 
         if(wordArray.length == 1){
-          addHyperlinkText(word +" ");
+          addHyperlinkText("$word ");
         }else{
           for(var line in wordArray){
             if(global_func.isLink(line) || line.contains("http")|| global_func.isPhoneNumber(line)){
@@ -65,7 +66,7 @@ class TextWithHyperlinkDetection extends StatelessWidget {
         }
 
       }else{
-        addNormalText(word +" ");
+        addNormalText("$word ");
       }
     }
 

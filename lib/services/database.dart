@@ -1,9 +1,10 @@
+import 'dart:convert';
+import 'dart:io' as io;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' hide Key;
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:io' as io;
 import 'package:flutter/foundation.dart' as foundation;
 
 import '../auth/secrets.dart';

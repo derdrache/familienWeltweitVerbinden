@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../global/style.dart' as style;
 
 customSnackBar(context, text, {color = Colors.red, duration = const Duration(seconds: 3)}){

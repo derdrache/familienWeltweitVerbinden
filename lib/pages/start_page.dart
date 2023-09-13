@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:familien_suche/pages/login_register_page/on_boarding_slider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -17,7 +15,9 @@ import '../global/variablen.dart';
 import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../services/network_connectivity.dart';
+import '../widgets/layout/ownIconButton.dart';
 import 'informationen/information.dart';
+import 'login_register_page/on_boarding_slider.dart';
 import 'news/news_page.dart';
 import 'weltkarte/erkunden_page.dart';
 import 'chat/chat_page.dart';

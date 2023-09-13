@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'dialogWindow.dart';
+import '../windows/dialog_window.dart';
 
 class NutzerrichtlinenAnzeigen extends StatelessWidget {
-  String page;
-  var isGerman = kIsWeb
-      ? window.locale.languageCode == "de"
+  final String page;
+  final bool isGerman = kIsWeb
+      ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
 
   NutzerrichtlinenAnzeigen({Key? key,  required this.page}) : super(key: key);
@@ -98,28 +98,6 @@ All users commit themselves to exempt the Families worldwide from any liability 
       return TextSpan(
           text: AppLocalizations.of(context)!.nutzungsbedingungen,
           recognizer: TapGestureRecognizer()..onTap = () => termsOfUseWindow(),
-          style: TextStyle(
-              fontSize: fontSize,
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-              decoration: TextDecoration.underline));
-    }
-
-    privacyPolicyWindow() {
-      showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return CustomAlertDialog(
-                title: AppLocalizations.of(context)!.datenschutzrichtlinie,
-                children: const []);
-          });
-    }
-
-    privacyPolicy() {
-      return TextSpan(
-          text: AppLocalizations.of(context)!.datenschutzrichtlinie,
-          recognizer: TapGestureRecognizer()
-            ..onTap = () => privacyPolicyWindow(),
           style: TextStyle(
               fontSize: fontSize,
               color: Colors.black,

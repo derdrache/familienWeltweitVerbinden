@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-class StrikeThroughIcon extends StatelessWidget {
-  Icon child;
+import 'package:flutter/material.dart';
 
-  StrikeThroughIcon({Key? key, required this.child}) : super(key: key);
+
+class StrikeThroughIcon extends StatelessWidget {
+  final Icon child;
+
+  const StrikeThroughIcon({Key? key, required this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../auth/secrets.dart';
 import '../global/global_functions.dart' as global_funcs;
 import 'database.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 
 sendNotification(notificationInformation, {isGroupNotification = false}) async {
+  return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
 

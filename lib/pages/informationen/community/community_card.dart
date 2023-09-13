@@ -1,12 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:familien_suche/services/database.dart';
-import 'package:familien_suche/widgets/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
-
+import '../../../services/database.dart';
+import '../../../widgets/custom_card.dart';
 import '../../../widgets/layout/custom_like_button.dart';
 import 'community_details.dart';
 

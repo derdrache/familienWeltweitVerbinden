@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
+
 
 
 class ForceUpdatePage extends StatelessWidget {
@@ -16,7 +18,7 @@ class ForceUpdatePage extends StatelessWidget {
       home: Scaffold(
         body: Container(
           margin: const EdgeInsets.all(20),
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Center(
               child:
               Column(mainAxisAlignment: MainAxisAlignment.center, children: [

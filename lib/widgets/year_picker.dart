@@ -65,9 +65,6 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
 
   String _locale(BuildContext context) {
     var locale = Localizations.localeOf(context);
-    if (locale == null) {
-      return Intl.systemLocale;
-    }
 
     return '${locale.languageCode}_${locale.countryCode}';
   }
@@ -80,11 +77,11 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
     var header = buildHeader(theme, locale);
     var pager = buildPager(theme, locale);
     var content = Material(
+      color: theme.dialogBackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [pager, buildButtonBar(context, localizations)],
       ),
-      color: theme.dialogBackgroundColor,
     );
     return Theme(
         data: Theme.of(context)
@@ -233,49 +230,6 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
                     ).toList()
                   );
                 })));
-  }
-
-  Widget _getMonthButton(
-      final DateTime date, final ThemeData theme, final String locale) {
-    VoidCallback callback;
-    if (_firstDate == null && _lastDate == null) {
-      callback =
-          () => setState(() => selectedDate = DateTime(date.year, date.month));
-    } else if (_firstDate != null &&
-        _lastDate != null &&
-        _firstDate.compareTo(date) <= 0 &&
-        _lastDate.compareTo(date) >= 0) {
-      callback =
-          () => setState(() => selectedDate = DateTime(date.year, date.month));
-    } else if (_firstDate != null &&
-        _lastDate == null &&
-        _firstDate.compareTo(date) <= 0) {
-      callback =
-          () => setState(() => selectedDate = DateTime(date.year, date.month));
-    } else if (_firstDate == null && _lastDate != null &&
-        _lastDate.compareTo(date) >= 0) {
-      callback = () => setState(() =>
-          selectedDate = DateTime(date.year, date.month));
-    } else {
-      callback = () {};
-    }
-    return TextButton(
-      onPressed: callback,
-      style: TextButton.styleFrom(
-        foregroundColor: date.month == selectedDate.month && date.year == selectedDate.year
-            ? theme.colorScheme.secondary
-            : null,
-      ),
-      child: Text(
-        DateFormat.MMM(locale).format(date),
-        style: TextStyle(color: date.month == selectedDate.month && date.year == selectedDate.year
-            ? theme.colorScheme.primary
-            : date.month == DateTime.now().month &&
-            date.year == DateTime.now().year
-            ? theme.colorScheme.secondary
-            : null),
-      ),
-    );
   }
 
   Widget _getYearButton(int year, ThemeData theme, String locale) {

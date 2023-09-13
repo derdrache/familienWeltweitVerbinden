@@ -1,17 +1,19 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../../services/locationsService.dart';
 import '../../services/notification.dart' as notifications;
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../services/database.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 import '../../widgets/layout/custom_snackbar.dart';
 

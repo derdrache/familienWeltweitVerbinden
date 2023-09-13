@@ -1,20 +1,20 @@
 import 'dart:io';
 
-import '../../auth/secrets.dart';
-import '../../global/variablen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hive/hive.dart';
-import '../../global/global_functions.dart' as global_func;
 
+import '../../auth/secrets.dart';
+import '../../global/variablen.dart';
+import '../../global/global_functions.dart' as global_func;
 import '../../global/global_functions.dart' as global_functions;
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../windows/dialog_window.dart';
+import '../../widgets/layout/custom_dropdown_button.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
 import '../login_register_page/login_page.dart';

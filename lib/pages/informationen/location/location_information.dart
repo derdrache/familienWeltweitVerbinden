@@ -1,11 +1,6 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:familien_suche/functions/user_speaks_german.dart';
-import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/show_profil.dart';
-import 'package:familien_suche/services/database.dart';
-import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,21 +11,26 @@ import 'package:translator/translator.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import '../../../functions/is_user_inactive.dart';
+import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../../../global/style.dart' as style;
+import '../../../services/database.dart';
 import '../../../widgets/custom_appbar.dart';
-import '../../../widgets/dialogWindow.dart';
+import '../../../windows/custom_popup_menu.dart';
+import '../../../windows/dialog_window.dart';
 import '../../../widgets/image_upload_box.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 import '../../../windows/image_fullscreen.dart';
+import '../../chat/chat_details.dart';
+import '../../show_profil.dart';
 import '../../start_page.dart';
 import 'weltkarte_mini.dart';
 
 class LocationInformationPage extends StatefulWidget {
-  String ortName;
-  bool fromCityPage;
+  final String ortName;
+  final bool fromCityPage;
   int? insiderInfoId = 0;
 
   LocationInformationPage({Key? key, required this.ortName, this.fromCityPage = false, this.insiderInfoId})
@@ -173,11 +173,11 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
 }
 
 class GeneralInformationPage extends StatefulWidget {
-  Map location;
-  List usersCityInformation;
-  bool fromCityPage;
+  final Map location;
+  final List usersCityInformation;
+  final bool fromCityPage;
 
-  GeneralInformationPage(
+  const GeneralInformationPage(
       {Key? key,
       required this.location,
       required this.usersCityInformation,
@@ -521,10 +521,10 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 }
 
 class InsiderInformationPage extends StatefulWidget {
-  Map location;
-  int? insiderInfoId;
+  final Map location;
+  final int? insiderInfoId;
 
-  InsiderInformationPage({Key? key, required this.location, this.insiderInfoId}) : super(key: key);
+  const InsiderInformationPage({Key? key, required this.location, this.insiderInfoId}) : super(key: key);
 
   @override
   State<InsiderInformationPage> createState() => _InsiderInformationPageState();

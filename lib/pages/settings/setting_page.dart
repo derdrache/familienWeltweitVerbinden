@@ -1,17 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/settings/change_reiseplanung.dart';
-import 'package:familien_suche/widgets/layout/ownIconButton.dart';
-import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:familien_suche/pages/settings/changePasswort.dart';
-import 'package:familien_suche/pages/settings/change_aboutme.dart';
-import 'package:familien_suche/pages/settings/change_interessen.dart';
-import 'package:familien_suche/pages/settings/change_sprachen.dart';
-import 'package:familien_suche/pages/settings/notifications_option.dart';
-import 'package:familien_suche/pages/show_profil.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
@@ -24,17 +14,27 @@ import '../../global/global_functions.dart';
 import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../widgets/ChildrenBirthdatePicker.dart';
-import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_dropdown_button.dart';
 import '../../widgets/layout/custom_multi_select.dart';
+import '../../widgets/layout/ownIconButton.dart';
 import '../../widgets/profil_image.dart';
+import '../../windows/custom_popup_menu.dart';
 import '../../windows/donations.dart';
 import '../../windows/patchnotes.dart';
+import '../chat/chat_details.dart';
 import '../login_register_page/login_page.dart';
+import '../show_profil.dart';
+import 'change_aboutme.dart';
 import 'change_aufreise.dart';
 import 'change_besuchte_laender.dart';
 import 'change_children.dart';
+import 'change_interessen.dart';
+import 'change_passwort.dart';
+import 'change_reiseplanung.dart';
 import 'change_social_media.dart';
+import 'change_sprachen.dart';
 import 'family_profil.dart';
+import 'notifications_option.dart';
 import 'privacy_security_page.dart';
 import 'feedback_page.dart';
 import 'change_city.dart';
@@ -598,8 +598,7 @@ class _SupportInformation extends StatelessWidget {
             settingThemeContainer(
                 AppLocalizations.of(context)!.mitFreundenTeilen,
                 Icons.share,
-                () => Share.share(AppLocalizations.of(context)!.teilenLinkText +
-                    '\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
+                () => Share.share('${AppLocalizations.of(context)!.teilenLinkText}\nhttps://families-worldwide.com/\n\nAndroid:\nhttps://play.google.com/store/apps/details?id=dominik.familien_suche\n\niOS:\nhttps://apps.apple.com/app/families-worldwide/id6444735167')),
             settingThemeContainer(
                 AppLocalizations.of(context)!.spenden, Icons.favorite,
                 () => donationWindow(context)),

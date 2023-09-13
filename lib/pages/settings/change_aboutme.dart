@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
@@ -11,7 +11,7 @@ import '../../widgets/layout/custom_text_input.dart';
 class ChangeAboutmePage extends StatelessWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final String oldText;
-  TextEditingController textKontroller = TextEditingController();
+  final TextEditingController textKontroller = TextEditingController();
 
   ChangeAboutmePage({Key? key,this.oldText = ""}) : super(key: key);
 

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../widgets/flexible_date_picker.dart';
 
 double sideSpace = 10;
 
 
 class CustomDatePicker extends StatefulWidget {
-  var deleteFunction;
+  Function()? deleteFunction;
   bool dateIsSelected;
   var datePicker;
 
@@ -64,7 +65,7 @@ class CustomDatePickerState extends State<CustomDatePicker> {
 
 class ChildrenBirthdatePickerBox extends StatefulWidget {
   List childrensBirthDatePickerList = [];
-  var margin;
+  EdgeInsets? margin;
 
   getDates({bool years = false}){
     List dates = [];
@@ -119,7 +120,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
   ChildrenBirthdatePickerBox({Key? key, this.margin}) : super(key: key);
 
   @override
-  _ChildrenBirthdatePickerBoxState createState() => _ChildrenBirthdatePickerBoxState();
+  State<ChildrenBirthdatePickerBox> createState() => _ChildrenBirthdatePickerBoxState();
 }
 
 class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox> {
@@ -222,7 +223,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
 
     return Align(
       alignment: Alignment.topCenter,
-      child: Container(
+      child: SizedBox(
         width: webWidth,
         child: Wrap(
           children: [

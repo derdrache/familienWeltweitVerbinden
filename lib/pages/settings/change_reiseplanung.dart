@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:collection/collection.dart';
+import "package:collection/collection.dart" show DeepCollectionEquality;
 
+import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../widgets/flexible_date_picker.dart';

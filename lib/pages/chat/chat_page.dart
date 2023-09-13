@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:familien_suche/pages/start_page.dart';
-import 'package:familien_suche/widgets/custom_appbar.dart';
-import 'package:familien_suche/widgets/dialogWindow.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,16 +11,19 @@ import 'package:intl/intl.dart';
 import '../../global/global_functions.dart';
 import '../../global/style.dart';
 import '../../services/database.dart';
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/profil_image.dart';
 import '../../global/style.dart' as style;
 import '../../widgets/strike_through_icon.dart';
 import '../../windows/all_user_select.dart';
+import '../../windows/dialog_window.dart';
+import '../start_page.dart';
 import 'chat_details.dart';
 
 class ChatPage extends StatefulWidget {
-  int chatPageSliderIndex;
+  final int chatPageSliderIndex;
 
-  ChatPage({Key? key, required this.chatPageSliderIndex}) : super(key: key);
+  const ChatPage({Key? key, required this.chatPageSliderIndex}) : super(key: key);
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -122,7 +122,8 @@ class _ChatPageState extends State<ChatPage>{
 
     if(selectedUser.isEmpty) return;
 
-    Navigator.push(
+    if (context.mounted) {
+      Navigator.push(
         context,
         MaterialPageRoute(
             builder: (_) => ChatDetailsPage(
@@ -134,6 +135,7 @@ class _ChatPageState extends State<ChatPage>{
         StartPage(
           selectedIndex: 3,
         )));
+    }
   }
 
   checkNewChatGroup(chatPartnerId) {
@@ -156,8 +158,7 @@ class _ChatPageState extends State<ChatPage>{
     var messageList = message.split("\n") ?? [];
 
     if (messageList.length > 2) {
-      message =
-          "${[messageList[0] ?? " " + messageList[1] ?? " "].join("\n")} ...";
+      message = "${[messageList[0] ?? "${messageList[1] ?? " "}"].join("\n")} ...";
     }
 
     return message;

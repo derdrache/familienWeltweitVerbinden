@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../global/style.dart' as style;
 
 class SearchAutocomplete extends StatefulWidget {
@@ -47,7 +48,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
         color: Theme.of(context).brightness == Brightness.dark
             ? Colors.black
             : Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),
+          borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners)),
           border: Border.all()
       ),
       child: Stack(
@@ -108,7 +109,7 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                   contentPadding: const EdgeInsets.all(10.0),
                   suffixIcon: IconButton(
                     onPressed: textEditingController.clear,
-                    icon: Icon(Icons.clear, color: Colors.red,),
+                    icon: const Icon(Icons.clear, color: Colors.red,),
                   ),
                 ),
                 focusNode: focusNode,

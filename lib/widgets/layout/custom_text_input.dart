@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../../global/style.dart' as style;
 
 class CustomTextInput extends StatelessWidget {
@@ -58,8 +59,8 @@ class CustomTextInput extends StatelessWidget {
           Align(
             alignment: Alignment.center,
             child: Container(
-              constraints: BoxConstraints(maxWidth: style.webWidth),
-              margin: margin ?? EdgeInsets.all(style.sideSpace),
+              constraints: const BoxConstraints(maxWidth: style.webWidth),
+              margin: margin ?? const EdgeInsets.all(style.sideSpace),
               child: TextFormField(
                   inputFormatters: inputFormater,
                   focusNode: focusNode,

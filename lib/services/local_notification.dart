@@ -20,11 +20,11 @@ class LocalNotificationService{
           priority: Priority.high,
 
           actions: !withMeetupAction ? null : <AndroidNotificationAction>[
-            AndroidNotificationAction('id_1', 'MeetupZusagen'),
-            AndroidNotificationAction('id_2', 'MeetupAbsagen'),
+            const AndroidNotificationAction('id_1', 'MeetupZusagen'),
+            const AndroidNotificationAction('id_2', 'MeetupAbsagen'),
           ]
         ),
-        iOS: DarwinNotificationDetails()
+        iOS: const DarwinNotificationDetails()
       );
 
       var typ = jsonEncode(json.decode(message.data.values.last)["typ"]);

@@ -1,15 +1,14 @@
-import 'package:familien_suche/global/global_functions.dart';
-import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_page.dart';
-import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../../global/style.dart' as style;
-import '../../widgets/layout/badgeWidget.dart';
+import '../../global/global_functions.dart';
+import '../../widgets/layout/badge_widget.dart';
+import '../../widgets/layout/ownIconButton.dart';
 import '../informationen/community/community_page.dart';
 import '../informationen/meetups/meetup_page.dart';
+import 'bulletin_board/bulletin_board_page.dart';
 import 'location/location_page.dart';
 
 class InformationPage extends StatefulWidget {
@@ -96,7 +95,7 @@ class _InformationPageState extends State<InformationPage>{
                   Container(
                       padding: const EdgeInsets.only(left: 10),
                       child: OwnIconButton(
-                        margin: EdgeInsets.all(5),
+                        margin: const EdgeInsets.all(5),
                         tooltipText: tooltipText,
                         image: icon,
                         bigButton: true,

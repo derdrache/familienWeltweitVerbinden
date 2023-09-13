@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:familien_suche/pages/login_register_page/login_page.dart';
-import 'package:familien_suche/widgets/layout/custom_snackbar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -17,12 +15,14 @@ import '../../global/profil_sprachen.dart';
 import '../../services/database.dart';
 import '../../widgets/ChildrenBirthdatePicker.dart';
 import '../../widgets/google_autocomplete.dart';
-import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../widgets/layout/custom_dropdown_button.dart';
 import '../../widgets/layout/custom_multi_select.dart';
+import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/variablen.dart' as global_variablen;
 import '../start_page.dart';
+import 'login_page.dart';
 
 var isGerman = kIsWeb
     ? PlatformDispatcher.instance.locale.languageCode == "de"
@@ -58,9 +58,9 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   next() async {
     if(currentPage == 0 && ! await sliderStepOne.allFilledAndErrorMsg(context)){
       return;
-    }else if(currentPage == 1 && !sliderStepTwo.allFilledAndErrorMsg(context)){
+    }else if(currentPage == 1 && context.mounted && !sliderStepTwo.allFilledAndErrorMsg(context)){
       return;
-    }else if(currentPage == 2 && !sliderStepThree.allFilledAndErrorMsg(context)){
+    }else if(currentPage == 2 && context.mounted &&!sliderStepThree.allFilledAndErrorMsg(context)){
       return;
     }
 
@@ -108,18 +108,23 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
           .createUserWithEmailAndPassword(email: profilData["email"], password: profilData["password"]);
       accounterSuccessfullyCreated = true;
     } on FirebaseAuthException catch (error) {
+      if(!context.mounted) return;
+
       if (error.code == "email-already-in-use") {
-        customSnackBar(
+          customSnackBar(
             context, AppLocalizations.of(context)!.emailInBenutzung);
       } else if (error.code == "invalid-email") {
         customSnackBar(context, AppLocalizations.of(context)!.emailUngueltig);
       } else if (error.code == "weak-password") {
-        customSnackBar(
+          customSnackBar(
             context, AppLocalizations.of(context)!.passwortSchwach);
       } else if (error.code == "network-request-failed") {
-        customSnackBar(
+          customSnackBar(
             context, AppLocalizations.of(context)!.keineVerbindungInternet);
+
       }
+
+
       pageController.jumpToPage(0);
     }
 

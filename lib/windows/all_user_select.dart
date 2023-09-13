@@ -3,21 +3,21 @@ import 'package:hive/hive.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../widgets/dialogWindow.dart';
+import 'dialog_window.dart';
 import '../widgets/search_autocomplete.dart';
 import '../../global/style.dart' as style;
 
 
 class AllUserSelectWindow {
   var context;
-  var title;
+  String title;
   List<String> allUserNames = [];
   var allUserIds = [];
   late var searchAutocomplete;
-  var selectedUserId;
+  String? selectedUserId;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
 
-  AllUserSelectWindow({this.context, this.title});
+  AllUserSelectWindow({this.context, required this.title});
 
   setAllUserData() {
     var allProfilData = Hive.box("secureBox").get("profils");

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
+
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
@@ -13,11 +14,11 @@ import '../../../global/profil_sprachen.dart';
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../../widgets/custom_appbar.dart';
-import '../../../widgets/dialogWindow.dart';
+import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/style.dart' as style;
-import '../../../widgets/layout/custom_dropdownButton.dart';
+import '../../../widgets/layout/custom_dropdown_button.dart';
 import '../../../widgets/layout/custom_multi_select.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';

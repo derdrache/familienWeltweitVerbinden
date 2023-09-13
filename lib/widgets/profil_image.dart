@@ -8,14 +8,14 @@ import '../functions/upload_and_save_image.dart';
 import '../global/global_functions.dart';
 import '../global/style.dart' as style;
 import '../services/database.dart';
-import 'dialogWindow.dart';
+import '../windows/dialog_window.dart';
 import 'layout/custom_snackbar.dart';
 import 'layout/custom_text_input.dart';
 
 class ProfilImage extends StatefulWidget {
-  var profil;
-  var changeable;
-  var fullScreenWindow;
+  Map profil;
+  bool changeable;
+  bool fullScreenWindow;
   double size;
 
   ProfilImage(this.profil,
@@ -26,7 +26,7 @@ class ProfilImage extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ProfilImageState createState() => _ProfilImageState();
+  State<ProfilImage> createState() => _ProfilImageState();
 }
 
 class _ProfilImageState extends State<ProfilImage> {
@@ -90,11 +90,6 @@ class _ProfilImageState extends State<ProfilImage> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.profilbildAendern,
-              children: [
-                CustomTextInput(
-                    AppLocalizations.of(context)!.linkProfilbildEingeben,
-                    profilImageLinkKontroller),
-              ],
               actions: [
                 TextButton(
                   child: Text(AppLocalizations.of(context)!.speichern),
@@ -105,11 +100,16 @@ class _ProfilImageState extends State<ProfilImage> {
                   onPressed: () => Navigator.pop(context),
                 )
               ],
+              children: [
+                CustomTextInput(
+                    AppLocalizations.of(context)!.linkProfilbildEingeben,
+                    profilImageLinkKontroller),
+              ],
             );
           });
     }
 
-    _showPopupMenu(tabPosition) async {
+    showPopupMenu(tabPosition) async {
       final overlay =
           Overlay.of(context).context.findRenderObject() as RenderBox;
 
@@ -158,7 +158,7 @@ class _ProfilImageState extends State<ProfilImage> {
                 child: GestureDetector(
                     onTapDown: (details) {
                       var getTabPostion = details.globalPosition;
-                      _showPopupMenu(getTabPostion);
+                      showPopupMenu(getTabPostion);
                     },
                     child: const Icon(Icons.change_circle)))
         ],
@@ -168,8 +168,8 @@ class _ProfilImageState extends State<ProfilImage> {
 }
 
 class DefaultProfilImage extends StatelessWidget {
-  var profil;
-  var size;
+  Map profil;
+  double size;
 
   DefaultProfilImage(this.profil, this.size, {Key? key}) : super(key: key);
 
@@ -241,12 +241,12 @@ class DefaultProfilImage extends StatelessWidget {
 }
 
 class OwnProfilImage extends StatelessWidget {
-  var profil;
-  var fullScreenWindow;
+  Map profil;
+  bool fullScreenWindow;
   double size;
 
   OwnProfilImage(this.profil,
-      {Key? key, this.fullScreenWindow, required this.size})
+      {Key? key, this.fullScreenWindow = false, required this.size})
       : super(key: key);
 
   @override
@@ -276,11 +276,11 @@ class OwnProfilImage extends StatelessWidget {
                       child: InkResponse(
                           onTap: () => Navigator.pop(context),
                           child: const CircleAvatar(
+                            backgroundColor: Colors.red,
                             child: Icon(
                               Icons.close,
                               size: 16,
                             ),
-                            backgroundColor: Colors.red,
                           )),
                     )
                   ],
@@ -311,14 +311,14 @@ class OwnProfilImage extends StatelessWidget {
 }
 
 class ImageCircleAvatar extends StatelessWidget {
-  var imageProvider;
+  ImageProvider? imageProvider;
   double size;
-  var backgroundColor;
+  Color? backgroundColor;
   Widget? child;
-  var childBackgroundColor;
+  Color? childBackgroundColor;
 
   ImageCircleAvatar(
-      {this.imageProvider,
+      {super.key, this.imageProvider,
       required this.size,
       this.backgroundColor,
       this.child,

@@ -25,9 +25,7 @@ class _MonthPickerBoxState extends State<MonthPickerBox> {
   createText() {
     if (widget.selectedDate == null) return widget.hintText;
 
-    return widget.selectedDate!.month.toString() +
-        "." +
-        widget.selectedDate!.year.toString();
+    return "${widget.selectedDate!.month}.${widget.selectedDate!.year}";
   }
 
   @override
@@ -115,9 +113,6 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
 
   String _locale(BuildContext context) {
     var locale = Localizations.localeOf(context);
-    if (locale == null) {
-      return Intl.systemLocale;
-    }
 
     return '${locale.languageCode}_${locale.countryCode}';
   }
@@ -130,11 +125,11 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
     var header = buildHeader(theme, locale);
     var pager = buildPager(theme, locale);
     var content = Material(
+      color: theme.dialogBackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [pager, buildButtonBar(context, localizations)],
       ),
-      color: theme.dialogBackgroundColor,
     );
 
     return Theme(

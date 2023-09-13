@@ -8,9 +8,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   var elevation;
   var onTap;
   var leading;
-  var profilBildProfil;
-  var withLeading;
-  var backgroundColor;
+  Map? profilBildProfil;
+  bool withLeading;
+  Color? backgroundColor;
   double? fontSize;
 
   CustomAppBar(
@@ -63,7 +63,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         height: 50,
                         width: 60,
                         child: ProfilImage(
-                          profilBildProfil,
+                          profilBildProfil!,
                           fullScreenWindow: true,
                         ),
                       )),
@@ -91,7 +91,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                             height: 50,
                             width: 60,
                             child: ProfilImage(
-                              profilBildProfil,
+                              profilBildProfil!,
                               fullScreenWindow: true,
                             ),
                           ),

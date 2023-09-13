@@ -1,8 +1,8 @@
-import 'package:familien_suche/functions/user_speaks_german.dart';
-import 'package:familien_suche/global/global_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
+import '../../../functions/user_speaks_german.dart';
+import '../../../global/global_functions.dart';
 import 'bulletin_board_details.dart';
 
 class BulletinBoardCard extends StatefulWidget {
@@ -91,7 +91,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
                 Text(
                   getNoteTitle(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold),
                 ),
@@ -100,12 +100,12 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
                 ),
                 Text(
                   getStringSized(noteLocation),
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.black),
                 ),
                 if (noteCountry != noteLocation)
                   Text(getStringSized(noteCountry),
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.black))
               ],
             )),

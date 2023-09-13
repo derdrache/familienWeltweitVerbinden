@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

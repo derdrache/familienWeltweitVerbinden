@@ -1,9 +1,11 @@
-import 'package:familien_suche/services/locationsService.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
-import '../global/style.dart' as style;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../global/style.dart' as style;
+import '../services/locationsService.dart';
+
 
 class GoogleAutoComplete extends StatefulWidget {
   List<Map> searchableItems = [];
@@ -13,10 +15,10 @@ class GoogleAutoComplete extends StatefulWidget {
   bool isSearching = false;
   bool suche;
   String hintText;
-  var googleSearchResult;
+  Map? googleSearchResult;
   var sessionToken = const Uuid().v4();
   Function? onConfirm;
-  var margin;
+  EdgeInsets margin;
   bool withOwnLocation;
   bool withWorldwideLocation;
   Color? borderColor;
@@ -66,7 +68,7 @@ class GoogleAutoComplete extends StatefulWidget {
       : super(key: key);
 
   @override
-  _GoogleAutoCompleteState createState() => _GoogleAutoCompleteState();
+  State<GoogleAutoComplete> createState() => _GoogleAutoCompleteState();
 }
 
 class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {

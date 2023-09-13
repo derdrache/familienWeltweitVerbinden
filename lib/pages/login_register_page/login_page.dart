@@ -1,6 +1,5 @@
 import 'dart:io' show Platform;
 
-import 'package:familien_suche/pages/login_register_page/on_boarding_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -13,7 +12,7 @@ import 'package:stacked_firebase_auth/stacked_firebase_auth.dart';
 import '../../auth/secrets.dart';
 import '../../functions/sendAdmin.dart';
 import '../../global/global_functions.dart' as global_functions;
-import '../../widgets/dialogWindow.dart';
+import '../../windows/dialog_window.dart';
 import '../../widgets/layout/custom_floating_action_button_extended.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
@@ -21,6 +20,7 @@ import '../start_page.dart';
 import '../login_register_page/forget_password_page.dart';
 import '../../services/database.dart';
 import 'impressum.dart';
+import 'on_boarding_slider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -88,14 +88,19 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         isLoading = false;
       });
+
       if (error.code == "user-not-found") {
-        customSnackBar(
+        if (context.mounted) {
+          customSnackBar(
             context, AppLocalizations.of(context)!.benutzerNichtGefunden);
+        }
       } else if (error.code == "wrong-password") {
-        customSnackBar(context, AppLocalizations.of(context)!.passwortFalsch);
+        if (context.mounted) customSnackBar(context, AppLocalizations.of(context)!.passwortFalsch);
       } else if (error.code == "network-request-failed") {
-        customSnackBar(
+        if (context.mounted) {
+          customSnackBar(
             context, AppLocalizations.of(context)!.keineVerbindungInternet);
+        }
       }
     }
   }
@@ -408,7 +413,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     Widget socialLoginButtons() {
-      if(kIsWeb) return SizedBox.shrink();
+      if(kIsWeb) return const SizedBox.shrink();
 
       return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         if (kIsWeb|| !Platform.isIOS) googleLoginButton(),

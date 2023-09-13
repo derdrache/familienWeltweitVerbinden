@@ -1,20 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:familien_suche/widgets/layout/custom_like_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
 import '../../../widgets/custom_card.dart';
-import 'location_Information.dart';
+import '../../../widgets/layout/custom_like_button.dart';
+import 'location_information.dart';
 
 class LocationCard extends StatefulWidget {
-  Map location;
-  bool fromCityPage;
-  bool smallCard;
-  Function? afterLike;
+  final Map location;
+  final bool fromCityPage;
+  final bool smallCard;
+  final Function? afterLike;
 
-  LocationCard(
+  const LocationCard(
       {Key? key,
       required this.location,
       this.fromCityPage = false,

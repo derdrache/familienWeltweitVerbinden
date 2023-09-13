@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-import 'package:familien_suche/global/global_functions.dart' as global_func;
-import 'package:familien_suche/services/database.dart';
-import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -10,6 +7,9 @@ import 'package:translator/translator.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../global/style.dart' as style;
+import '../../../global/global_functions.dart' as global_func;
+import '../../../services/database.dart';
+import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/nutzerrichtlinen.dart';

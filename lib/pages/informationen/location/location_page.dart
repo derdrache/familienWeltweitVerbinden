@@ -52,8 +52,9 @@ class _LocationPageState extends State<LocationPage> {
       var hasInterest = city["interesse"].contains(userId);
       var isCity = city["isCity"] == 1;
 
-      if (hasInterest && (widget.forLand ? !isCity : isCity))
+      if (hasInterest && (widget.forLand ? !isCity : isCity)) {
         interestCities.add(city);
+      }
     }
 
     return interestCities;
@@ -74,8 +75,9 @@ class _LocationPageState extends State<LocationPage> {
           searchText.isEmpty;
       var isCity = city["isCity"] == 1;
 
-      if (containsSearch && (widget.forLand ? !isCity : isCity))
+      if (containsSearch && (widget.forLand ? !isCity : isCity)) {
         searchedCities.add(city);
+      }
     }
 
     return searchedCities;

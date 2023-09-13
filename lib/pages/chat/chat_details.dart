@@ -2,16 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:familien_suche/global/global_functions.dart'
-    as global_functions;
-import 'package:familien_suche/pages/chat/pin_messages.dart';
-import 'package:familien_suche/pages/show_profil.dart';
-import 'package:familien_suche/pages/start_page.dart';
-import 'package:familien_suche/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -27,8 +21,10 @@ import 'package:record_mp3/record_mp3.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 
 import '../../global/style.dart' as style;
+import '../../global/global_functions.dart' as global_functions;
 import '../../functions/upload_and_save_image.dart';
 import '../../global/profil_sprachen.dart';
+import '../../services/database.dart';
 import '../../streams/record_timer.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../windows/custom_popup_menu.dart';
@@ -39,13 +35,16 @@ import '../informationen/meetups/meetup_card.dart';
 import '../informationen/meetups/meetup_details.dart';
 import '../../auth/secrets.dart';
 import '../../widgets/custom_appbar.dart';
-import '../../widgets/dialogWindow.dart';
+import '../../windows/dialog_window.dart';
 import '../../widgets/profil_image.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
 import '../../windows/all_user_select.dart';
 import '../../widgets/strike_through_icon.dart';
-import '../informationen/location/location_Information.dart';
+import '../informationen/location/location_information.dart';
 import '../informationen/location/location_card.dart';
+import '../show_profil.dart';
+import '../start_page.dart';
+import 'pin_messages.dart';
 
 class ChatDetailsPage extends StatefulWidget {
   String? chatPartnerId;

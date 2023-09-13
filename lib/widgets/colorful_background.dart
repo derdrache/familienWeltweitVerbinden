@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import '../global/style.dart' as Style;
+
+import 'package:flutter/material.dart';
+
+import '../global/style.dart' as style;
 
 class ColorfulBackground extends StatelessWidget {
   ColorfulBackground({
-    Key? key,
+    super.key,
     this.width = double.infinity,
     this.height = double.infinity,
     this.child,
@@ -31,7 +33,7 @@ class ColorfulBackground extends StatelessWidget {
               height: height / 3 * 2,
               width: 300,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Style.roundedCorners),
+                borderRadius: BorderRadius.circular(style.roundedCorners),
                 color: Colors.white.withOpacity(0.2),
               ),
             ),
@@ -46,7 +48,7 @@ class ColorfulBackground extends StatelessWidget {
               height: height / 3,
               width: 150,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Style.roundedCorners),
+                borderRadius: BorderRadius.circular(style.roundedCorners),
                 color: Colors.white.withOpacity(0.2),
               ),
             ),
@@ -61,7 +63,7 @@ class ColorfulBackground extends StatelessWidget {
               height: height / 3 * 2,
               width: 250,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Style.roundedCorners),
+                borderRadius: BorderRadius.circular(style.roundedCorners),
                 color: Colors.white.withOpacity(0.15),
               ),
             ),
@@ -76,7 +78,7 @@ class ColorfulBackground extends StatelessWidget {
               height: height / 3 * 2,
               width: 400,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Style.roundedCorners),
+                borderRadius: BorderRadius.circular(style.roundedCorners),
                 color: Colors.white.withOpacity(0.15),
               ),
             ),

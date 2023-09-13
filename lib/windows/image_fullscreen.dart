@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/dialogWindow.dart';
+import 'dialog_window.dart';
 
 
 ImageFullscreen(context, image) {

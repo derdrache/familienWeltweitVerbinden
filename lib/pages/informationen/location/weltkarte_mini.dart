@@ -4,9 +4,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 class WorldmapMini extends StatelessWidget {
-  double minMapZoom = kIsWeb ? 2.0 : 1.6;
-  double maxMapZoom = 14;
-  Map location;
+  final double minMapZoom = kIsWeb ? 2.0 : 1.6;
+  final double maxMapZoom = 14;
+  final Map location;
 
   WorldmapMini({Key? key, required this.location}) : super(key: key);
 

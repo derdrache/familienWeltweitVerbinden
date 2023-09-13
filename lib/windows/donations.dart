@@ -1,4 +1,4 @@
-import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,19 +28,19 @@ donationWindow(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CustomAlertDialog(children: [
+        return CustomAlertDialog( children: [
           Image.asset("assets/bilder/walletMatrixcode.png"),
           const SizedBox(height: 10,),
           Column(
             children: [
-              Text("Wallet:"),
+              const Text("Wallet:"),
               Text(walletKey)
             ],
           ),
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           Padding(
             padding: const EdgeInsets.all(10.0),
-            child: FloatingActionButton.extended(onPressed: () => copyText(walletKey), label: Text("Copy"),),
+            child: FloatingActionButton.extended(onPressed: () => copyText(walletKey), label: const Text("Copy"),),
           )
         ]);
       }

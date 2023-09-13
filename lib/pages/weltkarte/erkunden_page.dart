@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'dart:io';
-import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/informationen/location/location_Information.dart';
-import 'package:familien_suche/widgets/dialogWindow.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +21,10 @@ import '../../widgets/search_autocomplete.dart';
 import '../../widgets/flexible_date_picker.dart';
 import '../../services/database.dart';
 import '../../services/locationsService.dart';
+import '../../windows/dialog_window.dart';
+import '../chat/chat_details.dart';
 import '../informationen/community/community_card.dart';
+import '../informationen/location/location_information.dart';
 import '../informationen/meetups/meetup_card.dart';
 import '../show_profil.dart';
 

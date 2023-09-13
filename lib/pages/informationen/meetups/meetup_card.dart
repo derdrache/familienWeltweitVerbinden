@@ -1,6 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:familien_suche/services/database.dart';
-import 'package:familien_suche/widgets/layout/custom_like_button.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -9,21 +7,23 @@ import 'package:hive/hive.dart';
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_func;
+import '../../../services/database.dart';
 import '../../../widgets/custom_card.dart';
+import '../../../widgets/layout/custom_like_button.dart';
 import 'meetup_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser!.uid;
 
 class MeetupCard extends StatefulWidget {
-  EdgeInsets margin;
-  Map meetupData;
-  bool withInteresse;
-  Function? afterPageVisit;
-  bool isCreator;
-  bool bigCard;
-  bool fromMeetupPage;
-  bool smallCard;
-  Function? afterFavorite;
+  final EdgeInsets margin;
+  final Map meetupData;
+  final bool withInteresse;
+  final Function? afterPageVisit;
+  final bool isCreator;
+  final bool bigCard;
+  final bool fromMeetupPage;
+  final bool smallCard;
+  final Function? afterFavorite;
 
   MeetupCard({
     Key? key,

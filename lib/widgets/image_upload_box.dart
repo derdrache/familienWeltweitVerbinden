@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../functions/upload_and_save_image.dart';
 import '../services/database.dart';
 import '../windows/image_fullscreen.dart';
-import 'dialogWindow.dart';
 
 class ImageUploadBox extends StatefulWidget {
   String imageKategorie;
@@ -13,7 +12,7 @@ class ImageUploadBox extends StatefulWidget {
   List images = [null, null, null, null];
 
   ImageUploadBox({
-    Key? key,
+    super.key,
     required this.imageKategorie,
     this.numerImages = 4,
     this.uploadedImages
@@ -95,7 +94,7 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
               Container(
                 width: 80,
                 height: 80,
-                margin: EdgeInsets.all(5),
+                margin: const EdgeInsets.all(5),
                 child: Card(
                   elevation: 12,
                   child: value == null

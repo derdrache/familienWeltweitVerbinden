@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-import 'package:familien_suche/functions/user_speaks_german.dart';
-import 'package:familien_suche/pages/show_profil.dart';
-import 'package:familien_suche/widgets/layout/ownIconButton.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,19 +8,21 @@ import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:translator/translator.dart';
 
+import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
-import '../../../global/style.dart' as style;
 import '../../../global/profil_sprachen.dart';
 import '../../../services/notification.dart';
-import '../../../widgets/dialogWindow.dart';
+import '../../../widgets/layout/ownIconButton.dart';
+import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../services/database.dart';
 import '../../../global/variablen.dart' as global_var;
-import '../../../widgets/layout/custom_dropdownButton.dart';
+import '../../../widgets/layout/custom_dropdown_button.dart';
 import '../../../widgets/layout/custom_multi_select.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
-import '../location/location_Information.dart';
+import '../../show_profil.dart';
+import '../location/location_information.dart';
 import 'meetup_image_galerie.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 
@@ -291,7 +290,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   }
 
   checkAndSaveNewLocation() {
-    var newLocation = ortAuswahlBox.googleSearchResult;
+    Map newLocation = ortAuswahlBox.googleSearchResult!;
 
     if (newLocation["city"].isEmpty) return false;
 

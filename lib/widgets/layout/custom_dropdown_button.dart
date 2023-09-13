@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../global/style.dart' as style;
 
 class CustomDropdownButton extends StatefulWidget {
@@ -24,7 +25,7 @@ class CustomDropdownButton extends StatefulWidget {
   }
 
   @override
-  _CustomDropdownButtonState createState() => _CustomDropdownButtonState();
+  State<CustomDropdownButton> createState() => _CustomDropdownButtonState();
 }
 
 class _CustomDropdownButtonState extends State<CustomDropdownButton> {
@@ -52,7 +53,7 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
           border: Border.all(width: 1, color: Theme.of(context).brightness == Brightness.dark
               ? Colors.white
               : Colors.black),
-          borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))
+          borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners))
       ),
       child: DropdownButtonFormField<String>(
         isExpanded: true,

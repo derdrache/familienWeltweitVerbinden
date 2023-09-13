@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+
 import 'package:curved_text/curved_text.dart';
-import 'package:familien_suche/widgets/dialogWindow.dart';
-import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,7 +22,9 @@ import '../widgets/layout/custom_snackbar.dart';
 import '../widgets/layout/custom_text_input.dart';
 import '../widgets/profil_image.dart';
 import '../widgets/text_with_hyperlink_detection.dart';
-import 'informationen/location/location_Information.dart';
+import '../windows/custom_popup_menu.dart';
+import '../windows/dialog_window.dart';
+import 'informationen/location/location_information.dart';
 
 String? userId = FirebaseAuth.instance.currentUser?.uid;
 double headlineTextSize = 18;

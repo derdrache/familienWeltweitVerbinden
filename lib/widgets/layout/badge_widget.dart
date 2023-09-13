@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../global/style.dart' as style;
 
 class BadgeWidget extends StatelessWidget {
@@ -23,7 +24,7 @@ class BadgeWidget extends StatelessWidget {
                 width: badgeSize,
                 height: badgeSize,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners)),
+                  borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners)),
                   color: Theme.of(context).colorScheme.secondary,
                 ),
                 child: Center(

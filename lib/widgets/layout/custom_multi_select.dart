@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+
 import '../../global/style.dart' as style;
-
-
 
 class CustomMultiTextForm extends StatefulWidget {
   List auswahlList;
@@ -48,7 +47,7 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
 
     return Container(
       width: style.webWidth,
-      margin: widget.margin ?? EdgeInsets.all(style.sideSpace),
+      margin: widget.margin ?? const EdgeInsets.all(style.sideSpace),
       decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).brightness == Brightness.dark
               ? Colors.white

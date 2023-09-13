@@ -1,17 +1,16 @@
-import 'package:familien_suche/widgets/custom_appbar.dart';
+import 'dart:io' as io;
+import 'dart:ui' as ui;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
-import 'dart:io' as io;
-import 'dart:ui' as ui;
 
 import '../../../global/global_functions.dart';
-import '../../../global/global_functions.dart' as global_functions;
 import '../../../services/locationsService.dart';
-import '../../../widgets/layout/badgeWidget.dart';
-import '../../start_page.dart';
+import '../../../widgets/custom_appbar.dart';
+import '../../../widgets/layout/badge_widget.dart';
 import 'meetup_card.dart';
 import 'meetup_erstellen.dart';
 
@@ -77,8 +76,9 @@ class _MeetupPageState extends State<MeetupPage> {
                   .contains(searchText);
       bool cityKondition = meetup["stadt"].toLowerCase().contains(searchText);
 
-      if ((nameKondition || countryKondition || cityKondition) && isNotPrivat)
+      if ((nameKondition || countryKondition || cityKondition) && isNotPrivat) {
         searchedMeetups.add(meetup);
+      }
     }
 
     return searchedMeetups;

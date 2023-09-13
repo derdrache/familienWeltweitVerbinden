@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 class LoadingButton extends StatelessWidget {
-  var color;
-  LoadingButton({Key? key, this.color = Colors.white}) : super(key: key);
+  final Color color;
+
+  const LoadingButton({Key? key, this.color = Colors.white}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
         child: CircularProgressIndicator(
           color: color,
         ));

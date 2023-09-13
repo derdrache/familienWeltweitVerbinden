@@ -1,9 +1,9 @@
-import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
+import '../../widgets/custom_appbar.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
 
 class PinMessagesPage extends StatelessWidget {

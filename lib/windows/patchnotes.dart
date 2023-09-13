@@ -3,13 +3,13 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
-import '../widgets/dialogWindow.dart';
+import 'dialog_window.dart';
 
 
 class PatchnotesWindow{
   var context;
   var patchnotesTitle = "Patchnotes";
-  var isGerman = kIsWeb ? window.locale.languageCode == "de" : Platform.localeName == "de_DE";
+  var isGerman = kIsWeb ? PlatformDispatcher.instance.locale.languageCode == "de" : Platform.localeName == "de_DE";
 
   PatchnotesWindow({this.context});
 

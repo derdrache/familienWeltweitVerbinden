@@ -1,9 +1,9 @@
-import 'package:familien_suche/global/encryption.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../services/database.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../global/encryption.dart';
+import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
@@ -11,17 +11,17 @@ import '../../widgets/layout/custom_text_input.dart';
 class ChangeEmailPage extends StatelessWidget {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
   final String userEmail = FirebaseAuth.instance.currentUser!.email!;
-  TextEditingController emailKontroller = TextEditingController();
-  TextEditingController passwortKontroller = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   ChangeEmailPage({Key? key}) : super(key: key);
 
-  userLogin(passwort) async {
+  userLogin(password) async {
     var userEmail = FirebaseAuth.instance.currentUser!.email;
     UserCredential? loginUser;
     try {
       loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: userEmail ?? "", password: passwort);
+          email: userEmail ?? "", password: password);
     } on FirebaseAuthException catch (_) {
       loginUser = null;
     }
@@ -33,24 +33,24 @@ class ChangeEmailPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     checkValidationAndError() async {
-      if (emailKontroller.text.isEmpty) {
+      if (emailController.text.isEmpty) {
         customSnackBar(context, AppLocalizations.of(context)!.emailEingeben);
         return false;
       }
-      if (passwortKontroller.text.isEmpty) {
+      if (passwordController.text.isEmpty) {
         customSnackBar(context, AppLocalizations.of(context)!.passwortEingeben);
         return false;
       }
 
       bool emailIsValid = RegExp(
-          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-          .hasMatch(emailKontroller.text);
+          r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          .hasMatch(emailController.text);
       if (!emailIsValid) {
         customSnackBar(context, AppLocalizations.of(context)!.emailUngueltig);
         return false;
       }
 
-      var loginUser = await userLogin(passwortKontroller.text);
+      var loginUser = await userLogin(passwordController.text);
       if (loginUser == null && context.mounted) {
         customSnackBar(
             context, AppLocalizations.of(context)!.emailOderPasswortFalsch);
@@ -62,18 +62,18 @@ class ChangeEmailPage extends StatelessWidget {
 
     save() async {
       bool isValid = await checkValidationAndError();
-      var encryptedEmail = encrypt(emailKontroller.text);
+      var encryptedEmail = encrypt(emailController.text);
 
       if(!isValid) return;
 
       try{
-        await FirebaseAuth.instance.currentUser!.updateEmail(emailKontroller.text);
+        await FirebaseAuth.instance.currentUser!.updateEmail(emailController.text);
       }catch(error){
         if(context.mounted) customSnackBar(context, AppLocalizations.of(context)!.emailInBenutzung);
         return;
       }
 
-      updateHiveOwnProfil("email", emailKontroller.text);
+      updateHiveOwnProfil("email", emailController.text);
       ProfilDatabase().updateProfil(
           "email = '$encryptedEmail'", "WHERE id = '$userId'");
 
@@ -88,11 +88,11 @@ class ChangeEmailPage extends StatelessWidget {
           child: Column(
             children: [
               CustomTextInput(
-                  AppLocalizations.of(context)!.neueEmail, emailKontroller, keyboardType: TextInputType.emailAddress),
+                  AppLocalizations.of(context)!.neueEmail, emailController, keyboardType: TextInputType.emailAddress),
 
               const SizedBox(height: 15),
               CustomTextInput(AppLocalizations.of(context)!.passwortBestaetigen,
-                  passwortKontroller,
+                  passwordController,
                   hideInput: true, onSubmit: () => save()),
               const SizedBox(height: 20),
               FloatingActionButton.extended(

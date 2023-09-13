@@ -1,12 +1,12 @@
-import 'package:familien_suche/global/global_functions.dart';
-import 'package:familien_suche/services/database.dart';
-import 'package:familien_suche/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../../global/global_functions.dart';
+import '../../../services/database.dart';
 import '../../../services/locationsService.dart';
+import '../../../widgets/custom_appbar.dart';
 import 'community_card.dart';
 import 'community_erstellen.dart';
 
@@ -102,8 +102,9 @@ class _CommunityPageState extends State<CommunityPage> {
                   .contains(searchText);
       bool cityKondition = community["ort"].toLowerCase().contains(searchText);
 
-      if (nameKondition || countryKondition || cityKondition)
+      if (nameKondition || countryKondition || cityKondition) {
         searchedCommunities.add(community);
+      }
     }
 
     return searchedCommunities;

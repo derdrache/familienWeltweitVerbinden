@@ -4,12 +4,12 @@ import '../../global/style.dart';
 
 class OwnIconButton extends StatelessWidget {
   IconData? icon;
-  var image;
-  var color;
+  String? image;
+  Color? color;
   double size;
   String badgeText;
   bool withBox;
-  var margin;
+  EdgeInsets margin;
   Function? onPressed;
   bool bigButton;
   String tooltipText;
@@ -46,7 +46,7 @@ class OwnIconButton extends StatelessWidget {
               message: tooltipText,
               child: image != null
                   ? Image.asset(
-                image,
+                image!,
                 width: size,
                 height: size,
               )

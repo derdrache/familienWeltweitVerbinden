@@ -7,9 +7,9 @@ import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
 
 class ChangePasswortPage extends StatelessWidget {
-  TextEditingController passwortOldKontroller = TextEditingController();
-  TextEditingController passwortNewKontroller = TextEditingController();
-  TextEditingController passwortNewCheckKontroller = TextEditingController();
+  final TextEditingController passwortOldKontroller = TextEditingController();
+  final TextEditingController passwortNewKontroller = TextEditingController();
+  final TextEditingController passwortNewCheckKontroller = TextEditingController();
 
   ChangePasswortPage({Key? key}) : super(key: key);
 
@@ -48,8 +48,10 @@ class ChangePasswortPage extends StatelessWidget {
         loginUser = await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: userEmail ?? "", password: passwort);
       } on FirebaseAuthException catch (_) {
-        customSnackBar(
+        if (context.mounted) {
+          customSnackBar(
             context, AppLocalizations.of(context)!.altesPasswortFalsch);
+        }
         loginUser = null;
       }
 

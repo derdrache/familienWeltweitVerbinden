@@ -1,35 +1,35 @@
-import 'package:familien_suche/functions/user_speaks_german.dart';
-import 'package:familien_suche/global/global_functions.dart' as global_func;
-import 'package:familien_suche/pages/chat/chat_details.dart';
-import 'package:familien_suche/pages/informationen/meetups/meetup_page.dart';
-import 'package:familien_suche/widgets/layout/ownIconButton.dart';
-import 'package:familien_suche/windows/custom_popup_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
+import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart';
 import '../../../global/variablen.dart' as global_var;
+import '../../../global/global_functions.dart' as global_func;
 import '../../../services/notification.dart';
 import '../../../widgets/custom_appbar.dart';
-import '../../../widgets/dialogWindow.dart';
-import '../../../widgets/layout/custom_dropdownButton.dart';
+import '../../../widgets/layout/ownIconButton.dart';
+import '../../../windows/custom_popup_menu.dart';
+import '../../../windows/dialog_window.dart';
+import '../../../widgets/layout/custom_dropdown_button.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../services/database.dart';
 import '../../../windows/all_user_select.dart';
+import '../../chat/chat_details.dart';
 import '../../show_profil.dart';
 import '../../start_page.dart';
 import 'meetup_card_details.dart';
+import 'meetup_page.dart';
 
 var userId = Hive.box("secureBox").get("ownProfil")["id"];
 
 class MeetupDetailsPage extends StatefulWidget {
-  Map meetupData;
-  bool fromMeetupPage;
+  final Map meetupData;
+  final bool fromMeetupPage;
 
-  MeetupDetailsPage({
+  const MeetupDetailsPage({
     Key? key,
     required this.meetupData,
     this.fromMeetupPage = false
@@ -834,11 +834,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 }
 
 class MeetupArtButton extends StatefulWidget {
-  Map meetupData;
-  bool isCreator;
-  Function pageState;
+  final Map meetupData;
+  final bool isCreator;
+  final Function pageState;
 
-  MeetupArtButton({Key? key, required this.meetupData, required this.isCreator, required this.pageState})
+  const MeetupArtButton({Key? key, required this.meetupData, required this.isCreator, required this.pageState})
       : super(key: key);
 
   @override

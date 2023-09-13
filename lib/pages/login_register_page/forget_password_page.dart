@@ -35,8 +35,10 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
         return true;
       } on FirebaseAuthException catch (error) {
         if (error.code == "user-not-found") {
-          customSnackBar(
+          if (context.mounted) {
+            customSnackBar(
               context, AppLocalizations.of(context)!.userEmailNichtGefunden);
+          }
         }
         return false;
       }

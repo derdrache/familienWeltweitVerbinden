@@ -1,7 +1,8 @@
-import 'package:familien_suche/widgets/dialogWindow.dart';
+import 'dart:io';
+
+import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'dart:io';
 
 import '../global/style.dart' as style;
 
@@ -85,7 +86,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
 
   late DateTime selectedEndDate;
   bool moreDateData = false;
-  List<dynamic> listMonths_de = [
+  List<dynamic> monthsDE = [
     {"id": 1, "value": "Januar"},
     {"id": 2, "value": "Februar"},
     {"id": 3, "value": "März"},
@@ -99,7 +100,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
     {"id": 11, "value": "November"},
     {"id": 12, "value": "Dezember"}
   ];
-  List<dynamic> listMonths_en = [
+  List<dynamic> monthsENG = [
     {"id": 1, "value": "January"},
     {"id": 2, "value": "February"},
     {"id": 3, "value": "March"},
@@ -125,7 +126,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
     withDay = !widget.inaccurateDate;
     withMonth = true;
     listDays = Iterable<int>.generate(daysForListdays).skip(1).toList();
-    listMonths = defaultLocale == "de" ? listMonths_de : listMonths_en;
+    listMonths = defaultLocale == "de" ? monthsDE : monthsENG;
     listYears =
         Iterable<int>.generate((widget.endYear ?? DateTime.now().year + 10) + 1)
             .skip(widget.startYear ?? DateTime.now().year)
@@ -203,45 +204,21 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
 
     if (!withDay && !widget.withMonth) {
       if (widget.multiDate) {
-        return widget.selectedDate!.year.toString() +
-            " - " +
-            selectedEndDate.year.toString();
+        return "${widget.selectedDate!.year} - ${selectedEndDate.year}";
       } else {
         return widget.selectedDate!.year.toString();
       }
     } else if (!withDay && widget.withMonth) {
       if (widget.multiDate) {
-        return widget.selectedDate!.month.toString() +
-            "." +
-            widget.selectedDate!.year.toString() +
-            " - " +
-            selectedEndDate.month.toString() +
-            "." +
-            selectedEndDate.year.toString();
+        return "${widget.selectedDate!.month}.${widget.selectedDate!.year} - ${selectedEndDate.month}.${selectedEndDate.year}";
       } else {
-        return widget.selectedDate!.month.toString() +
-            "." +
-            widget.selectedDate!.year.toString();
+        return "${widget.selectedDate!.month}.${widget.selectedDate!.year}";
       }
     } else {
       if (widget.multiDate) {
-        return widget.selectedDate!.day.toString() +
-            "." +
-            widget.selectedDate!.month.toString() +
-            "." +
-            widget.selectedDate!.year.toString() +
-            " - " +
-            selectedEndDate.day.toString() +
-            "." +
-            selectedEndDate.month.toString() +
-            "." +
-            selectedEndDate.year.toString();
+        return "${widget.selectedDate!.day}.${widget.selectedDate!.month}.${widget.selectedDate!.year} - ${selectedEndDate.day}.${selectedEndDate.month}.${selectedEndDate.year}";
       } else {
-        return widget.selectedDate!.day.toString() +
-            "." +
-            widget.selectedDate!.month.toString() +
-            "." +
-            widget.selectedDate!.year.toString();
+        return "${widget.selectedDate!.day}.${widget.selectedDate!.month}.${widget.selectedDate!.year}";
       }
     }
   }
@@ -342,7 +319,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
             border: Border.all(color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.white
                 : Colors.black),
-            borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))),
+            borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners))),
         child: Center(
             child: Text(
           createDateText(),
@@ -357,7 +334,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
   }
 
   Widget dateDropDown(items, typ, {onClick, endDate = false}) {
-    var dropdownValue;
+    int? dropdownValue;
     if (typ == "day" && !endDate) {
       dropdownValue = widget.selectedDay;
     } else if (typ == "month" && !endDate) {

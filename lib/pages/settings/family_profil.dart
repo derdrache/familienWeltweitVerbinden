@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:familien_suche/pages/show_profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -9,12 +8,13 @@ import 'package:uuid/uuid.dart';
 
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
-import '../../widgets/dialogWindow.dart';
-import '../../widgets/layout/custom_dropdownButton.dart';
+import '../../windows/dialog_window.dart';
+import '../../widgets/layout/custom_dropdown_button.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../widgets/layout/custom_text_input.dart';
 import '../../global/global_functions.dart' as global_func;
 import '../../windows/all_user_select.dart';
+import '../show_profil.dart';
 
 class FamilieProfilPage extends StatefulWidget {
   const FamilieProfilPage({Key? key}) : super(key: key);

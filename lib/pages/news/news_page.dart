@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
-import 'package:collection/collection.dart';
 
-import 'package:familien_suche/pages/show_profil.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,8 @@ import '../../../global/style.dart' as style;
 import '../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../informationen/meetups/meetup_card.dart';
-import '../informationen/location/location_Information.dart';
+import '../informationen/location/location_information.dart';
+import '../show_profil.dart';
 import 'news_page_settings.dart';
 
 class NewsPage extends StatefulWidget {
@@ -949,7 +949,6 @@ class _NewsPageState extends State<NewsPage> {
             ? Container(
                 margin: const EdgeInsets.only(top: 5),
                 child: FloatingActionButton(
-                  child: const Icon(Icons.settings),
                   tooltip:
                       AppLocalizations.of(context)!.tooltipOpenNewsSettings,
                   onPressed: () => Navigator.push(
@@ -958,6 +957,7 @@ class _NewsPageState extends State<NewsPage> {
                               builder: (_) => NewsPageSettingsPage(
                                   settingsProfil: ownSettingProfil)))
                       .whenComplete(() => setState(() {})),
+                  child: const Icon(Icons.settings),
                 ),
               )
             : Container(

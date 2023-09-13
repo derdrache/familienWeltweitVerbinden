@@ -5,7 +5,7 @@ import 'package:familien_suche/functions/user_speaks_german.dart';
 import 'package:familien_suche/global/global_functions.dart';
 import 'package:familien_suche/pages/chat/chat_details.dart';
 import 'package:familien_suche/pages/informationen/bulletin_board/bulletin_board_page.dart';
-import 'package:familien_suche/pages/informationen/location/location_Information.dart';
+import 'package:familien_suche/pages/informationen/location/location_information.dart';
 import 'package:familien_suche/pages/show_profil.dart';
 import 'package:familien_suche/services/database.dart';
 import 'package:familien_suche/widgets/custom_appbar.dart';
@@ -15,16 +15,16 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../functions/translation.dart';
 import '../../../functions/upload_and_save_image.dart';
-import '../../../widgets/dialogWindow.dart';
+import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../windows/image_fullscreen.dart';
 import '../../start_page.dart';
 
 class BulletinBoardDetails extends StatefulWidget {
-  Map note;
+  final Map note;
 
-  BulletinBoardDetails({Key? key, required this.note}) : super(key: key);
+  const BulletinBoardDetails({Key? key, required this.note}) : super(key: key);
 
   @override
   State<BulletinBoardDetails> createState() => _BulletinBoardDetailsState();

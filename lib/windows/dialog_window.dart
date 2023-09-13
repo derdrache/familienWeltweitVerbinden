@@ -1,18 +1,17 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'Window_topbar.dart';
-import '../global/style.dart' as Style;
+import '../widgets/Window_topbar.dart';
+import '../global/style.dart' as style;
 
 class CustomAlertDialog extends StatefulWidget {
-  String title;
-  List<Widget> children;
-  List<Widget>? actions;
-  double? height;
-  var backgroundColor;
-  var windowPadding;
+  final String title;
+  final List<Widget> children;
+  final List<Widget>? actions;
+  final double? height;
+  final EdgeInsets windowPadding;
 
-  CustomAlertDialog(
+  const CustomAlertDialog(
       {Key? key,
       this.title = "",
       required this.children,
@@ -22,7 +21,8 @@ class CustomAlertDialog extends StatefulWidget {
       }) : super(key: key);
 
   @override
-  _CustomAlertDialogState createState() => _CustomAlertDialogState();
+  State<CustomAlertDialog> createState() => _CustomAlertDialogState();
+
 }
 
 class _CustomAlertDialogState extends State<CustomAlertDialog> {
@@ -30,8 +30,8 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(Style.roundedCorners))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(style.roundedCorners))),
       contentPadding: EdgeInsets.zero,
       insetPadding: widget.windowPadding,
       actions: widget.actions,
@@ -70,12 +70,12 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
               child: InkResponse(
                   onTap: () => Navigator.pop(context),
                   child: const CircleAvatar(
+                    backgroundColor: Colors.red,
                     child: Icon(
                       Icons.close,
                       color: Colors.white,
                       size: 16,
                     ),
-                    backgroundColor: Colors.red,
                   )),
             ),
           ],

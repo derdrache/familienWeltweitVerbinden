@@ -45,11 +45,11 @@ class CustomCard extends StatelessWidget {
                             color: Colors.grey.withOpacity(.5),
                             blurRadius: 20.0,
                             spreadRadius: 0.0,
-                            offset: Offset(
+                            offset: const Offset(
                               5.0,
                               5.0,
                             )),
-                        BoxShadow(color: Colors.white,)
+                        const BoxShadow(color: Colors.white,)
                       ]
                   ),
                   child: child,
