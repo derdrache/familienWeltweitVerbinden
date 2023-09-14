@@ -54,7 +54,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   List<String> allUserNames = [];
   List allUserIds = [];
   final _controller = ScrollController();
-  var scrollbarOnBottom = true;
+  var scrollbarOnBottom = false;
   var imageLoading = false;
   final translator = GoogleTranslator();
   late bool isCreator;
@@ -87,6 +87,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         } else {
           scrollbarOnBottom = true;
         }
+
         setState(() {});
       }
     });
@@ -1067,7 +1068,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             Expanded(
                 child: scrollbarOnBottom
                     ? const SizedBox()
-                    : const Icon(Icons.arrow_downward)),
+                    : const Center(child: Icon(Icons.arrow_downward))),
             InkWell(
                 onTap: () => global_func.changePage(
                     context,
@@ -1117,30 +1118,30 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           body: SafeArea(
             child: Center(
               child: Container(
-                height: screenHeight,
                 width: 600,
                 color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
-                padding: const EdgeInsets.only(bottom: 50),
-                child: Stack(
+                child: Column(
                   children: [
-                      ListView(
-                        controller: _controller,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        children: [
-                          imageLoading
-                              ? Center(
-                                  child: Container(
-                                      margin: const EdgeInsets.all(10),
-                                      width: 100,
-                                      height: 100,
-                                      child: const CircularProgressIndicator()))
-                              : communityImage(),
-                          const SizedBox(height: 10),
-                          ...communityInformation()
-                        ],
+                      Expanded(
+                        child: ListView(
+                          controller: _controller,
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          children: [
+                            imageLoading
+                                ? Center(
+                                    child: Container(
+                                        margin: const EdgeInsets.all(10),
+                                        width: 100,
+                                        height: 100,
+                                        child: const CircularProgressIndicator()))
+                                : communityImage(),
+                            const SizedBox(height: 10),
+                            ...communityInformation()
+                          ],
+                        ),
                       ),
-                    Positioned(bottom: 0, child: footbar())
+                    footbar()
                   ],
                 ),
               ),
