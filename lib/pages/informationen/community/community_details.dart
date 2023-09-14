@@ -1039,6 +1039,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           child: SizedBox(
               child: TextWithHyperlinkDetection(
             text: discription.isNotEmpty ? discription : widget.community["beschreibung"],
+            textColor: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : Colors.black,
             withoutActiveHyperLink: isCreator,
             onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
           )),
@@ -1115,6 +1118,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               children: [
                 Container(
                   height: screenHeight,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
                   padding: const EdgeInsets.only(bottom: 50),
                   child: ListView(
                     controller: _controller,

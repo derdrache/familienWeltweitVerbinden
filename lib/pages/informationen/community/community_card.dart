@@ -106,13 +106,14 @@ class _CommunityCardState extends State<CommunityCard> {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: fontSize + 1)),
+                            fontSize: fontSize + 1,
+                        color: Colors.black)),
                     SizedBox(height: 10 * sizeRefactor),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(widget.community["ort"],
-                            style: TextStyle(fontSize: fontSize))
+                            style: TextStyle(fontSize: fontSize, color: Colors.black))
                       ],
                     ),
                     const SizedBox(height: 2.5),
@@ -121,7 +122,7 @@ class _CommunityCardState extends State<CommunityCard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(widget.community["land"],
-                              style: TextStyle(fontSize: fontSize))
+                              style: TextStyle(fontSize: fontSize, color: Colors.black))
                         ],
                       ),
                   ],

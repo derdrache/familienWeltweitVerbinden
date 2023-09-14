@@ -252,8 +252,8 @@ class _MeetupCardState extends State<MeetupCard> {
           ),
           Container(
               padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5, right: 5),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(20.0),
                   bottomRight: Radius.circular(20.0),
                 ),
@@ -265,15 +265,15 @@ class _MeetupCardState extends State<MeetupCard> {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: fontSize + 1)),
+                          fontWeight: FontWeight.bold, fontSize: fontSize + 1, color: Colors.black), ),
                   SizedBox(height: 10 * sizeRefactor),
                   Row(
                     children: [
                       Text(AppLocalizations.of(context)!.datum,
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: fontSize)),
+                              fontWeight: FontWeight.bold, fontSize: fontSize, color: Colors.black)),
                       Text(createDatetimeText(),
-                          style: TextStyle(fontSize: fontSize))
+                          style: TextStyle(fontSize: fontSize, color: Colors.black))
                     ],
                   ),
                   const SizedBox(height: 2.5),
@@ -282,7 +282,7 @@ class _MeetupCardState extends State<MeetupCard> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(widget.meetupData["stadt"],
-                            style: TextStyle(fontSize: fontSize))
+                            style: TextStyle(fontSize: fontSize, color: Colors.black))
                       ],
                     ),
                   if (isOffline) const SizedBox(height: 2.5),
@@ -291,7 +291,7 @@ class _MeetupCardState extends State<MeetupCard> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(widget.meetupData["land"],
-                            style: TextStyle(fontSize: fontSize))
+                            style: TextStyle(fontSize: fontSize, color: Colors.black))
                       ],
                     ),
                   if (!isOffline)
@@ -300,7 +300,7 @@ class _MeetupCardState extends State<MeetupCard> {
                         Text(AppLocalizations.of(context)!.uhrzeit,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: fontSize)),
+                                fontSize: fontSize, color: Colors.black)),
                         Text(
                             createOnlineMeetupTime() +
                                 " GMT " +
@@ -308,7 +308,7 @@ class _MeetupCardState extends State<MeetupCard> {
                                     .timeZoneOffset
                                     .inHours
                                     .toString(),
-                            style: TextStyle(fontSize: fontSize))
+                            style: TextStyle(fontSize: fontSize, color: Colors.black))
                       ],
                     ),
                   if (!isOffline)
@@ -317,9 +317,9 @@ class _MeetupCardState extends State<MeetupCard> {
                         Text("Typ: ",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: fontSize)),
+                                fontSize: fontSize, color: Colors.black)),
                         Text(widget.meetupData["typ"],
-                            style: TextStyle(fontSize: fontSize))
+                            style: TextStyle(fontSize: fontSize, color: Colors.black))
                       ],
                     )
                 ],

@@ -403,7 +403,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
             children: [
               Text(rowTitle,
                   style: TextStyle(
-                      fontSize: fontsize, fontWeight: FontWeight.bold)),
+                      fontSize: fontsize, fontWeight: FontWeight.bold, color: Colors.black)),
               const Expanded(child: SizedBox.shrink()),
               InkWell(
                 onTap: changeWindow,
@@ -519,7 +519,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
             checkAndSaveNewName),
         child: Text(title.isNotEmpty ? title : widget.meetupData["name"],
             style:
-                TextStyle(fontSize: fontsize + 8, fontWeight: FontWeight.bold),
+                TextStyle(fontSize: fontsize + 8, fontWeight: FontWeight.bold, color: Colors.black),
             textAlign: TextAlign.center),
       );
     }
@@ -545,7 +545,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                       decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20)),
-                          color: Colors.white,
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.white,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.5),
@@ -922,7 +922,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                 margin: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: cardShadowColor().withOpacity(0.6),
@@ -1175,7 +1175,7 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
             children: [
               Text("${AppLocalizations.of(context)!.datum} ",
                   style: TextStyle(
-                      fontSize: fontsize, fontWeight: FontWeight.bold)),
+                      fontSize: fontsize, fontWeight: FontWeight.bold, color: Colors.black)),
               const Expanded(child: SizedBox.shrink()),
               SizedBox(
                 width: 200,
