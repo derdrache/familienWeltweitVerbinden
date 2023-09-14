@@ -738,16 +738,21 @@ class _ErkundenPageState extends State<ErkundenPage> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             title: "",
+            windowPadding: const EdgeInsets.all(30),
             children: [
               Container(
-                  margin: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.only(left: 30, right: 30, bottom: 30),
                   child: Text(
                     AppLocalizations.of(context)!.weltkarteReiseplanungSuchen,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   )),
               const SizedBox(height: 10),
-              datePicker,
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30),
+                child: datePicker,
+              ),
+              const SizedBox(height: 30,),
               Container(
                 margin: const EdgeInsets.all(30),
                 child: FloatingActionButton.extended(
