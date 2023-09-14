@@ -359,12 +359,12 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
         ),
         child: DropdownButton(
           value: dropdownValue,
-          items: items.map<DropdownMenuItem<Object>>((item) {
+          items: items.map<DropdownMenuItem<int>>((item) {
             var value = item.runtimeType == int ? item : item["id"];
             var text =
                 item.runtimeType == int ? item.toString() : item["value"];
 
-            return DropdownMenuItem(
+            return DropdownMenuItem<int>(
               value: value,
               child: Text(text),
             );

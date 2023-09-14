@@ -785,13 +785,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
         });
   }
 
-  showReiseplaungMatchedProfils(von, bis) {
+  showReiseplaungMatchedProfils(DateTime von, bis) {
     von = DateTime(von.year, von.month, von.day);
     bis = bis ?? von;
     var selectDates = [von];
     Set<Map> selectedProfils = <Map>{};
 
-    while (von != bis) {
+
+    while (von.isBefore(bis)) {
       von = DateTime(von.year, von.month + 1, von.day);
       selectDates.add(von);
     }
@@ -809,8 +810,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if (reiseplanung == null) continue;
 
       for (var planung in reiseplanung) {
-        var planungVon = DateTime.parse(planung["von"]);
-        var planungBis = DateTime.parse(planung["bis"]);
+        DateTime planungVon = DateTime.parse(planung["von"]);
+        DateTime planungBis = DateTime.parse(planung["bis"]);
         bool genauePlanung = planungVon.hour == 1;
 
         if (selectDates.contains(planungVon)) {
@@ -825,8 +826,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           continue;
         }
 
-        while (planungVon != planungBis) {
-
+        while (planungVon.isBefore(planungBis)) {
           planungVon = genauePlanung
               ? DateTime(planungVon.year, planungVon.month, planungVon.day + 1)
               : DateTime(planungVon.year, planungVon.month + 1, planungVon.day);
@@ -845,7 +845,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }
     }
 
-    profils = selectedProfils.toList();
+    profils = sortProfils(selectedProfils.toList());
     createAndSetZoomLevels(profils, "profils");
   }
 
