@@ -932,7 +932,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             ? Image.asset(widget.community["bild"],
                 height: screenWidth > 600 ? screenHeight / 3 : null)
             : CachedNetworkImage(imageUrl: widget.community["bild"], height: screenHeight / 3,
-            fit: screenWidth > 600 ? null : BoxFit.fitWidth)
+            fit: BoxFit.fitWidth)
       );
     }
 
@@ -1087,6 +1087,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     return SelectionArea(
       child: Scaffold(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
           appBar: CustomAppBar(
             title: "",
             buttons: [
@@ -1114,32 +1115,35 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             ],
           ),
           body: SafeArea(
-            child: Stack(
-              children: [
-                Container(
-                  height: screenHeight,
-                  color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
-                  padding: const EdgeInsets.only(bottom: 50),
-                  child: ListView(
-                    controller: _controller,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.zero,
-                    children: [
-                      imageLoading
-                          ? Center(
-                              child: Container(
-                                  margin: const EdgeInsets.all(10),
-                                  width: 100,
-                                  height: 100,
-                                  child: const CircularProgressIndicator()))
-                          : communityImage(),
-                      const SizedBox(height: 10),
-                      ...communityInformation()
-                    ],
-                  ),
+            child: Center(
+              child: Container(
+                height: screenHeight,
+                width: 600,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
+                padding: const EdgeInsets.only(bottom: 50),
+                child: Stack(
+                  children: [
+                      ListView(
+                        controller: _controller,
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        children: [
+                          imageLoading
+                              ? Center(
+                                  child: Container(
+                                      margin: const EdgeInsets.all(10),
+                                      width: 100,
+                                      height: 100,
+                                      child: const CircularProgressIndicator()))
+                              : communityImage(),
+                          const SizedBox(height: 10),
+                          ...communityInformation()
+                        ],
+                      ),
+                    Positioned(bottom: 0, child: footbar())
+                  ],
                 ),
-                Positioned(bottom: 0, child: footbar())
-              ],
+              ),
             ),
           )),
     );
