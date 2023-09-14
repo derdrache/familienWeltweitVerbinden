@@ -41,16 +41,11 @@ class FeedbackPage extends StatelessWidget {
         key: formKey,
         child: ListView(
           children: [
-            Center(
-              child: Container(
-                margin: const EdgeInsets.all(30),
-                  child: Text(AppLocalizations.of(context)!.feedbackText)),
-            ),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: CustomTextInput(
-                  AppLocalizations.of(context)!.feedback, feedbackTextKontroller,
-                  moreLines: 10, validator: checkValidatorEmpty(context)),
+                  feedbackTextKontroller.text, feedbackTextKontroller,
+                  moreLines: 10, hintText: AppLocalizations.of(context)!.feedbackText, validator: checkValidatorEmpty(context)),
             ),
             Align(
               child: Container(
@@ -58,7 +53,7 @@ class FeedbackPage extends StatelessWidget {
                 margin: const EdgeInsets.all(10),
                 child: FloatingActionButton.extended(
                     onPressed: () => feedbackSendenAndClose(context),
-                    label: Text(AppLocalizations.of(context)!.senden)),
+                    label: Text(AppLocalizations.of(context)!.senden, style: TextStyle(fontWeight: FontWeight.bold),)),
               ),
             )
           ],

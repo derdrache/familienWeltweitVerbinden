@@ -76,6 +76,7 @@ class CustomTextInput extends StatelessWidget {
 
                   decoration: InputDecoration(
                     counterStyle: TextStyle(color: maxLengthColor),
+                    hintMaxLines: moreLines,
                     isDense: true,
                     enabledBorder: OutlineInputBorder(
                       borderSide:  BorderSide(color: borderColor!),
