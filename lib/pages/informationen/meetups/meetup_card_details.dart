@@ -965,13 +965,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                 isCreator: widget.meetupData["erstelltVon"] == userId,
                 pageState: setState,
               ),
-              if (moreContent)
-                const Positioned.fill(
-                  bottom: 22,
-                  child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Icon(Icons.arrow_downward)),
-                )
             ],
           ),
           if (!widget.isApproved && !widget.isPublic) secretFogWithButton(),
@@ -984,7 +977,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               organisator: widget.meetupData["erstelltVon"],
               meetupData: widget.meetupData,
               meetupZusage: widget.meetupData["zusage"],
-              width: cardWidth),
+              width: cardWidth,
+              moreContent: moreContent,),
         ],
       ),
     );
@@ -1333,13 +1327,16 @@ class CardFeet extends StatefulWidget {
   Map meetupData;
   double width;
   List meetupZusage;
+  bool moreContent;
 
   CardFeet(
       {Key? key,
       required this.organisator,
       required this.width,
       required this.meetupData,
-      required this.meetupZusage})
+      required this.meetupZusage,
+      required this.moreContent,
+      })
       : super(key: key);
 
   @override
@@ -1422,7 +1419,7 @@ class _CardFeetState extends State<CardFeet> {
                       color: Theme.of(context).colorScheme.secondary)),
               onTap: () => showTeilnehmerWindow(),
             ),
-            const Expanded(child: SizedBox()),
+            Expanded(child: widget.moreContent ? Center(child: Icon(Icons.arrow_downward),) : SizedBox.shrink()),
             InkWell(
               child: Text(organisatorProfil!["name"] ?? "",
                   style: TextStyle(
