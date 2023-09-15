@@ -42,7 +42,6 @@ class ChangeAboutmePage extends StatelessWidget {
           const SizedBox(height: 10),
           FloatingActionButton.extended(
               label: Text(AppLocalizations.of(context)!.speichern, style: const TextStyle(fontSize: 20),),
-              icon: const Icon(Icons.save),
               onPressed: (){
                 String newText = textKontroller.text;
 

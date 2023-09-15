@@ -181,7 +181,6 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
                 AppLocalizations.of(context)!.speichern,
                 style: const TextStyle(fontSize: 20),
               ),
-              icon: const Icon(Icons.save),
               onPressed: () => save())
         ])
     );
