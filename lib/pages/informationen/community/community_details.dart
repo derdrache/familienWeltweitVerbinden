@@ -53,8 +53,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   String? selectedImage;
   List<String> allUserNames = [];
   List allUserIds = [];
-  final _controller = ScrollController();
-  var scrollbarOnBottom = false;
+  final scrollController = ScrollController();
+  bool moreContent = false;
   var imageLoading = false;
   final translator = GoogleTranslator();
   late bool isCreator;
@@ -79,20 +79,34 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["link"] = "http://${widget.community["link"]}";
     }
 
-    _controller.addListener(() {
-      if (_controller.position.atEdge) {
-        bool isTop = _controller.position.pixels == 0;
-        if (isTop) {
-          scrollbarOnBottom = false;
-        } else {
-          scrollbarOnBottom = true;
-        }
+    addScrollListener();
 
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => scrollbarCheckForMoreContent());
+
+    super.initState();
+  }
+
+  addScrollListener() {
+    scrollController.addListener(() {
+      if (scrollController.position.atEdge) {
+        bool isTop = scrollController.position.pixels == 0;
+        if (isTop) {
+          moreContent = true;
+        } else {
+          moreContent = false;
+        }
         setState(() {});
       }
     });
+  }
 
-    super.initState();
+  scrollbarCheckForMoreContent() {
+    if (scrollController.position.maxScrollExtent > 0) {
+      setState(() {
+        moreContent = true;
+      });
+    }
   }
 
   createMemberList(){
@@ -1076,9 +1090,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               ),
             ),
             Expanded(
-                child: scrollbarOnBottom
-                    ? const SizedBox()
-                    : const Center(child: Icon(Icons.arrow_downward))),
+                child: moreContent
+                    ? const Center(child: Icon(Icons.arrow_downward))
+                    : const SizedBox()),
             InkWell(
                 onTap: () => global_func.changePage(
                     context,
@@ -1144,7 +1158,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                     children: [
                         Expanded(
                           child: ListView(
-                            controller: _controller,
+                            controller: scrollController,
                             shrinkWrap: true,
                             children: [
                               imageLoading
