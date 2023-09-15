@@ -18,8 +18,8 @@ class BadgeWidget extends StatelessWidget {
         child,
         if (number != 0)
           Positioned(
-              top: -15,
-              right: -15,
+              top: -10,
+              right: -10,
               child: Container(
                 width: badgeSize,
                 height: badgeSize,
