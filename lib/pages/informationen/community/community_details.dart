@@ -929,12 +929,22 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           var getTabPostion = details.globalPosition;
           _changeImageWindow(getTabPostion);
         },
-        child: isAssetImage
-            ? Image.asset(widget.community["bild"],
-                height: screenWidth > 600 ? screenHeight / 3 : null)
-            : CachedNetworkImage(imageUrl: widget.community["bild"], height: screenHeight / 3,
-            fit: BoxFit.fitWidth)
-      );
+        child: Container(
+          width: double.infinity,
+          constraints: BoxConstraints(
+            maxHeight: screenHeight / 3
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20.0),
+              topRight: Radius.circular(20.0),
+            ),
+            child: isAssetImage
+              ? Image.asset(widget.community["bild"],fit: BoxFit.fitWidth)
+              : CachedNetworkImage(imageUrl: widget.community["bild"], //height: screenHeight / 3,
+              fit: BoxFit.fitWidth),
+          ),
+        ));
     }
 
     communityInformation() {
@@ -972,10 +982,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             )),
           ),
         ),
-        const SizedBox(height: 20),
+        //const SizedBox(height: 20),
         if (fremdeCommunity)
           Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15),
+            padding: const EdgeInsets.only(left: 15, right: 15, top: 10),
             child: SizedBox(
               width: screenWidth * 0.9,
               child: Text(AppLocalizations.of(context)!.nichtTeilGemeinschaft,
@@ -1086,6 +1096,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       );
     }
 
+
     return SelectionArea(
       child: Scaffold(
         backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
@@ -1119,30 +1130,39 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             child: Center(
               child: Container(
                 width: 600,
-                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
-                child: Column(
-                  children: [
-                      Expanded(
-                        child: ListView(
-                          controller: _controller,
-                          shrinkWrap: true,
-                          padding: EdgeInsets.zero,
-                          children: [
-                            imageLoading
-                                ? Center(
-                                    child: Container(
-                                        margin: const EdgeInsets.all(10),
-                                        width: 100,
-                                        height: 100,
-                                        child: const CircularProgressIndicator()))
-                                : communityImage(),
-                            const SizedBox(height: 10),
-                            ...communityInformation()
-                          ],
+                margin: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
+                  borderRadius: BorderRadius.circular(20)
+                ),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  elevation: 12,
+                  child: Column(
+                    children: [
+                        Expanded(
+                          child: ListView(
+                            controller: _controller,
+                            shrinkWrap: true,
+                            children: [
+                              imageLoading
+                                  ? Center(
+                                      child: Container(
+                                          margin: const EdgeInsets.all(10),
+                                          width: 100,
+                                          height: 100,
+                                          child: const CircularProgressIndicator()))
+                                  : communityImage(),
+                              const SizedBox(height: 10),
+                              ...communityInformation()
+                            ],
+                          ),
                         ),
-                      ),
-                    footbar()
-                  ],
+                      footbar()
+                    ],
+                  ),
                 ),
               ),
             ),
