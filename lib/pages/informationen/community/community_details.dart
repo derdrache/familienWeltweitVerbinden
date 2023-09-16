@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/widgets/layout/custom_like_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,7 @@ class CommunityDetails extends StatefulWidget {
 }
 
 class _CommunityDetailsState extends State<CommunityDetails> {
-  var userId = FirebaseAuth.instance.currentUser!.uid;
+  String userId = FirebaseAuth.instance.currentUser!.uid;
   var isWebDesktop = kIsWeb &&
       (defaultTargetPlatform != TargetPlatform.iOS ||
           defaultTargetPlatform != TargetPlatform.android);
@@ -55,14 +56,17 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   List allUserIds = [];
   final scrollController = ScrollController();
   bool moreContent = false;
-  var imageLoading = false;
+  bool imageLoading = false;
   final translator = GoogleTranslator();
   late bool isCreator;
   late bool isMember;
   List allMemberProfils = [];
+  late bool isLiked;
 
   @override
   void initState() {
+    isLiked = widget.community["interesse"].contains(userId);
+
     createMemberList();
     if (widget.community["beschreibungGer"].isEmpty) {
       widget.community["beschreibungGer"] = widget.community["beschreibung"];
@@ -661,6 +665,28 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     );
   }
 
+  Future<bool> changeIntereset(interest) async {
+    String communityId = widget.community["id"];
+    isLiked = !isLiked;
+
+    if (isLiked) {
+      widget.community["interesse"].add(userId);
+      CommunityDatabase().update(
+          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
+          "WHERE id ='$communityId'");
+    } else {
+      widget.community["interesse"].remove(userId);
+      CommunityDatabase().update(
+          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+          "WHERE id ='$communityId'");
+    }
+
+    updateHiveCommunity(
+        communityId, "interesse", widget.community["interesse"]);
+
+    return !interest;
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -943,21 +969,32 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           var getTabPostion = details.globalPosition;
           _changeImageWindow(getTabPostion);
         },
-        child: Container(
-          width: double.infinity,
-          constraints: BoxConstraints(
-            maxHeight: screenHeight / 3
-          ),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20.0),
-              topRight: Radius.circular(20.0),
+        child: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              constraints: BoxConstraints(
+                maxHeight: screenHeight / 3
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0),
+                ),
+                child: isAssetImage
+                  ? Image.asset(widget.community["bild"],fit: BoxFit.fitWidth)
+                  : CachedNetworkImage(imageUrl: widget.community["bild"], //height: screenHeight / 3,
+                  fit: BoxFit.fitWidth),
+              ),
             ),
-            child: isAssetImage
-              ? Image.asset(widget.community["bild"],fit: BoxFit.fitWidth)
-              : CachedNetworkImage(imageUrl: widget.community["bild"], //height: screenHeight / 3,
-              fit: BoxFit.fitWidth),
-          ),
+            if(!isCreator) Positioned(
+              right: 5,
+                top: 5,
+                child: CustomLikeButton(
+                    isLiked: isLiked,
+                    onLikeButtonTapped: changeIntereset,
+                ))
+          ],
         ));
     }
 
