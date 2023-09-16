@@ -18,7 +18,8 @@ class SearchAutocomplete extends StatefulWidget {
       this.onConfirm,
       this.onRemove,
       this.onClose,
-      this.hintText = ""}) : super(key: key);
+      this.hintText = ""})
+      : super(key: key);
 
   getSelected() {
     if (selected.isEmpty) return [];
@@ -26,11 +27,11 @@ class SearchAutocomplete extends StatefulWidget {
     return [selected];
   }
 
-  getInput(){
+  getInput() {
     return _textEditingController.text;
   }
 
-  clearInput(){
+  clearInput() {
     _focusNode.unfocus();
     _textEditingController.clear();
   }
@@ -47,16 +48,17 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
     return Container(
       margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.black
-            : Colors.white,
-          borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners)),
-          border: Border.all()
-      ),
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.black
+              : Colors.white,
+          borderRadius:
+              const BorderRadius.all(Radius.circular(style.roundedCorners)),
+          border: Border.all()),
       child: Stack(
         children: [
           RawAutocomplete(
-            optionsViewBuilder: (BuildContext context, void Function(Object) onSelected, Iterable<Object> options) {
+            optionsViewBuilder: (BuildContext context,
+                void Function(Object) onSelected, Iterable<Object> options) {
               return Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Align(
@@ -69,23 +71,25 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                       decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border.all(),
-                          borderRadius: BorderRadius.circular(style.roundedCorners)
-                      ),
+                          borderRadius:
+                              BorderRadius.circular(style.roundedCorners)),
                       child: ListView.builder(
                         padding: const EdgeInsets.all(10.0),
                         itemCount: options.length,
                         itemBuilder: (BuildContext context, int index) {
-                          final String option = options.elementAt(index) as String;
+                          final String option =
+                              options.elementAt(index) as String;
                           return GestureDetector(
                             onTap: () {
                               onSelected(option);
                               widget.selected = option;
-                              if (widget.onConfirm != null){
+                              if (widget.onConfirm != null) {
                                 widget.onConfirm!();
                               }
                             },
                             child: ListTile(
-                              title: Text(option, style: const TextStyle(color: Colors.black)),
+                              title: Text(option,
+                                  style: const TextStyle(color: Colors.black)),
                             ),
                           );
                         },
@@ -96,8 +100,11 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
               );
             },
             optionsBuilder: (TextEditingValue textEditingValue) {
-              return textEditingValue.text.isNotEmpty ? widget.searchableItems.where((item) => item.toLowerCase()
-                  .contains(textEditingValue.text.toLowerCase())) : <String>[];
+              return textEditingValue.text.isNotEmpty
+                  ? widget.searchableItems.where((item) => item
+                      .toLowerCase()
+                      .contains(textEditingValue.text.toLowerCase()))
+                  : <String>[];
             },
             fieldViewBuilder: (BuildContext context,
                 TextEditingController textEditingController,
@@ -109,25 +116,28 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                   border: InputBorder.none,
                   hintText: widget.hintText,
                   contentPadding: const EdgeInsets.all(10.0),
-                  suffixIcon: IconButton(
-                    onPressed: (){
-                      textEditingController.clear();
-                      if(widget.onClose != null) widget.onClose!();
+                  suffixIcon: textEditingController.text.isEmpty
+                      ? null
+                      : IconButton(
+                          onPressed: () {
+                            textEditingController.clear();
+                            if (widget.onClose != null) widget.onClose!();
 
-                      setState(() {});
-                    },
-                    icon: const Icon(Icons.clear, color: Colors.red,),
-                  ),
+                            setState(() {});
+                          },
+                          icon: const Icon(
+                            Icons.clear,
+                            color: Colors.red,
+                          ),
+                        ),
                 ),
                 focusNode: focusNode,
-                onChanged: (value) async{
-                  if(value.isEmpty){
+                onChanged: (value) async {
+                  if (value.isEmpty) {
                     widget.selected = "";
-                    if(widget.onRemove != null) widget.onRemove!();
+                    if (widget.onRemove != null) widget.onRemove!();
                   }
-                  setState(() {
-
-                  });
+                  setState(() {});
                 },
                 onFieldSubmitted: (String value) {
                   onFieldSubmitted();
@@ -135,13 +145,8 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
               );
             },
           ),
-
         ],
       ),
     );
   }
 }
-
-
-
-
