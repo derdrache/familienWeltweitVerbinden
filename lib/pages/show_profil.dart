@@ -536,7 +536,7 @@ class _UserInformationDisplay extends StatefulWidget {
 }
 
 class _UserInformationDisplayState extends State<_UserInformationDisplay> {
-  bool tranlsation = false;
+  bool translation = false;
   String translatedAboutMe = "";
 
   checkAccessReiseplanung() {
@@ -577,7 +577,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
     }
 
     setState(() {
-      tranlsation = !tranlsation;
+      translation = !translation;
     });
 
   }
@@ -1061,14 +1061,22 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
                       fontSize: style.textSize, fontWeight: FontWeight.bold),
                 ),
                 const Expanded(child: SizedBox.shrink()),
-                InkWell(onTap: () => translateAboutMe(), child: Text("translate", style: TextStyle(fontSize: style.textSize, color: Theme.of(context).colorScheme.secondary),))
+                InkWell(
+                    onTap: () => translateAboutMe(),
+                    child: Text(
+                      AppLocalizations.of(context)!.uebersetzen,
+                      style: TextStyle(
+                          fontSize: style.textSize,
+                          decoration: translation ? TextDecoration.lineThrough : null,
+                          color: Theme.of(context).colorScheme.secondary),
+                    ))
               ],
             ),
             const SizedBox(
               height: 5,
             ),
             TextWithHyperlinkDetection(
-              text: tranlsation
+              text: translation
                   ? translatedAboutMe + "\n\n<${AppLocalizations.of(context)!.automatischeUebersetzung}>"
                   : widget.profil["aboutme"],
               fontsize: style.textSize - 1,
@@ -1099,7 +1107,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
             if (widget.profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
             if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
-            SizedBox(height: 20,)
+            const SizedBox(height: 20,)
           ],
         ));
   }
