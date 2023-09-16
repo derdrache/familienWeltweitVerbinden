@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
+import 'package:translator/translator.dart';
 
 import '../global/style.dart' as style;
 import '../global/encryption.dart';
@@ -523,16 +524,25 @@ class _AppBarState extends State<_AppBar> {
   }
 }
 
-class _UserInformationDisplay extends StatelessWidget {
+class _UserInformationDisplay extends StatefulWidget {
   final Map profil;
+
 
   const _UserInformationDisplay({Key? key, required this.profil})
       : super(key: key);
 
+  @override
+  State<_UserInformationDisplay> createState() => _UserInformationDisplayState();
+}
+
+class _UserInformationDisplayState extends State<_UserInformationDisplay> {
+  bool tranlsation = false;
+  String translatedAboutMe = "";
+
   checkAccessReiseplanung() {
     Map ownProfil = Hive.box("secureBox").get("ownProfil") ?? {};
     bool hasAccess = false;
-    String reiseplanungSetting = profil["reiseplanungPrivacy"];
+    String reiseplanungSetting = widget.profil["reiseplanungPrivacy"];
     bool isPrivacyLevel1 = reiseplanungSetting == privacySetting[0] ||
         reiseplanungSetting == privacySettingEnglisch[0];
     bool isPrivacyLevel2 = reiseplanungSetting == privacySetting[1] ||
@@ -540,26 +550,42 @@ class _UserInformationDisplay extends StatelessWidget {
     bool isPrivacyLevel3 = reiseplanungSetting == privacySetting[2] ||
         reiseplanungSetting == privacySettingEnglisch[2];
 
-    if (profil["reisePlanung"].isEmpty) return false;
+    if (widget.profil["reisePlanung"].isEmpty) return false;
 
     if (isPrivacyLevel1) {
       hasAccess = true;
     } else if (isPrivacyLevel2 &&
-        (ownProfil["friendlist"].contains(profil["id"]))) {
+        (ownProfil["friendlist"].contains(widget.profil["id"]))) {
       hasAccess = true;
     } else if (isPrivacyLevel3 &&
-        ownProfil["friendlist"].contains(profil["id"]) &&
-        profil["friendlist"].contains(ownProfil["id"])) {
+        ownProfil["friendlist"].contains(widget.profil["id"]) &&
+        widget.profil["friendlist"].contains(ownProfil["id"])) {
       hasAccess = true;
     }
 
     return hasAccess;
   }
 
+  translateAboutMe() async {
+    if(translatedAboutMe.isEmpty){
+      final translator = GoogleTranslator();
+      var translation = await translator.translate(
+          widget.profil["aboutme"],
+          to: "auto");
+
+      translatedAboutMe = translation.text;
+    }
+
+    setState(() {
+      tranlsation = !tranlsation;
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isOwnProfil = profil["id"] == userId;
-    profil["lastLogin"] ??= DateTime.parse("2022-02-13");
+    bool isOwnProfil = widget.profil["id"] == userId;
+    widget.profil["lastLogin"] ??= DateTime.parse("2022-02-13");
 
     transformDateToText(dateString, {onlyMonth = false}) {
       DateTime date = DateTime.parse(dateString);
@@ -580,7 +606,7 @@ class _UserInformationDisplay extends StatelessWidget {
       var size = style.textSize - 2;
       var timeDifferenceLastLogin = Duration(
           microseconds: (DateTime.now().microsecondsSinceEpoch -
-                  DateTime.parse(profil["lastLogin"].toString())
+                  DateTime.parse(widget.profil["lastLogin"].toString())
                       .microsecondsSinceEpoch)
               .abs());
       var daysOffline = timeDifferenceLastLogin.inDays;
@@ -605,7 +631,7 @@ class _UserInformationDisplay extends StatelessWidget {
     locationDisplay() {
       return GestureDetector(
         onTap: () => changePage(
-            context, LocationInformationPage(ortName: profil["ort"])),
+            context, LocationInformationPage(ortName: widget.profil["ort"])),
         child: Row(
           children: [
             Text(
@@ -617,7 +643,7 @@ class _UserInformationDisplay extends StatelessWidget {
             ),
             Flexible(
                 child: Text(
-              profil["ort"],
+              widget.profil["ort"],
               style: const TextStyle(
                   fontSize: style.textSize,
                   decoration: TextDecoration.underline),
@@ -631,10 +657,10 @@ class _UserInformationDisplay extends StatelessWidget {
     travelTypDisplay() {
       String themaText = "${AppLocalizations.of(context)!.artDerReise}: ";
       String inhaltText =
-          global_functions.changeGermanToEnglish(profil["reiseart"]);
+          global_functions.changeGermanToEnglish(widget.profil["reiseart"]);
 
       if (spracheIstDeutsch) {
-        inhaltText = global_functions.changeEnglishToGerman(profil["reiseart"]);
+        inhaltText = global_functions.changeEnglishToGerman(widget.profil["reiseart"]);
       }
 
       return Row(children: [
@@ -648,7 +674,7 @@ class _UserInformationDisplay extends StatelessWidget {
     openBesuchteLaenderWindow() {
       List<Widget> besuchteLaenderList = [];
 
-      for (var land in profil["besuchteLaender"]) {
+      for (var land in widget.profil["besuchteLaender"]) {
         besuchteLaenderList.add(
             Container(margin: const EdgeInsets.all(10), child: Text(land)));
       }
@@ -674,7 +700,7 @@ class _UserInformationDisplay extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.underline),
           ),
-          Text(profil["besuchteLaender"].length.toString(),
+          Text(widget.profil["besuchteLaender"].length.toString(),
               style: const TextStyle(
                   fontSize: style.textSize,
                   decoration: TextDecoration.underline))
@@ -683,15 +709,15 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     aufreiseDisplay() {
-      if (profil["aufreiseSeit"] == null) return const SizedBox.shrink();
+      if (widget.profil["aufreiseSeit"] == null) return const SizedBox.shrink();
 
       String themenText = "${AppLocalizations.of(context)!.aufReise}: ";
       String seitText =
-          profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+          widget.profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
       String inhaltText = "";
 
-      if (profil["aufreiseBis"] == null) {
-        DateTime aufreiseSeit = DateTime.parse(profil["aufreiseSeit"]);
+      if (widget.profil["aufreiseBis"] == null) {
+        DateTime aufreiseSeit = DateTime.parse(widget.profil["aufreiseSeit"]);
         String yearsOnTravel =
             (DateTime.now().difference(aufreiseSeit).inDays / 365)
                 .toStringAsFixed(1);
@@ -699,12 +725,12 @@ class _UserInformationDisplay extends StatelessWidget {
         inhaltText =
             "$yearsOnTravel ${AppLocalizations.of(context)!.jahre} / $seitText - ${AppLocalizations.of(context)!.offen}";
       } else {
-        DateTime aufreiseSeit = DateTime.parse(profil["aufreiseSeit"]);
-        DateTime aufreiseBis = DateTime.parse(profil["aufreiseBis"]);
+        DateTime aufreiseSeit = DateTime.parse(widget.profil["aufreiseSeit"]);
+        DateTime aufreiseBis = DateTime.parse(widget.profil["aufreiseBis"]);
         String yearsOnTravel =
             (aufreiseBis.difference(aufreiseSeit).inDays / 365)
                 .toStringAsFixed(1);
-        var bisText = profil["aufreiseBis"]
+        var bisText = widget.profil["aufreiseBis"]
             .split("-")
             .take(2)
             .toList()
@@ -742,11 +768,11 @@ class _UserInformationDisplay extends StatelessWidget {
     sprachenDisplay() {
       String themenText = "${AppLocalizations.of(context)!.sprachen}: ";
       String inhaltText =
-          global_functions.changeGermanToEnglish(profil["sprachen"]).join(", ");
+          global_functions.changeGermanToEnglish(widget.profil["sprachen"]).join(", ");
 
       if (spracheIstDeutsch) {
         inhaltText = global_functions
-            .changeEnglishToGerman(profil["sprachen"])
+            .changeEnglishToGerman(widget.profil["sprachen"])
             .join(", ");
       }
 
@@ -759,7 +785,7 @@ class _UserInformationDisplay extends StatelessWidget {
     }
 
     kinderDisplay() {
-      List childrenProfilList = profil["kinder"];
+      List childrenProfilList = widget.profil["kinder"];
       childrenProfilList.sort();
       List childrenList = [];
       String alterZusatz = spracheIstDeutsch ? "J" : "y";
@@ -802,13 +828,13 @@ class _UserInformationDisplay extends StatelessWidget {
     reisePlanungBox() {
       var reiseplanung = [];
       var reiseplanungPrivacy = spracheIstDeutsch
-          ? changeEnglishToGerman(profil["reiseplanungPrivacy"])
-          : changeGermanToEnglish(profil["reiseplanungPrivacy"]);
+          ? changeEnglishToGerman(widget.profil["reiseplanungPrivacy"])
+          : changeGermanToEnglish(widget.profil["reiseplanungPrivacy"]);
 
-      profil["reisePlanung"]
+      widget.profil["reisePlanung"]
           .sort((a, b) => a["von"].compareTo(b["von"]) as int);
 
-      for (var reiseplan in profil["reisePlanung"]) {
+      for (var reiseplan in widget.profil["reisePlanung"]) {
         String ortText = reiseplan["ortData"]["city"];
         DateTime dateReiseplanBis = DateTime.parse(reiseplan["bis"]);
         DateTime dateNow = DateTime(DateTime.now().year, DateTime.now().month);
@@ -928,7 +954,7 @@ class _UserInformationDisplay extends StatelessWidget {
     socialMediaBox() {
       List<Widget> socialMediaContent = [];
 
-      for (var socialMediaLink in profil["socialMediaLinks"]) {
+      for (var socialMediaLink in widget.profil["socialMediaLinks"]) {
         socialMediaContent.add(socialMediaItem(socialMediaLink));
       }
 
@@ -946,15 +972,15 @@ class _UserInformationDisplay extends StatelessWidget {
       Map ownProfil = Hive.box('secureBox').get("ownProfil") ?? {};
       String themenText = AppLocalizations.of(context)!.interessen;
       List profilInteresets =
-          global_functions.changeGermanToEnglish(profil["interessen"]);
+          global_functions.changeGermanToEnglish(widget.profil["interessen"]);
       List matchInterest = [];
 
       if (spracheIstDeutsch) {
         profilInteresets =
-            global_functions.changeEnglishToGerman(profil["interessen"]);
+            global_functions.changeEnglishToGerman(widget.profil["interessen"]);
       }
 
-      for (var interest in profil["interessen"]) {
+      for (var interest in widget.profil["interessen"]) {
         List ownInterests = [
           ...global_functions.changeEnglishToGerman(ownProfil["interessen"]),
           ...global_functions.changeGermanToEnglish(ownProfil["interessen"])
@@ -1014,16 +1040,24 @@ class _UserInformationDisplay extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppLocalizations.of(context)!.ueberMich,
-              style: const TextStyle(
-                  fontSize: style.textSize, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.ueberMich,
+                  style: const TextStyle(
+                      fontSize: style.textSize, fontWeight: FontWeight.bold),
+                ),
+                Expanded(child: SizedBox.shrink()),
+                InkWell(onTap: () => translateAboutMe(), child: Text("translate", style: TextStyle(fontSize: style.textSize, color: Theme.of(context).colorScheme.secondary),))
+              ],
             ),
             const SizedBox(
               height: 5,
             ),
             TextWithHyperlinkDetection(
-              text: profil["aboutme"],
+              text: tranlsation
+                  ? translatedAboutMe + "\n\n<${AppLocalizations.of(context)!.automatischeUebersetzung}>"
+                  : widget.profil["aboutme"],
               fontsize: style.textSize - 1,
             )
           ],
@@ -1050,8 +1084,8 @@ class _UserInformationDisplay extends StatelessWidget {
             familyInfoBox(),
             interessenBox(),
             if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
-            if (profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
-            if (profil["aboutme"].isNotEmpty) aboutmeBox(),
+            if (widget.profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
+            if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
           ],
         ));
   }
