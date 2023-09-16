@@ -538,5 +538,6 @@
     "meetupNotificationHinweis": "Durch Abschalten werden keine vom Meetup ausgelösten Notifikation mehr angezeigt",
     "newFriendNotificationHinweis": "Durch Abschalten gibt es keine Notifikation mehr, wenn dich jemand als Freund hinzufügt",
     "travelPlanNotificationHinweis": "Durch Abschalten werden dir keine Notifikation von Freunden mehr angezeigt",
-    "familieAroundNotificationHinweis": "Durch Abschalten bekommst du keine Notifikation mehr, wenn eine Familie in deine nähe kommt"
+    "familieAroundNotificationHinweis": "Durch Abschalten bekommst du keine Notifikation mehr, wenn eine Familie in deine nähe kommt",
+    "tooltipLandInfoOeffnen": "Land Information öffnen"
 }

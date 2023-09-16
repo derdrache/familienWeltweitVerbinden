@@ -115,6 +115,13 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
       appBar: CustomAppBar(
         title: widget.ortName,
         buttons: [
+          if(location["isCity"] == 1) IconButton(
+            icon: Image.asset("assets/icons/country.png", color: Colors.white,),
+            tooltip: AppLocalizations.of(context)!.tooltipLandInfoOeffnen,
+            onPressed: () async {
+              global_func.changePage(context, LocationInformationPage(ortName: location["land"]));
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.link),
             tooltip: AppLocalizations.of(context)!.tooltipLinkKopieren,
