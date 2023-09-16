@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/widgets/custom_like_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -975,11 +976,13 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
             ],
           ),
           if (!widget.isApproved && !widget.isPublic) secretFogWithButton(),
-          if (!widget.isCreator)
-            InteresseButton(
-              hasIntereset: widget.meetupData["interesse"].contains(userId),
-              id: widget.meetupData["id"],
+          if (!widget.isCreator) Positioned(
+            top: 25,
+            right: 28,
+            child: CustomLikeButton(
+              meetupData: widget.meetupData,
             ),
+          ),
           CardFeet(
             organisator: widget.meetupData["erstelltVon"],
             meetupData: widget.meetupData,
@@ -1260,73 +1263,6 @@ class _DateButtonState extends State<DateButton> {
     return Container(
       padding: const EdgeInsets.all(10),
       child: widget.getDate ? dateBox() : timeBox(),
-    );
-  }
-}
-
-//ignore: must_be_immutable
-class InteresseButton extends StatefulWidget {
-  bool hasIntereset;
-  final String id;
-
-  InteresseButton({Key? key, required this.hasIntereset, required this.id})
-      : super(key: key);
-
-  @override
-  State<InteresseButton> createState() => _InteresseButtonState();
-}
-
-class _InteresseButtonState extends State<InteresseButton> {
-  var color = Colors.black;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: 25,
-      right: 28,
-      child: GestureDetector(
-          onTap: () async {
-            var myInterestedMeetups =
-                Hive.box('secureBox').get("interestEvents") ?? [];
-            var meetupData = getMeetupFromHive(widget.id);
-            var myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-            widget.hasIntereset = !widget.hasIntereset;
-
-            if (widget.hasIntereset) {
-              meetupData["interesse"].add(userId);
-              myInterestedMeetups.add(meetupData);
-              MeetupDatabase().update(
-                  "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-                  "WHERE id ='${widget.id}'");
-
-              myGroupChats.add(getChatGroupFromHive(connectedWith: widget.id));
-              ChatGroupsDatabase().updateChatGroup(
-                  "users = JSON_MERGE_PATCH(users, '${json.encode({
-                        userId: {"newMessages": 0}
-                      })}')",
-                  "WHERE connected LIKE '%${widget.id}%'");
-            } else {
-              meetupData["interesse"].remove(userId);
-              myInterestedMeetups
-                  .removeWhere((meetup) => meetup["id"] == widget.id);
-              MeetupDatabase().update(
-                  "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-                  "WHERE id ='${widget.id}'");
-
-              myGroupChats.removeWhere(
-                  (chatGroup) => chatGroup["connected"].contains(widget.id));
-              ChatGroupsDatabase().updateChatGroup(
-                  "users = JSON_REMOVE(users, '\$.$userId')",
-                  "WHERE connected LIKE '%${widget.id}%'");
-            }
-
-            setState(() {});
-          },
-          child: Icon(
-            Icons.favorite,
-            color: widget.hasIntereset ? Colors.red : Colors.black,
-            size: 30,
-          )),
     );
   }
 }

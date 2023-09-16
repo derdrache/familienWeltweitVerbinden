@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:familien_suche/widgets/layout/custom_like_button.dart';
+import 'package:familien_suche/widgets/custom_like_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -665,28 +665,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     );
   }
 
-  Future<bool> changeIntereset(interest) async {
-    String communityId = widget.community["id"];
-    isLiked = !isLiked;
-
-    if (isLiked) {
-      widget.community["interesse"].add(userId);
-      CommunityDatabase().update(
-          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id ='$communityId'");
-    } else {
-      widget.community["interesse"].remove(userId);
-      CommunityDatabase().update(
-          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id ='$communityId'");
-    }
-
-    updateHiveCommunity(
-        communityId, "interesse", widget.community["interesse"]);
-
-    return !interest;
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -990,10 +968,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             if(!isCreator) Positioned(
               right: 5,
                 top: 5,
-                child: CustomLikeButton(
-                    isLiked: isLiked,
-                    onLikeButtonTapped: changeIntereset,
-                ))
+                child: CustomLikeButton(communityData: widget.community,)
+            )
           ],
         ));
     }

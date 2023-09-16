@@ -3,9 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../../global/global_functions.dart';
-import '../../../services/database.dart';
 import '../../../widgets/custom_card.dart';
-import '../../../widgets/layout/custom_like_button.dart';
+import '../../../widgets/custom_like_button.dart';
 import 'location_information.dart';
 
 class LocationCard extends StatefulWidget {
@@ -49,29 +48,6 @@ class _LocationCardState extends State<LocationCard> {
       }
       return CachedNetworkImageProvider(widget.location["bild"]);
     }
-  }
-
-  Future<bool> changeIntereset(hasInterest) async {
-    if (hasInterest) {
-      hasInterest = false;
-
-      widget.location["interesse"].remove(userId);
-      StadtinfoDatabase().update(
-          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id = '${widget.location["id"]}'");
-    } else {
-      hasInterest = true;
-
-      widget.location["interesse"].add(userId);
-      StadtinfoDatabase().update(
-          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id = '${widget.location["id"]}'");
-    }
-
-    setState(() {});
-    if (widget.afterLike != null) widget.afterLike!();
-
-    return hasInterest;
   }
 
   @override
@@ -146,8 +122,8 @@ class _LocationCardState extends State<LocationCard> {
       height: 200,
       margin: const EdgeInsets.all(15),
       likeButton: CustomLikeButton(
-        isLiked: hasInterest,
-        onLikeButtonTapped: changeIntereset,
+        locationData: widget.location,
+        afterLike: widget.afterLike,
       ),
       onTap: () => changePage(
           context,

@@ -2,14 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:hive/hive.dart';
 
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_func;
 import '../../../services/database.dart';
 import '../../../widgets/custom_card.dart';
-import '../../../widgets/layout/custom_like_button.dart';
+import '../../../widgets/custom_like_button.dart';
 import 'meetup_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser!.uid;
@@ -213,11 +212,10 @@ class _MeetupCardState extends State<MeetupCard> {
       height: 250,
       margin: widget.margin,
       likeButton: widget.withInteresse && !widget.isCreator && !widget.smallCard
-          ? InteresseButton(
-              hasIntereset: widget.meetupData["interesse"].contains(userId),
-              id: widget.meetupData["id"],
-              afterFavorite:
-                  widget.afterFavorite != null ? widget.afterFavorite! : null)
+          ? CustomLikeButton(
+              meetupData: widget.meetupData,
+              afterLike: widget.afterFavorite,
+            )
           : null,
       onLongPressStart: widget.isCreator || forTeilnahmeFreigegeben
           ? (tapdownDetails) => cardMenu(tapdownDetails.globalPosition)
@@ -252,8 +250,8 @@ class _MeetupCardState extends State<MeetupCard> {
           ),
           Container(
               padding: EdgeInsets.only(top: 10 * sizeRefactor, left: 5, right: 5),
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(20.0),
                   bottomRight: Radius.circular(20.0),
                 ),
@@ -326,61 +324,6 @@ class _MeetupCardState extends State<MeetupCard> {
               ))
         ],
       ),
-    );
-  }
-}
-
-class InteresseButton extends StatefulWidget {
-  bool hasIntereset;
-  String id;
-  Function? afterFavorite;
-
-  InteresseButton(
-      {Key? key,
-      required this.hasIntereset,
-      required this.id,
-      this.afterFavorite})
-      : super(key: key);
-
-  @override
-  State<InteresseButton> createState() => _InteresseButtonState();
-}
-
-class _InteresseButtonState extends State<InteresseButton> {
-  var color = Colors.black;
-
-  Future<bool> setInteresse(isIntereset) async {
-    var myInterestedMeetups = Hive.box('secureBox').get("interestEvents") ?? [];
-    var meetupData = getMeetupFromHive(widget.id);
-    widget.hasIntereset = !widget.hasIntereset;
-
-    if (widget.hasIntereset) {
-      meetupData["interesse"].add(userId);
-      myInterestedMeetups.add(meetupData);
-
-      MeetupDatabase().update(
-          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id ='${widget.id}'");
-    } else {
-      meetupData["interesse"].remove(userId);
-      myInterestedMeetups.removeWhere((meetup) => meetup["id"] == widget.id);
-      MeetupDatabase().update(
-          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id ='${widget.id}'");
-    }
-
-    setState(() {});
-
-    if (widget.afterFavorite != null) widget.afterFavorite!();
-
-    return !isIntereset;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomLikeButton(
-      isLiked: widget.hasIntereset,
-      onLikeButtonTapped: setInteresse,
     );
   }
 }

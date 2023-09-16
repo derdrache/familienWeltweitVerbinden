@@ -4,9 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
-import '../../../services/database.dart';
 import '../../../widgets/custom_card.dart';
-import '../../../widgets/layout/custom_like_button.dart';
+import '../../../widgets/custom_like_button.dart';
 import 'community_details.dart';
 
 var userId = FirebaseAuth.instance.currentUser!.uid;
@@ -54,6 +53,7 @@ class _CommunityCardState extends State<CommunityCard> {
 
   @override
   Widget build(BuildContext context) {
+
     double sizeRefactor = widget.smallCard ? 0.5 : 1;
     var fontSize = 14 * sizeRefactor;
     var isAssetImage =
@@ -65,10 +65,10 @@ class _CommunityCardState extends State<CommunityCard> {
         height: 225,
         margin: widget.margin,
         likeButton: widget.withFavorite && !widget.isCreator
-            ? InteresseButton(
+            ? CustomLikeButton(
                 communityData: widget.community,
-                afterFavorite:
-                    widget.afterFavorite != null ? widget.afterFavorite! : null)
+                afterLike: widget.afterFavorite,
+              )
             : null,
         onTap: () => global_func.changePage(
             context, CommunityDetails(community: widget.community),
@@ -132,6 +132,9 @@ class _CommunityCardState extends State<CommunityCard> {
   }
 }
 
+
+/*
+
 class InteresseButton extends StatefulWidget {
   Map communityData;
   Function? afterFavorite;
@@ -187,3 +190,6 @@ class _InteresseButtonState extends State<InteresseButton> {
     );
   }
 }
+
+
+ */

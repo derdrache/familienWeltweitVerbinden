@@ -16,7 +16,7 @@ import '../../../global/global_functions.dart' as global_func;
 import '../../../global/style.dart' as style;
 import '../../../services/database.dart';
 import '../../../widgets/custom_appbar.dart';
-import '../../../widgets/layout/custom_like_button.dart';
+import '../../../widgets/custom_like_button.dart';
 import '../../../windows/custom_popup_menu.dart';
 import '../../../windows/dialog_window.dart';
 import '../../../widgets/image_upload_box.dart';
@@ -80,28 +80,6 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
     }
   }
 
-  Future<bool> changeIntereset(interest) async {
-    if (interest) {
-      hasInterest = interest;
-
-      location["interesse"].remove(userId);
-      StadtinfoDatabase().update(
-          "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
-          "WHERE id = '${location["id"]}'");
-    } else {
-      hasInterest = interest;
-
-      location["interesse"].add(userId);
-      StadtinfoDatabase().update(
-          "interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')",
-          "WHERE id = '${location["id"]}'");
-    }
-
-    setState(() {});
-
-    return !interest;
-  }
-
   void _onNavigationItemTapped(int index) {
     setState(() {
       _selectNavigationIndex = index;
@@ -142,8 +120,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
             },
           ),
           CustomLikeButton(
-            isLiked: hasInterest,
-            onLikeButtonTapped: changeIntereset,
+            locationData: location,
           )
         ],
       ),
