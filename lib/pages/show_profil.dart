@@ -1047,7 +1047,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
                   style: const TextStyle(
                       fontSize: style.textSize, fontWeight: FontWeight.bold),
                 ),
-                Expanded(child: SizedBox.shrink()),
+                const Expanded(child: SizedBox.shrink()),
                 InkWell(onTap: () => translateAboutMe(), child: Text("translate", style: TextStyle(fontSize: style.textSize, color: Theme.of(context).colorScheme.secondary),))
               ],
             ),

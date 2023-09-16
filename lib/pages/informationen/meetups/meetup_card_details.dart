@@ -403,7 +403,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
             children: [
               Text(rowTitle,
                   style: TextStyle(
-                      fontSize: fontsize, fontWeight: FontWeight.bold, color: Colors.black)),
+                      fontSize: fontsize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black)),
               const Expanded(child: SizedBox.shrink()),
               InkWell(
                 onTap: changeWindow,
@@ -518,8 +520,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                 maxLength: 40),
             checkAndSaveNewName),
         child: Text(title.isNotEmpty ? title : widget.meetupData["name"],
-            style:
-                TextStyle(fontSize: fontsize + 8, fontWeight: FontWeight.bold, color: Colors.black),
+            style: TextStyle(
+                fontSize: fontsize + 8,
+                fontWeight: FontWeight.bold,
+                color: Colors.black),
             textAlign: TextAlign.center),
       );
     }
@@ -545,7 +549,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                       decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20)),
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.white,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white70
+                              : Colors.white,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.5),
@@ -577,8 +583,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     openLocationChangeWindow() {
-      bool isWorldwide = widget.meetupData["stadt"] == "worldwide"
-          || widget.meetupData["stadt"]== "Weltweit";
+      bool isWorldwide = widget.meetupData["stadt"] == "worldwide" ||
+          widget.meetupData["stadt"] == "Weltweit";
 
       if (!widget.isCreator && !isWorldwide) {
         global_func.changePage(context,
@@ -773,7 +779,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                 icon: isOnList ? Icons.do_not_disturb_on : Icons.add_circle,
                 size: 80,
                 color: Colors.black,
-                tooltipText: isOnList ? AppLocalizations.of(context)!.tooltipRemoveMeetupInformationRequest : AppLocalizations.of(context)!.tooltipGetMeetupInformation,
+                tooltipText: isOnList
+                    ? AppLocalizations.of(context)!
+                        .tooltipRemoveMeetupInformationRequest
+                    : AppLocalizations.of(context)!.tooltipGetMeetupInformation,
                 onPressed: () {
                   askForRelease(isOnList);
                   setState(() {});
@@ -807,32 +816,28 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
         selected: createChangeableMeetupTags(null),
       );
 
-
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
             return StatefulBuilder(builder: (context, setStateMeetupTagWindow) {
-              tagSelection.onConfirm = (){
+              tagSelection.onConfirm = () {
                 List selectedTags = tagSelection.getSelected();
 
                 widget.meetupData["tags"] = selectedTags;
 
-                updateHiveMeetup(
-                    widget.meetupData["id"], "tags", selectedTags);
+                updateHiveMeetup(widget.meetupData["id"], "tags", selectedTags);
 
-                MeetupDatabase().update("tags = '${jsonEncode(selectedTags)}'", "WHERE id = '${widget.meetupData["id"]}'");
+                MeetupDatabase().update("tags = '${jsonEncode(selectedTags)}'",
+                    "WHERE id = '${widget.meetupData["id"]}'");
 
                 setStateMeetupTagWindow(() {});
                 setState(() {});
-
               };
 
               return CustomAlertDialog(
                   title: AppLocalizations.of(context)!.tagsChange,
                   children: [
                     tagSelection
-
-
 
                     /*
                     const SizedBox(height: 20),
@@ -922,7 +927,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                 margin: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey
+                        : Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: cardShadowColor().withOpacity(0.6),
@@ -974,11 +981,12 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
               id: widget.meetupData["id"],
             ),
           CardFeet(
-              organisator: widget.meetupData["erstelltVon"],
-              meetupData: widget.meetupData,
-              meetupZusage: widget.meetupData["zusage"],
-              width: cardWidth,
-              moreContent: moreContent,),
+            organisator: widget.meetupData["erstelltVon"],
+            meetupData: widget.meetupData,
+            meetupZusage: widget.meetupData["zusage"],
+            width: cardWidth,
+            moreContent: moreContent,
+          ),
         ],
       ),
     );
@@ -1174,7 +1182,9 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
             children: [
               Text("${AppLocalizations.of(context)!.datum} ",
                   style: TextStyle(
-                      fontSize: fontsize, fontWeight: FontWeight.bold, color: Colors.black)),
+                      fontSize: fontsize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black)),
               const Expanded(child: SizedBox.shrink()),
               SizedBox(
                 width: 200,
@@ -1329,15 +1339,14 @@ class CardFeet extends StatefulWidget {
   List meetupZusage;
   bool moreContent;
 
-  CardFeet(
-      {Key? key,
-      required this.organisator,
-      required this.width,
-      required this.meetupData,
-      required this.meetupZusage,
-      required this.moreContent,
-      })
-      : super(key: key);
+  CardFeet({
+    Key? key,
+    required this.organisator,
+    required this.width,
+    required this.meetupData,
+    required this.meetupZusage,
+    required this.moreContent,
+  }) : super(key: key);
 
   @override
   State<CardFeet> createState() => _CardFeetState();
@@ -1419,7 +1428,12 @@ class _CardFeetState extends State<CardFeet> {
                       color: Theme.of(context).colorScheme.secondary)),
               onTap: () => showTeilnehmerWindow(),
             ),
-            Expanded(child: widget.moreContent ? Center(child: Icon(Icons.arrow_downward),) : SizedBox.shrink()),
+            Expanded(
+                child: widget.moreContent
+                    ? Center(
+                        child: Icon(Icons.arrow_downward),
+                      )
+                    : SizedBox.shrink()),
             InkWell(
               child: Text(organisatorProfil!["name"] ?? "",
                   style: TextStyle(
@@ -1445,7 +1459,11 @@ class MeetupArtButton extends StatefulWidget {
   final bool isCreator;
   final Function pageState;
 
-  const MeetupArtButton({Key? key, required this.meetupData, required this.isCreator, required this.pageState})
+  const MeetupArtButton(
+      {Key? key,
+      required this.meetupData,
+      required this.isCreator,
+      required this.pageState})
       : super(key: key);
 
   @override
@@ -1477,88 +1495,81 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
           child: IconButton(
               icon: const Icon(Icons.help, size: 20),
               tooltip: AppLocalizations.of(context)!.tooltipMehrInformationen,
-              onPressed: () =>
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext buildContext) {
-                        return CustomAlertDialog(
-                            height: 500,
-                            title: AppLocalizations
-                                .of(context)!
-                                .informationMeetupArt,
-                            children: [
-                              const SizedBox(height: 10),
-                              Container(
-                                margin: const EdgeInsets.only(left: 5, right: 5),
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text("privat       ",
-                                          style:
-                                          TextStyle(fontWeight: FontWeight.bold)),
-                                      const SizedBox(width: 5),
-                                      Expanded(
-                                        child: Text(
-                                          AppLocalizations
-                                              .of(context)!
-                                              .privatInformationText,
-                                          maxLines: 10,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      )
-                                    ]),
-                              ),
-                              const SizedBox(height: 20),
-                              Container(
-                                margin: const EdgeInsets.only(left: 5, right: 5),
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                          width: 70,
-                                          child: Text(
-                                              AppLocalizations
-                                                  .of(context)!
-                                                  .halbOeffentlich,
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold))),
-                                      const SizedBox(width: 5),
-                                      Expanded(
-                                        child: Text(
-                                          AppLocalizations
-                                              .of(context)!
-                                              .halbOeffentlichInformationText,
-                                          maxLines: 10,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      )
-                                    ]),
-                              ),
-                              const SizedBox(height: 20),
-                              Container(
-                                margin: const EdgeInsets.only(left: 5, right: 5),
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(AppLocalizations
-                                          .of(context)!
-                                          .oeffentlich,
+              onPressed: () => showDialog(
+                  context: context,
+                  builder: (BuildContext buildContext) {
+                    return CustomAlertDialog(
+                        height: 500,
+                        title:
+                            AppLocalizations.of(context)!.informationMeetupArt,
+                        children: [
+                          const SizedBox(height: 10),
+                          Container(
+                            margin: const EdgeInsets.only(left: 5, right: 5),
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("privat       ",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .privatInformationText,
+                                      maxLines: 10,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                ]),
+                          ),
+                          const SizedBox(height: 20),
+                          Container(
+                            margin: const EdgeInsets.only(left: 5, right: 5),
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                      width: 70,
+                                      child: Text(
+                                          AppLocalizations.of(context)!
+                                              .halbOeffentlich,
                                           style: const TextStyle(
-                                              fontWeight: FontWeight.bold)),
-                                      const SizedBox(width: 5),
-                                      Expanded(
-                                        child: Text(
-                                          AppLocalizations
-                                              .of(context)!
-                                              .oeffentlichInformationText,
-                                          maxLines: 10,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ]),
-                              )
-                            ]);
-                      }))),
+                                              fontWeight: FontWeight.bold))),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .halbOeffentlichInformationText,
+                                      maxLines: 10,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                ]),
+                          ),
+                          const SizedBox(height: 20),
+                          Container(
+                            margin: const EdgeInsets.only(left: 5, right: 5),
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      AppLocalizations.of(context)!.oeffentlich,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .oeffentlichInformationText,
+                                      maxLines: 10,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ]),
+                          )
+                        ]);
+                  }))),
     );
   }
 
@@ -1566,7 +1577,8 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
   void initState() {
     userSpeakGerman = getUserSpeaksGerman();
     meetupTypInput = CustomDropdownButton(
-      items: userSpeakGerman ? global_var.eventArt : global_var.eventArtEnglisch,
+      items:
+          userSpeakGerman ? global_var.eventArt : global_var.eventArtEnglisch,
       selected: userSpeakGerman
           ? global_func.changeEnglishToGerman(widget.meetupData["art"])
           : global_func.changeGermanToEnglish(widget.meetupData["art"]),
@@ -1577,30 +1589,25 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
   @override
   Widget build(BuildContext context) {
     icon = widget.meetupData["art"] == "öffentlich" ||
-        widget.meetupData["art"] == "public"
+            widget.meetupData["art"] == "public"
         ? Icons.lock_open
-        : widget.meetupData["art"] == "privat" || widget.meetupData["art"] == "private"
-        ? Icons.enhanced_encryption
-        : Icons.lock;
+        : widget.meetupData["art"] == "privat" ||
+                widget.meetupData["art"] == "private"
+            ? Icons.enhanced_encryption
+            : Icons.lock;
 
     return Positioned(
       top: -5,
       left: -5,
       child: IconButton(
-          icon: Icon(icon, color: Theme
-              .of(context)
-              .colorScheme
-              .primary),
+          icon: Icon(icon, color: Theme.of(context).colorScheme.primary),
           onPressed: !widget.isCreator
               ? null
-              : () =>
-              showDialog(
+              : () => showDialog(
                   context: context,
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
-                        title: AppLocalizations
-                            .of(context)!
-                            .meetupArtAendern,
+                        title: AppLocalizations.of(context)!.meetupArtAendern,
                         height: 200,
                         children: [
                           meetupArtInformation(),
@@ -1612,16 +1619,13 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                                 children: [
                                   TextButton(
                                     child: Text(
-                                        AppLocalizations
-                                            .of(context)!
-                                            .abbrechen,
+                                        AppLocalizations.of(context)!.abbrechen,
                                         style: TextStyle(fontSize: fontsize)),
                                     onPressed: () => Navigator.pop(context),
                                   ),
                                   TextButton(
                                       child: Text(
-                                          AppLocalizations
-                                              .of(context)!
+                                          AppLocalizations.of(context)!
                                               .speichern,
                                           style: TextStyle(fontSize: fontsize)),
                                       onPressed: () {
