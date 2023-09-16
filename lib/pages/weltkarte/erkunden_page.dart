@@ -1800,7 +1800,12 @@ class _ErkundenPageState extends State<ErkundenPage> {
             deactivateAllButtons(filter: true);
             bottomSheet(profils: profils);
           },
-          onRemove: () => deactivateAllButtons());
+          onRemove: () => deactivateAllButtons(),
+          onClose: (){
+            filterList = [];
+            deactivateAllButtons();
+          }
+      );
     }
 
     setSearchAutocomplete();

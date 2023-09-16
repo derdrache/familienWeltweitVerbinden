@@ -7,6 +7,7 @@ class SearchAutocomplete extends StatefulWidget {
   Function? onConfirm;
   String hintText;
   Function? onRemove;
+  Function? onClose;
   var selected = "";
   final TextEditingController _textEditingController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
@@ -16,6 +17,7 @@ class SearchAutocomplete extends StatefulWidget {
       required this.searchableItems,
       this.onConfirm,
       this.onRemove,
+      this.onClose,
       this.hintText = ""}) : super(key: key);
 
   getSelected() {
@@ -108,7 +110,12 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                   hintText: widget.hintText,
                   contentPadding: const EdgeInsets.all(10.0),
                   suffixIcon: IconButton(
-                    onPressed: textEditingController.clear,
+                    onPressed: (){
+                      textEditingController.clear();
+                      if(widget.onClose != null) widget.onClose!();
+
+                      setState(() {});
+                    },
                     icon: const Icon(Icons.clear, color: Colors.red,),
                   ),
                 ),
