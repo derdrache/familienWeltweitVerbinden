@@ -935,6 +935,11 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             padding: const EdgeInsets.all(2.0),
             child: Image.asset("assets/icons/linktree.png", width: 20, height: 20)
         );
+      }else if(link.contains("/t.me/")){
+        displayLink = link.replaceAll("https://", "");
+        displayLink = displayLink.split("/")[1];
+
+        icon = Image.asset("assets/icons/telegram.png", width: 24, height: 24);
       }else {
         icon = const Icon(Icons.public);
       }
@@ -1094,6 +1099,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
             if (widget.profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
             if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
+            SizedBox(height: 20,)
           ],
         ));
   }
