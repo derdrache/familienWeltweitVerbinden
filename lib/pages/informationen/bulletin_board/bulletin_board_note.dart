@@ -70,6 +70,8 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
 
   @override
   Widget build(BuildContext context) {
+    double noteRotation = widget.note["rotation"] + 0.0;
+
     return InkWell(
       onTap: () => changePage(context, BulletinBoardDetails(note: widget.note), whenComplete: widget.afterPageVisit),
       child: Stack(
@@ -79,7 +81,7 @@ class _BulletinBoardCardState extends State<BulletinBoardCard> {
             padding: const EdgeInsets.all(5),
             width: 110,
             height: 110,
-            transform: Matrix4.rotationZ(widget.note["rotation"]),
+            transform: Matrix4.rotationZ(noteRotation),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(4),
               color: Colors.yellow[200],
