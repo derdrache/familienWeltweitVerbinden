@@ -927,7 +927,15 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
           padding: const EdgeInsets.all(2.0),
           child: Image.asset("assets/icons/youtube.png", width: 20, height: 20),
         );
-      } else {
+      } else if(link.contains("linktr.ee")){
+        displayLink = link.replaceAll("https://", "");
+        displayLink = displayLink.split("/")[1];
+
+        icon = Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Image.asset("assets/icons/linktree.png", width: 20, height: 20)
+        );
+      }else {
         icon = const Icon(Icons.public);
       }
 
