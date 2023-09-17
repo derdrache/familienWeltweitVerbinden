@@ -1135,13 +1135,16 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   ],
                 ),
               ),
-              SingleChildScrollView(
+              Expanded(
                 child: Container(
-                    margin: const EdgeInsets.only(left: 10, right: 10),
+                  margin: const EdgeInsets.only(left: 10, right: 10),
+                  child: SingleChildScrollView(
                     child: TextWithHyperlinkDetection(
                       text: showInformation,
                       fontsize: 16,
-                    )),
+                    ),
+                  ),
+                ),
               ),
               if (translated)
                 Padding(
@@ -1157,7 +1160,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ],
                   ),
                 ),
-              const Expanded(child: SizedBox.shrink()),
               if (informationImages.isNotEmpty)
                 Container(
                   alignment: Alignment.center,
