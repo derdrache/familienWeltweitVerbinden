@@ -765,15 +765,17 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
                   title: AppLocalizations.of(context)!.informationAendern,
+                  height: MediaQuery.of(context).size.height * 0.9,
                   children: [
                     CustomTextInput(AppLocalizations.of(context)!.titel,
                         titleTextKontroller),
                     const SizedBox(height: 10),
                     CustomTextInput(AppLocalizations.of(context)!.beschreibung,
                         informationTextKontroller,
-                        moreLines: 7, textInputAction: TextInputAction.newline),
+                        moreLines: 12, textInputAction: TextInputAction.newline),
                     const SizedBox(height: 5),
                     imageUploadBox,
+                    const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -1242,7 +1244,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                                         ? TextDecoration.lineThrough
                                         : null),
                               ))
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                     )),
                     GestureDetector(
                       onTap: () => creatorProfil == null
@@ -1277,7 +1279,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     const SizedBox(width: 5)
                   ],
                 ),
-              )
+              ),
+              const SizedBox(height: 5,)
             ],
           ),
         ),
