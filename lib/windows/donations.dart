@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../global/style.dart' as style;
 
-donationWindow(BuildContext context) {
+donationWindow(BuildContext context, {infoText = ""}) {
 
   openKoFi() async {
     Uri url = Uri.parse("https://ko-fi.com/devdrache");
@@ -62,6 +62,7 @@ donationWindow(BuildContext context) {
                 ),
                 insetPadding: const EdgeInsets.all(10),
                 children: [
+                  Text(infoText),
                   FloatingActionButton.extended(
                     icon: SizedBox(
                         width: 30,
