@@ -8,6 +8,11 @@ ThemeData darkTheme = ThemeData(
       primary: Colors.grey[800]!,
       secondary: Colors.grey[700]!,
     ),
+    textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.black, // Text Color
+        )
+    ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: Colors.grey
     ),
