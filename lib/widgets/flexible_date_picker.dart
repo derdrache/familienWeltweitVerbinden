@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +74,7 @@ class FlexibleDatePicker extends StatefulWidget {
 }
 
 class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
-  final String defaultLocale = Platform.localeName.split("_")[0];
+  final String defaultLocale = PlatformDispatcher.instance.locale.languageCode;
   final int daysForListdays = 32;
   late List listDays;
   late List listMonths;
