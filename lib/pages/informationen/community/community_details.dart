@@ -251,7 +251,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         });
   }
 
-  _windowOptions(saveFunction, {add = false}) {
+  _windowOptions(saveFunction) {
     return Container(
       margin: const EdgeInsets.only(right: 10),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -261,7 +261,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           onPressed: () => Navigator.pop(context),
         ),
         TextButton(
-            child: Text(add ? AppLocalizations.of(context)!.speichern : AppLocalizations.of(context)!.hinzufuegen,
+            child: Text(AppLocalizations.of(context)!.speichern,
                 style: TextStyle(fontSize: fontsize)),
             onPressed: () {
               saveFunction();
