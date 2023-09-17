@@ -5,7 +5,7 @@ List<String> reisearten = ["Fester Standort", "Flugzeug/Unterkünfte",
 List<String> interessenListe = ["Homeschooling", "Freilerner", "Worldschooling",
   "Montessori", "Waldorf", "Gemeinsame Aktivitäten", "Weltreise", "Langsam reisen", "Gemeinsam reisen",
   "Gemeinsam wohnen", "Digitale Nomaden", "Gemeinsame Kinderbetreuung", "Dauerhaft reisen", "Kaffeetreff", "Online kennenlernen",
-  "Minimalismus","Frugalismus", "Vegan", "Zuckerfrei","Glutenfrei", "Gewaltfreie Kommunikation", "Bitcoin", "Alleinerziehend"];
+  "Minimalismus","Frugalismus", "Vegan", "Zuckerfrei","Glutenfrei", "Gewaltfreie Kommunikation", "Bitcoin", "Alleinbegleitend"];
 List<String> meetupInterval = ["einmalig", "täglich", "mehrtägig", "wöchentlich", "alle 2 Wochen", "monatlich"];
 List<String> meetupTyp = ["offline", "online"];
 List<String> eventArt = ["öffentlich", "halb-öffentlich", "privat"];
