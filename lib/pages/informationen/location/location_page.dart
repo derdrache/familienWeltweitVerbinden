@@ -188,6 +188,8 @@ class _LocationPageState extends State<LocationPage> {
             if (onSearch) {
               searchFocusNode.unfocus();
               searchKontroller.clear();
+            }else{
+              searchFocusNode.requestFocus();
             }
 
             setState(() {
