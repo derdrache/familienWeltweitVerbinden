@@ -1070,15 +1070,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       List informationImages = information["images"];
 
       return Container(
-        margin: const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 60),
+        margin: const EdgeInsets.only(top: 10, bottom: 60),
         width: double.infinity,
-        /*
-        decoration: BoxDecoration(
-            border: Border.all(
-                width: 2, color: Theme.of(context).colorScheme.primary),
-            borderRadius: BorderRadius.circular(20)),
-
-         */
         child: Card(
           elevation: 15,
           shape: RoundedRectangleBorder(
@@ -1088,21 +1081,24 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                margin: const EdgeInsets.only(top: 5, bottom: 10),
+                margin: const EdgeInsets.only(top: 5, bottom: 20),
+                width: double.infinity,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Padding(
-                        padding: const EdgeInsets.only(left: 10, right: 10),
-                        child: Text(
-                          " #${index + 1} - $showTitle",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
-                        )),
-                    const Expanded(child: SizedBox.shrink()),
+                    Expanded(
+                      child: Padding(
+                          padding: const EdgeInsets.only(left: 10, right: 10),
+                          child: Text(
+                            " #${index + 1} - $showTitle",
+                            maxLines: 2,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          )),
+                    ),
                     InkWell(
                       onTap: () => openInformationMenu(information, index),
-                      child: const Icon(Icons.more_horiz),
+                      child: const Icon(Icons.more_horiz, size: 30,),
                     ),
                     const SizedBox(width: 5)
                   ],
@@ -1244,7 +1240,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       );
     }
 
-    userInfoBox() {
+    createInfoList(){
       List<Widget> userCityInfo = [];
 
       for (var i = 0; i < usersCityInformation.length; i++) {
@@ -1254,7 +1250,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       if (userCityInfo.isEmpty) {
         userCityInfo.add(Container(
           height: 500,
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(10),
           child: Center(
             child: Text(
               AppLocalizations.of(context)!.keineInsiderInformation,
@@ -1264,22 +1260,22 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         ));
       }
 
-      return CarouselSlider(
-        carouselController: carouselController,
-        options: CarouselOptions(height: double.infinity, initialPage: initalPage, enableInfiniteScroll: false),
-        items: userCityInfo.map((card) {
-          return Builder(
-            builder: (BuildContext context) {
-              return card;
-            },
-          );
-        }).toList(),
-      );
+      return userCityInfo;
     }
 
     return SafeArea(
       child: Scaffold(
-        body: userInfoBox(),
+        body: CarouselSlider(
+          carouselController: carouselController,
+          options: CarouselOptions(height: double.infinity, initialPage: initalPage, enableInfiniteScroll: false),
+          items: createInfoList().map((card) {
+            return Builder(
+              builder: (BuildContext context) {
+                return card;
+              },
+            );
+          }).toList(),
+        ),
         floatingActionButton: FloatingActionButton(
             heroTag: "create Stadtinformation",
             child: const Icon(Icons.create),
