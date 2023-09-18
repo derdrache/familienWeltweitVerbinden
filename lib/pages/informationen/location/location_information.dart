@@ -1101,7 +1101,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
       return Container(
         margin: const EdgeInsets.only(top: 10, bottom: 60),
-        width: double.infinity,
+        width: 800,
         child: Card(
           elevation: 15,
           shape: RoundedRectangleBorder(
