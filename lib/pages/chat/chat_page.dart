@@ -431,6 +431,9 @@ class _ChatPageState extends State<ChatPage>{
           chatName ??= AppLocalizations.of(context)!.weltChat;
         } else {
           var chatUsers = chat["users"].keys.toList();
+
+          if(chatUsers.length == 1) continue;
+
           var userPartnerId =
               chatUsers[0] != userId ? chatUsers[0] : chatUsers[1];
           chatName =
