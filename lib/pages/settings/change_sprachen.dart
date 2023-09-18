@@ -28,7 +28,6 @@ class ChangeSprachenPage extends StatelessWidget {
   Widget build(BuildContext context) {
     sprachenInputBox.hintText = AppLocalizations.of(context)!.spracheAuswaehlen;
 
-
     save() {
       if (sprachenInputBox.getSelected() == null ||
           sprachenInputBox.getSelected().isEmpty) {
@@ -42,16 +41,18 @@ class ChangeSprachenPage extends StatelessWidget {
       updateHiveOwnProfil("sprachen", sprachenInputBox.getSelected());
     }
 
-
     sprachenInputBox.onConfirm = () => save();
 
     return Scaffold(
       appBar: CustomAppBar(
           title: AppLocalizations.of(context)!.spracheVeraendern,
       ),
-      body: ListView(children: [
-        sprachenInputBox,
-      ])
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Align(child: sprachenInputBox),
+        ],
+      )
     );
   }
 }

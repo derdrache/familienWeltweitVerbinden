@@ -42,7 +42,7 @@ class ChangeReiseartPage extends StatelessWidget {
       appBar: CustomAppBar(
           title: AppLocalizations.of(context)!.reiseartAendern
       ),
-      body: reiseArtInput
+      body: Align(alignment: Alignment.topCenter, child: reiseArtInput)
     );
   }
 }

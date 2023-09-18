@@ -156,33 +156,35 @@ class _ChangeAufreisePageState extends State<ChangeAufreisePage> {
         appBar: CustomAppBar(
             title: AppLocalizations.of(context)!.aufReiseAendern,
         ),
-        body: Column(children: [
-          aufreiseDropdownButton,
-          if(!noTraveling) aufreiseBox(
-              AppLocalizations.of(context)!.seit,
-              widget.aufreiseSeit,
-          ),
-          if(pastTravler) aufreiseBox(
-              AppLocalizations.of(context)!.bis,
-              widget.aufreiseBis,
-          ),
-          if(stillTraveling) Container(
-            margin: const EdgeInsets.only(left: 10),
-            width: 600,
-            child: Row(children: [
-              Text(AppLocalizations.of(context)!.bis, style: const TextStyle(fontSize: 20)),
-              const SizedBox(width: 20),
-              Text(AppLocalizations.of(context)!.offen, style: const TextStyle(fontSize: 20)),
-            ],),
-          ),
-          const SizedBox(height: 20),
-          FloatingActionButton.extended(
-              label: Text(
-                AppLocalizations.of(context)!.speichern,
-                style: const TextStyle(fontSize: 20),
-              ),
-              onPressed: () => save())
-        ])
+        body: Align(
+          child: Column(children: [
+            aufreiseDropdownButton,
+            if(!noTraveling) aufreiseBox(
+                AppLocalizations.of(context)!.seit,
+                widget.aufreiseSeit,
+            ),
+            if(pastTravler) aufreiseBox(
+                AppLocalizations.of(context)!.bis,
+                widget.aufreiseBis,
+            ),
+            if(stillTraveling) Container(
+              margin: const EdgeInsets.only(left: 10),
+              width: 600,
+              child: Row(children: [
+                Text(AppLocalizations.of(context)!.bis, style: const TextStyle(fontSize: 20)),
+                const SizedBox(width: 20),
+                Text(AppLocalizations.of(context)!.offen, style: const TextStyle(fontSize: 20)),
+              ],),
+            ),
+            const SizedBox(height: 20),
+            FloatingActionButton.extended(
+                label: Text(
+                  AppLocalizations.of(context)!.speichern,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                onPressed: () => save())
+          ]),
+        )
     );
   }
 }

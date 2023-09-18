@@ -549,6 +549,7 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
                           inviteFamilyProfil != null) &&
                       inviteFamilyProfil["einladung"].contains(userId))
                     familyProfilInvite(),
+                  SizedBox(height: 10,)
                 ],
               ));
   }

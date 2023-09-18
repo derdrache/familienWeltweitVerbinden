@@ -70,9 +70,10 @@ class _ChangeBesuchteLaenderPageState extends State<ChangeBesuchteLaenderPage> {
         appBar: CustomAppBar(
           title: AppLocalizations.of(context)!.besucheLaenderVeraendern,
         ),
-        body: ListView(
+        body: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            besuchteLaenderDropdown,
+            Align(child: besuchteLaenderDropdown),
           ],
         ));
   }

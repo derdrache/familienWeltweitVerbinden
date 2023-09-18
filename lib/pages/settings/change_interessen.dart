@@ -45,9 +45,10 @@ class ChangeInteressenPage extends StatelessWidget {
       appBar: CustomAppBar(
           title: AppLocalizations.of(context)!.interessenVeraendern,
       ),
-      body: ListView(
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          interessenInputBox,
+          Align(child: interessenInputBox),
         ],
       )
     );

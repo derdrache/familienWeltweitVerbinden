@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../global/style.dart' as style;
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
 import '../../widgets/layout/custom_snackbar.dart';
@@ -51,7 +52,7 @@ class ChangeChildrenPage extends StatelessWidget {
       appBar: CustomAppBar(
           title: AppLocalizations.of(context)!.kinderAendern,
       ),
-      body: Padding(
+      body: Container(
         padding: const EdgeInsets.all(10.0),
         child: Column(children: [
           childrenBirthdatePickerBox,
