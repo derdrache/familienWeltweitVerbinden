@@ -199,7 +199,7 @@ class _NameSection extends StatelessWidget {
             children: [
               InkWell(
                   onTap: () => openSettingWindow(),
-                  child: Icon(Icons.more_vert, color: textColor)),
+                  child: Icon(Icons.more_vert, color: Theme.of(context).brightness == Brightness.dark ? Colors.white: textColor)),
             ],
           ),
           Row(
