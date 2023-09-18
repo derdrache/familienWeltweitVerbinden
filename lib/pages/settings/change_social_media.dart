@@ -1,3 +1,4 @@
+import 'package:familien_suche/global/style.dart' as style;
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -5,8 +6,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../global/global_functions.dart';
 import '../../services/database.dart';
 import '../../widgets/custom_appbar.dart';
-
-
 
 class ChangeSocialMediaLinks extends StatefulWidget {
   const ChangeSocialMediaLinks({Key? key}) : super(key: key);
@@ -110,9 +109,10 @@ class _ChangeSocialMediaLinksState extends State<ChangeSocialMediaLinks> {
       for(var socialMediaLink in ownProfil["socialMediaLinks"]){
         allSocialMediaLinks.add(
           Container(
+            width: style.webWidth,
             margin: const EdgeInsets.all(10),
             child: Row(children: [
-              Text(socialMediaLink),
+              Expanded(child: Text(socialMediaLink,maxLines: 3,)),
               const Expanded(child: SizedBox.shrink()),
               CloseButton(
                 onPressed: (){
