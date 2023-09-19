@@ -511,6 +511,7 @@ class _ChatPageState extends State<ChatPage>{
       var chatData = spezialData ?? getSelectedChatData();
 
       for (dynamic group in chatData) {
+        print(group);
         String? chatName = "";
         Map? chatPartnerProfil;
         String? chatPartnerId;
@@ -647,7 +648,7 @@ class _ChatPageState extends State<ChatPage>{
                                   chatPartnerName: isChatGroup
                                       ? null
                                       : chatPartnerProfil!["name"],
-                                  groupChatData: group,
+                                  groupChatData: isChatGroup ? group : null,
                                   backToChatPage: true,
                                   chatPageSliderIndex: mainSlider,
                                   isChatgroup: isChatGroup)));
