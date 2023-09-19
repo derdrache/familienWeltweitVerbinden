@@ -16,6 +16,7 @@ import '../services/database.dart';
 import '../services/locationsService.dart';
 import '../services/network_connectivity.dart';
 import '../widgets/layout/ownIconButton.dart';
+import '../windows/donations.dart';
 import 'informationen/information.dart';
 import 'login_register_page/on_boarding_slider.dart';
 import 'news/news_page.dart';
@@ -94,6 +95,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     _updateOwnEmail();
     _updateOwnToken();
     _updateOwnLastLogin();
+    askForDonation();
   }
 
   _checkForceUpdate() async {
@@ -284,6 +286,25 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     ownProfil!["lastLogin"] = DateTime.now().toString();
 
 
+  }
+
+  askForDonation()async {
+    DateTime? oldShowDonationDate = Hive.box("secureBox").get("donationDate") == null
+        ? null
+        : DateTime.parse(Hive.box("secureBox").get("donationDate"));
+    Map donationInfo = await AllgemeinDatabase().getData("donationText, donationDate", "");
+    DateTime donationDate = DateTime.parse(donationInfo["donationDate"]);
+
+    if(oldShowDonationDate == null){
+      Hive.box("secureBox").put("donationDate", donationDate.toString());
+      return;
+    }
+
+    if(oldShowDonationDate.isBefore(donationDate)){
+      donationWindow(context, infoText: donationInfo["donationText"]);
+    }
+
+    Hive.box("secureBox").put("donationDate", donationDate.toString());
   }
 
 

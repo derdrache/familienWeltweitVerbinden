@@ -2,6 +2,8 @@ import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../global/style.dart' as style;
 
 donationWindow(BuildContext context, {infoText = ""}) {
@@ -62,7 +64,8 @@ donationWindow(BuildContext context, {infoText = ""}) {
                 ),
                 insetPadding: const EdgeInsets.all(10),
                 children: [
-                  Text(infoText),
+                  Text(AppLocalizations.of(context)!.supportFamiliesWorldwide, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                  if(infoText.isNotEmpty) Container(margin: const EdgeInsets.only(top: 20,bottom: 20), child: Text(infoText)),
                   FloatingActionButton.extended(
                     icon: SizedBox(
                         width: 30,
