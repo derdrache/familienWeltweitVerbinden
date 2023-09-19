@@ -195,12 +195,10 @@ class ChatDatabase {
       "users": json.encode(userData),
       "lastMessage": "",
     };
-    print(userData);
     var url = Uri.parse(databaseUrl + databasePathNewPersonalChat);
     http.post(url, body: json.encode(newChatGroup));
 
     newChatGroup["users"] = userData;
-    //print(userData);
     return newChatGroup;
   }
 
