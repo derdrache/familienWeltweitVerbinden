@@ -328,7 +328,9 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
           style: TextStyle(
               fontWeight: widget.selectedDate == null? null :FontWeight.bold,
               fontSize: 14,
-              color: widget.selectedDate == null ? Colors.grey : Colors.black),
+              color: widget.selectedDate == null  || Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey
+                  : Colors.black),
         )),
       ),
     );
