@@ -564,6 +564,9 @@ class _ChatPageState extends State<ChatPage>{
 
           if(hasSecretChat && !secretChatMember) continue;
         } else if (users.isNotEmpty){
+
+          chatPartnerId = group["id"].replaceAll(userId, "").replaceAll("_", "");
+
           users.forEach((key, value) async {
             if (key != userId) {
               chatPartnerId = key;
