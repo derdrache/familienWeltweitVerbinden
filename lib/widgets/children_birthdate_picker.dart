@@ -5,64 +5,6 @@ import '../widgets/flexible_date_picker.dart';
 double sideSpace = 10;
 
 
-class CustomDatePicker extends StatefulWidget {
-  Function()? deleteFunction;
-  bool dateIsSelected;
-  var datePicker;
-
-  getPickedDate(){
-    if(datePicker == null) return;
-
-    return datePicker.getDate();
-  }
-
-  CustomDatePicker({
-    Key? key,
-    this.datePicker,
-    this.deleteFunction,
-    this.dateIsSelected = false,
-  }) : super(key: key);
-
-  @override
-  CustomDatePickerState createState() => CustomDatePickerState();
-}
-
-class CustomDatePickerState extends State<CustomDatePicker> {
-  @override
-  void initState() {
-    super.initState();
-  }            
-
-  @override
-  Widget build(BuildContext context) {
-    return FractionallySizedBox(
-      widthFactor: 0.25,
-      child: Stack(
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 10, bottom: 10),
-            child: widget.datePicker,
-          ),
-             widget.deleteFunction == null ? const SizedBox.shrink() : Positioned(
-                width: 20,
-                right: 1.0,
-                top: -5.0,
-                child: InkResponse(
-                  onTap: widget.deleteFunction,
-                  child: const CircleAvatar(
-                    backgroundColor: Colors.red,
-                    child: Icon(Icons.close, size: 10,),
-                  ),
-                ),
-              )  
-        ],
-      ),
-    );
-
-  }
-}
-
 class ChildrenBirthdatePickerBox extends StatefulWidget {
   List childrensBirthDatePickerList = [];
   EdgeInsets? margin;
@@ -105,7 +47,7 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
       birthDate.removeLast();
 
       childrensBirthDatePickerList.add(
-          CustomDatePicker(
+          _CustomDatePicker(
               datePicker: FlexibleDatePicker(
                 startYear: DateTime.now().year-18,
                 endYear: DateTime.now().year,
@@ -124,15 +66,15 @@ class ChildrenBirthdatePickerBox extends StatefulWidget {
 }
 
 class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox> {
-  var childrens = 1;
-  var maxChildrens = 8;
+  int childrens = 1;
+  int maxChildrens = 8;
   double webWidth = 600;
 
   @override
   void initState() {
     if(widget.childrensBirthDatePickerList.isEmpty){
       widget.childrensBirthDatePickerList.add(
-          CustomDatePicker()
+          const _CustomDatePicker()
       );
     }
 
@@ -151,7 +93,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
   addChildrensBirthDatePickerList(childrenCount){
     if(childrenCount <=8){
       widget.childrensBirthDatePickerList.add(
-          CustomDatePicker(
+          _CustomDatePicker(
               deleteFunction: deleteFunction()
           )
       );
@@ -190,7 +132,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
         hintText = date.join("-");
 
         newPicker.add(
-            CustomDatePicker(
+            _CustomDatePicker(
                 datePicker: FlexibleDatePicker(
                   startYear: DateTime.now().year-18,
                   endYear: DateTime.now().year,
@@ -201,7 +143,7 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
         );
       } else{
         newPicker.add(
-            CustomDatePicker(
+            _CustomDatePicker(
                 datePicker: FlexibleDatePicker(
                   startYear: DateTime.now().year-18,
                   endYear: DateTime.now().year,
@@ -233,5 +175,63 @@ class _ChildrenBirthdatePickerBoxState extends State<ChildrenBirthdatePickerBox>
         ),
       ),
     );
+  }
+}
+
+class _CustomDatePicker extends StatefulWidget {
+  final Function()? deleteFunction;
+  final bool dateIsSelected;
+  final FlexibleDatePicker? datePicker;
+
+  getPickedDate(){
+    if(datePicker == null) return;
+
+    return datePicker!.getDate();
+  }
+
+  const _CustomDatePicker({
+    Key? key,
+    this.datePicker,
+    this.deleteFunction,
+    this.dateIsSelected = false,
+  }) : super(key: key);
+
+  @override
+  _CustomDatePickerState createState() => _CustomDatePickerState();
+}
+
+class _CustomDatePickerState extends State<_CustomDatePicker> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FractionallySizedBox(
+      widthFactor: 0.25,
+      child: Stack(
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 10),
+            child: widget.datePicker,
+          ),
+          widget.deleteFunction == null ? const SizedBox.shrink() : Positioned(
+            width: 20,
+            right: 1.0,
+            top: -5.0,
+            child: InkResponse(
+              onTap: widget.deleteFunction,
+              child: const CircleAvatar(
+                backgroundColor: Colors.red,
+                child: Icon(Icons.close, size: 10,),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+
   }
 }

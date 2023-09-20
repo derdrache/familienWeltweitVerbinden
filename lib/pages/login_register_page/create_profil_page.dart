@@ -15,7 +15,7 @@ import '../../global/profil_sprachen.dart';
 import '../../services/notification.dart' as notifications;
 import '../../global/global_functions.dart' as global_functions;
 import '../../global/global_functions.dart';
-import '../../widgets/ChildrenBirthdatePicker.dart';
+import '../../widgets/children_birthdate_picker.dart';
 import '../../widgets/google_autocomplete.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../services/database.dart';
