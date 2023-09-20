@@ -1156,6 +1156,7 @@ class NewsSettingsDatabase {
         }));
 
     dynamic responseBody = res.body;
+
     responseBody = decrypt(responseBody);
 
     responseBody = jsonDecode(responseBody);
