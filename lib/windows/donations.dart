@@ -52,48 +52,37 @@ donationWindow(BuildContext context, {infoText = ""}) {
   return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: SimpleDialog(
-                contentPadding: const EdgeInsets.all(40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(style.roundedCorners),
-                ),
-                insetPadding: const EdgeInsets.all(10),
-                children: [
-                  Text(AppLocalizations.of(context)!.supportFamiliesWorldwide, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
-                  if(infoText.isNotEmpty) Container(margin: const EdgeInsets.only(top: 20,bottom: 20), child: Text(infoText)),
-                  FloatingActionButton.extended(
-                    icon: SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: Image.asset("assets/icons/kofi logo.png")),
-                    onPressed: () => openKoFi(),
-                    label: const Text("Buy me a coffee"),
-                  ),
-                  const SizedBox(height: 30),
-                  FloatingActionButton.extended(
-                    icon: Image.asset("assets/icons/paypal logo.png"),
-                    onPressed: ()=> openPaypal(),
-                    label: const Text(""),
-                  ),
-                  const SizedBox(height: 30),
-                  FloatingActionButton.extended(
-                    icon: SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: Image.asset("assets/icons/bitcoin.png")),
-                    onPressed: () => openBitcoin(),
-                    label: const Text("Bitcoin"),
-                  ),
-                  const SizedBox(height: 10)
-                ],
+        return CustomAlertDialog(
+          childrenMargin: const EdgeInsets.only(left: 40, right: 40, top: 20, bottom: 20),
+            children: [
+              Text(AppLocalizations.of(context)!.supportFamiliesWorldwide, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+              const SizedBox(height: 30,),
+              if(infoText.isNotEmpty) Container(margin: const EdgeInsets.only(bottom: 30), child: Text(infoText)),
+              FloatingActionButton.extended(
+                icon: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Image.asset("assets/icons/kofi logo.png")),
+                onPressed: () => openKoFi(),
+                label: const Text("Buy me a coffee"),
               ),
-            ),
-          ],
+              const SizedBox(height: 30),
+              FloatingActionButton.extended(
+                icon: Image.asset("assets/icons/paypal logo.png"),
+                onPressed: ()=> openPaypal(),
+                label: const Text(""),
+              ),
+              const SizedBox(height: 30),
+              FloatingActionButton.extended(
+                icon: SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: Image.asset("assets/icons/bitcoin.png")),
+                onPressed: () => openBitcoin(),
+                label: const Text("Bitcoin"),
+              ),
+              const SizedBox(height: 10)
+            ]
         );
       });
 }

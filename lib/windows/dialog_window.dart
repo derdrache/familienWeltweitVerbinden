@@ -7,6 +7,7 @@ import '../global/style.dart' as style;
 class CustomAlertDialog extends StatefulWidget {
   final String title;
   final List<Widget> children;
+  final EdgeInsets? childrenMargin;
   final List<Widget>? actions;
   final double? height;
   final EdgeInsets windowPadding;
@@ -17,6 +18,7 @@ class CustomAlertDialog extends StatefulWidget {
       required this.children,
       this.actions,
       this.height,
+      this.childrenMargin,
       this.windowPadding = const EdgeInsets.all(10)
       }) : super(key: key);
 
@@ -47,7 +49,7 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
                 PointerDeviceKind.mouse,
               }),
               child: Container(
-                margin: const EdgeInsets.all(10),
+                margin: widget.childrenMargin ?? const EdgeInsets.all(10),
                 child: ListView(
                   shrinkWrap: true,
                   children: [
