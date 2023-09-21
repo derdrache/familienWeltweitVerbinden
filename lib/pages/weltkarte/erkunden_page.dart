@@ -579,6 +579,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
     var checkNewCountry = true;
 
     for (var i = 0; i < list.length; i++) {
+      if(profil["land"] == "Online") profil["land"] = "Weltweit";
       var listCountryLocation =
           LocationService().getCountryLocationData(list[i]["countryname"]);
       var profilCountryLocation =
