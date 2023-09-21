@@ -975,12 +975,17 @@ class _ErkundenPageState extends State<ErkundenPage> {
       Map? familyProfil = getFamilyProfil(familyMember: profilId);
 
       if(familyProfil == null){
-        Map friendProfil = getProfilFromHive(profilId: profilId);
+        Map? friendProfil = getProfilFromHive(profilId: profilId);
+
+        if(friendProfil == null) continue;
+
         friendProfils.add(friendProfil);
       }else{
-        Map friendProfil = Map.of(getProfilFromHive(profilId: familyProfil["mainProfil"]));
+        Map? friendProfil = getProfilFromHive(profilId: familyProfil["mainProfil"]);
 
-        if(familyMainIds.contains(friendProfil["id"])) continue;
+        if(friendProfil == null || familyMainIds.contains(friendProfil["id"])) continue;
+
+        friendProfil = Map.of(friendProfil);
 
         friendProfil["name"] = familyProfil["name"];
 
