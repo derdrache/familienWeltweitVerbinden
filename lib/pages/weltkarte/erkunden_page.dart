@@ -968,17 +968,28 @@ class _ErkundenPageState extends State<ErkundenPage> {
   }
 
   activateFriendlistProfils(changeList) {
-    var newProfilList = [];
+    List friendProfils = [];
+    List familyMainIds = [];
 
-    for (var profilId in changeList) {
-      for (var profil in Hive.box('secureBox').get("profils") ?? []) {
-        if (profilId == profil["id"]) {
-          newProfilList.add(profil);
-          break;
-        }
+    for(var profilId in changeList){
+      Map? familyProfil = getFamilyProfil(familyMember: profilId);
+
+      if(familyProfil == null){
+        Map friendProfil = getProfilFromHive(profilId: profilId);
+        friendProfils.add(friendProfil);
+      }else{
+        Map friendProfil = Map.of(getProfilFromHive(profilId: familyProfil["mainProfil"]));
+
+        if(familyMainIds.contains(friendProfil["id"])) continue;
+
+        friendProfil["name"] = familyProfil["name"];
+
+        familyMainIds.add(friendProfil["id"]);
+        friendProfils.add(friendProfil);
       }
     }
-    profils = newProfilList;
+
+    profils = friendProfils;
     createAndSetZoomLevels(profils, "profils");
   }
 
