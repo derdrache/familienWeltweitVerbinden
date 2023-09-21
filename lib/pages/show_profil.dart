@@ -271,33 +271,68 @@ class _AppBarState extends State<_AppBar> {
   }
 
   changeFriendStatus(isFriend) {
-    var snackbarText = "";
-    var newsData = {
+    String snackbarText = "";
+    Map newsData = {
       "typ": "friendlist",
       "information": "",
     };
+    bool hasFamilyProfil = widget.familyProfil != null;
 
     if (isFriend) {
-      userFriendlist.remove(widget.profil["id"]);
-      snackbarText =
-          _userName + AppLocalizations.of(context)!.friendlistEntfernt;
+      if(hasFamilyProfil){
+        for(var profil in widget.familyProfil!["members"]){
+          String familyMemberId = profil["id"];
+          var newsId = getNewsId("added $familyMemberId");
 
-      var newsId = getNewsId("added ${widget.profil["id"]}");
 
-      if (newsId != null) NewsPageDatabase().delete(newsId);
+          userFriendlist.remove(familyMemberId);
+
+          if (newsId != null) NewsPageDatabase().delete(newsId);
+        }
+
+        snackbarText =
+            widget.familyProfil!["name"] + AppLocalizations.of(context)!.friendlistEntfernt;
+      }else{
+        userFriendlist.remove(widget.profil["id"]);
+        snackbarText =
+            _userName + AppLocalizations.of(context)!.friendlistEntfernt;
+
+        var newsId = getNewsId("added ${widget.profil["id"]}");
+
+        if (newsId != null) NewsPageDatabase().delete(newsId);
+      }
     } else {
-      userFriendlist.add(widget.profil["id"]);
-      snackbarText =
-          _userName + AppLocalizations.of(context)!.friendlistHinzugefuegt;
+      if(hasFamilyProfil){
+        for(var profil in widget.familyProfil!["members"]){
+          String familyMemberId = profil["id"];
+          userFriendlist.add(familyMemberId);
 
-      prepareFriendNotification(
-          newFriendId: userId,
-          toId: widget.profil["id"],
-          toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
-              widget.profil["sprachen"].contains("german"));
+          prepareFriendNotification(
+              newFriendId: userId,
+              toId: familyMemberId,
+              toCanGerman: profil["sprachen"].contains("Deutsch") ||
+                  profil["sprachen"].contains("german"));
 
-      newsData["information"] = "added ${widget.profil["id"]}";
-      NewsPageDatabase().addNewNews(newsData);
+          newsData["information"] = "added $familyMemberId";
+          NewsPageDatabase().addNewNews(newsData);
+        }
+
+        snackbarText =
+            widget.familyProfil!["name"] + AppLocalizations.of(context)!.friendlistHinzugefuegt;
+      }else{
+        userFriendlist.add(widget.profil["id"]);
+        snackbarText =
+            _userName + AppLocalizations.of(context)!.friendlistHinzugefuegt;
+
+        prepareFriendNotification(
+            newFriendId: userId,
+            toId: widget.profil["id"],
+            toCanGerman: widget.profil["sprachen"].contains("Deutsch") ||
+                widget.profil["sprachen"].contains("german"));
+
+        newsData["information"] = "added ${widget.profil["id"]}";
+        NewsPageDatabase().addNewNews(newsData);
+      }
     }
 
     var localBox = Hive.box('secureBox');
