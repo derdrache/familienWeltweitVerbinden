@@ -282,7 +282,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   filterProfils() {
     var filterProfils = [];
-    print(filterList);
+
     if (filterList.isEmpty) {
       filterProfils = profilsBackup;
     } else {
