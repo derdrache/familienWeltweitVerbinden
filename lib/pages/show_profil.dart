@@ -82,7 +82,7 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
           ClipPath(
               clipper: _MyCustomClipper(),
               child: ColorfulBackground(
-                height: 250,
+                height: 260,
                 colors: [
                   Theme.of(context).colorScheme.primary,
                   Theme.of(context).colorScheme.secondary
@@ -92,11 +92,11 @@ class _ShowProfilPageState extends State<ShowProfilPage> {
                   children: [
                     ProfilImage(
                       profil,
-                      size: 60,
+                      size: 80,
                       fullScreenWindow: true,
                     ),
                     SizedBox(
-                        height: 60,
+                        height: 50,
                         child: CurvedText(
                           curvature: -0.002,
                           text: profil["name"],
