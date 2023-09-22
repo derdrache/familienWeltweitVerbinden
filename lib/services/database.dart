@@ -1050,7 +1050,7 @@ class NewsPageDatabase {
           DateTime.now().difference(DateTime.parse(news["erstelltAm"])).inDays;
       news.removeWhere((key, value) =>
           key == "id" || key == "erstelltAm" || key == "erstelltVon");
-      var checkNewNews = Map<String, dynamic>.of(newNews);
+      var checkNewNews = Map.of(newNews);
       bool equality;
 
       try {

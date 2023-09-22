@@ -270,7 +270,7 @@ class _AppBarState extends State<_AppBar> {
         });
   }
 
-  changeFriendStatus(isFriend) {
+  changeFriendStatus(isFriend) async{
     String snackbarText = "";
     Map newsData = {
       "typ": "friendlist",
@@ -280,10 +280,8 @@ class _AppBarState extends State<_AppBar> {
 
     if (isFriend) {
       if(hasFamilyProfil){
-        for(var profil in widget.familyProfil!["members"]){
-          String familyMemberId = profil["id"];
+        for(var familyMemberId in widget.familyProfil!["members"]){
           var newsId = getNewsId("added $familyMemberId");
-
 
           userFriendlist.remove(familyMemberId);
 
@@ -303,8 +301,8 @@ class _AppBarState extends State<_AppBar> {
       }
     } else {
       if(hasFamilyProfil){
-        for(var profil in widget.familyProfil!["members"]){
-          String familyMemberId = profil["id"];
+        for(var familyMemberId in widget.familyProfil!["members"]){
+          Map profil = getProfilFromHive(profilId: familyMemberId);
           userFriendlist.add(familyMemberId);
 
           prepareFriendNotification(
@@ -314,7 +312,7 @@ class _AppBarState extends State<_AppBar> {
                   profil["sprachen"].contains("german"));
 
           newsData["information"] = "added $familyMemberId";
-          NewsPageDatabase().addNewNews(newsData);
+          await NewsPageDatabase().addNewNews(newsData);
         }
 
         snackbarText =
