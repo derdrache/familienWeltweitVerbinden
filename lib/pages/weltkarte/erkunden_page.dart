@@ -106,12 +106,13 @@ class _ErkundenPageState extends State<ErkundenPage> {
   var spracheIstDeutsch = kIsWeb
       ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
+  var hiveProfils = List.of(Hive.box('secureBox').get("profils") ?? []);
 
   @override
   void initState() {
     super.initState();
     
-    var hiveProfils = List.of(Hive.box('secureBox').get("profils") ?? []);
+
     profils = [for (var profil in hiveProfils) Map.of(profil)];
 
     setEvents();
@@ -195,7 +196,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   removeProfilsAndCreateAllUserName() {
     var removeProfils = [];
 
-    for (var profil in profils) {
+    for (var profil in profils + hiveProfils) {
       profil["lastLogin"] = profil["lastLogin"] ?? DateTime.parse("2022-02-13");
       var timeDifference = Duration(
           microseconds: (DateTime.now().microsecondsSinceEpoch -
@@ -281,7 +282,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   filterProfils() {
     var filterProfils = [];
-
+    print(filterList);
     if (filterList.isEmpty) {
       filterProfils = profilsBackup;
     } else {
@@ -290,6 +291,14 @@ class _ErkundenPageState extends State<ErkundenPage> {
           if (checkIfInFilter(profil)) {
             filterProfils.add(profil);
           }
+        }
+      }
+    }
+
+    if(filterProfils.isEmpty){
+      for (var profil in hiveProfils) {
+        if (checkIfInFilter(profil)) {
+          filterProfils.add(profil);
         }
       }
     }
@@ -1824,6 +1833,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           }
       );
     }
+
 
     setSearchAutocomplete();
 
