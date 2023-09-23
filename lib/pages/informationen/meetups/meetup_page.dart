@@ -97,7 +97,7 @@ class _MeetupPageState extends State<MeetupPage> {
 
       List<Widget> meetupCards = [];
       var emptyText =
-          AppLocalizations.of(context)!.nochKeinegemeinschaftVorhanden;
+          AppLocalizations.of(context)!.keineMeetupsErstellt;
       var emptySearchText = AppLocalizations.of(context)!.sucheKeineErgebnisse;
 
       if (allEntries.isEmpty) {
