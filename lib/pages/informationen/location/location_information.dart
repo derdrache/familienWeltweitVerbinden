@@ -1100,7 +1100,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       List informationImages = information["images"];
 
       return Container(
-        margin: const EdgeInsets.only(top: 10, bottom: 70),
+        margin: const EdgeInsets.only(top: 20, bottom: 70, right: 5, left: 5),
         width: 800,
         child: Card(
           elevation: 15,
