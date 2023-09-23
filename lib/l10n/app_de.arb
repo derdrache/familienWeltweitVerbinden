@@ -539,5 +539,7 @@
     "newFriendNotificationHinweis": "Durch Abschalten gibt es keine Notifikation mehr, wenn dich jemand als Freund hinzufügt",
     "travelPlanNotificationHinweis": "Durch Abschalten werden dir keine Notifikation von Freunden mehr angezeigt",
     "familieAroundNotificationHinweis": "Durch Abschalten bekommst du keine Notifikation mehr, wenn eine Familie in deine nähe kommt",
-    "supportFamiliesWorldwide": "Unterstütze families worldwide"
+    "supportFamiliesWorldwide": "Unterstütze families worldwide",
+    "keineSchwarzeBrettZettelVorhanden": "Es wurden noch keine Notizen erstellt",
+    "keineSchwarzeBrettZettelGefunden": "Keine Zettel gefunden"
 }

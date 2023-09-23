@@ -542,7 +542,9 @@
     "travelPlanNotificationHinweis": "By switching off, you will no longer be shown notifications from friends",
     "familieAroundNotificationHinweis": "By switching off, you will no longer receive a notification when a family comes near you",
     "tooltipLandInfoOeffnen": "open land information",
-    "supportFamiliesWorldwide": "Support families worldwide"
+    "supportFamiliesWorldwide": "Support families worldwide",
+    "keineSchwarzeBrettZettelVorhanden": "No notes have been created yet",
+    "keineSchwarzeBrettZettelGefunden": "No notes found"
 
 }
 

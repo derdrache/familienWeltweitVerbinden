@@ -18,7 +18,6 @@ class BulletinBoardPage extends StatefulWidget {
 
 class _BulletinBoardPageState extends State<BulletinBoardPage> {
   final String userId = FirebaseAuth.instance.currentUser!.uid;
-  var onSearch = false;
   TextEditingController noteSearchKontroller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
   final _scrollController = ScrollController();
@@ -76,24 +75,11 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
     allBulletinBoardNotes =
         Hive.box('secureBox').get("bulletinBoardNotes") ?? [];
     double width = MediaQuery.of(context).size.width;
-    String onSearchText = onSearch ? AppLocalizations.of(context)!.suche : "";
+    List allNotes = getAllSearchBulletinNotes();
 
     return Scaffold(
         appBar: CustomAppBar(
-          title:
-              "$onSearchText ${AppLocalizations.of(context)!.schwarzesBrett}",
-          leading: onSearch
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    setState(() {
-                      onSearch = false;
-                    });
-                  },
-                  tooltip:
-                      MaterialLocalizations.of(context).openAppDrawerTooltip,
-                )
-              : null,
+          title: AppLocalizations.of(context)!.schwarzesBrett,
         ),
         body: SafeArea(
           child: Stack(
@@ -105,17 +91,30 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
                     child: SizedBox(
                       width: double.infinity,
                       child: Wrap(alignment: WrapAlignment.center, children: [
-                        for (var note in getAllSearchBulletinNotes())
+                        for (var note in allNotes)
                           BulletinBoardCard(
                             note: note,
                             afterPageVisit: () {
                               setState(() {});
                             },
-                          )
+                          ),
+                        if (allNotes.isEmpty)
+                          SizedBox(
+                              height: 300,
+                              child: Center(
+                                child: Text(
+                                  noteSearchKontroller.text.isEmpty
+                                      ? AppLocalizations.of(context)!
+                                          .keineSchwarzeBrettZettelVorhanden
+                                      : AppLocalizations.of(context)!
+                                          .keineSchwarzeBrettZettelGefunden,
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                              ))
                       ]),
                     )),
               ),
-              if (onSearch)
+              if (allNotes.length > 30 || noteSearchKontroller.text.isNotEmpty)
                 Positioned(
                     bottom: 15,
                     right: 15,
@@ -149,23 +148,8 @@ class _BulletinBoardPageState extends State<BulletinBoardPage> {
                 child: const Icon(Icons.create),
                 onPressed: () => global_functions.changePage(
                     context, const BulletonBoardCreate())),
-            const SizedBox(height: 10),
-            FloatingActionButton(
-              mini: onSearch ? true : false,
-              backgroundColor: onSearch ? Colors.red : null,
-              onPressed: () {
-                if (onSearch) {
-                  searchFocusNode.unfocus();
-                  noteSearchKontroller.clear();
-                }
-
-                setState(() {
-                  onSearch = !onSearch;
-                });
-              },
-              tooltip: AppLocalizations.of(context)!.tooltipNotizSuche,
-              child: Icon(onSearch ? Icons.close : Icons.search),
-            ),
+            if (getAllSearchBulletinNotes().length > 30)
+              const SizedBox(height: 70),
           ],
         ));
   }
