@@ -1114,10 +1114,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ));
         },
         child: Container(
-          padding: const EdgeInsets.all(5.0),
+          padding: const EdgeInsets.all(10.0),
           margin: const EdgeInsets.all(10),
           width: 180,
-
           decoration: BoxDecoration(
               border: Border.all(
                   width: 2,
@@ -1129,7 +1128,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
             children: [
               Text(
                 infoTitle,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(
