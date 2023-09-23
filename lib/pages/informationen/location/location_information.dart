@@ -1225,7 +1225,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ),
                     Expanded(
                         child: Center(
-                      child: widget.location["erstelltVon"] == userId
+                      child: widget.location["erstelltVon"] != userId
                           ? TextButton(
                               style: TextButton.styleFrom(
                                 shape: const StadiumBorder(),
@@ -1255,13 +1255,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                                 profil: creatorProfil,
                               )),
                       child: SizedBox(
-                        width: 100,
+                        width: 130,
                         child: Column(
                           children: [
                             if (creatorName.isNotEmpty)
                               Text(
                                 "$creatorName ",
                                 maxLines: 1,
+                                overflow: TextOverflow.fade,
                                 style: const TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold),
