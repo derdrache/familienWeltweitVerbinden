@@ -8,6 +8,9 @@ ThemeData darkTheme = ThemeData(
       primary: Colors.grey[800]!,
       secondary: Colors.grey[700]!,
     ),
+    textTheme: const TextTheme(
+      titleMedium: TextStyle(color: Colors.black),
+    ),
     textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: Colors.black, // Text Color
