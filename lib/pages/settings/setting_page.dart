@@ -6,11 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../global/global_functions.dart' as global_func;
-import '../../global/global_functions.dart';
 import '../../global/profil_sprachen.dart';
 import '../../global/variablen.dart' as global_variablen;
 import '../../widgets/children_birthdate_picker.dart';
@@ -18,6 +16,7 @@ import '../../widgets/layout/custom_dropdown_button.dart';
 import '../../widgets/layout/custom_multi_select.dart';
 import '../../widgets/layout/ownIconButton.dart';
 import '../../widgets/profil_image.dart';
+import '../../windows/about_app.dart';
 import '../../windows/custom_popup_menu.dart';
 import '../../windows/donations.dart';
 import '../../windows/patchnotes.dart';
@@ -520,59 +519,6 @@ class _SupportInformation extends StatelessWidget {
       );
     }
 
-    aboutAppWindow() async {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (BuildContext buildContext) {
-            return AboutDialog(
-              applicationName: "families worldwide",
-              applicationVersion: packageInfo.version,
-              applicationIcon: Image.asset('assets/WeltFlugzeug.png'),
-              children: [
-                InkWell(
-                  onTap: () => openURL(
-                      "https://github.com/derdrache/familienWeltweitVerbinden"),
-                  child: const Row(
-                    children: [
-                      Text("Open Source: ",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text(
-                        "Github Repo",
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.blue,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Row(
-                  children: [
-                    Text("Framework:  ",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("Flutter"),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                const Row(
-                  children: [
-                    Text("Icons: ",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text("created by Freepik - Flaticon"),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Text(AppLocalizations.of(context)!.aboutAppText)
-              ],
-            );
-          });
-      }
-    }
-
     return Container(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -603,7 +549,7 @@ class _SupportInformation extends StatelessWidget {
                 AppLocalizations.of(context)!.spenden, Icons.favorite,
                 () => donationWindow(context)),
             settingThemeContainer(AppLocalizations.of(context)!.ueber,
-                Icons.info, () => aboutAppWindow()),
+                Icons.info, () => aboutAppWindow(context)),
           ],
         ));
   }
