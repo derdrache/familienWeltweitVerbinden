@@ -1100,7 +1100,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       List informationImages = information["images"];
 
       return Container(
-        margin: const EdgeInsets.only(top: 10, bottom: 60),
+        margin: const EdgeInsets.only(top: 10, bottom: 70),
         width: 800,
         child: Card(
           elevation: 15,
@@ -1137,14 +1137,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   ],
                 ),
               ),
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.only(left: 10, right: 10),
-                  child: SingleChildScrollView(
-                    child: TextWithHyperlinkDetection(
-                      text: showInformation,
-                      fontsize: 16,
-                    ),
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                child: SingleChildScrollView(
+                  child: TextWithHyperlinkDetection(
+                    text: showInformation,
+                    fontsize: 16,
                   ),
                 ),
               ),
@@ -1162,6 +1160,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ],
                   ),
                 ),
+              Expanded(child: SizedBox.shrink(),),
               if (informationImages.isNotEmpty)
                 Container(
                   alignment: Alignment.center,
