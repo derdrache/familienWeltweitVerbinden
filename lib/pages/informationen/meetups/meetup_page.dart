@@ -90,10 +90,11 @@ class _MeetupPageState extends State<MeetupPage> {
     double width = MediaQuery.of(context).size.width;
 
     showMeetups() {
+      List myMeetups = Hive.box('secureBox').get("interestEvents") +
+          Hive.box('secureBox').get("myEvents");
       List allEntries = onSearch
           ? getAllSearchMeetups()
-          : Hive.box('secureBox').get("interestEvents") +
-              Hive.box('secureBox').get("myEvents");
+          : myMeetups;
 
       List<Widget> meetupCards = [];
       var emptyText =
