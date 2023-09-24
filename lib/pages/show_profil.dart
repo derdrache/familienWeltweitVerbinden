@@ -606,7 +606,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
       final translator = GoogleTranslator();
       var translation = await translator.translate(
           widget.profil["aboutme"],
-          to: "auto");
+          to: WidgetsBinding.instance.platformDispatcher.locales[0].languageCode);
 
       translatedAboutMe = translation.text;
     }
