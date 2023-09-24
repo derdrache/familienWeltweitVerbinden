@@ -404,7 +404,10 @@ class _AppBarState extends State<_AppBar> {
               Text(AppLocalizations.of(context)!.privateProfilNotize)
             ],
           ),
-          onPressed: () => openNoteWindow()
+          onPressed: () {
+            Navigator.pop(context);
+            openNoteWindow();
+          }
       );
     }
 
