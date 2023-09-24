@@ -18,7 +18,7 @@ class FeedbackPage extends StatelessWidget {
   feedbackSendenAndClose(context) async {
     String text = feedbackTextKontroller.text;
 
-    if(text.isEmpty) return;
+    if (text.isEmpty) return;
 
     text = text.replaceAll("'", "''");
 
@@ -32,7 +32,6 @@ class FeedbackPage extends StatelessWidget {
     Navigator.pop(context);
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +44,9 @@ class FeedbackPage extends StatelessWidget {
               padding: const EdgeInsets.all(10.0),
               child: CustomTextInput(
                   feedbackTextKontroller.text, feedbackTextKontroller,
-                  moreLines: 10, hintText: AppLocalizations.of(context)!.feedbackText, validator: checkValidatorEmpty(context)),
+                  moreLines: 10,
+                  hintText: AppLocalizations.of(context)!.feedbackText,
+                  validator: checkValidatorEmpty(context)),
             ),
             Align(
               child: Container(
@@ -53,7 +54,10 @@ class FeedbackPage extends StatelessWidget {
                 margin: const EdgeInsets.all(10),
                 child: FloatingActionButton.extended(
                     onPressed: () => feedbackSendenAndClose(context),
-                    label: Text(AppLocalizations.of(context)!.senden, style: TextStyle(fontWeight: FontWeight.bold),)),
+                    label: Text(
+                      AppLocalizations.of(context)!.senden,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
               ),
             )
           ],

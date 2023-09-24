@@ -67,7 +67,7 @@ class CustomTextInput extends StatelessWidget {
                   onFieldSubmitted: (string) {
                     if(onSubmit != null) onSubmit!();
                   },
-                  keyboardType: keyboardType ?? TextInputType.emailAddress,
+                  keyboardType: keyboardType ?? TextInputType.text,
                   textInputAction: textInputAction,
                   textAlignVertical: TextAlignVertical.top,
                   maxLines: moreLines,
