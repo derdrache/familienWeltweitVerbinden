@@ -10,6 +10,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:translator/translator.dart';
 
+import '../global/profil_sprachen.dart';
 import '../global/style.dart' as style;
 import '../global/encryption.dart';
 import '../global/global_functions.dart' as global_functions;
@@ -804,9 +805,9 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
           global_functions.changeGermanToEnglish(widget.profil["sprachen"]).join(", ");
 
       if (spracheIstDeutsch) {
-        inhaltText = global_functions
-            .changeEnglishToGerman(widget.profil["sprachen"])
-            .join(", ");
+        inhaltText = ProfilSprachen().translateLanguageList(englishList: widget.profil["sprachen"]).join(", ");
+      }else{
+        inhaltText = ProfilSprachen().translateLanguageList(germanList: widget.profil["sprachen"]).join(", ");
       }
 
       return Row(children: [
