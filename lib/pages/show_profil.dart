@@ -18,6 +18,7 @@ import '../global/global_functions.dart';
 import '../global/variablen.dart';
 import '../pages/chat/chat_details.dart';
 import '../services/database.dart';
+import '../services/locationsService.dart';
 import '../services/notification.dart';
 import '../widgets/colorful_background.dart';
 import '../widgets/layout/custom_snackbar.dart';
@@ -705,10 +706,10 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
       ]);
     }
 
-    openBesuchteLaenderWindow() {
+    openBesuchteLaenderWindow(visitedCountries) {
       List<Widget> besuchteLaenderList = [];
 
-      for (var land in widget.profil["besuchteLaender"]) {
+      for (var land in visitedCountries) {
         besuchteLaenderList.add(
             Container(margin: const EdgeInsets.all(10), child: Text(land)));
       }
@@ -724,8 +725,14 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
     }
 
     besuchteLaenderDisplay() {
+      List translatedList = LocationService()
+          .transfromCountryListLanguage(
+          widget.profil["besuchteLaender"],
+          toEnglish: !spracheIstDeutsch,
+          toGerman: spracheIstDeutsch);
+
       return InkWell(
-        onTap: () => openBesuchteLaenderWindow(),
+        onTap: () => openBesuchteLaenderWindow(translatedList),
         child: Row(children: [
           Text(
             "${AppLocalizations.of(context)!.besuchteLaender}: ",
@@ -734,7 +741,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.underline),
           ),
-          Text(widget.profil["besuchteLaender"].length.toString(),
+          Text(translatedList.length.toString(),
               style: const TextStyle(
                   fontSize: style.textSize,
                   decoration: TextDecoration.underline))
@@ -1111,7 +1118,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             ),
             TextWithHyperlinkDetection(
               text: translation
-                  ? translatedAboutMe + "\n\n<${AppLocalizations.of(context)!.automatischeUebersetzung}>"
+                  ? "$translatedAboutMe\n\n<${AppLocalizations.of(context)!.automatischeUebersetzung}>"
                   : widget.profil["aboutme"],
               fontsize: style.textSize - 1,
             )

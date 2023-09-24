@@ -298,4 +298,21 @@ class LocationService {
 
     return searchCountry;
   }
+
+  transfromCountryListLanguage(countryList, {toGerman = false, toEnglish = false}){
+    List newCountryList = [];
+
+    for(var transformCountry in countryList){
+      for (var country in countryGeodata) {
+        if (country["nameGer"] == transformCountry || country["nameEng"] == transformCountry) {
+          if (toGerman) newCountryList.add(country["nameGer"]);
+          if (toEnglish) newCountryList.add(country["nameEng"]);
+          continue;
+        }
+      }
+    }
+
+    return newCountryList;
+  }
+
 }
