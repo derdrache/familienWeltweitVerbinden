@@ -396,13 +396,15 @@ class _AppBarState extends State<_AppBar> {
     }
 
     openNoteButton() {
-      return IconButton(
-        icon: Icon(
-          Icons.description,
-          color: buttonColor,
-        ),
-        tooltip: AppLocalizations.of(context)!.tooltipNotizBenutzerAngelegen,
-        onPressed: () => openNoteWindow(),
+      return SimpleDialogOption(
+          child: Row(
+            children: [
+              Icon(Icons.description),
+              const SizedBox(width: 10),
+              Text(AppLocalizations.of(context)!.privateProfilNotize)
+            ],
+          ),
+          onPressed: () => openNoteWindow()
       );
     }
 
@@ -535,7 +537,11 @@ class _AppBarState extends State<_AppBar> {
         onPressed: () {
           CustomPopupMenu(context,
               width: 220,
-              children: [userBlockierenButton(), meldeUserButton()]);
+              children: [
+                if (!_isOwnProfil) openNoteButton(),
+                userBlockierenButton(),
+                meldeUserButton()
+              ]);
         },
       );
     }
@@ -550,7 +556,6 @@ class _AppBarState extends State<_AppBar> {
           ),
           const Expanded(child: SizedBox.shrink()),
           if (!_isOwnProfil) friendButton(),
-          if (!_isOwnProfil) openNoteButton(),
           if (!_isOwnProfil) openChatButton(),
           if (!_isOwnProfil) moreMenuButton(),
         ],
