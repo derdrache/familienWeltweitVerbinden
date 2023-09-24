@@ -83,8 +83,6 @@
     "neuenChatEroeffnen": "Neuen Chat eröffnen",
     "keineVerbindungInternet" : "Keine Verbindung zum Internet",
     "willkommenBeiAppName" : "Willkommen bei Families worldwide",
-    "friendlistEntfernt" : " von der Freundesliste entfernt",
-    "friendlistHinzugefuegt": " der Freundesliste hinzugefügt",
     "familienAnzeige" : "Familienanzeige - Mehrere Accounts verbinden",
     "reisePlanung": "Reiseplanung/Reiseroute",
     "gemeinschaftenUpdate": "Gemeinschaften Eintragen/Anzeigen",
@@ -543,5 +541,10 @@
     "supportFamiliesWorldwide": "Unterstütze families worldwide",
     "keineSchwarzeBrettZettelVorhanden": "Es wurden noch keine Notizen erstellt",
     "keineSchwarzeBrettZettelGefunden": "Keine Zettel gefunden",
-    "privateProfilNotize": "Private Notiz"
+    "privateProfilNotize": "Private Notiz",
+    "freundEntfernen1" : "Möchtest du",
+    "freundEntfernen2" : "von deiner Freundesliste entfernen?",
+    "freundHinzufuegen1": "Möchtest du",
+    "freundHinzufuegen2": "deiner Freundesliste hinzufügen?"
+
 }

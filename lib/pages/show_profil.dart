@@ -383,11 +383,44 @@ class _AppBarState extends State<_AppBar> {
 
   @override
   Widget build(BuildContext context) {
+
+
+    changeFriendStatusWindow(isFriend){
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomAlertDialog(
+              title: isFriend
+                  ? AppLocalizations.of(context)!.freundHinzufuegen
+                  : AppLocalizations.of(context)!.freundEntfernen,
+              height: 120,
+              actions: [
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.hinzufuegen),
+                  onPressed: () => changeFriendStatus(isFriend),
+                ),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.abbrechen),
+                  onPressed: () => Navigator.pop(context),
+                )
+              ],
+              children: [
+                Center(
+                    child: Text( isFriend
+                        ? "${AppLocalizations.of(context)!.freundEntfernen1} $_userName ${AppLocalizations.of(context)!.freundEntfernen2}"
+                        : "${AppLocalizations.of(context)!.freundHinzufuegen1} $_userName ${AppLocalizations.of(context)!.freundHinzufuegen2}"
+                        )
+                )
+              ],
+            );
+          });
+    }
+
     friendButton() {
       bool isFriend = userFriendlist.contains(widget.profil["id"]);
 
       return IconButton(
-          onPressed: () => changeFriendStatus(isFriend),
+          onPressed: () => changeFriendStatusWindow(isFriend),
           tooltip: isFriend
               ? AppLocalizations.of(context)!.freundEntfernen
               : AppLocalizations.of(context)!.freundHinzufuegen,
