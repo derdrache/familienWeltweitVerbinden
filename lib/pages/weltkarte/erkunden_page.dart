@@ -1114,9 +1114,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
               ));
         },
         child: Container(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(10),
           margin: const EdgeInsets.all(10),
-          width: 180,
+          width: 170,
           decoration: BoxDecoration(
               border: Border.all(
                   width: 2,
