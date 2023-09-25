@@ -240,39 +240,50 @@ class _AppBarState extends State<_AppBar> {
                 title: AppLocalizations.of(context)!.notizeUeber + _userName,
                 children: [
                   if (userNotiz == null || changeNote)
-                    TextField(
-                      controller: userNotizController,
-                      maxLines: 10,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        hintText: AppLocalizations.of(context)!.notizEingeben,
+                    Container(
+                      margin: const EdgeInsets.all(10),
+                      child: TextField(
+                        controller: userNotizController,
+                        maxLines: 10,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          hintText: AppLocalizations.of(context)!.notizEingeben,
+                        ),
                       ),
                     ),
-                  const SizedBox(height: 10),
                   if (userNotiz == null || changeNote)
-                    FloatingActionButton.extended(
-                        label: Text(AppLocalizations.of(context)!.speichern),
-                        onPressed: () {
-                          saveNotiz(userNotizController.text);
+                    Align(
+                      child: Container(
+                        width: 100,
+                        margin: const EdgeInsets.all(10),
+                        child: FloatingActionButton.extended(
+                            label:
+                                Text(AppLocalizations.of(context)!.speichern),
+                            onPressed: () {
+                              saveNotiz(userNotizController.text);
 
-                          noteState(() {
-                            changeNote = false;
-                          });
-                        }),
+                              noteState(() {
+                                changeNote = false;
+                              });
+                            }),
+                      ),
+                    ),
                   if (userNotiz != null && !changeNote)
                     InkWell(
                         onTap: () => noteState(() {
                               changeNote = true;
                               userNotizController.text = userNotiz;
                             }),
-                        child: Text(userNotiz, maxLines: 10)),
+                        child: Container(
+                            margin: const EdgeInsets.all(10),
+                            child: Text(userNotiz, maxLines: 10))),
                   const SizedBox(height: 5)
                 ]);
           });
         });
   }
 
-  changeFriendStatus(isFriend) async{
+  changeFriendStatus(isFriend) async {
     String snackbarText = "";
     Map newsData = {
       "typ": "friendlist",
@@ -281,8 +292,8 @@ class _AppBarState extends State<_AppBar> {
     bool hasFamilyProfil = widget.familyProfil != null;
 
     if (isFriend) {
-      if(hasFamilyProfil){
-        for(var familyMemberId in widget.familyProfil!["members"]){
+      if (hasFamilyProfil) {
+        for (var familyMemberId in widget.familyProfil!["members"]) {
           var newsId = getNewsId("added $familyMemberId");
 
           userFriendlist.remove(familyMemberId);
@@ -290,9 +301,9 @@ class _AppBarState extends State<_AppBar> {
           if (newsId != null) NewsPageDatabase().delete(newsId);
         }
 
-        snackbarText =
-            widget.familyProfil!["name"] + AppLocalizations.of(context)!.friendlistEntfernt;
-      }else{
+        snackbarText = widget.familyProfil!["name"] +
+            AppLocalizations.of(context)!.friendlistEntfernt;
+      } else {
         userFriendlist.remove(widget.profil["id"]);
         snackbarText =
             _userName + AppLocalizations.of(context)!.friendlistEntfernt;
@@ -302,8 +313,8 @@ class _AppBarState extends State<_AppBar> {
         if (newsId != null) NewsPageDatabase().delete(newsId);
       }
     } else {
-      if(hasFamilyProfil){
-        for(var familyMemberId in widget.familyProfil!["members"]){
+      if (hasFamilyProfil) {
+        for (var familyMemberId in widget.familyProfil!["members"]) {
           Map profil = getProfilFromHive(profilId: familyMemberId);
           userFriendlist.add(familyMemberId);
 
@@ -317,9 +328,9 @@ class _AppBarState extends State<_AppBar> {
           await NewsPageDatabase().addNewNews(newsData);
         }
 
-        snackbarText =
-            widget.familyProfil!["name"] + AppLocalizations.of(context)!.friendlistHinzugefuegt;
-      }else{
+        snackbarText = widget.familyProfil!["name"] +
+            AppLocalizations.of(context)!.friendlistHinzugefuegt;
+      } else {
         userFriendlist.add(widget.profil["id"]);
         snackbarText =
             _userName + AppLocalizations.of(context)!.friendlistHinzugefuegt;
@@ -383,9 +394,7 @@ class _AppBarState extends State<_AppBar> {
 
   @override
   Widget build(BuildContext context) {
-
-
-    changeFriendStatusWindow(isFriend){
+    changeFriendStatusWindow(isFriend) {
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -406,11 +415,9 @@ class _AppBarState extends State<_AppBar> {
               ],
               children: [
                 Center(
-                    child: Text( isFriend
+                    child: Text(isFriend
                         ? "${AppLocalizations.of(context)!.freundEntfernen1} $_userName ${AppLocalizations.of(context)!.freundEntfernen2}"
-                        : "${AppLocalizations.of(context)!.freundHinzufuegen1} $_userName ${AppLocalizations.of(context)!.freundHinzufuegen2}"
-                        )
-                )
+                        : "${AppLocalizations.of(context)!.freundHinzufuegen1} $_userName ${AppLocalizations.of(context)!.freundHinzufuegen2}"))
               ],
             );
           });
@@ -432,7 +439,7 @@ class _AppBarState extends State<_AppBar> {
       return SimpleDialogOption(
           child: Row(
             children: [
-              Icon(Icons.description),
+              const Icon(Icons.description),
               const SizedBox(width: 10),
               Text(AppLocalizations.of(context)!.privateProfilNotize)
             ],
@@ -440,8 +447,7 @@ class _AppBarState extends State<_AppBar> {
           onPressed: () {
             Navigator.pop(context);
             openNoteWindow();
-          }
-      );
+          });
     }
 
     selectChatMemberWindow() {
@@ -571,13 +577,11 @@ class _AppBarState extends State<_AppBar> {
           color: buttonColor,
         ),
         onPressed: () {
-          CustomPopupMenu(context,
-              width: 220,
-              children: [
-                if (!_isOwnProfil) openNoteButton(),
-                userBlockierenButton(),
-                meldeUserButton()
-              ]);
+          CustomPopupMenu(context, width: 220, children: [
+            if (!_isOwnProfil) openNoteButton(),
+            userBlockierenButton(),
+            meldeUserButton()
+          ]);
         },
       );
     }
@@ -603,12 +607,12 @@ class _AppBarState extends State<_AppBar> {
 class _UserInformationDisplay extends StatefulWidget {
   final Map profil;
 
-
   const _UserInformationDisplay({Key? key, required this.profil})
       : super(key: key);
 
   @override
-  State<_UserInformationDisplay> createState() => _UserInformationDisplayState();
+  State<_UserInformationDisplay> createState() =>
+      _UserInformationDisplayState();
 }
 
 class _UserInformationDisplayState extends State<_UserInformationDisplay> {
@@ -643,11 +647,11 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
   }
 
   translateAboutMe() async {
-    if(translatedAboutMe.isEmpty){
+    if (translatedAboutMe.isEmpty) {
       final translator = GoogleTranslator();
-      var translation = await translator.translate(
-          widget.profil["aboutme"],
-          to: WidgetsBinding.instance.platformDispatcher.locales[0].languageCode);
+      var translation = await translator.translate(widget.profil["aboutme"],
+          to: WidgetsBinding
+              .instance.platformDispatcher.locales[0].languageCode);
 
       translatedAboutMe = translation.text;
     }
@@ -655,7 +659,6 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
     setState(() {
       translation = !translation;
     });
-
   }
 
   @override
@@ -736,7 +739,8 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
           global_functions.changeGermanToEnglish(widget.profil["reiseart"]);
 
       if (spracheIstDeutsch) {
-        inhaltText = global_functions.changeEnglishToGerman(widget.profil["reiseart"]);
+        inhaltText =
+            global_functions.changeEnglishToGerman(widget.profil["reiseart"]);
       }
 
       return Row(children: [
@@ -766,8 +770,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
     }
 
     besuchteLaenderDisplay() {
-      List translatedList = LocationService()
-          .transfromCountryListLanguage(
+      List translatedList = LocationService().transfromCountryListLanguage(
           widget.profil["besuchteLaender"],
           toEnglish: !spracheIstDeutsch,
           toGerman: spracheIstDeutsch);
@@ -794,8 +797,12 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
       if (widget.profil["aufreiseSeit"] == null) return const SizedBox.shrink();
 
       String themenText = "${AppLocalizations.of(context)!.aufReise}: ";
-      String seitText =
-          widget.profil["aufreiseSeit"].split("-").take(2).toList().reversed.join("-");
+      String seitText = widget.profil["aufreiseSeit"]
+          .split("-")
+          .take(2)
+          .toList()
+          .reversed
+          .join("-");
       String inhaltText = "";
 
       if (widget.profil["aufreiseBis"] == null) {
@@ -849,13 +856,18 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
 
     sprachenDisplay() {
       String themenText = "${AppLocalizations.of(context)!.sprachen}: ";
-      String inhaltText =
-          global_functions.changeGermanToEnglish(widget.profil["sprachen"]).join(", ");
+      String inhaltText = global_functions
+          .changeGermanToEnglish(widget.profil["sprachen"])
+          .join(", ");
 
       if (spracheIstDeutsch) {
-        inhaltText = ProfilSprachen().translateLanguageList(englishList: widget.profil["sprachen"]).join(", ");
-      }else{
-        inhaltText = ProfilSprachen().translateLanguageList(germanList: widget.profil["sprachen"]).join(", ");
+        inhaltText = ProfilSprachen()
+            .translateLanguageList(englishList: widget.profil["sprachen"])
+            .join(", ");
+      } else {
+        inhaltText = ProfilSprachen()
+            .translateLanguageList(germanList: widget.profil["sprachen"])
+            .join(", ");
       }
 
       return Row(children: [
@@ -1009,20 +1021,20 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
           padding: const EdgeInsets.all(2.0),
           child: Image.asset("assets/icons/youtube.png", width: 20, height: 20),
         );
-      } else if(link.contains("linktr.ee")){
+      } else if (link.contains("linktr.ee")) {
         displayLink = link.replaceAll("https://", "");
         displayLink = displayLink.split("/")[1];
 
         icon = Padding(
             padding: const EdgeInsets.all(2.0),
-            child: Image.asset("assets/icons/linktree.png", width: 20, height: 20)
-        );
-      }else if(link.contains("/t.me/")){
+            child: Image.asset("assets/icons/linktree.png",
+                width: 20, height: 20));
+      } else if (link.contains("/t.me/")) {
         displayLink = link.replaceAll("https://", "");
         displayLink = displayLink.split("/")[1];
 
         icon = Image.asset("assets/icons/telegram.png", width: 24, height: 24);
-      }else {
+      } else {
         icon = const Icon(Icons.public);
       }
 
@@ -1149,7 +1161,8 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
                       AppLocalizations.of(context)!.uebersetzen,
                       style: TextStyle(
                           fontSize: style.textSize,
-                          decoration: translation ? TextDecoration.lineThrough : null,
+                          decoration:
+                              translation ? TextDecoration.lineThrough : null,
                           color: Theme.of(context).colorScheme.secondary),
                     ))
               ],
@@ -1189,7 +1202,9 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             if (checkAccessReiseplanung() || isOwnProfil) reisePlanungBox(),
             if (widget.profil["socialMediaLinks"].isNotEmpty) socialMediaBox(),
             if (widget.profil["aboutme"].isNotEmpty) aboutmeBox(),
-            const SizedBox(height: 20,)
+            const SizedBox(
+              height: 20,
+            )
           ],
         ));
   }
