@@ -92,14 +92,15 @@ class _LoginPageState extends State<LoginPage> {
       if (error.code == "user-not-found") {
         if (context.mounted) {
           customSnackBar(
-            context, AppLocalizations.of(context)!.benutzerNichtGefunden);
+              context, AppLocalizations.of(context)!.benutzerNichtGefunden);
         }
       } else if (error.code == "wrong-password") {
-        if (context.mounted) customSnackBar(context, AppLocalizations.of(context)!.passwortFalsch);
+        if (context.mounted)
+          customSnackBar(context, AppLocalizations.of(context)!.passwortFalsch);
       } else if (error.code == "network-request-failed") {
         if (context.mounted) {
           customSnackBar(
-            context, AppLocalizations.of(context)!.keineVerbindungInternet);
+              context, AppLocalizations.of(context)!.keineVerbindungInternet);
         }
       }
     }
@@ -134,7 +135,6 @@ class _LoginPageState extends State<LoginPage> {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
 
       return await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (_) {}
@@ -277,15 +277,20 @@ class _LoginPageState extends State<LoginPage> {
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    customFloatbuttonExtended("Login", () => userLogin()),
+                    customFloatbuttonExtended("Login", () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      userLogin();
+                    }),
                     customFloatbuttonExtended(
                         AppLocalizations.of(context)!.registrieren, () {
-                      global_functions.changePage(
-                          context, OnBoardingSlider());
+                      global_functions.changePage(context, OnBoardingSlider());
                     })
                   ],
                 )
-              : customFloatbuttonExtended("Login", () => userLogin());
+              : customFloatbuttonExtended("Login", () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  userLogin();
+                });
     }
 
     Widget supportRow() {
@@ -413,10 +418,10 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     Widget socialLoginButtons() {
-      if(kIsWeb) return const SizedBox.shrink();
+      if (kIsWeb) return const SizedBox.shrink();
 
       return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        if (kIsWeb|| !Platform.isIOS) googleLoginButton(),
+        if (kIsWeb || !Platform.isIOS) googleLoginButton(),
         const SizedBox(width: 10),
         if (!kIsWeb || Platform.isIOS) appleLoginButton(),
       ]);
@@ -474,14 +479,14 @@ class _LoginPageState extends State<LoginPage> {
                 CustomTextInput("Email", emailController,
                     keyboardType: TextInputType.emailAddress,
                     validator: global_functions.checkValidationEmail(context),
-                    margin:
-                        const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                    margin: const EdgeInsets.only(
+                        left: 20, right: 20, top: 5, bottom: 5),
                     textInputAction: TextInputAction.next),
                 CustomTextInput(
                     AppLocalizations.of(context)!.passwort, passwortController,
                     validator: global_functions.checkValidatorPassword(context),
-                    margin:
-                        const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 5),
+                    margin: const EdgeInsets.only(
+                        left: 20, right: 20, top: 5, bottom: 5),
                     hideInput: true,
                     textInputAction: TextInputAction.done,
                     onSubmit: () => userLogin()),
