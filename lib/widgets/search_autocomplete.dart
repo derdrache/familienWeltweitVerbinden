@@ -140,6 +140,10 @@ class _SearchAutocompleteState extends State<SearchAutocomplete> {
                   setState(() {});
                 },
                 onFieldSubmitted: (String value) {
+                  widget.selected = value;
+                  if (widget.onConfirm != null) {
+                    widget.onConfirm!();
+                  }
                   onFieldSubmitted();
                 },
               );
