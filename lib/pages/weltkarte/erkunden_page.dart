@@ -980,6 +980,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
   activateFriendlistProfils(changeList) {
     List friendProfils = [];
     List familyMainIds = [];
+    Map ownFamilyProfil = getFamilyProfil(familyMember: userId);
 
     for(var profilId in changeList){
       Map? familyProfil = getFamilyProfil(familyMember: profilId);
@@ -993,7 +994,9 @@ class _ErkundenPageState extends State<ErkundenPage> {
       }else{
         Map? friendProfil = getProfilFromHive(profilId: familyProfil["mainProfil"]);
 
-        if(friendProfil == null || familyMainIds.contains(friendProfil["id"])) continue;
+        if(friendProfil == null
+            || familyMainIds.contains(friendProfil["id"])
+            || ownFamilyProfil["id"] == familyProfil["id"]) continue;
 
         friendProfil = Map.of(friendProfil);
 
@@ -1540,7 +1543,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
       );
     }
 
-    friendButton() {
+    friendListButton() {
       return OwnIconButton(
         image: !friendMarkerOn
             ? "assets/icons/friend_colorless.png"
@@ -1852,7 +1855,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 reiseplanungButton(),
                 communityButton(),
                 eventButton(),
-                friendButton(),
+                friendListButton(),
               ]))
         ]),
       ),
