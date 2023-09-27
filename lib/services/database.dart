@@ -784,22 +784,6 @@ class StadtinfoDatabase {
     return newCityInfo;
   }
 
-  addNewRating(rating)async{
-    var url = Uri.parse(databaseUrl + databasePathNewRating);
-    var response = await http.post(url, body: json.encode(rating));
-  }
-
-  changeRating(whatData,queryEnd) async{
-    var url = Uri.parse(databaseUrl + databasePathUpdate);
-
-    await http.post(url,
-        body: json.encode({
-          "table": "stadtinfo_rating",
-          "whatData": whatData,
-          "queryEnd": queryEnd
-        }));
-  }
-
   getData(whatData, queryEnd, {returnList = false}) async {
     var url = Uri.parse(databaseUrl + databasePathGetData);
 
@@ -866,6 +850,64 @@ class StadtinfoDatabase {
     }
 
     return true;
+  }
+}
+
+class StadtInfoRatingDatabase{
+
+  addNewRating(rating)async{
+    var url = Uri.parse(databaseUrl + databasePathNewRating);
+    await http.post(url, body: json.encode(rating));
+  }
+
+  getData(whatData, queryEnd, {returnList = false}) async {
+    var url = Uri.parse(databaseUrl + databasePathGetData);
+
+    var res = await http.post(url,
+        body: json.encode({
+          "whatData": whatData,
+          "queryEnd": queryEnd,
+          "table": "stadtinfo_rating"
+        }));
+    dynamic responseBody = res.body;
+    responseBody = decrypt(responseBody);
+
+    responseBody = jsonDecode(responseBody);
+    if (responseBody.isEmpty) return false;
+
+    for (var i = 0; i < responseBody.length; i++) {
+      if (responseBody[i].keys.toList().length == 1) {
+        var key = responseBody[i].keys.toList()[0];
+        responseBody[i] = responseBody[i][key];
+        continue;
+      }
+
+      for (var key in responseBody[i].keys.toList()) {
+        try {
+          responseBody[i][key] = jsonDecode(responseBody[i][key]);
+        } catch (_) {}
+      }
+    }
+
+    if (responseBody.length == 1 && !returnList) {
+      responseBody = responseBody[0];
+      try {
+        responseBody = jsonDecode(responseBody);
+      } catch (_) {}
+    }
+
+    return responseBody;
+  }
+
+  update(whatData, queryEnd) async {
+    var url = Uri.parse(databaseUrl + databasePathUpdate);
+
+    await http.post(url,
+        body: json.encode({
+          "table": "stadtinfo_rating",
+          "whatData": whatData,
+          "queryEnd": queryEnd
+        }));
   }
 }
 

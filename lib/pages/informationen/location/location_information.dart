@@ -76,7 +76,16 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
       if (!isCity) CountryCitiesPage(countryName: widget.ortName)
     ];
 
+    refreshRating();
+
     super.initState();
+  }
+
+  refreshRating() async {
+    var locationRatings = await StadtInfoRatingDatabase().getData("*", "where locationId = '${location["id"]}'", returnList: true);
+    if(locationRatings == false) locationRatings = [];
+
+    location["ratings"] = locationRatings;
   }
 
   void _onNavigationItemTapped(int index) {
@@ -527,6 +536,8 @@ class _LocationRatingState extends State<LocationRating> {
   late String ratingCount;
   late Map locationRating;
   bool hasRated = false;
+  List ratingCategories = ["familyFriendly", "security", "kindness",
+    "surrounding", "activities", "alternativeFood"];
   Map newRating = {
     "familyFriendly": 0.0,
     "security": 0.0,
@@ -538,6 +549,74 @@ class _LocationRatingState extends State<LocationRating> {
     "date": DateTime.now().toString()
   };
   TextEditingController newCommentController = TextEditingController();
+
+  setRatings() {
+    locationRating = {
+      "comments" : []
+    };
+
+    for(Map rating in allRatings){
+      var ratingValues = getAllRatingValues(rating);
+      Map commentInfo = {
+        "comment": rating["comment"],
+        "userName":
+        getProfilFromHive(profilId: rating["user"], getNameOnly: true) ??
+            AppLocalizations.of(context)!.geloeschterUser,
+        "sumRating": calculateSumRating(ratingValues),
+        "date": rating["date"]
+      };
+
+      locationRating["comments"].add(commentInfo);
+
+      if(rating["user"] == ownUserId){
+        newRating = rating;
+        hasRated = true;
+      }
+
+      ratingValues.forEach((key, value){
+        if(value >= 1){
+          locationRating["${key}Count"] ??= 0;
+          locationRating["${key}Count"] += 1;
+        }
+
+        locationRating[key] ??= 0.0;
+        locationRating[key] += value;
+      });
+    }
+
+    var allRatingValues = getAllRatingValues(locationRating);
+    var sumRating = calculateSumRating(allRatingValues);
+
+    locationRating["sum"] = allRatingValues.isEmpty ? 0.0 : sumRating;
+
+
+  }
+
+  getAllRatingValues(rating){
+    Map ratingValues = {};
+
+    rating.forEach((key, value){
+      if(ratingCategories.contains(key)){
+        ratingValues[key] = value + 0.0;
+      }
+    });
+
+    return ratingValues;
+  }
+
+  calculateSumRating(Map ratingValues){
+    double sum = 0.0;
+    int divider = 0;
+
+    ratingValues.forEach((key, value){
+      if(value >= 1){
+        sum += value;
+        divider += 1;
+      }
+    });
+
+    return sum / divider;
+  }
 
   changeNewRating(double rate, category) {
     if (category == null) return;
@@ -560,64 +639,19 @@ class _LocationRatingState extends State<LocationRating> {
 
     widget.location["rating"].add(dbNewRating);
 
-    StadtinfoDatabase().addNewRating(dbNewRating);
+    StadtInfoRatingDatabase().addNewRating(dbNewRating);
   }
 
   editRating() {}
 
-  calculateLocationRating() {
-    int? countCategories;
-    locationRating = {};
-
-    for (var ratingByUser in allRatings) {
-      for (var userId in ratingByUser.keys.toList()) {
-        Map ratings = ratingByUser[userId];
-        double totalRating = 0.0;
-        countCategories ??= ratings.length - 1;
-
-        if (userId == ownUserId) {
-          hasRated = true;
-          newRating = ratings;
-          newCommentController.text = newRating["comment"];
-        }
-
-        ratings.forEach((key, value) {
-          if (value.runtimeType == double) {
-            locationRating[key] = locationRating["key"] ?? 0.0 + value;
-            totalRating += value;
-          } else if (key == "date") {
-          } else {
-            Map commentInfo = {
-              "comment": value,
-              "userName":
-                  getProfilFromHive(profilId: userId, getNameOnly: true) ??
-                      AppLocalizations.of(context)!.geloeschterUser,
-              "sumRating": totalRating / countCategories!,
-              "date": ratings["date"]
-            };
-
-            locationRating["comments"] ??= [];
-            locationRating["comments"].add(commentInfo);
-          }
-        });
-
-        locationRating["sum"] = totalRating / countCategories;
-      }
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    widget.location["rating"] ??= [];
-  }
 
   @override
   Widget build(BuildContext context) {
-    allRatings = [];
+    allRatings = widget.location["ratings"] ?? [];
     ratingCount = allRatings.length.toString();
-    calculateLocationRating();
+
+    setRatings();
+
 
     ratingRow(title, double rating, {category, windowSetState}) {
       double iconSize = 26;
@@ -724,24 +758,8 @@ class _LocationRatingState extends State<LocationRating> {
           builder: (BuildContext buildContext) {
             return StatefulBuilder(
                 builder: (context, StateSetter windowsSetState) {
-              int divider = 0;
-              List ratingCategories = [
-                newRating["familyFriendly"],
-                newRating["security"],
-                newRating["kindness"],
-                newRating["surrounding"],
-                newRating["activities"],
-                newRating["alternativeFood"]
-              ];
-              double totalRating = 0.0;
-
-              for(var ratingCategory in ratingCategories){
-                totalRating = totalRating + ratingCategory;
-                if(ratingCategory != 0.0) divider = divider + 1;
-              }
-
-              if(divider > 0 )totalRating = totalRating / divider;
-
+                  Map ratingValues = getAllRatingValues(newRating);
+                  newCommentController.text = newRating["comment"] ?? "";
 
               return CustomAlertDialog(
                 title:
@@ -751,26 +769,26 @@ class _LocationRatingState extends State<LocationRating> {
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       children: [
-                        ratingRow("Gesamt", totalRating,
+                        ratingRow("Gesamt", calculateSumRating(ratingValues),
                             category: null, windowSetState: windowsSetState),
                         ratingRow(
-                            "Familenfreundlich", newRating["familyFriendly"],
+                            "Familenfreundlich", ratingValues["familyFriendly"],
                             category: "familyFriendly",
                             windowSetState: windowsSetState),
-                        ratingRow("Sicherheit", newRating["security"],
+                        ratingRow("Sicherheit", ratingValues["security"],
                             category: "security",
                             windowSetState: windowsSetState),
-                        ratingRow("Freundlichkeit", newRating["kindness"],
+                        ratingRow("Freundlichkeit", ratingValues["kindness"],
                             category: "kindness",
                             windowSetState: windowsSetState),
-                        ratingRow("Umland & Natur", newRating["surrounding"],
+                        ratingRow("Umland & Natur", ratingValues["surrounding"],
                             category: "surrounding",
                             windowSetState: windowsSetState),
-                        ratingRow("Aktivitäten", newRating["activities"],
+                        ratingRow("Aktivitäten", ratingValues["activities"],
                             category: "activities",
                             windowSetState: windowsSetState),
                         ratingRow("alternative Lebensmittel",
-                            newRating["alternativeFood"],
+                            ratingValues["alternativeFood"],
                             category: "alternativeFood",
                             windowSetState: windowsSetState),
                       ],
@@ -801,7 +819,7 @@ class _LocationRatingState extends State<LocationRating> {
                               });
                             },
                             label: Text(hasRated
-                                ? AppLocalizations.of(context)!.bearbeiten
+                                ? AppLocalizations.of(context)!.aendern
                                 : AppLocalizations.of(context)!.senden),
                           ))),
                   const SizedBox(
