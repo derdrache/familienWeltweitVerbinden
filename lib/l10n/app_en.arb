@@ -549,7 +549,10 @@
     "freundEntfernen1" : "Do you really want to take",
     "freundEntfernen2" : "off your friendlist?",
     "freundHinzufuegen1": "Do you really want to add",
-    "freundHinzufuegen2": "to your friendlist?"
+    "freundHinzufuegen2": "to your friendlist?",
+    "locationBewertung": "Rating",
+    "bewerten1": "rate",
+    "bewerten2": ""
 
 }
 

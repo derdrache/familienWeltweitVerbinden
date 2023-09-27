@@ -784,6 +784,22 @@ class StadtinfoDatabase {
     return newCityInfo;
   }
 
+  addNewRating(rating)async{
+    var url = Uri.parse(databaseUrl + databasePathNewRating);
+    var response = await http.post(url, body: json.encode(rating));
+  }
+
+  changeRating(whatData,queryEnd) async{
+    var url = Uri.parse(databaseUrl + databasePathUpdate);
+
+    await http.post(url,
+        body: json.encode({
+          "table": "stadtinfo_rating",
+          "whatData": whatData,
+          "queryEnd": queryEnd
+        }));
+  }
+
   getData(whatData, queryEnd, {returnList = false}) async {
     var url = Uri.parse(databaseUrl + databasePathGetData);
 

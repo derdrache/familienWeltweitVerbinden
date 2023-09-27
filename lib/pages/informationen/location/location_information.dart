@@ -69,20 +69,14 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
         usersCityInformation: usersCityInformation,
         fromCityPage: widget.fromCityPage,
       ),
+      LocationRating(location: location),
       InsiderInformationPage(
           location: location, insiderInfoId: widget.insiderInfoId),
+      if (isCity) WorldmapMini(location: location),
+      if (!isCity) CountryCitiesPage(countryName: widget.ortName)
     ];
-    addLastTab();
 
     super.initState();
-  }
-
-  addLastTab() {
-    if (isCity) {
-      tabPages.add(WorldmapMini(location: location));
-    } else {
-      tabPages.add(CountryCitiesPage(countryName: widget.ortName));
-    }
   }
 
   void _onNavigationItemTapped(int index) {
@@ -145,6 +139,10 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
           const BottomNavigationBarItem(
             icon: Icon(Icons.feed),
             label: 'Information',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.rate_review),
+            label: AppLocalizations.of(context)!.locationBewertung,
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.tips_and_updates),
@@ -514,6 +512,354 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   }
 }
 
+class LocationRating extends StatefulWidget {
+  final Map location;
+
+  LocationRating({super.key, required this.location});
+
+  @override
+  State<LocationRating> createState() => _LocationRatingState();
+}
+
+class _LocationRatingState extends State<LocationRating> {
+  final String ownUserId = FirebaseAuth.instance.currentUser!.uid;
+  late List allRatings;
+  late String ratingCount;
+  late Map locationRating;
+  bool hasRated = false;
+  Map newRating = {
+    "familyFriendly": 0.0,
+    "security": 0.0,
+    "kindness": 0.0,
+    "surrounding": 0.0,
+    "activities": 0.0,
+    "alternativeFood": 0.0,
+    "comment": "",
+    "date": DateTime.now().toString()
+  };
+  TextEditingController newCommentController = TextEditingController();
+
+  changeNewRating(double rate, category) {
+    if (category == null) return;
+    newRating[category] = rate + 1;
+  }
+
+  saveNewRating() async {
+    Map dbNewRating = {
+      "locationId": widget.location["id"],
+      "user": ownUserId,
+      "familyFriendly": newRating["familyFriendly"],
+      "security": newRating["security"],
+      "kindness": newRating["kindness"],
+      "surrounding": newRating["surrounding"],
+      "activities": newRating["activities"],
+      "alternativeFood": newRating["alternativeFood"],
+      "comment": newCommentController.text,
+      "date": DateTime.now().toString()
+    };
+
+    widget.location["rating"].add(dbNewRating);
+
+    StadtinfoDatabase().addNewRating(dbNewRating);
+  }
+
+  editRating() {}
+
+  calculateLocationRating() {
+    int? countCategories;
+    locationRating = {};
+
+    for (var ratingByUser in allRatings) {
+      for (var userId in ratingByUser.keys.toList()) {
+        Map ratings = ratingByUser[userId];
+        double totalRating = 0.0;
+        countCategories ??= ratings.length - 1;
+
+        if (userId == ownUserId) {
+          hasRated = true;
+          newRating = ratings;
+          newCommentController.text = newRating["comment"];
+        }
+
+        ratings.forEach((key, value) {
+          if (value.runtimeType == double) {
+            locationRating[key] = locationRating["key"] ?? 0.0 + value;
+            totalRating += value;
+          } else if (key == "date") {
+          } else {
+            Map commentInfo = {
+              "comment": value,
+              "userName":
+                  getProfilFromHive(profilId: userId, getNameOnly: true) ??
+                      AppLocalizations.of(context)!.geloeschterUser,
+              "sumRating": totalRating / countCategories!,
+              "date": ratings["date"]
+            };
+
+            locationRating["comments"] ??= [];
+            locationRating["comments"].add(commentInfo);
+          }
+        });
+
+        locationRating["sum"] = totalRating / countCategories;
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.location["rating"] ??= [];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    allRatings = [];
+    ratingCount = allRatings.length.toString();
+    calculateLocationRating();
+
+    ratingRow(title, double rating, {category, windowSetState}) {
+      double iconSize = 26;
+      List<Widget> starRating = List.generate(
+          5,
+          (i) => GestureDetector(
+                onTap: () {
+                  setState(() {});
+                  if (windowSetState != null) windowSetState(() {});
+                  changeNewRating(i.toDouble(), category);
+                },
+                child: Icon(
+                  Icons.star_border_outlined,
+                  size: iconSize,
+                ),
+              ));
+
+      for (var i = 0; i < rating.round(); i++) {
+        starRating[i] = GestureDetector(
+          onTap: () {
+            setState(() {});
+            if (windowSetState != null) windowSetState(() {});
+            changeNewRating(i.toDouble(), category);
+          },
+          child: Icon(
+            Icons.star,
+            size: iconSize,
+          ),
+        );
+      }
+
+      return Container(
+        margin: const EdgeInsets.only(top: 5, bottom: 5),
+        child: Row(
+          children: [
+            Expanded(
+                child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            )),
+            ...starRating,
+            const SizedBox(
+              width: 30,
+            ),
+            Text("${rating.toStringAsFixed(1)}")
+          ],
+        ),
+      );
+    }
+
+    commentSection() {
+      List comments = locationRating["comments"] ?? [];
+      return Expanded(
+        child: ListView(
+          children: comments
+              .map((commentInfo) => Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.star),
+                            Text(commentInfo["sumRating"].toStringAsFixed(1),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            Expanded(
+                                child: Center(
+                                    child: Text(
+                              commentInfo["userName"],
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ))),
+                            Text(
+                              commentInfo["date"]
+                                  .split(" ")[0]
+                                  .split("-")
+                                  .reversed
+                                  .toList()
+                                  .join("."),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            )
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(commentInfo["comment"])
+                      ],
+                    ),
+                  ))
+              .toList(),
+        ),
+      );
+    }
+
+    openRatingWindow() {
+      showDialog(
+          context: context,
+          builder: (BuildContext buildContext) {
+            return StatefulBuilder(
+                builder: (context, StateSetter windowsSetState) {
+              int divider = 0;
+              List ratingCategories = [
+                newRating["familyFriendly"],
+                newRating["security"],
+                newRating["kindness"],
+                newRating["surrounding"],
+                newRating["activities"],
+                newRating["alternativeFood"]
+              ];
+              double totalRating = 0.0;
+
+              for(var ratingCategory in ratingCategories){
+                totalRating = totalRating + ratingCategory;
+                if(ratingCategory != 0.0) divider = divider + 1;
+              }
+
+              if(divider > 0 )totalRating = totalRating / divider;
+
+
+              return CustomAlertDialog(
+                title:
+                    "${AppLocalizations.of(context)!.bewerten1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.bewerten2}",
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        ratingRow("Gesamt", totalRating,
+                            category: null, windowSetState: windowsSetState),
+                        ratingRow(
+                            "Familenfreundlich", newRating["familyFriendly"],
+                            category: "familyFriendly",
+                            windowSetState: windowsSetState),
+                        ratingRow("Sicherheit", newRating["security"],
+                            category: "security",
+                            windowSetState: windowsSetState),
+                        ratingRow("Freundlichkeit", newRating["kindness"],
+                            category: "kindness",
+                            windowSetState: windowsSetState),
+                        ratingRow("Umland & Natur", newRating["surrounding"],
+                            category: "surrounding",
+                            windowSetState: windowsSetState),
+                        ratingRow("Aktivitäten", newRating["activities"],
+                            category: "activities",
+                            windowSetState: windowsSetState),
+                        ratingRow("alternative Lebensmittel",
+                            newRating["alternativeFood"],
+                            category: "alternativeFood",
+                            windowSetState: windowsSetState),
+                      ],
+                    ),
+                  ),
+                  CustomTextInput(
+                    newRating["comment"],
+                    newCommentController,
+                    hintText: "Kommentar schreiben",
+                    moreLines: 8,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Align(
+                      child: SizedBox(
+                          width: 100,
+                          child: FloatingActionButton.extended(
+                            onPressed: () {
+                              Navigator.pop(context);
+
+                              setState(() {
+                                if (hasRated) {
+                                  editRating();
+                                } else {
+                                  saveNewRating();
+                                }
+                              });
+                            },
+                            label: Text(hasRated
+                                ? AppLocalizations.of(context)!.bearbeiten
+                                : AppLocalizations.of(context)!.senden),
+                          ))),
+                  const SizedBox(
+                    height: 10,
+                  )
+                ],
+              );
+            });
+          });
+    }
+
+    return SafeArea(
+      child: Scaffold(
+        body: Container(
+          margin: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Bewertungen: $ratingCount",
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              ratingRow("Gesamt", locationRating["sum"] ?? 0.0),
+              ratingRow(
+                  "Familenfreundlich", locationRating["familyFriendly"] ?? 0.0),
+              ratingRow("Sicherheit", locationRating["security"] ?? 0.0),
+              ratingRow("Freundlichkeit", locationRating["kindness"] ?? 0.0),
+              ratingRow("Umland & Natur", locationRating["surrounding"] ?? 0.0),
+              ratingRow("Aktivitäten", locationRating["activities"] ?? 0.0),
+              ratingRow("alternative Lebensmittel",
+                  locationRating["alternativeFood"] ?? 0.0),
+              const SizedBox(
+                height: 30,
+              ),
+              const Text(
+                "Kommentare",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              commentSection()
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => openRatingWindow(),
+          child: const Icon(Icons.rate_review),
+        ),
+      ),
+    );
+  }
+}
+
 class InsiderInformationPage extends StatefulWidget {
   final Map location;
   final int? insiderInfoId;
@@ -772,7 +1118,8 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     const SizedBox(height: 10),
                     CustomTextInput(AppLocalizations.of(context)!.beschreibung,
                         informationTextKontroller,
-                        moreLines: 12, textInputAction: TextInputAction.newline),
+                        moreLines: 12,
+                        textInputAction: TextInputAction.newline),
                     const SizedBox(height: 5),
                     imageUploadBox,
                     const SizedBox(height: 5),
@@ -996,14 +1343,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         information["sprache"] == systemLanguage ||
             ownlanguages.contains(informationLanguage[0]) ||
             ownlanguages.contains(informationLanguage[1]);
-    if(information["erstelltVon"] == userId) {
+    if (information["erstelltVon"] == userId) {
       usersCityInformationOriginal[index] = true;
-    } else if (usersCityInformationOriginal[index] == null){
+    } else if (usersCityInformationOriginal[index] == null) {
       canSpeakInformationLanguage
           ? usersCityInformationOriginal[index] = true
           : usersCityInformationOriginal[index] = false;
     }
-
 
     if (information["titleGer"].isEmpty) {
       return {
@@ -1160,7 +1506,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ],
                   ),
                 ),
-              Expanded(child: SizedBox.shrink(),),
+              const Expanded(
+                child: SizedBox.shrink(),
+              ),
               if (informationImages.isNotEmpty)
                 Container(
                   alignment: Alignment.center,
@@ -1280,7 +1628,9 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 5,)
+              const SizedBox(
+                height: 5,
+              )
             ],
           ),
         ),

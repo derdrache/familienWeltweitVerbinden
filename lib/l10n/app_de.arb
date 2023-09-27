@@ -366,7 +366,7 @@
     "chatsWirklichLoeschen": "Möchtest du die Chats wirklich löschen / verlassen ? ",
     "auchBeiLoeschen": "Auch löschen bei ",
     "antworten": "Antworten",
-    "bearbeiten": "Bearbeiten",
+    "bearbeiten": "bearbeiten",
     "textKopieren": "Text kopieren",
     "weiterleiten": "Weiterleiten",
     "loeschenGross": "Löschen",
@@ -545,6 +545,9 @@
     "freundEntfernen1" : "Möchtest du",
     "freundEntfernen2" : "von deiner Freundesliste entfernen?",
     "freundHinzufuegen1": "Möchtest du",
-    "freundHinzufuegen2": "deiner Freundesliste hinzufügen?"
+    "freundHinzufuegen2": "deiner Freundesliste hinzufügen?",
+    "locationBewertung": "Bewertung",
+    "bewerten1": "",
+    "bewerten2": "bewerten"
 
 }
