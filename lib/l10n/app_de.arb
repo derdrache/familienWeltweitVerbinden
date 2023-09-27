@@ -549,6 +549,16 @@
     "locationBewertung": "Bewertung",
     "bewerten1": "",
     "bewerten2": "bewerten",
-    "aendern": "ändern"
+    "aendern": "ändern",
+    "deinKommentar": "Dein Kommentar",
+    "bewertungen": "Bewertungen: ",
+    "gesamt": "Gesamt",
+    "familienfreundlich": "Familienfreundlich",
+    "sicherheit": "Sicherheit",
+    "freundlichkeit": "Freundlichkeit",
+    "umlandNatur": "Umland und Natur",
+    "aktivitaeten": "Aktivitäten",
+    "alternativeLebensmittel": "alternative Lebensmittel",
+    "kommentare": "Kommentare"
 
 }

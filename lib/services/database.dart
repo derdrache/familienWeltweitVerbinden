@@ -902,12 +902,13 @@ class StadtInfoRatingDatabase{
   update(whatData, queryEnd) async {
     var url = Uri.parse(databaseUrl + databasePathUpdate);
 
-    await http.post(url,
+    var test = await http.post(url,
         body: json.encode({
           "table": "stadtinfo_rating",
           "whatData": whatData,
           "queryEnd": queryEnd
         }));
+    print(test.body);
   }
 }
 

@@ -88,7 +88,7 @@ class CustomTextInput extends StatelessWidget {
                     alignLabelWithHint: true,
                     floatingLabelBehavior: hintText==null ? FloatingLabelBehavior.auto : FloatingLabelBehavior.always,
                     hintText: hintText,
-                    labelText: text,
+                    labelText: hintText,
                     labelStyle: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   maxLength: maxLength,

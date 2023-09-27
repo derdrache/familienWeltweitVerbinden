@@ -524,7 +524,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 class LocationRating extends StatefulWidget {
   final Map location;
 
-  LocationRating({super.key, required this.location});
+  const LocationRating({super.key, required this.location});
 
   @override
   State<LocationRating> createState() => _LocationRatingState();
@@ -642,7 +642,22 @@ class _LocationRatingState extends State<LocationRating> {
     StadtInfoRatingDatabase().addNewRating(dbNewRating);
   }
 
-  editRating() {}
+  editRating() {
+    newRating["comment"] = newCommentController.text;
+    newRating["date"] = DateTime.now().toString();
+
+    StadtInfoRatingDatabase().update(
+        "familyFriendly = '${newRating["familyFriendly"]}', "
+            "security = '${newRating["security"]}', "
+            "kindness = '${newRating["kindness"]}', "
+            "surrounding = '${newRating["surrounding"]}', "
+            "activities = '${newRating["activities"]}', "
+            "alternativeFood = '${newRating["alternativeFood"]}', "
+            "comment = '${newRating["comment"]}', "
+            "date = '${newRating["date"]}'",
+        "where locationId = ${widget.location["id"]} AND user = '$ownUserId'");
+
+  }
 
 
   @override
@@ -651,7 +666,6 @@ class _LocationRatingState extends State<LocationRating> {
     ratingCount = allRatings.length.toString();
 
     setRatings();
-
 
     ratingRow(title, double rating, {category, windowSetState}) {
       double iconSize = 26;
@@ -696,7 +710,7 @@ class _LocationRatingState extends State<LocationRating> {
             const SizedBox(
               width: 30,
             ),
-            Text("${rating.toStringAsFixed(1)}")
+            Text(rating.toStringAsFixed(1))
           ],
         ),
       );
@@ -769,25 +783,25 @@ class _LocationRatingState extends State<LocationRating> {
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       children: [
-                        ratingRow("Gesamt", calculateSumRating(ratingValues),
+                        ratingRow(AppLocalizations.of(context)!.gesamt, calculateSumRating(ratingValues),
                             category: null, windowSetState: windowsSetState),
                         ratingRow(
-                            "Familenfreundlich", ratingValues["familyFriendly"],
+                            AppLocalizations.of(context)!.familienfreundlich, ratingValues["familyFriendly"],
                             category: "familyFriendly",
                             windowSetState: windowsSetState),
-                        ratingRow("Sicherheit", ratingValues["security"],
+                        ratingRow(AppLocalizations.of(context)!.sicherheit, ratingValues["security"],
                             category: "security",
                             windowSetState: windowsSetState),
-                        ratingRow("Freundlichkeit", ratingValues["kindness"],
+                        ratingRow(AppLocalizations.of(context)!.freundlichkeit, ratingValues["kindness"],
                             category: "kindness",
                             windowSetState: windowsSetState),
-                        ratingRow("Umland & Natur", ratingValues["surrounding"],
+                        ratingRow(AppLocalizations.of(context)!.umlandNatur, ratingValues["surrounding"],
                             category: "surrounding",
                             windowSetState: windowsSetState),
-                        ratingRow("Aktivitäten", ratingValues["activities"],
+                        ratingRow(AppLocalizations.of(context)!.aktivitaeten, ratingValues["activities"],
                             category: "activities",
                             windowSetState: windowsSetState),
-                        ratingRow("alternative Lebensmittel",
+                        ratingRow(AppLocalizations.of(context)!.alternativeLebensmittel,
                             ratingValues["alternativeFood"],
                             category: "alternativeFood",
                             windowSetState: windowsSetState),
@@ -797,7 +811,7 @@ class _LocationRatingState extends State<LocationRating> {
                   CustomTextInput(
                     newRating["comment"],
                     newCommentController,
-                    hintText: "Kommentar schreiben",
+                    hintText: AppLocalizations.of(context)!.deinKommentar,
                     moreLines: 8,
                   ),
                   const SizedBox(
@@ -813,6 +827,7 @@ class _LocationRatingState extends State<LocationRating> {
                               setState(() {
                                 if (hasRated) {
                                   editRating();
+                                  customSnackBar(context, AppLocalizations.of(context)!.erfolgreichGeaender, color: Colors.green);
                                 } else {
                                   saveNewRating();
                                 }
@@ -839,28 +854,27 @@ class _LocationRatingState extends State<LocationRating> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Bewertungen: $ratingCount",
+                "${AppLocalizations.of(context)!.bewertungen} $ratingCount",
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 10,
               ),
-              ratingRow("Gesamt", locationRating["sum"] ?? 0.0),
-              ratingRow(
-                  "Familenfreundlich", locationRating["familyFriendly"] ?? 0.0),
-              ratingRow("Sicherheit", locationRating["security"] ?? 0.0),
-              ratingRow("Freundlichkeit", locationRating["kindness"] ?? 0.0),
-              ratingRow("Umland & Natur", locationRating["surrounding"] ?? 0.0),
-              ratingRow("Aktivitäten", locationRating["activities"] ?? 0.0),
-              ratingRow("alternative Lebensmittel",
+              ratingRow(AppLocalizations.of(context)!.gesamt, locationRating["sum"] ?? 0.0),
+              ratingRow(AppLocalizations.of(context)!.familienfreundlich, locationRating["familyFriendly"] ?? 0.0),
+              ratingRow(AppLocalizations.of(context)!.sicherheit, locationRating["security"] ?? 0.0),
+              ratingRow(AppLocalizations.of(context)!.freundlichkeit, locationRating["kindness"] ?? 0.0),
+              ratingRow(AppLocalizations.of(context)!.umlandNatur, locationRating["surrounding"] ?? 0.0),
+              ratingRow(AppLocalizations.of(context)!.aktivitaeten, locationRating["activities"] ?? 0.0),
+              ratingRow(AppLocalizations.of(context)!.alternativeLebensmittel,
                   locationRating["alternativeFood"] ?? 0.0),
               const SizedBox(
                 height: 30,
               ),
-              const Text(
-                "Kommentare",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              Text(
+                AppLocalizations.of(context)!.kommentare,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 10,

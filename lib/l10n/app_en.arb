@@ -551,9 +551,20 @@
     "freundHinzufuegen1": "Do you really want to add",
     "freundHinzufuegen2": "to your friendlist?",
     "locationBewertung": "Rating",
-    "bewerten1": "rate",
+    "bewerten1": "Review",
     "bewerten2": "",
-    "aendern": "change"
+    "aendern": "change",
+    "deinKommentar": "your comment",
+    "bewertungen": "Reviews: ",
+    "gesamt": "total",
+    "familienfreundlich": "family friendly",
+    "sicherheit": "security",
+    "freundlichkeit": "kindness",
+    "umlandNatur": "surrounding",
+    "aktivitaeten": "activities",
+    "alternativeLebensmittel": "alternative food",
+    "kommentare": "Comments"
+
 
 }
 
