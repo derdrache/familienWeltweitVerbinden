@@ -12,7 +12,7 @@ translation(text, {withTranslationNotice = false}) async{
         from: "de", to: "auto");
 
     textEng = textTranslation.toString();
-    if(withTranslationNotice) textEng += "\n\nThis is an automatic translation";
+    if(withTranslationNotice) textEng += "\n\n<This is an automatic translation>";
     textGer = text;
   } else {
     var textTranslation = await translator.translate(text,
@@ -20,11 +20,8 @@ translation(text, {withTranslationNotice = false}) async{
 
     textEng = text;
     textGer = textTranslation.toString();
-    if(withTranslationNotice) textGer += "\n\nDies ist eine automatische Übersetzung";
+    if(withTranslationNotice) textGer += "\n\n<Dies ist eine automatische Übersetzung>";
   }
-
-
-
 
   return{
     "eng": textEng,
