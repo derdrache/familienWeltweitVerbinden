@@ -24,7 +24,7 @@ import '../../services/locationsService.dart';
 import '../../windows/dialog_window.dart';
 import '../chat/chat_details.dart';
 import '../informationen/community/community_card.dart';
-import '../informationen/location/location_information.dart';
+import '../informationen/location/location_details/information_main.dart';
 import '../informationen/meetups/meetup_card.dart';
 import '../show_profil.dart';
 

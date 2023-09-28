@@ -23,7 +23,7 @@ import '../../../widgets/layout/custom_multi_select.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../show_profil.dart';
-import '../location/location_information.dart';
+import '../location/location_details/information_main.dart';
 import 'meetup_image_galerie.dart';
 import '../../../widgets/text_with_hyperlink_detection.dart';
 
@@ -1366,10 +1366,10 @@ class _CardFeetState extends State<CardFeet> {
             ),
             Expanded(
                 child: widget.moreContent
-                    ? Center(
+                    ? const Center(
                         child: Icon(Icons.arrow_downward),
                       )
-                    : SizedBox.shrink()),
+                    : const SizedBox.shrink()),
             InkWell(
               child: Text(organisatorProfil!["name"] ?? "",
                   style: TextStyle(

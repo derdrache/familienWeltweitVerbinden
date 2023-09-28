@@ -856,6 +856,9 @@ class StadtinfoDatabase {
 class StadtInfoRatingDatabase{
 
   addNewRating(rating)async{
+    rating["commentGer"] = rating["commentGer"].replaceAll("'", "''");
+    rating["commentEng"] = rating["commentEng"].replaceAll("'", "''");
+
     var url = Uri.parse(databaseUrl + databasePathNewRating);
     await http.post(url, body: json.encode(rating));
   }

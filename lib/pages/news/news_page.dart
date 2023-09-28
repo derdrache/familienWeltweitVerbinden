@@ -12,8 +12,8 @@ import 'package:intl/intl.dart';
 import '../../../global/style.dart' as style;
 import '../../services/database.dart';
 import '../../../global/global_functions.dart' as global_func;
+import '../informationen/location/location_details/information_main.dart';
 import '../informationen/meetups/meetup_card.dart';
-import '../informationen/location/location_information.dart';
 import '../show_profil.dart';
 import 'news_page_settings.dart';
 

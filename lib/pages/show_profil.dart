@@ -27,7 +27,8 @@ import '../widgets/profil_image.dart';
 import '../widgets/text_with_hyperlink_detection.dart';
 import '../windows/custom_popup_menu.dart';
 import '../windows/dialog_window.dart';
-import 'informationen/location/location_information.dart';
+import 'informationen/location/location_details/information_main.dart';
+
 
 String? userId = FirebaseAuth.instance.currentUser?.uid;
 double headlineTextSize = 18;

@@ -27,7 +27,7 @@ import '../../../windows/all_user_select.dart';
 import '../../chat/chat_details.dart';
 import '../../show_profil.dart';
 import '../../start_page.dart';
-import '../location/location_information.dart';
+import '../location/location_details/information_main.dart';
 import 'community_page.dart';
 
 class CommunityDetails extends StatefulWidget {

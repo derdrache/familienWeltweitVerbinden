@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../global/global_functions.dart';
 import '../../../widgets/custom_card.dart';
 import '../../../widgets/custom_like_button.dart';
-import 'location_information.dart';
+import 'location_details/information_main.dart';
 
 class LocationCard extends StatefulWidget {
   final Map location;

@@ -31,6 +31,7 @@ import '../../windows/custom_popup_menu.dart';
 import '../../windows/image_fullscreen.dart';
 import '../informationen/community/community_card.dart';
 import '../informationen/community/community_details.dart';
+import '../informationen/location/location_details/information_main.dart';
 import '../informationen/meetups/meetup_card.dart';
 import '../informationen/meetups/meetup_details.dart';
 import '../../auth/secrets.dart';
@@ -40,7 +41,6 @@ import '../../widgets/profil_image.dart';
 import '../../widgets/text_with_hyperlink_detection.dart';
 import '../../windows/all_user_select.dart';
 import '../../widgets/strike_through_icon.dart';
-import '../informationen/location/location_information.dart';
 import '../informationen/location/location_card.dart';
 import '../show_profil.dart';
 import '../start_page.dart';
@@ -1345,7 +1345,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               child: Row(
                 children: [
                   isInPinned
-                      ? StrikeThroughIcon(child: const Icon(Icons.push_pin))
+                      ? const StrikeThroughIcon(child: Icon(Icons.push_pin))
                       : const Icon(Icons.push_pin),
                   const SizedBox(width: 20),
                   Text(isInPinned
@@ -2158,7 +2158,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: Row(
           children: [
             chatIsPinned
-                ? StrikeThroughIcon(child: const Icon(Icons.push_pin))
+                ? const StrikeThroughIcon(child: Icon(Icons.push_pin))
                 : const Icon(Icons.push_pin),
             const SizedBox(width: 10),
             Text(chatIsPinned
