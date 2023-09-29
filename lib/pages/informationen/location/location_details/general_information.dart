@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -145,20 +146,72 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     });
   }
 
+  setCostIconColor(indikator) {
+    if (indikator <= 1) return Colors.green[800];
+    if (indikator <= 2) return Colors.green;
+    if (indikator <= 3) return Colors.yellow;
+    if (indikator <= 4) return Colors.orange;
+
+    return Colors.red;
+  }
+
+  setInternetIconColor(indikator) {
+    if (indikator <= 20) return Colors.red;
+    if (indikator <= 40) return Colors.orange;
+    if (indikator <= 60) return Colors.yellow;
+    if (indikator <= 80) return Colors.green;
+
+    return Colors.green[800];
+  }
+
+  getLocationImageWidget() {
+    if (widget.location["bild"].isEmpty) {
+      if (!isCity) return const AssetImage("assets/bilder/land.jpg");
+      return const AssetImage("assets/bilder/city.jpg");
+    } else {
+      if (!isCity) {
+        return AssetImage(
+            "assets/bilder/flaggen/${widget.location["bild"]}.jpeg");
+      }
+      return CachedNetworkImageProvider(widget.location["bild"]);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double iconSize = 28;
     double fontSize = 18;
     var anzahlFamilien = widget.location["familien"]?.length ?? 0;
 
+
+    displayContainer({child, margin}){
+      return Container(
+          margin: const EdgeInsets.only(top: 5, bottom: 5),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+              color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: child
+      );
+    }
+
     showCurrentlyThere() {
       var familiesOnLocation = getFamiliesThere();
 
       return InkWell(
         onTap: () => showFamilyVisitWindow(familiesThere),
-        child: Container(
-          margin: const EdgeInsets.all(5),
+        child: displayContainer(
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.pin_drop, size: iconSize),
               const SizedBox(width: 10),
@@ -178,9 +231,9 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     showVisited() {
       return InkWell(
         onTap: () => showFamilyVisitWindow(widget.location["familien"]),
-        child: Container(
-          margin: const EdgeInsets.all(5),
+        child: displayContainer(
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.family_restroom, size: iconSize),
               const SizedBox(width: 10),
@@ -198,18 +251,16 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
 
     showInsiderCount() {
-      return Container(
-        margin: const EdgeInsets.all(5),
+      return displayContainer(
+        margin: const EdgeInsets.only(top: 10, bottom: 10),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.tips_and_updates,
               size: iconSize,
             ),
             const SizedBox(width: 10),
-            Text("${AppLocalizations.of(context)!.insiderInformation}: ",
-                style: TextStyle(fontSize: fontSize)),
-            const SizedBox(width: 5),
             Text(widget.usersCityInformation.length.toString(),
                 style: TextStyle(fontSize: fontSize))
           ],
@@ -218,57 +269,34 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
 
     showCost() {
-      setCostIconColor(indikator) {
-        if (indikator <= 1) return Colors.green[800];
-        if (indikator <= 2) return Colors.green;
-        if (indikator <= 3) return Colors.yellow;
-        if (indikator <= 4) return Colors.orange;
-
-        return Colors.red;
+      if(widget.location["kosten"] == null){
+        return const SizedBox.shrink();
       }
 
-      return Container(
-        margin: const EdgeInsets.all(5),
+      int costRate = widget.location["kosten"];
+
+      return displayContainer(
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.monetization_on_outlined,
-              color: widget.location["kosten"] == null
-                  ? null
-                  : setCostIconColor(widget.location["kosten"]),
-              size: iconSize,
-            ),
-            const SizedBox(width: 10),
-            Text(AppLocalizations.of(context)!.kosten,
-                style: TextStyle(fontSize: fontSize)),
-            const SizedBox(width: 5),
-            Text(
-                widget.location["kosten"] == null
-                    ? "?"
-                    : "\$ " * widget.location["kosten"],
-                style: TextStyle(fontSize: fontSize))
+            for(var i = 0; i< costRate; i++) const Icon(Icons.attach_money),
+            for(var i = costRate; i< 5; i++) Icon(Icons.attach_money, color: Colors.grey[200],),
+
           ],
         ),
       );
     }
 
     showInternetSpeed() {
-      String internetSpeedText = widget.location["internet"] == null
-          ? "?"
-          : widget.location["internet"].toString();
+      String internetSpeedText =  widget.location["internet"].toString();
 
-      setInternetIconColor(indikator) {
-        if (indikator <= 20) return Colors.red;
-        if (indikator <= 40) return Colors.orange;
-        if (indikator <= 60) return Colors.yellow;
-        if (indikator <= 80) return Colors.green;
-
-        return Colors.green[800];
+      if(widget.location["internet"] == null){
+        return const SizedBox.shrink();
       }
 
-      return Container(
-        margin: const EdgeInsets.all(5),
+      return displayContainer(
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.network_check_outlined,
@@ -278,12 +306,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               size: iconSize,
             ),
             const SizedBox(width: 10),
-            Text("Internet: ", style: TextStyle(fontSize: fontSize)),
-            const SizedBox(width: 5),
-            Text(
-                widget.location["internet"] == null
-                    ? "?"
-                    : "Ø $internetSpeedText Mbps",
+            Text("$internetSpeedText Mbps",
                 style: TextStyle(fontSize: fontSize))
           ],
         ),
@@ -291,51 +314,60 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
 
     showWeather() {
-      return Container(
-        margin: const EdgeInsets.all(5),
+      return displayContainer(
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.thermostat,
               size: iconSize,
             ),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context)!.wetter,
-                style: TextStyle(fontSize: fontSize)),
-            if (widget.location["wetter"] != null)
-              Flexible(
-                  child: InkWell(
-                      onTap: () =>
-                          global_func.openURL(widget.location["wetter"]),
-                      child: Text(widget.location["wetter"],
-                          style:
-                          TextStyle(color: Colors.blue, fontSize: fontSize),
-                          overflow: TextOverflow.ellipsis)))
+            InkWell(
+                onTap: () =>
+                    global_func.openURL(widget.location["wetter"]),
+                child: Text(AppLocalizations.of(context)!.klimatabelle,
+                    style:
+                    TextStyle(color: Colors.blue, fontSize: fontSize,decoration: TextDecoration.underline),))
           ],
         ),
       );
     }
 
+    showBulletInformation(){
+      return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        showInsiderCount(),
+        showInternetSpeed(),
+        showCost()
+      ],);
+    }
+
     return SelectionArea(
       child: SafeArea(
         child: Scaffold(
-          body: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.all(10),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      showCurrentlyThere(),
-                      showVisited(),
-                      showInsiderCount(),
-                      showCost(),
-                      showInternetSpeed(),
-                      showWeather(),
-                    ]),
+          body: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: getLocationImageWidget(),
+                fit: BoxFit.fill,
               ),
-            ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.all(10),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        showBulletInformation(),
+                        showCurrentlyThere(),
+                        showVisited(),
+                        showWeather(),
+                      ]),
+                ),
+              ],
+            ),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
