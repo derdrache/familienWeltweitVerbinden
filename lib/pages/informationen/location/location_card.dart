@@ -125,11 +125,14 @@ class _LocationCardState extends State<LocationCard> {
         locationData: widget.location,
         afterLike: widget.afterLike,
       ),
-      onTap: () => changePage(
-          context,
-          LocationInformationPage(
-              ortName: widget.location["ort"],
-              fromCityPage: widget.fromCityPage)),
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        changePage(
+            context,
+            LocationInformationPage(
+                ortName: widget.location["ort"],
+                fromCityPage: widget.fromCityPage));
+      } ,
       child: isCity ? cityLayout() : countryLayout(),
     );
   }
