@@ -9,7 +9,6 @@ import '../../../../widgets/layout/custom_snackbar.dart';
 import '../../../../widgets/layout/custom_text_input.dart';
 import '../../../../windows/dialog_window.dart';
 
-
 class LocationRating extends StatefulWidget {
   final Map location;
 
@@ -21,10 +20,6 @@ class LocationRating extends StatefulWidget {
 
 class _LocationRatingState extends State<LocationRating> {
   final String ownUserId = FirebaseAuth.instance.currentUser!.uid;
-  late List allRatings;
-  late String ratingCount;
-  late Map locationRating;
-  bool hasRated = false;
   List ratingCategories = [
     "familyFriendly",
     "security",
@@ -33,23 +28,25 @@ class _LocationRatingState extends State<LocationRating> {
     "activities",
     "alternativeFood"
   ];
+  late List allRatings;
+  late String ratingCount;
+  late Map locationRating = {"comments": []};
   late Map newRating;
+  bool hasRated = false;
   TextEditingController newCommentController = TextEditingController();
   List showOriginalComment = [];
 
-  setRatings() {
-    locationRating = {"comments": []};
-
+  void calculateAndSetLocationRatingData() {
     for (Map rating in allRatings) {
-      var ratingValues = getAllRatingValues(rating);
+      Map ratingValues = getAllRatingValues(rating);
       Map commentInfo = {
         "commentGer": rating["commentGer"],
         "commentEng": rating["commentEng"],
         "sprache": rating["sprache"],
         "userId": rating["user"],
         "userName":
-        getProfilFromHive(profilId: rating["user"], getNameOnly: true) ??
-            AppLocalizations.of(context)!.geloeschterUser,
+            getProfilFromHive(profilId: rating["user"], getNameOnly: true) ??
+                AppLocalizations.of(context)!.geloeschterUser,
         "sumRating": calculateSumRating(ratingValues),
         "date": rating["date"]
       };
@@ -72,20 +69,19 @@ class _LocationRatingState extends State<LocationRating> {
       });
     }
 
-    var allRatingValues = getAllRatingValues(locationRating);
-    var adjustedRatingValues = {};
-    allRatingValues.forEach((key, value){
-      locationRating[key] = value / locationRating[key+"Count"];
-      adjustedRatingValues[key] = value / locationRating[key+"Count"];
+    Map allRatingValues = getAllRatingValues(locationRating);
+    Map adjustedRatingValues = {};
+    allRatingValues.forEach((key, value) {
+      locationRating[key] = value / locationRating[key + "Count"];
+      adjustedRatingValues[key] = value / locationRating[key + "Count"];
     });
 
-    var sumRating = calculateSumRating(adjustedRatingValues);
+    double sumRating = calculateSumRating(adjustedRatingValues);
 
     locationRating["sum"] = adjustedRatingValues.isEmpty ? 0.0 : sumRating;
-
   }
 
-  getAllRatingValues(rating) {
+  Map getAllRatingValues(Map rating) {
     Map ratingValues = {};
 
     rating.forEach((key, value) {
@@ -108,7 +104,7 @@ class _LocationRatingState extends State<LocationRating> {
       }
     });
 
-    if(divider == 0) return 0.0;
+    if (divider == 0) return 0.0;
 
     return sum / divider;
   }
@@ -135,13 +131,13 @@ class _LocationRatingState extends State<LocationRating> {
 
     if (commentIsGerman) {
       newRating["sprache"] = "de";
-      var translation = await translator
-          .translate(newCommentController.text, from: "de", to: "auto");
+      var translation = await translator.translate(newCommentController.text,
+          from: "de", to: "auto");
       newRating["commentEng"] = translation.text;
     } else {
       newRating["sprache"] = "auto";
-      var translation = await translator
-          .translate(newCommentController.text, from: "auto", to: "de");
+      var translation = await translator.translate(newCommentController.text,
+          from: "auto", to: "de");
       newRating["commentGer"] = translation.text;
     }
 
@@ -188,37 +184,37 @@ class _LocationRatingState extends State<LocationRating> {
   Widget build(BuildContext context) {
     allRatings = widget.location["ratings"] ?? [];
     ratingCount = allRatings.length.toString();
-    setRatings();
+    calculateAndSetLocationRatingData();
 
-    ratingRow(title, double rating, {category, windowSetState}) {
+    Widget starIcon(
+        {required rate, required fillIcon, category, windowSetState}) {
       double iconSize = 26;
-      List<Widget> starRating = List.generate(
-          5,
-              (i) => GestureDetector(
-            onTap: () {
-              setState(() {});
-              if (windowSetState != null) windowSetState(() {});
-              changeNewRating(i.toDouble(), category);
-            },
-            child: Icon(
-              Icons.star_border_outlined,
-              size: iconSize,
-            ),
-          ));
 
-      for (var i = 0; i < rating.round(); i++) {
-        starRating[i] = GestureDetector(
-          onTap: () {
-            setState(() {});
-            if (windowSetState != null) windowSetState(() {});
-            changeNewRating(i.toDouble(), category);
-          },
-          child: Icon(
-            Icons.star,
-            size: iconSize,
-          ),
-        );
-      }
+      return GestureDetector(
+        onTap: () {
+          setState(() {});
+          if (windowSetState != null) windowSetState(() {});
+          changeNewRating(rate.toDouble(), category);
+        },
+        child: Icon(
+          fillIcon ? Icons.star : Icons.star_border_outlined,
+          size: iconSize,
+        ),
+      );
+    }
+
+    ratingRow(title, double rating, {category, windowSetState, totalSpezial = false}) {
+      int maxRating = 5;
+      List<Widget> starRating = List.generate(
+          maxRating,
+          (i) => Opacity(
+            opacity: totalSpezial && rating == 0.0 ? 0 : 1,
+            child: starIcon(
+                rate: i,
+                fillIcon: i < rating.round(),
+                category: category,
+                windowSetState: windowSetState),
+          ));
 
       return Container(
         margin: const EdgeInsets.only(top: 5, bottom: 5),
@@ -226,9 +222,9 @@ class _LocationRatingState extends State<LocationRating> {
           children: [
             Expanded(
                 child: Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                )),
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            )),
             ...starRating,
             const SizedBox(
               width: 30,
@@ -289,22 +285,23 @@ class _LocationRatingState extends State<LocationRating> {
                   Expanded(
                       child: Center(
                           child: Text(
-                            comments[i]["userName"],
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ))),
-                  if(comments[i]["userId"] != ownUserId) InkWell(
-                    onTap: () => setState(() {
-                      showOriginalComment[i] = !showOriginalComment[i];
-                    }),
-                    child: Text(
-                      showOriginalComment[i]
-                          ? AppLocalizations.of(context)!.uebersetzen
-                          : "Original",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.secondary,
+                    comments[i]["userName"],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ))),
+                  if (comments[i]["userId"] != ownUserId)
+                    InkWell(
+                      onTap: () => setState(() {
+                        showOriginalComment[i] = !showOriginalComment[i];
+                      }),
+                      child: Text(
+                        showOriginalComment[i]
+                            ? AppLocalizations.of(context)!.uebersetzen
+                            : "Original",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
                       ),
-                    ),
-                  )
+                    )
                 ],
               ),
               const SizedBox(
@@ -323,7 +320,6 @@ class _LocationRatingState extends State<LocationRating> {
                         .join("."),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   )
-
                 ],
               )
             ],
@@ -333,7 +329,7 @@ class _LocationRatingState extends State<LocationRating> {
 
       return Expanded(
         child: ListView(
-          children: commentWidgets,
+          children: commentWidgets
         ),
       );
     }
@@ -344,89 +340,91 @@ class _LocationRatingState extends State<LocationRating> {
           builder: (BuildContext buildContext) {
             return StatefulBuilder(
                 builder: (context, StateSetter windowsSetState) {
-                  Map ratingValues = getAllRatingValues(newRating);
-                  newCommentController.text =  newRating["sprache"] == "de" ?newRating["commentGer"] :newRating["commentEng"];
+              Map ratingValues = getAllRatingValues(newRating);
+              newCommentController.text = newRating["sprache"] == "de"
+                  ? newRating["commentGer"]
+                  : newRating["commentEng"];
 
-                  return CustomAlertDialog(
-                    title:
+              return CustomAlertDialog(
+                title:
                     "${AppLocalizations.of(context)!.bewerten1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.bewerten2}",
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          children: [
-                            ratingRow(AppLocalizations.of(context)!.gesamt,
-                                calculateSumRating(ratingValues),
-                                category: null, windowSetState: windowsSetState),
-                            ratingRow(
-                                AppLocalizations.of(context)!.familienfreundlich,
-                                ratingValues["familyFriendly"],
-                                category: "familyFriendly",
-                                windowSetState: windowsSetState),
-                            ratingRow(AppLocalizations.of(context)!.sicherheit,
-                                ratingValues["security"],
-                                category: "security",
-                                windowSetState: windowsSetState),
-                            ratingRow(AppLocalizations.of(context)!.freundlichkeit,
-                                ratingValues["kindness"],
-                                category: "kindness",
-                                windowSetState: windowsSetState),
-                            ratingRow(AppLocalizations.of(context)!.umlandNatur,
-                                ratingValues["surrounding"],
-                                category: "surrounding",
-                                windowSetState: windowsSetState),
-                            ratingRow(AppLocalizations.of(context)!.aktivitaeten,
-                                ratingValues["activities"],
-                                category: "activities",
-                                windowSetState: windowsSetState),
-                            ratingRow(
-                                AppLocalizations.of(context)!
-                                    .alternativeLebensmittel,
-                                ratingValues["alternativeFood"],
-                                category: "alternativeFood",
-                                windowSetState: windowsSetState),
-                          ],
-                        ),
-                      ),
-                      CustomTextInput(
-                        newRating["commentGer"],
-                        newCommentController,
-                        hintText: AppLocalizations.of(context)!.deinKommentar,
-                        moreLines: 8,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Align(
-                          child: SizedBox(
-                              width: 100,
-                              child: FloatingActionButton.extended(
-                                onPressed: () {
-                                  Navigator.pop(context);
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        ratingRow(AppLocalizations.of(context)!.gesamt,
+                            calculateSumRating(ratingValues),
+                            category: null, windowSetState: windowsSetState, totalSpezial: true),
+                        ratingRow(
+                            AppLocalizations.of(context)!.familienfreundlich,
+                            ratingValues["familyFriendly"],
+                            category: "familyFriendly",
+                            windowSetState: windowsSetState),
+                        ratingRow(AppLocalizations.of(context)!.sicherheit,
+                            ratingValues["security"],
+                            category: "security",
+                            windowSetState: windowsSetState),
+                        ratingRow(AppLocalizations.of(context)!.freundlichkeit,
+                            ratingValues["kindness"],
+                            category: "kindness",
+                            windowSetState: windowsSetState),
+                        ratingRow(AppLocalizations.of(context)!.umlandNatur,
+                            ratingValues["surrounding"],
+                            category: "surrounding",
+                            windowSetState: windowsSetState),
+                        ratingRow(AppLocalizations.of(context)!.aktivitaeten,
+                            ratingValues["activities"],
+                            category: "activities",
+                            windowSetState: windowsSetState),
+                        ratingRow(
+                            AppLocalizations.of(context)!
+                                .alternativeLebensmittel,
+                            ratingValues["alternativeFood"],
+                            category: "alternativeFood",
+                            windowSetState: windowsSetState),
+                      ],
+                    ),
+                  ),
+                  CustomTextInput(
+                    newRating["commentGer"],
+                    newCommentController,
+                    hintText: AppLocalizations.of(context)!.deinKommentar,
+                    moreLines: 8,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Align(
+                      child: SizedBox(
+                          width: 100,
+                          child: FloatingActionButton.extended(
+                            onPressed: () {
+                              Navigator.pop(context);
 
-                                  setState(() {
-                                    if (hasRated) {
-                                      editRating();
-                                      customSnackBar(
-                                          context,
-                                          AppLocalizations.of(context)!
-                                              .erfolgreichGeaender,
-                                          color: Colors.green);
-                                    } else {
-                                      saveNewRating();
-                                    }
-                                  });
-                                },
-                                label: Text(hasRated
-                                    ? AppLocalizations.of(context)!.aendern
-                                    : AppLocalizations.of(context)!.senden),
-                              ))),
-                      const SizedBox(
-                        height: 10,
-                      )
-                    ],
-                  );
-                });
+                              setState(() {
+                                if (hasRated) {
+                                  editRating();
+                                  customSnackBar(
+                                      context,
+                                      AppLocalizations.of(context)!
+                                          .erfolgreichGeaender,
+                                      color: Colors.green);
+                                } else {
+                                  saveNewRating();
+                                }
+                              });
+                            },
+                            label: Text(hasRated
+                                ? AppLocalizations.of(context)!.aendern
+                                : AppLocalizations.of(context)!.senden),
+                          ))),
+                  const SizedBox(
+                    height: 10,
+                  )
+                ],
+              );
+            });
           });
     }
 
@@ -437,10 +435,22 @@ class _LocationRatingState extends State<LocationRating> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "${AppLocalizations.of(context)!.bewertungen} $ratingCount",
-                style:
-                const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "${AppLocalizations.of(context)!.bewertungen} $ratingCount",
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  if (!hasRated)
+                    FloatingActionButton.extended(
+                      onPressed: () => openRatingWindow(),
+                      label: Text(AppLocalizations.of(context)!.ortBewerten),
+                      tooltip: AppLocalizations.of(context)!.ortBewerten,
+                    )
+                ],
               ),
               const SizedBox(
                 height: 10,
@@ -465,7 +475,7 @@ class _LocationRatingState extends State<LocationRating> {
               Text(
                 AppLocalizations.of(context)!.kommentare,
                 style:
-                const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 10,
@@ -476,6 +486,7 @@ class _LocationRatingState extends State<LocationRating> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => openRatingWindow(),
+          tooltip: AppLocalizations.of(context)!.ortBewerten,
           child: const Icon(Icons.rate_review),
         ),
       ),

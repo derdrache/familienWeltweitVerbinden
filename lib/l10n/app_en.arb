@@ -563,8 +563,9 @@
     "umlandNatur": "surrounding",
     "aktivitaeten": "activities",
     "alternativeLebensmittel": "alternative food",
-    "kommentare": "Comments"
-
+    "kommentare": "Comments",
+    "bewerten": "Review",
+    "ortBewerten": "Review location"
 
 }
 
