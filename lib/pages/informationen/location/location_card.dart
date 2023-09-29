@@ -87,8 +87,11 @@ class _LocationCardState extends State<LocationCard> {
         children: [
           Container(
             width: 150 * sizeRefactor,
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Colors.grey))
+            ),
             constraints: BoxConstraints(
-              maxHeight: 80 * sizeRefactor
+              maxHeight: 80 * sizeRefactor,
             ),
             child: ClipRRect(
                 borderRadius: const BorderRadius.only(
