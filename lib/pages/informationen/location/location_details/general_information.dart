@@ -190,7 +190,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-              color: Colors.white,
+              color: Colors.white.withOpacity(0.9),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
@@ -280,7 +280,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             for(var i = 0; i< costRate; i++) const Icon(Icons.attach_money),
-            for(var i = costRate; i< 5; i++) Icon(Icons.attach_money, color: Colors.grey[200],),
+            for(var i = costRate; i< 5; i++) Icon(Icons.attach_money, color: Colors.grey[300],),
 
           ],
         ),
