@@ -53,7 +53,7 @@ class CustomTextInput extends StatelessWidget {
       keyboardType = TextInputType.number;
       inputFormater = [FilteringTextInputFormatter.digitsOnly];
     }
-
+    print(textInputAction);
     return Stack(
         children: [
           Align(
@@ -67,13 +67,13 @@ class CustomTextInput extends StatelessWidget {
                   onFieldSubmitted: (string) {
                     if(onSubmit != null) onSubmit!();
                   },
-                  keyboardType: keyboardType ?? TextInputType.text,
+                  keyboardType: keyboardType ?? (moreLines > 1 ? TextInputType.multiline :  TextInputType.text),
                   textInputAction: textInputAction,
                   textAlignVertical: TextAlignVertical.top,
                   maxLines: moreLines,
                   obscureText: hideInput,
                   controller: controller,
-
+                  style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     counterStyle: TextStyle(color: maxLengthColor),
                     hintMaxLines: moreLines,
