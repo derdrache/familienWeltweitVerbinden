@@ -10,7 +10,11 @@ ImageFullscreen(context, image) {
       builder: (BuildContext buildContext) {
         return CustomAlertDialog(
           windowPadding: const EdgeInsets.all(30),
-          children: [CachedNetworkImage(imageUrl: image,)],
+          children: [
+            if(!image.contains("asset"))CachedNetworkImage(imageUrl: image,),
+            if(image.contains("asset"))Image.asset(image),
+
+          ],
         );
       });
 }
