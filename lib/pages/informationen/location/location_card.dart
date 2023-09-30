@@ -134,7 +134,8 @@ class _LocationCardState extends State<LocationCard> {
         changePage(
             context,
             LocationInformationPage(
-                ortName: widget.location["ort"],
+                ortName: widget.location["id"],
+                ortLatt: widget.location["latt"],
                 fromCityPage: widget.fromCityPage));
       } ,
       child: isCity ? cityLayout() : countryLayout(),

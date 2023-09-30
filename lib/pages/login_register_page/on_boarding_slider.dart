@@ -171,7 +171,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
         "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
         "WHERE ort LIKE '%${ortMapData["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
 
-    await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"]);
+    await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"], ortMapData["latt"]);
     await ChatGroupsDatabase().updateChatGroup(
         "users = JSON_MERGE_PATCH(users, '${json.encode({
           userId: {"newMessages": 0}

@@ -90,7 +90,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
 
     if (userName == null || ownProfil == null) return;
 
-    _oldUserAutomaticJoinChats(ownProfil!["ort"]);
+    _oldUserAutomaticJoinChats(ownProfil!);
     _setOwnLocation();
     _updateOwnEmail();
     _updateOwnToken();
@@ -119,7 +119,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     return profilExist != false;
   }
 
-  _oldUserAutomaticJoinChats(ort) async {
+  _oldUserAutomaticJoinChats(profil) async {
     var savedVersion = Hive.box('secureBox').get("version");
     var lastLoginBeforeUpdate = savedVersion == null && DateTime.parse(ownProfil!["lastLogin"])
         .isBefore(DateTime.parse("2022-12-16"));
@@ -132,7 +132,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
           userId: {"newMessages": 0}
         })}')",
         "WHERE id = '1'");
-    await ChatGroupsDatabase().joinAndCreateCityChat(ort);
+    await ChatGroupsDatabase().joinAndCreateCityChat(profil["ort"], profil["latt"]);
   }
 
   _setOwnLocation(){
@@ -202,12 +202,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
 
   _databaseOperations(locationData,
       {exactLocation = false, nearstLocationData}) async {
-    String oldLocation = ownProfil!["ort"];
+    Map oldLocationProfil = ownProfil!;
 
     _updateOwnLocation(locationData);
     _updateNewsPage(locationData);
     _updateCityInformation(locationData, exactLocation);
-    _updateChatGroups(oldLocation, locationData);
+    _updateChatGroups(oldLocationProfil, locationData);
   }
 
   _updateOwnLocation(locationData) {
@@ -243,12 +243,12 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
         "WHERE (ort LIKE '%${locationData["city"]}%' OR ort LIKE '%${locationData["countryname"]}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
   }
 
-  _updateChatGroups(oldLocation, locationData) {
-    var leaveChat = getCityFromHive(cityName: oldLocation);
+  _updateChatGroups(oldLocationProfil, locationData) {
+    var leaveChat = getCityFromHive(cityName: oldLocationProfil["ort"], latt: oldLocationProfil["latt"]);
     var leaveChatId = leaveChat != null ? leaveChat["id"] : "0";
 
     ChatGroupsDatabase().leaveChat(leaveChatId);
-    ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"]);
+    ChatGroupsDatabase().joinAndCreateCityChat(locationData["city"],locationData["latt"] );
   }
 
   _updateOwnEmail() async {

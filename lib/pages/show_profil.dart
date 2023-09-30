@@ -713,7 +713,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
     locationDisplay() {
       return GestureDetector(
         onTap: () => changePage(
-            context, LocationInformationPage(ortName: widget.profil["ort"])),
+            context, LocationInformationPage(ortName: widget.profil["ort"], ortLatt: widget.profil["latt"],)),
         child: Row(
           children: [
             Text(
@@ -946,7 +946,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
 
         reiseplanung.add(GestureDetector(
           onTap: () => changePage(context,
-              LocationInformationPage(ortName: reiseplan["ortData"]["city"])),
+              LocationInformationPage(ortName: reiseplan["ortData"]["city"], ortLatt: reiseplan["ortData"]["latt"],)),
           child: Container(
             margin: const EdgeInsets.only(bottom: 5),
             child: Row(

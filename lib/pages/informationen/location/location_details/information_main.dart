@@ -19,12 +19,14 @@ import 'location_rating.dart';
 
 class LocationInformationPage extends StatefulWidget {
   final String ortName;
+  final double ortLatt;
   final bool fromCityPage;
   int? insiderInfoId = 0;
 
   LocationInformationPage(
       {Key? key,
       required this.ortName,
+      required this.ortLatt,
       this.fromCityPage = false,
       this.insiderInfoId})
       : super(key: key);
@@ -46,7 +48,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
   @override
   void initState() {
     _selectNavigationIndex = widget.insiderInfoId != null ? 1 : 0;
-    location = getCityFromHive(cityName: widget.ortName);
+    location = getCityFromHive(cityName: widget.ortName, latt: widget.ortLatt);
 
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
     isCity = location["isCity"] == 1;
@@ -102,7 +104,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
               tooltip: AppLocalizations.of(context)!.tooltipLandInfoOeffnen,
               onPressed: () async {
                 global_func.changePage(context,
-                    LocationInformationPage(ortName: location["land"]));
+                    LocationInformationPage(ortName: location["land"], ortLatt: location["latt"],));
               },
             ),
           IconButton(

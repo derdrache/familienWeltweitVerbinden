@@ -589,7 +589,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
       if (!widget.isCreator && !isWorldwide) {
         global_func.changePage(context,
-            LocationInformationPage(ortName: widget.meetupData["stadt"]));
+            LocationInformationPage(ortName: widget.meetupData["stadt"], ortLatt: widget.meetupData["latt"],));
         return;
       }
 

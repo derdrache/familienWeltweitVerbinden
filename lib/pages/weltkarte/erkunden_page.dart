@@ -144,7 +144,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   setInsiderInfo() {
     for (var info in List.of(Hive.box('secureBox').get("stadtinfoUser"))) {
-      Map insiderInfoData = getCityFromHive(cityName: info["ort"]) ?? {};
+      Map insiderInfoData = getCityFromHive(cityName: info["ort"], latt: info["latt"]) ?? {};
 
       info["latt"] = insiderInfoData["latt"];
       info["longt"] = insiderInfoData["longt"];
@@ -1113,6 +1113,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               context,
               LocationInformationPage(
                 ortName: infoData["ort"],
+                ortLatt: infoData["latt"],
                 insiderInfoId: infoData["id"],
               ));
         },
@@ -1465,6 +1466,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
     createInsiderInfoMarker() {
       for (var insiderInfo in aktiveInsiderInfos) {
+
         var position = LatLng(insiderInfo["latt"], insiderInfo["longt"]);
 
         allMarker.add(insiderInfoMarker(insiderInfo, position));

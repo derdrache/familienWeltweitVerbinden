@@ -150,25 +150,6 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     changeLoading();
   }
 
-  saveCityInformation(locationDict, location, userId) async {
-    await StadtinfoDatabase().addNewCity(locationDict);
-
-    var sql =
-        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')";
-    var cityInfo = getCityFromHive(cityName: locationDict[location]);
-
-      sql +=
-      ", interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')";
-      cityInfo["interesse"].add(userId);
-
-    StadtinfoDatabase().update(sql,
-        "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
-
-    if(!cityInfo["familien"].contains(userId)){
-      cityInfo["familien"].add(userId);
-    }
-
-  }
 
   additionalDatabaseOperations(ortMapData, userId) async {
     StadtinfoDatabase().addFamiliesInCity(ortMapData, userId);

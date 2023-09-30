@@ -525,11 +525,11 @@ class ChatGroupsDatabase {
     _deleteInTable("group_messages", "chatId", chatId);
   }
 
-  joinAndCreateCityChat(cityName) async {
+  joinAndCreateCityChat(cityName, cityLatt) async {
     var userId = FirebaseAuth.instance.currentUser?.uid;
     var isNewChat = false;
 
-    var city = getCityFromHive(cityName: cityName);
+    var city = getCityFromHive(cityName: cityName, latt: cityLatt);
 
     if (city == null) return;
 
@@ -760,7 +760,6 @@ class StadtinfoDatabase {
     }
 
     if (!await _checkIfNew(city)) return false;
-
     Map dbCity = Map.of(city);
     dbCity["ort"] = dbCity["ort"].replaceAll("'", "''");
     dbCity["countryname"] = dbCity["countryname"].replaceAll("'", "''");
@@ -785,15 +784,15 @@ class StadtinfoDatabase {
   }
 
   addFamiliesInCity(locationDict, userId) async {
-    List locations = ["city", "countryName"];
+    List locations = ["city", "countryname"];
 
     await StadtinfoDatabase().addNewCity(locationDict);
 
     for(var location in locations){
       var sql =
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')";
-      var cityInfo = getCityFromHive(cityName: locationDict[location]);
 
+      var cityInfo = getCityFromHive(cityName: locationDict[location], latt: locationDict["latt"]);
       if(cityInfo["familien"].contains(userId)) continue;
 
       if (!cityInfo["interesse"].contains(userId)) {
@@ -803,7 +802,7 @@ class StadtinfoDatabase {
       }
 
       StadtinfoDatabase().update(sql,
-          "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND latt = ${cityInfo["latt"]} AND longt = ${cityInfo["longt"]} AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+          "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
 
       if(!cityInfo["familien"].contains(userId)){
         cityInfo["familien"].add(userId);
@@ -1585,18 +1584,19 @@ getCommunityFromHive(communityId) {
   return {};
 }
 
-getCityFromHive({cityId, cityName, getName = false}) {
-  var stadtInfos = Hive.box('secureBox').get("stadtinfo");
+getCityFromHive({latt,  cityId, cityName, getName = false}) {
+  var locations = Hive.box('secureBox').get("stadtinfo");
   cityName ??= "XXXXXX";
 
-  for (var stadtInfo in stadtInfos) {
-    if (stadtInfo["id"].toString() == cityId ||
-        stadtInfo["ort"].contains(cityName)) {
+  for (var location in locations) {
+    if (location["id"].toString() == cityId ||
+        (location["ort"].contains(cityName) && latt == location["latt"])) {
+
       if (getName) {
-        return stadtInfo["ort"];
+        return location["ort"];
       }
 
-      return stadtInfo;
+      return location;
     }
   }
 }

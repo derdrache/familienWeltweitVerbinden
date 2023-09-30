@@ -732,7 +732,7 @@ class _NewsPageState extends State<NewsPage> {
         "newsWidget": InkWell(
           onTap: () {
             global_func.changePage(
-                context, LocationInformationPage(ortName: info["ort"]));
+                context, LocationInformationPage(ortName: info["ort"], ortLatt: info["latt"],));
           },
           child: Align(
             child: Stack(
@@ -803,6 +803,7 @@ class _NewsPageState extends State<NewsPage> {
                 context,
                 LocationInformationPage(
                   ortName: ortsName,
+                  ortLatt: news["information"]["latt"],
                 ));
           },
           child: Align(
