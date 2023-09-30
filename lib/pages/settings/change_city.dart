@@ -141,12 +141,14 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     });
   }
 
-  saveCityInformation(locationDict) async {
+
+
+  saveCityInformation(locationDict, location) async {
     await StadtinfoDatabase().addNewCity(locationDict);
 
     var sql =
         "familien = JSON_ARRAY_APPEND(familien, '\$', '${ownProfil["id"]}')";
-    var cityInfo = getCityFromHive(cityName: locationDict["city"]);
+    var cityInfo = getCityFromHive(cityName: locationDict[location]);
 
     if (!cityInfo["interesse"].contains(ownProfil["id"])) {
       sql +=
@@ -155,7 +157,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     }
 
     StadtinfoDatabase().update(sql,
-        "WHERE (ort LIKE '%${locationDict["city"].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
+        "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
 
     if(!cityInfo["familien"].contains(ownProfil["id"])){
       cityInfo["familien"].add(ownProfil["id"]);
@@ -204,7 +206,8 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     final String oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
 
     saveLocation(locationDict);
-    await saveCityInformation(locationDict);
+    await saveCityInformation(locationDict, "city");
+    await saveCityInformation(locationDict, "countryname");
     joindAndRemoveChatGroups(locationDict, oldLocation);
     deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);
