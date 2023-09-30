@@ -1,3 +1,4 @@
+import 'package:familien_suche/windows/image_fullscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -29,7 +30,7 @@ aboutAppWindow(context) async {
   iconsInformation() {
     icconInfoRow(icon, creator, link) {
       return Container(
-        margin: EdgeInsets.only(left: 15, bottom: 15),
+        margin: const EdgeInsets.only(left: 15, bottom: 15),
         child: Row(
           children: [
             Image.asset(
@@ -37,7 +38,7 @@ aboutAppWindow(context) async {
               width: 24,
               height: 24,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             InkWell(
@@ -50,7 +51,7 @@ aboutAppWindow(context) async {
     }
 
     return ExpansionTile(
-      title: Text("Icon creators"),
+      title: const Text("Icon creators"),
       children: [
         icconInfoRow("assets/icons/meetup.png", "Freepik", "https://www.flaticon.com/authors/freepik"),
         icconInfoRow("assets/icons/community.png", "Freepik", "https://www.flaticon.com/authors/freepik"),
@@ -64,6 +65,40 @@ aboutAppWindow(context) async {
       ],
     );
 
+  }
+
+  imageInformation(){
+    imageInfoRow(image, creator, link) {
+      return Container(
+        margin: const EdgeInsets.only(left: 15, bottom: 15),
+        child: Row(
+          children: [
+            InkWell(
+              onTap: () => ImageFullscreen(context, image),
+              child: Image.asset(
+                image,
+                width: 50,
+                height: 50,
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            InkWell(
+                onTap: () => openURL(link),
+                child: Text("createt by $creator")
+            )
+          ],
+        ),
+      );
+    }
+
+    return ExpansionTile(
+      title: const Text("Image creators"),
+      children: [
+        imageInfoRow("assets/bilder/city.jpg", "Tomáš Malík", "https://www.pexels.com/photo/mt-fuji-3408353/"),
+      ],
+    );
   }
 
   return showDialog(
@@ -85,6 +120,7 @@ aboutAppWindow(context) async {
             ),
             const SizedBox(height: 10),
             iconsInformation(),
+            imageInformation(),
             const SizedBox(height: 20),
             Text(AppLocalizations.of(context)!.aboutAppText)
           ],
