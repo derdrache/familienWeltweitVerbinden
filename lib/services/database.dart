@@ -784,6 +784,34 @@ class StadtinfoDatabase {
     return newCityInfo;
   }
 
+  addFamiliesInCity(locationDict, userId) async {
+    List locations = ["city", "countryName"];
+
+    await StadtinfoDatabase().addNewCity(locationDict);
+
+    for(var location in locations){
+      var sql =
+          "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')";
+      var cityInfo = getCityFromHive(cityName: locationDict[location]);
+
+      if(cityInfo["familien"].contains(userId)) continue;
+
+      if (!cityInfo["interesse"].contains(userId)) {
+        sql +=
+        ", interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')";
+        cityInfo["interesse"].add(userId);
+      }
+
+      StadtinfoDatabase().update(sql,
+          "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND latt = ${cityInfo["latt"]} AND longt = ${cityInfo["longt"]} AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+
+      if(!cityInfo["familien"].contains(userId)){
+        cityInfo["familien"].add(userId);
+      }
+    }
+
+  }
+
   getData(whatData, queryEnd, {returnList = false}) async {
     var url = Uri.parse(databaseUrl + databasePathGetData);
 

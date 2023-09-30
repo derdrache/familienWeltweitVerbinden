@@ -206,8 +206,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     final String oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
 
     saveLocation(locationDict);
-    if(locationDict["city"] != locationDict["countryname"]) await saveCityInformation(locationDict, "city");
-    await saveCityInformation(locationDict, "countryname");
+    StadtinfoDatabase().addFamiliesInCity(locationDict, ownProfil["id"]);
     joindAndRemoveChatGroups(locationDict, oldLocation);
     deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);

@@ -171,8 +171,7 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
   }
 
   additionalDatabaseOperations(ortMapData, userId) async {
-    if(ortMapData["city"] != ortMapData["countryname"]) await saveCityInformation(ortMapData, "city", userId);
-    await saveCityInformation(ortMapData, "countryname", userId);
+    StadtinfoDatabase().addFamiliesInCity(ortMapData, userId);
 
     await refreshHiveChats();
     await refreshHiveMeetups();
