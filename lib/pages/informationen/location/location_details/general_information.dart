@@ -11,6 +11,7 @@ import '../../../../services/database.dart';
 import '../../../../windows/dialog_window.dart';
 import '../../../chat/chat_details.dart';
 import '../../../show_profil.dart';
+import '../../meetups/meetup_card_details.dart';
 
 class GeneralInformationPage extends StatefulWidget {
   final Map location;
@@ -33,6 +34,9 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   late bool isCity;
   final translator = GoogleTranslator();
   List familiesThere = [];
+  late bool hasVisited;
+
+
 
   @override
   void initState() {
@@ -177,11 +181,63 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
   }
 
+  changeVisitedStauts(){
+      hasVisited = !hasVisited;
+
+      if(hasVisited){
+        widget.location["familien"].add(userId);
+        StadtinfoDatabase().update("familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')","where id = '${widget.location["id"]}'");
+      }else{
+        widget.location["familien"].remove(userId);
+        StadtinfoDatabase().update("familien = JSON_REMOVE(familien, JSON_UNQUOTE(JSON_SEARCH(familien, 'one', '$userId')))","where id = '${widget.location["id"]}'");
+      }
+  }
+
+  changeVisitedStatusWindow() {
+    double fontsize = isWebDesktop ? 12 : 16;
+
+    showDialog(
+        context: context,
+        builder: (BuildContext buildContext) {
+          return CustomAlertDialog(
+              title: hasVisited ? AppLocalizations.of(context)!.ortNichtBesuchtTitle :AppLocalizations.of(context)!.ortBesuchtTitle,
+              children: [
+                Container(
+                    margin: const EdgeInsets.all(10),
+                    child: Center(child: Text(hasVisited
+                        ? "${AppLocalizations.of(context)!.ortNichtBesuchtBody1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.ortNichtBesuchtBody2}"
+                        : "${AppLocalizations.of(context)!.ortBesuchtBody1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.ortBesuchtBody2}"
+                    ))
+                ),
+                Container(
+                  margin: const EdgeInsets.only(right: 10),
+                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    TextButton(
+                      child: Text(AppLocalizations.of(context)!.abbrechen,
+                          style: TextStyle(fontSize: fontsize)),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 10,),
+                    TextButton(
+                        child: Text(AppLocalizations.of(context)!.bestaetigen,
+                            style: TextStyle(fontSize: fontsize)),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          setState(() {
+                            changeVisitedStauts();
+                          });
+                        }),
+                  ]),
+                )
+              ]);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     double iconSize = 28;
     double fontSize = 18;
-    var anzahlFamilien = widget.location["familien"]?.length ?? 0;
+    hasVisited = widget.location["familien"].contains(userId);
 
 
     displayContainer({child, margin}){
@@ -196,7 +252,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 5,
                 blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
+                offset: const Offset(0, 3), // changes position of shadow
               ),
             ],
           ),
@@ -229,24 +285,43 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
 
     showVisited() {
-      return InkWell(
-        onTap: () => showFamilyVisitWindow(widget.location["familien"]),
-        child: displayContainer(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.family_restroom, size: iconSize),
-              const SizedBox(width: 10),
-              Text(
-                  AppLocalizations.of(context)!.besuchtVon +
-                      anzahlFamilien.toString() +
-                      AppLocalizations.of(context)!.familien,
-                  style: TextStyle(
-                      fontSize: fontSize,
-                      decoration: TextDecoration.underline)),
-            ],
+      List visitFamilies = List.of(widget.location["familien"]);
+      visitFamilies.remove(userId);
+      int anzahlFamilien = visitFamilies.length;
+
+      return Row(
+        children: [
+          InkWell(
+            onTap: () => showFamilyVisitWindow(visitFamilies),
+            child: displayContainer(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.family_restroom, size: iconSize),
+                  const SizedBox(width: 10),
+                  Text(
+                      AppLocalizations.of(context)!.besuchtVon +
+                          anzahlFamilien.toString() +
+                          AppLocalizations.of(context)!.familien,
+                      style: TextStyle(
+                          fontSize: fontSize,
+                          decoration: TextDecoration.underline)),
+                ],
+              ),
+            ),
           ),
-        ),
+          const SizedBox(width: 10),
+          SizedBox(
+            height: 25,
+            width: 25,
+            child: FloatingActionButton.small(
+              heroTag: "openVisitedStatusWindow",
+              onPressed: () => changeVisitedStatusWindow(),
+              backgroundColor: hasVisited ? Colors.red : null,
+              child: Icon(hasVisited ? Icons.remove : Icons.add, size: 20,),
+            ),
+          )
+        ],
       );
     }
 

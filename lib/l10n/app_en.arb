@@ -566,7 +566,13 @@
     "kommentare": "Comments",
     "bewerten": "Review",
     "ortBewerten": "Review location",
-    "klimatabelle": "Climate chart"
-
+    "klimatabelle": "Climate chart",
+    "bestaetigen": "confim",
+    "ortBesuchtTitle": "location visited ?",
+    "ortBesuchtBody1": "You have already been to",
+    "ortBesuchtBody2": "and want to add yourself ?",
+    "ortNichtBesuchtTitle": "location not visited ?",
+    "ortNichtBesuchtBody1": "You have been added to",
+    "ortNichtBesuchtBody2": "by mistake and want to remove yourself again ?"
 }
 
