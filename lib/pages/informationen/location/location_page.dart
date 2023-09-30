@@ -62,6 +62,7 @@ class _LocationPageState extends State<LocationPage> {
 
   getAllSearchedLocations() {
     List allCities = Hive.box('secureBox').get("stadtinfo");
+    allCities = sort(allCities);
     String searchText = searchKontroller.text.toLowerCase();
     List searchedCities = [];
 
@@ -116,6 +117,18 @@ class _LocationPageState extends State<LocationPage> {
     }
 
     return interestCitiyCards;
+  }
+
+  sort(locationList){
+    if(locationList.isEmpty) return locationList;
+
+    locationList.sort((m1, m2) {
+      var r = m2["familien"].length.compareTo(m1["familien"].length) as int ;
+      if (r != 0) return r;
+      return m2["familien"].length.compareTo(m1["familien"].length) as int ;
+    });
+
+    return locationList;
   }
 
   @override
