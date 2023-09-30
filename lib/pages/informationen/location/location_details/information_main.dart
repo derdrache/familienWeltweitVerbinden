@@ -48,7 +48,6 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
     _selectNavigationIndex = widget.insiderInfoId != null ? 1 : 0;
     location = getCityFromHive(cityName: widget.ortName);
 
-    location["familien"].remove(userId);
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
     isCity = location["isCity"] == 1;
     tabPages = [
