@@ -1576,9 +1576,8 @@ getCityFromHive({cityId, cityName, getName = false}) {
 getCityUserInfoFromHive(cityName) {
   var stadtUserInfos = Hive.box('secureBox').get("stadtinfoUser");
   var infos = [];
-
   for (var info in stadtUserInfos) {
-    if (cityName.contains(info["ort"])) infos.add(info);
+    if (cityName.contains(info["ort"]) || info["ort"].contains(cityName)) infos.add(info);
   }
 
   return infos;
