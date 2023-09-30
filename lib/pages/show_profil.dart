@@ -667,13 +667,15 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
     bool isOwnProfil = widget.profil["id"] == userId;
     widget.profil["lastLogin"] ??= DateTime.parse("2022-02-13");
 
-    transformDateToText(dateString, {onlyMonth = false}) {
+    transformDateToText(dateString, {onlyMonth = false, exact = false}) {
       DateTime date = DateTime.parse(dateString);
       bool laterSameYear =
           date.month > DateTime.now().month && date.year == DateTime.now().year;
       bool laterOnlyYears = date.year > DateTime.now().year;
 
-      if (laterSameYear || laterOnlyYears || onlyMonth) {
+      if(exact){
+        return "${date.day}.${date.month}.${date.year}";
+      } else if (laterSameYear || laterOnlyYears || onlyMonth) {
         return "${date.month}.${date.year}";
       } else {
         return AppLocalizations.of(context)!.jetzt;
@@ -932,7 +934,8 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
       for (var reiseplan in widget.profil["reisePlanung"]) {
         String ortText = reiseplan["ortData"]["city"];
         DateTime dateReiseplanBis = DateTime.parse(reiseplan["bis"]);
-        DateTime dateNow = DateTime(DateTime.now().year, DateTime.now().month);
+        DateTime dateNow = DateTime.now();
+        bool exactTravelPlan = dateReiseplanBis.hour == 1;
 
         if (dateReiseplanBis.isBefore(dateNow)) continue;
 
@@ -951,7 +954,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
                 Row(
                   children: [
                     Text(
-                        "${transformDateToText(reiseplan["von"])} - ${transformDateToText(reiseplan["bis"], onlyMonth: true)} in ",
+                        "${transformDateToText(reiseplan["von"], exact: exactTravelPlan)} - ${transformDateToText(reiseplan["bis"], exact: exactTravelPlan)} in ",
                         style: const TextStyle(fontSize: style.textSize)),
                     Text(ortText,
                         style: const TextStyle(
