@@ -59,6 +59,7 @@ class AllUserSelectWindow {
               style: TextStyle(fontSize: fontsize)),
           onPressed: () => Navigator.pop(context),
         ),
+        const SizedBox(width: 10,),
         TextButton(
             child: Text(AppLocalizations.of(context)!.speichern,
                 style: TextStyle(fontSize: fontsize)),
