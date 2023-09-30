@@ -9,7 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:hive/hive.dart';
 
 import '../../global/profil_sprachen.dart';
 import '../../services/notification.dart' as notifications;
@@ -151,20 +150,29 @@ class _CreateProfilPageState extends State<CreateProfilPage> {
     changeLoading();
   }
 
-  additionalDatabaseOperations(ortMapData, userId) async {
-    await StadtinfoDatabase().addNewCity(ortMapData);
-    StadtinfoDatabase().update(
-        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-        "WHERE ort LIKE '%${ortMapData["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+  saveCityInformation(locationDict, location, userId) async {
+    await StadtinfoDatabase().addNewCity(locationDict);
 
-    await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"]);
-    await ChatGroupsDatabase().updateChatGroup(
-        "users = JSON_MERGE_PATCH(users, '${json.encode({
-              userId: {"newMessages": 0}
-            })}')",
-        "WHERE id = '1'");
-    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-    myGroupChats.add(getChatGroupFromHive(chatId: "1"));
+    var sql =
+        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')";
+    var cityInfo = getCityFromHive(cityName: locationDict[location]);
+
+      sql +=
+      ", interesse = JSON_ARRAY_APPEND(interesse, '\$', '$userId')";
+      cityInfo["interesse"].add(userId);
+
+    StadtinfoDatabase().update(sql,
+        "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+
+    if(!cityInfo["familien"].contains(userId)){
+      cityInfo["familien"].add(userId);
+    }
+
+  }
+
+  additionalDatabaseOperations(ortMapData, userId) async {
+    if(ortMapData["city"] != ortMapData["countryname"]) await saveCityInformation(ortMapData, "city", userId);
+    await saveCityInformation(ortMapData, "countryname", userId);
 
     await refreshHiveChats();
     await refreshHiveMeetups();
