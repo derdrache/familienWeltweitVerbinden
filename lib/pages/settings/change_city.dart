@@ -45,11 +45,11 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     super.initState();
   }
 
-  joindAndRemoveChatGroups(locationDict, oldLocation) async {
-    final Map leaveCity = getCityFromHive(cityName: oldLocation) ?? {};
+  joindAndRemoveChatGroups(locationDict, oldLocation, oldLocationLatt) async {
+    final Map leaveCity = getCityFromHive(cityName: oldLocation, latt: oldLocationLatt) ?? {};
     String chatConnect = "</stadt=${leaveCity["id"]}";
 
-    ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"]);
+    ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"], locationDict["latt"]);
     ChatGroupsDatabase().leaveChat(chatConnect);
   }
 
@@ -141,30 +141,6 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     });
   }
 
-
-
-  saveCityInformation(locationDict, location) async {
-    await StadtinfoDatabase().addNewCity(locationDict);
-
-    var sql =
-        "familien = JSON_ARRAY_APPEND(familien, '\$', '${ownProfil["id"]}')";
-    var cityInfo = getCityFromHive(cityName: locationDict[location]);
-
-    if (!cityInfo["interesse"].contains(ownProfil["id"])) {
-      sql +=
-          ", interesse = JSON_ARRAY_APPEND(interesse, '\$', '${ownProfil["id"]}')";
-      cityInfo["interesse"].add(ownProfil["id"]);
-    }
-
-    StadtinfoDatabase().update(sql,
-        "WHERE (ort LIKE '%${locationDict[location].replaceAll("'", "''")}%') AND JSON_CONTAINS(familien, '\"${ownProfil["id"]}\"') < 1");
-
-    if(!cityInfo["familien"].contains(ownProfil["id"])){
-      cityInfo["familien"].add(ownProfil["id"]);
-    }
-
-  }
-
   deleteOldTravelPlan(locationDict) {
     List travelPlans = ownProfil["reisePlanung"];
     List removePlans = [];
@@ -189,7 +165,12 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
   }
 
   save() async {
-    var locationData = autoComplete.getGoogleLocationData();
+    var locationData = {
+      "city": "Germany",
+      "countryname": "Germany",
+      "longt": 10.451526,
+      "latt": 51.165691,
+      "adress": "Germany"};//autoComplete.getGoogleLocationData();
 
     if (locationData["city"] == null) {
       customSnackBar(context, AppLocalizations.of(context)!.ortEingeben);
@@ -203,11 +184,14 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
       "latt": locationData["latt"],
       "countryname": locationData["countryname"],
     };
-    final String oldLocation = Hive.box("secureBox").get("ownProfil")["ort"];
 
+    await StadtinfoDatabase().addFamiliesInCity(locationDict, ownProfil["id"]);
+    return ;
+    final String oldLocationName = Hive.box("secureBox").get("ownProfil")["ort"];
+    final double oldLocationLatt = Hive.box("secureBox").get("ownProfil")["latt"];
     saveLocation(locationDict);
     StadtinfoDatabase().addFamiliesInCity(locationDict, ownProfil["id"]);
-    joindAndRemoveChatGroups(locationDict, oldLocation);
+    joindAndRemoveChatGroups(locationDict, oldLocationName, oldLocationLatt);
     deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);
     notifications.prepareNewLocationNotification();
@@ -227,6 +211,7 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
   @override
   Widget build(BuildContext context) {
+    save();
     autoComplete.hintText = AppLocalizations.of(context)!.neuenOrtEingeben;
 
     return Scaffold(

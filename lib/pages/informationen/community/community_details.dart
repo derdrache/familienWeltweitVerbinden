@@ -1028,7 +1028,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             onTap: isWorldwide && !isCreator ? null : () => isCreator
                 ? _changeOrtWindow()
                 : global_func.changePage(context,
-                    LocationInformationPage(ortName: widget.community["ort"])),
+                    LocationInformationPage(ortName: widget.community["ort"], ortLatt: widget.community["latt"],)),
             child: Row(
               children: [
                 Text(AppLocalizations.of(context)!.ort,

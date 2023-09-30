@@ -76,7 +76,7 @@ class _CountryCitiesPageState extends State<CountryCitiesPage> {
     cityEntry(city) {
       return GestureDetector(
         onTap: () => global_func.changePage(
-            context, LocationInformationPage(ortName: city["ort"])),
+            context, LocationInformationPage(ortName: city["ort"], ortLatt: city["latt"],)),
         child: Container(
           margin: const EdgeInsets.all(10),
           padding: const EdgeInsets.all(10),

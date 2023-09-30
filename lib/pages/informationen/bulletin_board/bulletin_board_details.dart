@@ -249,6 +249,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                             context,
                             LocationInformationPage(
                               ortName: widget.note["location"]["city"],
+                              ortLatt: widget.note["location"]["latt"],
                             )),
                     child: Text(
                       locationText,
