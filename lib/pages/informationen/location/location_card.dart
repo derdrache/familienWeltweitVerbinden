@@ -105,10 +105,11 @@ class _LocationCardState extends State<LocationCard> {
           Expanded(
             child: Center(
               child: Container(
-                padding: const EdgeInsets.only(right: 5, left: 5),
+                padding: const EdgeInsets.all(5),
                 child: Text(
                   widget.location["ort"],
                   textAlign: TextAlign.center,
+                  overflow: TextOverflow.fade,
                   style: TextStyle(
                       fontSize: 20 * sizeRefactor, fontWeight: FontWeight.bold),
                 ),
