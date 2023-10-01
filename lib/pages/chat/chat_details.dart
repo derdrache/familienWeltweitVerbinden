@@ -1769,7 +1769,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: CachedNetworkImage(
             imageUrl: image,
             width: 200,
-            placeholder: (context, url) => const CircularProgressIndicator(),
+            placeholder: (context, url) => Container(padding: EdgeInsets.all(10), child: Center(child: const CircularProgressIndicator())),
             errorWidget: (context, url, error) => const Icon(Icons.error)),
       );
     }
