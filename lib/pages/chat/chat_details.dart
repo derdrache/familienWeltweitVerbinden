@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
-import 'dart:io';
 
 import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,18 +12,12 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:translator/translator.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:record_mp3/record_mp3.dart';
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 
 import '../../global/style.dart' as style;
 import '../../global/global_functions.dart' as global_functions;
 import '../../functions/upload_and_save_image.dart';
 import '../../global/profil_sprachen.dart';
 import '../../services/database.dart';
-import '../../streams/record_timer.dart';
 import '../../widgets/layout/custom_snackbar.dart';
 import '../../windows/custom_popup_menu.dart';
 import '../../windows/image_fullscreen.dart';
@@ -110,12 +101,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   late int globalMessageIndex;
   int lastReadMessageIndex = 0;
   bool isWriting = false;
-  String? recordModus;
-  var recordTimer = RecordTimer();
-  String voiceMessagePath = "/voiceMessage.mp3";
-  AudioPlayer audioPlayer = AudioPlayer();
-  String playedVoiceMessage = "";
-  bool isPlaying = false;
   List chatParticipantProfils = [];
 
   @override
@@ -143,9 +128,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
   @override
   void dispose() {
     timer.cancel();
-    recordTimer.dispose();
     messageInputNode.dispose();
-    audioPlayer.dispose();
 
     _changeUserChatStatus(0);
 
@@ -1065,105 +1048,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     }
   }
 
-  Future<bool> checkRecordPermission() async {
-    if (!await Permission.microphone.isGranted) {
-      PermissionStatus status = await Permission.microphone.request();
-      if (status != PermissionStatus.granted) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  recordVoiceMessage() async {
-    setState(() {
-      recordModus = "recording";
-    });
-
-    bool hasPermission = await checkRecordPermission();
-    recordTimer.start();
-
-    if (hasPermission) {
-      var recordFile = await getApplicationDocumentsDirectory();
-      var recordFilePath = recordFile.path;
-
-      RecordMp3.instance.start(recordFilePath + voiceMessagePath, (type) {
-        setState(() {});
-      });
-    } else {}
-    setState(() {});
-  }
-
-  stopVoiceMessage() async {
-    recordTimer.dispose();
-    setState(() {
-      recordModus = null;
-    });
-    RecordMp3.instance.stop();
-  }
-
-  pauseVoiceMessage() async {
-    recordTimer.stop();
-    recordModus = "pause";
-    RecordMp3.instance.pause();
-  }
-
-  resumeVoiceMessage() async {
-    recordTimer.start();
-    recordModus = "recording";
-    RecordMp3.instance.resume();
-  }
-
-  saveVoiceMessage() async {
-    String fileName = ownProfil["name"] + DateTime.now().toString();
-    stopVoiceMessage();
-    await uploadVoiceMessage(fileName);
-    _saveNewMessage(message: "</voiceMessage=$fileName");
-  }
-
-  uploadVoiceMessage(fileName) async {
-    var appDir = await getApplicationDocumentsDirectory();
-    uploadFile("$fileName.mp3",
-        await File(appDir.path + voiceMessagePath).readAsBytes(), "voice/");
-  }
-
-  downloadVoiceMessage(String fileName) async {
-    var voiceDir = "${bilderPath}voice/";
-    var appDir = await getApplicationDocumentsDirectory();
-
-    try {
-      final http.Response response =
-          await http.get(Uri.parse(voiceDir + fileName));
-      final file = File("${appDir.path}/$fileName");
-      await file.writeAsBytes(response.bodyBytes);
-    } catch (_) {}
-  }
-
-  playVoiceMessage(String audioPath) async {
-    var appDir = await getApplicationDocumentsDirectory();
-    await audioPlayer.play(DeviceFileSource("${appDir.path}/$audioPath"));
-  }
-
-  Future<bool> fileExist(fileName) async {
-    var appDir = await getApplicationDocumentsDirectory();
-
-    return File("${appDir.path}/$fileName").existsSync();
-  }
-
-  audioData(file, isPlaying) async {
-    if (!isPlaying) return 0;
-  }
-
-  Future<Duration> getFileDuration(fileName) async {
-    var appDir = await getApplicationDocumentsDirectory();
-    AudioPlayer durationAudioPlayer = AudioPlayer();
-    await durationAudioPlayer
-        .setSource(DeviceFileSource("${appDir.path}/$fileName"));
-    Duration? duration = await durationAudioPlayer.getDuration();
-
-    return duration!;
-  }
-
   @override
   Widget build(BuildContext context) {
     Color ownMessageBoxColor =
@@ -1769,7 +1653,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: CachedNetworkImage(
             imageUrl: image,
             width: 200,
-            placeholder: (context, url) => Container(padding: EdgeInsets.all(10), child: Center(child: const CircularProgressIndicator())),
+            placeholder: (context, url) => Container(padding: const EdgeInsets.all(10), child: const Center(child: CircularProgressIndicator())),
             errorWidget: (context, url, error) => const Icon(Icons.error)),
       );
     }
@@ -1804,71 +1688,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    voiceMessage(message) {
-      var voiceFileUrl = message["message"].split("=")[1];
-
-      return Row(
-        children: [
-          FutureBuilder<bool>(
-              future: fileExist(voiceFileUrl),
-              builder: (context, snapshot) {
-                bool isDownloaded = snapshot.hasData ? snapshot.data! : false;
-
-                return IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () async {
-                      if (!isDownloaded) {
-                        await downloadVoiceMessage(voiceFileUrl);
-                      } else if (playedVoiceMessage == voiceFileUrl &&
-                          isPlaying) {
-                        isPlaying = false;
-                        audioPlayer.pause();
-                      } else {
-                        isPlaying = true;
-                        playVoiceMessage(voiceFileUrl);
-                        playedVoiceMessage = voiceFileUrl;
-                      }
-                      setState(() {});
-                    },
-                    icon: Icon(
-                      isDownloaded
-                          ? isPlaying
-                              ? Icons.pause
-                              : Icons.play_arrow
-                          : Icons.download,
-                      size: 50,
-                    ));
-              }),
-          const SizedBox(
-            width: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15),
-            child: FutureBuilder<Duration>(
-                future: getFileDuration(voiceFileUrl),
-                builder: (context, snapshot) {
-                  Duration maxDuration =
-                      snapshot.hasData ? snapshot.data! : Duration.zero;
-
-                  return SizedBox(
-                    width: 200,
-                    child: StreamBuilder<Duration>(
-                        stream: audioPlayer.onPositionChanged,
-                        builder: (context, snapshot) {
-                          return ProgressBar(
-                              progress: snapshot.hasData &&
-                                      playedVoiceMessage == voiceFileUrl
-                                  ? snapshot.data!
-                                  : Duration.zero,
-                              total: maxDuration);
-                        }),
-                  );
-                }),
-          ),
-        ],
-      );
-    }
-
     getAdditionChild(Map message) {
       if (message["forward"].isNotEmpty) {
         return forwardMessageNew(message);
@@ -1886,8 +1705,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       } else if (message["message"].contains("</images") &&
           message["images"].isNotEmpty) {
         return imageMessageNew(message["images"][0]);
-      } else if (message["message"].contains("</voiceMessage")) {
-        return voiceMessage(message);
       }
     }
 
@@ -2520,125 +2337,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    voiceMessageRecordMenu() {
-      recordVoiceMessage();
-
-      showModalBottomSheet<void>(
-          context: context,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(style.roundedCorners),
-          ),
-          builder: (BuildContext context) {
-            return StatefulBuilder(builder: (BuildContext context, setState) {
-              return SizedBox(
-                height: 250,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      AppLocalizations.of(context)!.sprachnachricht,
-                      style: const TextStyle(
-                          fontSize: 27, fontWeight: FontWeight.bold),
-                    ),
-                    const Expanded(child: SizedBox.shrink()),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          color: recordModus == "recording"
-                              ? Colors.red
-                              : Colors.grey,
-                          size: 23,
-                        ),
-                        const SizedBox(width: 5),
-                        StreamBuilder(
-                            stream: recordTimer.stream(),
-                            builder:
-                                (context, AsyncSnapshot<Duration> snapshot) {
-                              var timer = Duration.zero;
-                              if (snapshot.hasData) timer = snapshot.data!;
-
-                              return Text(
-                                timer
-                                    .toString()
-                                    .split('.')
-                                    .first
-                                    .padLeft(8, "0"),
-                                style: const TextStyle(fontSize: 23),
-                              );
-                            }),
-                      ],
-                    ),
-                    const SizedBox(height: 50),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (recordModus == "pause")
-                          Expanded(
-                            child: IconButton(
-                              icon: Icon(Icons.delete,
-                                  size: 40,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                stopVoiceMessage();
-                              },
-                            ),
-                          ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () async {
-                              if (recordModus == "pause") {
-                                resumeVoiceMessage();
-                              } else if (recordModus == "recording") {
-                                pauseVoiceMessage();
-                              }
-                              setState(() {});
-                            },
-                            icon: Icon(
-                                recordModus == "pause"
-                                    ? Icons.play_arrow
-                                    : Icons.pause,
-                                size: 60,
-                                color:
-                                    Theme.of(context).colorScheme.secondary)),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        if (recordModus == "pause")
-                          Expanded(
-                            child: IconButton(
-                                icon: Icon(Icons.send,
-                                    size: 40,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondary),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  saveVoiceMessage();
-                                }),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-                  ],
-                ),
-              );
-            });
-          });
-    }
-
     normalBottomBar() {
       return Container(
-          constraints: BoxConstraints(
-
-              minHeight: 60, maxHeight: recordModus != null ? 60 : 200),
+          constraints: const BoxConstraints(
+              minHeight: 60, maxHeight: 200),
           decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark
                   ? Colors.black
@@ -2728,15 +2430,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                             tooltip:
                                 AppLocalizations.of(context)!.tooltipBildSenden,
                             icon: Icon(Icons.photo_library,
-                                size: 34,
-                                color:
-                                    Theme.of(context).colorScheme.secondary)),
-                        if(!kIsWeb) IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () async => voiceMessageRecordMenu(),
-                            tooltip: AppLocalizations.of(context)!
-                                .tooltipSprachnachrichtAufnehmen,
-                            icon: Icon(Icons.mic,
                                 size: 34,
                                 color:
                                     Theme.of(context).colorScheme.secondary)),
