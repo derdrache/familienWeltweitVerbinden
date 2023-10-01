@@ -113,7 +113,7 @@ class ProfilDatabase {
 
   deleteProfil(userId) async {
     Map ownProfil = getProfilFromHive(profilId: userId);
-    ReportsDatabase().add("", "delete User", "Folgende Email muss gelöscht werden: ${ownProfil["email"]}");
+    ReportsDatabase().add("", "delete User", "Email von Profil: ${ownProfil["id"]} muss gelöscht werden: ${ownProfil["email"]}");
 
 
     _deleteInTable("profils", "id", userId);
