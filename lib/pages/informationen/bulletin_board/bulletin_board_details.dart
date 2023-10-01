@@ -10,6 +10,7 @@ import '../../../functions/translation.dart';
 import '../../../functions/upload_and_save_image.dart';
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart';
+import '../../../global/variablen.dart';
 import '../../../services/database.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../windows/dialog_window.dart';
@@ -48,8 +49,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   late Map? creatorProfil;
 
   checkAndSetTextVariations() {
-    bool noteLanguageGerman = widget.note["beschreibungEng"]
-        .contains("This is an automatic translation");
+    bool noteLanguageGerman = widget.note["sprache"] == "de";
     bool userSpeakGerman = getUserSpeaksGerman();
     bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
         ownProfil["sprachen"].contains("english") ||
@@ -66,12 +66,14 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       originalText["title"] = widget.note["titleGer"];
       originalText["description"] = widget.note["beschreibungGer"];
       translatedText["title"] = widget.note["titleEng"];
-      translatedText["description"] = widget.note["beschreibungEng"];
+      translatedText["description"] = widget.note["beschreibungEng"]
+          + automaticTranslationEng;
     } else {
       originalText["title"] = widget.note["titleEng"];
       originalText["description"] = widget.note["beschreibungEng"];
       translatedText["title"] = widget.note["titleGer"];
-      translatedText["description"] = widget.note["beschreibungGer"];
+      translatedText["description"] = widget.note["beschreibungGer"]
+          + automaticTranslationGer;
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:translator/translator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../functions/user_speaks_german.dart';
+import '../../../../global/variablen.dart';
 import '../../../../services/database.dart';
 import '../../../../widgets/layout/custom_snackbar.dart';
 import '../../../../widgets/layout/custom_text_input.dart';
@@ -255,12 +256,10 @@ class _LocationRatingState extends State<LocationRating> {
 
         if (commentIsGerman) {
           originalComment = comments[i]["commentGer"];
-          translatedComment = comments[i]["commentEng"] +
-              "\n\n<This is an automatic translation>";
+          translatedComment = comments[i]["commentEng"] + automaticTranslationEng;
         } else {
           originalComment = comments[i]["commentEng"];
-          translatedComment = comments[i]["commentGer"] +
-              "\n\n<Dies ist eine automatische Übersetzung>";
+          translatedComment = comments[i]["commentGer"] + automaticTranslationGer;
         }
 
         if (showOriginalComment[i] || comments[i]["userId"] == ownUserId) {

@@ -13,6 +13,7 @@ import 'package:translator/translator.dart';
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../../../global/profil_sprachen.dart';
+import '../../../global/variablen.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/layout/ownIconButton.dart';
 import '../../../windows/dialog_window.dart';
@@ -216,12 +217,11 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       meetupData["nameGer"] = newTitle;
       var translation = await descriptionTranslation(newTitle, "auto");
       meetupData["beschreibungEng"] =
-          translation + "\n\nThis is an automatic translation";
+          translation + automaticTranslationEng;
     } else {
       meetupData["nameEng"] = newTitle;
       var translation = await descriptionTranslation(newTitle, "de");
-      meetupData["nameGer"] = translation +
-          "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      meetupData["nameGer"] = translation + automaticTranslationGer;
     }
 
     String name = meetupData["name"].replaceAll("'", "''");
@@ -258,13 +258,11 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (descriptionIsGerman) {
       meetupData["beschreibungGer"] = newBeschreibung;
       var translation = await descriptionTranslation(newBeschreibung, "auto");
-      meetupData["beschreibungEng"] =
-          translation + "\n\nThis is an automatic translation";
+      meetupData["beschreibungEng"] = translation + automaticTranslationEng;
     } else {
       meetupData["beschreibungEng"] = newBeschreibung;
       var translation = await descriptionTranslation(newBeschreibung, "de");
-      meetupData["beschreibungGer"] = translation +
-          "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      meetupData["beschreibungGer"] = translation + automaticTranslationGer;
     }
 
     String beschreibung = meetupData["beschreibung"].replaceAll("'", "''");

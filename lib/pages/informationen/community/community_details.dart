@@ -13,6 +13,7 @@ import 'package:translator/translator.dart';
 
 import '../../../functions/upload_and_save_image.dart';
 import '../../../functions/user_speaks_german.dart';
+import '../../../global/variablen.dart';
 import '../../../services/database.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/custom_appbar.dart';
@@ -520,14 +521,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["beschreibung"] = newBeschreibung;
       widget.community["beschreibungGer"] = newBeschreibung;
       var translation = await _descriptionTranslation(newBeschreibung, "auto");
-      widget.community["beschreibungEng"] =
-          translation + "\n\nThis is an automatic translation";
+      widget.community["beschreibungEng"] = translation + automaticTranslationEng;
     } else {
       widget.community["beschreibung"] = newBeschreibung;
       widget.community["beschreibungEng"] = newBeschreibung;
       var translation = await _descriptionTranslation(newBeschreibung, "de");
-      widget.community["beschreibungGer"] = translation +
-          "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      widget.community["beschreibungGer"] = translation + automaticTranslationGer;
     }
 
     newBeschreibung = newBeschreibung.replaceAll("'", "''");

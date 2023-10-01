@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../global/style.dart' as style;
 import '../../../global/global_functions.dart' as global_func;
+import '../../../global/variablen.dart';
 import '../../../services/database.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
@@ -85,13 +86,13 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
       communityData["nameEng"] = await descriptionTranslation(communityData["name"], "auto");
       communityData["beschreibungGer"] = communityData["beschreibung"];
       communityData["beschreibungEng"] = await descriptionTranslation(communityData["beschreibungGer"], "auto");
-      communityData["beschreibungEng"] += "\n\nThis is an automatic translation";
+      communityData["beschreibungEng"] += automaticTranslationEng;
     }else{
       communityData["nameEng"] = communityData["name"];
       communityData["nameGer"] = await descriptionTranslation(communityData["name"], "de");
       communityData["beschreibungEng"] = communityData["beschreibung"];
       communityData["beschreibungGer"] = await descriptionTranslation(communityData["beschreibungEng"],"de");
-      communityData["beschreibungGer"] = communityData["beschreibungGer"] + "\n\nDies ist eine automatische Übersetzung";
+      communityData["beschreibungGer"] = communityData["beschreibungGer"] + automaticTranslationGer;
     }
 
     communityData["members"] = json.encode(communityData["members"]);

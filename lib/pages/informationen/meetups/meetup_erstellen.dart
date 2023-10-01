@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../global/profil_sprachen.dart';
+import '../../../global/variablen.dart';
 import '../../../services/database.dart';
 import '../../../global/global_functions.dart' as global_functions;
 import '../../../widgets/custom_appbar.dart';
@@ -179,14 +180,14 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       meetup["nameEng"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungGer"] = meetup["beschreibung"];
       meetup["beschreibungEng"] = await descriptionTranslation(meetup["beschreibungGer"], "auto");
-      meetup["beschreibungEng"] += "\n\nThis is an automatic translation";
+      meetup["beschreibungEng"] += automaticTranslationEng;
     }else{
       meetup["nameEng"] = meetup["name"];
       meetup["nameGer"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungEng"] = meetup["beschreibung"];
       meetup["beschreibungGer"] = await descriptionTranslation(
           meetup["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
-      meetup["beschreibungGer"] = meetup["beschreibungGer"] + "\n\nHierbei handelt es sich um eine automatische Übersetzung";
+      meetup["beschreibungGer"] = meetup["beschreibungGer"] + automaticTranslationGer;
     }
 
 
