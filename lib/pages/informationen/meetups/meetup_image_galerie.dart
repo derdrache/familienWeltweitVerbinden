@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:familien_suche/windows/dialog_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -137,26 +138,6 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
           }));
     }
 
-    windowOptions() {
-      return Container(
-        margin: const EdgeInsets.only(right: 10),
-        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          TextButton(
-            child: Text(AppLocalizations.of(context)!.abbrechen,
-                style: TextStyle(fontSize: fontsize)),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-              child: Text(AppLocalizations.of(context)!.speichern,
-                  style: TextStyle(fontSize: fontsize)),
-              onPressed: () {
-                saveChanges();
-                Navigator.pop(context);
-              }),
-        ]),
-      );
-    }
-
     windowChangeImageToPredetermined() async {
       showDialog(
           context: context,
@@ -168,7 +149,9 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
                 children: [
                   showImages(),
                   const SizedBox(height: 20),
-                  windowOptions()
+                  WindowConfirmCancelBar(
+                    onConfirm: () => saveChanges(),
+                  )
                 ],
               );
             });
@@ -184,7 +167,9 @@ class _ImageMeetupGalerieState extends State<MeetupImageGalerie> {
               children: [
                 ownLinkInput(),
                 const SizedBox(height: 20),
-                windowOptions()
+                WindowConfirmCancelBar(
+                  onConfirm: () => saveChanges(),
+                )
               ],
             );
           });

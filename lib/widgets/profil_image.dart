@@ -11,6 +11,7 @@ import '../services/database.dart';
 import '../windows/dialog_window.dart';
 import 'layout/custom_snackbar.dart';
 import 'layout/custom_text_input.dart';
+import 'windowConfirmCancelBar.dart';
 
 class ProfilImage extends StatefulWidget {
   Map profil;
@@ -90,20 +91,13 @@ class _ProfilImageState extends State<ProfilImage> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.profilbildAendern,
-              actions: [
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.speichern),
-                  onPressed: () => checkAndSaveImage(),
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
-                )
-              ],
               children: [
                 CustomTextInput(
                     AppLocalizations.of(context)!.linkProfilbildEingeben,
                     profilImageLinkKontroller),
+                WindowConfirmCancelBar(
+                  onConfirm: () => checkAndSaveImage(),
+                )
               ],
             );
           });

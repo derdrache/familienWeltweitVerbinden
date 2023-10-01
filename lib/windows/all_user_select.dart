@@ -1,3 +1,4 @@
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter/foundation.dart';
@@ -41,36 +42,6 @@ class AllUserSelectWindow {
 
         Navigator.pop(context, selectedUserId);
       },
-    );
-  }
-
-  _windowOptions() {
-    var isWebDesktop = kIsWeb &&
-        (defaultTargetPlatform != TargetPlatform.iOS ||
-            defaultTargetPlatform != TargetPlatform.android);
-    double fontsize = isWebDesktop ? 12 : 16;
-
-
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-        TextButton(
-          child: Text(AppLocalizations.of(context)!.abbrechen,
-              style: TextStyle(fontSize: fontsize)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        const SizedBox(width: 10,),
-        TextButton(
-            child: Text(AppLocalizations.of(context)!.speichern,
-                style: TextStyle(fontSize: fontsize)),
-            onPressed: () {
-              var selectedUser = searchAutocomplete.getSelected()[0];
-              var userIndex = allUserNames.indexOf(selectedUser);
-              var selectedUserId = allUserIds[userIndex];
-
-              Navigator.pop(context, selectedUserId);
-            }),
-      ]),
     );
   }
 
@@ -133,7 +104,17 @@ class AllUserSelectWindow {
             children: [
               searchAutocomplete,
               const SizedBox(height: 15),
-              _windowOptions(),
+              WindowConfirmCancelBar(
+                confirmTitle: AppLocalizations.of(context)!.speichern,
+                withCloseWindow: false,
+                onConfirm: (){
+                  var selectedUser = searchAutocomplete.getSelected()[0];
+                  var userIndex = allUserNames.indexOf(selectedUser);
+                  var selectedUserId = allUserIds[userIndex];
+
+                  Navigator.pop(context, selectedUserId);
+                },
+              ),
               ...createFriendlistBox(),
             ],
           );

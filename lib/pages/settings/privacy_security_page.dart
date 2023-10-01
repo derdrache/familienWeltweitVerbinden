@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -217,10 +218,14 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.accountLoeschen,
               height: 90,
-              actions: [
-                TextButton(
-                  child: const Text("Ok"),
-                  onPressed: () async{
+              children: [
+                const SizedBox(height: 10),
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context)!.accountWirklichLoeschen)),
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.loeschen,
+                  onConfirm: (){
                     var deleteProfil = ownProfil;
 
                     ProfilDatabase().deleteProfil(deleteProfil["id"]);
@@ -229,17 +234,7 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
                     setState(() {});
                     global_functions.changePageForever(context, const LoginPage());
                   },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
                 )
-              ],
-              children: [
-                const SizedBox(height: 10),
-                Center(
-                    child: Text(
-                        AppLocalizations.of(context)!.accountWirklichLoeschen))
               ],
             );
           });

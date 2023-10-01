@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 Color borderColorGrey = const Color(0xFFDFDDDD);
+var isWebDesktop = kIsWeb &&
+    (defaultTargetPlatform != TargetPlatform.iOS ||
+        defaultTargetPlatform != TargetPlatform.android);
 const double roundedCorners = 20;
-const double textSize = 16;
+double textSize = isWebDesktop ? 12 : 16;
 const double webWidth = 600;
 const double sideSpace = 10;
 const double iconSizeNormal = 24;

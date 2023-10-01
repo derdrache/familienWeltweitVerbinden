@@ -10,6 +10,7 @@ import '../../../global/global_functions.dart' as global_func;
 import '../../../services/notification.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/layout/ownIconButton.dart';
+import '../../../widgets/windowConfirmCancelBar.dart';
 import '../../../windows/custom_popup_menu.dart';
 import '../../../windows/dialog_window.dart';
 import '../../../widgets/layout/custom_dropdown_button.dart';
@@ -255,26 +256,18 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.meetupLoeschen,
               height: 90,
-              actions: [
-                TextButton(
-                  child: const Text("Ok"),
-                  onPressed: (){
-                    deleteMeetup();
-
-                    Navigator.pop(context);
-                  },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
-                )
-              ],
               children: [
                 Center(
                     child: Text(
                         AppLocalizations
                             .of(context)!
-                            .meetupWirklichLoeschen))
+                            .meetupWirklichLoeschen)),
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.loeschen,
+                  onConfirm: (){
+                    deleteMeetup();
+                  },
+                ),
               ],
             );
           });

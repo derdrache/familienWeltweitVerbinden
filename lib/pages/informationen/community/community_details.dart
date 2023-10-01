@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/widgets/custom_like_button.dart';
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -198,7 +199,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               children: [
                 _showImages(),
                 const SizedBox(height: 20),
-                _windowOptions(() => _saveChangeImage(null))
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.speichern,
+                  onConfirm: () => _saveChangeImage(null),
+                )
               ],
             );
           });
@@ -245,30 +249,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                       AppLocalizations.of(context)!.eigenesBildLinkEingeben,
                       ownPictureKontroller)),
               const SizedBox(height: 20),
-              _windowOptions(() => _saveChangeImage(ownPictureKontroller.text))
+              WindowConfirmCancelBar(
+                confirmTitle: AppLocalizations.of(context)!.speichern,
+                onConfirm: () => _saveChangeImage(ownPictureKontroller.text),
+              )
             ],
           );
         });
-  }
-
-  _windowOptions(saveFunction) {
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-        TextButton(
-          child: Text(AppLocalizations.of(context)!.abbrechen,
-              style: TextStyle(fontSize: fontsize)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        TextButton(
-            child: Text(AppLocalizations.of(context)!.speichern,
-                style: TextStyle(fontSize: fontsize)),
-            onPressed: () {
-              saveFunction();
-              Navigator.pop(context);
-            }),
-      ]),
-    );
   }
 
   _saveChangeImage(image) async {
@@ -316,7 +303,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               CustomTextInput(AppLocalizations.of(context)!.neuenNamenEingeben,
                   newNameKontroller,maxLength: 40),
               const SizedBox(height: 15),
-              _windowOptions(() => _saveChangeName(newNameKontroller.text))
+              WindowConfirmCancelBar(
+                confirmTitle: AppLocalizations.of(context)!.speichern,
+                onConfirm: () => _saveChangeName(newNameKontroller.text),
+              )
             ],
           );
         });
@@ -372,15 +362,18 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             children: [
               ortAuswahlBox,
               const SizedBox(height: 15),
-              _windowOptions(() {
-                var newLocation = ortAuswahlBox.getGoogleLocationData();
-                if (newLocation["city"].isEmpty) {
-                  customSnackBar(
-                      context, AppLocalizations.of(context)!.ortEingeben);
-                  return;
-                }
-                _saveChangeLocation(newLocation);
-              })
+              WindowConfirmCancelBar(
+                confirmTitle: AppLocalizations.of(context)!.speichern,
+                onConfirm: () {
+                  var newLocation = ortAuswahlBox.getGoogleLocationData();
+                  if (newLocation["city"].isEmpty) {
+                    customSnackBar(
+                        context, AppLocalizations.of(context)!.ortEingeben);
+                    return;
+                  }
+                  _saveChangeLocation(newLocation);
+                },
+              )
             ],
           );
         });
@@ -449,7 +442,10 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               CustomTextInput(AppLocalizations.of(context)!.neuenLinkEingeben,
                   newLinkKontroller),
               const SizedBox(height: 15),
-              _windowOptions(() => _saveChangeLink(newLinkKontroller.text))
+              WindowConfirmCancelBar(
+                confirmTitle: AppLocalizations.of(context)!.speichern,
+                onConfirm: () => _saveChangeLink(newLinkKontroller.text),
+              )
             ],
           );
         });
@@ -492,18 +488,21 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                   newBeschreibungKontroller,
                   moreLines: 13,
                   textInputAction: TextInputAction.newline),
-              _windowOptions(() {
-                String newBeschreibung = newBeschreibungKontroller.text;
-                if (newBeschreibung.isEmpty) {
-                  customSnackBar(
-                      context,
-                      AppLocalizations.of(context)!
-                          .bitteCommunityBeschreibungEingeben);
-                  return;
-                }
+              WindowConfirmCancelBar(
+                confirmTitle: AppLocalizations.of(context)!.speichern,
+                onConfirm: () {
+                  String newBeschreibung = newBeschreibungKontroller.text;
+                  if (newBeschreibung.isEmpty) {
+                    customSnackBar(
+                        context,
+                        AppLocalizations.of(context)!
+                            .bitteCommunityBeschreibungEingeben);
+                    return;
+                  }
 
-                _saveChangeBeschreibung(newBeschreibung);
-              })
+                  _saveChangeBeschreibung(newBeschreibung);
+                },
+              )
             ],
           );
         });
@@ -723,34 +722,27 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.communityLoeschen,
               height: 120,
-              actions: [
-                TextButton(
-                  child: const Text("Ok"),
-                  onPressed: () async {
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context)!.communityWirklichLoeschen)),
+                WindowConfirmCancelBar(
+                  onConfirm: () async {
                     CommunityDatabase().delete(widget.community["id"]);
                     ChatGroupsDatabase().deleteChat(getChatGroupFromHive(
                         connectedWith:
-                            "</community=${widget.community["id"]}")["id"]);
+                        "</community=${widget.community["id"]}")["id"]);
 
                     var communities = Hive.box('secureBox').get("communities");
                     communities.removeWhere((community) =>
-                        community["id"] == widget.community["id"]);
+                    community["id"] == widget.community["id"]);
 
                     dbDeleteImage(widget.community["bild"]);
 
                     global_func.changePage(context, StartPage(selectedIndex: 2,));
                     global_func.changePage(context, const CommunityPage());
                   },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
                 )
-              ],
-              children: [
-                Center(
-                    child: Text(
-                        AppLocalizations.of(context)!.communityWirklichLoeschen))
               ],
             );
           });

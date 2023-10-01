@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:familien_suche/widgets/custom_like_button.dart';
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -431,33 +432,21 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(title: title, height: height, children: [
               inputWidget,
-              Container(
-                margin: const EdgeInsets.only(right: 10),
-                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  TextButton(
-                      child: Text(AppLocalizations.of(context)!.abbrechen,
-                          style: TextStyle(fontSize: fontsize)),
-                      onPressed: () {
-                        changeTextInputController = TextEditingController();
-                        Navigator.pop(context);
-                      }),
-                  TextButton(
-                      child: Text(AppLocalizations.of(context)!.speichern,
-                          style: TextStyle(fontSize: fontsize)),
-                      onPressed: () async {
-                        bool saveSuccess = await saveFunction();
+              WindowConfirmCancelBar(
+                confirmTitle: AppLocalizations.of(context)!.speichern,
+                onConfirm: () async{
+                  bool saveSuccess = await saveFunction();
 
-                        if (!saveSuccess && context.mounted) {
-                          customSnackBar(context,
-                              AppLocalizations.of(context)!.keineEingabe);
-                          return;
-                        }
+                  if (!saveSuccess && context.mounted) {
+                    customSnackBar(context,
+                        AppLocalizations.of(context)!.keineEingabe);
+                    return;
+                  }
 
-                        changeTextInputController = TextEditingController();
-                        setState(() {});
-                        if (context.mounted) Navigator.pop(context);
-                      }),
-                ]),
+                  changeTextInputController = TextEditingController();
+                  setState(() {});
+                  if (context.mounted) Navigator.pop(context);
+                },
               )
             ]);
           });
@@ -630,28 +619,13 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                         ],
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(right: 10),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                                child: Text(
-                                    AppLocalizations.of(context)!.abbrechen,
-                                    style: TextStyle(fontSize: fontsize)),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                }),
-                            TextButton(
-                                child: Text(
-                                    AppLocalizations.of(context)!.speichern,
-                                    style: TextStyle(fontSize: fontsize)),
-                                onPressed: () {
-                                  checkAndSaveNewLocation();
-                                  setState(() {});
-                                  Navigator.pop(context);
-                                }),
-                          ]),
+                    WindowConfirmCancelBar(
+                      confirmTitle: AppLocalizations.of(context)!.speichern,
+                      onConfirm: (){
+                        setState(() {
+                          checkAndSaveNewLocation();
+                        });
+                      },
                     )
                   ]);
             });
@@ -1096,20 +1070,9 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
                 const SizedBox(height: 20),
                 changeWindowMainButtons(),
                 const SizedBox(height: 10),
-                Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  child:
-                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    TextButton(
-                      child: Text(AppLocalizations.of(context)!.abbrechen,
-                          style: TextStyle(fontSize: fontsize)),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    TextButton(
-                        child: Text(AppLocalizations.of(context)!.speichern,
-                            style: TextStyle(fontSize: fontsize)),
-                        onPressed: () => saveChanges()),
-                  ]),
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.speichern,
+                  onConfirm: () => saveChanges(),
                 )
               ]);
         });
@@ -1548,29 +1511,15 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                         children: [
                           meetupArtInformation(),
                           meetupTypInput,
-                          Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                    child: Text(
-                                        AppLocalizations.of(context)!.abbrechen,
-                                        style: TextStyle(fontSize: fontsize)),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                  TextButton(
-                                      child: Text(
-                                          AppLocalizations.of(context)!
-                                              .speichern,
-                                          style: TextStyle(fontSize: fontsize)),
-                                      onPressed: () {
-                                        saveMeetupArt();
-                                        setState(() {});
-                                        widget.pageState(() {});
-                                        Navigator.pop(context);
-                                      }),
-                                ]),
+                          WindowConfirmCancelBar(
+                            confirmTitle: AppLocalizations.of(context)!
+                                .speichern,
+                            onConfirm: () {
+                              saveMeetupArt();
+                              setState(() {});
+                              widget.pageState(() {});
+                              Navigator.pop(context);
+                            },
                           )
                         ]);
                   })),

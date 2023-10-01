@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -258,21 +259,6 @@ class _ChatPageState extends State<ChatPage>{
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.chatLoeschen,
               height: countSelected == 1 && !isChatGroup ? 150 : 100,
-              actions: [
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.loeschen),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    changeBarOn = false;
-                    deleteChat();
-                    selectedChats = [];
-                  },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
-                )
-              ],
               children: [
                 Center(
                     child: Text(countSelected == 1
@@ -295,7 +281,15 @@ class _ChatPageState extends State<ChatPage>{
                                 chatPartnerName),
                       ) //widget.chatPartnerName)
                     ],
-                  )
+                  ),
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.loeschen,
+                  onConfirm: (){
+                    changeBarOn = false;
+                    deleteChat();
+                    selectedChats = [];
+                  },
+                )
               ],
             );
           });

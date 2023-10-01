@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -363,24 +364,18 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.bulletinNoteLoeschen,
               height: 120,
-              actions: [
-                TextButton(
-                  child: const Text("Ok"),
-                  onPressed: () async {
+              children: [
+                Center(
+                    child: Text(AppLocalizations.of(context)!
+                        .communityWirklichLoeschen)),
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.bulletinNoteLoeschen,
+                  onConfirm: () async {
                     deleteNote();
                     changePage(context, StartPage(selectedIndex: 2,));
                     changePage(context, const BulletinBoardPage());
                   },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
                 )
-              ],
-              children: [
-                Center(
-                    child: Text(AppLocalizations.of(context)!
-                        .communityWirklichLoeschen))
               ],
             );
           });

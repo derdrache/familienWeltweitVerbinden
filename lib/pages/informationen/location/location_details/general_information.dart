@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../../global/global_functions.dart' as global_func;
 import '../../../../functions/is_user_inactive.dart';
 import '../../../../services/database.dart';
+import '../../../../widgets/windowConfirmCancelBar.dart';
 import '../../../../windows/dialog_window.dart';
 import '../../../chat/chat_details.dart';
 import '../../../show_profil.dart';
@@ -194,8 +195,6 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   }
 
   changeVisitedStatusWindow() {
-    double fontsize = isWebDesktop ? 12 : 16;
-
     showDialog(
         context: context,
         builder: (BuildContext buildContext) {
@@ -209,26 +208,13 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                         : "${AppLocalizations.of(context)!.ortBesuchtBody1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.ortBesuchtBody2}"
                     ))
                 ),
-                Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    TextButton(
-                      child: Text(AppLocalizations.of(context)!.abbrechen,
-                          style: TextStyle(fontSize: fontsize)),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 10,),
-                    TextButton(
-                        child: Text(AppLocalizations.of(context)!.bestaetigen,
-                            style: TextStyle(fontSize: fontsize)),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          setState(() {
-                            changeVisitedStauts();
-                          });
-                        }),
-                  ]),
-                )
+                WindowConfirmCancelBar(
+                  onConfirm: (){
+                    setState(() {
+                      changeVisitedStauts();
+                    });
+                  },
+                ),
               ]);
         });
   }

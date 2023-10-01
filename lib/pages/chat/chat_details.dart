@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:io';
 
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -613,10 +614,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.nachrichtLoeschen,
                 height: 100,
-                actions: [
-                  TextButton(
-                    child: Text(AppLocalizations.of(context)!.loeschen),
-                    onPressed: () {
+                children: [
+                  Center(
+                      child: Text(AppLocalizations.of(context)!
+                          .nachrichtWirklichLoeschen)),
+                  WindowConfirmCancelBar(
+                    confirmTitle: AppLocalizations.of(context)!.loeschen,
+                    onConfirm: () {
                       _checkAndRemovePinnedMessage(message);
                       _deleteMessage(message["id"]);
                       if (message["message"].contains("</images")) {
@@ -624,18 +628,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         dbDeleteImage(imageName, imagePath: "chats/");
                       }
                       setState(() {});
-                      Navigator.pop(context);
+
                     },
-                  ),
-                  TextButton(
-                    child: Text(AppLocalizations.of(context)!.abbrechen),
-                    onPressed: () => Navigator.pop(context),
                   )
-                ],
-                children: [
-                  Center(
-                      child: Text(AppLocalizations.of(context)!
-                          .nachrichtWirklichLoeschen))
                 ],
               );
             }));
@@ -2230,18 +2225,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.chatLoeschen,
                 height: 150,
-                actions: [
-                  TextButton(
-                    child: Text(AppLocalizations.of(context)!.loeschen),
-                    onPressed: () async {
-                      _deletePrivatChat();
-                    },
-                  ),
-                  TextButton(
-                    child: Text(AppLocalizations.of(context)!.abbrechen),
-                    onPressed: () => Navigator.pop(context),
-                  )
-                ],
                 children: [
                   Center(
                       child: Text(
@@ -2262,7 +2245,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                                 chatPartnerProfil!["name"]),
                       )
                     ],
+                  ),
+                  WindowConfirmCancelBar(
+                    confirmTitle: AppLocalizations.of(context)!.loeschen,
+                    onConfirm: () async {
+                      _deletePrivatChat();
+                    },
                   )
+
                 ],
               );
             });
@@ -2295,12 +2285,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.gruppeVerlassen,
               height: 100,
-              actions: [
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.gruppeVerlassen),
-                  onPressed: () async {
-                    Navigator.pop(context);
-
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context)!.gruppeWirklichVerlassen)),
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.gruppeVerlassen,
+                  onConfirm: () async {
                     ChatGroupsDatabase()
                         .leaveChat(widget.groupChatData!["connected"]);
 
@@ -2308,16 +2299,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       userJoinedChat = false;
                     });
                   },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
                 )
-              ],
-              children: [
-                Center(
-                    child: Text(
-                        AppLocalizations.of(context)!.gruppeWirklichVerlassen)),
               ],
             );
           });

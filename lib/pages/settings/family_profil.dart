@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -272,33 +273,25 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.familyProfilloeschen,
               height: 110,
-              actions: [
-                TextButton(
-                  child: const Text("Ok"),
-                  onPressed: ()  async {
+              children: [
+                Center(
+                    child: Text(
+                        AppLocalizations.of(context)!.familyProfilWirklichLoeschen)),
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.loeschen,
+                  onConfirm: () async{
                     await FamiliesDatabase().delete(familyProfil["id"]);
 
                     var familyProfils = Hive.box('secureBox').get("familyProfils");
                     familyProfils.removeWhere((item) => item["id"] == familyProfil["id"]);
 
-                    if (context.mounted) Navigator.pop(context);
-
                     setState(() {
                       familyProfil = null;
                       familyProfilIsActive = false;
                     });
-
                   },
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
                 )
-              ],
-              children: [
-                Center(
-                    child: Text(
-                        AppLocalizations.of(context)!.familyProfilWirklichLoeschen))
+
               ],
             );
           });

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -82,26 +83,12 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     moreLines: 7, textInputAction: TextInputAction.newline),
                 const SizedBox(height: 5),
                 imageUploadBox,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                        child: Text(
-                          AppLocalizations.of(context)!.speichern,
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        onPressed: () => saveNewInformation(
-                            title: titleTextKontroller.text,
-                            inhalt: informationTextKontroller.text,
-                            images: imageUploadBox.getImages())),
-                    TextButton(
-                      child: Text(
-                        AppLocalizations.of(context)!.abbrechen,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.speichern,
+                  onConfirm: () => saveNewInformation(
+                      title: titleTextKontroller.text,
+                      inhalt: informationTextKontroller.text,
+                      images: imageUploadBox.getImages()),
                 ),
                 const SizedBox(height: 20)
               ]);
@@ -286,28 +273,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     const SizedBox(height: 5),
                     imageUploadBox,
                     const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          child: Text(
-                            AppLocalizations.of(context)!.speichern,
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          onPressed: () => changeInsiderInformation(
-                              id: information["id"],
-                              newTitle: titleTextKontroller.text,
-                              images: imageUploadBox.getImages(),
-                              newInformation: informationTextKontroller.text),
-                        ),
-                        TextButton(
-                          child: Text(
-                            AppLocalizations.of(context)!.abbrechen,
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        )
-                      ],
+                    WindowConfirmCancelBar(
+                      confirmTitle: AppLocalizations.of(context)!.speichern,
+                      onConfirm: () => changeInsiderInformation(
+                          id: information["id"],
+                          newTitle: titleTextKontroller.text,
+                          images: imageUploadBox.getImages(),
+                          newInformation: informationTextKontroller.text),
                     ),
                     const SizedBox(height: 20)
                   ]);
@@ -428,10 +400,13 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.informationLoeschen,
                 height: 100,
-                actions: [
-                  TextButton(
-                    child: const Text("Ok"),
-                    onPressed: () {
+                children: [
+                  const SizedBox(height: 10),
+                  Center(
+                      child: Text(AppLocalizations.of(context)!
+                          .informationWirklichLoeschen)),
+                  WindowConfirmCancelBar(
+                    onConfirm: () {
                       StadtinfoUserDatabase().delete(information["id"]);
 
                       var secureBox = Hive.box("secureBox");
@@ -445,17 +420,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
                       Navigator.pop(context);
                     },
-                  ),
-                  TextButton(
-                    child: Text(AppLocalizations.of(context)!.abbrechen),
-                    onPressed: () => Navigator.pop(context),
                   )
-                ],
-                children: [
-                  const SizedBox(height: 10),
-                  Center(
-                      child: Text(AppLocalizations.of(context)!
-                          .informationWirklichLoeschen))
                 ],
               );
             }));

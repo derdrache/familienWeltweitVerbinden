@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:curved_text/curved_text.dart';
+import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -404,21 +405,15 @@ class _AppBarState extends State<_AppBar> {
                   ? AppLocalizations.of(context)!.freundHinzufuegen
                   : AppLocalizations.of(context)!.freundEntfernen,
               height: 120,
-              actions: [
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.hinzufuegen),
-                  onPressed: () => changeFriendStatus(isFriend),
-                ),
-                TextButton(
-                  child: Text(AppLocalizations.of(context)!.abbrechen),
-                  onPressed: () => Navigator.pop(context),
-                )
-              ],
               children: [
                 Center(
                     child: Text(isFriend
                         ? "${AppLocalizations.of(context)!.freundEntfernen1} $_userName ${AppLocalizations.of(context)!.freundEntfernen2}"
-                        : "${AppLocalizations.of(context)!.freundHinzufuegen1} $_userName ${AppLocalizations.of(context)!.freundHinzufuegen2}"))
+                        : "${AppLocalizations.of(context)!.freundHinzufuegen1} $_userName ${AppLocalizations.of(context)!.freundHinzufuegen2}")),
+                WindowConfirmCancelBar(
+                  confirmTitle: AppLocalizations.of(context)!.hinzufuegen,
+                  onConfirm: () => changeFriendStatus(isFriend),
+                )
               ],
             );
           });
@@ -718,7 +713,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
           children: [
             Text(
               "${AppLocalizations.of(context)!.aktuelleOrt}: ",
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: style.textSize,
                   fontWeight: FontWeight.bold,
                   decoration: TextDecoration.underline),
@@ -726,7 +721,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             Flexible(
                 child: Text(
               widget.profil["ort"],
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: style.textSize,
                   decoration: TextDecoration.underline),
               maxLines: 2,
@@ -748,9 +743,9 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
 
       return Row(children: [
         Text(themaText,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: style.textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: const TextStyle(fontSize: style.textSize))
+        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
       ]);
     }
 
@@ -783,13 +778,13 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
         child: Row(children: [
           Text(
             "${AppLocalizations.of(context)!.besuchteLaender}: ",
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: style.textSize,
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.underline),
           ),
           Text(translatedList.length.toString(),
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: style.textSize,
                   decoration: TextDecoration.underline))
         ]),
@@ -834,9 +829,9 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
 
       return Row(children: [
         Text(themenText,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: style.textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: const TextStyle(fontSize: style.textSize))
+        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
       ]);
     }
 
@@ -875,9 +870,9 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
 
       return Row(children: [
         Text(themenText,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: style.textSize, fontWeight: FontWeight.bold)),
-        Text(inhaltText, style: const TextStyle(fontSize: style.textSize))
+        Text(inhaltText, style: TextStyle(fontSize: style.textSize))
       ]);
     }
 
@@ -896,10 +891,10 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
       return Row(
         children: [
           Text("${AppLocalizations.of(context)!.kinder}: ",
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: style.textSize, fontWeight: FontWeight.bold)),
           Text(childrenList.reversed.join(", "),
-              style: const TextStyle(fontSize: style.textSize))
+              style: TextStyle(fontSize: style.textSize))
         ],
       );
     }
@@ -955,9 +950,9 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
                   children: [
                     Text(
                         "${transformDateToText(reiseplan["von"], exact: exactTravelPlan)} - ${transformDateToText(reiseplan["bis"], exact: exactTravelPlan)} in ",
-                        style: const TextStyle(fontSize: style.textSize)),
+                        style: TextStyle(fontSize: style.textSize)),
                     Text(ortText,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: style.textSize,
                             decoration: TextDecoration.underline))
                   ],
@@ -976,7 +971,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
             children: [
               Text(
                 "${AppLocalizations.of(context)!.reisePlanung}: ",
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: style.textSize, fontWeight: FontWeight.bold),
               ),
               if (isOwnProfil)
@@ -1071,7 +1066,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
 
       return _InfoBox(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text("Social Media: ",
+          Text("Social Media: ",
               style: TextStyle(
                   fontSize: style.textSize, fontWeight: FontWeight.bold)),
           ...socialMediaContent
@@ -1109,7 +1104,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
           children: [
             Text(
               themenText,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: style.textSize, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
@@ -1155,7 +1150,7 @@ class _UserInformationDisplayState extends State<_UserInformationDisplay> {
               children: [
                 Text(
                   AppLocalizations.of(context)!.ueberMich,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: style.textSize, fontWeight: FontWeight.bold),
                 ),
                 const Expanded(child: SizedBox.shrink()),
