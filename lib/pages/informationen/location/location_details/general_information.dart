@@ -58,7 +58,8 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   }
 
   showFamilyVisitWindow(list) {
-    List<Widget> familiesList = [];
+    List<Widget> familiesListActive = [];
+    List<Widget> familiesListInacitve = [];
 
     for (var family in list) {
       var profil = getProfilFromHive(profilId: family);
@@ -66,7 +67,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
       if (profil == null) continue;
 
-      familiesList.add(InkWell(
+      Widget profilRow = InkWell(
         onTap: () =>
             global_func.changePage(context, ShowProfilPage(profil: profil)),
         child: Container(
@@ -84,8 +85,16 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
                   )
               ],
             )),
-      ));
+      );
+
+      if (isInactive) {
+        familiesListInacitve.add(profilRow);
+      } else {
+        familiesListActive.add(profilRow);
+      }
     }
+
+    List<Widget> familiesList = familiesListActive + familiesListInacitve;
 
     if (familiesList.isEmpty) {
       familiesList.add(Container(
@@ -274,6 +283,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       List visitFamilies = List.of(widget.location["familien"]);
       visitFamilies.remove(userId);
       int anzahlFamilien = visitFamilies.length;
+
 
       return Row(
         children: [
