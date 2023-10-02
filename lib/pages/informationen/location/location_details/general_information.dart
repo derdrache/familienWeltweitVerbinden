@@ -237,7 +237,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
     displayContainer({child, margin}){
       return Container(
-          margin: const EdgeInsets.only(top: 5, bottom: 5),
+          margin: const EdgeInsets.only(top: 10, bottom: 10),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
@@ -420,7 +420,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: getLocationImageWidget(),
-                fit: BoxFit.fill,
+                fit:  isCity ? BoxFit.fill : null,
               ),
             ),
             child: Column(
