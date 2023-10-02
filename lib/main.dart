@@ -24,7 +24,7 @@ import 'pages/login_register_page/login_page.dart';
 import 'services/database.dart';
 import 'services/local_notification.dart';
 import 'auth/secrets.dart';
-import 'themes/dark_theme.dart';
+
 import 'themes/light_theme.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -335,7 +335,6 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
               title: "families worldwide",
               theme: lightTheme,
-              darkTheme: darkTheme,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: const [
                 Locale('en', ''),

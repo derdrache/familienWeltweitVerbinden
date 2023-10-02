@@ -45,9 +45,7 @@ class CustomTextInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<TextInputFormatter>? inputFormater;
-    borderColor ??= Theme.of(context).brightness == Brightness.dark
-          ? Colors.white
-          : Colors.black;
+    borderColor ??= Colors.black;
 
     if(onlyNumbers){
       keyboardType = TextInputType.number;

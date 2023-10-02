@@ -50,16 +50,12 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
         maxHeight: 70.0,
       ),
       decoration: BoxDecoration(
-          border: Border.all(width: 1, color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black),
+          border: Border.all(width: 1, color: Colors.black),
           borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners))
       ),
       child: DropdownButtonFormField<String>(
         isExpanded: true,
-        icon: Icon(Icons.arrow_downward,color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : Colors.black),
+        icon: Icon(Icons.arrow_downward,color: Colors.black),
         value: widget.selected == "" ? null : widget.selected,
         hint: Text(widget.hintText, style: const TextStyle(color: Colors.grey)),
         elevation: 16,

@@ -69,9 +69,7 @@ class _LocationCardState extends State<LocationCard> {
               child: Container(
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey.withOpacity(0.7)
-                    : Colors.white.withOpacity(0.7),
+                color: Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(20)),
             child: Text(
               widget.location["ort"],
@@ -135,7 +133,7 @@ class _LocationCardState extends State<LocationCard> {
             context,
             LocationInformationPage(
                 ortName: widget.location["ort"],
-                ortLatt: widget.location["latt"],
+                ortLatt: widget.location["latt"] + 0.0,
                 fromCityPage: widget.fromCityPage));
       } ,
       child: isCity ? cityLayout() : countryLayout(),

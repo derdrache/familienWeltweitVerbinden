@@ -49,17 +49,13 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
       width: style.webWidth,
       margin: widget.margin ?? const EdgeInsets.all(style.sideSpace),
       decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black),
+          border: Border.all(color: Colors.black),
           borderRadius: BorderRadius.circular(style.roundedCorners)
       ),
       child: MultiSelectDialogField(
         decoration: const BoxDecoration(),
         initialValue: widget.selected!,
-        buttonIcon: Icon(Icons.arrow_downward, color: Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : Colors.black),
+        buttonIcon: Icon(Icons.arrow_downward, color: Colors.black),
         items: widget.auswahlList.map((e) => MultiSelectItem(e, e)).toList(),
         listType: MultiSelectListType.LIST,
         searchable: true,

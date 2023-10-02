@@ -40,7 +40,7 @@ class CustomCard extends StatelessWidget {
                   height: height ?? 225 * sizeRefactor,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20.0),
-                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
                             color: Colors.grey.withOpacity(.5),

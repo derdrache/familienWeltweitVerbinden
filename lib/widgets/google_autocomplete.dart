@@ -117,9 +117,7 @@ class _GoogleAutoCompleteState extends State<GoogleAutoComplete> {
 
   @override
   Widget build(BuildContext context) {
-    widget.borderColor ??= Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+    widget.borderColor ??= Colors.black;
 
     return Container(
       margin: widget.margin,

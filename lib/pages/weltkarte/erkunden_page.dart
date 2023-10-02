@@ -1073,9 +1073,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
         child: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.black
-                    : Colors.white,
+                color: Colors.white,
                 border: Border(
                     bottom:
                         BorderSide(width: 1, color: style.borderColorGrey))),
@@ -1124,9 +1122,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           decoration: BoxDecoration(
               border: Border.all(
                   width: 2,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black),
+                  color: Colors.black),
               borderRadius: BorderRadius.circular(style.roundedCorners)),
           child: Column(
             children: [
@@ -1196,9 +1192,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           builder: (context) {
             return Container(
               decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : Colors.white,
+                  color: Colors.white,
                   border: Border.all(),
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
@@ -1509,35 +1503,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
           TileLayer(
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               userAgentPackageName: 'com.example.app',
-              backgroundColor: Colors.transparent,
-              tileBuilder: Theme.of(context).brightness == Brightness.dark
-                  ? (BuildContext context, Widget tileWidget, tile) {
-                      return ColorFiltered(
-                          colorFilter: const ColorFilter.matrix(<double>[
-                            0.2126,
-                            0.7152,
-                            0.0722,
-                            0,
-                            0,
-                            0.2126,
-                            0.7152,
-                            0.0722,
-                            0,
-                            0,
-                            0.2126,
-                            0.7152,
-                            0.0722,
-                            0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            1,
-                            0,
-                          ]),
-                          child: tileWidget);
-                    }
-                  : null),
+              backgroundColor: Colors.transparent),
           MarkerLayer(
             markers: allMarker,
           )

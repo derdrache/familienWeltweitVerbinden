@@ -317,9 +317,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
         width: widget.multiDate ? 160 : 80,
         height: 50,
         decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black),
+            border: Border.all(color: Colors.black),
             borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners))),
         child: Center(
             child: Text(
@@ -328,7 +326,7 @@ class _FlexibleDatePickerState extends State<FlexibleDatePicker> {
           style: TextStyle(
               fontWeight: widget.selectedDate == null? null :FontWeight.bold,
               fontSize: 14,
-              color: widget.selectedDate == null  || Theme.of(context).brightness == Brightness.dark
+              color: widget.selectedDate == null
                   ? Colors.grey
                   : Colors.black),
         )),

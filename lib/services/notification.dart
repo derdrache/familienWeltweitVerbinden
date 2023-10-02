@@ -9,7 +9,6 @@ import 'database.dart';
 
 
 sendNotification(notificationInformation, {isGroupNotification = false}) async {
-  return;
   var userId = FirebaseAuth.instance.currentUser?.uid;
   var groupLists = [];
 

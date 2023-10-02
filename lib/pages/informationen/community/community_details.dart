@@ -1068,9 +1068,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           child: SizedBox(
               child: TextWithHyperlinkDetection(
             text: discription.isNotEmpty ? discription : widget.community["beschreibung"],
-            textColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
+            textColor: Colors.black,
             withoutActiveHyperLink: isCreator,
             onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
           )),
@@ -1117,7 +1115,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
 
     return SelectionArea(
       child: Scaffold(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
+        backgroundColor: Colors.white,
           appBar: CustomAppBar(
             title: "",
             buttons: [
@@ -1150,7 +1148,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 width: 600,
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white,
+                    color: Colors.white,
                   borderRadius: BorderRadius.circular(20)
                 ),
                 child: Card(

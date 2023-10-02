@@ -537,9 +537,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                       decoration: BoxDecoration(
                           borderRadius:
                               const BorderRadius.all(Radius.circular(20)),
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white70
-                              : Colors.white,
+                          color: Colors.white,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.5),
@@ -900,9 +898,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                 margin: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.grey
-                        : Colors.white,
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: cardShadowColor().withOpacity(0.6),

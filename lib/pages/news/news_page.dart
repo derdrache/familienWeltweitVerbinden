@@ -392,9 +392,7 @@ class _NewsPageState extends State<NewsPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black
-                          : Colors.white,
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -495,9 +493,7 @@ class _NewsPageState extends State<NewsPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black
-                          : Colors.white,
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -590,9 +586,7 @@ class _NewsPageState extends State<NewsPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black
-                          : Colors.white,
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -746,9 +740,7 @@ class _NewsPageState extends State<NewsPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black
-                          : Colors.white,
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -818,9 +810,7 @@ class _NewsPageState extends State<NewsPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(style.roundedCorners),
                       border: Border.all(),
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.black
-                          : Colors.white,
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.5),
@@ -883,9 +873,7 @@ class _NewsPageState extends State<NewsPage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(style.roundedCorners),
                   border: Border.all(),
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : Colors.white,
+                  color: Colors.white,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.5),

@@ -573,6 +573,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       String creatorName = creatorProfil == null ? "" : creatorProfil["name"];
       List informationImages = information["images"];
 
+
       return Container(
         margin: const EdgeInsets.only(top: 20, bottom: 70, right: 5, left: 5),
         width: 800,
@@ -700,7 +701,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ),
                     Expanded(
                         child: Center(
-                          child: widget.location["erstelltVon"] != userId
+                          child: information["erstelltVon"] != userId
                               ? TextButton(
                               style: TextButton.styleFrom(
                                 shape: const StadiumBorder(),

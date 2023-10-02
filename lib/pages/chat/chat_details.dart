@@ -1123,9 +1123,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               border: Border(
                   top: const BorderSide(color: Colors.grey),
                   bottom: BorderSide(color: Colors.grey.withOpacity(0.3))),
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black
-                  : Colors.white,
+              color: Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.5),
@@ -1451,8 +1449,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         child: AnimatedContainer(
           color: highlightMessages.contains(index)
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).brightness == Brightness.dark
-              ? Colors.black
               : Colors.white,
           duration: const Duration(seconds: 1),
           curve: Curves.easeIn,
@@ -2322,9 +2318,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
               minHeight: 60,
             ),
             decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.green
-                    : Colors.green,boxShadow: [
+                color: Colors.green,boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 5,
@@ -2342,9 +2336,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           constraints: const BoxConstraints(
               minHeight: 60, maxHeight: 200),
           decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black
-                  : Colors.white,
+              color: Colors.white,
               border: extraInputInformationBox.runtimeType == SizedBox
                   ? const Border(top: BorderSide(color: Colors.grey))
                   : null,
