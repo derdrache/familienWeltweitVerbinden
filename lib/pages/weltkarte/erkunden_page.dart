@@ -144,8 +144,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
 
   setInsiderInfo() {
     for (var info in List.of(Hive.box('secureBox').get("stadtinfoUser"))) {
-      Map insiderInfoData = getCityFromHive(cityName: info["ort"], latt: info["latt"]) ?? {};
-
+      Map insiderInfoData = getCityFromHive(cityId: info["locationId"]) ?? {};
       info["latt"] = insiderInfoData["latt"];
       info["longt"] = insiderInfoData["longt"];
       info["land"] = insiderInfoData["land"];
@@ -153,9 +152,11 @@ class _ErkundenPageState extends State<ErkundenPage> {
       if (info["latt"] == null) {
         continue;
       } else {
+
         insiderInfos.add(info);
       }
     }
+
   }
 
   changeAllCitiesAndCreateCityNames() {
