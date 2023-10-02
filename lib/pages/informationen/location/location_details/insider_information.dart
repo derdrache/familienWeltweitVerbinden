@@ -116,6 +116,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
 
     var newUserInformation = {
       "id": -1,
+      "locationId": widget.location["id"],
       "ort": widget.location["ort"],
       "sprache": "auto",
       "titleGer": title,
@@ -176,18 +177,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     allInformations.add(newUserInformation);
     secureBox.put("stadtinfoUser", allInformations);
 
-    newUserInformation["ort"] = newUserInformation["ort"].replaceAll("'", "''");
-    newUserInformation["titleGer"] =
-        newUserInformation["titleGer"].replaceAll("'", "''");
-    newUserInformation["informationGer"] =
-        newUserInformation["informationGer"].replaceAll("'", "''");
-    newUserInformation["titleEng"] =
-        newUserInformation["titleEng"].replaceAll("'", "''");
-    newUserInformation["informationEng"] =
-        newUserInformation["informationEng"].replaceAll("'", "''");
-    newUserInformation["images"] = jsonEncode(newUserInformation["images"]);
-
-    StadtinfoUserDatabase().addNewInformation(newUserInformation);
+    StadtinfoUserDatabase().addNewInformation(Map.of(newUserInformation));
   }
 
   setThumbUp(index) {
