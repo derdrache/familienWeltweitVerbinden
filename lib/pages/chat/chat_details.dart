@@ -245,9 +245,10 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       connectedData = {
         "name": location["ort"],
-        "latt": location["ort"],
+        "latt": location["latt"],
         "bild": iscity ? cityImage : countryImage
       };
+
       pageDetailsPage = LocationInformationPage(ortName: connectedData["name"], ortLatt: connectedData["latt"],);
     } else if (widget.groupChatData!["connected"].contains("world")) {
       connectedData = {
