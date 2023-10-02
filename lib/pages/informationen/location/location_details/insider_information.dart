@@ -76,11 +76,11 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
               AppLocalizations.of(context)!.insiderInformationHinzufuegen,
               children: [
                 CustomTextInput(
-                    AppLocalizations.of(context)!.titel, titleTextKontroller),
+                    AppLocalizations.of(context)!.titel, titleTextKontroller, hintText: AppLocalizations.of(context)!.titelEingeben,),
                 const SizedBox(height: 10),
                 CustomTextInput(AppLocalizations.of(context)!.beschreibung,
                     informationTextKontroller,
-                    moreLines: 7, textInputAction: TextInputAction.newline),
+                    moreLines: 7, textInputAction: TextInputAction.newline, hintText: AppLocalizations.of(context)!.beschreibungEingeben,),
                 const SizedBox(height: 5),
                 imageUploadBox,
                 WindowConfirmCancelBar(
