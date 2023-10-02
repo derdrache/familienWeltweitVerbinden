@@ -1917,7 +1917,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                 width: 600,
                 child: Column(children: [
                   const SizedBox(height: 10),
-                  if (widget.chatId != "1")
+                  if (widget.chatId != "1" && widget.chatId != "8")
                     Container(
                       width: 100,
                       height: 40,
