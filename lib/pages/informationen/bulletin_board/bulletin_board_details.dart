@@ -359,6 +359,23 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       );
     }
 
+    bottomBar(){
+      return Center(
+        child: Container(
+          margin: EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              InkWell(onTap: () => changePage(
+                  context,
+                  ShowProfilPage(
+                      profil: creatorProfil!)), child: Text(creatorProfil!["name"] ?? "", style: TextStyle(color: Theme.of(context).colorScheme.secondary),))
+            ],
+          ),
+        ),
+      );
+    }
+
     deleteWindow() {
       showDialog(
           context: context,
@@ -393,15 +410,6 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 onPressed: () => changeNoteLanguage(),
                 tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
                 icon: const Icon(Icons.change_circle)),
-          if (!isNoteOwner && creatorProfil != null)
-            IconButton(
-                onPressed: () => changePage(
-                    context,
-                    ShowProfilPage(
-                        profil: creatorProfil!)),
-                tooltip:
-                    AppLocalizations.of(context)!.tooltipZeigeProfilErsteller,
-                icon: const Icon(Icons.account_circle)),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
@@ -453,7 +461,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             showLocation(),
             showDescription(),
             const SizedBox(height: 30),
-            showImages()
+            showImages(),
+            bottomBar()
           ],
         ),
       ),
