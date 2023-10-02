@@ -71,7 +71,7 @@ class CustomTextInput extends StatelessWidget {
                   maxLines: moreLines,
                   obscureText: hideInput,
                   controller: controller,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     counterStyle: TextStyle(color: maxLengthColor),
                     hintMaxLines: moreLines,
