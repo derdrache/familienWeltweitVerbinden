@@ -943,6 +943,17 @@ class StadtInfoRatingDatabase{
 
 class StadtinfoUserDatabase {
   addNewInformation(stadtinformation) async {
+    stadtinformation["ort"] = stadtinformation["ort"].replaceAll("'", "''");
+    stadtinformation["titleGer"] =
+        stadtinformation["titleGer"].replaceAll("'", "''");
+    stadtinformation["informationGer"] =
+        stadtinformation["informationGer"].replaceAll("'", "''");
+    stadtinformation["titleEng"] =
+        stadtinformation["titleEng"].replaceAll("'", "''");
+    stadtinformation["informationEng"] =
+        stadtinformation["informationEng"].replaceAll("'", "''");
+    stadtinformation["images"] = jsonEncode(stadtinformation["images"]);
+
     var url =
         Uri.parse(databaseUrl + databasePathNewCityInformation);
 
@@ -1589,7 +1600,7 @@ getCityFromHive({latt,  cityId, cityName, getName = false}) {
   cityName ??= "XXXXXX";
 
   for (var location in locations) {
-    if (location["id"].toString() == cityId ||
+    if (location["id"].toString() == cityId  || location["id"] == cityId ||
         (location["ort"].contains(cityName) && latt == location["latt"])) {
 
       if (getName) {
