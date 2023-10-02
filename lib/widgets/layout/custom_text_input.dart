@@ -51,7 +51,7 @@ class CustomTextInput extends StatelessWidget {
       keyboardType = TextInputType.number;
       inputFormater = [FilteringTextInputFormatter.digitsOnly];
     }
-    print(textInputAction);
+
     return Stack(
         children: [
           Align(
@@ -85,7 +85,7 @@ class CustomTextInput extends StatelessWidget {
                     ),
                     alignLabelWithHint: true,
                     floatingLabelBehavior: hintText==null ? FloatingLabelBehavior.auto : FloatingLabelBehavior.always,
-                    hintText: hintText,
+                    hintText: hintText ?? text,
                     labelText: hintText,
                     labelStyle: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
