@@ -47,7 +47,7 @@ class _LocationInformationPageState extends State<LocationInformationPage> {
 
   @override
   void initState() {
-    _selectNavigationIndex = widget.insiderInfoId != null ? 1 : 0;
+    _selectNavigationIndex = widget.insiderInfoId != null ? 2 : 0;
     location = getCityFromHive(cityName: widget.ortName, latt: widget.ortLatt);
 
     usersCityInformation = getCityUserInfoFromHive(widget.ortName);
