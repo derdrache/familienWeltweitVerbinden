@@ -385,6 +385,11 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
 
     showWeather() {
+
+      if(widget.location["wetter"] == null){
+        return const SizedBox.shrink();
+      }
+
       return displayContainer(
         child: Row(
           mainAxisSize: MainAxisSize.min,
