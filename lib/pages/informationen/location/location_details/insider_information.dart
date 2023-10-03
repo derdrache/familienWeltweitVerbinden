@@ -15,6 +15,7 @@ import '../../../../global/global_functions.dart' as global_func;
 import '../../../../global/style.dart' as style;
 import '../../../../functions/user_speaks_german.dart';
 import '../../../../services/database.dart';
+import '../../../../widgets/automatic_translation_notice.dart';
 import '../../../../widgets/image_upload_box.dart';
 import '../../../../widgets/layout/custom_snackbar.dart';
 import '../../../../widgets/layout/custom_text_input.dart';
@@ -611,20 +612,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                   ),
                 ),
               ),
-              if (translated)
-                Padding(
-                  padding: const EdgeInsets.only(right: 5, top: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.automatischeUebersetzung,
-                        style:
-                        const TextStyle(color: Colors.grey, fontSize: 12),
-                      )
-                    ],
-                  ),
-                ),
+              AutomaticTranslationNotice(translated: translated),
               const Expanded(
                 child: SizedBox.shrink(),
               ),
