@@ -1112,7 +1112,7 @@ class _ErkundenPageState extends State<ErkundenPage> {
               context,
               LocationInformationPage(
                 ortName: infoData["ort"],
-                ortLatt: infoData["latt"],
+                ortLatt: infoData["latt"] + 0.0,
                 insiderInfoId: infoData["id"],
               ));
         },
