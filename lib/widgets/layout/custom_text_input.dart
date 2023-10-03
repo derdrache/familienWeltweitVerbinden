@@ -20,6 +20,7 @@ class CustomTextInput extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   Color? borderColor;
   Color? maxLengthColor;
+  final String? labelText;
 
 
   CustomTextInput(
@@ -39,7 +40,8 @@ class CustomTextInput extends StatelessWidget {
         this.onlyNumbers = false,
         this.margin,
         this.borderColor,
-        this.maxLengthColor
+        this.maxLengthColor,
+        this.labelText
   });
 
   @override
@@ -86,7 +88,7 @@ class CustomTextInput extends StatelessWidget {
                     alignLabelWithHint: true,
                     floatingLabelBehavior: hintText==null ? FloatingLabelBehavior.auto : FloatingLabelBehavior.always,
                     hintText: hintText ?? text,
-                    labelText: hintText,
+                    labelText: labelText ?? hintText,
                     labelStyle: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   maxLength: maxLength,
