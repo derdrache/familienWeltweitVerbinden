@@ -46,6 +46,7 @@ class FeedbackPage extends StatelessWidget {
                   feedbackTextKontroller.text, feedbackTextKontroller,
                   moreLines: 10,
                   hintText: AppLocalizations.of(context)!.feedbackText,
+                  labelText: "Feedback",
                   validator: checkValidatorEmpty(context)),
             ),
             Align(
