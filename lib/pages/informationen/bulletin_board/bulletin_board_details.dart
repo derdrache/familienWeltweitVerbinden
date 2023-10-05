@@ -10,8 +10,8 @@ import '../../../functions/translation.dart';
 import '../../../functions/upload_and_save_image.dart';
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart';
-import '../../../global/variablen.dart';
 import '../../../services/database.dart';
+import '../../../widgets/automatic_translation_notice.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
@@ -66,14 +66,12 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       originalText["title"] = widget.note["titleGer"];
       originalText["description"] = widget.note["beschreibungGer"];
       translatedText["title"] = widget.note["titleEng"];
-      translatedText["description"] = widget.note["beschreibungEng"]
-          + automaticTranslationEng;
+      translatedText["description"] = widget.note["beschreibungEng"];
     } else {
       originalText["title"] = widget.note["titleEng"];
       originalText["description"] = widget.note["beschreibungEng"];
       translatedText["title"] = widget.note["titleGer"];
-      translatedText["description"] = widget.note["beschreibungGer"]
-          + automaticTranslationGer;
+      translatedText["description"] = widget.note["beschreibungGer"];
     }
   }
 
@@ -460,6 +458,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             showTitle(),
             showLocation(),
             showDescription(),
+            AutomaticTranslationNotice(translated: !showOnlyOriginal,),
             const SizedBox(height: 30),
             showImages(),
             bottomBar()

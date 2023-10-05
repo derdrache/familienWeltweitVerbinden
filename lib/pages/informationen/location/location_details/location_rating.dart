@@ -4,8 +4,8 @@ import 'package:translator/translator.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../functions/user_speaks_german.dart';
-import '../../../../global/variablen.dart';
 import '../../../../services/database.dart';
+import '../../../../widgets/automatic_translation_notice.dart';
 import '../../../../widgets/layout/custom_snackbar.dart';
 import '../../../../widgets/layout/custom_text_input.dart';
 import '../../../../windows/dialog_window.dart';
@@ -245,6 +245,7 @@ class _LocationRatingState extends State<LocationRating> {
         String comment = "";
         String originalComment = "";
         String translatedComment = "";
+        bool translated = false;
 
         bool commentIsGerman = comments[i]["sprache"] == "de";
         bool commentGerAndUserGer = commentIsGerman && userSpeakGerman;
@@ -256,15 +257,16 @@ class _LocationRatingState extends State<LocationRating> {
 
         if (commentIsGerman) {
           originalComment = comments[i]["commentGer"];
-          translatedComment = comments[i]["commentEng"] + automaticTranslationEng;
+          translatedComment = comments[i]["commentEng"];
         } else {
           originalComment = comments[i]["commentEng"];
-          translatedComment = comments[i]["commentGer"] + automaticTranslationGer;
+          translatedComment = comments[i]["commentGer"];
         }
 
         if (showOriginalComment[i] || comments[i]["userId"] == ownUserId) {
           comment = originalComment;
         } else {
+          translated = true;
           comment = translatedComment;
         }
 
@@ -307,6 +309,7 @@ class _LocationRatingState extends State<LocationRating> {
                 height: 10,
               ),
               Text(comment),
+              AutomaticTranslationNotice(translated: translated, padding: EdgeInsets.all(10),),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
