@@ -1,8 +1,6 @@
 import 'package:translator/translator.dart';
 
-import '../global/variablen.dart';
-
-translation(text, {withTranslationNotice = false}) async{
+translation(text) async{
   final translator = GoogleTranslator();
   var languageCheck = await translator.translate(text);
   bool isGerman = languageCheck.sourceLanguage.code == "de";
@@ -14,7 +12,6 @@ translation(text, {withTranslationNotice = false}) async{
         from: "de", to: "auto");
 
     textEng = textTranslation.toString();
-    if(withTranslationNotice) textEng += automaticTranslationEng;
     textGer = text;
   } else {
     var textTranslation = await translator.translate(text,
@@ -22,7 +19,6 @@ translation(text, {withTranslationNotice = false}) async{
 
     textEng = text;
     textGer = textTranslation.toString();
-    if(withTranslationNotice) textGer += automaticTranslationGer;
   }
 
   return{
