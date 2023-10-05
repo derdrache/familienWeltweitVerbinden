@@ -16,6 +16,7 @@ import '../../../functions/user_speaks_german.dart';
 import '../../../global/variablen.dart';
 import '../../../services/database.dart';
 import '../../../services/notification.dart';
+import '../../../widgets/automatic_translation_notice.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../windows/custom_popup_menu.dart';
 import '../../../windows/dialog_window.dart';
@@ -521,12 +522,12 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       widget.community["beschreibung"] = newBeschreibung;
       widget.community["beschreibungGer"] = newBeschreibung;
       var translation = await _descriptionTranslation(newBeschreibung, "auto");
-      widget.community["beschreibungEng"] = translation + automaticTranslationEng;
+      widget.community["beschreibungEng"] = translation;
     } else {
       widget.community["beschreibung"] = newBeschreibung;
       widget.community["beschreibungEng"] = newBeschreibung;
       var translation = await _descriptionTranslation(newBeschreibung, "de");
-      widget.community["beschreibungGer"] = translation + automaticTranslationGer;
+      widget.community["beschreibungGer"] = translation;
     }
 
     newBeschreibung = newBeschreibung.replaceAll("'", "''");
@@ -976,6 +977,8 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       }
       bool isWorldwide = widget.community["ort"] == "worldwide"
           || widget.community["ort"]== "Weltweit";
+      bool communityIsGerman = widget.community["sprache"] == "de";
+      bool showOriginal = (communityIsGerman && userSpeakGerman) || (!communityIsGerman && !userSpeakGerman);
 
       if (isCreator) {
         title = widget.community["name"];
@@ -1066,12 +1069,17 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SizedBox(
-              child: TextWithHyperlinkDetection(
+              child: Column(
+                children: [
+                  TextWithHyperlinkDetection(
             text: discription.isNotEmpty ? discription : widget.community["beschreibung"],
             textColor: Colors.black,
             withoutActiveHyperLink: isCreator,
             onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
-          )),
+          ),
+                  AutomaticTranslationNotice(translated: !showOriginal,)
+                ],
+              )),
         )
       ];
     }

@@ -15,6 +15,7 @@ import '../../../global/global_functions.dart' as global_func;
 import '../../../global/profil_sprachen.dart';
 import '../../../global/variablen.dart';
 import '../../../services/notification.dart';
+import '../../../widgets/automatic_translation_notice.dart';
 import '../../../widgets/layout/ownIconButton.dart';
 import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
@@ -258,11 +259,11 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     if (descriptionIsGerman) {
       meetupData["beschreibungGer"] = newBeschreibung;
       var translation = await descriptionTranslation(newBeschreibung, "auto");
-      meetupData["beschreibungEng"] = translation + automaticTranslationEng;
+      meetupData["beschreibungEng"] = translation;
     } else {
       meetupData["beschreibungEng"] = newBeschreibung;
       var translation = await descriptionTranslation(newBeschreibung, "de");
-      meetupData["beschreibungGer"] = translation + automaticTranslationGer;
+      meetupData["beschreibungGer"] = translation;
     }
 
     String beschreibung = meetupData["beschreibung"].replaceAll("'", "''");
@@ -686,7 +687,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     meetupBeschreibung() {
-      var discription = "";
+      bool meetupIsGerman = widget.meetupData["originalSprache"] == "de";
+      bool showOriginal = (meetupIsGerman && userSpeakGerman) || (!meetupIsGerman && !userSpeakGerman);
+      String discription = "";
 
       if (widget.isCreator) {
         discription = widget.meetupData["beschreibung"];
@@ -705,24 +708,29 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                   constraints: const BoxConstraints(
                     minHeight: 50.0,
                   ),
-                  child: TextWithHyperlinkDetection(
-                      text: discription.isNotEmpty
-                          ? discription
-                          : widget.meetupData["beschreibung"],
-                      withoutActiveHyperLink: widget.isCreator,
-                      onTextTab: widget.isCreator
-                          ? () => openChangeWindow(
-                              AppLocalizations.of(context)!
-                                  .meetupBeschreibungAendern,
-                              CustomTextInput(
+                  child: Column(
+                    children: [
+                      TextWithHyperlinkDetection(
+                          text: discription.isNotEmpty
+                              ? discription
+                              : widget.meetupData["beschreibung"],
+                          withoutActiveHyperLink: widget.isCreator,
+                          onTextTab: widget.isCreator
+                              ? () => openChangeWindow(
                                   AppLocalizations.of(context)!
-                                      .neueBeschreibungEingeben,
-                                  beschreibungInputKontroller,
-                                  moreLines: 8,
-                                  textInputAction: TextInputAction.newline),
-                              checkAndSaveNewBeschreibung,
-                              height: 350)
-                          : null))));
+                                      .meetupBeschreibungAendern,
+                                  CustomTextInput(
+                                      AppLocalizations.of(context)!
+                                          .neueBeschreibungEingeben,
+                                      beschreibungInputKontroller,
+                                      moreLines: 8,
+                                      textInputAction: TextInputAction.newline),
+                                  checkAndSaveNewBeschreibung,
+                                  height: 350)
+                              : null),
+                      AutomaticTranslationNotice(translated: !showOriginal,),
+                    ],
+                  ))));
     }
 
     cardShadowColor() {

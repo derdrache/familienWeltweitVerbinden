@@ -180,14 +180,12 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
       meetup["nameEng"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungGer"] = meetup["beschreibung"];
       meetup["beschreibungEng"] = await descriptionTranslation(meetup["beschreibungGer"], "auto");
-      meetup["beschreibungEng"] += automaticTranslationEng;
     }else{
       meetup["nameEng"] = meetup["name"];
       meetup["nameGer"] = await descriptionTranslation(meetup["name"], "auto");
       meetup["beschreibungEng"] = meetup["beschreibung"];
       meetup["beschreibungGer"] = await descriptionTranslation(
           meetup["beschreibungEng"] + "\n\n Hierbei handelt es sich um eine automatische Übersetzung","de");
-      meetup["beschreibungGer"] = meetup["beschreibungGer"] + automaticTranslationGer;
     }
 
 
