@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:math' as math;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/widgets/custom_like_button.dart';
 import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
@@ -13,7 +13,6 @@ import 'package:translator/translator.dart';
 
 import '../../../functions/upload_and_save_image.dart';
 import '../../../functions/user_speaks_german.dart';
-import '../../../global/variablen.dart';
 import '../../../services/database.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/automatic_translation_notice.dart';
@@ -961,7 +960,15 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               right: 5,
                 top: 5,
                 child: CustomLikeButton(communityData: widget.community,)
-            )
+            ),
+            if(isCreator) Positioned(
+                right: 0, top: 0,
+                child: Banner(
+                  message: AppLocalizations.of(context)!.besitzer,
+                  location: BannerLocation.topEnd,
+                    color: Theme.of(context).colorScheme.secondary
+                  
+                ))
           ],
         ));
     }

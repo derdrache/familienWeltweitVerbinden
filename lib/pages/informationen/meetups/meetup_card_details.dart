@@ -527,6 +527,14 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                 isCreator: widget.isCreator,
                 meetupData: widget.meetupData,
               ),
+              if(widget.isCreator) Positioned(
+                  right: 0, top: 0,
+                  child: Banner(
+                      message: AppLocalizations.of(context)!.besitzer,
+                      location: BannerLocation.topEnd,
+                      color: Theme.of(context).colorScheme.secondary
+
+                  ))
             ],
           ),
           Positioned.fill(
@@ -690,7 +698,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       bool meetupIsGerman = widget.meetupData["originalSprache"] == "de";
       bool showOriginal = (meetupIsGerman && userSpeakGerman) || (!meetupIsGerman && !userSpeakGerman);
       String discription = "";
-      bool isCreator = widget.meetupData["erstelltVon"].contains(userId);
 
       if (widget.isCreator) {
         discription = widget.meetupData["beschreibung"];
@@ -728,7 +735,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                                       textInputAction: TextInputAction.newline),
                                   checkAndSaveNewBeschreibung,)
                               : null),
-                      AutomaticTranslationNotice(translated: !showOriginal && !isCreator,),
+                      AutomaticTranslationNotice(translated: !showOriginal && !widget.isCreator,),
                     ],
                   ))));
     }
