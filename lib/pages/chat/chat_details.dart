@@ -1871,8 +1871,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     getMemberWidgetList() {
       List<Widget> memberList = [];
+      List familieMember = [];
+      List changedMemberList = [];
 
-      for(var participantProfil in chatParticipantProfils){
+      for(var profil in chatParticipantProfils){
+        if(familieMember.contains(profil["id"])) continue;
+
+        Map? familyProfil = getFamilyProfil(familyMember: profil["id"]);
+
+        if(familyProfil != null){
+          familieMember += familyProfil["members"];
+          Map mainProfil = Map.of(getProfilFromHive(profilId: familyProfil["mainProfil"]));
+          mainProfil["name"] = familyProfil["name"];
+          changedMemberList.add(mainProfil);
+        }else{
+          changedMemberList.add(profil);
+        }
+      }
+
+
+      for(var participantProfil in changedMemberList){
         memberList.add(GestureDetector(
           onTap: () => global_functions.changePage(
               context,
