@@ -981,6 +981,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
       bool showOriginal = (communityIsGerman && userSpeakGerman) || (!communityIsGerman && !userSpeakGerman);
 
       if (isCreator) {
+
         title = widget.community["name"];
         discription = widget.community["beschreibung"];
       } else if (userSpeakGerman) {
@@ -1077,7 +1078,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             withoutActiveHyperLink: isCreator,
             onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
           ),
-                  AutomaticTranslationNotice(translated: !showOriginal,)
+                  AutomaticTranslationNotice(translated: !showOriginal && !isCreator,)
                 ],
               )),
         )

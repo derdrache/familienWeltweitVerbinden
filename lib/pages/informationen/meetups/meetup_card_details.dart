@@ -690,6 +690,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       bool meetupIsGerman = widget.meetupData["originalSprache"] == "de";
       bool showOriginal = (meetupIsGerman && userSpeakGerman) || (!meetupIsGerman && !userSpeakGerman);
       String discription = "";
+      bool isCreator = widget.meetupData["erstelltVon"].contains(userId);
 
       if (widget.isCreator) {
         discription = widget.meetupData["beschreibung"];
@@ -725,10 +726,9 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                                       beschreibungInputKontroller,
                                       moreLines: 8,
                                       textInputAction: TextInputAction.newline),
-                                  checkAndSaveNewBeschreibung,
-                                  height: 350)
+                                  checkAndSaveNewBeschreibung,)
                               : null),
-                      AutomaticTranslationNotice(translated: !showOriginal,),
+                      AutomaticTranslationNotice(translated: !showOriginal && !isCreator,),
                     ],
                   ))));
     }
@@ -882,8 +882,10 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       if (meetupTags.isEmpty && widget.isCreator) {
         meetupTags.add(Container(
             margin: const EdgeInsets.all(10),
-            child: const Text("Hier klicken um Meetuplabel hinzuzufügen",
-                style: TextStyle(color: Colors.grey))));
+            child: Center(
+              child: Text(AppLocalizations.of(context)!.klickForLabel,
+                  style: TextStyle(color: Colors.grey)),
+            )));
       }
 
       return InkWell(
