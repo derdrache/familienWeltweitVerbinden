@@ -86,11 +86,14 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                 imageUploadBox,
                 WindowConfirmCancelBar(
                   confirmTitle: AppLocalizations.of(context)!.speichern,
-                  onConfirm: () => saveNewInformation(
+                  onConfirm:  (){
+                    saveNewInformation(
                       title: titleTextKontroller.text,
                       inhalt: informationTextKontroller.text,
-                      images: imageUploadBox.getImages()),
-                ),
+                      images: imageUploadBox.getImages()
+                    );
+
+                  }),
                 const SizedBox(height: 20)
               ]);
         });
@@ -115,7 +118,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       return;
     }
 
-    var newUserInformation = {
+    Map newUserInformation = {
       "id": -1,
       "locationId": widget.location["id"],
       "ort": widget.location["ort"],
@@ -138,8 +141,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     });
 
     carouselController.jumpToPage(usersCityInformation.length - 1);
-
-    Navigator.pop(context);
 
     var languageCheck = await translator.translate(inhalt);
     var languageCode = languageCheck.sourceLanguage.code;
