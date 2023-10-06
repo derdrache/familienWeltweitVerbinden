@@ -569,5 +569,6 @@
     "ortBesuchtBody2": "gewesen und nöchtest dich hinzufügen ?",
     "ortNichtBesuchtTitle": "Ort nicht besucht ?",
     "ortNichtBesuchtBody1": "Du wurdest ausversehen zu",
-    "ortNichtBesuchtBody2": "hinzugefügt und möchtest dich wieder entfernen ?"
+    "ortNichtBesuchtBody2": "hinzugefügt und möchtest dich wieder entfernen ?",
+    "klickForLabel": "Hier klicken um Meetuplabel hinzuzufügen"
 }
