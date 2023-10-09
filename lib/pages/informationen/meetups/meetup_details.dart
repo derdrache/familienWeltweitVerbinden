@@ -29,11 +29,13 @@ var userId = Hive.box("secureBox").get("ownProfil")["id"];
 class MeetupDetailsPage extends StatefulWidget {
   final Map meetupData;
   final bool fromMeetupPage;
+  final bool toMainPage;
 
   const MeetupDetailsPage({
     Key? key,
     required this.meetupData,
-    this.fromMeetupPage = false
+    this.fromMeetupPage = false,
+    this.toMainPage = false
   }):super(key: key);
 
   @override
@@ -759,7 +761,17 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
     return SelectionArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: "", buttons: [
+        appBar: CustomAppBar(title: "",
+            leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              if(widget.toMainPage){
+                global_func.changePage(context, const MeetupPage());
+              } else{
+                Navigator.of(context).pop();
+              }
+            }
+        ),buttons: [
           if (isCreator && isNotPublic)
             FutureBuilder(
                 future: MeetupDatabase().getData(

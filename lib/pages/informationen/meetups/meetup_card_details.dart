@@ -387,7 +387,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       if (!fremdesMeetup || widget.isCreator) return const SizedBox.shrink();
 
       return Container(
-        padding: const EdgeInsets.only(left: 10, right: 10),
+        padding: const EdgeInsets.all(10),
         width: screenWidth * 0.8,
         child: Text(AppLocalizations.of(context)!.nichtErstellerMeetup,
             textAlign: TextAlign.center,
@@ -1341,7 +1341,7 @@ class _CardFeetState extends State<CardFeet> {
             Expanded(
                 child: widget.moreContent
                     ? const Center(
-                        child: Icon(Icons.arrow_downward),
+                        child: Icon(Icons.arrow_downward, size: 18,),
                       )
                     : const SizedBox.shrink()),
             InkWell(

@@ -167,8 +167,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
     var meetups = Hive.box('secureBox').get("events") ?? [];
     meetups.add(meetupData);
 
-    Navigator.pop(context);
-    global_functions.changePage(context, MeetupDetailsPage(meetupData: meetupData));
+    return meetupData;
   }
 
   saveDB(meetup, locationData) async{
@@ -450,7 +449,11 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
           title: AppLocalizations.of(context)!.meetupErstellen,
           buttons: [
             IconButton(
-                onPressed: () => saveMeetup(),
+                onPressed: () {
+                  Map meetupData = saveMeetup();
+                  Navigator.pop(context);
+                  global_functions.changePage(context, MeetupDetailsPage(meetupData: meetupData, toMainPage: true,));
+                } ,
                 tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done, size: 30))
           ]),
