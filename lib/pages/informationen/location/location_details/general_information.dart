@@ -12,7 +12,6 @@ import '../../../../widgets/windowConfirmCancelBar.dart';
 import '../../../../windows/dialog_window.dart';
 import '../../../chat/chat_details.dart';
 import '../../../show_profil.dart';
-import '../../meetups/meetup_card_details.dart';
 
 class GeneralInformationPage extends StatefulWidget {
   final Map location;
@@ -21,9 +20,9 @@ class GeneralInformationPage extends StatefulWidget {
 
   const GeneralInformationPage(
       {Key? key,
-        required this.location,
-        required this.usersCityInformation,
-        this.fromCityPage = false})
+      required this.location,
+      required this.usersCityInformation,
+      this.fromCityPage = false})
       : super(key: key);
 
   @override
@@ -36,8 +35,6 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
   final translator = GoogleTranslator();
   List familiesThere = [];
   late bool hasVisited;
-
-
 
   @override
   void initState() {
@@ -106,7 +103,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
 
     Future<void>.delayed(
         const Duration(),
-            () => showDialog(
+        () => showDialog(
             context: context,
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
@@ -149,7 +146,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     if (checkChatGroup != false) return;
 
     var newChatId =
-    await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$locationId");
+        await ChatGroupsDatabase().addNewChatGroup(null, "</stadt=$locationId");
     var hiveChatGroups = Hive.box('secureBox').get("chatGroups");
     hiveChatGroups.add({
       "id": newChatId,
@@ -178,29 +175,69 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     return Colors.green[800];
   }
 
-  getLocationImageWidget() {
+  getCityImage(){
     if (widget.location["bild"].isEmpty) {
-      if (!isCity) return const AssetImage("assets/bilder/land.jpg");
-      return const AssetImage("assets/bilder/city.jpg");
-    } else {
-      if (!isCity) {
-        return AssetImage(
-            "assets/bilder/flaggen/${widget.location["bild"]}.jpeg");
-      }
-      return CachedNetworkImageProvider(widget.location["bild"]);
+      return Image.asset(
+        "assets/bilder/city.jpg",
+        fit: BoxFit.fill,
+      );
+    }else{
+      return CachedNetworkImage(
+        imageUrl: widget.location["bild"],
+        fit: BoxFit.fill,
+      );
     }
   }
 
-  changeVisitedStauts(){
-      hasVisited = !hasVisited;
+  getCountryImage(){
+    if (widget.location["mainCityImage"].isEmpty) {
+      return Image.asset(
+        "assets/bilder/land.jpg",
+        fit: BoxFit.fill,
+      );
+    }else{
+      return CachedNetworkImage(
+        imageUrl: widget.location["mainCityImage"],
+        fit: BoxFit.fill,
+      );
+    }
+  }
 
-      if(hasVisited){
-        widget.location["familien"].add(userId);
-        StadtinfoDatabase().update("familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')","where id = '${widget.location["id"]}'");
-      }else{
-        widget.location["familien"].remove(userId);
-        StadtinfoDatabase().update("familien = JSON_REMOVE(familien, JSON_UNQUOTE(JSON_SEARCH(familien, 'one', '$userId')))","where id = '${widget.location["id"]}'");
+  getLocationImageWidgetNew() {
+    if (widget.location["bild"].isEmpty) {
+      if (!isCity) {
+        return Image.asset(
+          "assets/bilder/land.jpg",
+          fit: BoxFit.fill,
+        );
       }
+      return Image.asset(
+        "assets/bilder/city.jpg",
+        fit: BoxFit.fill,
+      );
+    } else {
+      String imgUrl = isCity ? widget.location["bild"] : widget.location["mainCityImage"] ?? "";
+      return CachedNetworkImage(
+        imageUrl: imgUrl,
+        fit: BoxFit.fill,
+      );
+    }
+  }
+
+  changeVisitedStauts() {
+    hasVisited = !hasVisited;
+
+    if (hasVisited) {
+      widget.location["familien"].add(userId);
+      StadtinfoDatabase().update(
+          "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
+          "where id = '${widget.location["id"]}'");
+    } else {
+      widget.location["familien"].remove(userId);
+      StadtinfoDatabase().update(
+          "familien = JSON_REMOVE(familien, JSON_UNQUOTE(JSON_SEARCH(familien, 'one', '$userId')))",
+          "where id = '${widget.location["id"]}'");
+    }
   }
 
   changeVisitedStatusWindow() {
@@ -208,17 +245,18 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-              title: hasVisited ? AppLocalizations.of(context)!.ortNichtBesuchtTitle :AppLocalizations.of(context)!.ortBesuchtTitle,
+              title: hasVisited
+                  ? AppLocalizations.of(context)!.ortNichtBesuchtTitle
+                  : AppLocalizations.of(context)!.ortBesuchtTitle,
               children: [
                 Container(
                     margin: const EdgeInsets.all(10),
-                    child: Center(child: Text(hasVisited
-                        ? "${AppLocalizations.of(context)!.ortNichtBesuchtBody1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.ortNichtBesuchtBody2}"
-                        : "${AppLocalizations.of(context)!.ortBesuchtBody1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.ortBesuchtBody2}"
-                    ))
-                ),
+                    child: Center(
+                        child: Text(hasVisited
+                            ? "${AppLocalizations.of(context)!.ortNichtBesuchtBody1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.ortNichtBesuchtBody2}"
+                            : "${AppLocalizations.of(context)!.ortBesuchtBody1} ${widget.location["ort"]} ${AppLocalizations.of(context)!.ortBesuchtBody2}"))),
                 WindowConfirmCancelBar(
-                  onConfirm: (){
+                  onConfirm: () {
                     setState(() {
                       changeVisitedStauts();
                     });
@@ -234,14 +272,13 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     double fontSize = 18;
     hasVisited = widget.location["familien"].contains(userId);
 
-
-    displayContainer({child, margin}){
+    displayContainer({child, margin}) {
       return Container(
           margin: const EdgeInsets.only(top: 10, bottom: 10),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-              color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withOpacity(0.9),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
@@ -251,8 +288,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               ),
             ],
           ),
-          child: child
-      );
+          child: child);
     }
 
     showCurrentlyThere() {
@@ -284,7 +320,6 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
       visitFamilies.remove(userId);
       int anzahlFamilien = visitFamilies.length;
 
-
       return Row(
         children: [
           InkWell(
@@ -314,7 +349,10 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
               heroTag: "openVisitedStatusWindow",
               onPressed: () => changeVisitedStatusWindow(),
               backgroundColor: hasVisited ? Colors.red : null,
-              child: Icon(hasVisited ? Icons.remove : Icons.add, size: 20,),
+              child: Icon(
+                hasVisited ? Icons.remove : Icons.add,
+                size: 20,
+              ),
             ),
           )
         ],
@@ -340,7 +378,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
 
     showCost() {
-      if(widget.location["kosten"] == null){
+      if (widget.location["kosten"] == null) {
         return const SizedBox.shrink();
       }
 
@@ -350,18 +388,21 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            for(var i = 0; i< costRate; i++) const Icon(Icons.attach_money),
-            for(var i = costRate; i< 5; i++) Icon(Icons.attach_money, color: Colors.grey[300],),
-
+            for (var i = 0; i < costRate; i++) const Icon(Icons.attach_money),
+            for (var i = costRate; i < 5; i++)
+              Icon(
+                Icons.attach_money,
+                color: Colors.grey[300],
+              ),
           ],
         ),
       );
     }
 
     showInternetSpeed() {
-      String internetSpeedText =  widget.location["internet"].toString();
+      String internetSpeedText = widget.location["internet"].toString();
 
-      if(widget.location["internet"] == null){
+      if (widget.location["internet"] == null) {
         return const SizedBox.shrink();
       }
 
@@ -385,8 +426,7 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
     }
 
     showWeather() {
-
-      if(widget.location["wetter"] == null){
+      if (widget.location["wetter"] == null) {
         return const SizedBox.shrink();
       }
 
@@ -400,50 +440,71 @@ class _GeneralInformationPageState extends State<GeneralInformationPage> {
             ),
             const SizedBox(width: 10),
             InkWell(
-                onTap: () =>
-                    global_func.openURL(widget.location["wetter"]),
-                child: Text(AppLocalizations.of(context)!.klimatabelle,
-                    style:
-                    TextStyle(color: Colors.blue, fontSize: fontSize,decoration: TextDecoration.underline),))
+                onTap: () => global_func.openURL(widget.location["wetter"]),
+                child: Text(
+                  AppLocalizations.of(context)!.klimatabelle,
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: fontSize,
+                      decoration: TextDecoration.underline),
+                ))
           ],
         ),
       );
     }
 
-    showBulletInformation(){
-      return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        showInsiderCount(),
-        showInternetSpeed(),
-        showCost()
-      ],);
+    showBulletInformation() {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [showInsiderCount(), showInternetSpeed(), showCost()],
+      );
     }
 
     return SelectionArea(
       child: SafeArea(
         child: Scaffold(
-          body: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: getLocationImageWidget(),
-                fit:  isCity ? BoxFit.fill : null,
+          body: Stack(
+            children: [
+              SizedBox(
+                height: double.infinity,
+                width: double.infinity,
+                child: isCity
+                    ? getLocationImageWidgetNew()
+                    : Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            height: !isCity
+                                ? MediaQuery.of(context).size.height / 3 * 1.7
+                                : double.infinity,
+                            child: getLocationImageWidgetNew(),
+                          ),
+                          if (!isCity)
+                            Expanded(
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Image.asset(
+                                  "assets/bilder/flaggen/${widget.location["bild"]}.jpeg",
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            )
+                        ],
+                      ),
               ),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.all(10),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        showBulletInformation(),
-                        showCurrentlyThere(),
-                        showVisited(),
-                        showWeather(),
-                      ]),
-                ),
-              ],
-            ),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.all(10),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      showBulletInformation(),
+                      showCurrentlyThere(),
+                      showVisited(),
+                      showWeather(),
+                    ]),
+              ),
+            ],
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
