@@ -13,7 +13,7 @@ class WindowConfirmCancelBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(right: 10),
+      margin: const EdgeInsets.only(right: 10, bottom: 10),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         TextButton(
             child: Text(confirmTitle ?? AppLocalizations.of(context)!.bestaetigen,
