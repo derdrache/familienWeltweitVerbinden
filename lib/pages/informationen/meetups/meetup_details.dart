@@ -259,13 +259,13 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
               title: AppLocalizations.of(context)!.meetupLoeschen,
               height: 200,
               children: [
-                SizedBox(height: 30,),
+                const SizedBox(height: 30,),
                 Center(
                     child: Text(
                         AppLocalizations
                             .of(context)!
                             .meetupWirklichLoeschen)),
-                SizedBox(height: 30,),
+                const SizedBox(height: 30,),
                 WindowConfirmCancelBar(
                   confirmTitle: AppLocalizations.of(context)!.loeschen,
                   onConfirm: (){

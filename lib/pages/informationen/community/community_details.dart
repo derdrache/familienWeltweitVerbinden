@@ -1076,9 +1076,9 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15),
+          padding: const EdgeInsets.all(10),
           child: SizedBox(
               child: Column(
                 children: [

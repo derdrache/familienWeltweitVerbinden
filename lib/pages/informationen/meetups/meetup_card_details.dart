@@ -709,7 +709,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
       return Container(
           margin:
-              const EdgeInsets.only(top: 5, left: 10, right: 10, bottom: 10),
+              const EdgeInsets.all(10),
           child: Center(
               child: Container(
                   width: double.infinity,
