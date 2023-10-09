@@ -1316,7 +1316,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       if (showButton) {
         return Positioned(
             right: 5,
-            bottom: -10,
+            bottom: -12,
             child: Row(
               children: [
                 if (!showOriginalMessage)
@@ -1326,6 +1326,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                               ? "Original"
                               : "Original",
                           style: TextStyle(
+                              fontSize: 16,
                               decoration: message["original"] ?? false
                                   ? TextDecoration.lineThrough
                                   : TextDecoration.none)),
@@ -1336,78 +1337,81 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                           message["original"] = !message["original"];
                         });
                       }),
-                if(ownLanguages[0] != "en") TextButton(
-                    child: const Icon(Icons.translate_outlined),
-                    onPressed: () async {
-                      String translationMessage =
-                          message["message"].replaceAll("'", "");
+                if(ownLanguages[0] != "en") Container(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: TextButton(
+                      child: const Icon(Icons.translate_outlined, size: 16,),
+                      onPressed: () async {
+                        String translationMessage =
+                            message["message"].replaceAll("'", "");
 
-                      var translation = await translator.translate(
-                          translationMessage,
-                          from: "auto",
-                          to: ownLanguages[0]);
+                        var translation = await translator.translate(
+                            translationMessage,
+                            from: "auto",
+                            to: ownLanguages[0]);
 
-                      if (context.mounted) {
-                        showModalBottomSheet<void>(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Stack(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.only(
-                                        top: 30,
-                                        left: 30,
-                                        bottom: 20,
-                                        right: 15),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                            AppLocalizations.of(context)!
-                                                .uebersetzen,
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold)),
-                                        const SizedBox(height: 15),
-                                        ListView(
-                                          shrinkWrap: true,
-                                          children: [
-                                            Text(
-                                              translation.toString(),
-                                              style:
-                                                  const TextStyle(fontSize: 18),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 30),
-                                        SizedBox(
-                                          width: double.maxFinite,
-                                          child: FloatingActionButton.extended(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            label: Text(
-                                                AppLocalizations.of(context)!
-                                                    .uebersetzungSchliessen),
+                        if (context.mounted) {
+                          showModalBottomSheet<void>(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Stack(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.only(
+                                          top: 30,
+                                          left: 30,
+                                          bottom: 20,
+                                          right: 15),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                              AppLocalizations.of(context)!
+                                                  .uebersetzen,
+                                              style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold)),
+                                          const SizedBox(height: 15),
+                                          ListView(
+                                            shrinkWrap: true,
+                                            children: [
+                                              Text(
+                                                translation.toString(),
+                                                style:
+                                                    const TextStyle(fontSize: 18),
+                                              ),
+                                            ],
                                           ),
-                                        )
-                                      ],
+                                          const SizedBox(height: 30),
+                                          SizedBox(
+                                            width: double.maxFinite,
+                                            child: FloatingActionButton.extended(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              label: Text(
+                                                  AppLocalizations.of(context)!
+                                                      .uebersetzungSchliessen),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  const Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: CloseButton(
-                                        color: Colors.red,
-                                      ))
-                                ],
-                              );
-                            });
-                      }
-                    }),
+                                    const Positioned(
+                                        top: 0,
+                                        right: 0,
+                                        child: CloseButton(
+                                          color: Colors.red,
+                                        ))
+                                  ],
+                                );
+                              });
+                        }
+                      }),
+                ),
               ],
             ));
       } else {
