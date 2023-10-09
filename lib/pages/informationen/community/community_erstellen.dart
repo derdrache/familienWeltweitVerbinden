@@ -187,7 +187,7 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                   if (context.mounted){
                     Navigator.pop(context);
                     global_func.changePage(
-                        context, CommunityDetails(community: communityData));
+                        context, CommunityDetails(community: communityData, toMainPage: true,));
                   }
                 },
                 tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,

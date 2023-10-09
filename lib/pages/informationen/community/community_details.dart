@@ -34,8 +34,9 @@ import 'community_page.dart';
 
 class CommunityDetails extends StatefulWidget {
   Map community;
+  bool? toMainPage;
 
-  CommunityDetails({Key? key, required this.community})
+  CommunityDetails({Key? key, required this.community, this.toMainPage})
       : super(key: key);
 
   @override
@@ -720,11 +721,13 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.communityLoeschen,
-              height: 120,
+              height: 200,
               children: [
+                const SizedBox(height: 30,),
                 Center(
                     child: Text(
                         AppLocalizations.of(context)!.communityWirklichLoeschen)),
+                const SizedBox(height: 30,),
                 WindowConfirmCancelBar(
                   onConfirm: () async {
                     CommunityDatabase().delete(widget.community["id"]);
@@ -824,7 +827,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           children: [
             const Icon(Icons.person_add),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context)!.mitgliedHinzufuegen),
+            Flexible(child: Text(AppLocalizations.of(context)!.mitgliedHinzufuegen, maxLines: 2,)),
           ],
         ),
         onPressed: () {
@@ -885,7 +888,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           children: [
             const Icon(Icons.delete, color: Colors.red),
             const SizedBox(width: 10),
-            Text(AppLocalizations.of(context)!.communityLoeschen, style: const TextStyle(color: Colors.red),),
+            Flexible(child: Text(AppLocalizations.of(context)!.communityLoeschen, maxLines: 2 ,style: const TextStyle(color: Colors.red),)),
           ],
         ),
         onPressed: () {
@@ -1134,6 +1137,16 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         backgroundColor: Colors.white,
           appBar: CustomAppBar(
             title: "",
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                  if(widget.toMainPage ?? false){
+                    global_func.changePage(context, const CommunityPage());
+                  } else{
+                    Navigator.of(context).pop();
+                  }
+                }
+            ),
             buttons: [
               IconButton(
                 icon: const Icon(Icons.chat),
