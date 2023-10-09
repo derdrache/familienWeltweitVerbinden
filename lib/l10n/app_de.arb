@@ -356,7 +356,7 @@
     "nichtTeilGemeinschaft": "Der Ersteller ist nicht Teil dieser Community",
     "nichtErstellerMeetup" : "Der Ersteller ist nicht Initiator des Meetup",
     "benutzerEingeben": "Benutzer eingeben",
-    "nichtErstellerMeetup": "Handelt es sich beim neuen Meetup-Besitzer um den Initiator?",
+    "newOwnerIsInitiator": "Handelt es sich beim neuen Meetup-Besitzer um den Initiator?",
     "nochKeineNewsVorhanden": "Es sind noch keine News für dich erstellt worden",
     "meetupWiederholung": "Meetup Wiederholung",
     "meetupOeffentlichkeit" : "Öffentlichkeit",
