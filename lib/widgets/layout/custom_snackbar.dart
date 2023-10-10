@@ -7,6 +7,7 @@ customSnackBar(context, text, {color = Colors.red, duration = const Duration(sec
       duration: duration,
       elevation: 0,
       backgroundColor: Colors.transparent,
+      behavior: SnackBarBehavior.floating,
       content: Container(
         padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
