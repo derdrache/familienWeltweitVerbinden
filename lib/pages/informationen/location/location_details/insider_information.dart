@@ -309,7 +309,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
     updateDatabase(id, newTitle, newInformation, images);
 
     setState(() {});
-    Navigator.pop(context);
   }
 
   updateDatabase(id, newTitle, newInformation, images) async {
