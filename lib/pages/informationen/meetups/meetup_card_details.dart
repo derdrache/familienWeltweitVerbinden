@@ -375,9 +375,12 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     creatorChangeHintBox() {
       if (!widget.isCreator) return const SizedBox.shrink();
 
-      return Center(
-        child: Text(AppLocalizations.of(context)!.antippenZumAendern,
-            style: const TextStyle(color: Colors.grey)),
+      return Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: Center(
+          child: Text(AppLocalizations.of(context)!.antippenZumAendern,
+              style: const TextStyle(color: Colors.grey)),
+        ),
       );
     }
 
@@ -889,9 +892,14 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       if (meetupTags.isEmpty && widget.isCreator) {
         meetupTags.add(Container(
             margin: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(20)
+            ),
             child: Center(
               child: Text(AppLocalizations.of(context)!.klickForLabel,
-                  style: TextStyle(color: Colors.grey)),
+                  style: const TextStyle(color: Colors.grey)),
             )));
       }
 
