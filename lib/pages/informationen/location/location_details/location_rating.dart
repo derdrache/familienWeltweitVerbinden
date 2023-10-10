@@ -136,6 +136,26 @@ class _LocationRatingState extends State<LocationRating> {
       newRating["sprache"] = "de";
       var translation = await translator.translate(newCommentController.text,
           from: "de", to: "auto");
+      newRating["commentEng"] = translation.text.replaceAll("'", "''");
+    } else {
+      newRating["sprache"] = "auto";
+      var translation = await translator.translate(newCommentController.text,
+          from: "auto", to: "de");
+      newRating["commentGer"] = translation.text.replaceAll("'", "''");
+    }
+
+    StadtInfoRatingDatabase().addNewRating(newRating);
+  }
+
+  dbUpdateRating(newRating) async{
+    final translator = GoogleTranslator();
+    var languageCheck = await translator.translate(newCommentController.text);
+    bool commentIsGerman = languageCheck.sourceLanguage.code == "de";
+
+    if (commentIsGerman) {
+      newRating["sprache"] = "de";
+      var translation = await translator.translate(newCommentController.text,
+          from: "de", to: "auto");
       newRating["commentEng"] = translation.text;
     } else {
       newRating["sprache"] = "auto";
@@ -144,14 +164,6 @@ class _LocationRatingState extends State<LocationRating> {
       newRating["commentGer"] = translation.text;
     }
 
-    StadtInfoRatingDatabase().addNewRating(newRating);
-  }
-
-  editRating() {
-    print(newCommentController.text);
-    newRating["comment"] = newCommentController.text;
-    newRating["date"] = DateTime.now().toString();
-
     StadtInfoRatingDatabase().update(
         "familyFriendly = '${newRating["familyFriendly"]}', "
             "security = '${newRating["security"]}', "
@@ -159,9 +171,18 @@ class _LocationRatingState extends State<LocationRating> {
             "surrounding = '${newRating["surrounding"]}', "
             "activities = '${newRating["activities"]}', "
             "alternativeFood = '${newRating["alternativeFood"]}', "
-            "comment = '${newRating["comment"]}', "
+            "commentGer = '${newRating["commentGer"].replaceAll("'", "''")}', "
+            "commentEng = '${newRating["commentEng"].replaceAll("'", "''")}', "
             "date = '${newRating["date"]}'",
         "where locationId = ${widget.location["id"]} AND user = '$ownUserId'");
+  }
+
+  editRating() {
+    newRating["commentGer"] = newCommentController.text;
+    newRating["commentEng"] = newCommentController.text;
+    newRating["date"] = DateTime.now().toString();
+
+    dbUpdateRating(newRating);
   }
 
   @override
