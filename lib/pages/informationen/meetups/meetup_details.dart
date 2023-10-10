@@ -524,53 +524,55 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           widget.meetupData["eventInterval"]
           && global_var.meetupInterval[0] != widget.meetupData["eventInterval"];
 
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if(isRepeating) Column(children: [
-            Text(AppLocalizations
-                .of(context)!
-                .immerDabei),
-            Switch(
-              value: widget.meetupData["immerZusagen"].contains(userId),
-              onChanged: (value) {
-                changeImmerZusage(value);
-                setState(() {});
-              },)
-          ],),
-          if (teilnahme != true)
-            Container(
-              margin: const EdgeInsets.only(left: 10, right: 10),
-              child: FloatingActionButton.extended(
-                  heroTag: "teilnehmen",
+      return Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if(isRepeating) Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(AppLocalizations
+                  .of(context)!
+                  .immerDabei),
+              Switch(
+                value: widget.meetupData["immerZusagen"].contains(userId),
+                onChanged: (value) {
+                  changeImmerZusage(value);
+                  setState(() {});
+                },)
+            ],),
+            if (teilnahme != true)
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                child: FloatingActionButton.extended(
+                    heroTag: "teilnehmen",
+                    backgroundColor: Theme
+                        .of(context)
+                        .colorScheme
+                        .primary,
+                    onPressed: () {
+                      takePartDecision(true);
+                      sendTakePartNotification(widget.meetupData);
+                    },
+                    label: Text(AppLocalizations
+                        .of(context)!
+                        .teilnehmen)),
+              ),
+            if (absage != true)
+              Container(
+                margin: const EdgeInsets.only(left: 10, right: 10),
+                child: FloatingActionButton.extended(
+                  heroTag: "Absagen",
                   backgroundColor: Theme
                       .of(context)
                       .colorScheme
                       .primary,
-                  onPressed: () {
-                    takePartDecision(true);
-                    sendTakePartNotification(widget.meetupData);
-                  },
                   label: Text(AppLocalizations
                       .of(context)!
-                      .teilnehmen)),
-            ),
-          if (absage != true)
-            Container(
-              margin: const EdgeInsets.only(left: 10, right: 10),
-              child: FloatingActionButton.extended(
-                heroTag: "Absagen",
-                backgroundColor: Theme
-                    .of(context)
-                    .colorScheme
-                    .primary,
-                label: Text(AppLocalizations
-                    .of(context)!
-                    .absage),
-                onPressed: () => takePartDecision(false),
-              ),
-            )
-        ],
+                      .absage),
+                  onPressed: () => takePartDecision(false),
+                ),
+              )
+          ],
+        ),
       );
     }
 
@@ -819,14 +821,12 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             onPressed: () => moreMenu(),
           )
         ]),
-        body: ListView(
+        body: Column(
           children: [
-            Stack(children: [
-              MeetupCardDetails(
-                meetupData: widget.meetupData,
-                isApproved: isApproved,
-              ),
-            ]),
+            MeetupCardDetails(
+              meetupData: widget.meetupData,
+              isApproved: isApproved,
+            ),
             if (isApproved || !isNotPublic) teilnahmeButtonBox(),
           ],
         ),
