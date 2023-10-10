@@ -182,6 +182,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   @override
   void initState() {
+    isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
     creatorProfil = getProfilFromHive(
         profilId: widget.note["erstelltVon"]);
 
@@ -192,7 +193,6 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   @override
   Widget build(BuildContext context) {
-    isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
 
     showTitle() {
       String title;
