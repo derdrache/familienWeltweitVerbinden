@@ -405,7 +405,7 @@ class _LocationRatingState extends State<LocationRating> {
                           child: FloatingActionButton.extended(
                             onPressed: () {
                               Navigator.pop(context);
-/*
+
                               setState(() {
                                 if (hasRated) {
                                   editRating();
@@ -420,10 +420,6 @@ class _LocationRatingState extends State<LocationRating> {
 
 
                               });
-
-
- */
-                              setState(() {});
                             },
                             label: Text(hasRated
                                 ? AppLocalizations.of(context)!.aendern
