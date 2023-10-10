@@ -571,5 +571,6 @@
     "ortNichtBesuchtBody1": "Du wurdest ausversehen zu",
     "ortNichtBesuchtBody2": "hinzugefügt und möchtest dich wieder entfernen ?",
     "klickForLabel": "Meetuplabel hinzuzufügen",
-    "besitzer": "Besitzer"
+    "besitzer": "Besitzer",
+    "bewertungAendern": "Bewertung ändern"
 }

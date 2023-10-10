@@ -148,6 +148,7 @@ class _LocationRatingState extends State<LocationRating> {
   }
 
   editRating() {
+    print(newCommentController.text);
     newRating["comment"] = newCommentController.text;
     newRating["date"] = DateTime.now().toString();
 
@@ -417,8 +418,6 @@ class _LocationRatingState extends State<LocationRating> {
                                 } else {
                                   saveNewRating();
                                 }
-
-
                               });
                             },
                             label: Text(hasRated
@@ -450,10 +449,9 @@ class _LocationRatingState extends State<LocationRating> {
                           fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  if (!hasRated)
                     FloatingActionButton.extended(
                       onPressed: () => openRatingWindow(),
-                      label: Text(AppLocalizations.of(context)!.ortBewerten),
+                      label: Text( !hasRated ? AppLocalizations.of(context)!.ortBewerten : AppLocalizations.of(context)!.bewertungAendern),
                       tooltip: AppLocalizations.of(context)!.ortBewerten,
                     )
                 ],
@@ -489,11 +487,6 @@ class _LocationRatingState extends State<LocationRating> {
               commentSection()
             ],
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => openRatingWindow(),
-          tooltip: AppLocalizations.of(context)!.ortBewerten,
-          child: const Icon(Icons.rate_review),
         ),
       ),
     );

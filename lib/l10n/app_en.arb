@@ -575,6 +575,7 @@
     "ortNichtBesuchtBody1": "You have been added to",
     "ortNichtBesuchtBody2": "by mistake and want to remove yourself again ?",
     "klickForLabel": "add Meetuplabel",
-    "besitzer": "Owner"
+    "besitzer": "Owner",
+    "bewertungAendern": "change rating"
 }
 
