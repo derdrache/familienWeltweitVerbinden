@@ -311,11 +311,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       return SimpleDialogOption(
         child: Row(
           children: [
-            const Icon(Icons.delete),
+            const Icon(Icons.delete, color: Colors.red,),
             const SizedBox(width: 10),
             Text(AppLocalizations
                 .of(context)!
-                .meetupLoeschen),
+                .meetupLoeschen, style: const TextStyle(color: Colors.red),),
           ],
         ),
         onPressed: () {
