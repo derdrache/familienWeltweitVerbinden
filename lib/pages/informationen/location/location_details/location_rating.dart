@@ -31,13 +31,15 @@ class _LocationRatingState extends State<LocationRating> {
   ];
   late List allRatings;
   late String ratingCount;
-  late Map locationRating = {"comments": []};
+  late Map locationRating;
   late Map newRating;
   bool hasRated = false;
   TextEditingController newCommentController = TextEditingController();
   List showOriginalComment = [];
 
   void calculateAndSetLocationRatingData() {
+    locationRating = {"comments": []};
+
     for (Map rating in allRatings) {
       Map ratingValues = getAllRatingValues(rating);
       Map commentInfo = {
@@ -403,7 +405,7 @@ class _LocationRatingState extends State<LocationRating> {
                           child: FloatingActionButton.extended(
                             onPressed: () {
                               Navigator.pop(context);
-
+/*
                               setState(() {
                                 if (hasRated) {
                                   editRating();
@@ -415,7 +417,13 @@ class _LocationRatingState extends State<LocationRating> {
                                 } else {
                                   saveNewRating();
                                 }
+
+
                               });
+
+
+ */
+                              setState(() {});
                             },
                             label: Text(hasRated
                                 ? AppLocalizations.of(context)!.aendern
