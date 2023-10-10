@@ -1595,13 +1595,16 @@ getCommunityFromHive(communityId) {
   return {};
 }
 
-getCityFromHive({latt,  cityId, cityName, getName = false}) {
+getCityFromHive({cityId, cityName, getName = false, latt = 0.0, isCountry = false}) {
   var locations = Hive.box('secureBox').get("stadtinfo");
   cityName ??= "XXXXXX";
 
   for (var location in locations) {
-    if (location["id"].toString() == cityId  || location["id"] == cityId ||
-        (location["ort"].contains(cityName) && latt == location["latt"])) {
+    bool sameId = location["id"].toString() == cityId.toString();
+    bool sameLocation = location["ort"].contains(cityName);
+    bool sameLatt = latt == location["latt"];
+
+    if (sameId  || (sameLocation && sameLatt) || (sameLocation && isCountry)) {
 
       if (getName) {
         return location["ort"];
