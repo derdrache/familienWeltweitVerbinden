@@ -212,7 +212,6 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
           context,
           "${AppLocalizations.of(context)!.aktuelleOrt} ${AppLocalizations.of(context)!.erfolgreichGeaender}",
           color: Colors.green);
-      Navigator.pop(context);
     }
   }
 
