@@ -891,6 +891,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     setState(() {
       widget.groupChatData!["users"][userId] = newUserInformation;
+      chatParticipantProfils.add(ownProfil);
       userJoinedChat = true;
     });
 
@@ -2134,6 +2135,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                         .leaveChat(widget.groupChatData!["connected"]);
 
                     setState(() {
+                      chatParticipantProfils.removeWhere((element) => element["id"] == userId);
                       userJoinedChat = false;
                     });
                   },
