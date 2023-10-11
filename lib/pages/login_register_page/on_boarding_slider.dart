@@ -73,7 +73,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   }
 
   done() async{
-    if(!sliderStepTwo.allFilledAndErrorMsg(context)) return;
+    if(!sliderStepThree.allFilledAndErrorMsg(context)) return;
 
     setState(() {
       isLoading = true;
@@ -387,11 +387,10 @@ class SliderStepTwo extends StatelessWidget {
   late CustomMultiTextForm _sprachenAuswahlBox;
   late ChildrenBirthdatePickerBox _childrenAgePickerBox;
   bool builded = false;
-  Map testLocation = {"city": "Wiesbaden", "countryname": "Deutschland", "longt": 8.239760799999999, "latt": 50.0782184, "adress": "Wiesbaden, Deutschland"};
 
   Map getAllData(){
     return {
-      "location": testLocation,// _ortAuswahlBox.getGoogleLocationData(),
+      "location": _ortAuswahlBox.getGoogleLocationData(),
       "travelTyp": _reiseArtenAuswahlBox.getSelected(),
       "languages": _sprachenAuswahlBox.getSelected(),
       "children": _childrenAgePickerBox.getDates()
@@ -399,7 +398,7 @@ class SliderStepTwo extends StatelessWidget {
   }
 
   bool allFilledAndErrorMsg(context){
-    var ortMapData = testLocation;//_ortAuswahlBox.getGoogleLocationData();
+    var ortMapData = _ortAuswahlBox.getGoogleLocationData();
     bool locationSelected = ortMapData["city"] != null;
     bool travelTypSelected = _reiseArtenAuswahlBox.getSelected().isNotEmpty;
     bool languageSelected = _sprachenAuswahlBox.getSelected().isNotEmpty;
