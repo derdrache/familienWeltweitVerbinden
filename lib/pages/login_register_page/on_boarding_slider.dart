@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:familien_suche/auth/secrets.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:hive/hive.dart';
 
 import '../../global/style.dart' as style;
 import '../../services/notification.dart' as notifications;
@@ -30,9 +28,9 @@ var isGerman = kIsWeb
     : Platform.localeName == "de_DE";
 
 class OnBoardingSlider extends StatefulWidget {
-  bool withSocialLogin;
+  final bool withSocialLogin;
 
-  OnBoardingSlider({
+  const OnBoardingSlider({
     super.key,
     this.withSocialLogin = false
   });
@@ -44,7 +42,7 @@ class OnBoardingSlider extends StatefulWidget {
 class _OnBoardingSliderState extends State<OnBoardingSlider> {
   int currentPage = 0;
   final PageController pageController = PageController(initialPage: 0);
-  late var sliderStepOne;
+  late SliderStepOne sliderStepOne;
   var sliderStepTwo = SliderStepTwo();
   var sliderStepThree = SliderStepThree();
   bool isLoading = false;
@@ -223,7 +221,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
         body: SafeArea(
           child: PageView(
             controller: pageController,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             onPageChanged: (int page) {
               setState(() {
                 currentPage = page;
@@ -239,7 +237,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 }
 
 class SliderStepOne extends StatelessWidget {
-  bool withSocialLogin;
+  final bool withSocialLogin;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _userNameKontroller = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
