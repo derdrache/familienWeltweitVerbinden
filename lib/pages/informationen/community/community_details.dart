@@ -925,6 +925,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         if (!isCreator) reportDialog(),
         if (isCreator) addMemberDialog(),
         if (isCreator) settingDialog(),
+        if (isCreator) const SizedBox(height: 15),
         if (isCreator) deleteDialog(),
         if (!isCreator && isMember) leaveDialog()
       ]);
