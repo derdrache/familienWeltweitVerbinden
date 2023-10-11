@@ -126,7 +126,6 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
       }
 
-
       pageController.jumpToPage(0);
     }
 
@@ -172,15 +171,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
 
     await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"], ortMapData["latt"]);
     if(ortMapData["city"] != ortMapData["countryname"]) await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["countryname"], ortMapData["latt"], isCountry: true);
-    await ChatGroupsDatabase().updateChatGroup(
-        "users = JSON_MERGE_PATCH(users, '${json.encode({
-          userId: {"newMessages": 0}
-        })}')",
-        "WHERE id = '1'");
-    List myGroupChats = Hive.box("secureBox").get("myGroupChats") ?? [];
-    myGroupChats.add(getChatGroupFromHive(chatId: "1"));
 
-    await refreshHiveChats();
     await refreshHiveMeetups();
   }
 
