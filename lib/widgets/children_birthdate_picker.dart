@@ -219,7 +219,7 @@ class _CustomDatePickerState extends State<_CustomDatePicker> {
           ),
           widget.deleteFunction == null ? const SizedBox.shrink() : Positioned(
             width: 20,
-            right: 1.0,
+            right: 10.0,
             top: -5.0,
             child: InkResponse(
               onTap: widget.deleteFunction,
