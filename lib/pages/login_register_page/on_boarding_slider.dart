@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:familien_suche/auth/secrets.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -167,13 +168,10 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   }
 
   additionalDatabaseOperations(ortMapData, userId) async {
-    await StadtinfoDatabase().addNewCity(ortMapData);
-    StadtinfoDatabase().update(
-        "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')",
-        "WHERE ort LIKE '%${ortMapData["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
+    await StadtinfoDatabase().addFamiliesInCity(ortMapData, userId);
 
     await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"], ortMapData["latt"]);
-    if(ortMapData["city"] != ortMapData["countryname"]) await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["countryname"], ortMapData["latt"]);
+    if(ortMapData["city"] != ortMapData["countryname"]) await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["countryname"], ortMapData["latt"], isCountry: true);
     await ChatGroupsDatabase().updateChatGroup(
         "users = JSON_MERGE_PATCH(users, '${json.encode({
           userId: {"newMessages": 0}

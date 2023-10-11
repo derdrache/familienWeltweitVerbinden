@@ -186,11 +186,9 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     };
 
     await StadtinfoDatabase().addFamiliesInCity(locationDict, ownProfil["id"]);
-    return ;
     final String oldLocationName = Hive.box("secureBox").get("ownProfil")["ort"];
     final double oldLocationLatt = Hive.box("secureBox").get("ownProfil")["latt"];
     saveLocation(locationDict);
-    StadtinfoDatabase().addFamiliesInCity(locationDict, ownProfil["id"]);
     joindAndRemoveChatGroups(locationDict, oldLocationName, oldLocationLatt);
     deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);

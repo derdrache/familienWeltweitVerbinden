@@ -525,11 +525,11 @@ class ChatGroupsDatabase {
     _deleteInTable("group_messages", "chatId", chatId);
   }
 
-  joinAndCreateCityChat(cityName, cityLatt) async {
+  joinAndCreateCityChat(cityName, cityLatt, {isCountry = false}) async {
     var userId = FirebaseAuth.instance.currentUser?.uid;
     var isNewChat = false;
 
-    var city = getCityFromHive(cityName: cityName, latt: cityLatt);
+    var city = getCityFromHive(cityName: cityName, latt: cityLatt, isCountry: isCountry);
 
     if (city == null) return;
 
