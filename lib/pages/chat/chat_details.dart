@@ -2120,11 +2120,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.gruppeVerlassen,
-              height: 100,
+              height: 180,
               children: [
+                const SizedBox(height: 10,),
                 Center(
                     child: Text(
                         AppLocalizations.of(context)!.gruppeWirklichVerlassen)),
+                const SizedBox(height: 30,),
                 WindowConfirmCancelBar(
                   confirmTitle: AppLocalizations.of(context)!.gruppeVerlassen,
                   onConfirm: () async {
