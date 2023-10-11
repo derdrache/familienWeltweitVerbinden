@@ -47,6 +47,8 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
   var sliderStepTwo = SliderStepTwo();
   var sliderStepThree = SliderStepThree();
   bool isLoading = false;
+  Map newProfilData ={};
+
 
   late List<Widget> pages;
 
@@ -60,9 +62,11 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
       return;
     }else if(currentPage == 1 && context.mounted && !sliderStepTwo.allFilledAndErrorMsg(context)){
       return;
-    }else if(currentPage == 2 && context.mounted &&!sliderStepThree.allFilledAndErrorMsg(context)){
-      return;
     }
+
+    if(currentPage == 0) newProfilData.addAll(sliderStepOne.getAllData());
+    if(currentPage == 1) newProfilData.addAll(sliderStepTwo.getAllData());
+
 
     currentPage += 1;
     pageController.jumpToPage(currentPage);
@@ -75,13 +79,10 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
       isLoading = true;
     });
 
-    Map accountData = sliderStepOne.getAllData();
-    Map personalData1 = sliderStepTwo.getAllData();
-    Map personalData2 = sliderStepThree.getAllData();
-    Map allData = {...accountData, ...personalData1,...personalData2};
+    newProfilData.addAll(sliderStepThree.getAllData());
 
     if(!widget.withSocialLogin){
-      bool createdAccount = await createAccount(allData);
+      bool createdAccount = await createAccount(newProfilData);
 
       if(!createdAccount) {
         setState(() {
@@ -92,10 +93,10 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
     }
 
 
-    Map ownProfil = await createProfil(allData);
+    Map ownProfil = await createProfil(newProfilData);
 
     notifications.prepareNewLocationNotification();
-    additionalDatabaseOperations(allData["location"], ownProfil["id"]);
+    additionalDatabaseOperations(newProfilData["location"], ownProfil["id"]);
 
     if(context.mounted) global_functions.changePageForever(context, StartPage());
   }
@@ -172,6 +173,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
         "WHERE ort LIKE '%${ortMapData["city"]}%' AND JSON_CONTAINS(familien, '\"$userId\"') < 1");
 
     await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"], ortMapData["latt"]);
+    if(ortMapData["city"] != ortMapData["countryname"]) await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["countryname"], ortMapData["latt"]);
     await ChatGroupsDatabase().updateChatGroup(
         "users = JSON_MERGE_PATCH(users, '${json.encode({
           userId: {"newMessages": 0}
@@ -232,6 +234,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
         body: SafeArea(
           child: PageView(
             controller: pageController,
+            physics: NeverScrollableScrollPhysics(),
             onPageChanged: (int page) {
               setState(() {
                 currentPage = page;
@@ -277,11 +280,15 @@ class SliderStepOne extends StatelessWidget {
 
     String userName = _userNameKontroller.text;
     userName = userName.replaceAll("'", "''");
+    bool rightPassword = _passwordController.text == _checkPasswordController.text;
 
     bool userExist =
         await ProfilDatabase().getData("id", "WHERE name = '$userName'");
 
     if(userExist != false){
+      customSnackBar(context, AppLocalizations.of(context)!.benutzerNamevergeben);
+      return false;
+    }else if(!rightPassword){
       customSnackBar(context, AppLocalizations.of(context)!.benutzerNamevergeben);
       return false;
     }
@@ -379,10 +386,12 @@ class SliderStepTwo extends StatelessWidget {
   late CustomDropdownButton _reiseArtenAuswahlBox;
   late CustomMultiTextForm _sprachenAuswahlBox;
   late ChildrenBirthdatePickerBox _childrenAgePickerBox;
+  bool builded = false;
+  Map testLocation = {"city": "Wiesbaden", "countryname": "Deutschland", "longt": 8.239760799999999, "latt": 50.0782184, "adress": "Wiesbaden, Deutschland"};
 
   Map getAllData(){
     return {
-      "location": _ortAuswahlBox.getGoogleLocationData(),
+      "location": testLocation,// _ortAuswahlBox.getGoogleLocationData(),
       "travelTyp": _reiseArtenAuswahlBox.getSelected(),
       "languages": _sprachenAuswahlBox.getSelected(),
       "children": _childrenAgePickerBox.getDates()
@@ -390,7 +399,7 @@ class SliderStepTwo extends StatelessWidget {
   }
 
   bool allFilledAndErrorMsg(context){
-    var ortMapData = _ortAuswahlBox.getGoogleLocationData();
+    var ortMapData = testLocation;//_ortAuswahlBox.getGoogleLocationData();
     bool locationSelected = ortMapData["city"] != null;
     bool travelTypSelected = _reiseArtenAuswahlBox.getSelected().isNotEmpty;
     bool languageSelected = _sprachenAuswahlBox.getSelected().isNotEmpty;
@@ -424,8 +433,9 @@ class SliderStepTwo extends StatelessWidget {
     return allFilled;
   }
 
-  @override
-  Widget build(BuildContext context) {
+  setInputs(context){
+    if(builded) return;
+
     _ortAuswahlBox = GoogleAutoComplete(
       margin: const EdgeInsets.only(top: 10, bottom: 10),
       hintText: AppLocalizations.of(context)!.aktuellenOrtEingeben,
@@ -446,6 +456,13 @@ class SliderStepTwo extends StatelessWidget {
     _childrenAgePickerBox = ChildrenBirthdatePickerBox(
       margin: const EdgeInsets.only(top: 10, bottom: 10),
     );
+
+    builded = true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    setInputs(context);
 
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
@@ -506,6 +523,9 @@ class SliderStepTwo extends StatelessWidget {
 class SliderStepThree extends StatelessWidget {
   final TextEditingController _aboutusKontroller = TextEditingController();
   late CustomMultiTextForm _interessenAuswahlBox;
+  bool builded = false;
+
+  SliderStepThree({super.key});
 
   Map getAllData(){
     return {
@@ -525,16 +545,22 @@ class SliderStepThree extends StatelessWidget {
     return true;
   }
 
-  SliderStepThree({super.key});
+  setInterestInput(context){
+    if(builded) return;
 
-  @override
-  Widget build(BuildContext context) {
     _interessenAuswahlBox = CustomMultiTextForm(
         margin: const EdgeInsets.only(top: 10, bottom: 10),
         hintText: AppLocalizations.of(context)!.interessenAuswaehlen,
         auswahlList: isGerman
             ? global_variablen.interessenListe
             : global_variablen.interessenListeEnglisch);
+
+    builded = true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    setInterestInput(context);
 
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),

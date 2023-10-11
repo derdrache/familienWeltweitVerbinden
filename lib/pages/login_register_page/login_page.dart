@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       } else {
         if (context.mounted) {
-          global_functions.changePageForever(context, OnBoardingSlider());
+          global_functions.changePageForever(context, OnBoardingSlider(withSocialLogin: true,));
         }
       }
     } on FirebaseAuthException catch (error) {
