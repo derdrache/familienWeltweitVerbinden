@@ -792,7 +792,7 @@ class StadtinfoDatabase {
       var sql =
           "familien = JSON_ARRAY_APPEND(familien, '\$', '$userId')";
 
-      var cityInfo = getCityFromHive(cityName: locationDict[location], latt: locationDict["latt"]);
+      var cityInfo = getCityFromHive(cityName: locationDict[location], latt: locationDict["latt"], isCountry: location =="countryname");
       if(cityInfo["familien"].contains(userId)) continue;
 
       if (!cityInfo["interesse"].contains(userId)) {

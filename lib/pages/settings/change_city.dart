@@ -164,13 +164,20 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
         "reisePlanung = '$travelPlans'", "WHERE id = '${ownProfil["id"]}'");
   }
 
+  changeAllDbEntries(locationDict, oldLocationName, oldLocationLatt) async {
+    await StadtinfoDatabase().addFamiliesInCity(locationDict, ownProfil["id"]);
+
+    joindAndRemoveChatGroups(locationDict, oldLocationName, oldLocationLatt);
+    deleteChangeCityNewsSameDay();
+    saveNewsPage(locationDict);
+    notifications.prepareNewLocationNotification();
+
+    deleteOldTravelPlan(locationDict);
+    addVisitedCountries(locationDict["countryname"]);
+  }
+
   save() async {
-    var locationData = {
-      "city": "Germany",
-      "countryname": "Germany",
-      "longt": 10.451526,
-      "latt": 51.165691,
-      "adress": "Germany"};//autoComplete.getGoogleLocationData();
+    var locationData = autoComplete.getGoogleLocationData();
 
     if (locationData["city"] == null) {
       customSnackBar(context, AppLocalizations.of(context)!.ortEingeben);
@@ -185,17 +192,12 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
       "countryname": locationData["countryname"],
     };
 
-    await StadtinfoDatabase().addFamiliesInCity(locationDict, ownProfil["id"]);
     final String oldLocationName = Hive.box("secureBox").get("ownProfil")["ort"];
     final double oldLocationLatt = Hive.box("secureBox").get("ownProfil")["latt"];
-    saveLocation(locationDict);
-    joindAndRemoveChatGroups(locationDict, oldLocationName, oldLocationLatt);
-    deleteChangeCityNewsSameDay();
-    saveNewsPage(locationDict);
-    notifications.prepareNewLocationNotification();
 
-    deleteOldTravelPlan(locationDict);
-    addVisitedCountries(locationDict["countryname"]);
+    saveLocation(locationDict);
+
+    changeAllDbEntries(locationDict, oldLocationName, oldLocationLatt);
 
 
     if (context.mounted){
@@ -209,7 +211,6 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
 
   @override
   Widget build(BuildContext context) {
-    save();
     autoComplete.hintText = AppLocalizations.of(context)!.neuenOrtEingeben;
 
     return Scaffold(
