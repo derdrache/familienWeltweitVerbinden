@@ -217,12 +217,13 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.accountLoeschen,
-              height: 90,
+              height: 180,
               children: [
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 Center(
                     child: Text(
                         AppLocalizations.of(context)!.accountWirklichLoeschen)),
+                SizedBox(height: 30,),
                 WindowConfirmCancelBar(
                   confirmTitle: AppLocalizations.of(context)!.loeschen,
                   onConfirm: (){
