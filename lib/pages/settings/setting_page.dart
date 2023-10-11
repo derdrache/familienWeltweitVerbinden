@@ -242,8 +242,8 @@ class _ProfilSection extends StatelessWidget {
     kinderAgeBox.setSelected(childrenAgeTimestamp);
 
     interessenInputBox.selected = List<String>.from(spracheIstDeutsch
-        ? global_func.changeEnglishToGerman(userProfil["interessen"])
-        : global_func.changeGermanToEnglish(userProfil["interessen"]));
+        ? global_func.changeEnglishToGerman(userProfil["interessen"] ?? [])
+        : global_func.changeGermanToEnglish(userProfil["interessen"] ?? []));
 
     reiseArtInput.selected = spracheIstDeutsch
         ? global_func.changeEnglishToGerman(userProfil["reiseart"])
@@ -371,7 +371,7 @@ class _ProfilSection extends StatelessWidget {
                         : sprachenInputBox.getSelected().join(", "),
                     AppLocalizations.of(context)!.sprachen,
                     ChangeSprachenPage(
-                      selected: sprachenInputBox.getSelected(),
+                      selected: sprachenInputBox.getSelected() ?? [],
                       isGerman: spracheIstDeutsch,
                     )),
                 profilThemeContainer(
@@ -391,7 +391,7 @@ class _ProfilSection extends StatelessWidget {
                         : interessenInputBox.getSelected().join(", "),
                     AppLocalizations.of(context)!.interessen,
                     ChangeInteressenPage(
-                      selected: interessenInputBox.getSelected(),
+                      selected: interessenInputBox.getSelected() ?? [],
                       isGerman: spracheIstDeutsch,
                     )),
 

@@ -115,7 +115,7 @@ changeGermanToEnglish(list){
   var checkList = [];
   var englishList = [];
 
-  if(interessenListe.contains(list[0])) {
+  if(list.length != 0 && interessenListe.contains(list[0])) {
     checkList = interessenListe;
     englishList = interessenListeEnglisch;
   }
