@@ -45,12 +45,15 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
     super.initState();
   }
 
-  joindAndRemoveChatGroups(locationDict, oldLocation, oldLocationLatt) async {
-    final Map leaveCity = getCityFromHive(cityName: oldLocation, latt: oldLocationLatt) ?? {};
-    String chatConnect = "</stadt=${leaveCity["id"]}";
+  joindAndRemoveChatGroups(locationDict, oldLocationDict) async {
+    final Map leaveCity = getCityFromHive(cityName: oldLocationDict["city"], latt: oldLocationDict["latt"]) ?? {};
+    final Map leaveCountry = getCityFromHive(cityName: oldLocationDict["countryname"], latt: oldLocationDict["latt"], isCountry: true) ?? {};
 
     ChatGroupsDatabase().joinAndCreateCityChat(locationDict["city"], locationDict["latt"]);
-    ChatGroupsDatabase().leaveChat(chatConnect);
+    if(locationDict["city"] != locationDict["countryname"]) ChatGroupsDatabase().joinAndCreateCityChat(locationDict["countryname"], locationDict["latt"], isCountry: true);
+
+    ChatGroupsDatabase().leaveChat("</stadt=${leaveCity["id"]}");
+    if(oldLocationDict["city"] != oldLocationDict["countryname"]) ChatGroupsDatabase().leaveChat("</stadt=${leaveCountry["id"]}");
   }
 
   addVisitedCountries(newCountry) async {
@@ -164,10 +167,10 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
         "reisePlanung = '$travelPlans'", "WHERE id = '${ownProfil["id"]}'");
   }
 
-  changeAllDbEntries(locationDict, oldLocationName, oldLocationLatt) async {
+  changeAllDbEntries(locationDict, oldLocationDict) async {
     await StadtinfoDatabase().addFamiliesInCity(locationDict, ownProfil["id"]);
 
-    joindAndRemoveChatGroups(locationDict, oldLocationName, oldLocationLatt);
+    joindAndRemoveChatGroups(locationDict, oldLocationDict);
     deleteChangeCityNewsSameDay();
     saveNewsPage(locationDict);
     notifications.prepareNewLocationNotification();
@@ -191,13 +194,17 @@ class _ChangeLocationPageState extends State<ChangeLocationPage> {
       "latt": locationData["latt"],
       "countryname": locationData["countryname"],
     };
-
-    final String oldLocationName = Hive.box("secureBox").get("ownProfil")["ort"];
-    final double oldLocationLatt = Hive.box("secureBox").get("ownProfil")["latt"];
+    Map ownProfilData = Hive.box("secureBox").get("ownProfil");
+    Map oldLocationDict = {
+      "city": ownProfilData["ort"],
+      "longt": ownProfilData["longt"],
+      "latt": ownProfilData["latt"],
+      "countryname": ownProfilData["land"],
+    };
 
     saveLocation(locationDict);
 
-    changeAllDbEntries(locationDict, oldLocationName, oldLocationLatt);
+    changeAllDbEntries(locationDict, oldLocationDict);
 
 
     if (context.mounted){
