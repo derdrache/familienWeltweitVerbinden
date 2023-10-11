@@ -572,5 +572,6 @@
     "ortNichtBesuchtBody2": "hinzugefügt und möchtest dich wieder entfernen ?",
     "klickForLabel": "Meetuplabel hinzuzufügen",
     "besitzer": "Besitzer",
-    "bewertungAendern": "Bewertung ändern"
+    "bewertungAendern": "Bewertung ändern",
+    "zumLogin": "Zum Login"
 }

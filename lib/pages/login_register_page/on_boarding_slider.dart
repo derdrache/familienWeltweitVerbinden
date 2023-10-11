@@ -221,7 +221,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
         TextButton(
           style: style.textButtonStyle(),
           onPressed: () => isFirstPage ? skip() : back(),
-          child: Text(isFirstPage ? "Skip" : AppLocalizations.of(context)!.zurueck),
+          child: Text(isFirstPage ? AppLocalizations.of(context)!.zumLogin : AppLocalizations.of(context)!.zurueck),
         ),
         Expanded(child: Wrap(alignment: WrapAlignment.center, children: indicators(pages.length, currentPage))),
         if(isLoading) const SizedBox(width: 20, height: 20,child: CircularProgressIndicator()),
