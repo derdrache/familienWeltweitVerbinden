@@ -225,7 +225,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
         ),
         Expanded(child: Wrap(alignment: WrapAlignment.center, children: indicators(pages.length, currentPage))),
         if(isLoading) const SizedBox(width: 20, height: 20,child: CircularProgressIndicator()),
-        if(isLastPage) TextButton(style: style.textButtonStyle(), onPressed: ()=> done(), child: Text(AppLocalizations.of(context)!.fertig)),
+        if(isLastPage && !isLoading) TextButton(style: style.textButtonStyle(), onPressed: ()=> done(), child: Text(AppLocalizations.of(context)!.fertig)),
         if(!isLastPage && !isLoading) TextButton(style: style.textButtonStyle(), onPressed: ()=> next(), child: Text(AppLocalizations.of(context)!.weiter)),
       ],);
     }
