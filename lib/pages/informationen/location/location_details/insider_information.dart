@@ -475,6 +475,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         "title": information["titleEng"],
         "information": information["informationEng"],
         "translated": false,
+        "speaksInformationLanguage" : canSpeakInformationLanguage
       };
     }
     if (information["titleEng"].isEmpty) {
@@ -482,6 +483,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
         "title": information["titleGer"],
         "information": information["informationGer"],
         "translated": false,
+        "speaksInformationLanguage" : canSpeakInformationLanguage
       };
     }
 
@@ -510,6 +512,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
       "title": showTitle,
       "information": showInformation,
       "translated": !usersCityInformationOriginal[index],
+      "speaksInformationLanguage" : canSpeakInformationLanguage
     };
   }
 
@@ -679,7 +682,7 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
                     ),
                     Expanded(
                         child: Center(
-                          child: information["erstelltVon"] != userId
+                          child: information["erstelltVon"] != userId && !informationText["speaksInformationLanguage"]
                               ? TextButton(
                               style: TextButton.styleFrom(
                                 shape: const StadiumBorder(),
