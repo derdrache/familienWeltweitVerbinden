@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:familien_suche/widgets/strike_through_icon.dart';
 import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -414,11 +415,11 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       appBar: CustomAppBar(
         title: AppLocalizations.of(context)!.note,
         buttons: [
-          if (!isNoteOwner && !showOnlyOriginal)
+          if (!showOnlyOriginal)
             IconButton(
                 onPressed: () => changeNoteLanguage(),
                 tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
-                icon: const Icon(Icons.change_circle)),
+                icon: showOriginalText ?  const Icon(Icons.translate ): const StrikeThroughIcon(child: Icon(Icons.translate),)),
           if (!isNoteOwner)
             IconButton(
                 onPressed: () => changePage(
