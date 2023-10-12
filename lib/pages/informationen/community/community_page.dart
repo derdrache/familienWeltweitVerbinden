@@ -23,7 +23,6 @@ class _CommunityPageState extends State<CommunityPage> {
   TextEditingController communitySearchKontroller = TextEditingController();
   FocusNode searchFocusNode = FocusNode();
   int displayDataEntries = 20;
-
   var allCommunities = Hive.box('secureBox').get("communities") ?? [];
   var allCommunitiesCities = [];
   var allCommunitiesCountries = [];
