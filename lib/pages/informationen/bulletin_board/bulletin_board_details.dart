@@ -308,8 +308,10 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
         }
       }
 
+      if(noteImages.isEmpty) return SizedBox.shrink();
+
       return Container(
-        margin: const EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 10),
+        margin: const EdgeInsets.only(left: 0, right: 0, top: 20, bottom: 10),
         child: Wrap(
           children: noteImages
               .map<Widget>((image) => InkWell(
@@ -475,7 +477,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             AutomaticTranslationNotice(
               translated: !showOriginalText,
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             showImages(),
             bottomBar()
           ],
