@@ -1585,6 +1585,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         }
       }
 
+      if(replyMessage["images"].runtimeType == String) replyMessage["images"] = jsonDecode(replyMessage["images"]);
       bool replayContainsImage = (replyMessage["images"] ?? []).isNotEmpty;
       String? cardTyp;
 
