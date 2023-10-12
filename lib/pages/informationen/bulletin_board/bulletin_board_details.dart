@@ -193,6 +193,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   @override
   Widget build(BuildContext context) {
+
     showTitle() {
       String title;
 
@@ -471,7 +472,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             showLocation(),
             showDescription(),
             AutomaticTranslationNotice(
-              translated: !showOnlyOriginal,
+              translated: !showOriginalText,
             ),
             const SizedBox(height: 30),
             showImages(),
