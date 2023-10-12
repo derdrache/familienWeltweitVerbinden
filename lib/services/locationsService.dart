@@ -290,10 +290,10 @@ class LocationService {
     return newWords.join(" ");
   }
 
-  transformCountryLanguage(searchCountry){
+  transformCountryLanguage(searchCountry,{ showOnlyGerman = false, showOnlyEnglisch = false}){
     for (var country in countryGeodata) {
-      if(country["nameGer"] == searchCountry) return country["nameEng"];
-      if(country["nameEng"] == searchCountry) return country["nameGer"];
+      if(country["nameGer"] == searchCountry && !showOnlyGerman) return country["nameEng"];
+      if(country["nameEng"] == searchCountry && !showOnlyEnglisch) return country["nameGer"];
     }
 
     return searchCountry;
