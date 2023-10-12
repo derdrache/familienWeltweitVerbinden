@@ -7,6 +7,7 @@ import '../../../functions/user_speaks_german.dart';
 import '../../../global/variablen.dart' as global_var;
 import '../../../global/global_functions.dart' as global_func;
 import '../../../services/database.dart';
+import '../../../services/locationsService.dart';
 import '../../../widgets/custom_card.dart';
 import '../../../widgets/custom_like_button.dart';
 import 'meetup_details.dart';
@@ -45,6 +46,8 @@ class _MeetupCardState extends State<MeetupCard> {
   late bool onAbsageList;
   late bool onZusageList;
   var shadowColor = Colors.grey.withOpacity(0.8);
+  bool systemIsGerman =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode == "de";
 
   @override
   void initState() {
@@ -288,7 +291,7 @@ class _MeetupCardState extends State<MeetupCard> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(widget.meetupData["land"],
+                        Text(LocationService().transformCountryLanguage(widget.meetupData["land"], showOnlyEnglisch: !systemIsGerman, showOnlyGerman: systemIsGerman),
                             style: TextStyle(fontSize: fontSize, color: Colors.black))
                       ],
                     ),

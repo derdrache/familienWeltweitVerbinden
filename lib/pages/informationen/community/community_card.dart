@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
+import '../../../services/locationsService.dart';
 import '../../../widgets/custom_card.dart';
 import '../../../widgets/custom_like_button.dart';
 import 'community_details.dart';
@@ -18,6 +19,7 @@ class CommunityCard extends StatefulWidget {
   bool isCreator;
   Function? afterFavorite;
   bool smallCard;
+
 
   CommunityCard(
       {Key? key,
@@ -36,6 +38,8 @@ class CommunityCard extends StatefulWidget {
 
 class _CommunityCardState extends State<CommunityCard> {
   var shadowColor = Colors.grey.withOpacity(0.8);
+  bool systemIsGerman =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode == "de";
 
   getCommunityTitle() {
     String? title;
@@ -121,7 +125,7 @@ class _CommunityCardState extends State<CommunityCard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(widget.community["land"],
+                          Text(LocationService().transformCountryLanguage(widget.community["land"], showOnlyEnglisch: !systemIsGerman, showOnlyGerman: systemIsGerman),
                               style: TextStyle(fontSize: fontSize, color: Colors.black))
                         ],
                       ),
