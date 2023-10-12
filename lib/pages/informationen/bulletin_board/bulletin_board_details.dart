@@ -183,8 +183,8 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
   @override
   void initState() {
     isNoteOwner = ownProfil["id"] == widget.note["erstelltVon"];
-    creatorProfil = getProfilFromHive(
-        profilId: widget.note["erstelltVon"]);
+    creatorProfil =
+        getProfilFromHive(profilId: widget.note["erstelltVon"]) ?? {};
 
     checkAndSetTextVariations();
 
@@ -193,7 +193,6 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
 
   @override
   Widget build(BuildContext context) {
-
     showTitle() {
       String title;
 
@@ -241,8 +240,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 children: [
                   Text("${AppLocalizations.of(context)!.ort} ",
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black)),
+                          fontWeight: FontWeight.bold, color: Colors.black)),
                   InkWell(
                     onTap: isWorldwide
                         ? null
@@ -285,8 +283,7 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                   alignment: Alignment.topLeft,
                   child: Text(
                     description,
-                    style: const TextStyle(
-                        color: Colors.black),
+                    style: const TextStyle(color: Colors.black),
                   ))
               : Column(
                   children: [
@@ -325,12 +322,11 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                             elevation: 12,
                             child: image != null
                                 ? CachedNetworkImage(
-                              imageUrl: image,
-                            )
+                                    imageUrl: image,
+                                  )
                                 : IconButton(
-                              onPressed: () => uploadImage(),
-                              icon: const Icon(Icons.upload)
-                            ),
+                                    onPressed: () => uploadImage(),
+                                    icon: const Icon(Icons.upload)),
                           ),
                         ),
                         if (image != null && changeNote)
@@ -357,17 +353,26 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
       );
     }
 
-    bottomBar(){
+    bottomBar() {
       return Center(
         child: Container(
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              InkWell(onTap: () => changePage(
-                  context,
-                  ShowProfilPage(
-                      profil: creatorProfil!)), child: Text(creatorProfil!["name"] ?? "", style: TextStyle(color: Theme.of(context).colorScheme.secondary),))
+              InkWell(
+                  onTap: () {
+                    if (creatorProfil!.isEmpty) return;
+                    changePage(context, ShowProfilPage(profil: creatorProfil!));
+                  },
+                  child: Text(
+                      creatorProfil!["name"] ??
+                          AppLocalizations.of(context)!.geloeschterUser,
+                      style: TextStyle(
+                        color: creatorProfil!["name"] != null
+                            ? Theme.of(context).colorScheme.secondary
+                            : Colors.red,
+                      )))
             ],
           ),
         ),
@@ -386,10 +391,15 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                     child: Text(AppLocalizations.of(context)!
                         .communityWirklichLoeschen)),
                 WindowConfirmCancelBar(
-                  confirmTitle: AppLocalizations.of(context)!.bulletinNoteLoeschen,
+                  confirmTitle:
+                      AppLocalizations.of(context)!.bulletinNoteLoeschen,
                   onConfirm: () async {
                     deleteNote();
-                    changePage(context, StartPage(selectedIndex: 2,));
+                    changePage(
+                        context,
+                        StartPage(
+                          selectedIndex: 2,
+                        ));
                     changePage(context, const BulletinBoardPage());
                   },
                 )
@@ -435,15 +445,17 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
                 tooltip:
                     AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done)),
-          if(isNoteOwner) const SizedBox(
-            width: 10,
-          ),
-          if(isNoteOwner) IconButton(
-              onPressed: () {
-                deleteWindow();
-              },
-              tooltip: AppLocalizations.of(context)!.tooltipNotizLoeschen,
-              icon: const Icon(Icons.delete))
+          if (isNoteOwner)
+            const SizedBox(
+              width: 10,
+            ),
+          if (isNoteOwner)
+            IconButton(
+                onPressed: () {
+                  deleteWindow();
+                },
+                tooltip: AppLocalizations.of(context)!.tooltipNotizLoeschen,
+                icon: const Icon(Icons.delete))
         ],
       ),
       body: Container(
@@ -458,7 +470,9 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
             showTitle(),
             showLocation(),
             showDescription(),
-            AutomaticTranslationNotice(translated: !showOnlyOriginal,),
+            AutomaticTranslationNotice(
+              translated: !showOnlyOriginal,
+            ),
             const SizedBox(height: 30),
             showImages(),
             bottomBar()
