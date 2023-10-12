@@ -43,12 +43,14 @@ class MeetupCardDetails extends StatefulWidget {
   bool isCreator;
   bool isApproved;
   bool isPublic;
+  bool showOriginal;
 
   MeetupCardDetails(
       {Key? key,
       required this.meetupData,
       this.offlineMeetup = true,
-      this.isApproved = false})
+      this.isApproved = false,
+      this.showOriginal = true})
       : isCreator = meetupData["erstelltVon"] == userId,
         isPublic =
             meetupData["art"] == "öffentlich" || meetupData["art"] == "public",
@@ -691,7 +693,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
     meetupBeschreibung() {
       bool meetupIsGerman = widget.meetupData["originalSprache"] == "de";
-      bool showOriginal = (meetupIsGerman && userSpeakGerman) || (!meetupIsGerman && !userSpeakGerman);
       String discription = widget.meetupData["discription"];
 
       return Container(
@@ -722,7 +723,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                                       textInputAction: TextInputAction.newline),
                                   checkAndSaveNewBeschreibung,)
                               : null),
-                      AutomaticTranslationNotice(translated: !showOriginal && !widget.isCreator,),
+                      AutomaticTranslationNotice(translated: !widget.showOriginal && !widget.isCreator,),
                     ],
                   ))));
     }

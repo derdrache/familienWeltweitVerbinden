@@ -56,6 +56,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
   @override
   void initState() {
+    isCreator = widget.meetupData["erstelltVon"] == userId;
     checkAndSetTextVariations();
 
     teilnahme = widget.meetupData["zusage"] == null
@@ -869,6 +870,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             MeetupCardDetails(
               meetupData: copyMeetupData,
               isApproved: isApproved,
+              showOriginal: showOriginalContent,
             ),
             if (isApproved || !isNotPublic) teilnahmeButtonBox(),
           ],
