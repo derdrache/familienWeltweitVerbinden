@@ -14,6 +14,7 @@ import '../../../functions/user_speaks_german.dart';
 import '../../../global/global_functions.dart' as global_func;
 import '../../../global/profil_sprachen.dart';
 import '../../../global/variablen.dart';
+import '../../../services/locationsService.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/automatic_translation_notice.dart';
 import '../../../widgets/layout/ownIconButton.dart';
@@ -73,6 +74,8 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
   bool chooseCurrentLocation = false;
   var ownProfil = Hive.box('secureBox').get("ownProfil");
   late bool userSpeakGerman;
+  bool systemIsGerman =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode == "de";
 
   @override
   void initState() {
@@ -637,7 +640,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     locationInformation() {
       return meetupInformationRow(
           AppLocalizations.of(context)!.ort,
-          widget.meetupData["stadt"] + ", " + widget.meetupData["land"],
+          widget.meetupData["stadt"] + ", " + LocationService().transformCountryLanguage(widget.meetupData["land"], showOnlyEnglisch: !systemIsGerman, showOnlyGerman: systemIsGerman),
           () => openLocationChangeWindow());
     }
 
