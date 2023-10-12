@@ -10,6 +10,7 @@ import '../../../global/global_functions.dart' as global_func;
 import '../../../services/notification.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/layout/ownIconButton.dart';
+import '../../../widgets/strike_through_icon.dart';
 import '../../../widgets/windowConfirmCancelBar.dart';
 import '../../../windows/custom_popup_menu.dart';
 import '../../../windows/dialog_window.dart';
@@ -31,12 +32,12 @@ class MeetupDetailsPage extends StatefulWidget {
   final bool fromMeetupPage;
   final bool toMainPage;
 
-  const MeetupDetailsPage({
-    Key? key,
-    required this.meetupData,
-    this.fromMeetupPage = false,
-    this.toMainPage = false
-  }):super(key: key);
+  const MeetupDetailsPage(
+      {Key? key,
+      required this.meetupData,
+      this.fromMeetupPage = false,
+      this.toMainPage = false})
+      : super(key: key);
 
   @override
   State<MeetupDetailsPage> createState() => _MeetupDetailsPageState();
@@ -48,15 +49,21 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
   late bool isCreator;
   late bool isApproved;
   late bool isNotPublic;
-
+  Map originalContent = {};
+  Map translationContent = {};
+  bool showOriginalContent = false;
+  bool showOnlyOriginal = false;
 
   @override
   void initState() {
+    checkAndSetTextVariations();
 
     teilnahme = widget.meetupData["zusage"] == null
-        ? false : widget.meetupData["zusage"].contains(userId);
-    absage =widget.meetupData["absage"] == null
-        ? false : widget.meetupData["absage"].contains(userId);
+        ? false
+        : widget.meetupData["zusage"].contains(userId);
+    absage = widget.meetupData["absage"] == null
+        ? false
+        : widget.meetupData["absage"].contains(userId);
 
     super.initState();
   }
@@ -83,11 +90,10 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     setState(() {});
 
     prepareMeetupNotification(
-      toId: user,
-      meetupId: meetupId,
-      meetupName: widget.meetupData["name"],
-      typ: "freigegeben"
-    );
+        toId: user,
+        meetupId: meetupId,
+        meetupName: widget.meetupData["name"],
+        typ: "freigegeben");
   }
 
   removeUser(user, windowState) async {
@@ -116,15 +122,13 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                     newOwnerIsInitsiator = true;
                     Navigator.pop(context);
                   },
-                  child: Text(AppLocalizations.of(context)!.ja)
-              ),
+                  child: Text(AppLocalizations.of(context)!.ja)),
               TextButton(
                   onPressed: () {
                     newOwnerIsInitsiator = false;
                     Navigator.pop(context);
                   },
-                  child: Text(AppLocalizations.of(context)!.nein)
-              ),
+                  child: Text(AppLocalizations.of(context)!.nein)),
             ],
             children: const [],
           );
@@ -135,7 +139,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
   takePartDecision(bool confirm) async {
     if (confirm) {
-
       if (!widget.meetupData["interesse"].contains(userId)) {
         widget.meetupData["interesse"].add(userId);
         MeetupDatabase().update(
@@ -143,11 +146,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
             "WHERE id = '${widget.meetupData["id"]}'");
       }
 
-      if(widget.meetupData["absage"].contains(userId)){
+      if (widget.meetupData["absage"].contains(userId)) {
         MeetupDatabase().update(
             "absage = JSON_REMOVE(absage, JSON_UNQUOTE(JSON_SEARCH(absage, 'one', '$userId'))),zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
             "WHERE id = '${widget.meetupData["id"]}'");
-      }else{
+      } else {
         MeetupDatabase().update(
             "zusage = JSON_ARRAY_APPEND(zusage, '\$', '$userId')",
             "WHERE id = '${widget.meetupData["id"]}'");
@@ -158,11 +161,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       widget.meetupData["zusage"].add(userId);
       widget.meetupData["absage"].remove(userId);
     } else {
-      if(widget.meetupData["zusage"].contains(userId)){
+      if (widget.meetupData["zusage"].contains(userId)) {
         MeetupDatabase().update(
             "zusage = JSON_REMOVE(zusage, JSON_UNQUOTE(JSON_SEARCH(zusage, 'one', '$userId'))),absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
             "WHERE id = '${widget.meetupData["id"]}'");
-      }else{
+      } else {
         MeetupDatabase().update(
             "absage = JSON_ARRAY_APPEND(absage, '\$', '$userId')",
             "WHERE id = '${widget.meetupData["id"]}'");
@@ -171,7 +174,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       absage = true;
       widget.meetupData["zusage"].remove(userId);
       widget.meetupData["absage"].add(userId);
-
     }
 
     setState(() {});
@@ -204,30 +206,36 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     }
   }
 
-  deleteMeetup(){
+  deleteMeetup() {
     MeetupDatabase().delete(widget.meetupData["id"]);
 
     dbDeleteImage(widget.meetupData["bild"]);
 
-    global_func.changePage(context, StartPage(selectedIndex: 2,));
+    global_func.changePage(
+        context,
+        StartPage(
+          selectedIndex: 2,
+        ));
     global_func.changePage(context, const MeetupPage());
   }
 
-  sendTakePartNotification(meetupData){
+  sendTakePartNotification(meetupData) {
     prepareMeetupNotification(
-      meetupId: meetupData["id"],
-      toId: meetupData["erstelltVon"],
-      meetupName: meetupData["name"],
-      typ: "takePart"
-    );
+        meetupId: meetupData["id"],
+        toId: meetupData["erstelltVon"],
+        meetupName: meetupData["name"],
+        typ: "takePart");
   }
 
-  openChat(){
-    bool isPrivat = widget.meetupData["art"] == "private" || widget.meetupData["art"] == "privat";
-    bool hasAccsess = widget.meetupData["erstelltAm"] == userId || widget.meetupData["freigegeben"].contains(userId);
+  openChat() {
+    bool isPrivat = widget.meetupData["art"] == "private" ||
+        widget.meetupData["art"] == "privat";
+    bool hasAccsess = widget.meetupData["erstelltAm"] == userId ||
+        widget.meetupData["freigegeben"].contains(userId);
 
-    if(isPrivat && !hasAccsess){
-      customSnackBar(context, AppLocalizations.of(context)!.geheimerChatMeldung);
+    if (isPrivat && !hasAccsess) {
+      customSnackBar(
+          context, AppLocalizations.of(context)!.geheimerChatMeldung);
       return;
     }
 
@@ -240,16 +248,62 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     );
   }
 
-  removeUnknownUser(userId){
+  removeUnknownUser(userId) {
     //Remove user
+  }
+
+  checkAndSetTextVariations() {
+    String systemLanguage =
+        WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+    Map ownProfil = Hive.box('secureBox').get("ownProfil");
+    bool meetupLanguageGerman = widget.meetupData["originalSprache"] == "de";
+    bool userSpeakGerman = getUserSpeaksGerman();
+    bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
+        ownProfil["sprachen"].contains("english") ||
+        systemLanguage == "en";
+    bool bothGerman = meetupLanguageGerman && userSpeakGerman;
+    bool bothEnglish = !meetupLanguageGerman && userSpeakEnglish;
+
+    if (bothGerman || bothEnglish || isCreator) {
+      showOriginalContent = true;
+      showOnlyOriginal = true;
+    }
+
+    if (meetupLanguageGerman) {
+      originalContent["title"] = widget.meetupData["nameGer"];
+      originalContent["description"] = widget.meetupData["beschreibungGer"];
+      translationContent["title"] = widget.meetupData["nameEng"];
+      translationContent["description"] = widget.meetupData["beschreibungEng"];
+    } else {
+      originalContent["title"] = widget.meetupData["nameEng"];
+      originalContent["description"] = widget.meetupData["beschreibungEng"];
+      translationContent["title"] = widget.meetupData["nameGer"];
+      translationContent["description"] = widget.meetupData["beschreibungGer"];
+    }
+  }
+
+  changeLanguage() {
+    setState(() {
+      showOriginalContent = !showOriginalContent;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     isCreator = widget.meetupData["erstelltVon"] == userId;
-    isApproved = isCreator ? true : widget.meetupData["freigegeben"].contains(userId);
-    isNotPublic = widget.meetupData["art"] != "öffentlich" && widget.meetupData["art"] != "public";
+    isApproved =
+        isCreator ? true : widget.meetupData["freigegeben"].contains(userId);
+    isNotPublic = widget.meetupData["art"] != "öffentlich" &&
+        widget.meetupData["art"] != "public";
+    Map copyMeetupData = Map.of(widget.meetupData);
 
+    if (isCreator || showOriginalContent) {
+      copyMeetupData["title"] = originalContent["title"];
+      copyMeetupData["discription"] = originalContent["description"];
+    } else {
+      copyMeetupData["title"] = translationContent["title"];
+      copyMeetupData["discription"] = translationContent["description"];
+    }
 
     deleteMeetupWindow() {
       showDialog(
@@ -259,16 +313,18 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
               title: AppLocalizations.of(context)!.meetupLoeschen,
               height: 200,
               children: [
-                const SizedBox(height: 30,),
+                const SizedBox(
+                  height: 30,
+                ),
                 Center(
                     child: Text(
-                        AppLocalizations
-                            .of(context)!
-                            .meetupWirklichLoeschen)),
-                const SizedBox(height: 30,),
+                        AppLocalizations.of(context)!.meetupWirklichLoeschen)),
+                const SizedBox(
+                  height: 30,
+                ),
                 WindowConfirmCancelBar(
                   confirmTitle: AppLocalizations.of(context)!.loeschen,
-                  onConfirm: (){
+                  onConfirm: () {
                     deleteMeetup();
                   },
                 ),
@@ -287,7 +343,8 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                 height: 380,
                 title: AppLocalizations.of(context)!.meetupMelden,
                 children: [
-                  CustomTextInput(AppLocalizations.of(context)!.meetupMeldenFrage,
+                  CustomTextInput(
+                      AppLocalizations.of(context)!.meetupMeldenFrage,
                       reportController,
                       moreLines: 10),
                   Container(
@@ -295,13 +352,12 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                     child: FloatingActionButton.extended(
                         onPressed: () {
                           Navigator.pop(context);
-                          ReportsDatabase().add(userId,
+                          ReportsDatabase().add(
+                              userId,
                               "Melde Event id: ${widget.meetupData["id"]}",
                               reportController.text);
                         },
-                        label: Text(AppLocalizations
-                            .of(context)!
-                            .senden)),
+                        label: Text(AppLocalizations.of(context)!.senden)),
                   )
                 ]);
           });
@@ -311,11 +367,15 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       return SimpleDialogOption(
         child: Row(
           children: [
-            const Icon(Icons.delete, color: Colors.red,),
+            const Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
             const SizedBox(width: 10),
-            Text(AppLocalizations
-                .of(context)!
-                .meetupLoeschen, style: const TextStyle(color: Colors.red),),
+            Text(
+              AppLocalizations.of(context)!.meetupLoeschen,
+              style: const TextStyle(color: Colors.red),
+            ),
           ],
         ),
         onPressed: () {
@@ -331,9 +391,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           children: [
             const Icon(Icons.report),
             const SizedBox(width: 10),
-            Text(AppLocalizations
-                .of(context)!
-                .meetupMelden),
+            Text(AppLocalizations.of(context)!.meetupMelden),
           ],
         ),
         onPressed: () {
@@ -350,7 +408,8 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       int meetupFreigegebene = widget.meetupData["freigegeben"].length;
       List interestedCleaned = widget.meetupData["interesse"];
 
-      for(var user in widget.meetupData["zusage"] + widget.meetupData["absage"]){
+      for (var user
+          in widget.meetupData["zusage"] + widget.meetupData["absage"]) {
         interestedCleaned.remove(user);
       }
 
@@ -362,24 +421,20 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
               Text("Meetup Info"),
             ],
           ),
-          onPressed: () =>
-              showDialog(
-                  context: context,
-                  builder: (BuildContext buildContext) {
-                    return CustomAlertDialog(
-                        title: "Meetup Information", children: [
+          onPressed: () => showDialog(
+              context: context,
+              builder: (BuildContext buildContext) {
+                return CustomAlertDialog(
+                    title: "Meetup Information",
+                    children: [
                       const SizedBox(height: 10),
                       Text(
-                          AppLocalizations
-                              .of(context)!
-                              .interessierte +
+                          AppLocalizations.of(context)!.interessierte +
                               meetupInteressierte.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       Text(
-                          AppLocalizations
-                              .of(context)!
-                              .zusagen +
+                          AppLocalizations.of(context)!.zusagen +
                               meetupZusagen.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
@@ -389,21 +444,19 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       Text(
-                          AppLocalizations.of(context)!.unsicher
-                              + interestedCleaned.length.toString(),
+                          AppLocalizations.of(context)!.unsicher +
+                              interestedCleaned.length.toString(),
                           style: TextStyle(fontSize: fontsize)),
                       const SizedBox(height: 10),
                       if (isNotPublic)
                         Text(
-                            AppLocalizations
-                                .of(context)!
-                                .freigegeben +
+                            AppLocalizations.of(context)!.freigegeben +
                                 (meetupFreigegebene + 1).toString(),
                             style: TextStyle(fontSize: fontsize)),
                       if (isNotPublic) const SizedBox(height: 10),
                       const SizedBox(height: 10)
                     ]);
-                  }));
+              }));
     }
 
     meetupOptinenDialog() {
@@ -423,47 +476,42 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                 builder: (BuildContext buildContext) {
                   return StatefulBuilder(
                       builder: (buildContext, dialogSetState) {
-                        return CustomAlertDialog(
-                            title: AppLocalizations.of(context)!.meetupOptionen,
+                    return CustomAlertDialog(
+                        title: AppLocalizations.of(context)!.meetupOptionen,
+                        children: [
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                      child: Text(
-                                          AppLocalizations
-                                              .of(context)!
-                                              .immerDabei)),
-                                  Switch(
-                                    value: widget.meetupData["immerZusagen"]
-                                        .contains(userId),
-                                    inactiveThumbColor: Colors.grey[700],
-                                    activeColor:
-                                    Theme
-                                        .of(context)
-                                        .colorScheme
-                                        .primary,
-                                    onChanged: (value) {
-                                      changeImmerZusage(value);
-                                      dialogSetState(() {});
-                                      setState(() {});
-
-                                    },
-                                  )
-                                ],
+                              Expanded(
+                                  child: Text(AppLocalizations.of(context)!
+                                      .immerDabei)),
+                              Switch(
+                                value: widget.meetupData["immerZusagen"]
+                                    .contains(userId),
+                                inactiveThumbColor: Colors.grey[700],
+                                activeColor:
+                                    Theme.of(context).colorScheme.primary,
+                                onChanged: (value) {
+                                  changeImmerZusage(value);
+                                  dialogSetState(() {});
+                                  setState(() {});
+                                },
                               )
-                            ]);
-                      });
+                            ],
+                          )
+                        ]);
+                  });
                 });
           });
     }
 
-    changeOrganisatorWindow() async{
+    changeOrganisatorWindow() async {
       String selectedUserId = await AllUserSelectWindow(
         context: context,
         title: AppLocalizations.of(context)!.personSuchen,
       ).openWindow();
       bool isInitiator = await isOwnerWindow();
-      String selectedUserName = getProfilFromHive(profilId: selectedUserId, getNameOnly: true);
+      String selectedUserName =
+          getProfilFromHive(profilId: selectedUserId, getNameOnly: true);
 
       setState(() {
         widget.meetupData["erstelltVon"] = selectedUserId;
@@ -473,7 +521,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       var myOwnMeetups = Hive.box('secureBox').get("myEvents") ?? [];
       myOwnMeetups.remove(widget.meetupData);
 
-      if (context.mounted){
+      if (context.mounted) {
         customSnackBar(
             context,
             AppLocalizations.of(context)!.meetupUebergebenAn1 +
@@ -493,9 +541,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           children: [
             const Icon(Icons.change_circle),
             const SizedBox(width: 10),
-            Text(AppLocalizations
-                .of(context)!
-                .bestitzerWechseln),
+            Text(AppLocalizations.of(context)!.bestitzerWechseln),
           ],
         ),
         onPressed: () {
@@ -506,8 +552,10 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     }
 
     moreMenu() {
-      bool isRepeating = widget.meetupData["eventInterval"] != global_var.meetupInterval[0] &&
-          widget.meetupData["eventInterval"] != global_var.meetupIntervalEnglisch[0];
+      bool isRepeating =
+          widget.meetupData["eventInterval"] != global_var.meetupInterval[0] &&
+              widget.meetupData["eventInterval"] !=
+                  global_var.meetupIntervalEnglisch[0];
 
       CustomPopupMenu(context, children: [
         if (isApproved || !isNotPublic) meetupDetailsDialog(),
@@ -520,54 +568,47 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     }
 
     teilnahmeButtonBox() {
-      bool isRepeating  = global_var.meetupIntervalEnglisch[0] !=
-          widget.meetupData["eventInterval"]
-          && global_var.meetupInterval[0] != widget.meetupData["eventInterval"];
+      bool isRepeating = global_var.meetupIntervalEnglisch[0] !=
+              widget.meetupData["eventInterval"] &&
+          global_var.meetupInterval[0] != widget.meetupData["eventInterval"];
 
       return Expanded(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if(isRepeating) Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(AppLocalizations
-                  .of(context)!
-                  .immerDabei),
-              Switch(
-                value: widget.meetupData["immerZusagen"].contains(userId),
-                onChanged: (value) {
-                  changeImmerZusage(value);
-                  setState(() {});
-                },)
-            ],),
+            if (isRepeating)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(AppLocalizations.of(context)!.immerDabei),
+                  Switch(
+                    value: widget.meetupData["immerZusagen"].contains(userId),
+                    onChanged: (value) {
+                      changeImmerZusage(value);
+                      setState(() {});
+                    },
+                  )
+                ],
+              ),
             if (teilnahme != true)
               Container(
                 margin: const EdgeInsets.only(left: 10, right: 10),
                 child: FloatingActionButton.extended(
                     heroTag: "teilnehmen",
-                    backgroundColor: Theme
-                        .of(context)
-                        .colorScheme
-                        .primary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     onPressed: () {
                       takePartDecision(true);
                       sendTakePartNotification(widget.meetupData);
                     },
-                    label: Text(AppLocalizations
-                        .of(context)!
-                        .teilnehmen)),
+                    label: Text(AppLocalizations.of(context)!.teilnehmen)),
               ),
             if (absage != true)
               Container(
                 margin: const EdgeInsets.only(left: 10, right: 10),
                 child: FloatingActionButton.extended(
                   heroTag: "Absagen",
-                  backgroundColor: Theme
-                      .of(context)
-                      .colorScheme
-                      .primary,
-                  label: Text(AppLocalizations
-                      .of(context)!
-                      .absage),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  label: Text(AppLocalizations.of(context)!.absage),
                   onPressed: () => takePartDecision(false),
                 ),
               )
@@ -582,7 +623,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       for (var userId in widget.meetupData["freischalten"]) {
         Map? profil = getProfilFromHive(profilId: userId);
 
-        if(profil == null){
+        if (profil == null) {
           userFreischalten(userId, false, windowSetState);
           continue;
         }
@@ -593,19 +634,20 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
               children: [
                 Expanded(
                   child: InkWell(
-                      onTap: () =>
-                          changePage(
-                              context,
-                              ShowProfilPage(
-                                profil: profil,
-                              )),
+                      onTap: () => changePage(
+                          context,
+                          ShowProfilPage(
+                            profil: profil,
+                          )),
                       child: Text(profil["name"])),
                 ),
                 IconButton(
-                    onPressed: () => userFreischalten(userId, true, windowSetState),
+                    onPressed: () =>
+                        userFreischalten(userId, true, windowSetState),
                     icon: const Icon(Icons.check_circle, size: 27)),
                 IconButton(
-                    onPressed: () => userFreischalten(userId, false, windowSetState),
+                    onPressed: () =>
+                        userFreischalten(userId, false, windowSetState),
                     icon: const Icon(
                       Icons.cancel,
                       size: 27,
@@ -619,9 +661,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           padding: const EdgeInsets.only(top: 50),
           child: Center(
             child: Text(
-              AppLocalizations
-                  .of(context)!
-                  .keineFamilienFreigebenVorhanden,
+              AppLocalizations.of(context)!.keineFamilienFreigebenVorhanden,
               style: const TextStyle(color: Colors.grey),
             ),
           ),
@@ -637,7 +677,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
       for (var user in widget.meetupData["freigegeben"]) {
         Map? profil = getProfilFromHive(profilId: user);
 
-        if(profil == null) continue;
+        if (profil == null) continue;
 
         freigeschlatetList.add(Container(
             margin: const EdgeInsets.only(left: 20),
@@ -645,12 +685,11 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
               children: [
                 Expanded(
                   child: InkWell(
-                      onTap: () =>
-                          changePage(
-                              context,
-                              ShowProfilPage(
-                                profil: profil,
-                              )),
+                      onTap: () => changePage(
+                          context,
+                          ShowProfilPage(
+                            profil: profil,
+                          )),
                       child: Text(profil["name"])),
                 ),
                 const Expanded(child: SizedBox(width: 10)),
@@ -669,9 +708,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           padding: const EdgeInsets.only(top: 50),
           child: Center(
             child: Text(
-              AppLocalizations
-                  .of(context)!
-                  .keineFamilienFreigebenVorhanden,
+              AppLocalizations.of(context)!.keineFamilienFreigebenVorhanden,
               style: const TextStyle(color: Colors.grey),
             ),
           ),
@@ -699,9 +736,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                         Container(
                           margin: const EdgeInsets.all(10),
                           child: Text(
-                            AppLocalizations
-                                .of(context)!
-                                .familienFreigeben,
+                            AppLocalizations.of(context)!.familienFreigeben,
                             style: TextStyle(
                                 fontSize: fontsize,
                                 fontWeight: FontWeight.bold),
@@ -722,9 +757,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                         Container(
                           margin: const EdgeInsets.all(10),
                           child: Text(
-                            AppLocalizations
-                                .of(context)!
-                                .freigegebeneFamilien,
+                            AppLocalizations.of(context)!.freigegebeneFamilien,
                             style: TextStyle(
                                 fontSize: fontsize,
                                 fontWeight: FontWeight.bold),
@@ -765,66 +798,76 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
 
     return SelectionArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: "",
+        appBar: CustomAppBar(
+            title: "",
             leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              if(widget.toMainPage){
-                global_func.changePage(context, const MeetupPage());
-              } else{
-                Navigator.of(context).pop();
-              }
-            }
-        ),buttons: [
-          if (isCreator && isNotPublic)
-            FutureBuilder(
-                future: MeetupDatabase().getData(
-                    "freischalten", "WHERE id = '${widget.meetupData["id"]}'"),
-                builder: (context, snap) {
-                  String data = "";
-                  if(snap.data == null || snap.data == false) {
-                    data = "0";
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  if (widget.toMainPage) {
+                    global_func.changePage(context, const MeetupPage());
                   } else {
-                    List snapData = snap.data as List;
-                    data = snapData.length.toString();
+                    Navigator.of(context).pop();
                   }
-
-                  if (data == "0") data = "";
-
-                  return OwnIconButton(
-                    icon: Icons.event_available,
-                    tooltipText: AppLocalizations.of(context)!.tooltipMeetupDetailsVerwaltung,
-                    badgeText: data.toString(),
-                    onPressed: () => userfreischalteWindow(),
-                  );
                 }),
-          OwnIconButton(
-            icon: Icons.message,
-            tooltipText: AppLocalizations.of(context)!.tooltipChatErsteller,
-            onPressed: () => openChat(),
-          ),
-          OwnIconButton(
-            icon: Icons.link,
-            tooltipText: AppLocalizations.of(context)!.tooltipLinkKopieren,
-            onPressed: () {
-              Clipboard.setData(
-                  ClipboardData(text: "</eventId=${widget.meetupData["id"]}"));
+            buttons: [
+              if (isCreator && isNotPublic)
+                FutureBuilder(
+                    future: MeetupDatabase().getData("freischalten",
+                        "WHERE id = '${widget.meetupData["id"]}'"),
+                    builder: (context, snap) {
+                      String data = "";
+                      if (snap.data == null || snap.data == false) {
+                        data = "0";
+                      } else {
+                        List snapData = snap.data as List;
+                        data = snapData.length.toString();
+                      }
 
-              customSnackBar(context, AppLocalizations
-                  .of(context)!
-                  .linkWurdekopiert, color: Colors.green);
-            },
-          ),
-          OwnIconButton(
-            icon:Icons.more_vert,
-            tooltipText: AppLocalizations.of(context)!.tooltipMehrOptionen,
-            onPressed: () => moreMenu(),
-          )
-        ]),
+                      if (data == "0") data = "";
+
+                      return OwnIconButton(
+                        icon: Icons.event_available,
+                        tooltipText: AppLocalizations.of(context)!
+                            .tooltipMeetupDetailsVerwaltung,
+                        badgeText: data.toString(),
+                        onPressed: () => userfreischalteWindow(),
+                      );
+                    }),
+              if(!showOnlyOriginal) IconButton(
+                  onPressed: () => changeLanguage(),
+                  tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
+                  icon: showOriginalContent
+                      ? const Icon(Icons.translate)
+                      : const StrikeThroughIcon(
+                          child: Icon(Icons.translate),
+                        )),
+              OwnIconButton(
+                icon: Icons.message,
+                tooltipText: AppLocalizations.of(context)!.tooltipChatErsteller,
+                onPressed: () => openChat(),
+              ),
+              OwnIconButton(
+                icon: Icons.link,
+                tooltipText: AppLocalizations.of(context)!.tooltipLinkKopieren,
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(
+                      text: "</eventId=${widget.meetupData["id"]}"));
+
+                  customSnackBar(
+                      context, AppLocalizations.of(context)!.linkWurdekopiert,
+                      color: Colors.green);
+                },
+              ),
+              OwnIconButton(
+                icon: Icons.more_vert,
+                tooltipText: AppLocalizations.of(context)!.tooltipMehrOptionen,
+                onPressed: () => moreMenu(),
+              )
+            ]),
         body: Column(
           children: [
             MeetupCardDetails(
-              meetupData: widget.meetupData,
+              meetupData: copyMeetupData,
               isApproved: isApproved,
             ),
             if (isApproved || !isNotPublic) teilnahmeButtonBox(),
@@ -834,5 +877,3 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
     );
   }
 }
-
-

@@ -494,15 +494,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     }
 
     nameInformation() {
-      String title;
-
-      if (widget.isCreator) {
-        title = widget.meetupData["name"];
-      } else if (userSpeakGerman) {
-        title = widget.meetupData["nameGer"];
-      } else {
-        title = widget.meetupData["nameEng"];
-      }
+      String title = widget.meetupData["title"];
 
       return InkWell(
         onTap: () => openChangeWindow(
@@ -700,15 +692,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
     meetupBeschreibung() {
       bool meetupIsGerman = widget.meetupData["originalSprache"] == "de";
       bool showOriginal = (meetupIsGerman && userSpeakGerman) || (!meetupIsGerman && !userSpeakGerman);
-      String discription = "";
-
-      if (widget.isCreator) {
-        discription = widget.meetupData["beschreibung"];
-      } else if (userSpeakGerman) {
-        discription = widget.meetupData["beschreibungGer"];
-      } else {
-        discription = widget.meetupData["beschreibungEng"];
-      }
+      String discription = widget.meetupData["discription"];
 
       return Container(
           margin:

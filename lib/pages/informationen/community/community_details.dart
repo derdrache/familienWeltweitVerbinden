@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math' as math;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:familien_suche/widgets/custom_like_button.dart';
 import 'package:familien_suche/widgets/windowConfirmCancelBar.dart';
@@ -17,6 +16,7 @@ import '../../../services/database.dart';
 import '../../../services/notification.dart';
 import '../../../widgets/automatic_translation_notice.dart';
 import '../../../widgets/custom_appbar.dart';
+import '../../../widgets/strike_through_icon.dart';
 import '../../../windows/custom_popup_menu.dart';
 import '../../../windows/dialog_window.dart';
 import '../../../widgets/google_autocomplete.dart';
@@ -65,9 +65,14 @@ class _CommunityDetailsState extends State<CommunityDetails> {
   late bool isMember;
   List allMemberProfils = [];
   late bool isLiked;
+  Map originalContent = {};
+  Map translationContent = {};
+  bool showOriginalContent = false;
+  bool showOnlyOriginal = false;
 
   @override
   void initState() {
+    isCreator = widget.community["erstelltVon"].contains(userId);
     isLiked = widget.community["interesse"].contains(userId);
 
     createMemberList();
@@ -81,6 +86,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     setCreatorData();
     _initImages();
     _getDBDataSetAllUserNames();
+    checkAndSetTextVariations();
 
     if (!widget.community["link"].contains("http")) {
       widget.community["link"] = "http://${widget.community["link"]}";
@@ -664,6 +670,43 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     );
   }
 
+  checkAndSetTextVariations() {
+    String systemLanguage =
+        WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
+    Map ownProfil = Hive.box('secureBox').get("ownProfil");
+    bool communityLanguageGerman = widget.community["sprache"] == "de";
+    bool userSpeakGerman = getUserSpeaksGerman();
+    bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
+        ownProfil["sprachen"].contains("english") ||
+        systemLanguage == "en";
+    bool bothGerman = communityLanguageGerman && userSpeakGerman;
+    bool bothEnglish = !communityLanguageGerman && userSpeakEnglish;
+
+    if (bothGerman || bothEnglish || isCreator) {
+      showOriginalContent = true;
+      showOnlyOriginal = true;
+    }
+
+    if (communityLanguageGerman) {
+      originalContent["title"] = widget.community["nameGer"];
+      originalContent["description"] = widget.community["beschreibungGer"];
+      translationContent["title"] = widget.community["nameEng"];
+      translationContent["description"] = widget.community["beschreibungEng"];
+    } else {
+      originalContent["title"] = widget.community["nameEng"];
+      originalContent["description"] = widget.community["beschreibungEng"];
+      translationContent["title"] = widget.community["nameGer"];
+      translationContent["description"] = widget.community["beschreibungGer"];
+    }
+
+  }
+
+  changeLanguage() {
+    setState(() {
+      showOriginalContent = !showOriginalContent;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -978,29 +1021,18 @@ class _CommunityDetailsState extends State<CommunityDetails> {
     }
 
     communityInformation() {
-      var fremdeCommunity = widget.community["ownCommunity"] == 0;
-      bool userSpeakGerman = getUserSpeaksGerman();
-      String discription;
-      String title;
-      String locationText = widget.community["ort"];
-      if (widget.community["ort"] != widget.community["land"]) {
-        locationText += " / ${widget.community["land"]}";
-      }
+      bool fremdeCommunity = widget.community["ownCommunity"] == 0;
       bool isWorldwide = widget.community["ort"] == "worldwide"
           || widget.community["ort"]== "Weltweit";
-      bool communityIsGerman = widget.community["sprache"] == "de";
-      bool showOriginal = (communityIsGerman && userSpeakGerman) || (!communityIsGerman && !userSpeakGerman);
+      String title;
+      String discription;
 
-      if (isCreator) {
-
-        title = widget.community["name"];
-        discription = widget.community["beschreibung"];
-      } else if (userSpeakGerman) {
-        title = widget.community["nameGer"];
-        discription = widget.community["beschreibungGer"];
-      } else {
-        title = widget.community["nameEng"];
-        discription = widget.community["beschreibungEng"];
+      if (isCreator || showOriginalContent) {
+        title = originalContent["title"];
+        discription = originalContent["description"];
+      } else{
+        title = translationContent["title"];
+        discription = translationContent["description"];
       }
 
       return [
@@ -1042,7 +1074,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                         fontWeight: FontWeight.bold,
                          decoration: isCreator || isWorldwide ? TextDecoration.none : TextDecoration.underline)),
                 Text(
-                  locationText,
+                  widget.community["ort"],
                   style: TextStyle(decoration: isCreator ? TextDecoration.none : TextDecoration.underline),
                 )
               ],
@@ -1089,7 +1121,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
             withoutActiveHyperLink: isCreator,
             onTextTab: () => isCreator ? _changeBeschreibungWindow() : null,
           ),
-                  AutomaticTranslationNotice(translated: !showOriginal && !isCreator,)
+                  AutomaticTranslationNotice(translated: !showOriginalContent && !isCreator,)
                 ],
               )),
         )
@@ -1149,6 +1181,11 @@ class _CommunityDetailsState extends State<CommunityDetails> {
                 }
             ),
             buttons: [
+              if (!showOnlyOriginal)
+                IconButton(
+                    onPressed: () => changeLanguage(),
+                    tooltip: AppLocalizations.of(context)!.tooltipSpracheWechseln,
+                    icon: showOriginalContent ?  const Icon(Icons.translate ): const StrikeThroughIcon(child: Icon(Icons.translate),)),
               IconButton(
                 icon: const Icon(Icons.chat),
                 tooltip: AppLocalizations.of(context)!.tooltipChatErsteller,
