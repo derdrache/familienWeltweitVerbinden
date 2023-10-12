@@ -573,5 +573,6 @@
     "klickForLabel": "Meetuplabel hinzuzufügen",
     "besitzer": "Besitzer",
     "bewertungAendern": "Bewertung ändern",
-    "zumLogin": "Zum Login"
+    "zumLogin": "Zum Login",
+    "eineOptionMussAusgewaehltSein": "Eine Option muss ausgewählt sein"
 }

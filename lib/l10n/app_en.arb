@@ -577,6 +577,7 @@
     "klickForLabel": "add Meetuplabel",
     "besitzer": "Owner",
     "bewertungAendern": "change rating",
-    "zumLogin": "To login"
+    "zumLogin": "To login",
+    "eineOptionMussAusgewaehltSein": "one option must be selected"
 }
 

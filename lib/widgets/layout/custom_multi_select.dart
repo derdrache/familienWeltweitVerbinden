@@ -1,5 +1,7 @@
+import 'package:familien_suche/widgets/layout/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../global/style.dart' as style;
 
@@ -64,9 +66,19 @@ class _CustomMultiTextFormState extends State<CustomMultiTextForm> {
         buttonText: Text(widget.hintText, style: const TextStyle(color: Colors.grey),),
         chipDisplay: MultiSelectChipDisplay(
           onTap: (value){
-            setState(() {});
-            widget.selected!.remove(value);
+
+            if(widget.selected!.length == 1){
+              customSnackBar(context, AppLocalizations.of(context)!.eineOptionMussAusgewaehltSein);
+              return null;
+            }
+
+
+            setState(() {
+              widget.selected!.remove(value);
+            });
+
             widget.onConfirm!();
+
             return widget.selected;
           },
         ),
