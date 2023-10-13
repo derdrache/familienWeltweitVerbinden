@@ -296,10 +296,31 @@ class ChatDatabase {
 
     _changeNewMessageCounter(messageData["zu"], chatgroupData);
 
-    var isMute = chatgroupData["users"][messageData["zu"]]["mute"] ?? false;
-    var isActive =
-        chatgroupData["users"][messageData["zu"]]["isActive"] ?? false;
-    isActive = isActive == 1 ? true : false;
+    bool isMute = false;
+    bool isActive = false;
+
+    if(chatgroupData["users"][messageData["zu"]] == null) {
+      var userData = {messageData["zu"]: {"newMessages": 0}};
+      var newChatUserData = {
+        ...chatgroupData["users"],
+        ...userData
+      };
+
+      updateChatGroup(
+        "users = '${jsonEncode(newChatUserData)}'",
+        "WHERE id = '$chatId'"
+      );
+
+      var myChats = Hive.box('secureBox').get("myChats");
+      for(var chat in myChats){
+        if(chat["id"] == chatId) chat["users"] = newChatUserData;
+      }
+    }else{
+      isMute = chatgroupData["users"][messageData["zu"]]["mute"] ?? false;
+      var getUserActiveStatus = chatgroupData["users"][messageData["zu"]]["isActive"] ?? false;
+      isActive = getUserActiveStatus == 1 ? true : false;
+    }
+
 
     if (!isMute && !isActive) {
       prepareChatNotification(
