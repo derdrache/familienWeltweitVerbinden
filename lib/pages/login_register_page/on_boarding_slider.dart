@@ -311,13 +311,12 @@ class SliderStepOne extends StatelessWidget {
                 AppLocalizations.of(context)!.benutzername,
                 _userNameKontroller,
                 maxLength: 40,
-                margin: const EdgeInsets.only(top: 10),
+                margin: const EdgeInsets.only(top: 10, bottom: 10),
                 validator: global_functions.checkValidatorEmpty(context, username: true)),
             if(!withSocialLogin) const Text(
               "Email",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10,),
             if(!withSocialLogin )CustomTextInput(
               "Email",
               _emailController,
