@@ -16,9 +16,10 @@ double calculateDistance(lat1, lon1, lat2, lon2){
   return 12742 * asin(sqrt(a));
 }
 
-checkValidatorEmpty(context) {
+checkValidatorEmpty(context, {username = false}) {
   return (value){
     if(value == null || value.isEmpty){
+      if(username) return AppLocalizations.of(context)!.benutzernameEingeben;
       return AppLocalizations.of(context)!.diesesFeldAusfuellen;
     }
     return null;
