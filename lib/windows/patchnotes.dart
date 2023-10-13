@@ -56,6 +56,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch200D),
                   _patch(patch1103D),
                   _patch(patch1102D),
                   _patch(patch1101D),
@@ -91,6 +92,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch200E),
                   _patch(patch1103E),
                   _patch(patch1102E),
                   _patch(patch1101E),
@@ -138,6 +140,50 @@ var patchVorlage={
 
   ]
 };
+
+var patch200E={
+  "title" : "2.0.0 - 21.10.2023",
+  "inhalt": [
+    "Group chat direct translation - The messages are now displayed directly translated if you do not speak the language (device language or specified in the profile)",
+    "Bulletin board - Everything can be placed here as notes, which has nowhere else to fit and should be findable for longer",
+    "Rating system places - All places and countries can now be rated",
+    "Layout heavily revised",
+    "Insert pictures - Pictures can now be shared in chat and insider info",
+    "Insider Info World Map - There is now a quick filter for the insider info on the world map",
+    "Meetup Notification - It is now possible to accept or cancel in the Meetup reminder notification",
+    "Registration process has been revised",
+    "Apple Login has been added",
+    "World Map - the large filter option now offers even more options (twins, single child, multi-child family)"
+        "Profile enhancement - all languages are now available for selection and interests have been expanded to include: 'Bitcoin, Single Parent'"
+        "More donation options have been added",
+    "Tooltips - All buttons now have a tooltip",
+    "Email Notifications completely removed",
+    "many more improvements",
+    "many more bug fixes"
+  ]
+};
+var patch200D={
+  "title" : "2.0.0 - 21.10.2023",
+  "inhalt": [
+    "Gruppenchat Direktübersetzung - Die Nachrichten werden jetzt direkt übersetzt angezeigt, falsch du die Sprache nicht sprichst (Gerätsprache oder im Profil angegeben)",
+    "Schwarzes Brett - Hier kann alles als Notizen platziert werden, was sonst nirgends Platz findet und für länger auffindbar sein soll",
+    "Bewertungssystem Orte - Es können jetzt alle Orte und Länder bewertet werden",
+    "Layout stark überarbeitet",
+    "Bilder einfügen - Im Chat und in den Insiderinformationen können jetzt Bilder geteilt werden",
+    "Insiderinfo Weltkarte - Auf der Weltkarte gibt es jetzt ein Schnellfilter für die Insiderinfos",
+    "Meetup Notification - Es ist jetzt Möglich in der Erinnerungs-Benachrichtigung für das Meetup zuzusagen oder abzusagen",
+    "Registrierungsprozess wurde überarbeitet",
+    "Apple Login wurde hinzugefügt",
+    "Weltkarte - die große Filter Option biete nun noch mehr Möglichkeiten (Zwillinge, Einzelkind, Mehrkind-Familie)"
+    "Profil Erweiterung - Es stehen jetzt alle Sprachen zur Auswahl und die Interessen wurden um folgendes erweitert: 'Bitcoin, Alleinerziehend'"
+    "weitere Spendenoptionen wurden hinzugefügt",
+    "Tooltips - Alle Buttons haben jetzt ein Tooltip",
+    "Email Notifications komplett entfernt",
+    "viele weitere Verbesserungen",
+    "viele weitere Fehlerbehebungen"
+  ]
+};
+
 var patch1103E={
   "title" : "1.10.3 - 31.07.2023",
   "inhalt": [
