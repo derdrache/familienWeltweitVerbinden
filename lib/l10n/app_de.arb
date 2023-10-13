@@ -516,7 +516,6 @@
     "bereitsMitglied": "Bereits Mitglied? ",
     "anmelden": "Anmelden",
     "accountErstellen": "Account erstellen",
-    "accountErstellenInfo": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
     "persoenlicheDaten": "Persönliche Daten",
     "woSeidIhrImMoment": "Wo seid ihr im Moment ?",
     "wieSeidIhrUnterwegs": "Wie seid ihr unterwegs ?",
@@ -525,8 +524,6 @@
     "infoZumAlterDerKinder": "Das genaue Datum deiner Kinder wird nicht öffentlich gezeigt, es dient nur zur Berechnung des angezeigten Alters",
     "welcheThemenInteressierenEuch": "Welche Themen interessieren euch ?",
     "beschreibungEuererFamilie": "Beschreibung eurer Familie - optional",
-    "informationRegisterStepTwo": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
-    "informationRegisterStepThree": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
     "weiter": "Weiter",
     "fertig": "Fertig",
     "zurueck": "Zurück",
@@ -574,5 +571,7 @@
     "besitzer": "Besitzer",
     "bewertungAendern": "Bewertung ändern",
     "zumLogin": "Zum Login",
-    "eineOptionMussAusgewaehltSein": "Eine Option muss ausgewählt sein"
+    "eineOptionMussAusgewaehltSein": "Eine Option muss ausgewählt sein",
+    "standortHinweis": "Bei deinem Standort ist es dir überlassen wie genau du sein möchtest. Am ungenausten ist das Land und am genausten Stadt/Dorf",
+    "profilErstellenGreeting": "Schön das du ein Mitglied der families worldwide community werden möchtest.\nDas Profil erstellen wird ~3 min dauern."
 }

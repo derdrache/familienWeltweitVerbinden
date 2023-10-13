@@ -28,7 +28,7 @@
     "geburtsdatumEingeben": "Enter the child's date of birth",
     "genauenStandortWaehlen": "Please select the exact location",
     "profilErstellen": "Create profile",
-    "benutzername" : "User name",
+    "benutzername" : "Username",
     "aktuellenOrtEingeben": "Enter current location",
     "anzahlUndAlterKinder": "number and ages of children:",
     "emailNichtBestaetigt": "E-mail has not yet been confirmed",
@@ -519,7 +519,6 @@
     "bereitsMitglied": "Already a member ? ",
     "anmelden": "Sign in",
     "accountErstellen": "Create Account",
-    "accountErstellenInfo": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
     "persoenlicheDaten": "Personal data",
     "woSeidIhrImMoment": "Where are you at the moment ?",
     "wieSeidIhrUnterwegs": "How are you traveling ?",
@@ -528,8 +527,6 @@
     "infoZumAlterDerKinder": "The exact date of your children is not shown publicly, it is only used to calculate the displayed age",
     "welcheThemenInteressierenEuch": "What topics are you interested in ?",
     "beschreibungEuererFamilie": "Description of your family - optional",
-    "informationRegisterStepTwo": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
-    "informationRegisterStepThree": "Hier könnte ein wenig erklärung zum dem profil erstellen stehen",
     "weiter": "Next",
     "fertig": "Done",
     "zurueck": "Back",
@@ -577,7 +574,9 @@
     "klickForLabel": "add Meetuplabel",
     "besitzer": "Owner",
     "bewertungAendern": "change rating",
-    "zumLogin": "To login",
-    "eineOptionMussAusgewaehltSein": "one option must be selected"
+    "zumLogin": "to login",
+    "eineOptionMussAusgewaehltSein": "one option must be selected",
+    "standortHinweis": "With your location, it's up to you how accurate you want to be. The country is the least accurate and the city/village the most accurate.",
+    "profilErstellenGreeting": "Nice that you want to become a member of families worldwide community.\nThe profile creation will take ~3 min."
 }
 

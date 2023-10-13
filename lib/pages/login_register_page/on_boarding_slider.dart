@@ -66,7 +66,6 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
     if(currentPage == 0) newProfilData.addAll(sliderStepOne.getAllData());
     if(currentPage == 1) newProfilData.addAll(sliderStepTwo.getAllData());
 
-
     currentPage += 1;
     pageController.jumpToPage(currentPage);
   }
@@ -302,11 +301,7 @@ class SliderStepOne extends StatelessWidget {
                       fontSize: 20, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(
-              height: 10,
-            ),
-            Text(AppLocalizations.of(context)!.accountErstellenInfo),
-            const SizedBox(
-              height: 20,
+              height: 30,
             ),
             Text(
               AppLocalizations.of(context)!.benutzername,
@@ -462,17 +457,14 @@ class SliderStepTwo extends StatelessWidget {
                 const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       ),
       const SizedBox(
-        height: 10,
-      ),
-      Text(AppLocalizations.of(context)!.informationRegisterStepTwo),
-      const SizedBox(
-        height: 20,
+        height: 30,
       ),
       Text(
         AppLocalizations.of(context)!.woSeidIhrImMoment,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       _ortAuswahlBox,
+      Text(AppLocalizations.of(context)!.standortHinweis),
       const SizedBox(
         height: 10,
       ),
@@ -558,11 +550,7 @@ class SliderStepThree extends StatelessWidget {
               const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
     ),
     const SizedBox(
-      height: 10,
-    ),
-    Text(AppLocalizations.of(context)!.informationRegisterStepThree),
-    const SizedBox(
-      height: 20,
+      height: 30,
     ),
     Text(
       AppLocalizations.of(context)!.welcheThemenInteressierenEuch,
