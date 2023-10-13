@@ -521,13 +521,12 @@ class _ChatPageState extends State<ChatPage>{
 
           if (group["connected"].contains("event")) {
             chatData = getMeetupFromHive(connectedId);
-
             chatName = chatData["name"];
           } else if (group["connected"].contains("community")) {
             chatData = getCommunityFromHive(connectedId);
             chatName = chatData["name"];
           } else if (group["connected"].contains("stadt")) {
-            chatData = Map.of(getCityFromHive(cityId: connectedId));
+            chatData = Map.of(getCityFromHive(cityId: connectedId) ?? {});
             chatName = chatData["ort"];
             var cityImage = chatData["bild"].isEmpty
                 ? Hive.box('secureBox').get("allgemein")["cityImage"]
