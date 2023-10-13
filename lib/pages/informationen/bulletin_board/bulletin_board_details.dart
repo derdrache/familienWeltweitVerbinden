@@ -389,7 +389,6 @@ class _BulletinBoardDetailsState extends State<BulletinBoardDetails> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.bulletinNoteLoeschen,
-              height: 120,
               children: [
                 Center(
                     child: Text(AppLocalizations.of(context)!

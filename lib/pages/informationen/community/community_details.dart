@@ -489,7 +489,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
             title: AppLocalizations.of(context)!.beschreibungAendern,
-            height: 400,
             children: [
               CustomTextInput(
                   AppLocalizations.of(context)!.neueBeschreibungEingeben,
@@ -764,7 +763,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.communityLoeschen,
-              height: 200,
               children: [
                 const SizedBox(height: 30,),
                 Center(
@@ -800,7 +798,6 @@ class _CommunityDetailsState extends State<CommunityDetails> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-                height: 380,
                 title: AppLocalizations.of(context)!.communityMelden,
                 children: [
                   CustomTextInput(

@@ -404,7 +404,6 @@ class _AppBarState extends State<_AppBar> {
               title: isFriend
                   ? AppLocalizations.of(context)!.freundHinzufuegen
                   : AppLocalizations.of(context)!.freundEntfernen,
-              height: 120,
               children: [
                 Center(
                     child: Text(isFriend
@@ -540,7 +539,6 @@ class _AppBarState extends State<_AppBar> {
                 context: context,
                 builder: (BuildContext buildContext) {
                   return CustomAlertDialog(
-                    height: 380,
                     title: AppLocalizations.of(context)!.benutzerMelden,
                     children: [
                       CustomTextInput(

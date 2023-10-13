@@ -351,7 +351,6 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
                   context: context,
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
-                        height: 500,
                         title: AppLocalizations.of(context)!.informationMeetupArt,
                         children: [
                           const SizedBox(height: 10),

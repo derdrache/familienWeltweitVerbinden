@@ -99,7 +99,6 @@ class AllUserSelectWindow {
         context: context,
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
-            height: 600,
             title: title,
             children: [
               searchAutocomplete,

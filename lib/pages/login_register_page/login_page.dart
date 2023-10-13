@@ -239,7 +239,6 @@ class _LoginPageState extends State<LoginPage> {
                 context: context,
                 builder: (BuildContext buildContext) {
                   return CustomAlertDialog(
-                      height: 390,
                       title: AppLocalizations.of(context)!.hilfe,
                       children: [
                         TextField(

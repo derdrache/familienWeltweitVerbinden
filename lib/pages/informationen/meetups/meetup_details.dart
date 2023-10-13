@@ -312,7 +312,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.meetupLoeschen,
-              height: 200,
               children: [
                 const SizedBox(
                   height: 30,
@@ -341,7 +340,6 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-                height: 380,
                 title: AppLocalizations.of(context)!.meetupMelden,
                 children: [
                   CustomTextInput(

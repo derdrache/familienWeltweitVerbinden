@@ -437,7 +437,7 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
       showDialog(
           context: context,
           builder: (BuildContext buildContext) {
-            return CustomAlertDialog(title: title, height: height, children: [
+            return CustomAlertDialog(title: title, children: [
               inputWidget,
               WindowConfirmCancelBar(
                 confirmTitle: AppLocalizations.of(context)!.speichern,
@@ -605,7 +605,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
 
               return CustomAlertDialog(
                   title: AppLocalizations.of(context)!.meetupStadtAendern,
-                  height: 400,
                   children: [
                     ortAuswahlBox,
                     Container(
@@ -815,43 +814,6 @@ class _MeetupCardDetailsState extends State<MeetupCardDetails> {
                   title: AppLocalizations.of(context)!.tagsChange,
                   children: [
                     tagSelection
-
-                    /*
-                    const SizedBox(height: 20),
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Container(
-                        width: 250,
-                        decoration: BoxDecoration(
-                            border: Border.all(width: 1),
-                            borderRadius: const BorderRadius.all(Radius.circular(style.roundedCorners))
-                        ),
-                        child: DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                                hint: Center(
-                                    child: Text(AppLocalizations.of(context)!
-                                        .tagHinzufuegen)),
-                                isExpanded: true,
-                                items: tagItems.map((String item) {
-                                  return DropdownMenuItem(
-                                    value: item,
-                                    child: Text(item),
-                                  );
-                                }).toList(),
-                                onChanged: (newValue) async {
-                                  saveTag(newValue);
-                                  setStateMeetupTagWindow(() {});
-                                  setState(() {});
-                                })),)
-                    ]),
-                    const SizedBox(height: 20),
-                    Container(
-                        margin: const EdgeInsets.all(5),
-                        child: Wrap(
-                          children: createChangeableMeetupTags(
-                              setStateMeetupTagWindow),
-                        ))
-
-                     */
                   ]);
             });
           });
@@ -1072,7 +1034,6 @@ class _ShowDatetimeBoxState extends State<ShowDatetimeBox> {
         builder: (BuildContext buildContext) {
           return CustomAlertDialog(
               title: AppLocalizations.of(context)!.meetupDatumAendern,
-              height: 300,
               children: [
                 const SizedBox(height: 20),
                 changeWindowMainButtons(),
@@ -1405,7 +1366,6 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                   context: context,
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
-                        height: 500,
                         title:
                             AppLocalizations.of(context)!.informationMeetupArt,
                         children: [
@@ -1514,7 +1474,6 @@ class _MeetupArtButtonState extends State<MeetupArtButton> {
                   builder: (BuildContext buildContext) {
                     return CustomAlertDialog(
                         title: AppLocalizations.of(context)!.meetupArtAendern,
-                        height: 200,
                         children: [
                           meetupArtInformation(),
                           meetupTypInput,

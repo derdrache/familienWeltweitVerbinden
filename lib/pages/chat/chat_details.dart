@@ -597,7 +597,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             builder: (BuildContext context) {
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.nachrichtLoeschen,
-                height: 100,
                 children: [
                   Center(
                       child: Text(AppLocalizations.of(context)!
@@ -2062,7 +2061,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             return StatefulBuilder(builder: (ontext, setState) {
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.chatLoeschen,
-                height: 150,
                 children: [
                   Center(
                       child: Text(
@@ -2122,7 +2120,6 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.gruppeVerlassen,
-              height: 180,
               children: [
                 const SizedBox(height: 10,),
                 Center(

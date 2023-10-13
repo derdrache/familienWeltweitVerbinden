@@ -259,7 +259,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           context: context,
           builder: (BuildContext buildContext) {
             return CustomAlertDialog(
-              height: 600,
               title: AppLocalizations.of(context)!.member,
               children: allMemberName,
             );
@@ -272,7 +271,6 @@ class _FamilieProfilPageState extends State<FamilieProfilPage> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.familyProfilloeschen,
-              height: 110,
               children: [
                 Center(
                     child: Text(

@@ -253,7 +253,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
                   title: AppLocalizations.of(context)!.informationAendern,
-                  height: MediaQuery.of(context).size.height * 0.9,
                   children: [
                     CustomTextInput(AppLocalizations.of(context)!.titel,
                         titleTextKontroller),
@@ -390,7 +389,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             builder: (BuildContext context) {
               return CustomAlertDialog(
                 title: AppLocalizations.of(context)!.informationLoeschen,
-                height: 100,
                 children: [
                   const SizedBox(height: 10),
                   Center(
@@ -426,7 +424,6 @@ class _InsiderInformationPageState extends State<InsiderInformationPage> {
             context: context,
             builder: (BuildContext buildContext) {
               return CustomAlertDialog(
-                  height: 500,
                   title: AppLocalizations.of(context)!.informationMelden,
                   children: [
                     CustomTextInput("", reportTextKontroller,

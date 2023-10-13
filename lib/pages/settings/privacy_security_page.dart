@@ -192,7 +192,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: "Accountid zum löschen eingeben",
-              height: 150,
               actions: [
                 TextButton(
                   child: const Text("Ok"),
@@ -217,7 +216,6 @@ class _PrivacySecurityPageState extends State<PrivacySecurityPage> {
           builder: (BuildContext context) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.accountLoeschen,
-              height: 180,
               children: [
                 const SizedBox(height: 20),
                 Center(

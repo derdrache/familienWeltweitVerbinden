@@ -258,7 +258,6 @@ class _ChatPageState extends State<ChatPage>{
           return StatefulBuilder(builder: (context, setState) {
             return CustomAlertDialog(
               title: AppLocalizations.of(context)!.chatLoeschen,
-              height: countSelected == 1 && !isChatGroup ? 150 : 100,
               children: [
                 Center(
                     child: Text(countSelected == 1
