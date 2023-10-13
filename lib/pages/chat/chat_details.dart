@@ -1419,7 +1419,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       }
     }
 
-    normalMessageNew(int index, Map message, Map messageBoxInformation,
+    normalMessage(int index, Map message, Map messageBoxInformation,
         {additionChild}) {
       Map creatorData = getProfilFromHive(profilId: message["von"]) ?? {};
       String creatorName =
@@ -1566,13 +1566,13 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    cardMessageNew(String cardType, cardIdData, {smallCard = false}) {
+    cardMessage(String cardType, cardIdData, {smallCard = false}) {
       Map? cardData = getCardData(cardIdData);
       if (cardData == null) return Container();
       return _getDisplayedCard(cardType, cardData, smallCard: smallCard);
     }
 
-    responseMessageNew(responseId) {
+    responseMessage(responseId) {
       Map replyMessage = {};
       int replyIndex = 0;
 
@@ -1634,7 +1634,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
                       width: 150,
                       height: 150),
                 if (cardTyp != null)
-                  cardMessageNew(cardTyp,
+                  cardMessage(cardTyp,
                       _getCardIdDataFromMessage(replyMessage["message"]),
                       smallCard: true),
                 if (!replayContainsImage && cardTyp == null)
@@ -1649,7 +1649,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
         );
     }
 
-    imageMessageNew(image) {
+    imageMessage(image) {
       return InkWell(
         onTap: () => ImageFullscreen(context, image),
         child: CachedNetworkImage(
@@ -1660,7 +1660,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
       );
     }
 
-    forwardMessageNew(message) {
+    forwardMessage(message) {
       Map forwardProfil =
           getProfilFromHive(profilId: message["forward"].split(":")[1]);
       bool messageContainsImage = message["images"].isNotEmpty;
@@ -1682,9 +1682,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 5),
-          if (messageContainsImage) imageMessageNew(message["images"][0]),
+          if (messageContainsImage) imageMessage(message["images"][0]),
           if (cardTyp != null)
-            cardMessageNew(
+            cardMessage(
                 cardTyp, _getCardIdDataFromMessage(message["message"]))
         ],
       );
@@ -1692,21 +1692,21 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
     getAdditionChild(Map message) {
       if (message["forward"].isNotEmpty) {
-        return forwardMessageNew(message);
+        return forwardMessage(message);
       } else if (message["message"].contains("</eventId=")) {
-        return cardMessageNew(
+        return cardMessage(
             "event", _getCardIdDataFromMessage(message["message"]));
       } else if (message["message"].contains("</communityId=")) {
-        return cardMessageNew(
+        return cardMessage(
             "community", _getCardIdDataFromMessage(message["message"]));
       } else if (message["message"].contains("</cityId=")) {
-        return cardMessageNew(
+        return cardMessage(
             "location", _getCardIdDataFromMessage(message["message"]));
       } else if (int.parse(message["responseId"]) != 0) {
-        return responseMessageNew(message["responseId"]);
+        return responseMessage(message["responseId"]);
       } else if (message["message"].contains("</images") &&
           message["images"].isNotEmpty) {
-        return imageMessageNew(message["images"][0]);
+        return imageMessage(message["images"][0]);
       }
     }
 
@@ -1774,7 +1774,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
           oldMessageDate = messageDate;
         }
 
-        messageBox.add(normalMessageNew(
+        messageBox.add(normalMessage(
             globalMessageIndex, message, messageBoxInformation,
             additionChild: getAdditionChild(message)));
 
