@@ -275,7 +275,7 @@ class SliderStepOne extends StatelessWidget {
       customSnackBar(context, AppLocalizations.of(context)!.benutzerNamevergeben);
       return false;
     }else if(!rightPassword){
-      customSnackBar(context, AppLocalizations.of(context)!.benutzerNamevergeben);
+      customSnackBar(context, AppLocalizations.of(context)!.passwortStimmtNichtUeberein);
       return false;
     }
 
