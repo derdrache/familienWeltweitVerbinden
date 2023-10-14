@@ -163,10 +163,19 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
     return profil;
   }
 
+  joinWorldChat(userId) async {
+    await ChatGroupsDatabase().updateChatGroup(
+        "users = JSON_MERGE_PATCH(users, '${json.encode({
+          userId: {"newMessages": 0}
+        })}')",
+        "WHERE id = 1");
+  }
+
   additionalDatabaseOperations(ortMapData, userId) async {
     await StadtinfoDatabase().addFamiliesInCity(ortMapData, userId);
 
     await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["city"], ortMapData["latt"]);
+    joinWorldChat(userId);
     if(ortMapData["city"] != ortMapData["countryname"]) await ChatGroupsDatabase().joinAndCreateCityChat(ortMapData["countryname"], ortMapData["latt"], isCountry: true);
 
     await refreshHiveMeetups();
@@ -210,7 +219,7 @@ class _OnBoardingSliderState extends State<OnBoardingSlider> {
           child: Text(isFirstPage ? AppLocalizations.of(context)!.zumLogin : AppLocalizations.of(context)!.zurueck),
         ),
         Expanded(child: Wrap(alignment: WrapAlignment.center, children: indicators(pages.length, currentPage))),
-        if(isLoading) const SizedBox(width: 20, height: 20,child: CircularProgressIndicator()),
+        if(isLoading) Container(margin: const EdgeInsets.only(right: 10), child: const SizedBox(width: 20, height: 20,child: CircularProgressIndicator())),
         if(isLastPage && !isLoading) TextButton(style: style.textButtonStyle(), onPressed: ()=> done(), child: Text(AppLocalizations.of(context)!.fertig)),
         if(!isLastPage && !isLoading) TextButton(style: style.textButtonStyle(), onPressed: ()=> next(), child: Text(AppLocalizations.of(context)!.weiter)),
       ],);
