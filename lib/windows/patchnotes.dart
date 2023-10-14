@@ -145,7 +145,7 @@ var patch200E={
   "title" : "2.0.0 - 21.10.2023",
   "inhalt": [
     "Group chat direct translation - The messages are now displayed directly translated if you do not speak the language (device language or specified in the profile)",
-    "Bulletin board - Everything can be placed here as notes, which has nowhere else to fit and should be findable for longer",
+    "Bulletin board - Everything can be placed here as notes, which doesn't fit anywhere else and should be findable for a longer time",
     "Rating system places - All places and countries can now be rated",
     "Layout heavily revised",
     "Insert pictures - Pictures can now be shared in chat and insider info",
@@ -154,8 +154,8 @@ var patch200E={
     "Registration process has been revised",
     "Apple Login has been added",
     "World Map - the large filter option now offers even more options (twins, single child, multi-child family)"
-        "Profile enhancement - all languages are now available for selection and interests have been expanded to include: 'Bitcoin, Single Parent'"
-        "More donation options have been added",
+    "Profile enhancement - all languages are now available for selection and interests have been expanded to include: 'Bitcoin, Single Parent'"
+    "More donation options have been added",
     "Tooltips - All buttons now have a tooltip",
     "Email Notifications completely removed",
     "many more improvements",
@@ -165,19 +165,19 @@ var patch200E={
 var patch200D={
   "title" : "2.0.0 - 21.10.2023",
   "inhalt": [
-    "Gruppenchat Direktübersetzung - Die Nachrichten werden jetzt direkt übersetzt angezeigt, falsch du die Sprache nicht sprichst (Gerätsprache oder im Profil angegeben)",
+    "Gruppenchat Direktübersetzung - Die Nachrichten werden jetzt direkt übersetzt angezeigt, falls du die Sprache nicht sprichst (Gerätsprache oder im Profil angegeben)",
     "Schwarzes Brett - Hier kann alles als Notizen platziert werden, was sonst nirgends Platz findet und für länger auffindbar sein soll",
     "Bewertungssystem Orte - Es können jetzt alle Orte und Länder bewertet werden",
     "Layout stark überarbeitet",
     "Bilder einfügen - Im Chat und in den Insiderinformationen können jetzt Bilder geteilt werden",
-    "Insiderinfo Weltkarte - Auf der Weltkarte gibt es jetzt ein Schnellfilter für die Insiderinfos",
+    "Insiderinfo Weltkarte - Auf der Weltkarte gibt es jetzt einen Schnellfilter für die Insiderinfos",
     "Meetup Notification - Es ist jetzt Möglich in der Erinnerungs-Benachrichtigung für das Meetup zuzusagen oder abzusagen",
     "Registrierungsprozess wurde überarbeitet",
     "Apple Login wurde hinzugefügt",
-    "Weltkarte - die große Filter Option biete nun noch mehr Möglichkeiten (Zwillinge, Einzelkind, Mehrkind-Familie)"
+    "Weltkarte - die große Filter Option bietet nun noch mehr Möglichkeiten (Zwillinge, Einzelkind, Mehrkind-Familie)"
     "Profil Erweiterung - Es stehen jetzt alle Sprachen zur Auswahl und die Interessen wurden um folgendes erweitert: 'Bitcoin, Alleinerziehend'"
     "weitere Spendenoptionen wurden hinzugefügt",
-    "Tooltips - Alle Buttons haben jetzt ein Tooltip",
+    "Tooltips - Alle Buttons haben jetzt einen Tooltip",
     "Email Notifications komplett entfernt",
     "viele weitere Verbesserungen",
     "viele weitere Fehlerbehebungen"
