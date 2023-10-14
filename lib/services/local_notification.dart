@@ -20,8 +20,8 @@ class LocalNotificationService{
           priority: Priority.high,
 
           actions: !withMeetupAction ? null : <AndroidNotificationAction>[
-            const AndroidNotificationAction('id_1', 'MeetupZusagen'),
-            const AndroidNotificationAction('id_2', 'MeetupAbsagen'),
+            const AndroidNotificationAction('id_1', 'MeetupZusagen', showsUserInterface: true,),
+            const AndroidNotificationAction('id_2', 'MeetupAbsagen', showsUserInterface: true,),
           ]
         ),
         iOS: const DarwinNotificationDetails()
