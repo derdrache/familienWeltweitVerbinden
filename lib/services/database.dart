@@ -484,9 +484,10 @@ class ChatGroupsDatabase {
     var date = DateTime.now().millisecondsSinceEpoch;
 
     messageData["message"] = messageData["message"].replaceAll("'", "\\'");
+    messageData["translateMessage"] = messageData["translateMessage"].replaceAll("'", "\\'");
 
     var url = Uri.parse(databaseUrl + databasePathChatGroupNewMessage);
-    await http.post(url,
+    var test = await http.post(url,
         body: json.encode({
           "chatId": chatId,
           "date": date,
@@ -498,6 +499,8 @@ class ChatGroupsDatabase {
           "translateMessage": messageData["translateMessage"],
           "images": jsonEncode(messageData["images"]),
         }));
+
+    print(test.body);
 
     _addNotificationCounterAndSendNotification(
         messageData, chatgroupData, chatGroupName);
