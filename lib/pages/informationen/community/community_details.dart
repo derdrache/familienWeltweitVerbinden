@@ -1171,7 +1171,7 @@ class _CommunityDetailsState extends State<CommunityDetails> {
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
                   if(widget.toMainPage ?? false){
-                    global_func.changePage(context, const CommunityPage());
+                    global_func.changePage(context, const CommunityPage(toInformationPage: true,));
                   } else{
                     Navigator.of(context).pop();
                   }

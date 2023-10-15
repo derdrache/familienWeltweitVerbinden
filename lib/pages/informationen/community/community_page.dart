@@ -2,16 +2,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../../global/global_functions.dart' as global_func;
 
 import '../../../global/global_functions.dart';
 import '../../../services/database.dart';
 import '../../../services/locationsService.dart';
 import '../../../widgets/custom_appbar.dart';
+import '../../start_page.dart';
 import 'community_card.dart';
 import 'community_erstellen.dart';
 
 class CommunityPage extends StatefulWidget {
-  const CommunityPage({Key? key}) : super(key: key);
+  final bool toInformationPage;
+
+  const CommunityPage({Key? key, this.toInformationPage = false}) : super(key: key);
 
   @override
   State<CommunityPage> createState() => _CommunityPageState();
@@ -213,13 +217,19 @@ class _CommunityPageState extends State<CommunityPage> {
     return Scaffold(
       appBar: CustomAppBar(
         title: "$onSearchText Communities",
-        leading: onSearch
+        leading: onSearch || widget.toInformationPage
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
-                  setState(() {
-                    onSearch = false;
-                  });
+                  if(widget.toInformationPage){
+                    global_func.changePageForever(
+                        context, StartPage(selectedIndex: 2));
+                    return;
+                  } else{
+                    setState(() {
+                      onSearch = false;
+                    });
+                  }
                 },
                 tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
               )

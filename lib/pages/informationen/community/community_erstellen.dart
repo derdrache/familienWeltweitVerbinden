@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:familien_suche/pages/informationen/community/community_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -13,6 +14,7 @@ import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../widgets/nutzerrichtlinen.dart';
+import '../../start_page.dart';
 import 'community_details.dart';
 import '../../../widgets/google_autocomplete.dart';
 
@@ -184,11 +186,9 @@ class _CommunityErstellenState extends State<CommunityErstellen> {
                 onPressed: () async {
                   var communityData = await saveCommunity();
 
-                  if (context.mounted){
-                    Navigator.pop(context);
                     global_func.changePage(
                         context, CommunityDetails(community: communityData, toMainPage: true,));
-                  }
+
                 },
                 tooltip: AppLocalizations.of(context)!.tooltipEingabeBestaetigen,
                 icon: const Icon(Icons.done, size: 30))
