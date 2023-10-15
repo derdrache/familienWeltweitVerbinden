@@ -166,8 +166,12 @@ class ProfilDatabase {
     );
 
     StadtinfoDatabase().update(
-        "members = JSON_REMOVE(familien, JSON_UNQUOTE(JSON_SEARCH(familien, 'one', '$userId')))",
+        "familien = JSON_REMOVE(familien, JSON_UNQUOTE(JSON_SEARCH(familien, 'one', '$userId')))",
         "WHERE JSON_CONTAINS(familien, '\"$userId\"') > 0");
+
+    StadtinfoDatabase().update(
+        "interesse = JSON_REMOVE(interesse, JSON_UNQUOTE(JSON_SEARCH(interesse, 'one', '$userId')))",
+        "WHERE JSON_CONTAINS(interesse, '\"$userId\"') > 0");
 
     if(userId == FirebaseAuth.instance.currentUser?.uid){
       Hive.box("secureBox").deleteFromDisk();
