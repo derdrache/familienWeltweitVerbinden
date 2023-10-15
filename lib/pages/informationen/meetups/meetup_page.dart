@@ -7,15 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 
-import '../../../global/global_functions.dart';
+
+import '../../../global/global_functions.dart' as global_func;
 import '../../../services/locationsService.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../../widgets/layout/badge_widget.dart';
+import '../../start_page.dart';
 import 'meetup_card.dart';
 import 'meetup_erstellen.dart';
 
 class MeetupPage extends StatefulWidget {
-  const MeetupPage({Key? key}) : super(key: key);
+  final bool toInformationPage;
+
+  const MeetupPage({Key? key, this.toInformationPage = false}) : super(key: key);
 
   @override
   State<MeetupPage> createState() => _MeetupPageState();
@@ -143,13 +147,18 @@ class _MeetupPageState extends State<MeetupPage> {
           title: onSearch
               ? "${AppLocalizations.of(context)!.suche} Meetups"
               : "Meetups",
-          leading: onSearch
+          leading: onSearch || widget.toInformationPage
               ? IconButton(
                   icon: const Icon(Icons.arrow_back),
                   onPressed: () {
-                    setState(() {
-                      onSearch = false;
-                    });
+                    if(widget.toInformationPage){
+                      global_func.changePageForever(
+                          context, StartPage(selectedIndex: 2));
+                    }else{
+                      setState(() {
+                        onSearch = false;
+                      });
+                    }
                   },
                   tooltip:
                       MaterialLocalizations.of(context).openAppDrawerTooltip,
@@ -195,7 +204,7 @@ class _MeetupPageState extends State<MeetupPage> {
               heroTag: "create meetup",
               tooltip: AppLocalizations.of(context)!.tooltipMeetupErstellen,
               child: const Icon(Icons.create),
-              onPressed: () => changePage(context, const MeetupErstellen())),
+              onPressed: () => global_func.changePage(context, const MeetupErstellen())),
           const SizedBox(height: 10),
           FloatingActionButton(
             mini: onSearch ? true : false,

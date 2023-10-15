@@ -14,7 +14,6 @@ import '../../../widgets/strike_through_icon.dart';
 import '../../../widgets/windowConfirmCancelBar.dart';
 import '../../../windows/custom_popup_menu.dart';
 import '../../../windows/dialog_window.dart';
-import '../../../widgets/layout/custom_dropdown_button.dart';
 import '../../../widgets/layout/custom_snackbar.dart';
 import '../../../widgets/layout/custom_text_input.dart';
 import '../../../services/database.dart';
@@ -803,7 +802,7 @@ class _MeetupDetailsPageState extends State<MeetupDetailsPage> {
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   if (widget.toMainPage) {
-                    global_func.changePage(context, const MeetupPage());
+                    global_func.changePage(context, const MeetupPage(toInformationPage: true,));
                   } else {
                     Navigator.of(context).pop();
                   }

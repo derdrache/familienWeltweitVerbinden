@@ -90,7 +90,7 @@ class _MeetupErstellenState extends State<MeetupErstellen> {
         interval == global_var.meetupIntervalEnglisch[2];
   }
 
-  saveMeetup() async {
+  saveMeetup() {
     var locationData = ortAuswahlBox.getGoogleLocationData();
     var uuid = const Uuid();
     var meetupId = uuid.v4();
