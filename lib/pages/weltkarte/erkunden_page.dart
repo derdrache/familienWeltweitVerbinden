@@ -107,6 +107,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
       ? PlatformDispatcher.instance.locale.languageCode == "de"
       : Platform.localeName == "de_DE";
   var hiveProfils = List.of(Hive.box('secureBox').get("profils") ?? []);
+  bool systemIsGerman =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode == "de";
 
   @override
   void initState() {
@@ -1141,8 +1143,8 @@ class _ErkundenPageState extends State<ErkundenPage> {
                 "${infoData["ort"]}",
                 overflow: TextOverflow.ellipsis,
               ),
-              Text(
-                "${infoData["land"]}",
+              if(!infoData["ort"].contains(infoData["land"])) Text(
+                LocationService().transformCountryLanguage(infoData["land"], showOnlyEnglisch: !systemIsGerman, showOnlyGerman: systemIsGerman),
                 overflow: TextOverflow.ellipsis,
               ),
             ],
