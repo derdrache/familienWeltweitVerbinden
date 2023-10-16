@@ -412,9 +412,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     groupText = groupText.replaceAll("'", "''");
 
     if (widget.isChatgroup) {
-      ChatGroupsDatabase().updateChatGroup(
-          "lastMessage = '$groupText' , lastMessageDate = '${messageData["date"]}'",
-          "WHERE id = '${widget.groupChatData!["id"]}'");
+
 
       var translateMessage = await translator.translate(messageData["message"]);
       var languageCode = translateMessage.sourceLanguage.code;
@@ -425,6 +423,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
 
       messageData["language"] = languageCode;
       messageData["translateMessage"] = translateMessage.text;
+
+      ChatGroupsDatabase().updateChatGroup(
+          "lastMessage = '$groupText', "
+              "lastMessageTranslate = '${messageData["translateMessage"].replaceAll("'", "''")}', "
+              "lastMessageDate = '${messageData["date"]}', sprache = '${messageData["language"]}'",
+          "WHERE id = '${widget.groupChatData!["id"]}'");
 
       await ChatGroupsDatabase().addNewMessageAndNotification(
           widget.groupChatData!["id"], messageData, connectedData["name"]);
@@ -766,22 +770,49 @@ class _ChatDetailsPageState extends State<ChatDetailsPage>
     setState(() {});
   }
 
-  _saveEditMessage() {
+  _saveEditMessage() async {
+
     for (var message in messages) {
       if (message["id"] == messageExtraInformationId) {
         message["message"] = nachrichtController.text;
         message["editDate"] = DateTime.now();
       }
     }
+    String normalText = nachrichtController.text.replaceAll("'", "''");
 
     if (widget.isChatgroup) {
+      var translateMessage = await translator.translate(nachrichtController.text);
+      var languageCode = translateMessage.sourceLanguage.code;
+      if (languageCode == "auto") {
+        translateMessage =
+            await translator.translate(nachrichtController.text, to: "de");
+      }
+
+      String translationText = translateMessage.text.replaceAll("'", "''");
+
       ChatGroupsDatabase().updateMessage(
-          "message = '${nachrichtController.text}', editDate = '${DateTime.now()}'",
+          "message = '$normalText', "
+              "translateMessage = '$translationText', "
+              "editDate = '${DateTime.now()}'",
           "WHERE id = '$messageExtraInformationId'");
+
+      var lastMessage = messages.last;
+
+      if(lastMessage["id"]== messageExtraInformationId){
+        ChatGroupsDatabase().updateChatGroup("lastMessage = '$normalText', lastMessageTranslate = '$translationText'", "WHERE id = '${widget.chatId}'");
+      }
     } else {
+      String text = nachrichtController.text.replaceAll("'", "''");
+
       ChatDatabase().updateMessage(
-          "message = '${nachrichtController.text}', editDate = '${DateTime.now()}'",
+          "message = '$text', editDate = '${DateTime.now()}'",
           "WHERE id = '$messageExtraInformationId'");
+
+      var lastMessage = messages.last;
+
+      if(lastMessage["id"] == messageExtraInformationId){
+        ChatDatabase().updateChatGroup("lastMessage = '$text'", "WHERE id = '${widget.chatId}'");
+      }
     }
   }
 
