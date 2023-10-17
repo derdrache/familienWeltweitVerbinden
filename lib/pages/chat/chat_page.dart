@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
+import '../../functions/user_speaks_german.dart';
 import '../../global/global_functions.dart';
 import '../../global/style.dart';
 import '../../services/database.dart';
@@ -49,6 +50,8 @@ class _ChatPageState extends State<ChatPage>{
   var searchTextKontroller = TextEditingController();
   var searchListMyGroups = [];
   var searchListAllChatgroups = [];
+  String systemLanguage =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode;
 
   @override
   void initState() {
@@ -593,7 +596,24 @@ class _ChatPageState extends State<ChatPage>{
           if(isBlocked) continue;
         }
 
-        var lastMessage = cutMessage(group["lastMessage"] ?? "");
+        bool userSpeakGerman = getUserSpeaksGerman();
+        bool userSpeakEnglish = ownProfil["sprachen"].contains("Englisch") ||
+            ownProfil["sprachen"].contains("english") ||
+            systemLanguage == "en";
+        bool lastMessageIsGerman = group["sprache"] == "de";
+        bool bothGerman = lastMessageIsGerman && userSpeakGerman;
+        bool bothEnglish = !lastMessageIsGerman && userSpeakEnglish;
+        String selectedLastMessage = group["lastMessage"];
+
+        if(bothGerman || bothEnglish || group["lastMessageTranslate"] == null || group["lastMessageTranslate"].isEmpty){
+          selectedLastMessage = group["lastMessage"];
+        }else{
+
+          selectedLastMessage = group["lastMessageTranslate"];
+        }
+
+
+        var lastMessage = cutMessage(selectedLastMessage ?? "");
         var ownChatNewMessages =
             users[userId] != null ? users[userId]["newMessages"] : 0;
 
