@@ -50,6 +50,7 @@ class _NewsPageState extends State<NewsPage> {
 
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await refreshHiveProfils();
       await refreshHiveNewsPage();
       setState(() {});
     });
