@@ -260,7 +260,6 @@ setOrientation() async {
 refreshHiveData() async {
   String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-  await refreshHiveNewsPage();
   await refreshHiveCommunities();
   await refreshHiveStadtInfo();
   await refreshHiveStadtInfoUser();
@@ -269,7 +268,6 @@ refreshHiveData() async {
 
   if(userId == null) return;
 
-  await refreshHiveProfils();
   await refreshHiveChats();
   await refreshHiveMeetups();
 }
