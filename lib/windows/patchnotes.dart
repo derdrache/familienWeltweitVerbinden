@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import 'dialog_window.dart';
 
-
 class PatchnotesWindow{
   var context;
   var patchnotesTitle = "Patchnotes";
@@ -131,7 +130,6 @@ class PatchnotesWindow{
         });
 
   }
-
 }
 
 var patchVorlage={
