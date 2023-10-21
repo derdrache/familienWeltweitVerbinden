@@ -577,6 +577,7 @@
     "zumLogin": "to login",
     "eineOptionMussAusgewaehltSein": "one option must be selected",
     "standortHinweis": "With your location, it's up to you how accurate you want to be. The country is the least accurate and the city/village the most accurate.",
-    "profilErstellenGreeting": "Nice that you want to become a member of families worldwide community.\nThe profile creation will take ~3 min."
+    "profilErstellenGreeting": "Nice that you want to become a member of families worldwide community.\nThe profile creation will take ~3 min.",
+    "entfernen": "remove"
 }
 

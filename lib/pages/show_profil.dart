@@ -359,7 +359,6 @@ class _AppBarState extends State<_AppBar> {
     ProfilDatabase().updateProfil(
         "friendlist = '${jsonEncode(userFriendlist)}'", "WHERE id = '$userId'");
 
-    Navigator.pop(context);
     setState(() {});
   }
 
@@ -410,7 +409,7 @@ class _AppBarState extends State<_AppBar> {
                         ? "${AppLocalizations.of(context)!.freundEntfernen1} $_userName ${AppLocalizations.of(context)!.freundEntfernen2}"
                         : "${AppLocalizations.of(context)!.freundHinzufuegen1} $_userName ${AppLocalizations.of(context)!.freundHinzufuegen2}")),
                 WindowConfirmCancelBar(
-                  confirmTitle: AppLocalizations.of(context)!.hinzufuegen,
+                  confirmTitle: isFriend ? AppLocalizations.of(context)!.entfernen : AppLocalizations.of(context)!.hinzufuegen,
                   onConfirm: () => changeFriendStatus(isFriend),
                 )
               ],
