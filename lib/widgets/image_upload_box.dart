@@ -92,8 +92,8 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
           child: Stack(
             children: [
               Container(
-                width: 80,
-                height: 80,
+                width: 75,
+                height: 75,
                 margin: const EdgeInsets.all(5),
                 child: Card(
                   elevation: 12,
@@ -127,7 +127,7 @@ class _ImageUploadBoxState extends State<ImageUploadBox> {
 
       return Container(
         margin: const EdgeInsets.all(5),
-        child: Wrap(children: imageWidgets),
+        child: Center(child: Wrap(children: imageWidgets)),
       );
     }
 
