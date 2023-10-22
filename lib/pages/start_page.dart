@@ -292,7 +292,7 @@ class _StartPageState extends State<StartPage> with WidgetsBindingObserver{
     DateTime? oldShowDonationDate = Hive.box("secureBox").get("donationDate") == null
         ? null
         : DateTime.parse(Hive.box("secureBox").get("donationDate"));
-    Map donationInfo = await AllgemeinDatabase().getData("donationTextGer,, donationTextEng, donationDate", "");
+    Map donationInfo = await AllgemeinDatabase().getData("donationTextGer, donationTextEng, donationDate", "");
     DateTime donationDate = DateTime.parse(donationInfo["donationDate"]);
 
     if(oldShowDonationDate == null){
