@@ -55,6 +55,7 @@ class PatchnotesWindow{
               title: patchnotesTitle,
               children: isGerman
                 ? [
+                  _patch(patch201D),
                   _patch(patch200D),
                   _patch(patch1103D),
                   _patch(patch1102D),
@@ -91,6 +92,7 @@ class PatchnotesWindow{
                   _patch(patch1D),
                 ]
                 :[
+                  _patch(patch201E),
                   _patch(patch200E),
                   _patch(patch1103E),
                   _patch(patch1102E),
@@ -134,6 +136,18 @@ class PatchnotesWindow{
 
 var patchVorlage={
   "title" : "",
+  "inhalt": [
+
+  ]
+};
+
+var patch201E={
+  "title" : "2.0.1 - xx.11.2023",
+  "inhalt": [
+
+  ]
+};var patch201D={
+  "title" : "2.0.1 - xx.11.2023",
   "inhalt": [
 
   ]
