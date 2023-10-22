@@ -4,9 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../global/style.dart' as style;
+import '../functions/user_speaks_german.dart';
 
-donationWindow(BuildContext context, {infoText = ""}) {
+donationWindow(BuildContext context, {infoTextGer = "", infoTextEng = ""}) {
+  String infoText = infoTextEng;
+  bool systemIsGerman =
+      WidgetsBinding.instance.platformDispatcher.locales[0].languageCode == "de";
+  bool userSpeakGerman = getUserSpeaksGerman();
+
+  if(systemIsGerman || userSpeakGerman) infoText = infoTextGer;
 
   openKoFi() async {
     Uri url = Uri.parse("https://ko-fi.com/devdrache");
